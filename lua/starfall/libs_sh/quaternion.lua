@@ -21,9 +21,10 @@ return function(instance)
 
 local checktype = instance.CheckType
 local quat_methods, quat_meta, qwrap, unwrap = instance.Types.Quaternion.Methods, instance.Types.Quaternion, instance.Types.Quaternion.Wrap, instance.Types.Quaternion.Unwrap
-local ent_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
-local ang_methods, ang_meta, awrap, aunwrap = instance.Types.Angle.Methods, instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local ent_methods = instance.Types.Entity.Methods
+local ang_methods, awrap, aunwrap = instance.Types.Angle.Methods, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_methods, vec_meta, vwrap, vunwrap = instance.Types.Vector.Methods, instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local mwrap = instance.Types.VMatrix.Wrap
 local math_library = instance.Libraries.math
 
 local function wrap(tbl)
@@ -88,6 +89,15 @@ local function quatLog(q)
 			return { math_log(len), 0, 0, 0 }
 		end
 	end
+end
+
+local function quatNorm(q)
+	local len = math_sqrt(q[1] * q[1] + q[2] * q[2] + q[3] * q[3] + q[4] * q[4])
+	return { q[1] / len, q[2] / len, q[3] / len, q[4] / len }
+end
+
+local function quatDot(lhs, rhs)
+	return lhs[1] * rhs[1] + lhs[2] * rhs[2] + lhs[3] * rhs[3] + lhs[4] * rhs[4]
 end
 
 local function quatFromAngle(ang)
@@ -475,34 +485,47 @@ function quat_methods:mod()
 	end
 end
 
-function quat_methods:getSlerp(quat, t)
-	checkluatype(t, TYPE_NUMBER)
+function quat_methods:getNormalized()
+	return wrap(quatNorm(unwrap(self)))
+end
+
+function quat_methods:normalize()
+	local len = math_sqrt(self[1] * self[1] + self[2] * self[2] + self[3] * self[3] + self[4] * self[4])
+	self[1] = self[1] / len
+	self[2] = self[2] / len
+	self[3] = self[3] / len
+	self[4] = self[4] / len
+end
+
+function quat_methods:dot(quat)
 	quat = unwrap(quat)
-	
-	local len = self[1] * self[1] + self[2] * self[2] + self[3] * self[3] + self[4] * self[4]
-	if len == 0 then
-		return wrap({ 0, 0, 0, 0})
-	else
-		local dot = self[1] * quat[1] + self[2] * quat[2] + self[3] * quat[3] + self[4] * quat[4]
-		local new
-		if dot < 0 then
-			new = { -quat[1], -quat[2], -quat[3], -quat[4] }
-		else
-			new = quat
-		end
-		
-		local inv = { self[1] / len, -self[2] / len, -self[3] / len, -self[4] / len }
-		local log = quatLog(quatMul(inv, new))
-		local q = quatExp({ log[1] * t, log[2] * t, log[3] * t, log[4] * t })
-		
-		return wrap(quatMul(self, q))
-	end
+	return quatDot(self, quat)
 end
 
 -------------------------------------
 
 function quat_methods:getVector()
 	return vwrap(Vector(self[2], self[3], self[4]))
+end
+
+-- normalize: true = same as Q:getNormalized():getMatrix() // credits: https://stackoverflow.com/a/1556470
+function quat_methods:getMatrix(normalize)
+	local quat
+	if normalize then
+		checkluatype(normalize, BOOL)
+		quat = quatNorm(self)
+	else
+		quat = unwrap(self)
+	end
+	
+	local w, x, y, z = quat[1], quat[2], quat[3], quat[4]
+	
+	return mwrap(Matrix({
+		{ 1 - 2*y*y - 2*z*z,	2*x*y - 2*z*w,		2*x*z + 2*y*w,		0 },
+		{ 2*x*y + 2*z*w,		1 - 2*x*y - 2*z*z,	2*y*z - 2*x*w,		0 },
+		{ 2*x*z - 2*y*w,		2*y*z + 2*x*w,		1 - 2*x*x - 2*y*y,	0 },
+		{ 0,					0,					0,					0 }
+	}))
 end
 
 -- quat_lib.rotationEulerAngle(q)
@@ -648,17 +671,16 @@ function ent_methods:getQuaternion()
 end
 
 function math_library.slerpQuaternion(from, to, t)
-	checkluatype(t, TYPE_NUMBER)
 	quat1 = unwrap(from)
 	quat2 = unwrap(to)
+	checkluatype(t, TYPE_NUMBER)
 	
 	local len = quat1[1] * quat1[1] + quat1[2] * quat1[2] + quat1[3] * quat1[3] + quat1[4] * quat1[4]
 	if len == 0 then
 		return wrap({ 0, 0, 0, 0})
 	else
-		local dot = quat1[1] * quat2[1] + quat1[2] * quat2[2] + quat1[3] * quat2[3] + quat1[4] * quat2[4]
 		local new
-		if dot < 0 then
+		if quatDot(quat1, quat2) < 0 then
 			new = { -quat2[1], -quat2[2], -quat2[3], -quat2[4] }
 		else
 			new = quat2
@@ -671,6 +693,26 @@ function math_library.slerpQuaternion(from, to, t)
 		return wrap(quatMul(quat1, q))
 	end
 end
+
+-- TEST
+function math_library.nlerpQuaternion(from, to, t)
+	quat1 = unwrap(from)
+	quat2 = unwrap(to)
+	checkluatype(t, TYPE_NUMBER)
+		
+	local t1 = 1 - t
+	local new
+	if quatDot(quat1, quat2) < 0 then
+		new = { quat1[1] * t1 - quat2[1] * t, quat1[2] * t1 - quat2[2] * t, quat1[3] * t1 - quat2[3] * t, quat1[4] * t1 - quat2[4] * t }
+	else
+		new = { quat1[1] * t1 + quat2[1] * t, quat1[2] * t1 + quat2[2] * t, quat1[3] * t1 + quat2[3] * t, quat1[4] * t1 + quat2[4] * t }
+	end
+	
+	return wrap(quatNorm(new))
+end
+
+
+
 
 end
 
@@ -687,9 +729,11 @@ V Meta events
 V Better name for qMod
 V math.slerpQuaternion
 V Replace rad2deg -> math.deg; deg2rad -> math.rad
+V Make quatDot (qdot) and quatNormalize (qNorm) function
+V Get rid of the unused parts of imported libs
 Documentation
 Credits
-Compare all the calculations to E2 to ensure that there were no mistakes during original Starfall rewrite
+Compare all the calculations to E2 to ensure that there were no mistakes during original Starfall rewrite - SOMETHING IS WRONG WITH nlerpQuaternion! maybe due to quatDot or quatNorm
 Translate Fizyk's applyTorque example to SF
 Blackmain Divran to test this
 Remove quaternions.txt
