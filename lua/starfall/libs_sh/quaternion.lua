@@ -1,7 +1,7 @@
 local checkluatype = SF.CheckLuaType
 local dgetmeta = debug.getmetatable
 
---- Quaternion object
+--- Quaternion type. Recently reworked library, for full changelist visit: https://github.com/thegrb93/StarfallEx/pull/953
 -- @name Quaternion
 -- @class type
 -- @libtbl quat_methods
@@ -46,9 +46,8 @@ local math_min = math.min
 local math_acos = math.acos
 local math_clamp = math.Clamp
 local math_max = math.max
-
-local deg2rad = math.pi / 180
-local rad2deg = 180 / math.pi
+local math_rad = math.rad
+local math_deg = math.deg
 
 -- Following helper functions are strictly operating on tables, so be sure to wrap the return value
 
@@ -92,9 +91,9 @@ local function quatLog(q)
 end
 
 local function quatFromAngle(ang)
-	local p = ang[1] * deg2rad * 0.5
-	local y = ang[2] * deg2rad * 0.5
-	local r = ang[3] * deg2rad * 0.5
+	local p = math_rad(ang[1]) * 0.5
+	local y = math_rad(ang[2]) * 0.5
+	local r = math_rad(ang[3]) * 0.5
 	
 	local qr = { math_cos(r), math_sin(r), 0, 0 }
 	local qp = { math_cos(p), 0, math_sin(p), 0 }
@@ -104,9 +103,9 @@ local function quatFromAngle(ang)
 end
 
 local function quatFromAngleComponents(p, y, r)
-	p = p * deg2rad * 0.5
-	y = y * deg2rad * 0.5
-	r = r * deg2rad * 0.5
+	p = math_rad(p) * 0.5
+	y = math_rad(y) * 0.5
+	r = math_rad(r) * 0.5
 	
 	local qr = { math_cos(r), math_sin(r), 0, 0 }
 	local qp = { math_cos(p), 0, math_sin(p), 0 }
@@ -527,7 +526,7 @@ function quat_methods:getEulerAngle()
 		local yaw = Vector(0, 1, 0)
 		yaw:Rotate(Angle(0, ang[1], 0))
 		
-		ang[3] = math_acos(math_clamp(y:Dot(yaw), -1, 1)) * rad2deg
+		ang[3] = math_deg(math_acos(math_clamp(y:Dot(yaw), -1, 1)))
 		local dot = q1 * q2 + q3 * q4
 		if dot < 0 then
 			ang[3] = -ang[3]
@@ -538,12 +537,13 @@ function quat_methods:getEulerAngle()
 end
 
 -- full: true = [0..360]; false = [-180..180]
+-- quat_lib.rotationAngle(q)
 function quat_methods:getRotationAngle(full)
 	local len = self[1] * self[1] + self[2] * self[2] + self[3] * self[3] + self[4] * self[4]
 	if len == 0 then
 		return 0
 	else
-		local ang = 2 * math_acos(math_clamp(self[1] / math_sqrt(len), -1, 1)) * rad2deg
+		local ang = math_deg(2 * math_acos(math_clamp(self[1] / math_sqrt(len), -1, 1)))
 		
 		if full then
 			checkluatype(full, TYPE_BOOL)
@@ -575,7 +575,7 @@ function quat_methods:getRotationVector()
 	if len == 0 or m == 0 then
 		return vwrap(Vector(0, 0, 0))
 	else
-		local ang = 2 * math_acos(math_clamp(self[1] / math_sqrt(len), -1, 1)) * rad2deg
+		local ang = math_deg(2 * math_acos(math_clamp(self[1] / math_sqrt(len), -1, 1)))
 		if ang > 180 then
 			ang = ang - 360
 		end
@@ -604,7 +604,7 @@ function vec_methods:getQuaternion(up)
 		local yaw = Vector(0, 1, 0)
 		yaw:Rotate(Angle(0, ang[2], 0))
 		
-		local roll = math_acos(math_clamp(y:Dot(yaw), -1, 1)) * rad2deg
+		local roll = math_deg(math_acos(math_clamp(y:Dot(yaw), -1, 1)))
 		if y[3] < 0 then
 			roll = -roll
 		end
@@ -618,7 +618,7 @@ end
 -- quat_lib.qRotation(axis, ang)
 function vec_methods:getQuaternionFromAxis(ang)
 	local axis = vunwrap(self):GetNormalized()
-	local rang = ang * deg2rad * 0.5
+	local rang = math_rad(ang) * 0.5
 	
 	return wrap({ math_cos(rang), axis[1] * math_sin(rang), axis[2] * math_sin(rang), axis[3] * math_sin(rang) })
 end
@@ -631,7 +631,7 @@ function vec_methods:getQuaternionFromRotation()
 	else
 		local len = math_sqrt(sqr)
 		local norm = (len + 180) % 360 - 180
-		local ang = norm * deg2rad * 0.5
+		local ang = math_rad(norm) * 0.5
 		local anglen = math_sin(ang) / len
 		
 		return wrap({ math_cos(ang), self[1] * anglen, self[2] * anglen, self[3] * anglen })
@@ -686,15 +686,17 @@ V Lookup
 V Meta events
 V Better name for qMod
 V math.slerpQuaternion
+V Replace rad2deg -> math.deg; deg2rad -> math.rad
 Documentation
-X Write changelog (include which functions have transformed into methods) and link to it at the top of quat lib
-Replace rad2deg -> math.deg; deg2rad -> math.rad
 Credits
 Compare all the calculations to E2 to ensure that there were no mistakes during original Starfall rewrite
-Check if quatLong and other functions that use E2's `delta` thingy work correctly without it
 Translate Fizyk's applyTorque example to SF
 Blackmain Divran to test this
 Remove quaternions.txt
+
+TOOLAZYTODO:
+Check if quatLong and other functions that use E2's `delta` thingy work correctly without it
+Write changelog (include which functions have transformed into methods) and link to it at the top of quat lib
 
 ]]
 
