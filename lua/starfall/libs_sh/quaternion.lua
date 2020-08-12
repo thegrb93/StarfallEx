@@ -14,7 +14,7 @@ local math_rad = math.rad
 local math_deg = math.deg
 
 
---- Quaternion type. Recently reworked library, for full changelist visit: https://github.com/thegrb93/StarfallEx/pull/953
+--- Quaternion type. Recently reworked, for full changelist visit: https://github.com/thegrb93/StarfallEx/pull/953
 -- @name Quaternion
 -- @class type
 -- @libtbl quat_methods
@@ -154,10 +154,10 @@ end
 --- Creates a Quaternion
 -- @name builtins_library.Quaternion
 -- @class function
--- @param r - R
--- @param i - I
--- @param j - J
--- @param k - K
+-- @param r R (real) component
+-- @param i I component
+-- @param j J component
+-- @param k K component
 -- @return Quaternion object
 function instance.env.Quaternion(r, i, j, k)
 	if r ~= nil then checkluatype(r, TYPE_NUMBER) else r = 0 end
@@ -171,7 +171,7 @@ end
 
 local rijk = { r = 1, i = 2, j = 3, k = 4 }
 
---- __newindex metamethod
+--- newindex metamethod
 function quat_meta.__newindex(t, k, v)
 	if rijk[k] then
 		rawset(t, rijk[k], v)
@@ -202,7 +202,7 @@ function quat_meta.__newindex(t, k, v)
 	end
 end
 
---- __index metamethod
+--- index metamethod
 -- Can be indexed with: 1, 2, 3, 4, r, i, j, k, rr, ri, rj, rk, rrr, rijk, kjir, etc. Numerical lookup is the most efficient
 function quat_meta.__index(t, k)
 	local method = quat_methods[k]
@@ -230,7 +230,7 @@ end
 --- multiplication metamethod
 -- @param lhs Left side of equation
 -- @param rhs Right side of equation
--- @return Quaternion product
+-- @return Product
 function quat_meta.__mul(lhs, rhs)
 	if isnumber(rhs) then -- Q * N
 		return wrap({ lhs[1] * rhs, lhs[2] * rhs, lhs[3] * rhs, lhs[4] * rhs })
@@ -269,6 +269,10 @@ function quat_meta.__mul(lhs, rhs)
 	end
 end
 
+--- division metamethod
+-- @param lhs Left side of equation
+-- @param rhs Right side of equation
+-- @return Quotient
 function quat_meta.__div(lhs, rhs)
 	if isnumber(rhs) then -- Q / N
 		return wrap({ lhs[1] / rhs, lhs[2] / rhs, lhs[3] / rhs, lhs[4] / rhs })
@@ -301,6 +305,10 @@ function quat_meta.__div(lhs, rhs)
 	end
 end
 
+--- involution metamethod
+-- @param lhs Left side of equation
+-- @param rhs Right side of equation
+-- @return Power
 function quat_meta.__pow(lhs, rhs)
 	if isnumber(rhs) then
 		local log = quatLog(lhs)
@@ -321,6 +329,10 @@ function quat_meta.__pow(lhs, rhs)
 	end
 end
 
+--- addition metamethod
+-- @param lhs Left side of equation
+-- @param rhs Right side of equation
+-- @return Sum
 function quat_meta.__add(lhs, rhs)
 	if isnumber(rhs) then -- Q + N
 		return wrap({ rhs + lhs[1], lhs[2], lhs[3], lhs[4] })
@@ -338,6 +350,10 @@ function quat_meta.__add(lhs, rhs)
 	end
 end
 
+--- subtraction metamethod
+-- @param lhs Left side of equation
+-- @param rhs Right side of equation
+-- @return Difference
 function quat_meta.__sub(lhs, rhs)
 	if isnumber(rhs) then -- Q - N
 		return wrap({ lhs[1] - rhs, lhs[2], lhs[3], lhs[4] })
@@ -355,28 +371,44 @@ function quat_meta.__sub(lhs, rhs)
 	end
 end
 
+--- unary minus metamethod
+-- @param q Quaternion
+-- @return Negated quaternion
 function quat_meta.__unm(q)
 	return wrap({ -q[1], -q[2], -q[3], -q[4] })
 end
 
+--- equivalence metamethod
+-- @param lhs Left side of equation
+-- @param rhs Right side of equation
+-- @return True if both sides are equal
 function quat_meta.__eq(lhs, rhs)
 	return lhs[1] == rhs[1] and lhs[2] == rhs[2] and lhs[3] == rhs[3] and lhs[4] == rhs[4]
 end
 
+--- tostring metamethod
+-- @param q Quaternion
+-- @return Quaternion represented as a string
 function quat_meta.__tostring(q)
 	return table.concat(unwrap(q), " ", 1, 4)
 end
 
 -------------------------------------
 
+--- Returns components of the quaternion
+-- @return r, i, j, k
 function quat_methods:unpack()
 	return qunpack(self)
 end
 
+--- Creates a copy of the quaternion
+-- @return Duplicate quaternion
 function quat_methods:clone()
 	return wrap({ qunpack(self) })
 end
 
+--- Copies components of the second quaternion to the first quaternion. Self-modifies
+-- @param quat Quaternion to copy from
 function quat_methods:set(quat)
 	self[1] = quat[1]
 	self[2] = quat[2]
@@ -384,28 +416,39 @@ function quat_methods:set(quat)
 	self[4] = quat[4]
 end
 
-function quat_methods:setR(value)
-	self[1] = value
+--- Sets R (real) component of the quaternion
+-- @param r Value of the R component
+function quat_methods:setR(r)
+	self[1] = r
 end
 
-function quat_methods:setI(value)
-	self[2] = value
+--- Sets I component of the quaternion
+-- @param i Value of the I component
+function quat_methods:setI(i)
+	self[2] = i
 end
 
-function quat_methods:setJ(value)
-	self[3] = value
+--- Sets J component of the quaternion
+-- @param j Value of the J component
+function quat_methods:setJ(j)
+	self[3] = j
 end
 
-function quat_methods:setK(value)
-	self[4] = value
+--- Sets K component of the quaternion
+-- @param k Value of the K component
+function quat_methods:setK(k)
+	self[4] = k
 end
 
 -------------------------------------
 
+--- Raises Euler's constant e to the quaternion's power
+-- @return Constant e raised to the quaternion
 function quat_methods:getExp()
 	return wrap(quatExp(unwrap(self)))
 end
 
+--- Raises Euler's constant e to the quaternion's power. Self-modifies
 function quat_methods:exp()
 	local q = quatExp(unwrap(self))
 	self[1] = q[1]
@@ -414,10 +457,13 @@ function quat_methods:exp()
 	self[4] = q[4]
 end
 
+--- Calculates natural logarithm of the quaternion
+-- @return Logarithmic quaternion
 function quat_methods:getLog()
 	return wrap(quatLog(unwrap(self)))
 end
 
+--- Calculates natural logarithm of the quaternion. Self-modifies
 function quat_methods:log()
 	local q = quatLog(unwrap(self))
 	self[1] = q[1]
@@ -428,6 +474,8 @@ end
 
 -------------------------------------
 
+--- Calculates upward direction of the quaternion
+-- @return Vector pointing up
 function quat_methods:getUp()
 	local lhs1, lhs2, lhs3, lhs4 = qunpack(self)
 	local t2, t3, t4 = lhs2 * 2, lhs3 * 2, lhs4 * 2
@@ -438,6 +486,8 @@ function quat_methods:getUp()
 	))
 end
 
+--- Calculates right direction of the quaternion
+-- @return Vector pointing right
 function quat_methods:getRight()
 	local lhs1, lhs2, lhs3, lhs4 = qunpack(self)
 	local t2, t3, t4 = lhs2 * 2, lhs3 * 2, lhs4 * 2
@@ -448,6 +498,8 @@ function quat_methods:getRight()
 	))
 end
 
+--- Calculates forward direction of the quaternion
+-- @return Vector pointing forward
 function quat_methods:getForward()
 	local lhs1, lhs2, lhs3, lhs4 = qunpack(self)
 	local t2, t3, t4 = lhs2 * 2, lhs3 * 2, lhs4 * 2
@@ -460,26 +512,34 @@ end
 
 -------------------------------------
 
+--- Returns absolute value of the quaternion
+-- @return Absolute value
 function quat_methods:getAbsolute()
 	return quatLen(self)
 end
 
+--- Returns conjecture of the quaternion
+-- @return Quaternion's conjecture
 function quat_methods:getConjecture()
 	return wrap({ self[1], -self[2], -self[3], -self[4] })
 end
 
 -- TEST
+--- Conjugates the quaternion.
 function quat_methods:conjugate()
 	self[2] = -self[2]
 	self[3] = -self[3]
 	self[4] = -self[4]
 end
 
+--- Calculates inverse of the quaternion
+-- @return Inverse of the quaternion
 function quat_methods:getInverse()
 	local len = quatLen(self)
 	return wrap({ self[1] / len, self[2] / len, self[3] / len, self[4] / len })
 end
 
+--- Calculates inverse of the quaternon. Self-modifies
 function quat_methods:inverse()
 	local len = quatLen(self)
 	self[1] = self[1] / len
@@ -488,7 +548,10 @@ function quat_methods:inverse()
 	self[4] = self[4] / len
 end
 
-function quat_methods:getMod() -- credits: https://github.com/coder0xff
+--- Gets the quaternion representing rotation contained within an angle between 0 and 180 degrees
+-- credits: https://github.com/coder0xff
+-- @return Quaternion with contained rotation
+function quat_methods:getMod()
 	if self[1] < 0 then
 		return wrap({ -self[1], -self[2], -self[3], -self[4] })
 	else
@@ -496,6 +559,7 @@ function quat_methods:getMod() -- credits: https://github.com/coder0xff
 	end
 end
 
+--- Contains quaternion's represented rotation within an angle between 0 and 180 degrees. Self-modifies
 function quat_methods:mod()
 	if self[1] < 0 then
 		self[1] = -self[1]
@@ -505,10 +569,13 @@ function quat_methods:mod()
 	end
 end
 
+--- Returns new normalized quaternion
+-- @return Normalized quaternion
 function quat_methods:getNormalized()
 	return wrap(quatNorm(unwrap(self)))
 end
 
+--- Normalizes the quaternion. Self-modifies
 function quat_methods:normalize()
 	local len = quatLenSqrt(self)
 	self[1] = self[1] / len
@@ -517,6 +584,9 @@ function quat_methods:normalize()
 	self[4] = self[4] / len
 end
 
+--- Returns dot product of two quaternions
+-- @param quat Second quaternion
+-- @return The dot product
 function quat_methods:dot(quat)
 	quat = unwrap(quat)
 	return quatDot(self, quat)
@@ -524,11 +594,16 @@ end
 
 -------------------------------------
 
+--- Converts quaternion to a vector by dropping the R (real) component
+-- @return Vector from the quaternion
 function quat_methods:getVector()
 	return vwrap(Vector(self[2], self[3], self[4]))
 end
 
--- normalize: true = same as Q:getNormalized():getMatrix() // credits: https://stackoverflow.com/a/1556470
+--- Converts quaternion to a matrix
+-- credits: Malte Clasen (https://stackoverflow.com/a/1556470)
+-- @param Optional bool, normalizes the quaternion
+-- @return Transformation matrix
 function quat_methods:getMatrix(normalize)
 	local quat
 	if normalize then
@@ -558,7 +633,8 @@ function quat_methods:getMatrix(normalize)
 	}))]]--
 end
 
--- quat_lib.rotationEulerAngle(q)
+--- Returns the euler angle of rotation in degrees
+-- @return Angle object
 function quat_methods:getEulerAngle()
 	local len_sqrt = quatLenSqrt(self)
 	if len_sqrt == 0 then
@@ -589,8 +665,10 @@ function quat_methods:getEulerAngle()
 	end
 end
 
--- full: true = [0..360]; false = [-180..180]
--- quat_lib.rotationAngle(q)
+--- Returns the angle of rotation in degrees
+-- credits: https://github.com/coder0xff
+-- @param full Optional bool, if true returned angle will be between -180 and 180, otherwise between 0 and 360
+-- @return Angle number
 function quat_methods:getRotationAngle(full)
 	local len = quatLen(self)
 	if len == 0 then
@@ -610,7 +688,9 @@ function quat_methods:getRotationAngle(full)
 	end
 end
 
--- coder0xff
+--- Returns the axis of rotation
+-- credits: https://github.com/cder0xff
+-- @return Vector axis
 function quat_methods:getRotationAxis()
 	local ilen = quatImaginaryLen(self)
 	if ilen == 0 then
@@ -621,6 +701,9 @@ function quat_methods:getRotationAxis()
 	end
 end
 
+--- Returns the rotation vector - rotation axis where magnitude is the angle of rotation in degrees
+-- credits: https://github.com/cder0xff
+-- @return Rotation vector
 function quat_methods:getRotationVector()
 	local len = quatLen(self)
 	local ilen_max = math_max(quatImaginaryLen(self), 0)
@@ -668,7 +751,9 @@ function vec_methods:getQuaternion(up)
 	end
 end
 
--- quat_lib.qRotation(axis, ang)
+--- Returns quaternion for rotation about axis represented by the vector by an angle
+-- @param ang Number rotation angle
+-- @return Rotated quaternion
 function vec_methods:getQuaternionFromAxis(ang)
 	local axis = vunwrap(self):GetNormalized()
 	local rang = math_rad(ang) * 0.5
@@ -676,7 +761,9 @@ function vec_methods:getQuaternionFromAxis(ang)
 	return wrap({ math_cos(rang), axis[1] * math_sin(rang), axis[2] * math_sin(rang), axis[3] * math_sin(rang) })
 end
 
--- quat_lib.qRotation(rv1) // coder0xff (github)
+--- Constructs a quaternion from the rotation vector. Vector direction is axis of rotation, it's magnitude is angle in degrees
+-- credits: https://github.com/cder0xff
+-- @return Rotated quaternion
 function vec_methods:getQuaternionFromRotation()
 	local vec_len = self[1] * self[1] + self[2] * self[2] + self[3] * self[3]
 	if vec_len == 0 then
@@ -691,15 +778,24 @@ function vec_methods:getQuaternionFromRotation()
 	end
 end
 
+--- Converts angle to a quaternion
+-- @return Constructed quaternion
 function ang_methods:getQuaternion()
 	return wrap(quatFromAngle(aunwrap(self)))
 end
 
+--- Converts entity angles to a quaternion
+-- @return Constructed quaternion
 function ent_methods:getQuaternion()
 	local ang = getent(self):GetAngles()
 	return wrap(quatFromAngle(ang))
 end
 
+--- Performs spherical linear interpolation between two quaternions
+-- @param from Quaternion to start with
+-- @param to Quaternion to end with
+-- @param t Ratio, 0 = from; 1 = to
+-- @return Interpolated quaternion
 function math_library.slerpQuaternion(from, to, t)
 	quat1 = unwrap(from)
 	quat2 = unwrap(to)
@@ -724,6 +820,11 @@ function math_library.slerpQuaternion(from, to, t)
 	end
 end
 
+--- Performs normalized linear interpolation between two quaternions
+-- @param from Quaternion to start with
+-- @param to Quaternion to end with
+-- @param t Ratio, 0 = from; 1 = to
+-- @return Interpolated quaternion
 function math_library.nlerpQuaternion(from, to, t)
 	quat1 = unwrap(from)
 	quat2 = unwrap(to)
@@ -740,36 +841,4 @@ function math_library.nlerpQuaternion(from, to, t)
 	return wrap(quatNorm(new))
 end
 
-
-
-
 end
-
-
-
---[[
-
-TODO:
-
-V Initialization - By definition one of the imaginary components has to be non-zero, maybe i, if not specified? Altho I might leave it 0,0,0,0 if it won't interfere with any of the MaThZ
-V Setting
-V Lookup
-V Meta events
-V Better name for qMod
-V math.slerpQuaternion
-V Replace rad2deg -> math.deg; deg2rad -> math.rad
-V Make quatDot (qdot) and quatNormalize (qNorm) function
-V Get rid of the unused parts of imported libs
-V Write changelog (include which functions have transformed into methods) and link to it at the top of quat lib
-Documentation
-Credits
-Compare all the calculations to E2 to ensure that there were no mistakes during original Starfall rewrite
-Translate Fizyk's applyTorque example to SF
-Blackmain Divran to test this
-Remove quaternions.txt
-
-TOOLAZYTODO:
-Check if quatLong and other functions that use E2's `delta` thingy work correctly without it
-
-]]
-
