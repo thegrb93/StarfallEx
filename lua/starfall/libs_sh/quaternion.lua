@@ -44,6 +44,10 @@ local function wrap(tbl)
 	return setmetatable(tbl, quat_meta)
 end
 
+local function unpack(tbl)
+	return self[1], self[2], self[3], self[4]
+end
+
 local getent
 instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
@@ -345,8 +349,12 @@ end
 
 -------------------------------------
 
+function quat_methods:unpack()
+	return wrap({ unpack(self) })
+end
+
 function quat_methods:clone()
-	return wrap({ self[1], self[2], self[3], self[4] })
+	return wrap({ unpack(self) })
 end
 
 function quat_methods:set(quat)
@@ -401,7 +409,7 @@ end
 -------------------------------------
 
 function quat_methods:getUp()
-	local lhs1, lhs2, lhs3, lhs4 = self[1], self[2], self[3], self[4]
+	local lhs1, lhs2, lhs3, lhs4 = unpack(self)
 	local t2, t3, t4 = lhs2 * 2, lhs3 * 2, lhs4 * 2
 	return vwrap(Vector(
 		t3 * lhs1 + t2 * lhs4,
@@ -411,7 +419,7 @@ function quat_methods:getUp()
 end
 
 function quat_methods:getRight()
-	local lhs1, lhs2, lhs3, lhs4 = self[1], self[2], self[3], self[4]
+	local lhs1, lhs2, lhs3, lhs4 = unpack(self)
 	local t2, t3, t4 = lhs2 * 2, lhs3 * 2, lhs4 * 2
 	return vwrap(Vector(
 		t4 * lhs1 - t2 * lhs3,
@@ -421,7 +429,7 @@ function quat_methods:getRight()
 end
 
 function quat_methods:getForward()
-	local lhs1, lhs2, lhs3, lhs4 = self[1], self[2], self[3], self[4]
+	local lhs1, lhs2, lhs3, lhs4 = unpack(self)
 	local t2, t3, t4 = lhs2 * 2, lhs3 * 2, lhs4 * 2
 	return vwrap(Vector(
 		lhs1 * lhs1 + lhs2 * lhs2 - lhs3 * lhs3 - lhs4 * lhs4,
@@ -464,7 +472,7 @@ function quat_methods:getMod() -- credits: https://github.com/coder0xff
 	if self[1] < 0 then
 		return wrap({ -self[1], -self[2], -self[3], -self[4] })
 	else
-		return wrap({ self[1], self[2], self[3], self[4] })
+		return wrap({ unpack(self) })
 	end
 end
 
