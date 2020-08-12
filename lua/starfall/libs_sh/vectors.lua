@@ -31,6 +31,12 @@ local function wrap(tbl)
 	return setmetatable(tbl, vec_meta)
 end
 
+local quatMul
+instance:AddHook("initialize", function()
+	quatMul = instance.Types.Quaternion.QuaternionMultiply
+end)
+
+
 --- Creates a Vector struct.
 -- @name builtins_library.Vector
 -- @class function
@@ -117,14 +123,12 @@ function vec_meta.__mul(a, b)
 	elseif dgetmeta(a) == vec_meta and dgetmeta(b) == vec_meta then
 		return wrap({ a[1] * b[1], a[2] * b[2], a[3] * b[3] })
 	elseif dgetmeta(a) == vec_meta and dgetmeta(b) == quat_meta then -- Vector * Quaternion
-		local a2, a3, a4 = a[1], a[2], a[3]
-		local b1, b2, b3, b4 = b[1], b[2], b[3], b[4]
-		return qwrap({
-			-a2 * b2 - a3 * b3 - a4 * b4,
-			a2 * b1 + a3 * b4 - a4 * b3,
-			a3 * b1 + a4 * b2 - a2 * b4,
-			a4 * b1 + a2 * b3 - a3 * b2
-		})
+		local quat_vec = { 0, a[1], a[2], a[3] }
+		local conj = { b[1], -b[2], -b[3], -b[4] }
+		
+		local prod = quatMul(quatMul(b, quat_vec), conj)
+		return wrap({ prod[2], prod[3], prod[4] })
+		
 	elseif dgetmeta(a) == vec_meta then
 		checkluatype(b, TYPE_NUMBER)
 	else

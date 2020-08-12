@@ -84,6 +84,7 @@ local function quatMul(lhs, rhs)
 		lhs1 * rhs4 + lhs4 * rhs1 + lhs2 * rhs3 - lhs3 * rhs2
 	}
 end
+instance.Types.Quaternion.QuaternionMultiply = quatMul
 
 local function quatExp(q)
 	local ilen_sqrt = quatImaginaryLenSqrt(q)
