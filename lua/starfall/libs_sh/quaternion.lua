@@ -42,6 +42,7 @@ local math_exp = math.exp
 local math_log = math.log
 local math_sin = math.sin
 local math_cos = math.cos
+local math_min = math.min
 local math_acos = math.acos
 local math_clamp = math.Clamp
 local math_max = math.max
@@ -167,7 +168,6 @@ function quat_meta.__newindex(t, k, v)
 	end
 end
 
-local math_min = math.min
 --- __index metamethod
 -- Can be indexed with: 1, 2, 3, 4, r, i, j, k, rr, ri, rj, rk, rrr, rijk, kjir, etc. Numerical lookup is the most efficient
 function quat_meta.__index(t, k)
@@ -178,7 +178,7 @@ function quat_meta.__index(t, k)
 		return rawget(t, rijk[k])
 	else 
 		-- Swizzle support
-		local q = { 0,0,0,0 }
+		local q = { 0, 0, 0, 0 }
 		for i = 1, math_min(#k, 4)do
 			local vk = rijk[k[i]]
 			if vk then
@@ -433,7 +433,7 @@ end
 -------------------------------------
 
 function quat_methods:getAbsolute()
-	return sqrt(self[1] * self[1] + self[2] * self[2] + self[3] * self[3] + self[4] * self[4])
+	return math_sqrt(self[1] * self[1] + self[2] * self[2] + self[3] * self[3] + self[4] * self[4])
 end
 
 function quat_methods:getConjecture()
@@ -476,8 +476,6 @@ function quat_methods:mod()
 	end
 end
 
--------------------------------------
-
 function quat_methods:getSlerp(quat, t)
 	checkluatype(t, TYPE_NUMBER)
 	quat = unwrap(quat)
@@ -501,6 +499,8 @@ function quat_methods:getSlerp(quat, t)
 		return wrap(quatMul(self, q))
 	end
 end
+
+-------------------------------------
 
 function quat_methods:getVector()
 	return vwrap(Vector(self[2], self[3], self[4]))
@@ -617,8 +617,8 @@ end
 
 -- quat_lib.qRotation(axis, ang)
 function vec_methods:getQuaternionFromAxis(ang)
-	local axis = vunwrap(self):Normalize()
-	local rang = anuwrap(ang) * deg2rad * 0.5
+	local axis = vunwrap(self):GetNormalized()
+	local rang = ang * deg2rad * 0.5
 	
 	return wrap({ math_cos(rang), axis[1] * math_sin(rang), axis[2] * math_sin(rang), axis[3] * math_sin(rang) })
 end
@@ -632,9 +632,9 @@ function vec_methods:getQuaternionFromRotation()
 		local len = math_sqrt(sqr)
 		local norm = (len + 180) % 360 - 180
 		local ang = norm * deg2rad * 0.5
-		local anglen = math_sin(ang2) / len
+		local anglen = math_sin(ang) / len
 		
-		return wrap({ math_cos(ang2), self[1] * ang2len, self[2] * ang2len, self[3] * ang2len })
+		return wrap({ math_cos(ang), self[1] * anglen, self[2] * anglen, self[3] * anglen })
 	end
 end
 
@@ -687,7 +687,7 @@ V Meta events
 V Better name for qMod
 V math.slerpQuaternion
 Documentation
-Write changelog (include which functions have transformed into methods) and link to it at the top of quat lib
+X Write changelog (include which functions have transformed into methods) and link to it at the top of quat lib
 Replace rad2deg -> math.deg; deg2rad -> math.rad
 Credits
 Compare all the calculations to E2 to ensure that there were no mistakes during original Starfall rewrite
