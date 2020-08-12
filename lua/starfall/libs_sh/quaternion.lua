@@ -25,7 +25,7 @@ SF.RegisterType("Quaternion", true, false, nil, nil, function(checktype, quat_me
 	end,
 	function(obj)
 		checktype(obj, quat_meta, 2)
-		return {obj[1], obj[2], obj[3], obj[4]}
+		return { obj[1], obj[2], obj[3], obj[4] }
 	end	
 end)
 
@@ -44,7 +44,7 @@ local function wrap(tbl)
 	return setmetatable(tbl, quat_meta)
 end
 
-local function unpack(tbl)
+local function qunpack(tbl)
 	return self[1], self[2], self[3], self[4]
 end
 
@@ -57,9 +57,25 @@ end)
 
 -- Following helper functions are strictly operating on tables, so be sure to wrap the return value
 
+local function quatLen(q)
+	return self[1] * self[1] + self[2] * self[2] + self[3] * self[3] + self[4] * self[4]
+end
+
+local function quatLenSqrt(q)
+	return math_sqrt(quatLen(q))
+end
+
+local function quatImaginaryLen(q)
+	return self[2] * self[2] + self[3] * self[3] + self[4] * self[4]
+end
+
+local function quatImaginaryLenSqrt(q)
+	return math_sqrt(quatImaginaryLen(q))
+end
+
 local function quatMul(lhs, rhs)
-	local lhs1, lhs2, lhs3, lhs4 = lhs[1], lhs[2], lhs[3], lhs[4]
-	local rhs1, rhs2, rhs3, rhs4 = rhs[1], rhs[2], rhs[3], rhs[4]
+	local lhs1, lhs2, lhs3, lhs4 = qunpack(lhs)
+	local rhs1, rhs2, rhs3, rhs4 = qunpack(rhs)
 	return {
 		lhs1 * rhs1 - lhs2 * rhs2 - lhs3 * rhs3 - lhs4 * rhs4,
 		lhs1 * rhs2 + lhs2 * rhs1 + lhs3 * rhs4 - lhs4 * rhs3,
@@ -69,35 +85,39 @@ local function quatMul(lhs, rhs)
 end
 
 local function quatExp(q)
-	local m = math_sqrt(q[2] * q[2] + q[3] * q[3] + q[4] * q[4])
-	local r = math_exp(q[1])
+	local ilen_sqrt = quatImaginaryLenSqrt(q)
+	local real_exp = math_exp(q[1])
 	
-	if m ~= 0 then
-		local sin_m = math_sin(m)
-		return { r * math_cos(m), r * (q[2] * sin_m / m), r * (q[3] * sin_m / m), r * (q[4] * sin_m / m) }
+	if ilen_sqrt ~= 0 then
+		local sin_ilen_sqrt = math_sin(ilen_sqrt)
+		return {
+			real_exp * math_cos(ilen_sqrt),
+			real_exp * (q[2] * sin_ilen_sqrt / ilen_sqrt),
+			real_exp * (q[3] * sin_ilen_sqrt / ilen_sqrt),
+			real_exp * (q[4] * sin_ilen_sqrt / ilen_sqrt)}
 	else
-		return { r, 0, 0, 0 }
+		return { real_exp, 0, 0, 0 }
 	end
 end
 
 local function quatLog(q)
-	local len = math_sqrt(q[1] * q[1] + q[2] * q[2] + q[3] * q[3] + q[4] * q[4])
-	if len == 0 then
+	local len_sqrt = quatLenSqrt(q)
+	if len_sqrt == 0 then
 		return { -1e+100, 0, 0, 0 }
 	else
-		local u = { q[1] / len, q[2] / len, q[3] / len, q[4] / len }
+		local u = { q[1] / len_sqrt, q[2] / len_sqrt, q[3] / len_sqrt, q[4] / len_sqrt }
 		local a = math_acos(u[1])
 		local m = math_sqrt(u[2] * u[2] + u[3] * u[3] + u[4] * u[4])
 		if m ~= 0 then
-			return { math_log(len), a * u[2] / m, a * u[3] / m, a * u[4] / m }
+			return { math_log(len_sqrt), a * u[2] / m, a * u[3] / m, a * u[4] / m }
 		else
-			return { math_log(len), 0, 0, 0 }
+			return { math_log(len_sqrt), 0, 0, 0 }
 		end
 	end
 end
 
 local function quatNorm(q)
-	local len = math_sqrt(q[1] * q[1] + q[2] * q[2] + q[3] * q[3] + q[4] * q[4])
+	local len = quatLenSqrt(q)
 	return { q[1] / len, q[2] / len, q[3] / len, q[4] / len }
 end
 
@@ -223,8 +243,8 @@ function quat_meta.__mul(lhs, rhs)
 	local rhs_meta = dgetmeta(rhs)
 	
 	if lhs_meta == quat_meta and rhs_meta == quat_meta then -- Q * Q
-		local lhs1, lhs2, lhs3, lhs4 = lhs[1], lhs[2], lhs[3], lhs[4]
-		local rhs1, rhs2, rhs3, rhs4 = rhs[1], rhs[2], rhs[3], rhs[4]
+		local lhs1, lhs2, lhs3, lhs4 = qunpack(lhs)
+		local rhs1, rhs2, rhs3, rhs4 = qunpack(rhs)
 		return wrap({
 			lhs1 * rhs1 - lhs2 * rhs2 - lhs3 * rhs3 - lhs4 * rhs4,
 			lhs1 * rhs2 + lhs2 * rhs1 + lhs3 * rhs4 - lhs4 * rhs3,
@@ -233,7 +253,7 @@ function quat_meta.__mul(lhs, rhs)
 		})
 		
 	elseif lhs_meta == quat_meta and rhs_meta == vec_meta then -- Q * V
-		local lhs1, lhs2, lhs3, lhs4 = lhs[1], lhs[2], lhs[3], lhs[4]
+		local lhs1, lhs2, lhs3, lhs4 = qunpack(lhs)
 		local rhs2, rhs3, rhs4 = rhs[1], rhs[2], rhs[3]
 		return wrap({
 			-lhs2 * rhs2 - lhs3 * rhs3 - lhs4 * rhs4,
@@ -264,8 +284,8 @@ function quat_meta.__div(lhs, rhs)
 		})
 		
 	elseif dgetmeta(lhs) == quat_meta and dgetmeta(rhs) == quat_meta then -- Q / Q
-		local lhs1, lhs2, lhs3, lhs4 = lhs[1], lhs[2], lhs[3], lhs[4]
-		local rhs1, rhs2, rhs3, rhs4 = rhs[1], rhs[2], rhs[3], rhs[4]
+		local lhs1, lhs2, lhs3, lhs4 = qunpack(lhs)
+		local rhs1, rhs2, rhs3, rhs4 = qunpack(rhs)
 		local len = rhs1 * rhs1 + rhs2 * rhs2 + rhs3 * rhs3 + rhs4 * rhs4
 		return wrap({
 			(lhs1 * rhs1 + lhs2 * rhs2 + lhs3 * rhs3 + lhs4 * rhs4) / len,
@@ -350,11 +370,11 @@ end
 -------------------------------------
 
 function quat_methods:unpack()
-	return wrap({ unpack(self) })
+	return qunpack(self)
 end
 
 function quat_methods:clone()
-	return wrap({ unpack(self) })
+	return wrap({ qunpack(self) })
 end
 
 function quat_methods:set(quat)
@@ -409,7 +429,7 @@ end
 -------------------------------------
 
 function quat_methods:getUp()
-	local lhs1, lhs2, lhs3, lhs4 = unpack(self)
+	local lhs1, lhs2, lhs3, lhs4 = qunpack(self)
 	local t2, t3, t4 = lhs2 * 2, lhs3 * 2, lhs4 * 2
 	return vwrap(Vector(
 		t3 * lhs1 + t2 * lhs4,
@@ -419,7 +439,7 @@ function quat_methods:getUp()
 end
 
 function quat_methods:getRight()
-	local lhs1, lhs2, lhs3, lhs4 = unpack(self)
+	local lhs1, lhs2, lhs3, lhs4 = qunpack(self)
 	local t2, t3, t4 = lhs2 * 2, lhs3 * 2, lhs4 * 2
 	return vwrap(Vector(
 		t4 * lhs1 - t2 * lhs3,
@@ -429,7 +449,7 @@ function quat_methods:getRight()
 end
 
 function quat_methods:getForward()
-	local lhs1, lhs2, lhs3, lhs4 = unpack(self)
+	local lhs1, lhs2, lhs3, lhs4 = qunpack(self)
 	local t2, t3, t4 = lhs2 * 2, lhs3 * 2, lhs4 * 2
 	return vwrap(Vector(
 		lhs1 * lhs1 + lhs2 * lhs2 - lhs3 * lhs3 - lhs4 * lhs4,
@@ -441,7 +461,7 @@ end
 -------------------------------------
 
 function quat_methods:getAbsolute()
-	return math_sqrt(self[1] * self[1] + self[2] * self[2] + self[3] * self[3] + self[4] * self[4])
+	return quatLen(self)
 end
 
 function quat_methods:getConjecture()
@@ -456,12 +476,12 @@ function quat_methods:conjugate()
 end
 
 function quat_methods:getInverse()
-	local len = self[1] * self[1] + self[2] * self[2] + self[3] * self[3] + self[4] * self[4]
+	local len = quatLen(self)
 	return wrap({ self[1] / len, self[2] / len, self[3] / len, self[4] / len })
 end
 
 function quat_methods:inverse()
-	local len = self[1] * self[1] + self[2] * self[2] + self[3] * self[3] + self[4] * self[4]
+	local len = quatLen(self)
 	self[1] = self[1] / len
 	self[2] = self[2] / len
 	self[3] = self[3] / len
@@ -472,7 +492,7 @@ function quat_methods:getMod() -- credits: https://github.com/coder0xff
 	if self[1] < 0 then
 		return wrap({ -self[1], -self[2], -self[3], -self[4] })
 	else
-		return wrap({ unpack(self) })
+		return wrap({ qunpack(self) })
 	end
 end
 
@@ -490,7 +510,7 @@ function quat_methods:getNormalized()
 end
 
 function quat_methods:normalize()
-	local len = math_sqrt(self[1] * self[1] + self[2] * self[2] + self[3] * self[3] + self[4] * self[4])
+	local len = quatLenSqrt(self)
 	self[1] = self[1] / len
 	self[2] = self[2] / len
 	self[3] = self[3] / len
@@ -540,11 +560,11 @@ end
 
 -- quat_lib.rotationEulerAngle(q)
 function quat_methods:getEulerAngle()
-	local len = math_sqrt(self[1] * self[1] + self[2] * self[2] + self[3] * self[3] + self[4] * self[4])
-	if len == 0 then
+	local len_sqrt = quatLenSqrt(self)
+	if len_sqrt == 0 then
 		return awrap(Angle(0, 0, 0))
 	else
-		local q1, q2, q3, q4 = self[1] / len, self[2] / len, self[3] / len, self[4] / len
+		local q1, q2, q3, q4 = self[1] / len_sqrt, self[2] / len_sqrt, self[3] / len_sqrt, self[4] / len_sqrt
 		local x = Vector(q1 * q1 + q2 * q2 - q3 * q3 - q4 * q4,
 			2 * q3 * q2 + 2 * q4 * q1,
 			2 * q4 * q2 - 2 * q3 * q1)
@@ -572,7 +592,7 @@ end
 -- full: true = [0..360]; false = [-180..180]
 -- quat_lib.rotationAngle(q)
 function quat_methods:getRotationAngle(full)
-	local len = self[1] * self[1] + self[2] * self[2] + self[3] * self[3] + self[4] * self[4]
+	local len = quatLen(self)
 	if len == 0 then
 		return 0
 	else
@@ -592,27 +612,27 @@ end
 
 -- coder0xff
 function quat_methods:getRotationAxis()
-	local m = self[2] * self[2] + self[3] * self[3] + self[4] * self[4]
-	if m == 0 then
+	local ilen = quatImaginaryLen(self)
+	if ilen == 0 then
 		return vwrap(Vector(0, 0, 1))
 	else
-		local m_sqrt = math_sqrt(m)
-		return vwrap(Vector(self[2] / m_sqrt, self[3] / m_sqrt, self[4] / m_sqrt))
+		local ilen_sqrt = math_sqrt(ilen)
+		return vwrap(Vector(self[2] / ilen_sqrt, self[3] / ilen_sqrt, self[4] / ilen_sqrt))
 	end
 end
 
 function quat_methods:getRotationVector()
-	local len = self[1] * self[1] + self[2] * self[2] + self[3] * self[3] + self[4] * self[4]
-	local m = math_max(self[2] * self[2] + self[3] * self[3] + self[4] * self[4], 0)
+	local len = quatLen(self)
+	local ilen_max = math_max(quatImaginaryLen(self), 0)
 	
-	if len == 0 or m == 0 then
+	if len == 0 or ilen_max == 0 then
 		return vwrap(Vector(0, 0, 0))
 	else
 		local ang = math_deg(2 * math_acos(math_clamp(self[1] / math_sqrt(len), -1, 1)))
 		if ang > 180 then
 			ang = ang - 360
 		end
-		ang = ang / math_sqrt(m)
+		ang = ang / math_sqrt(ilen_max)
 		
 		return vwrap(Vector(self[2] * ang, self[3] * ang, self[4] * ang))
 	end
@@ -658,14 +678,14 @@ end
 
 -- quat_lib.qRotation(rv1) // coder0xff (github)
 function vec_methods:getQuaternionFromRotation()
-	local sqr = self[1] * self[1] + self[2] * self[2] + self[3] * self[3]
-	if sqr == 0 then
+	local vec_len = self[1] * self[1] + self[2] * self[2] + self[3] * self[3]
+	if vec_len == 0 then
 		return wrap({ 0, 0, 0, 0})
 	else
-		local len = math_sqrt(sqr)
-		local norm = (len + 180) % 360 - 180
+		local vec_len_sqrt = math_sqrt(vec_len)
+		local norm = (vec_len_sqrt + 180) % 360 - 180
 		local ang = math_rad(norm) * 0.5
-		local anglen = math_sin(ang) / len
+		local anglen = math_sin(ang) / vec_len_sqrt
 		
 		return wrap({ math_cos(ang), self[1] * anglen, self[2] * anglen, self[3] * anglen })
 	end
