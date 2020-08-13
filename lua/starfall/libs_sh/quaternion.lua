@@ -13,42 +13,7 @@ local math_max = math.max
 local math_rad = math.rad
 local math_deg = math.deg
 
-
--- Based on Expression's 2 quaternion library: https://github.com/wiremod/wire/blob/master/lua/entities/gmod_wire_expression2/core/quaternion.lua
---- Quaternion type. Recently reworked, for full changelist visit: https://github.com/thegrb93/StarfallEx/pull/953
--- @name Quaternion
--- @class type
--- @libtbl quat_methods
--- @libtbl quat_meta
-SF.RegisterType("Quaternion", true, false)
-
-
-return function(instance)
-
-local checktype = instance.CheckType
-local quat_methods, quat_meta, qwrap, unwrap = instance.Types.Quaternion.Methods, instance.Types.Quaternion, instance.Types.Quaternion.Wrap, instance.Types.Quaternion.Unwrap
-local ent_methods = instance.Types.Entity.Methods
-local ang_methods, awrap, aunwrap = instance.Types.Angle.Methods, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
-local vec_methods, vec_meta, vwrap, vunwrap = instance.Types.Vector.Methods, instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
-local mwrap = instance.Types.VMatrix.Wrap
-local math_library = instance.Libraries.math
-
-local function wrap(q)
-	return setmetatable(q, quat_meta)
-end
-
-local function qunpack(q)
-	return q[1], q[2], q[3], q[4]
-end
-
-local getent
-instance:AddHook("initialize", function()
-	getent = instance.Types.Entity.GetEntity
-end)
-
 -------------------------------------
-
--- Following helper functions are strictly operating on tables, so be sure to wrap the return value
 
 local function quatLen(q)
 	return q[1] * q[1] + q[2] * q[2] + q[3] * q[3] + q[4] * q[4]
@@ -67,8 +32,8 @@ local function quatImaginaryLenSqrt(q)
 end
 
 local function quatMul(lhs, rhs)
-	local lhs1, lhs2, lhs3, lhs4 = qunpack(lhs)
-	local rhs1, rhs2, rhs3, rhs4 = qunpack(rhs)
+	local lhs1, lhs2, lhs3, lhs4 = lhs[1], lhs[2], lhs[3], lhs[4]
+	local rhs1, rhs2, rhs3, rhs4 = rhs[1], rhs[2], rhs[3], rhs[4]
 	return {
 		lhs1 * rhs1 - lhs2 * rhs2 - lhs3 * rhs3 - lhs4 * rhs4,
 		lhs1 * rhs2 + lhs2 * rhs1 + lhs3 * rhs4 - lhs4 * rhs3,
@@ -76,7 +41,6 @@ local function quatMul(lhs, rhs)
 		lhs1 * rhs4 + lhs4 * rhs1 + lhs2 * rhs3 - lhs3 * rhs2
 	}
 end
-instance.Types.Quaternion.QuaternionMultiply = quatMul
 
 local function quatExp(q)
 	local ilen_sqrt = quatImaginaryLenSqrt(q)
@@ -142,6 +106,40 @@ local function quatFromAngleComponents(p, y, r)
 	
 	return quatMul(qy, quatMul(qp, qr))
 end
+
+
+-- Based on Expression's 2 quaternion library: https://github.com/wiremod/wire/blob/master/lua/entities/gmod_wire_expression2/core/quaternion.lua
+--- Quaternion type. Recently reworked, for full changelist visit: https://github.com/thegrb93/StarfallEx/pull/953
+-- @name Quaternion
+-- @class type
+-- @libtbl quat_methods
+-- @libtbl quat_meta
+SF.RegisterType("Quaternion", true, false)
+
+
+return function(instance)
+
+local checktype = instance.CheckType
+local quat_methods, quat_meta, qwrap, unwrap = instance.Types.Quaternion.Methods, instance.Types.Quaternion, instance.Types.Quaternion.Wrap, instance.Types.Quaternion.Unwrap
+local ent_methods = instance.Types.Entity.Methods
+local ang_methods, awrap, aunwrap = instance.Types.Angle.Methods, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local vec_methods, vec_meta, vwrap, vunwrap = instance.Types.Vector.Methods, instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local mwrap = instance.Types.VMatrix.Wrap
+local math_library = instance.Libraries.math
+
+local function wrap(q)
+	return setmetatable(q, quat_meta)
+end
+
+local function qunpack(q)
+	return q[1], q[2], q[3], q[4]
+end
+
+local getent
+instance:AddHook("initialize", function()
+	getent = instance.Types.Entity.GetEntity
+end)
+instance.Types.Quaternion.QuaternionMultiply = quatMul
 
 -------------------------------------
 
