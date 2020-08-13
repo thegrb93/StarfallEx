@@ -314,7 +314,7 @@ end
 function quat_meta.__pow(lhs, rhs)
 	if isnumber(rhs) then -- Q ^ N
 		local log = quatLog(lhs)
-		return wrap({ log[1] * rhs, log[2] * rhs, log[3] * rhs, log[4] * rhs })
+		return wrap(quatExp({ log[1] * rhs, log[2] * rhs, log[3] * rhs, log[4] * rhs }))
 		
 	elseif isnumber(lhs) then -- N ^ Q
 		if rhs == 0 then
