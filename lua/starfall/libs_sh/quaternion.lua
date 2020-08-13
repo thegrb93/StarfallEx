@@ -20,15 +20,7 @@ local math_deg = math.deg
 -- @class type
 -- @libtbl quat_methods
 -- @libtbl quat_meta
-SF.RegisterType("Quaternion", true, false, nil, nil, function(checktype, quat_meta)
-	return function(q)
-		return setmetatable({ q:Unpack() }, quat_meta)
-	end,
-	function(obj)
-		checktype(obj, quat_meta, 2)
-		return { obj[1], obj[2], obj[3], obj[4] }
-	end	
-end)
+SF.RegisterType("Quaternion", true, false)
 
 
 return function(instance)
