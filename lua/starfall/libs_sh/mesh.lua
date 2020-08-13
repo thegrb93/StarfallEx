@@ -221,7 +221,7 @@ function SF.GenerateNormals(vertices, inverted, smoothrad, Vector)
 		c.normal = norm
 	end
 	
-	if smoothrad ~= 0 then
+	if smoothrad ~= 1 then
 		local function id(v)
 			return v[1] .. "\0" .. v[2] .. "\0" .. v[3]
 		end
