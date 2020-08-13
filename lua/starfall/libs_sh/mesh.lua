@@ -193,10 +193,14 @@ function SF.GenerateUV(vertices, scale, Vector, Angle, worldtolocal)
 	end
 end
 
-function SF.GenerateNormals(vertices, inverted, Vector)
+function SF.GenerateNormals(vertices, inverted, smoothrad, Vector)
 	local v = Vector()
 	local cross = v.cross or v.Cross
 	local normalize = v.normalize or v.Normalize
+	local dot = v.dot or v.Dot
+	local add = v.add or v.Add
+	local div = v.div or v.Div
+	smoothrad = math.cos(smoothrad)
 	
 	if inverted then
 		local org = cross
@@ -215,6 +219,36 @@ function SF.GenerateNormals(vertices, inverted, Vector)
 		a.normal = norm
 		b.normal = norm
 		c.normal = norm
+	end
+	
+	if smoothrad ~= 0 then
+		local function id(v)
+			return v[1] .. "\0" .. v[2] .. "\0" .. v[3]
+		end
+		
+		local norms = {}
+		for _, vertex in ipairs(vertices) do
+			local i = id(vertex.pos)
+			norms[i] = norms[i] or {}
+			norms[i][#norms[i] + 1] = vertex.normal
+		end
+		
+		for _, vertex in ipairs(vertices) do
+			local normal = Vector()
+			local count = 0
+			
+			for _, norm in ipairs(norms[id(vertex.pos)]) do
+				if dot(vertex.normal, norm) >= smoothrad then
+					add(normal, norm)
+					count = count + 1
+				end
+			end
+			
+			if count > 1 then
+				div(normal, count)
+				vertex.normal = normal
+			end
+		end
 	end
 end
 
@@ -668,13 +702,15 @@ end
 --- Generates normal vectors for the provided vertices table
 -- @param vertices The table of vertices
 -- @param inverted Optional bool, invert the normal
-function mesh_library.generateNormals(vertices, inverted)
+-- @param smooth_limit Optional number, smooths the normal based on the limit in radians
+function mesh_library.generateNormals(vertices, inverted, smooth_limit)
 	checkluatype(vertices, TYPE_TABLE)
 	if inverted ~= nil then checkluatype(inverted, TYPE_BOOL) else inverted = false end
+	if smooth_limit ~= nil then checkluatype(smooth_limit, TYPE_NUMBER) else smooth_limit = 0 end
 	local nvertices = #vertices
 	if nvertices<3 or nvertices%3~=0 then SF.Throw("Expected a multiple of 3 vertices.", 2) end
 	
-	SF.GenerateNormals(vertices, inverted, vector)
+	SF.GenerateNormals(vertices, inverted, smooth_limit, vector)
 end
 
 --- Generates the uv for the provided vertices table
