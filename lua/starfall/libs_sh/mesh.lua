@@ -686,7 +686,7 @@ end)
 -- @param obj The obj data
 -- @param threaded Optional bool, use threading object that can be used to load the mesh over time to prevent hitting quota limit
 -- @param triangulate Whether to triangulate the faces
--- @return Table of Mesh tables. The keys correspond to the objs object names, and the values are tables of vertices that can be passed to mesh.buildFromTriangles
+-- @return Table of Mesh tables. The keys correspond to the objs object names, and the values are tables of vertices that can be passed to mesh.createFromTable
 -- @return Table of Mesh data. {positions = positionData, normals = normalData, texturecoords = texturecoordData, faces = faceData}
 function mesh_library.parseObj(obj, threaded, triangulate)
 	checkluatype (obj, TYPE_STRING)
