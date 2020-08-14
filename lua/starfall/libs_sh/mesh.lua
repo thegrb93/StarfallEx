@@ -193,10 +193,14 @@ function SF.GenerateUV(vertices, scale, Vector, Angle, worldtolocal)
 	end
 end
 
-function SF.GenerateNormals(vertices, inverted, Vector)
+function SF.GenerateNormals(vertices, inverted, smoothrad, Vector)
 	local v = Vector()
 	local cross = v.cross or v.Cross
 	local normalize = v.normalize or v.Normalize
+	local dot = v.dot or v.Dot
+	local add = v.add or v.Add
+	local div = v.div or v.Div
+	smoothrad = math.cos(smoothrad)
 	
 	if inverted then
 		local org = cross
@@ -215,6 +219,33 @@ function SF.GenerateNormals(vertices, inverted, Vector)
 		a.normal = norm
 		b.normal = norm
 		c.normal = norm
+	end
+	
+	if smoothrad ~= 1 then
+		local norms = setmetatable({},{__index = function(t,k) local r=setmetatable({},{__index=function(t,k) local r=setmetatable({},{__index=function(t,k) local r={} t[k]=r return r end}) t[k]=r return r end}) t[k]=r return r end})
+		for _, vertex in ipairs(vertices) do
+			local pos = vertex.pos
+			local norm = norms[pos[1]][pos[2]][pos[3]]
+			norm[#norm+1] = vertex.normal
+		end
+		
+		for _, vertex in ipairs(vertices) do
+			local normal = Vector()
+			local count = 0
+			local pos = vertex.pos
+			
+			for _, norm in ipairs(norms[pos[1]][pos[2]][pos[3]]) do
+				if dot(vertex.normal, norm) >= smoothrad then
+					add(normal, norm)
+					count = count + 1
+				end
+			end
+			
+			if count > 1 then
+				div(normal, count)
+				vertex.normal = normal
+			end
+		end
 	end
 end
 
@@ -655,7 +686,7 @@ end)
 -- @param obj The obj data
 -- @param threaded Optional bool, use threading object that can be used to load the mesh over time to prevent hitting quota limit
 -- @param triangulate Whether to triangulate the faces
--- @return Table of Mesh tables. The keys correspond to the objs object names, and the values are tables of vertices that can be passed to mesh.buildFromTriangles
+-- @return Table of Mesh tables. The keys correspond to the objs object names, and the values are tables of vertices that can be passed to mesh.createFromTable
 -- @return Table of Mesh data. {positions = positionData, normals = normalData, texturecoords = texturecoordData, faces = faceData}
 function mesh_library.parseObj(obj, threaded, triangulate)
 	checkluatype (obj, TYPE_STRING)
@@ -668,13 +699,15 @@ end
 --- Generates normal vectors for the provided vertices table
 -- @param vertices The table of vertices
 -- @param inverted Optional bool, invert the normal
-function mesh_library.generateNormals(vertices, inverted)
+-- @param smooth_limit Optional number, smooths the normal based on the limit in radians
+function mesh_library.generateNormals(vertices, inverted, smooth_limit)
 	checkluatype(vertices, TYPE_TABLE)
 	if inverted ~= nil then checkluatype(inverted, TYPE_BOOL) else inverted = false end
+	if smooth_limit ~= nil then checkluatype(smooth_limit, TYPE_NUMBER) else smooth_limit = 0 end
 	local nvertices = #vertices
 	if nvertices<3 or nvertices%3~=0 then SF.Throw("Expected a multiple of 3 vertices.", 2) end
 	
-	SF.GenerateNormals(vertices, inverted, vector)
+	SF.GenerateNormals(vertices, inverted, smooth_limit, vector)
 end
 
 --- Generates the uv for the provided vertices table
