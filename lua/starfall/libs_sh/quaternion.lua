@@ -15,7 +15,7 @@ local math_deg = math.deg
 
 -------------------------------------
 
-local function quatSet(q, r, i, j, k)
+local function quatPack(q, r, i, j, k)
 	q[1] = r
 	q[2] = i
 	q[3] = j
@@ -28,32 +28,30 @@ end
 
 -------------------------------------
 
-local function getQuatLen(q)
-	local q1, q2, q3, q4 = quatUnpack(q)
-	return q1*q1 + q2*q2 + q3*q3 + q4*q4
+local function getQuatLenSqr(q)
+	return q[1]^2 + q[2]^2 + q[3]^2 + q[4]^2
 end
 
-local function getQuatLenSqrt(q)
-	return math_sqrt(getQuatLen(q))
+local function getQuatLen(q)
+	return math_sqrt(getQuatLenSqr(q))
+end
+
+local function getQuatImaginaryLenSqr(q)
+	return q[2]^2 + q[3]^2 + q[4]^2
 end
 
 local function getQuatImaginaryLen(q)
-	local _, q2, q3, q4 = quatUnpack(q)
-	return q2*q2 + q3*q3 + q4*q4
-end
-
-local function getQuatImaginaryLenSqrt(q)
-	return math_sqrt(getQuatImaginaryLen(q))
+	return math_sqrt(getQuatImaginaryLenSqr(q))
 end
 
 local function getQuatDot(lhs, rhs)
-	return lhs[1] * rhs[1] + lhs[2] * rhs[2] + lhs[3] * rhs[3] + lhs[4] * rhs[4]
+	return lhs[1]*rhs[1] + lhs[2]*rhs[2] + lhs[3]*rhs[3] + lhs[4]*rhs[4]
 end
 
 -------------------------------------
 
 local function quatNorm(q)
-	local len = getQuatLenSqrt(q)
+	local len = getQuatLen(q)
 	q[1] = q[1] / len
 	q[2] = q[2] / len
 	q[3] = q[3] / len
@@ -112,7 +110,7 @@ local function quatMulNum(q, n)
 end
 
 local function quatExp(q)
-	local ilen_sqrt = getQuatImaginaryLenSqrt(q)
+	local ilen_sqrt = getQuatImaginaryLen(q)
 	local real_exp = math_exp(q[1])
 	
 	if ilen_sqrt ~= 0 then
@@ -123,32 +121,32 @@ local function quatExp(q)
 		q[3] = real_exp * (q[3] * sin_ilen_sqrt / ilen_sqrt)
 		q[4] = real_exp * (q[4] * sin_ilen_sqrt / ilen_sqrt)
 	else
-		quatSet(q, real_exp, 0, 0, 0)
+		quatPack(q, real_exp, 0, 0, 0)
 	end
 end
 
 local function quatLog(q)
-	local len_sqrt = getQuatLenSqrt(q)
+	local len_sqrt = getQuatLen(q)
 	if len_sqrt == 0 then
-		quatSet(q, -1e+100, 0, 0, 0)
+		quatPack(q, -1e+100, 0, 0, 0)
 	else
 		quatNorm(q)
 		local q1, q2, q3, q4 = quatUnpack(q)
 		
 		local acos = math_acos(q1)
-		local ilen = getQuatImaginaryLenSqrt(q)
+		local ilen = getQuatImaginaryLen(q)
 		local ilen_log = math_log(len_sqrt)
 		
 		if ilen ~= 0 then
-			quatSet(q, ilen_log, acos * q2 / ilen, acos * q3 / ilen, acos * q4 / ilen)
+			quatPack(q, ilen_log, acos * q2 / ilen, acos * q3 / ilen, acos * q4 / ilen)
 		else
-			quatSet(q, ilen_log, 0, 0, 0)
+			quatPack(q, ilen_log, 0, 0, 0)
 		end
 	end
 end
 
 local function quatInv(q)
-	local len = getQuatLen(q)
+	local len = getQuatLenSqr(q)
 	q[1] = q[1] / len
 	q[2] = q[2] / len
 	q[3] = q[3] / len
@@ -356,7 +354,7 @@ function quat_meta.__div(lhs, rhs)
 		return wrap({ lhs[1] / rhs, lhs[2] / rhs, lhs[3] / rhs, lhs[4] / rhs })
 		
 	elseif isnumber(lhs) then -- N / Q
-		local len = getQuatLen(rhs)
+		local len = getQuatLenSqr(rhs)
 		return wrap({
 			(lhs * rhs[1]) / len,
 			(-lhs * rhs[2]) / len,
@@ -500,7 +498,7 @@ end
 --- Copies components of the second quaternion to the first quaternion. Self-modifies
 -- @param quat Quaternion to copy from
 function quat_methods:set(quat)
-	quatSet(self, quat[1], quat[2], quat[3], quat[4])
+	quatPack(self, quat[1], quat[2], quat[3], quat[4])
 end
 
 --- Sets R (real) component of the quaternion
@@ -594,7 +592,7 @@ end
 --- Returns absolute value of the quaternion
 -- @return Absolute value
 function quat_methods:getAbsolute()
-	return getQuatLen(self)
+	return getQuatLenSqr(self)
 end
 
 --- Returns conjecture of the quaternion
@@ -665,9 +663,7 @@ function quat_methods:getMatrix(normalize)
 	local quat
 	if normalize then
 		checkluatype(normalize, TYPE_BOOL)
-		
-		quat = self:clone()
-		quatNorm(quat)
+		quat = cloneModify(quatNorm, self)
 	else
 		quat = self
 	end
@@ -686,7 +682,7 @@ end
 --- Returns the euler angle of rotation in degrees
 -- @return Angle object
 function quat_methods:getEulerAngle()
-	local len_sqrt = getQuatLenSqrt(self)
+	local len_sqrt = getQuatLen(self)
 	if len_sqrt == 0 then
 		return awrap(Angle(0, 0, 0))
 	else
@@ -718,7 +714,7 @@ end
 -- @param full Optional bool, if true returned angle will be between -180 and 180, otherwise between 0 and 360
 -- @return Angle number
 function quat_methods:getRotationAngle(full)
-	local len = getQuatLen(self)
+	local len = getQuatLenSqr(self)
 	if len == 0 then
 		return 0
 	else
@@ -740,7 +736,7 @@ end
 --- Returns the axis of rotation
 -- @return Vector axis
 function quat_methods:getRotationAxis()
-	local ilen = getQuatImaginaryLen(self)
+	local ilen = getQuatImaginaryLenSqr(self)
 	if ilen == 0 then
 		return vwrap(Vector(0, 0, 1))
 	else
@@ -753,8 +749,8 @@ end
 --- Returns the rotation vector - rotation axis where magnitude is the angle of rotation in degrees
 -- @return Rotation vector
 function quat_methods:getRotationVector()
-	local len = getQuatLen(self)
-	local ilen_max = math_max(getQuatImaginaryLen(self), 0)
+	local len = getQuatLenSqr(self)
+	local ilen_max = math_max(getQuatImaginaryLenSqr(self), 0)
 	
 	if len == 0 or ilen_max == 0 then
 		return vwrap(Vector(0, 0, 0))
@@ -848,7 +844,7 @@ function math_library.slerpQuaternion(from, to, t)
 	quat2 = unwrap(to)
 	checkluatype(t, TYPE_NUMBER)
 	
-	if getQuatLen(quat1) == 0 then
+	if getQuatLenSqr(quat1) == 0 then
 		return wrap({ 0, 0, 0, 0})
 	else
 		local new = quat2:clone()
