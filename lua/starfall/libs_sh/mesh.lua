@@ -222,22 +222,19 @@ function SF.GenerateNormals(vertices, inverted, smoothrad, Vector)
 	end
 	
 	if smoothrad ~= 1 then
-		local function id(v)
-			return v[1] .. "\0" .. v[2] .. "\0" .. v[3]
-		end
-		
-		local norms = {}
+		local norms = setmetatable({},{__index = function(t,k) local r=setmetatable({},{__index=function(t,k) local r=setmetatable({},{__index=function(t,k) local r={} t[k]=r return r end}) t[k]=r return r end}) t[k]=r return r end})
 		for _, vertex in ipairs(vertices) do
-			local i = id(vertex.pos)
-			norms[i] = norms[i] or {}
-			norms[i][#norms[i] + 1] = vertex.normal
+			local pos = vertex.pos
+			local norm = norms[pos[1]][pos[2]][pos[3]]
+			norm[#norm+1] = vertex.normal
 		end
 		
 		for _, vertex in ipairs(vertices) do
 			local normal = Vector()
 			local count = 0
+			local pos = vertex.pos
 			
-			for _, norm in ipairs(norms[id(vertex.pos)]) do
+			for _, norm in ipairs(norms[pos[1]][pos[2]][pos[3]]) do
 				if dot(vertex.normal, norm) >= smoothrad then
 					add(normal, norm)
 					count = count + 1
