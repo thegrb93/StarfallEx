@@ -575,4 +575,15 @@ env.MATERIAL = {
 	["TRIANGLE_STRIP"] = MATERIAL_TRIANGLE_STRIP
 }
 
+--- ENUMs of fog modes to use with render.setFogMode
+-- @name builtins_library.MATERIAL_FOG
+-- @field NONE
+-- @field LINEAR
+-- @field LINEAR_BELOW_FOG_Z
+env.MATERIAL_FOG = {
+	["NONE"] = MATERIAL_FOG_NONE,
+	["LINEAR"] = MATERIAL_FOG_LINEAR,
+	["LINEAR_BELOW_FOG_Z"] = MATERIAL_FOG_LINEAR_BELOW_FOG_Z,
+}
+
 end

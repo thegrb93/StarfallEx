@@ -16,6 +16,7 @@ registerprivilege("render.renderView", "Render View", "Allows the user to render
 registerprivilege("render.renderscene", "Render Scene", "Allows the user to render a world again without a screen with custom perspective", { client = {} })
 registerprivilege("render.effects", "Render Effects", "Allows the user to render special effects such as screen blur, color modification, and bloom", { client = {} })
 registerprivilege("render.calcview", "Render CalcView", "Allows the use of the CalcView hook", { client = {} })
+registerprivilege("render.fog", "Render Fog", "Allows the user to control fog", { client = {} })
 
 local cv_max_rendertargets = CreateConVar("sf_render_maxrendertargets", "20", { FCVAR_ARCHIVE })
 local cv_max_maxrenderviewsperframe = CreateConVar("sf_render_maxrenderviewsperframe", "2", { FCVAR_ARCHIVE })
@@ -155,6 +156,11 @@ local function prepareScreen(data)
 	data.noStencil = true
 end
 
+local function prepareRenderFog(data)
+	prepareRender(data)
+	render.FogMode(MATERIAL_FOG_LINEAR)
+end
+
 local renderhooks = {
 	render = prepareScreen,
 	renderoffscreen = prepareRenderOffscreen,
@@ -164,6 +170,8 @@ local renderhooks = {
 	predrawhud = prepareRender,
 	drawhud = prepareRender,
 	postdrawhud = prepareRender,
+	setupworldfog = prepareRenderFog,
+	setupskyboxfog = prepareRenderFog,
 }
 
 
@@ -211,7 +219,8 @@ SF.hookAdd("PostDrawOpaqueRenderables", nil, canRenderHudSafeArgs)
 SF.hookAdd("PreDrawHUD", nil, canRenderHudSafeArgs)
 SF.hookAdd("PostDrawHUD", nil, canRenderHudSafeArgs)
 SF.hookAdd("CalcView", nil, canCalcview, returnCalcview)
-
+SF.hookAdd("SetupWorldFog", nil, canRenderHudSafeArgs, function() return true end)
+SF.hookAdd("SetupSkyboxFog", nil, canRenderHudSafeArgs, function() return true end)
 
 --- Render library. Screens are 512x512 units. Most functions require
 -- that you be in the rendering hook to call, otherwise an error is
@@ -1931,6 +1940,65 @@ function render_library.getAmbientLightColor()
 	return vwrap(render.GetAmbientLightColor())
 end
 
+--- Sets the fog mode. See: https://wiki.facepunch.com/gmod/Enums/MATERIAL_FOG
+-- @param mode Fog mode
+function render_library.setFogMode(mode)
+	checkpermission(instance, nil, "render.fog")
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	checkluatype(mode, TYPE_NUMBER)
+	
+	render.FogMode(mode)
+end
+
+--- Changes color of the fog
+-- @param color Color (alpha won't have any effect)
+function render_library.setFogColor(color)
+	checkpermission(instance, nil, "render.fog")
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	
+	local col = cunwrap(color)
+	render.FogColor(col.r, col.g, col.b)
+end
+
+--- Changes density of the fog
+-- @param density Number density between 0 and 1
+function render_library.setFogDensity(density)
+	checkpermission(instance, nil, "render.fog")
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	checkluatype(density, TYPE_NUMBER)
+	
+	render.FogMaxDensity(density)
+end
+
+--- Sets distance at which the fog will start appearing
+-- @param distance Start distance
+function render_library.setFogStart(distance)
+	checkpermission(instance, nil, "render.fog")
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	checkluatype(distance, TYPE_NUMBER)
+	
+	render.FogStart(distance)
+end
+
+--- Sets distance at which the fog will reach it's target density
+-- @param distance End distance
+function render_library.setFogEnd(distance)
+	checkpermission(instance, nil, "render.fog")
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	checkluatype(distance, TYPE_NUMBER)
+	
+	render.FogEnd(distance)
+end
+
+--- Sets the height below which fog will be rendered. Only works with fog mode 2
+function render_library.setFogHeight(height)
+	checkpermission(instance, nil, "render.fog")
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	checkluatype(height, TYPE_NUMBER)
+	
+	render.SetFogZ(height)
+end
+
 end
 
 --- Called when a frame is requested to be drawn on screen. (2D/3D Context)
@@ -2012,6 +2080,17 @@ end
 -- @param znear Current near plane of the camera
 -- @param zfar Current far plane of the camera
 -- @return table Table containing information for the camera. {origin=camera origin, angles=camera angles, fov=camera fov, znear=znear, zfar=zfar, drawviewer=drawviewer, ortho=ortho table}
+
+--- Called when world fog is drawn.
+-- @name setupworldfog
+-- @class hook
+-- @client
+
+--- Called when skybox fog is drawn.
+-- @name setupskyboxfog
+-- @class hook
+-- @client
+-- @param scale Skybox scale
 
 --- Called when a player uses the screen
 -- @name starfallUsed
