@@ -576,11 +576,11 @@ env.MATERIAL = {
 }
 
 --- ENUMs of fog modes to use with render.setFogMode
--- @name builtins_library.FOG
+-- @name builtins_library.MATERIAL_FOG
 -- @field NONE
 -- @field LINEAR
 -- @field LINEAR_BELOW_FOG_Z
-env.FOG = {
+env.MATERIAL_FOG = {
 	["NONE"] = MATERIAL_FOG_NONE,
 	["LINEAR"] = MATERIAL_FOG_LINEAR,
 	["LINEAR_BELOW_FOG_Z"] = MATERIAL_FOG_LINEAR_BELOW_FOG_Z,
