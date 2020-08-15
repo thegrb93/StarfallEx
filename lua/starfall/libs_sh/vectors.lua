@@ -26,9 +26,16 @@ local checktype = instance.CheckType
 local vec_methods, vec_meta, vwrap, unwrap = instance.Types.Vector.Methods, instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
+local quat_meta, qwrap = instance.Types.Quaternion, instance.Types.Quaternion.Wrap
 local function wrap(tbl)
 	return setmetatable(tbl, vec_meta)
 end
+
+local quatMul
+instance:AddHook("initialize", function()
+	quatMul = instance.Types.Quaternion.QuaternionMultiply
+end)
+
 
 --- Creates a Vector struct.
 -- @name builtins_library.Vector
@@ -115,6 +122,10 @@ function vec_meta.__mul(a, b)
 		return wrap({ b[1] * a, b[2] * a, b[3] * a })
 	elseif dgetmeta(a) == vec_meta and dgetmeta(b) == vec_meta then
 		return wrap({ a[1] * b[1], a[2] * b[2], a[3] * b[3] })
+	elseif dgetmeta(a) == vec_meta and dgetmeta(b) == quat_meta then -- Vector * Quaternion
+		local quat_vec = { 0, a[1], a[2], a[3] }
+		local conj = { b[1], -b[2], -b[3], -b[4] }
+		return wrap(quatMul(quatMul(b, quat_vec), conj))
 	elseif dgetmeta(a) == vec_meta then
 		checkluatype(b, TYPE_NUMBER)
 	else
