@@ -14,6 +14,8 @@ function ENT:Initialize()
 		net.WriteEntity(self)
 		net.SendToServer()
 	end
+
+	self:OnScaleChanged(nil, nil, self:GetScale())
 end
 
 function ENT:SetClip(index, enabled, normal, origin, entity)
@@ -25,7 +27,7 @@ function ENT:SetClip(index, enabled, normal, origin, entity)
 end
 
 function ENT:OnScaleChanged(name, old, scale)
-	SF.Holograms.SetScale(self, scale)
+	SF.SetHologramScale(self, scale)
 end
 
 function ENT:Draw()
