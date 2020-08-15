@@ -16,10 +16,7 @@ local math_deg = math.deg
 -------------------------------------
 
 local function quatPack(q, r, i, j, k)
-	q[1] = r
-	q[2] = i
-	q[3] = j
-	q[4] = k
+	q[1], q[2], q[3], q[4] = r, i, j, k
 end
 
 local function quatUnpack(q)
