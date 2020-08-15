@@ -328,9 +328,9 @@ function quat_meta.__mul(lhs, rhs)
 	local rhs_meta = dgetmeta(rhs)
 	
 	if lhs_meta == quat_meta and rhs_meta == quat_meta then -- Q * Q
-		local ret = clone(lhs)
-		quatMul(ret, rhs)
-		return ret
+		lhs = clone(lhs)
+		quatMul(lhs, rhs)
+		return lhs
 		
 	elseif lhs_meta == quat_meta and rhs_meta == vec_meta then -- Q * V
 		local lhs1, lhs2, lhs3, lhs4 = quatUnpack(lhs)
