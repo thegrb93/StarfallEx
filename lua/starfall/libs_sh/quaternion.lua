@@ -288,7 +288,7 @@ function quat_meta.__mul(lhs, rhs)
 	local rhs_meta = dgetmeta(rhs)
 	
 	if lhs_meta == quat_meta and rhs_meta == quat_meta then -- Q * Q
-		return getQuatMul(lhs, rhs)
+		return wrap(getQuatMul(lhs, rhs))
 		
 	elseif lhs_meta == quat_meta and rhs_meta == vec_meta then -- Q * V
 		local lhs1, lhs2, lhs3, lhs4 = quatUnpack(lhs)
@@ -841,7 +841,7 @@ function math_library.slerpQuaternion(quat1, quat2, t)
 		quatMulNum(out, t)
 		quatExp(out)
 		
-		return getQuatMul(quat1, out)
+		return wrap(getQuatMul(quat1, out))
 	end
 end
 
