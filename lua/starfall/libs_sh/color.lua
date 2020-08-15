@@ -93,7 +93,7 @@ end
 -- @return Added color.
 function color_meta.__add(a, b)
 
-	return wrap({ clamp(a[1] + b[1]), clamp(a[2] + b[2]), clamp(a[3] + b[3]), clamp(a[4] + b[4]) })
+	return wrap({ a[1] + b[1], a[2] + b[2], a[3] + b[3], a[4] + b[4] })
 end
 
 --- subtraction metamethod
@@ -102,7 +102,7 @@ end
 -- @return Subtracted color.
 function color_meta.__sub(a, b)
 
-	return wrap({ clamp(a[1]-b[1]), clamp(a[2]-b[2]), clamp(a[3]-b[3]), clamp(a[4]-b[4]) })
+	return wrap({ a[1]-b[1], a[2]-b[2], a[3]-b[3], a[4]-b[4] })
 end
 
 --- multiplication metamethod
@@ -110,11 +110,11 @@ end
 -- @return Scaled color.
 function color_meta.__mul(a, b)
 	if isnumber(b) then
-		return wrap({ clamp(a[1] * b), clamp(a[2] * b), clamp(a[3] * b), clamp(a[4] * b) })
+		return wrap({ a[1] * b, a[2] * b, a[3] * b, a[4] * b })
 	elseif isnumber(a) then
-		return wrap({ clamp(b[1] * a), clamp(b[2] * a), clamp(b[3] * a), clamp(b[4] * a) })
+		return wrap({ b[1] * a, b[2] * a, b[3] * a, b[4] * a })
 	elseif dgetmeta(a) == color_meta and dgetmeta(b) == color_meta then
-		return wrap({ clamp(a[1] * b[1]), clamp(a[2] * b[2]), clamp(a[3] * b[3]), clamp(a[4] * b[4]) })
+		return wrap({ a[1] * b[1], a[2] * b[2], a[3] * b[3], a[4] * b[4] })
 	elseif dgetmeta(a) == color_meta then
 		checkluatype(b, TYPE_NUMBER)
 	else
@@ -127,11 +127,11 @@ end
 -- @return Scaled color.
 function color_meta.__div(a, b)
 	if isnumber(b) then
-		return wrap({ clamp(a[1] / b), clamp(a[2] / b), clamp(a[3] / b), clamp(a[4] / b) })
+		return wrap({ a[1] / b, a[2] / b, a[3] / b, a[4] / b })
 	elseif isnumber(a) then
-		return wrap({ clamp(b[1] / a), clamp(b[2] / a), clamp(b[3] / a), clamp(b[4] / a) })
+		return wrap({ b[1] / a, b[2] / a, b[3] / a, b[4] / a })
 	elseif dgetmeta(a) == color_meta and dgetmeta(b) == color_meta then
-		return wrap({ clamp(a[1] / b[1]), clamp(a[2] / b[2]), clamp(a[3] / b[3]), clamp(a[4] / b[4]) })
+		return wrap({ a[1] / b[1], a[2] / b[2], a[3] / b[3], a[4] / b[4] })
 	elseif dgetmeta(a) == color_meta then
 		checkluatype(b, TYPE_NUMBER)
 	else
