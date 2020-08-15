@@ -125,13 +125,7 @@ function vec_meta.__mul(a, b)
 	elseif dgetmeta(a) == vec_meta and dgetmeta(b) == quat_meta then -- Vector * Quaternion
 		local quat_vec = { 0, a[1], a[2], a[3] }
 		local conj = { b[1], -b[2], -b[3], -b[4] }
-		
-		local out = b:clone()
-		quatMul(out, quat_vec)
-		quatMul(out, conj)
-		
-		return wrap({ out[2], out[3], out[4] })
-		
+		return wrap(quatMul(quatMul(b, quat_vec), conj))
 	elseif dgetmeta(a) == vec_meta then
 		checkluatype(b, TYPE_NUMBER)
 	else
