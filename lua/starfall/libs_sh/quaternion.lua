@@ -468,31 +468,39 @@ end
 --- Copies components of the second quaternion to the first quaternion. Self-modifies
 -- @param quat Quaternion to copy from
 function quat_methods:set(quat)
-	quatPack(self, quat[1], quat[2], quat[3], quat[4])
+	quatPack(self, quatUnpack(quat))
 end
 
 --- Sets R (real) component of the quaternion
 -- @param r Value of the R component
+-- @return self
 function quat_methods:setR(r)
 	self[1] = r
+	return self
 end
 
 --- Sets I component of the quaternion
 -- @param i Value of the I component
+-- @return self
 function quat_methods:setI(i)
 	self[2] = i
+	return self
 end
 
 --- Sets J component of the quaternion
 -- @param j Value of the J component
+-- @return self
 function quat_methods:setJ(j)
 	self[3] = j
+	return self
 end
 
 --- Sets K component of the quaternion
 -- @param k Value of the K component
+-- @return self
 function quat_methods:setK(k)
 	self[4] = k
+	return self
 end
 
 -------------------------------------
