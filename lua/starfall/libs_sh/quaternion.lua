@@ -62,41 +62,16 @@ local function quatDivNum(q, n)
 	q[4] = q[4] / n
 end
 
-local function quatMul(lhs, rhs)
+-- We're gonna make this one not self-modify for the sake of sanity
+local function getQuatMul(lhs, rhs)
 	local lhs1, lhs2, lhs3, lhs4 = quatUnpack(lhs)
 	local rhs1, rhs2, rhs3, rhs4 = quatUnpack(rhs)
-	lhs[1] = lhs1 * rhs1 - lhs2 * rhs2 - lhs3 * rhs3 - lhs4 * rhs4
-	lhs[2] = lhs1 * rhs2 + lhs2 * rhs1 + lhs3 * rhs4 - lhs4 * rhs3
-	lhs[3] = lhs1 * rhs3 + lhs3 * rhs1 + lhs4 * rhs2 - lhs2 * rhs4
-	lhs[4] = lhs1 * rhs4 + lhs4 * rhs1 + lhs2 * rhs3 - lhs3 * rhs2
-end
-
--- just like quatMul, except the right side is getting modified
--- this is because of self-modifying nature of the lib while dealing with noncommutative multiplication
-local function quatMulRight(lhs, rhs)
-	local lhs1, lhs2, lhs3, lhs4 = quatUnpack(lhs)
-	local rhs1, rhs2, rhs3, rhs4 = quatUnpack(rhs)
-	rhs[1] = lhs1 * rhs1 - lhs2 * rhs2 - lhs3 * rhs3 - lhs4 * rhs4
-	rhs[2] = lhs1 * rhs2 + lhs2 * rhs1 + lhs3 * rhs4 - lhs4 * rhs3
-	rhs[3] = lhs1 * rhs3 + lhs3 * rhs1 + lhs4 * rhs2 - lhs2 * rhs4
-	rhs[4] = lhs1 * rhs4 + lhs4 * rhs1 + lhs2 * rhs3 - lhs3 * rhs2
-end
-
-local function quatMulComponents(q, r, i, j, k)
-	local q1, q2, q3, q4 = quatUnpack(q)
-	q[1] = q1 * r - q2 * i - q3 * j - q4 * k
-	q[2] = q1 * i + q2 * r + q3 * k - q4 * j
-	q[3] = q1 * j + q3 * r + q4 * i - q2 * k
-	q[4] = q1 * k + q4 * r + q2 * j - q3 * i
-end
-
--- similarly to quatMulRight, the right side is getting modified
-local function quatMulComponentsRight(r, i, j, k, q)
-	local q1, q2, q3, q4 = quatUnpack(q)
-	q[1] = r * q1 - i * q2 - j * q3 - k * q4
-	q[2] = r * q2 + i * q1 + j * q4 - k * q3
-	q[3] = r * q3 + j * q1 + k * q2 - i * q4
-	q[4] = r * q4 + k * q1 + i * q3 - j * q2
+	return {
+		lhs1 * rhs1 - lhs2 * rhs2 - lhs3 * rhs3 - lhs4 * rhs4,
+		lhs1 * rhs2 + lhs2 * rhs1 + lhs3 * rhs4 - lhs4 * rhs3,
+		lhs1 * rhs3 + lhs3 * rhs1 + lhs4 * rhs2 - lhs2 * rhs4,
+		lhs1 * rhs4 + lhs4 * rhs1 + lhs2 * rhs3 - lhs3 * rhs2
+	}
 end
 
 local function quatMulNum(q, n)
@@ -169,28 +144,16 @@ local function quatMod(q)
 	end
 end
 
-local function quatFromAngle(ang)
-	local p = math_rad(ang[1]) * 0.5
-	local y = math_rad(ang[2]) * 0.5
-	local r = math_rad(ang[3]) * 0.5
-	
-	local qp = { math_cos(p), 0, math_sin(p), 0 }
-	quatMulComponents(qp, math_cos(r), math_sin(r), 0, 0)
-	quatMulComponentsRight(math_cos(y), 0, 0, math_sin(y), qp)
-	
-	return qp
-end
-
 local function quatFromAngleComponents(p, y, r)
 	p = math_rad(p) * 0.5
 	y = math_rad(y) * 0.5
 	r = math_rad(r) * 0.5
 	
-	local qp = { math_cos(p), 0, math_sin(p), 0 }
-	quatMulComponents(qp, math_cos(r), math_sin(r), 0, 0)
-	quatMulComponentsRight(math_cos(y), 0, 0, math_sin(y), qp)
-	
-	return qp
+	return getQuatMul({math_cos(y), 0, 0, math_sin(y)}, getQuatMul({ math_cos(p), 0, math_sin(p), 0 }, {math_cos(r), math_sin(r), 0, 0}))
+end
+
+local function quatFromAngle(ang)
+	return quatFromAngleComponents(ang[1], ang[2], ang[3])
 end
 
 
@@ -225,7 +188,7 @@ local getent
 instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
 end)
-instance.Types.Quaternion.QuaternionMultiply = quatMul
+instance.Types.Quaternion.QuaternionMultiply = getQuatMul
 
 -------------------------------------
 
@@ -325,9 +288,7 @@ function quat_meta.__mul(lhs, rhs)
 	local rhs_meta = dgetmeta(rhs)
 	
 	if lhs_meta == quat_meta and rhs_meta == quat_meta then -- Q * Q
-		lhs = clone(lhs)
-		quatMul(lhs, rhs)
-		return lhs
+		return getQuatMul(lhs, rhs)
 		
 	elseif lhs_meta == quat_meta and rhs_meta == vec_meta then -- Q * V
 		local lhs1, lhs2, lhs3, lhs4 = quatUnpack(lhs)
@@ -872,17 +833,15 @@ function math_library.slerpQuaternion(quat1, quat2, t)
 			quatFlip(new)
 		end
 		
-		-- Sparky made me do it! Blame him.
 		local out = clone(quat1)
 		quatInv(out)
 		quatConj(out)
-		quatMul(out, new)
+		out = getQuatMul(out, new)
 		quatLog(out)
 		quatMulNum(out, t)
 		quatExp(out)
-		quatMulRight(quat1, out)
 		
-		return out
+		return getQuatMul(quat1, out)
 	end
 end
 
