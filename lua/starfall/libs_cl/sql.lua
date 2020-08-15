@@ -1,21 +1,24 @@
-do
-	local P = SF.Permissions
-	P.registerPrivilege("sql", "Perform actions on the local SQLite database.", "Allows users to perform actions on the local SQLite database.", { client = { default = 1 } })
-end
-
-local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
+
+SF.Permissions.registerPrivilege("sql", "Perform actions on the local SQLite database.", "Allows users to perform actions on the local SQLite database.", { client = { default = 1 } })
 
 --- SQL library.
--- @client
-local sql_library = SF.RegisterLibrary("sql")
+-- @name sql
+-- @class library
+-- @libtbl sql_library
+SF.RegisterLibrary("sql")
+
+
+return function(instance)
+local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
+
+local sql_library = instance.Libraries.sql
 
 --- Performs a query on the local SQLite database.
 -- @param query The query to execute.
 -- @return Query results as a table, nil if the query returned no data.
 function sql_library.query(query)
-	checkpermission(SF.instance, nil, "sql")
+	checkpermission(instance, nil, "sql")
 	checkluatype(query, TYPE_STRING)
 
 	local query = sql.Query(query)
@@ -30,7 +33,7 @@ end
 -- @param tabname The table to check for.
 -- @return False if the table does not exist, true if it does.
 function sql_library.tableExists(tabname)
-	checkpermission(SF.instance, nil, "sql")
+	checkpermission(instance, nil, "sql")
 	checkluatype(tabname, TYPE_STRING)
 	
 	return sql.TableExists(tabname)
@@ -40,7 +43,7 @@ end
 -- @param tabname The table to remove.
 -- @return True if the table was successfully removed, false if not.
 function sql_library.tableRemove(tabname)
-	checkpermission(SF.instance, nil, "sql")
+	checkpermission(instance, nil, "sql")
 	checkluatype(tabname, TYPE_STRING)
 	
 	if not sql.TableExists(tabname) then return false end
@@ -53,9 +56,11 @@ end
 -- @param bNoQuotes Set this as true, and the function will not wrap the input string in apostrophes.
 -- @return The escaped input.
 function sql_library.SQLStr(str, bNoQuotes)
-	checkpermission(SF.instance, nil, "sql")
+	checkpermission(instance, nil, "sql")
 	checkluatype(str, TYPE_STRING)
 	checkluatype(bNoQuotes, TYPE_BOOL)
 	
 	return sql.SQLStr(str, bNoQuotes)
+end
+
 end

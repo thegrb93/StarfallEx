@@ -113,63 +113,43 @@ local function loadSessions()
 	end
 end
 
-local function createLibraryMap ()
-
+local function createLibraryMap()
 	local libMap, libs = {}, {}
 	local libsLookup = {}
-
-	libMap["Environment"] = {}
-	for name, val in pairs(SF.DefaultEnvironment) do
-		table.insert(libMap["Environment"], name)
-		table.insert(libs, name)
-	end
-
-	--Gathering data from docs
-	for lib, tbl in pairs(SF.Docs.classes) do
-		if not isstring(lib) then continue end -- We gotta skip numberics
-		libMap[lib] = {}
-		for name, val in pairs(tbl.methods) do
-			if not isstring(name) then continue end -- We gotta skip numberics
-			table.insert(libs, "\\:"..name)
+	
+	libMap.Environment = {}
+	
+	for typename, tbl in pairs(SF.Docs.Types) do
+		libMap[typename] = {}
+		for methodname, val in pairs(tbl.methods) do
+			table.insert(libs, "\\:"..methodname)
 		end
 	end
-
-	for lib, tbl in pairs(SF.Libraries) do --Constants/enums aren't present in docs ATM
-		table.insert(libs, lib) -- Highlight library name
-		libsLookup[lib] = true
-		libMap[lib] = {}
-
-		for name, val in pairs(tbl) do
-			local fullname = lib .. "\\." .. name
-
-			if libsLookup[fullname] then continue end
-			libsLookup[fullname] = true
-
-			table.insert(libMap[lib], name)
-			table.insert(libs, fullname)
+	for libname, lib in pairs(SF.Docs.Libraries) do
+		table.insert(libs, libname)
+		local tbl
+		if libname == "builtins" then
+			tbl = libMap.Environment
+		else
+			tbl = {}
+			libMap[libname] = tbl
+		end
+		for name, val in pairs(lib.methods) do
+			table.insert(tbl, name)
+			table.insert(libs, libname.."\\."..name)
+		end
+		for name, val in pairs(lib.fields) do
+			table.insert(tbl, name)
+			table.insert(libs, libname.."\\."..name)
 		end
 	end
-
-	--Gathering data from docs
-	for lib, tbl in pairs(SF.Docs.libraries) do
-		if not isstring(lib) then continue end -- We gotta skip numberics
-
-		if not libsLookup[lib] then
-			table.insert(libs, lib)
-			libsLookup[lib] = true
-		end
-
-		libMap[lib] = {}
-
-		for name, val in pairs(tbl.functions) do
-			if not isstring(name) then continue end -- We gotta skip numberics
-
-			local fullname = lib .. "\\." .. name
-			if libsLookup[fullname] then continue end
-			libsLookup[fullname] = true
-
-			table.insert(libMap[lib], name)
-			table.insert(libs, fullname)
+	for name, val in pairs(SF.Docs.Libraries.builtins.tables) do
+		local tbl = {}
+		libMap[name] = tbl
+		if val.fields then
+			for _, fielddata in pairs(val.fields) do
+				table.insert(tbl, fielddata.name)
+			end
 		end
 	end
 
@@ -184,7 +164,7 @@ end
 
 local function fixKeys(key, notfirst)
 
-	local function repeatKey ()
+	local function repeatKey()
 		timer.Create("repeatKey"..key, not notfirst and 0.5 or 0.02, 1, function () TabHandler.html:OnKeyCodePressed(key, true) end)
 	end
 
@@ -308,9 +288,9 @@ function TabHandler:RegisterSettings()
 	form.Header:SetVisible(false)
 	form.Paint = function () end
 
-	local function setDoClick (panel)
+	local function setDoClick(panel)
 		panel:SetDark(false)
-		function panel:OnChange ()
+		function panel:OnChange()
 			saveSettings()
 			timer.Simple(0.1, function () updateSettings() end)
 		end
@@ -393,7 +373,7 @@ function TabHandler:Init() -- It's caled when editor is initalized, you can crea
 		local libMap, libs = createLibraryMap()
 		html:QueueJavascript("libraryMap = " .. util.TableToJSON(libMap))
 		html:QueueJavascript("createStarfallMode(\"" .. libs .. "\")")
-		function html:OnKeyCodePressed (key, notfirst)
+		function html:OnKeyCodePressed(key, notfirst)
 
 			if input.IsKeyDown(KEY_LCONTROL) then
 				self:OnShortcut(key)

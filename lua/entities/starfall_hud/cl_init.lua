@@ -3,24 +3,19 @@ include("shared.lua")
 ENT.RenderGroup = RENDERGROUP_BOTH
 
 
-function ENT:Initialize ()
+function ENT:Initialize()
 	self.BaseClass.Initialize(self)
 
-	net.Start("starfall_processor_update_links")
-		net.WriteEntity(self)
+	net.Start("starfall_processor_link")
+		net.WriteUInt(self:EntIndex(), 16)
 	net.SendToServer()
 end
 
-function ENT:LinkEnt (ent)
-	self.link = ent
-end
-
-function ENT:Draw ()
+function ENT:Draw()
 	self:DrawModel()
 end
 
 SF.ActiveHuds = {}
-local hook_pref = "starfall_hud_hook_"
 local ConnectHUD, DisconnectHUD
 
 local Hint_FirstPrint = true
@@ -37,8 +32,8 @@ function ConnectHUD(ent)
 	if not (ent.link and ent.link:IsValid()) then return end
 	local instance = ent.link.instance
 	if not instance then return end
-	instance:runScriptHook("hudconnected", SF.WrapObject(ent))
-	SF.CallHook("starfall_hud_connected", instance, ent)
+	instance:runScriptHook("hudconnected", instance.WrapObject(ent))
+	instance:RunHook("starfall_hud_connected", ent)
 end
 
 function DisconnectHUD(ent)
@@ -49,8 +44,8 @@ function DisconnectHUD(ent)
 	if not (ent.link and ent.link:IsValid()) then return end
 	local instance = ent.link.instance
 	if not instance then return end
-	instance:runScriptHook("huddisconnected", SF.WrapObject(ent))
-	SF.CallHook("starfall_hud_disconnected", instance, ent)
+	instance:runScriptHook("huddisconnected", instance.WrapObject(ent))
+	instance:RunHook("starfall_hud_disconnected", ent)
 end
 
 net.Receive("starfall_hud_set_enabled" , function()

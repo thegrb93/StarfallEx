@@ -1,8 +1,5 @@
-if not pcall(require, "joystick") then return end
+if not SF.Require("joystick") then return function() end end
 
---- Joystick library.
--- @client
-local joystick_library = SF.RegisterLibrary("joystick")
 local next_updates = {}
 
 local function refresh(enum)
@@ -13,6 +10,17 @@ local function refresh(enum)
 		joystick.refresh(enum)
 	end
 end
+
+--- Joystick library.
+-- @name joystick
+-- @class library
+-- @libtbl joystick_library
+SF.RegisterLibrary("joystick")
+
+return function(instance)
+
+local joystick_library = instance.Libraries.joystick
+
 
 --- Gets the axis data value.
 -- @param enum Joystick number. Starts at 0
@@ -77,4 +85,6 @@ end
 function joystick_library.numButtons(enum)
 	refresh(enum)
 	return joystick.count(enum, 3)
+end
+
 end

@@ -10,11 +10,11 @@ surface.CreateFont("Starfall_ErrorFont", {
 	weight = 200
 })
 
-function ENT:Initialize ()
+function ENT:Initialize()
 	self.BaseClass.Initialize(self)
 
-	net.Start("starfall_processor_update_links")
-		net.WriteEntity(self)
+	net.Start("starfall_processor_link")
+		net.WriteUInt(self:EntIndex(), 16)
 	net.SendToServer()
 
 	local info = self.Monitor_Offsets[self:GetModel()]
@@ -47,13 +47,10 @@ function ENT:Initialize ()
 	self.Aspect = info.RatioX
 	self.Scale = info.RS
 	self.Origin = info.offset
+	self.Transform = self:GetWorldTransformMatrix() * self.ScreenMatrix
 
 	local w, h = 512 / self.Aspect, 512
 	self.ScreenQuad = {Vector(0,0,0), Vector(w,0,0), Vector(w,h,0), Vector(0,h,0), Color(0, 0, 0, 255)}
-end
-
-function ENT:LinkEnt (ent)
-	self.link = ent
 end
 
 function ENT:RenderScreen()
@@ -63,8 +60,9 @@ function ENT:RenderScreen()
 			if SF.Permissions.hasAccess(instance, nil, "render.screen") then
 
 				instance.data.render.renderEnt = self
-
 				instance:runScriptHook("render")
+				instance.data.render.renderEnt = nil
+
 			end
 		elseif self.link.error then
 			local error = self.link.error
@@ -82,7 +80,7 @@ function ENT:RenderScreen()
 	end
 end
 
-function ENT:Draw ()
+function ENT:Draw()
 	self:DrawModel()
 end
 
@@ -91,7 +89,7 @@ function ENT:SetBackgroundColor(r, g, b, a)
 end
 
 local writez = Material("engine/writez")
-function ENT:DrawTranslucent ()
+function ENT:DrawTranslucent()
 	self:DrawModel()
 
 	if halo.RenderedEntity() == self then return end

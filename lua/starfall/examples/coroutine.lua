@@ -3,12 +3,12 @@
 --@server
 
 -- Some functions for checking our quota usage.
-local function checkQ (n)
+local function checkQ(n)
 	return quotaAverage() < quotaMax()*n
 end
 
 -- Check if we should yield
-local function yieldCheck ()
+local function yieldCheck()
 	if not checkQ(0.95) then
 		coroutine.yield()
 	end

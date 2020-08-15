@@ -106,50 +106,38 @@ function TabHandler:GetSyntaxColor(name)
 end
 
 ---------------------
-local libsworkingastypes = { -- those aren't present in docs
-	["string"] = true,
-	["table"] = true,
-}
-local function createWireLibraryMap () -- Hashtable
-
+local function createWireLibraryMap()
 	local libMap = {}
-	libMap["Methods"] = {}
-	for lib, tbl in pairs(SF.Docs.classes) do
-		if not isstring(lib) then continue end -- We gotta skip numberics
-		for name, val in pairs(tbl.methods) do
-			if not isstring(name) then continue end -- We gotta skip numberics
-			libMap["Methods"][name] = true
-		end
-	end
+	libMap.Methods = {}
+	libMap.Environment = {}
 
-	libMap["Environment"] = {}
-	for name, val in pairs(SF.DefaultEnvironment) do
-		if istable(val) then
-			libMap["Environment"][name] = {}
-			for n, v in pairs(val) do
-				libMap["Environment"][name][n] = type(v)
-			end
-			continue
-		end
-		libMap["Environment"][name] = type(val)
-	end
-
-	for lib, tbl in pairs(SF.Libraries) do --Constants/enums aren't present in docs ATM
-		libMap[lib] = {}
-		for name, val in pairs(tbl) do
-			libMap[lib][name] = type(val)
-			if libsworkingastypes[lib] then
-				libMap["Methods"][name] = true
-			end
+	for typename, tbl in pairs(SF.Docs.Types) do
+		for methodname, val in pairs(tbl.methods) do
+			libMap.Methods[methodname] = true
 		end
 	end
-	--Gathering data from docs
-	for lib, tbl in pairs(SF.Docs.libraries) do
-		if not isstring(lib) then continue end -- We gotta skip numberics
-		libMap[lib] = {}
-		for name, val in pairs(tbl.functions) do
-			if not isstring(name) then continue end -- We gotta skip numberics
-			libMap[lib][name] = val.class
+	for libname, lib in pairs(SF.Docs.Libraries) do
+		local tbl
+		if libname == "builtins" then
+			tbl = libMap.Environment
+		else
+			tbl = {}
+			libMap[libname] = tbl
+		end
+		for name, val in pairs(lib.methods) do
+			tbl[name] = val.class
+		end
+		for name, val in pairs(lib.fields) do
+			tbl[name] = val.class
+		end
+	end
+	for name, val in pairs(SF.Docs.Libraries.builtins.tables) do
+		local tbl = {}
+		libMap[name] = tbl
+		if val.fields then
+			for _, fielddata in pairs(val.fields) do
+				tbl[fielddata.name] = "field"
+			end
 		end
 	end
 
@@ -1438,7 +1426,7 @@ end
 
 function PANEL:_OnTextChanged()
 	local ctrlv = false
-	local text = self.TextEntry:GetValue()
+	local text = self.TextEntry:GetText()
 	self.TextEntry:SetText("")
 
 	if (input.IsKeyDown(KEY_LCONTROL) or input.IsKeyDown(KEY_RCONTROL)) and not (input.IsKeyDown(KEY_LALT) or input.IsKeyDown(KEY_RALT)) then
@@ -2631,7 +2619,7 @@ function PANEL:_OnKeyCodeTyped(code)
 	end
 
 	if control and not handled then
-		handled = self:OnShortcut(code)
+		handled = self:OnShortcut(code, shift)
 	end
 
 	return handled

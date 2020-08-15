@@ -9,6 +9,9 @@ local PANEL = {} -- It's our VGUI
 -------------------------------
 
 function TabHandler:Init() -- It's caled when editor is initalized, you can create library map there etc
+	http.Fetch(SF.Editor.HelperURL:GetString(), function(data)
+		self.htmldata = data
+	end)
 end
 
 function TabHandler:RegisterSettings() -- Setting panels should be registered there
@@ -35,6 +38,7 @@ local function htmlSetup(old, new)
 		if not (new and new:IsValid()) then return end
 		_.loaded = true
 		new.url = url
+		html:RunJavascript([[SF_DOC.BuildPages(]]..util.TableToJSON(SF.Docs)..[[);]])
 	end
 end
 
@@ -49,7 +53,6 @@ end
 function TabHandler:Cleanup() -- Called when editor is reloaded/removed
 end
 
-
 -----------------------
 -- VGUI part (content)
 -----------------------
@@ -60,12 +63,7 @@ function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate
 	html:DockPadding(0, 0, 0, 0)
 	html:SetKeyboardInputEnabled(true)
 	html:SetMouseInputEnabled(true)
-	html:OpenURL(SF.Editor.HelperURL:GetString())
-	timer.Simple(3,function()
-		if not html.loaded then
-			SF.AddNotify(LocalPlayer(), "Your connection seems to be slow or offline, you may try using legacy helper(available from settings).", "GENERIC" , 10, "DRIP2")
-		end
-	end)
+	html:SetHTML(TabHandler.htmldata)
 	self.html = html
 	htmlSetup(nil, self)
 end

@@ -51,7 +51,7 @@ else
 	end)
 
 	http.get("https://dl.dropboxusercontent.com/s/vdcb9ujr7qslg51/sphere.obj",function(data)
-		sphere = mesh.createFromObj(data)
+		sphere = mesh.createFromObj(data).Sphere
 		init()
 	end)
 end

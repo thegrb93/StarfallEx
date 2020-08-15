@@ -1,17 +1,21 @@
 
 --- Library for retreiving information about teams
--- @shared
-local team_library = SF.RegisterLibrary("team")
-local cwrap, cunwrap
-SF.AddHook("postload", function()
-	cwrap = SF.Color.Wrap
-	cunwrap = SF.Color.Unwrap
-end)
+-- @name team
+-- @class library
+-- @libtbl team_library
+SF.RegisterLibrary("team")
+
+
+return function(instance)
+
+
+local team_library = instance.Libraries.team
+local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 
 --- Returns a table containing team information
 -- @return table containing team information
 function team_library.getAllTeams()
-	return SF.Sanitize(team.GetAllTeams())
+	return instance.Sanitize(team.GetAllTeams())
 end
 
 --- Returns the color of a team
@@ -25,7 +29,7 @@ end
 -- @param ind Index of the team
 -- @return Table of players
 function team_library.getPlayers(ind)
-	return SF.Sanitize(team.GetPlayers(ind))
+	return instance.Sanitize(team.GetPlayers(ind))
 end
 
 --- Returns team with least players
@@ -82,3 +86,5 @@ team_library.getNumFrags = team.TotalFrags
 -- @param ind Index of the team
 -- @return boolean
 team_library.exists = team.Valid
+
+end

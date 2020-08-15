@@ -6,7 +6,7 @@ util.AddNetworkString("starfall_hud_set_enabled")
 
 local vehiclelinks = SF.EntityTable("vehicleLinks")
 
-function ENT:Initialize ()
+function ENT:Initialize()
 	self.BaseClass.Initialize(self)
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
@@ -24,27 +24,35 @@ function ENT:SetHudEnabled(ply, mode)
 		if (self.link and self.link:IsValid()) then
 			local instance = self.link.instance
 			if instance then
-				instance:runScriptHook("hudconnected", SF.WrapObject(self))
+				instance:runScriptHook("hudconnected", instance.WrapObject(self))
+			end
+			
+			if self.locksControls then
+				net.Start("starfall_lock_control")
+					net.WriteEntity(self.link)
+					net.WriteBool(true)
+				net.Send(ply)
 			end
 		end
 		ply.sfhudenabled = self
-		if self.locksControls then
-			net.Start("starfall_lock_control") net.WriteBool(true) net.Send(ply)
-		end
 	end
 
 	local function disconnect()
 		if (self.link and self.link:IsValid()) then
 			local instance = self.link.instance
 			if instance then
-				instance:runScriptHook("huddisconnected", SF.WrapObject(self))
+				instance:runScriptHook("huddisconnected", instance.WrapObject(self))
+			end
+
+			if self.locksControls then
+				net.Start("starfall_lock_control")
+					net.WriteEntity(self.link)
+					net.WriteBool(false)
+				net.Send(ply)
 			end
 		end
 		ply.sfhudenabled = nil
 		ply:SetViewEntity()
-		if self.locksControls then
-			net.Start("starfall_lock_control") net.WriteBool(false) net.Send(ply)
-		end
 	end
 
 	if mode == 1 then
@@ -74,14 +82,6 @@ function ENT:Use(ply)
 			net.WriteEntity(ply)
 		net.Broadcast()
 	end
-end
-
-function ENT:LinkEnt (ent, ply)
-	self.link = ent
-	net.Start("starfall_processor_link")
-		net.WriteEntity(self)
-		net.WriteEntity(ent)
-	if ply then net.Send(ply) else net.Broadcast() end
 end
 
 function ENT:LinkVehicle(ent)
@@ -118,7 +118,7 @@ hook.Add("PlayerLeaveVehicle", "Starfall_HUD_PlayerLeaveVehicle", function(ply, 
 	end
 end)
 
-function ENT:PreEntityCopy ()
+function ENT:PreEntityCopy()
 	if self.EntityMods then self.EntityMods.SFLink = nil end
 	local info = {}
 	if (self.link and self.link:IsValid()) then
@@ -138,7 +138,7 @@ function ENT:PreEntityCopy ()
 	end
 end
 
-function ENT:PostEntityPaste (ply, ent, CreatedEntities)
+function ENT:PostEntityPaste(ply, ent, CreatedEntities)
 	if ent.EntityMods and ent.EntityMods.SFLink then
 		local info = ent.EntityMods.SFLink
 		if info.link then

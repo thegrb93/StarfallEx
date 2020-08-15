@@ -1,26 +1,34 @@
--------------------------------------------------------------------------------
--- Physenv library
--------------------------------------------------------------------------------
+
 
 --- Physenv functions
--- @shared
-local physenv_lib = SF.RegisterLibrary("physenv")
+-- @name physenv
+-- @class library
+-- @libtbl physenv_lib
+SF.RegisterLibrary("physenv")
+
+
+return function(instance)
+
+local physenv_lib = instance.Libraries.physenv
+local vwrap = instance.Types.Vector.Wrap
 
 --- Gets the air density.
 -- @return number Air Density
-function physenv_lib.getAirDensity ()
+function physenv_lib.getAirDensity()
 	return physenv.GetAirDensity()
 end
 
 --- Gets the gravity vector
 -- @return Vector Gravity Vector ( eg Vector(0,0,-600) )
-function physenv_lib.getGravity ()
-	return SF.WrapObject(physenv.GetGravity())
+function physenv_lib.getGravity()
+	return vwrap(physenv.GetGravity())
 end
 
 --- Gets the performance settings.</br>
--- See <a href="http://wiki.garrysmod.com/page/Structures/PhysEnvPerformanceSettings">PhysEnvPerformance Settings Table Structure</a> for table structure.
+-- See http://wiki.facepunch.com/gmod/Structures/PhysEnvPerformanceSettings for table structure.
 -- @return table Performance Settings Table.
-function physenv_lib.getPerformanceSettings ()
-	return SF.Sanitize(physenv.GetPerformanceSettings())
+function physenv_lib.getPerformanceSettings()
+	return instance.Sanitize(physenv.GetPerformanceSettings())
+end
+
 end

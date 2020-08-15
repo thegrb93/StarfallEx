@@ -14,8 +14,8 @@ P.checks = {
 		local owner = instance.player
 		return LocalPlayer()==owner or (owner and owner:IsValid() and owner:GetFriendStatus()=="friend"), "This function can only be used on the player's or their friends' chips"
 	end,
-	function() return true end,
-	function() return false, "This function is disabled" end
+	"allow",
+	"block"
 }
 
 SF.Permissions.registerProvider(P)

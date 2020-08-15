@@ -5,6 +5,8 @@
 ---------------------------------------------------------------------
 
 local dsethook, dgethook = debug.sethook, debug.gethook
+local dgetmeta = debug.getmetatable
+
 if SERVER then
 	SF.cpuQuota = CreateConVar("sf_timebuffer", 0.005, FCVAR_ARCHIVE, "The max average the CPU time can reach.")
 	SF.cpuBufferN = CreateConVar("sf_timebuffersize", 100, FCVAR_ARCHIVE, "The window width of the CPU time quota moving average.")
@@ -32,63 +34,78 @@ SF.playerInstances = {}
 -- @param mainfile If code is a table, this specifies the first file to parse.
 -- @param player The "owner" of the instance
 -- @param data The table to set instance.data to. Default is a new table.
--- @param dontpreprocess Set to true to skip preprocessing
 -- @return True if no errors, false if errors occured.
 -- @return The compiled instance, or the error message.
-function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
+function SF.Instance.Compile(code, mainfile, player, data)
 	if isstring(code) then
 		mainfile = mainfile or "generic"
 		code = { [mainfile] = code }
 	end
 
-	local quotaRun
-	if SERVER then
-		if SF.softLockProtection:GetBool() then
-			quotaRun = SF.Instance.runWithOps
-		else
-			quotaRun = SF.Instance.runWithoutOps
-		end
-	else
-		if SF.softLockProtection:GetBool() then
-			quotaRun = SF.Instance.runWithOps
-		elseif SF.softLockProtectionOwner:GetBool() and LocalPlayer() ~= player then
-			quotaRun = SF.Instance.runWithOps
-		else
-			quotaRun = SF.Instance.runWithoutOps
-		end
-	end
-
 	local instance = setmetatable({}, SF.Instance)
-
-	instance.player = player
-	instance.env = SF.BuildEnvironment()
-	instance.env._G = instance.env
 	instance.data = data or {}
-	instance.ppdata = {}
-	instance.ops = 0
 	instance.hooks = {}
 	instance.scripts = {}
 	instance.source = code
-	instance.initialized = false
 	instance.mainfile = mainfile
 	instance.requires = {}
-	instance.requirestack = {string.GetPathFromFilename(mainfile)}
-	instance.cpuQuota = (SERVER or LocalPlayer() ~= player) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
-	instance.cpuQuotaRatio = 1 / SF.cpuBufferN:GetInt()
-	instance.run = quotaRun
-	instance.startram = collectgarbage("count")
+	instance.requirestack = {mainfile}
 
-	if CLIENT and instance.cpuQuota <= 0 then
-		return false, { message = "Cannot execute with 0 sf_timebuffer", traceback = "" }
+	instance.ppdata = {}
+	for filename, source in pairs(code) do
+		SF.Preprocessor.ParseDirectives(filename, source, instance.ppdata)
 	end
 
-	for filename, source in pairs(code) do
-		if not dontpreprocess then
-			SF.Preprocessor.ParseDirectives(filename, source, instance.ppdata)
+	if player ~= SF.Superuser and instance.ppdata.superuser and instance.ppdata.superuser[mainfile] then
+		if player:IsSuperAdmin() then
+			player = SF.Superuser
+		else
+			return false, { message = "Can't use --@superuser unless you are superadmin!", traceback = "" }
 		end
+	end
+	instance.player = player
 
+	local quotaRun
+	if player == SF.Superuser then
+		quotaRun = SF.Instance.runWithoutOps
+	else
+		if SERVER then
+			if SF.softLockProtection:GetBool() then
+				quotaRun = SF.Instance.runWithOps
+			else
+				quotaRun = SF.Instance.runWithoutOps
+			end
+		else
+			if SF.softLockProtection:GetBool() then
+				quotaRun = SF.Instance.runWithOps
+			elseif SF.softLockProtectionOwner:GetBool() and LocalPlayer() ~= player then
+				quotaRun = SF.Instance.runWithOps
+			else
+				quotaRun = SF.Instance.runWithoutOps
+			end
+		end
+	end
+	instance.run = quotaRun
+	
+	if quotaRun == SF.Instance.runWithOps then
+		instance.cpuQuota = (SERVER or LocalPlayer() ~= player) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
+		instance.cpuQuotaRatio = 1 / SF.cpuBufferN:GetInt()
+
+		if CLIENT and instance.cpuQuota <= 0 then
+			return false, { message = "Cannot execute with 0 sf_timebuffer", traceback = "" }
+		end
+	else
+		instance.cpuQuota = math.huge
+		instance.cpuQuotaRatio = 0
+	end
+
+	local ok, err = xpcall(instance.BuildEnvironment, debug.traceback, instance)
+	if not ok then
+		return false, { message = "", traceback = err }
+	end
+	for filename, source in pairs(code) do
 		local serverorclient
-		if  instance.ppdata.serverorclient then
+		if instance.ppdata.serverorclient then
 			serverorclient = instance.ppdata.serverorclient[filename]
 		end
 
@@ -105,7 +122,298 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 		end
 	end
 
+	instance.startram = collectgarbage("count")
+
 	return true, instance
+end
+
+--- Adds a hook to the instance
+-- @param name The hook name
+-- @param func The hook function
+function SF.Instance:AddHook(name, func)
+	local hook = self.Hooks[name]
+	if hook then
+		hook[#hook + 1] = func
+	else
+		self.Hooks[name] = {func}
+	end
+end
+
+--- Runs a library hook.
+-- @param name Hook to run.
+-- @param ... Additional arguments.
+function SF.Instance:RunHook(name, ...)
+	local hook = self.Hooks[name]
+	if hook then
+		for i = 1, #hook do
+			hook[i](...)
+		end
+	end
+end
+
+--- Creates and registers a library.
+-- @param name The library name
+-- @return methods The library's methods
+function SF.RegisterLibrary(name)
+	SF.Libraries[name] = true
+end
+
+--- Registers a type.
+-- @param name The library name
+-- @param weakwrapper Make the wrapper weak inside the internal lookup table. Default: True
+-- @param weaksensitive Make the sensitive data weak inside the internal lookup table. Default: True
+-- @param target_metatable (optional) The metatable of the object that will get
+-- 		wrapped by these wrapper functions.  This is required if you want to
+-- 		have the object be auto-recognized by the generic self.WrapObject
+--		function.
+-- @param super Optional type name that this will inherit from
+-- @return methods The type's methods
+-- @return metamethods The type's metamethods
+function SF.RegisterType(name, weakwrapper, weaksensitive, target_metatable, supertype, customwrappers)
+	SF.Types[name] = {
+		weakwrapper = weakwrapper,
+		weaksensitive = weaksensitive,
+		target_metatable = target_metatable,
+		supertype = supertype,
+		customwrappers = customwrappers,
+	}
+end
+
+--- Creates wrap/unwrap functions for sensitive values, by using a lookup table
+-- (which is set to have weak keys and values)
+-- @param metatable The metatable to assign the wrapped value.
+-- @return The function to wrap sensitive values to a SF-safe table
+-- @return The function to unwrap the SF-safe table to the sensitive table
+function SF.Instance:CreateWrapper(metatable, typedata)
+	
+	local wrap, unwrap
+	-- If the type already has wrappers, dont re-assign
+	if typedata.weakwrapper==nil or typedata.weaksensitive==nil then
+		if typedata.customwrappers then
+			wrap, unwrap = typedata.customwrappers(self.CheckType, metatable)
+		else
+			return
+		end
+	else
+
+		local sf2sensitive = setmetatable({}, { __mode = (typedata.weakwrapper and "k" or "") .. (typedata.weaksensitive and "v" or "") })
+		local sensitive2sf = setmetatable({}, { __mode = (typedata.weaksensitive and "k" or "") .. (typedata.weakwrapper and "v" or "") })
+		metatable.sensitive2sf = sensitive2sf
+		metatable.sf2sensitive = sf2sensitive
+
+		if metatable.supertype then
+			local supersensitive2sf = metatable.supertype.sensitive2sf
+			local supersf2sensitive = metatable.supertype.sf2sensitive
+
+			function wrap(value)
+				if value == nil then return nil end
+				if sensitive2sf[value] then return sensitive2sf[value] end
+				local tbl = setmetatable({}, metatable)
+				sensitive2sf[value] = tbl
+				sf2sensitive[tbl] = value
+				supersensitive2sf[value] = tbl
+				supersf2sensitive[tbl] = value
+				return tbl
+			end
+		else
+			function wrap(value)
+				if value == nil then return nil end
+				if sensitive2sf[value] then return sensitive2sf[value] end
+				local tbl = setmetatable({}, metatable)
+				sensitive2sf[value] = tbl
+				sf2sensitive[tbl] = value
+				return tbl
+			end
+		end
+		function unwrap(value)
+			local ret = sf2sensitive[value]
+			return ret or self.CheckType(value, metatable, 2) or SF.Throw("Object no longer valid", 3)
+		end
+	end
+
+	if typedata.target_metatable then
+		self.object_wrappers[typedata.target_metatable] = wrap
+	end
+	self.object_unwrappers[metatable] = unwrap
+
+	metatable.Wrap = wrap
+	metatable.Unwrap = unwrap
+end
+
+--- Builds an environment table
+-- @return The environment
+function SF.Instance:BuildEnvironment()
+	self.Hooks = {}
+	self.Libraries = {}
+	self.Types = {}
+	self.env = {}
+
+	local object_wrappers = {}
+	local object_unwrappers = {}
+	self.object_wrappers = object_wrappers
+	self.object_unwrappers = object_unwrappers
+
+	--- Checks the starfall type of val. Errors if the types don't match
+	-- @param val The value to be checked.
+	-- @param typ A metatable.
+	-- @param level Level at which to error at. 2 is added to this value. Default is 1.
+	function self.CheckType(val, typ, level)
+		local meta = dgetmeta(val)
+		if meta == typ or (meta and meta.supertype == typ and object_unwrappers[meta]) then
+			return val
+		else
+			assert(istable(typ) and typ.__metatable and isstring(typ.__metatable))
+			level = (level or 1) + 2
+			SF.ThrowTypeError(typ.__metatable, SF.GetType(val), level)
+		end
+	end
+
+	function self.IsSFType(val)
+		local metatable = dgetmeta(val)
+		return metatable and object_unwrappers[metatable]~=nil
+	end
+
+	-- A list of safe data types
+	local safe_types = {
+		[TYPE_NUMBER] = true,
+		[TYPE_STRING] = true,
+		[TYPE_BOOL] = true,
+		[TYPE_NIL] = true,
+	}
+
+	--- Wraps the given object so that it is safe to pass into starfall
+	-- It will wrap it as long as we have the metatable of the object that is
+	-- getting wrapped.
+	-- @param object the object needing to get wrapped as it's passed into starfall
+	-- @return returns nil if the object doesn't have a known wrapper,
+	-- or returns the wrapped object if it does have a wrapper.
+	local function WrapObject(object)
+		local metatable = dgetmeta(object)
+		if metatable then
+			local wrap = object_wrappers[metatable]
+			if wrap then
+				return wrap(object)
+			else
+				-- Check if the object is already an SF type
+				if object_unwrappers[metatable] then
+					return object
+				end
+			end
+		end
+		-- Do not elseif here because strings do have a metatable.
+		if safe_types[TypeID(object)] then
+			return object
+		end
+	end
+	self.WrapObject = WrapObject
+
+	--- Takes a wrapped starfall object and returns the unwrapped version
+	-- @param object the wrapped starfall object, should work on any starfall
+	-- wrapped object.
+	-- @return the unwrapped starfall object
+	local function UnwrapObject(object)
+		local metatable = dgetmeta(object)
+		if metatable then
+			local unwrap = object_unwrappers[metatable]
+			if unwrap then
+				return unwrap(object)
+			end
+		end
+		if safe_types[TypeID(object)] then
+			return object
+		end
+	end
+	self.UnwrapObject = UnwrapObject
+
+	--- Sanitizes and returns its argument list.
+	-- Basic types are returned unchanged. Non-object tables will be
+	-- recursed into and their keys and values will be sanitized. Object
+	-- types will be wrapped if a wrapper is available. When a wrapper is
+	-- not available objects will be replaced with nil, so as to prevent
+	-- any possiblitiy of leakage. Functions will always be replaced with
+	-- nil as there is no way to verify that they are safe.
+	function self.Sanitize(original)
+		local completed_tables = {}
+
+		local function RecursiveSanitize(tbl)
+			local return_list = {}
+			completed_tables[tbl] = return_list
+			for key, value in pairs(tbl) do
+				local keyt = TypeID(key)
+				local valuet = TypeID(value)
+				if not safe_types[keyt] then
+					key = WrapObject(key) or (keyt == TYPE_TABLE and (completed_tables[key] or RecursiveSanitize(key)) or nil)
+				end
+				if not safe_types[valuet] then
+					value = WrapObject(value) or (valuet == TYPE_TABLE and (completed_tables[value] or RecursiveSanitize(value)) or nil)
+				end
+				return_list[key] = value
+			end
+			return return_list
+		end
+
+		return RecursiveSanitize(original)
+	end
+
+	--- Takes output from starfall and does it's best to make the output
+	-- fully usable outside of starfall environment
+	function self.Unsanitize(original)
+		local completed_tables = {}
+
+		local function RecursiveUnsanitize(tbl)
+			local return_list = {}
+			completed_tables[tbl] = return_list
+			for key, value in pairs(tbl) do
+				if TypeID(key) == TYPE_TABLE then
+					key = UnwrapObject(key) or completed_tables[key] or RecursiveUnsanitize(key)
+				end
+				if TypeID(value) == TYPE_TABLE then
+					value = UnwrapObject(value) or completed_tables[value] or RecursiveUnsanitize(value)
+				end
+				return_list[key] = value
+			end
+			return return_list
+		end
+
+		return RecursiveUnsanitize(original)
+	end
+	
+	for name, _ in pairs(SF.Libraries) do
+		self.Libraries[name] = {}
+	end
+	
+	for name, typedata in pairs(SF.Types) do
+		local methods = {}
+		local metatable = {__metatable = name, __index = methods, supertype = typedata.supertype, Methods = methods}
+		self.Types[name] = metatable
+	end
+	
+	for name, meta in pairs(self.Types) do
+		if meta.supertype then
+			local supermeta = self.Types[meta.supertype]
+			meta.supertype = supermeta
+			setmetatable(meta.Methods, {__index = supermeta.Methods})
+		else
+			self:CreateWrapper(meta, SF.Types[name])
+		end
+	end
+	
+	for name, meta in pairs(self.Types) do
+		if meta.supertype then
+			self:CreateWrapper(meta, SF.Types[name])
+		end
+	end
+	
+	for name, mod in pairs(SF.Modules) do
+		for filename, data in pairs(mod) do
+			if data.init then
+				local ok, err = xpcall(function() data.init(self) end, debug.traceback)
+				if not ok then ErrorNoHalt(err) end
+			end
+		end
+	end
+	table.Inherit( self.env, self.Libraries ) 
+	self.env._G = self.env
 end
 
 --- Overridable hook for pcall-based hook systems
@@ -131,8 +439,8 @@ local function safeThrow(self, msg, nocatch, force)
 	end
 end
 
-local function xpcall_callback (err)
-	if debug.getmetatable(err)~=SF.Errormeta then
+local function xpcall_callback(err)
+	if dgetmeta(err)~=SF.Errormeta then
 		return SF.MakeError(err, 1)
 	end
 	return err
@@ -177,8 +485,6 @@ function SF.Instance:runWithOps(func, ...)
 		local usedRatio = self:movingCPUAverage() / self.cpuQuota
 		if usedRatio>1 then
 			return {false, SF.MakeError("CPU Quota exceeded.", 1, true, true)}
-		elseif usedRatio > self.cpu_softquota then
-			return {false, SF.MakeError("CPU Quota warning.", 1, false, true)}
 		end
 	end
 
@@ -196,41 +502,6 @@ function SF.Instance:runWithoutOps(func, ...)
 	return { xpcall(func, xpcall_callback, ...) }
 end
 
---- Internal function - Do not call. Prepares the script to be executed.
--- This is done automatically by Initialize and runScriptHook.
-function SF.Instance:prepare(hook)
-	assert(self.initialized, "Instance not initialized!")
-	--Functions calling this one will silently halt.
-	if self.error then return true end
-
-	if SF.instance ~= nil then
-		if self.instanceStack then
-			self.instanceStack[#self.instanceStack + 1] = SF.instance
-		else
-			self.instanceStack = {SF.instance}
-		end
-	end
-
-	SF.instance = self
-	self:runLibraryHook("prepare", hook)
-end
-
---- Internal function - Do not call. Cleans up the script.
--- This is done automatically by Initialize and runScriptHook.
-function SF.Instance:cleanup(hook, ok, err)
-	assert(SF.instance == self)
-	self:runLibraryHook("cleanup", hook, ok, err)
-
-	if self.instanceStack then
-		SF.instance = self.instanceStack[#self.instanceStack]
-		if #self.instanceStack == 1 then self.instanceStack = nil
-		else self.instanceStack[#self.instanceStack] = nil
-		end
-	else
-		SF.instance = nil
-	end
-end
-
 --- Runs the scripts inside of the instance. This should be called once after
 -- compiling/unpacking so that scripts can register hooks and such. It should
 -- not be called more than once.
@@ -238,9 +509,6 @@ end
 -- @return The error message, if applicable
 -- @return The error traceback, if applicable
 function SF.Instance:initialize()
-	assert(not self.initialized, "Already initialized!")
-	self.initialized = true
-
 	self.cpu_total = 0
 	self.cpu_average = 0
 	self.cpu_softquota = 1
@@ -252,18 +520,18 @@ function SF.Instance:initialize()
 		SF.playerInstances[self.player] = {[self] = true}
 	end
 
-	self:runLibraryHook("initialize")
-	self:prepare("_initialize")
+	self:RunHook("initialize")
 
+	self:RunHook("prepare", "_initialize")
 	local func = self.scripts[self.mainfile]
 	local tbl = self:run(func)
 	if not tbl[1] then
-		self:cleanup("_initialize", true, tbl[2])
+		self:RunHook("cleanup", "_initialize", true, tbl[2])
 		self:Error(tbl[2])
 		return false, tbl[2]
 	end
 
-	self:cleanup("_initialize", false)
+	self:RunHook("cleanup", "_initialize", false)
 	return true
 end
 
@@ -273,19 +541,21 @@ end
 -- @return True if it executed ok, false if not or if there was no hook
 -- @return If the first return value is false then the error message or nil if no hook was registered
 function SF.Instance:runScriptHook(hook, ...)
-	if not self.hooks[hook] then return {} end
-	if self:prepare(hook) then return {} end
+	if self.error then return {} end
+	local hooks = self.hooks[hook]
+	if not hooks then return {} end
+	self:RunHook("prepare", hook)
 	local tbl
-	for name, func in pairs(self.hooks[hook]) do
+	for name, func in hooks:pairs() do
 		tbl = self:run(func, ...)
 		if not tbl[1] then
 			tbl[2].message = "Hook '" .. hook .. "' errored with: " .. tbl[2].message
-			self:cleanup(hook, true, tbl[2])
+			self:RunHook("cleanup", hook, true, tbl[2])
 			self:Error(tbl[2])
 			return tbl
 		end
 	end
-	self:cleanup(hook, false)
+	self:RunHook("cleanup", hook, false)
 	return tbl
 end
 
@@ -296,10 +566,12 @@ end
 -- @return If the first return value is false then the error message or nil if no hook was registered. Else any values that the hook returned.
 -- @return The traceback if the instance errored
 function SF.Instance:runScriptHookForResult(hook, ...)
-	if not self.hooks[hook] then return {} end
-	if self:prepare(hook) then return {} end
+	if self.error then return {} end
+	local hooks = self.hooks[hook]
+	if not hooks then return {} end
+	self:RunHook("prepare", hook)
 	local tbl
-	for name, func in pairs(self.hooks[hook]) do
+	for name, func in hooks:pairs() do
 		tbl = self:run(func, ...)
 		if tbl[1] then
 			if tbl[2]~=nil then
@@ -307,20 +579,13 @@ function SF.Instance:runScriptHookForResult(hook, ...)
 			end
 		else
 			tbl[2].message = "Hook '" .. hook .. "' errored with: " .. tbl[2].message
-			self:cleanup(hook, true, tbl[2])
+			self:RunHook("cleanup", hook, true, tbl[2])
 			self:Error(tbl[2])
 			return tbl
 		end
 	end
-	self:cleanup(hook, false)
+	self:RunHook("cleanup", hook, false)
 	return tbl
-end
-
---- Runs a library hook. Alias to SF.CallHook(hook, self, ...).
--- @param hook Hook to run.
--- @param ... Additional arguments.
-function SF.Instance:runLibraryHook(hook, ...)
-	return SF.CallHook(hook, self, ...)
 end
 
 --- Runs an arbitrary function under the SF instance. This can be used
@@ -329,14 +594,15 @@ end
 -- @param func Function to run
 -- @param ... Arguments to pass to func
 function SF.Instance:runFunction(func, ...)
-	if self:prepare("_runFunction") then return {} end
+	if self.error then return {} end
+	self:RunHook("prepare", "_runFunction")
 
 	local tbl = self:run(func, ...)
 	if tbl[1] then
-		self:cleanup("_runFunction", false)
+		self:RunHook("cleanup", "_runFunction", false)
 	else
 		tbl[2].message = "Callback errored with: " .. tbl[2].message
-		self:cleanup("_runFunction", true, tbl[2])
+		self:RunHook("cleanup", "_runFunction", true, tbl[2])
 		self:Error(tbl[2])
 	end
 
@@ -345,7 +611,7 @@ end
 
 --- Deinitializes the instance. After this, the instance should be discarded.
 function SF.Instance:deinitialize()
-	self:runLibraryHook("deinitialize")
+	self:RunHook("deinitialize")
 	SF.allInstances[self] = nil
 	SF.playerInstances[self.player][self] = nil
 	if not next(SF.playerInstances[self.player]) then
@@ -359,10 +625,12 @@ hook.Add("Think", "SF_Think", function()
 	local ram = collectgarbage("count")
 	if SF.Instance.Ram then
 		if ram > SF.RamCap:GetInt() then
-			for inst, _ in pairs(SF.allInstances) do
-				inst:Error(SF.MakeError("Global RAM usage limit exceeded!!", 1))
+			local doClean = false
+			for instance, _ in pairs(SF.allInstances) do
+				doClean = true
+				instance:Error(SF.MakeError("Global RAM usage limit exceeded!!", 1))
 			end
-			collectgarbage()
+			if doClean then collectgarbage() end
 		end
 		SF.Instance.Ram = ram
 		SF.Instance.RamAvg = SF.Instance.RamAvg*0.999 + ram*0.001
@@ -379,13 +647,14 @@ hook.Add("Think", "SF_Think", function()
 	end
 
 	for pl, insts in pairs(SF.playerInstances) do
-		local plquota = (SERVER or LocalPlayer() ~= pl) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
+		local plquota
 		local cputotal = 0
 		for instance, _ in pairs(insts) do
 			instance.cpu_average = instance:movingCPUAverage()
 			instance.cpu_total = 0
 			instance:runScriptHook("think")
 			cputotal = cputotal + instance.cpu_average
+			plquota = instance.cpuQuota
 		end
 
 		if cputotal>plquota then
@@ -423,15 +692,16 @@ end
 function SF.Instance:Error(err)
 	if self.error then return end
 	if self.runOnError then -- We have a custom error function, use that instead
-		self:runOnError(err)
+		self.runOnError(err)
 	else
 		-- Default behavior
 		self:deinitialize()
 	end
 end
 
--- Don't self modify. The average should only the modified per tick.
+-- Don't self modify. The average should only be modified per tick.
 function SF.Instance:movingCPUAverage()
 	return self.cpu_average + (self.cpu_total - self.cpu_average) * self.cpuQuotaRatio
 end
+
 

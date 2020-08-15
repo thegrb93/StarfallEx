@@ -1,36 +1,11 @@
 -------------------------------------------------------------------------------
 -- The main Starfall library
 -------------------------------------------------------------------------------
-SF = SF or {}
-
+SF.Modules = {}
+SF.Types = {}
+SF.Libraries = {}
+SF.Superuser = {IsValid = function() return false end}
 local dgetmeta = debug.getmetatable
-
--------------------------------------------------------------------------------
--- Some basic initialization
--------------------------------------------------------------------------------
-
-if SERVER then
-	SF.Version = "StarfallEx"
-	local files, directories = file.Find( "addons/*", "GAME" )
-	local sf_dir = nil
-	for k,v in pairs(directories) do
-		if file.Exists("addons/"..v.."/lua/starfall/sflib.lua", "GAME") then
-			sf_dir = "addons/"..v.."/"
-			break
-		end
-	end
-	if sf_dir then
-		local head = file.Read(sf_dir..".git/HEAD","GAME") -- Where head points to
-		if head then
-			head = head:sub(6,-2) -- skipping ref: and new line
-			local lastCommit = file.Read( sf_dir..".git/"..head, "GAME")
-
-			if lastCommit then
-				SF.Version = SF.Version .. "_" .. lastCommit:sub(1,7) -- We need only first 7 to be safely unique
-			end
-		end
-	end
-end
 
 -- Make sure this is done after metatables have been set
 hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
@@ -42,22 +17,22 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 					local myMetaFunc = myMeta and myMeta[k]
 					if myMetaFunc then
 						meta[k] = function(...)
-							if SF.instance then return myMetaFunc(...) else return v(...) end
+							if SF.runningOps then return myMetaFunc(...) else return v(...) end
 						end
 					else
 						meta[k] = function(...)
-							if not SF.instance then return v(...) end
+							if not SF.runningOps then return v(...) end
 						end
 					end
 				elseif istable(v) and k=="__index" then
 					local myMetaFunc = myMeta and myMeta[k]
 					if myMetaFunc then
 						meta[k] = function(t,k)
-							if SF.instance then return myMetaFunc(t,k) else return rawget(t,k) end
+							if SF.runningOps then return myMetaFunc(t,k) else return rawget(t,k) end
 						end
 					else
 						meta[k] = function(t,k)
-							if not SF.instance then return rawget(t,k) end
+							if not SF.runningOps then return rawget(t,k) end
 						end
 					end
 				end
@@ -71,9 +46,9 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 	sanitizeTypeMeta(function() end)
 	sanitizeTypeMeta(coroutine.create(function() end))
 
-	local string_methods_copy = table.Copy(SF.Libraries.string)
+	local string_library = SF.SafeStringLib
 	local function sf_string_index(self, key)
-		local val = string_methods_copy[key]
+		local val = string_library[key]
 		if (val) then
 			return val
 		elseif (tonumber(key)) then
@@ -111,52 +86,49 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 	end
 end)
 
+
 -------------------------------------------------------------------------------
 -- Declare Basic Starfall Types
 -------------------------------------------------------------------------------
 
-local EntityTable = {
-	__newindex = function(t, e, v)
-		rawset(t, e, v)
-		if t.wait then
-			e:CallOnRemove("SF_" .. t.key, function()
-				timer.Simple(0, function()
-					if t[e] and not e:IsValid() then
-						t[e] = nil
-						if t.destructor then t.destructor(e, v) end
-					end
-				end)
-			end)
-		else
-			e:CallOnRemove("SF_" .. t.key, function()
-				if t[e] then
-					t[e] = nil
-					if t.destructor then t.destructor(e, v) end
-				end
-			end)
-		end
-	end
-}
 -- Returns a class that manages a table of entity keys
 function SF.EntityTable(key, destructor, dontwait)
-	local t = {
-		key = key,
-		destructor = destructor,
-		wait = CLIENT and not dontwait
-	}
-	return setmetatable(t, EntityTable)
+	return setmetatable({}, {
+		__newindex = function(t, e, v)
+			rawset(t, e, v)
+			if e ~= SF.Superuser then
+				if dontwait then
+					e:CallOnRemove("SF_" .. key, function()
+						if t[e] then
+							if destructor then destructor(e, v) end
+							t[e] = nil
+						end
+					end)
+				else
+					e:CallOnRemove("SF_" .. key, function()
+						timer.Simple(0, function()
+							if t[e] and not e:IsValid() then
+								if destructor then destructor(e, v) end
+								t[e] = nil
+							end
+						end)
+					end)
+				end
+			end
+		end
+	})
 end
 
 --- Returns a class that wraps a structure and caches indexes
 SF.StructWrapper = {
-	__call = function(p, data)
+	__call = function(p, instance, data)
 		local cache = {}
 		return setmetatable({}, {
 			__index = function(t, k)
 				if cache[k] then
 					return cache[k]
 				else
-					local ret = SF.WrapObject(data[k])
+					local ret = instance.WrapObject(data[k])
 					cache[k] = ret
 					return ret
 				end
@@ -174,10 +146,10 @@ setmetatable(SF.StructWrapper, SF.StructWrapper)
 SF.BurstObject = {
 	__index = {
 		use = function(self, ply, amount)
-			if ply:IsValid() then
+			if ply:IsValid() or ply==SF.Superuser then
 				local obj = self:get(ply)
 				local new = math.min(obj.val + (CurTime() - obj.lasttick) * self.rate, self.max) - amount
-				if new < 0 then
+				if new < 0 and ply~=SF.Superuser then
 					SF.Throw("The ".. self.name .." burst limit has been exceeded.", 3)
 				end
 				obj.lasttick = CurTime()
@@ -187,7 +159,7 @@ SF.BurstObject = {
 			end
 		end,
 		check = function(self, ply)
-			if ply:IsValid() then
+			if ply:IsValid() or ply==SF.Superuser then
 				local obj = self:get(ply)
 				obj.val = math.min(obj.val + (CurTime() - obj.lasttick) * self.rate, self.max)
 				obj.lasttick = CurTime()
@@ -235,10 +207,10 @@ setmetatable(SF.BurstObject, SF.BurstObject)
 SF.LimitObject = {
 	__index = {
 		use = function(self, ply, amount)
-			if ply:IsValid() then
+			if ply:IsValid() or ply==SF.Superuser then
 				local obj = self:get(ply)
 				local new = obj.val + amount
-				if new > self.max then
+				if new > self.max and ply~=SF.Superuser then
 					SF.Throw("The ".. self.name .." limit has been reached. (".. self.max ..")", 3)
 				end
 				obj.val = new
@@ -247,9 +219,9 @@ SF.LimitObject = {
 			end
 		end,
 		checkuse = function(self, ply, amount)
-			if ply:IsValid() then
+			if ply:IsValid() or ply==SF.Superuser then
 				local obj = self:get(ply)
-				if obj.val + amount > self.max then
+				if obj.val + amount > self.max and ply~=SF.Superuser then
 					SF.Throw("The ".. self.name .." limit has been reached. (".. self.max ..")", 3)
 				end
 			else
@@ -257,7 +229,7 @@ SF.LimitObject = {
 			end
 		end,
 		check = function(self, ply)
-			if ply:IsValid() then
+			if ply:IsValid() or ply==SF.Superuser then
 				return self.max - self:get(ply).val
 			else
 				SF.Throw("Invalid starfall user", 3)
@@ -320,13 +292,12 @@ SF.ResourceHandler = {
 			end
 		end,
 		check = function(self, ply)
-			self.players[ply] = self.players[ply] or 0
-			return self.players[ply] < self.max
+			return self.players[ply] < self.max or ply==SF.Superuser
 		end,
 		free = function(self, ply, object)
 			local t = self.typer(object)
 			if not self.objects[t][object] then
-				if ply then self.players[ply] = self.players[ply] - 1 end
+				if self.players[ply] <= 1 then self.players[ply] = nil else self.players[ply] = self.players[ply] - 1 end
 				self.objects[t][object] = true
 				if self.destructor then self.destructor(object) end
 			end
@@ -340,7 +311,7 @@ SF.ResourceHandler = {
 			destructor = destructor,
 			typer = typer,
 			objects = {},
-			players = setmetatable({},{__mode="k"}),
+			players = setmetatable({},{__index=function() return 0 end}),
 			max = max,
 		}
 		return setmetatable(t, p)
@@ -396,7 +367,7 @@ SF.Errormeta = {
 -- @param level Which level in the stacktrace to blame
 -- @param uncatchable Makes this exception uncatchable
 -- @param prependinfo The error message needs file and line number info
-function SF.MakeError (msg, level, uncatchable, prependinfo)
+function SF.MakeError(msg, level, uncatchable, prependinfo)
 	level = 1 + (level or 1)
 	local info = debug.getinfo(level, "Sl")
 	if not info then
@@ -425,8 +396,213 @@ end
 
 
 -------------------------------------------------------------------------------
+-- Starfall instance hook management
+-------------------------------------------------------------------------------
+
+do
+	local registered_instances = {}
+	local gmod_hooks = {}
+
+	local function getHookFunc(instances, hookname, customargfunc, customretfunc)
+		--- There are 4 varients of hookfunc depending on if there are custom callbacks
+		if customargfunc then
+			if customretfunc then
+				return function(...)
+					local result
+					for instance, _ in pairs(instances) do
+						local canrun, customargs = customargfunc(instance, ...)
+						if canrun then
+							local tbl = instance:runScriptHookForResult(hookname, unpack(customargs))
+							if tbl[1] then
+								local sane = customretfunc(instance, tbl, ...)
+								if sane ~= nil then result = sane end
+							end
+						end
+					end
+					return result
+				end
+			else
+				return function(...)
+					for instance, _ in pairs(instances) do
+						local canrun, customargs = customargfunc(instance, ...)
+						if canrun then
+							instance:runScriptHook(hookname, unpack(customargs))
+						end
+					end
+				end
+			end
+		else
+			if customretfunc then
+				return function(...)
+					local result
+					for instance, _ in pairs(instances) do
+						local tbl = instance:runScriptHookForResult(hookname, unpack(instance.Sanitize({...})))
+						if tbl[1] then
+							local sane = customretfunc(instance, tbl, ...)
+							if sane ~= nil then result = sane end
+						end
+					end
+					return result
+				end
+			else
+				return function(...)
+					for instance, _ in pairs(instances) do
+						instance:runScriptHook(hookname, unpack(instance.Sanitize({...})))
+					end
+				end
+			end
+		end
+	end
+
+	--- Returns a class that can manage hooks. Required because adding to a table being iterated with pairs is undefined behavior.
+	SF.HookTable = {
+		__index = {
+			add = function(self, index, func)
+				self.hookstoadd[index] = func
+			end,
+			remove = function(self, index)
+				self.hooks[index] = nil
+				self.hookstoadd[index] = nil
+			end,
+			isEmpty = function(self)
+				return next(self.hooks)==nil and next(self.hookstoadd)==nil
+			end,
+			pairs = function(self)
+				for k, v in pairs(self.hookstoadd) do
+					self.hooks[k] = v
+					self.hookstoadd[k] = nil
+				end
+				return pairs(self.hooks)
+			end
+		},
+		__call = function(p)
+			return setmetatable({
+				hooks = {},
+				hookstoadd = {}
+			}, p)
+		end
+	}
+	setmetatable(SF.HookTable, SF.HookTable)
+
+	--- Add a GMod hook so that SF gets access to it
+	-- @shared
+	-- @param hookname The hook name. In-SF hookname will be lowercased
+	-- @param customargfunc Optional custom function
+	-- Returns true if the hook should be called, then extra arguements to be passed to the starfall hooks
+	-- @param customretfunc Optional custom function
+	-- Takes values returned from starfall hook and returns what should be passed to the gmod hook
+	-- @param gmoverride Whether this hook should override the gamemode function (makes the hook run last, but adds a little overhead)
+	function SF.hookAdd(realname, hookname, customargfunc, customretfunc, gmoverride)
+		hookname = hookname or realname:lower()
+		registered_instances[hookname] = {}
+		if gmoverride then
+			local function override(again)
+				local hookfunc = getHookFunc(registered_instances[hookname], hookname, customargfunc, customretfunc)
+
+				local gmfunc
+				if again then
+					gmfunc = GAMEMODE["SF"..realname]
+				else
+					gmfunc = GAMEMODE[realname]
+					GAMEMODE["SF"..realname] = gmfunc
+				end
+
+				if gmfunc then
+					GAMEMODE[realname] = function(gm, ...)
+						local a,b,c,d,e,f = hookfunc(...)
+						if a~= nil then return a,b,c,d,e,f
+						else return gmfunc(gm, ...) end
+					end
+				else
+					GAMEMODE[realname] = function(gm, ...)
+						return hookfunc(...)
+					end
+				end
+			end
+			if GAMEMODE then
+				override(true)
+			else
+				hook.Add("Initialize", "SF_Hook_Override"..hookname, override)
+			end
+		else
+			gmod_hooks[hookname] = { realname, customargfunc, customretfunc }
+		end
+	end
+
+	function SF.HookAddInstance(instance, hookname)
+		local instances = registered_instances[hookname]
+		if instances then
+			if next(instances)==nil then
+				local gmod_hook = gmod_hooks[hookname]
+				if gmod_hook then
+					local realname, customargfunc, customretfunc = unpack(gmod_hook)
+					local hookfunc = getHookFunc(instances, hookname, customargfunc, customretfunc)
+					hook.Add(realname, "SF_Hook_"..hookname, hookfunc)
+				end
+			end
+			instances[instance] = true
+		end
+	end
+	
+	function SF.HookRemoveInstance(instance, hookname)
+		local instances = registered_instances[hookname]
+		if instances and instances[instance] then
+			instances[instance] = nil
+			if not next(instances) then
+				local gmod_hook = gmod_hooks[hookname]
+				if gmod_hook then
+					hook.Remove(gmod_hook[1], "SF_Hook_" .. hookname)
+				end
+			end
+		end
+	end
+
+	function SF.HookDestroyInstance(instance)
+		for hookname, instances in pairs(registered_instances) do
+			if instances[instance] then
+				instances[instance] = nil
+				if not next(instances) then
+					local gmod_hook = gmod_hooks[hookname]
+					if gmod_hook then
+						hook.Remove(gmod_hook[1], "SF_Hook_" .. hookname)
+					end
+				end
+			end
+		end
+	end
+end
+
+
+-------------------------------------------------------------------------------
 -- Utility functions
 -------------------------------------------------------------------------------
+
+--- Require .dll but doesn't throw an error. Returns true if success or false if fail.
+function SF.Require(moduleName)
+	local realmPrefix = SERVER and "sv" or "cl"
+	local osSuffix
+	if system.IsWindows() then
+		osSuffix = (jit.arch~="x64" and "win32" or "win64")
+	elseif system.IsLinux() then
+		osSuffix = (jit.arch~="x64" and "linux" or "linux64")
+	elseif system.IsOSX() then 
+		osSuffix = (jit.arch~="x64" and "osx" or "osx64")
+	else
+		error("couldn't determine system type?")
+	end
+
+	if file.Exists("lua/bin/gm"..realmPrefix.."_"..moduleName.."_"..osSuffix..".dll", "GAME") then
+		local ok, err = pcall(require, moduleName)
+		if ok then
+			return true
+		else
+			ErrorNoHalt(err)
+			return false
+		end
+	end
+	return false
+end
+
 
 function SF.CompileString(str, name, handle)
 	if string.find(str, "repeat.*continue.*until") then
@@ -435,208 +611,139 @@ function SF.CompileString(str, name, handle)
 	return CompileString(str, name, handle)
 end
 
+--- The safest write file function
+function SF.FileWrite(path, data)
+	path = SF.NormalizePath(path)
+	file.CreateDir(string.GetPathFromFilename( path ))
+	file.Write(path, data)
+	return file.Read(path)==data
+end
+
 --- Throws an error like the throw function in builtins
 -- @param msg Message
 -- @param level Which level in the stacktrace to blame
 -- @param uncatchable Makes this exception uncatchable
-function SF.Throw (msg, level, uncatchable)
+function SF.Throw(msg, level, uncatchable)
 	local level = 1 + (level or 1)
 	error(SF.MakeError(msg, level, uncatchable, true), level)
 end
 
 --- Throws a type error
-function SF.ThrowTypeError(expected, got, level)
+-- @param expected The expected type name
+-- @param got The type name that was provided
+-- @param level The stack level
+-- @param msg Optional error message
+function SF.ThrowTypeError(expected, got, level, msg)
 	local level = 1 + (level or 1)
 	local funcname = debug.getinfo(level-1, "n").name or "<unnamed>"
-	SF.Throw("Type mismatch (Expected " .. expected .. ", got " .. got .. ") in function " .. funcname, level)
+	SF.Throw((msg and #msg>0 and (msg .. " ") or "") .. "Type mismatch (Expected " .. expected .. ", got " .. got .. ") in function " .. funcname, level)
 end
 
-SF.Libraries = {}
-SF.Types = {}
-SF.Hooks = {}
+--- Lookup table of TYPE > name
+SF.TYPENAME = {
+	[TYPE_NONE]             = "Invalid type",
+	[TYPE_NIL]              = "nil",
+	[TYPE_BOOL]             = "boolean",
+	[TYPE_LIGHTUSERDATA]    = "light userdata",
+	[TYPE_NUMBER]           = "number",
+	[TYPE_STRING]           = "string",
+	[TYPE_TABLE]            = "table",
+	[TYPE_FUNCTION]         = "function",
+	[TYPE_USERDATA]         = "userdata",
+	[TYPE_THREAD]           = "thread",
+	[TYPE_ENTITY]           = "Entity",
+	[TYPE_VECTOR]           = "Vector",
+	[TYPE_ANGLE]            = "Angle",
+	[TYPE_PHYSOBJ]          = "PhysObj",
+	[TYPE_SAVE]             = "ISave",
+	[TYPE_RESTORE]          = "IRestore",
+	[TYPE_DAMAGEINFO]       = "CTakeDamageInfo",
+	[TYPE_EFFECTDATA]       = "CEffectData",
+	[TYPE_RECIPIENTFILTER]  = "CUserCmd",
+	[TYPE_SCRIPTEDVEHICLE]  = "ScriptedVehicle", -- Depricated, also TYPE Enum doesnt specify the name so this it is
+	[TYPE_MATERIAL]         = "IMaterial",
+	[TYPE_PANEL]            = "Panel",
+	[TYPE_PARTICLE]         = "CLuaParticle",
+	[TYPE_PARTICLEEMITTER]  = "CLuaEmitter",
+	[TYPE_TEXTURE]          = "ITexture",
+	[TYPE_USERMSG]          = "bf_read",
+	[TYPE_CONVAR]           = "ConVar",
+	[TYPE_IMESH]            = "IMesh",
+	[TYPE_MATRIX]           = "VMatrix",
+	[TYPE_SOUND]            = "CSoundPatch",
+	[TYPE_PIXELVISHANDLE]   = "pixelvis_handle_t",
+	[TYPE_DLIGHT]           = "dlight_t",
+	[TYPE_VIDEO]            = "IVideoWriter",
+	[TYPE_FILE]             = "File",
+	[TYPE_LOCOMOTION]       = "CLuaLocomotion",
+	[TYPE_PATH]             = "PathFollower",
+	[TYPE_NAVAREA]          = "CNavArea",
+	[TYPE_SOUNDHANDLE]      = "IGModAudioChannel",
+	[TYPE_NAVLADDER]        = "CNavLadder",
+	[TYPE_PARTICLESYSTEM]   = "CNewParticleEffect",
+	[TYPE_PROJECTEDTEXTURE] = "ProjectedTexture",
+	[TYPE_PHYSCOLLIDE]      = "PhysCollide",
+	[TYPE_SURFACEINFO]      = "SurfaceInfo",
+	[TYPE_COLOR]            = "Color" -- TypeID doesnt return this but lets still add it
+}
 
---- Creates and registers a library.
--- @param name The library name
-function SF.RegisterLibrary(name)
-	local methods = {}
-	SF.Libraries[name] = methods
-	return methods
-end
-
---- Creates and registers a type.
--- @param name The library name
--- @return methods The type's methods
--- @return metamethods The type's metamethods
-function SF.RegisterType(name)
-	local methods, metamethods = {}, {}
-	SF.Types[name] = metamethods
-	SF.Types[metamethods] = true
-	metamethods.__index = methods
-	metamethods.__methods = methods
-	metamethods.__metatable = name
-	return methods, metamethods
-end
-
---- Gets a starfall type. ACF uses this so can't remove it. (otherwise it's useless)
-function SF.GetTypeDef(name)
-	return SF.Types[name]
-end
-
---- Applies inheritance to a derived type.
--- @param methods The type's methods table
--- @param metamethods The type's metamethods table
--- @param supermeta The meta of the inherited type
-function SF.ApplyTypeDependencies(methods, metamethods, supermeta)
-	local supermethods = supermeta.__methods
-
-	setmetatable(methods, {__index = supermethods})
-
-	metamethods.__supertypes = { [supermeta] = true }
-	if supermeta.__supertypes then
-		for k, _ in pairs(supermeta.__supertypes) do
-			metamethods.__supertypes[k] = true
-		end
-	end
-end
-
-function SF.DeepDeepCopy(src, dst, done)
-	-- Copy the values
-	for k, v in pairs(src) do
-		if istable(k) then error("Tried to shallow copy a table!!") end
-		if istable(v) then
-			if done[v] then
-				dst[k] = done[v]
-			else
-				local t = {}
-				done[v] = t
-				SF.DeepDeepCopy(v, t, done)
-				dst[k] = t
-			end
-		else
-			dst[k] = v
-		end
-	end
-
-	-- Copy the metatable
-	local meta = dgetmeta(src)
-	if meta then
-		local t = {}
-		SF.DeepDeepCopy(meta, t, done)
-		setmetatable(dst, t)
-	end
-end
-
---- Builds an environment table
--- @return The environment
-function SF.BuildEnvironment()
-	local env = {}
-	SF.DeepDeepCopy(SF.DefaultEnvironment, env, {})
-	for name, methods in pairs(SF.Libraries) do
-		env[name] = {}
-		SF.DeepDeepCopy(methods, env[name], {})
-	end
-	return env
-end
-
---- Registers a library hook. These hooks are only available to SF libraries,
--- and are called by Libraries.CallHook.
--- @param hookname The name of the hook.
--- @param func The function to call
-function SF.AddHook(hookname, func)
-	local hook = SF.Hooks[hookname]
-	if not hook then
-		hook = {}
-		SF.Hooks[hookname] = hook
-	end
-
-	hook[#hook + 1] = func
-end
-
---- Calls a library hook.
--- @param hookname The name of the hook.
--- @param ... The arguments to the functions that are called.
-function SF.CallHook(hookname, ...)
-	local hook = SF.Hooks[hookname]
-	if not hook then return end
-
-	for i = 1, #hook do
-		hook[i](...)
-	end
-end
-
---- Checks the starfall type of val. Errors if the types don't match
--- @param val The value to be checked.
--- @param typ A metatable.
--- @param level Level at which to error at. 2 is added to this value. Default is 1.
-function SF.CheckType(val, typ, level)
-	local meta = dgetmeta(val)
-	if meta == typ or (meta and meta.__supertypes and meta.__supertypes[typ] and SF.Types[meta]) then
-		return val
-	else
-		assert(istable(typ) and typ.__metatable and isstring(typ.__metatable))
-		level = (level or 1) + 2
-		SF.ThrowTypeError(typ.__metatable, SF.GetType(val), level)
-	end
-end
-
---- Gets the type of val.
--- @param val The value to be checked.
-function SF.GetType(val)
-	local mt = dgetmeta(val)
-	return (mt and mt.__metatable and isstring(mt.__metatable)) and mt.__metatable or type(val)
+--- Returns corresponding name of the TypeID
+-- @param typeid The TYPE
+-- @return String name
+function SF.TypeName(typeid)
+	return assert(SF.TYPENAME[typeid], "Type not defined")
 end
 
 --- Checks the lua type of val. Errors if the types don't match
 -- @param val The value to be checked.
 -- @param typ A string type or metatable.
 -- @param level Level at which to error at. 2 is added to this value. Default is 1.
-function SF.CheckLuaType(val, typ, level)
-	local valtype = TypeID(val)
-	if valtype == typ then
-		return val
-	else
+-- @param msg Optional error message
+function SF.CheckLuaType(val, typ, level, msg)
+	if TypeID(val) ~= typ then
 		-- Failed, throw error
 		assert(isnumber(typ))
-		local typeLookup = {
-			[TYPE_BOOL] = "boolean",
-			[TYPE_FUNCTION] = "function",
-			[TYPE_NIL] = "nil",
-			[TYPE_NUMBER] = "number",
-			[TYPE_STRING] = "string",
-			[TYPE_TABLE] = "table",
-			[TYPE_THREAD] = "thread",
-			[TYPE_USERDATA] = "userdata"
-		}
-
+		
 		level = (level or 1) + 2
-		SF.ThrowTypeError(typeLookup[typ], SF.GetType(val), level)
+		SF.ThrowTypeError(SF.TypeName(typ), SF.GetType(val), level, msg)
 	end
 end
 
-function SF.WaitForEntity(index, callback)
-	local ent = Entity(index)
-	if ent:IsValid() then
-		callback(ent)
-	else
-		local timeout = CurTime()+5
-		local name = "SF_WaitForEntity"..index
-		hook.Add("Think", name, function()
+do
+	local waitingEntities = {}
+	local function findWaitingEntities()
+		local time = CurTime()
+		for index, v in pairs(waitingEntities) do
 			local ent = Entity(index)
 			if ent:IsValid() then
-				callback(ent)
-				hook.Remove("Think", name)
-			elseif CurTime()>timeout then
-				hook.Remove("Think", name)
+				for _, func in ipairs(v) do func(ent) end
+				waitingEntities[index] = nil
+			elseif time>v.timeout then
+				for _, func in ipairs(v) do func() end
+				waitingEntities[index] = nil
 			end
-		end)
+		end
+		if next(waitingEntities) == nil then hook.Remove("Think", "SF_WaitingForEntities") end
+	end
+
+	function SF.WaitForEntity(index, callback)
+		local ent = Entity(index)
+		if ent:IsValid() then
+			callback(ent)
+		else
+			if next(waitingEntities) == nil then hook.Add("Think", "SF_WaitingForEntities", findWaitingEntities) end
+			local indexTbl = waitingEntities[index]
+			if not indexTbl then indexTbl = {timeout = CurTime()+5} waitingEntities[index] = indexTbl end
+			indexTbl[#indexTbl+1] = callback
+		end
 	end
 end
 
-function SF.WaitForPlayerInit(ply, func)
-	local n = "SF_WaitForPlayerInit"..ply:EntIndex()
-	hook.Add("SetupMove", n, function(ply2)
+function SF.WaitForPlayerInit(ply, name, func)
+	local n = "SF_WaitForPlayerInit"..name..ply:EntIndex()
+	hook.Add("SetupMove", n, function(ply2, mv, cmd)
 		if ply:IsValid() then
-			if ply == ply2 then
+			if ply == ply2 and not cmd:IsForced() then
 				func()
 				hook.Remove("SetupMove", n)
 			end
@@ -644,6 +751,126 @@ function SF.WaitForPlayerInit(ply, func)
 			hook.Remove("SetupMove", n)
 		end
 	end)
+end
+
+
+-- Table networking
+do
+	local typetostringfuncs = {
+		[TYPE_NUMBER] = function(ss, x) ss:writeInt8(TYPE_NUMBER) ss:writeDouble(x) end,
+		[TYPE_STRING] = function(ss, x) ss:writeInt8(TYPE_STRING) ss:writeInt32(#x) ss:write(x) end,
+		[TYPE_BOOL] = function(ss, x) ss:writeInt8(TYPE_BOOL) ss:writeInt8(x and 1 or 0) end,
+		[TYPE_ENTITY] = function(ss, x) ss:writeInt8(TYPE_ENTITY) ss:writeInt16(x:EntIndex()) end,
+		[TYPE_VECTOR] = function(ss, x) ss:writeInt8(TYPE_VECTOR) for i=1, 3 do ss:writeFloat(x[i]) end end,
+		[TYPE_ANGLE] = function(ss, x) ss:writeInt8(TYPE_ANGLE) for i=1, 3 do ss:writeFloat(x[i]) end end,
+		[TYPE_COLOR] = function(ss, x) ss:writeInt8(TYPE_COLOR) for i=1, 4 do ss:writeInt8(x[i]) end end,
+		[TYPE_MATRIX] = function(ss, x) ss:writeInt8(TYPE_MATRIX) for k, v in ipairs{x:Unpack()} do ss:writeFloat(v) end end,
+	}
+	local stringtotypefuncs = {
+		[TYPE_NUMBER] = function(ss) return ss:readDouble() end,
+		[TYPE_STRING] = function(ss) return ss:read(ss:readUInt32()) end,
+		[TYPE_BOOL] = function(ss) return ss:readUInt8() == 1 end,
+		[TYPE_ENTITY] = function(ss) return Entity(ss:readUInt16()) end,
+		[TYPE_VECTOR] = function(ss) return Vector(ss:readFloat(), ss:readFloat(), ss:readFloat()) end,
+		[TYPE_ANGLE] = function(ss) return Angle(ss:readFloat(), ss:readFloat(), ss:readFloat()) end,
+		[TYPE_COLOR] = function(ss) return Color(ss:readUInt8(), ss:readUInt8(), ss:readUInt8(), ss:readUInt8()) end,
+		[TYPE_MATRIX] = function(ss)
+			local t = {} for i=1, 16 do t[i] = ss:readFloat() end
+			local m = Matrix() m:SetUnpacked(unpack(t))
+			return m
+		end,
+	}
+	--- Convert table to string data.
+	-- Only works with strings, numbers, tables, bools, 
+	function SF.TableToString(tbl, instance, sorted)
+		local pairs = sorted and SortedPairs or pairs
+		local ss = SF.StringStream()
+		local tableLoopupCtr = 1
+		local tableLookup = {}
+
+		local function typeToString(val)
+			local func = typetostringfuncs[TypeID(val)]
+			if func then func(ss, val) else error("Invalid type " .. SF.GetType(val)) end
+		end
+
+		typetostringfuncs[TYPE_TABLE] = function(ss, val)
+			if instance then
+				local unwrapped = instance.UnwrapObject(val)
+				if unwrapped then
+					typeToString(unwrapped)
+					return
+				end
+			end
+			
+			ss:writeInt8(TYPE_TABLE)
+			
+			local lookup = tableLookup[val]
+			if lookup then
+				ss:writeInt16(lookup)
+				return
+			end
+			
+			tableLookup[val] = tableLoopupCtr
+			tableLoopupCtr = tableLoopupCtr + 1
+			ss:writeInt16(tableLoopupCtr)
+			ss:writeInt16(table.Count(val))
+			
+			for key, value in pairs(val) do
+				typeToString(key)
+				typeToString(value)
+			end
+		end
+
+		typeToString(tbl)
+		return ss:getString()
+	end
+
+	--- Convert string data to table
+	function SF.StringToTable(str, instance)
+		local ss = SF.StringStream(str)
+		local tableLookup = {}
+
+		local function stringToType()
+			local t = ss:readUInt8()
+			local func = stringtotypefuncs[t]
+			if func then return func(ss) else error("Invalid type " .. t) end
+		end
+
+		stringtotypefuncs[TYPE_TABLE] = function(ss)
+			local index = ss:readUInt16()
+			local lookup = tableLookup[index]
+			if lookup then
+				return lookup
+			end
+			
+			local t = {}
+			tableLookup[index] = t
+			
+			for i=1, ss:readUInt16() do
+				local key, val
+				if instance then
+					key = stringToType()
+					key = instance.WrapObject(key) or key
+					val = stringToType()
+					val = instance.WrapObject(val) or val
+				else
+					key = stringToType()
+					val = stringToType()
+				end
+				t[key] = val
+			end
+			return t
+		end
+
+		return stringToType()
+	end
+end
+
+--- Gets the type of val.
+-- @param val The value to be checked.
+function SF.GetType(val)
+	local meta = dgetmeta(val)
+	return meta and isstring(meta.__metatable) and meta.__metatable or type(val)
 end
 
 local shaderBlacklist = {
@@ -666,142 +893,27 @@ function SF.CheckMaterial(material)
 	return mat
 end
 
--- ------------------------------------------------------------------------- --
 
-local object_wrappers = {}
-local object_unwrappers = {}
-local sensitive2sf_tables = {}
-local sf2sensitive_tables = {}
-
---- Creates wrap/unwrap functions for sensitive values, by using a lookup table
--- (which is set to have weak keys and values)
--- @param metatable The metatable to assign the wrapped value.
--- @param weakwrapper Make the wrapper weak inside the internal lookup table. Default: True
--- @param weaksensitive Make the sensitive data weak inside the internal lookup table. Default: True
--- @param target_metatable (optional) The metatable of the object that will get
--- 		wrapped by these wrapper functions.  This is required if you want to
--- 		have the object be auto-recognized by the generic SF.WrapObject
---		function.
--- @return The function to wrap sensitive values to a SF-safe table
--- @return The function to unwrap the SF-safe table to the sensitive table
-function SF.CreateWrapper(metatable, weakwrapper, weaksensitive, target_metatable, shared_meta)
-	local sensitive2sf, sf2sensitive
-	if shared_meta then
-		sensitive2sf = sensitive2sf_tables[shared_meta]
-		sf2sensitive = sf2sensitive_tables[shared_meta]
-	else
-		local s2sfmode = ""
-		local sf2smode = ""
-		if weakwrapper == nil or weakwrapper then
-			sf2smode = "k"
-			s2sfmode = "v"
-		end
-		if weaksensitive then
-			sf2smode = sf2smode.."v"
-			s2sfmode = s2sfmode.."k"
-		end
-		sensitive2sf = setmetatable({}, { __mode = s2sfmode })
-		sf2sensitive = setmetatable({}, { __mode = sf2smode })
-		sensitive2sf_tables[metatable] = sensitive2sf
-		sf2sensitive_tables[metatable] = sf2sensitive
-	end
-
-	local function wrap(value)
-		if value == nil then return nil end
-		if sensitive2sf[value] then return sensitive2sf[value] end
-		local tbl = setmetatable({}, metatable)
-		sensitive2sf[value] = tbl
-		sf2sensitive[tbl] = value
-		return tbl
-	end
-	if target_metatable ~= nil then
-		object_wrappers[target_metatable] = wrap
-	end
-
-	local function unwrap(value)
-		return sf2sensitive[value]
-	end
-	object_unwrappers[metatable] = unwrap
-
-	return wrap, unwrap
-end
-
---- Helper function for adding custom wrappers
--- @param object_meta metatable of object
--- @param sf_object_meta starfall metatable of object
--- @param wrapper function that wraps object
-function SF.AddObjectWrapper(object_meta, sf_object_meta, wrapper)
-	object_wrappers[object_meta] = wrapper
-end
-
---- Helper function for adding custom unwrappers
--- @param object_meta metatable of object
--- @param unwrapper function that unwraps object
-function SF.AddObjectUnwrapper(object_meta, unwrapper)
-	object_unwrappers[object_meta] = unwrapper
-end
-
---- Returns the wrapper table of a specified type
--- @param meta The type's metatable
--- @return The sf to sensitive wrapper table
--- @return The sensitive to sf wrapper table
-function SF.GetWrapperTables(meta)
-	return sensitive2sf_tables[meta], sf2sensitive_tables[meta]
-end
-
--- A list of safe data types
-local safe_types = {
-	[TYPE_NUMBER] = true,
-	[TYPE_STRING] = true,
-	[TYPE_BOOL] = true,
-	[TYPE_NIL] = true,
-}
-
---- Wraps the given object so that it is safe to pass into starfall
--- It will wrap it as long as we have the metatable of the object that is
--- getting wrapped.
--- @param object the object needing to get wrapped as it's passed into starfall
--- @return returns nil if the object doesn't have a known wrapper,
--- or returns the wrapped object if it does have a wrapper.
-function SF.WrapObject(object)
-	local metatable = dgetmeta(object)
-	if metatable then
-		local wrap = object_wrappers[metatable]
-		if wrap then
-			return wrap(object)
-		else
-			-- If the object is already an SF type
-			local sf2sensitive = sf2sensitive_tables[metatable]
-			if sf2sensitive and sf2sensitive[object] then
-				return object
+function SF.CheckModel(model, player)
+	if #model > 260 then return false end
+	model = SF.NormalizePath(string.lower(model))
+	if util.IsValidModel(model) and util.IsValidProp(model) then
+		if player and player:IsValid() then
+			if hook.Run("PlayerSpawnObject", player, model)~=false then
+				return model
 			end
+		else
+			return model
 		end
 	end
-	-- Do not elseif here because strings do have a metatable.
-	if safe_types[TypeID(object)] then
-		return object
-	end
-end
-
---- Takes a wrapped starfall object and returns the unwrapped version
--- @param object the wrapped starfall object, should work on any starfall
--- wrapped object.
--- @return the unwrapped starfall object
-function SF.UnwrapObject(object)
-	local metatable = dgetmeta(object)
-	if metatable then
-		local unwrap = object_unwrappers[metatable]
-		if unwrap then
-			return unwrap(object)
-		end
-	end
-	if safe_types[TypeID(object)] then
-		return object
-	end
+	return false
 end
 
 --- Returns a path with all .. accounted for
 function SF.NormalizePath(path)
+	local null = string.find(path, "\x00", 1, true)
+	if null then path = string.sub(path, 1, null-1) end
+
 	local tbl = string.Explode("[/\\]+", path, true)
 	if #tbl == 1 then return path end
 	local i = 1
@@ -820,62 +932,6 @@ function SF.NormalizePath(path)
 	end
 	return table.concat(tbl, "/")
 end
-
---- Sanitizes and returns its argument list.
--- Basic types are returned unchanged. Non-object tables will be
--- recursed into and their keys and values will be sanitized. Object
--- types will be wrapped if a wrapper is available. When a wrapper is
--- not available objects will be replaced with nil, so as to prevent
--- any possiblitiy of leakage. Functions will always be replaced with
--- nil as there is no way to verify that they are safe.
-function SF.Sanitize(original)
-	local completed_tables = {}
-
-	local function RecursiveSanitize(tbl)
-		local return_list = {}
-		completed_tables[tbl] = return_list
-		for key, value in pairs(tbl) do
-			local keyt = TypeID(key)
-			local valuet = TypeID(value)
-			if not safe_types[keyt] then
-				key = SF.WrapObject(key) or (keyt == TYPE_TABLE and (completed_tables[key] or RecursiveSanitize(key)) or nil)
-			end
-			if not safe_types[valuet] then
-				value = SF.WrapObject(value) or (valuet == TYPE_TABLE and (completed_tables[value] or RecursiveSanitize(value)) or nil)
-			end
-			return_list[key] = value
-		end
-		return return_list
-	end
-
-	return RecursiveSanitize(original)
-end
-
---- Takes output from starfall and does it's best to make the output
--- fully usable outside of starfall environment
-function SF.Unsanitize(original)
-	local completed_tables = {}
-
-	local function RecursiveUnsanitize(tbl)
-		local return_list = {}
-		completed_tables[tbl] = return_list
-		for key, value in pairs(tbl) do
-			if TypeID(key) == TYPE_TABLE then
-				key = SF.UnwrapObject(key) or completed_tables[key] or RecursiveUnsanitize(key)
-			end
-			if TypeID(value) == TYPE_TABLE then
-				value = SF.UnwrapObject(value) or completed_tables[value] or RecursiveUnsanitize(value)
-			end
-			return_list[key] = value
-		end
-		return return_list
-	end
-
-	return RecursiveUnsanitize(original)
-end
-
--- ------------------------------------------------------------------------- --
-
 
 -- This function clamps the position before moving the entity
 local minx, miny, minz = -16384, -16384, -16384
@@ -951,6 +1007,7 @@ local soundsMap = {
 	["CONFIRM2"] = 7,	[7] = "buttons/button14.wav",
 	["CONFIRM3"] = 8,	[8] = "buttons/button15.wav",
 	["CONFIRM4"] = 9,	[9] = "buttons/button17.wav",
+	["SILENT"] = 10,
 }
 local notificationsMap = {
 	["GENERIC"] = 0,
@@ -961,51 +1018,11 @@ local notificationsMap = {
 }
 -- ------------------------------------------------------------------------- --
 
-local function argsToChat(...)
-	local n = select('#', ...)
-	local input = { ... }
-	local output = {}
-	local color = false
-	for i = 1, n do
-		local add
-		if dgetmeta(input[i]) == SF.Types["Color"] then
-			color = true
-			add = SF.Color.Unwrap(input[i])
-		else
-			add = tostring(input[i])
-		end
-		output[i] = add
-	end
-	-- Combine the strings with tabs
-	local processed = {}
-	if not color then processed[1] = Color(151, 211, 255) end
-	local i = 1
-	while i <= n do
-		if isstring(output[i]) then
-			local j = i + 1
-			while j <= n and isstring(output[j]) do
-				j = j + 1
-			end
-			if i==(j-1) then
-				processed[#processed + 1] = output[i]
-			else
-				processed[#processed + 1] = table.concat({ unpack(output, i, j) }, "\t")
-			end
-			i = j
-		else
-			processed[#processed + 1] = output[i]
-			i = i + 1
-		end
-	end
-	return processed
-end
-
 if SERVER then
 	util.AddNetworkString("starfall_addnotify")
 	util.AddNetworkString("starfall_console_print")
-	util.AddNetworkString("starfall_chatprint")
 
-	function SF.AddNotify (ply, msg, notifyType, duration, sound)
+	function SF.AddNotify(ply, msg, notifyType, duration, sound)
 		if not (ply and ply:IsValid()) then return end
 
 		net.Start("starfall_addnotify")
@@ -1020,28 +1037,15 @@ if SERVER then
 		end
 	end
 
-	function SF.Print (ply, msg)
+	function SF.Print(ply, msg)
 		net.Start("starfall_console_print")
 			net.WriteString(msg)
 		if ply then net.Send(ply) else net.Broadcast() end
 	end
 
-	function SF.ChatPrint(ply, ...)
-		local tbl = argsToChat(...)
-
-		net.Start("starfall_chatprint")
-		net.WriteUInt(#tbl, 32)
-		for i, v in ipairs(tbl) do
-			net.WriteType(v)
-		end
-		local ret = net.BytesWritten()
-		net.Send(ply)
-		return ret
-	end
-
 else
 
-	function SF.AddNotify (ply, msg, type, duration, sound)
+	function SF.AddNotify(ply, msg, type, duration, sound)
 		if ply == LocalPlayer() then
 			print(msg)
 			GAMEMODE:AddNotify(msg, notificationsMap[type], duration)
@@ -1061,7 +1065,15 @@ else
 	end)
 
 	function SF.HTTPNotify(ply, url)
-		MsgC(Color(255, 255, 0), "SF HTTP: " .. ply:Nick() .. " [" .. ply:SteamID() .. "]: requested url ", Color(255,255,255), url, "\n")
+		local plyStr
+		if ply:IsValid() then
+			plyStr = ply:Nick() .. " [" .. ply:SteamID() .. "]"
+		elseif ply == SF.Superuser then
+			plyStr = "Superuser"
+		else
+			plyStr = "Invalid user"
+		end
+		MsgC(Color(255, 255, 0), "SF HTTP: " .. plyStr .. ": requested url ", Color(255,255,255), url, "\n")
 	end
 
 	net.Receive("starfall_console_print", function ()
@@ -1076,26 +1088,268 @@ else
 		end
 		chat.AddText(unpack(recv))
 	end)
+end
 
-	function SF.ChatPrint(...)
-		chat.AddText(unpack(argsToChat(...)))
+
+do
+	local middleclass = {
+		_VERSION     = 'middleclass v4.1.1',
+		_DESCRIPTION = 'Object Orientation for Lua',
+		_URL         = 'https://github.com/kikito/middleclass',
+		_LICENSE     = [[
+		MIT LICENSE
+
+		Copyright (c) 2011 Enrique García Cota
+
+		Permission is hereby granted, free of charge, to any person obtaining a
+		copy of this software and associated documentation files (the
+		"Software"), to deal in the Software without restriction, including
+		without limitation the rights to use, copy, modify, merge, publish,
+		distribute, sublicense, and/or sell copies of the Software, and to
+		permit persons to whom the Software is furnished to do so, subject to
+		the following conditions:
+
+		The above copyright notice and this permission notice shall be included
+		in all copies or substantial portions of the Software.
+
+		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+		OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+		IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+		CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+		SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+		]]
+	}
+
+	local function _createIndexWrapper(aClass, f)
+		if f == nil then
+		return aClass.__instanceDict
+		else
+		return function(self, name)
+			local value = aClass.__instanceDict[name]
+
+			if value ~= nil then
+			return value
+			elseif isfunction(f) then
+			return (f(self, name))
+			else
+			return f[name]
+			end
+		end
+		end
+	end
+
+	local function _propagateInstanceMethod(aClass, name, f)
+		f = name == "__index" and _createIndexWrapper(aClass, f) or f
+		aClass.__instanceDict[name] = f
+
+		for subclass in pairs(aClass.subclasses) do
+		if rawget(subclass.__declaredMethods, name) == nil then
+			_propagateInstanceMethod(subclass, name, f)
+		end
+		end
+	end
+
+	local function _declareInstanceMethod(aClass, name, f)
+		aClass.__declaredMethods[name] = f
+
+		if f == nil and aClass.super then
+		f = aClass.super.__instanceDict[name]
+		end
+
+		_propagateInstanceMethod(aClass, name, f)
+	end
+
+	local function _tostring(self) return "class " .. self.name end
+	local function _call(self, ...) return self:new(...) end
+
+	local function _createClass(name, super)
+		local dict = {}
+		dict.__index = dict
+
+		local aClass = { name = name, super = super, static = {},
+						 __instanceDict = dict, __declaredMethods = {},
+						 subclasses = setmetatable({}, {__mode='k'})  }
+
+		if super then
+		setmetatable(aClass.static, {
+			__index = function(_,k)
+			local result = rawget(dict,k)
+			if result == nil then
+				return super.static[k]
+			end
+			return result
+			end
+		})
+		else
+		setmetatable(aClass.static, { __index = function(_,k) return rawget(dict,k) end })
+		end
+
+		setmetatable(aClass, { __index = aClass.static, __tostring = _tostring,
+							 __call = _call, __newindex = _declareInstanceMethod })
+
+		return aClass
+	end
+
+	local function _includeMixin(aClass, mixin)
+		assert(istable(mixin), "mixin must be a table")
+
+		for name,method in pairs(mixin) do
+		if name ~= "included" and name ~= "static" then aClass[name] = method end
+		end
+
+		for name,method in pairs(mixin.static or {}) do
+		aClass.static[name] = method
+		end
+
+		if isfunction(mixin.included) then mixin:included(aClass) end
+		return aClass
+	end
+
+	local DefaultMixin = {
+		__tostring   = function(self) return "instance of " .. tostring(self.class) end,
+
+		initialize   = function(self, ...) end,
+
+		isInstanceOf = function(self, aClass)
+		return istable(aClass)
+			 and istable(self)
+			 and (self.class == aClass
+				or istable(self.class)
+				and isfunction(self.class.isSubclassOf)
+				and self.class:isSubclassOf(aClass))
+		end,
+
+		static = {
+		allocate = function(self)
+			assert(istable(self), "Make sure that you are using 'Class:allocate' instead of 'Class.allocate'")
+			return setmetatable({ class = self }, self.__instanceDict)
+		end,
+
+		new = function(self, ...)
+			assert(istable(self), "Make sure that you are using 'Class:new' instead of 'Class.new'")
+			local instance = self:allocate()
+			instance:initialize(...)
+			return instance
+		end,
+
+		subclass = function(self, name)
+			assert(istable(self), "Make sure that you are using 'Class:subclass' instead of 'Class.subclass'")
+			assert(isstring(name), "You must provide a name(string) for your class")
+
+			local subclass = _createClass(name, self)
+
+			for methodName, f in pairs(self.__instanceDict) do
+			_propagateInstanceMethod(subclass, methodName, f)
+			end
+			subclass.initialize = function(instance, ...) return self.initialize(instance, ...) end
+
+			self.subclasses[subclass] = true
+			self:subclassed(subclass)
+
+			return subclass
+		end,
+
+		subclassed = function(self, other) end,
+
+		isSubclassOf = function(self, other)
+			return istable(other) and
+				istable(self.super) and
+				( self.super == other or self.super:isSubclassOf(other) )
+		end,
+
+		include = function(self, ...)
+			assert(istable(self), "Make sure you that you are using 'Class:include' instead of 'Class.include'")
+			for _,mixin in ipairs({...}) do _includeMixin(self, mixin) end
+			return self
+		end
+		}
+	}
+
+	local checkluatype = SF.CheckLuaType
+	function SF.Class(name, super)
+		checkluatype(name, TYPE_STRING)
+		if super~=nil then checkluatype(super, TYPE_TABLE) end
+		return super and super:subclass(name) or _includeMixin(_createClass(name), DefaultMixin)
 	end
 end
+
+
+do
+	local checkluatype = SF.CheckLuaType
+	local string_library = {}
+	string_library.byte = string.byte
+	string_library.char = string.char
+	string_library.comma = string.Comma string_library.Comma = string.Comma
+	string_library.dump = string.dump
+	string_library.endsWith = string.EndsWith string_library.EndsWith = string.EndsWith
+	string_library.explode = string.Explode string_library.Explode = string.Explode
+	string_library.find = string.find
+	string_library.format = string.format
+	string_library.formattedTime = string.FormattedTime string_library.FormattedTime = string.FormattedTime
+	string_library.getChar = string.GetChar string_library.GetChar = string.GetChar
+	string_library.getExtensionFromFilename = string.GetExtensionFromFilename string_library.GetExtensionFromFilename = string.GetExtensionFromFilename
+	string_library.getFileFromFilename = string.GetFileFromFilename string_library.GetFileFromFilename = string.GetFileFromFilename
+	string_library.getPathFromFilename = string.GetPathFromFilename string_library.GetPathFromFilename = string.GetPathFromFilename
+	string_library.gfind = string.gfind
+	string_library.gmatch = string.gmatch
+	string_library.gsub = string.gsub
+	string_library.implode = string.Implode string_library.Implode = string.Implode
+	local function javascriptSafe(str)
+		checkluatype(str, TYPE_STRING)
+		return string.JavascriptSafe(str)
+	end
+	string_library.javascriptSafe = javascriptSafe string_library.JavascriptSafe = javascriptSafe
+	string_library.left = string.Left string_library.Left = string.Left
+	string_library.len = string.len
+	string_library.lower = string.lower
+	string_library.match = string.match
+	string_library.niceSize = string.NiceSize string_library.NiceSize = string.NiceSize
+	string_library.niceTime = string.NiceTime string_library.NiceTime = string.NiceTime
+	local function patternSafe(str)
+		checkluatype(str, TYPE_STRING)
+		return string.PatternSafe(str)
+	end
+	string_library.patternSafe = patternSafe string_library.PatternSafe = patternSafe
+	string_library.replace = string.Replace string_library.Replace = string.Replace
+	string_library.reverse = string.reverse
+	string_library.right = string.Right string_library.Right = string.Right
+	string_library.setChar = string.SetChar string_library.SetChar = string.SetChar
+	string_library.split = string.Split string_library.Split = string.Split
+	string_library.startWith = string.StartWith string_library.StartWith = string.StartWith
+	string_library.stripExtension = string.StripExtension string_library.StripExtension = string.StripExtension
+	string_library.sub = string.sub
+	string_library.toMinutesSeconds = string.ToMinutesSeconds string_library.ToMinutesSeconds = string.ToMinutesSeconds
+	string_library.toMinutesSecondsMilliseconds = string.ToMinutesSecondsMilliseconds string_library.ToMinutesSecondsMilliseconds = string.ToMinutesSecondsMilliseconds
+	string_library.toTable = string.ToTable string_library.ToTable = string.ToTable
+	string_library.trim = string.Trim string_library.Trim = string.Trim
+	string_library.trimLeft = string.TrimLeft string_library.TrimLeft = string.TrimLeft
+	string_library.trimRight = string.TrimRight string_library.TrimRight = string.TrimRight
+	string_library.upper = string.upper
+	string_library.normalizePath = SF.NormalizePath
+
+	--UTF8 part
+	string_library.utf8char = utf8.char
+	string_library.utf8codepoint = utf8.codepoint
+	string_library.utf8codes = utf8.codes
+	string_library.utf8force = utf8.force
+	string_library.utf8len = utf8.len
+	string_library.utf8offset = utf8.offset
+
+	local max_rep = 1000000
+	function string_library.rep(str, rep, sep)
+		if #str*rep+(sep and #sep or 0)*rep > max_rep then SF.Throw("Max string.rep length is " .. max_rep, 2) end
+
+		return string.rep(str, rep, sep)
+	end
+	SF.SafeStringLib = string_library
+end
+
 
 -------------------------------------------------------------------------------
 -- Includes
 -------------------------------------------------------------------------------
-
-if SERVER then
-	AddCSLuaFile("sflib.lua")
-	AddCSLuaFile("instance.lua")
-	AddCSLuaFile("preprocessor.lua")
-	AddCSLuaFile("permissions/core.lua")
-	AddCSLuaFile("netstream.lua")
-	AddCSLuaFile("transfer.lua")
-
-	AddCSLuaFile("editor/editor.lua")
-end
 
 include("instance.lua")
 include("preprocessor.lua")
@@ -1105,115 +1359,127 @@ include("netstream.lua")
 include("transfer.lua")
 
 do
-	if SERVER then
-		local l
-
-		l = file.Find("starfall/libs_sh/*.lua", "LUA")
-		for _, filename in pairs(l) do
-			include("starfall/libs_sh/"..filename)
-			AddCSLuaFile("starfall/libs_sh/"..filename)
+	local function compileModule(source, path)
+		local ok, init = xpcall(function() return CompileString(source, path)() end, debug.traceback)
+		if ok then
+			if not isfunction(init) then
+				ErrorNoHalt("[SF] Attempt to load bad module: " .. path .. "\n")
+				init = nil
+			end
+		else
+			ErrorNoHalt(init .. "\n")
+			init = nil
 		end
-
-		l = file.Find("starfall/libs_sv/*.lua", "LUA")
-		for _, filename in pairs(l) do
-			include("starfall/libs_sv/"..filename)
-			AddCSLuaFile("starfall/libs_sv/"..filename)
-		end
-
-		l = file.Find("starfall/libs_cl/*.lua", "LUA")
-		for _, filename in pairs(l) do
-			AddCSLuaFile("starfall/libs_cl/"..filename)
-		end
-
-	else
-		local l
-
-		l = file.Find("starfall/libs_sh/*.lua", "LUA")
-		for _, filename in pairs(l) do
-			include("starfall/libs_sh/"..filename)
-		end
-
-		l = file.Find("starfall/libs_cl/*.lua", "LUA")
-		for _, filename in pairs(l) do
-			include("starfall/libs_cl/"..filename)
-		end
+		return init
 	end
-end
-
-do
-	local function cleanHooks(path)
-		for k, v in pairs(SF.Hooks) do
-			local i = 1
-			while i <= #v do
-				local hookfile = debug.getinfo(v[i], "S").short_src
-				if string.find(hookfile, path, 1, true) then
-					table.remove(v, i)
-				else
-					i = i + 1
-				end
+	
+	local function addModule(name, path, shouldrun)
+		local source, init
+		if SERVER then
+			AddCSLuaFile(path)
+			source = file.Read(path, "LUA")
+			if shouldrun then
+				init = compileModule(source, path)
+			end
+		else
+			if shouldrun then
+				init = CompileFile(path)
+				if init then init = init() end
 			end
 		end
+		local tbl = SF.Modules[name]
+		if not tbl then tbl = {} SF.Modules[name] = tbl end
+		tbl[path] = {source = source, init = init}
 	end
 
+	local function loadModules(folder, shouldrun)
+		local l = file.Find(folder.."*.lua", "LUA")
+		for _, filename in pairs(l) do
+			local path = folder..filename
+			addModule(string.StripExtension(filename), path, shouldrun)
+		end
+	end
+
+	loadModules("starfall/libs_sh/", SERVER or CLIENT)
+	loadModules("starfall/libs_sv/", SERVER)
+	loadModules("starfall/libs_cl/", CLIENT)
+	SF.Permissions.loadPermissionOptions()
+
 	if SERVER then
+		util.AddNetworkString("sf_receivelibrary")
+		include("starfall/editor/docs.lua")
+		SF.Docs = util.Compress(SF.TableToString(SF.Docs, nil, true))
+		SF.DocsCRC = util.CRC(SF.Docs)
 
 		-- Command to reload the libraries
-		util.AddNetworkString("sf_reloadlibrary")
 		concommand.Add("sf_reloadlibrary", function(ply, com, arg)
 			if ply:IsValid() and not ply:IsSuperAdmin() then return end
-			local filename = arg[1]
-			if not filename then return end
-			filename = string.lower(filename)
+			local name = arg[1]
+			if not name then return end
+			name = string.lower(name)
 
-			local function sendToClient(path)
-				net.Start("sf_reloadlibrary")
-				net.WriteString(path)
-				net.WriteStream(file.Read(path, "LUA"))
-				net.Broadcast()
-			end
+			local sv_filename = "starfall/libs_sv/"..name..".lua"
+			local sh_filename = "starfall/libs_sh/"..name..".lua"
+			local cl_filename = "starfall/libs_cl/"..name..".lua"
 
-			local sv_filename = "starfall/libs_sv/"..filename..".lua"
-			local sh_filename = "starfall/libs_sh/"..filename..".lua"
-			local cl_filename = "starfall/libs_cl/"..filename..".lua"
-
-			cleanHooks(filename)
-
-			local postload
-			if file.Exists(sh_filename, "LUA") then
-				print("Reloaded library: " .. filename)
-				include(sh_filename)
-				sendToClient(sh_filename)
-				postload = true
-			end
-			if file.Exists(sv_filename, "LUA") then
-				print("Reloaded library: " .. filename)
-				include(sv_filename)
-				postload = true
+			local sendToClientTbl = {}
+			if file.Exists(sh_filename, "LUA") or file.Exists(sv_filename, "LUA") then
+				print("Reloaded library: " .. name)
+				SF.Modules[name] = {}
+				if file.Exists(sh_filename, "LUA") then
+					addModule(name, sh_filename, true)
+					sendToClientTbl[#sendToClientTbl+1] = sh_filename
+				end
+				if file.Exists(sv_filename, "LUA") then
+					addModule(name, sv_filename, true)
+				end
 			end
 			if file.Exists(cl_filename, "LUA") then
-				sendToClient(cl_filename)
+				addModule(name, cl_filename, false)
+				sendToClientTbl[#sendToClientTbl+1] = cl_filename
 			end
-			if postload then
-				SF.CallHook("postload")
+			if #sendToClientTbl>0 then
+				local files = {}
+				for k, path in pairs(sendToClientTbl) do
+					files[name..":"..path] = SF.Modules[name][path].source
+				end
+				net.Start("sf_receivelibrary")
+				net.WriteBool(false)
+				net.WriteStarfall({files = files, mainfile = name, proc = Entity(0), owner = Entity(0)})
+				net.Broadcast()
 			end
 		end)
 
 	else
-		local root_path = SF.NormalizePath(string.GetPathFromFilename(debug.getinfo(1, "S").short_src).."../")
-		net.Receive("sf_reloadlibrary", function(len)
-			local path = net.ReadString()
-			net.ReadStream(nil, function(file)
-				if file then
-					print("Reloaded library: " .. string.StripExtension(string.GetFileFromFilename(path)))
-					cleanHooks(path)
-					local func = CompileString(file, root_path .. path)
-					func()
-					SF.CallHook("postload")
+		net.Receive("sf_receivelibrary", function(len)
+			local init = net.ReadBool()
+			net.ReadStarfall(nil, function(ok, data)
+				if ok then
+					if not init then
+						SF.Modules[data.mainfile] = {}
+						print("Reloaded library: " .. data.mainfile)
+					end
+					for k, code in pairs(data.files) do
+						local modname, path = string.match(k, "(.+):(.+)")
+						local t = SF.Modules[modname]
+						if not t then t = {} SF.Modules[modname] = t end
+						local shouldrun
+						if string.find(path, "starfall/libs_sv", 1, true) then
+							shouldrun = SERVER
+						elseif string.find(path, "starfall/libs_sh", 1, true) then
+							shouldrun = true
+						elseif string.find(path, "starfall/libs_cl", 1, true) then
+							shouldrun = CLIENT
+						end
+						local t2 = t[path]
+						if not t2 then t2 = {} t[path] = t2 end
+						t2.source = code
+						if shouldrun then
+							t2.init = compileModule(code, path)
+						end
+					end
 				end
 			end)
 		end)
-
 	end
 end
-
-SF.CallHook("postload")

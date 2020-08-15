@@ -22,6 +22,7 @@ if SERVER then
 
 		local sf = ents.Create("starfall_processor")
 		if not (sf and sf:IsValid()) then return false end
+		if not (util.IsValidModel(model) and util.IsValidProp(model)) then model = "models/spacecode/sfchip.mdl" end
 
 		sf:SetAngles(Ang)
 		sf:SetPos(Pos)
@@ -63,32 +64,18 @@ else
 	TOOL.Information = { "left", "right", "reload" }
 
 	net.Receive("starfall_openeditor", function(len)
-		SF.Version = net.ReadString()
 		SF.Editor.open()
 
 		if net.ReadBool() then
 			net.ReadStarfall(nil, function(ok, sfdata)
 				if ok then
-					local function openfiles()
-						local mainfile = sfdata.files[sfdata.mainfile]
-						sfdata.files[sfdata.mainfile] = nil
-						for filename, code in pairs(sfdata.files) do
-							SF.Editor.openWithCode(filename, code)
-						end
-						-- Add mainfile last so it gets focus
-						SF.Editor.openWithCode(sfdata.mainfile, mainfile)
+					local mainfile = sfdata.files[sfdata.mainfile]
+					sfdata.files[sfdata.mainfile] = nil
+					for filename, code in pairs(sfdata.files) do
+						SF.Editor.openWithCode(filename, code, nil, true)
 					end
-
-					if SF.Editor.initialized then
-						openfiles()
-					else
-						hook.Add("Think", "SFWaitForEditor", function()
-							if SF.Editor.initialized then
-								openfiles()
-								hook.Remove("Think", "SFWaitForEditor")
-							end
-						end)
-					end
+					-- Add mainfile last so it gets focus
+					SF.Editor.openWithCode(sfdata.mainfile, mainfile, nil, true)
 				else
 					SF.AddNotify(LocalPlayer(), "Error downloading SF code.", "ERROR", 7, "ERROR1")
 				end
@@ -138,7 +125,6 @@ function TOOL:LeftClick(trace)
 		sf = ent
 	else
 		local model = self:GetClientInfo("Model")
-		if not (util.IsValidModel(model) and util.IsValidProp(model)) then return false end
 		if not self:GetSWEP():CheckLimit("starfall_processor") then return false end
 
 		local Ang = trace.HitNormal:Angle()
@@ -170,14 +156,12 @@ function TOOL:RightClick(trace)
 		if ent and ent:IsValid() and ent:GetClass() == "starfall_processor" then
 			if ent.mainfile then
 				net.Start("starfall_openeditor")
-				net.WriteString(SF.Version)
 				net.WriteBool(true)
 				net.WriteStarfall(ent)
 				net.Send(ply)
 			end
 		else
 			net.Start("starfall_openeditor")
-			net.WriteString(SF.Version)
 			net.WriteBool(false)
 			net.Send(ply)
 		end

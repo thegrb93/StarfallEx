@@ -13,9 +13,8 @@ function net.ReadStarfall(ply, callback)
 		headers[#headers + 1] = {name = net.ReadString(), size = net.ReadUInt(32)}
 	end
 
-	local crc = net.ReadString()
 	net.ReadStream(ply, function(data)
-		if data and util.CRC(data)==crc then
+		if data then
 			local pos = 1
 			for k, v in pairs(headers) do
 				sfdata.files[v.name] = string.sub(data, pos, pos+v.size-1)
@@ -26,9 +25,11 @@ function net.ReadStarfall(ply, callback)
 			callback(false, sfdata)
 		end
 	end)
+
+	return sfdata
 end
 
-function net.WriteStarfall(sfdata)
+function net.WriteStarfall(sfdata, callback)
 	if #sfdata.mainfile > 255 then error("Main file name too large: " .. #sfdata.mainfile .. " (max is 255)") end
 	if SERVER then
 		net.WriteEntity(sfdata.proc)
@@ -49,17 +50,20 @@ function net.WriteStarfall(sfdata)
 		filecodes[#filecodes + 1] = code
 	end
 	local data = table.concat(filecodes)
-	net.WriteString(util.CRC(data))
-	net.WriteStream(data)
+	return net.WriteStream(data, callback)
 end
 
 if SERVER then
 	util.AddNetworkString("starfall_upload")
 
-	function SF.SendStarfall(msg, sfdata, recipient)
+	function SF.SendStarfall(msg, sfdata, recipient, callback)
 		net.Start(msg)
-		net.WriteStarfall(sfdata)
-		if recipient then net.Send(recipient) else net.Broadcast() end
+		net.WriteStarfall(sfdata, callback)
+		if recipient then
+			net.Send(recipient)
+		else
+			net.Broadcast()
+		end
 	end
 
 	local uploaddata = setmetatable({},{__mode="k"})
@@ -104,24 +108,24 @@ if SERVER then
 else
 
 	-- Sends starfall files to server
-	function SF.SendStarfall(msg, sfdata)
+	function SF.SendStarfall(msg, sfdata, callback)
 		net.Start(msg)
-		net.WriteStarfall(sfdata)
+		net.WriteStarfall(sfdata, callback)
 		net.SendToServer()
 	end
 
 	net.Receive("starfall_upload", function(len)
 		local mainfile = net.ReadString()
 		if #mainfile==0 then mainfile = nil end
-		local ok, list = SF.Editor.BuildIncludesTable(mainfile)
-		if ok then
-			SF.SendStarfall("starfall_upload", {files = list.files, mainfile = list.mainfile})
-		else
-			SF.SendStarfall("starfall_upload", {files = {}, mainfile = ""})
-			if list then
-				SF.AddNotify(LocalPlayer(), list, "ERROR", 7, "ERROR1")
+		SF.Editor.BuildIncludesTable(mainfile,
+			function(list)
+				SF.SendStarfall("starfall_upload", {files = list.files, mainfile = list.mainfile})
+			end,
+			function(err)
+				SF.SendStarfall("starfall_upload", {files = {}, mainfile = ""})
+				SF.AddNotify(LocalPlayer(), err, "ERROR", 7, "ERROR1")
 			end
-		end
+		)
 	end)
 end
 

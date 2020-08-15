@@ -24,7 +24,7 @@ function ENT:Compile()
 
 	self.error = nil
 
-	if not self.files[self.mainfile] then return end
+	if not (self.mainfile and self.files and self.files[self.mainfile]) then return end
 	local ok, instance = SF.Instance.Compile(self.files, self.mainfile, self.owner, { entity = self })
 	if not ok then self:Error(instance) return end
 
@@ -42,10 +42,10 @@ function ENT:Compile()
 
 
 	self.instance = instance
-	instance.runOnError = function(inst, ...)
+	instance.runOnError = function(err)
 		-- Have to make sure it's valid because the chip can be deleted before deinitialization and trigger errors
 		if self:IsValid() then
-			self:Error(...)
+			self:Error(err)
 		end
 	end
 
@@ -64,6 +64,13 @@ function ENT:Compile()
 			end
 		end
 	end
+
+	for k, v in ipairs(ents.FindByClass("starfall_screen")) do
+		if v.link == self then v.link = nil v:LinkEnt(self) end
+	end
+	for k, v in ipairs(ents.FindByClass("starfall_hud")) do
+		if v.link == self then v.link = nil v:LinkEnt(self) end
+	end
 end
 
 function ENT:Destroy()
@@ -78,13 +85,6 @@ function ENT:Destroy()
 end
 
 function ENT:SetupFiles(sfdata)
-	local update = self.instance ~= nil or self.error ~= nil
-	if SERVER and update then
-		net.Start("starfall_processor_destroy")
-		net.WriteEntity(self)
-		net.Broadcast()
-	end
-
 	self.owner = sfdata.owner
 	self.files = sfdata.files
 	self.mainfile = sfdata.mainfile
@@ -94,17 +94,12 @@ function ENT:SetupFiles(sfdata)
 	if SERVER then
 		if self.instance and self.instance.ppdata.models and self.instance.mainfile then
 			local model = self.instance.ppdata.models[self.instance.mainfile]
-			if util.IsValidModel(model) and util.IsValidProp(model) then
+			if model and SF.CheckModel(model, self.owner) then
 				self:SetCustomModel(model)
 			end
 		end
-	
-		if update then
-			self:SendCode()
-		elseif self.SendQueue then
-			self:SendCode(self.SendQueue)
-			self.SendQueue = nil
-		end
+
+		self:SendCode()
 	end
 end
 
@@ -128,7 +123,9 @@ function ENT:Error(err)
 	if newline then
 		msg = string.sub(msg, 1, newline - 1)
 	end
-	SF.AddNotify(self.owner, msg, "ERROR", 7, "ERROR1")
+	if self.owner:IsValid() then
+		SF.AddNotify(self.owner, msg, "ERROR", 7, "ERROR1")
+	end
 
 	if self.instance then
 		self.instance:deinitialize()
@@ -136,16 +133,22 @@ function ENT:Error(err)
 	end
 
 	if SERVER then
-		SF.Print(self.owner, traceback)
+		if self.owner:IsValid() then
+			SF.Print(self.owner, traceback)
+		end
 	else
 		print(traceback)
 
-		if self.owner ~= LocalPlayer() then
+		if self.owner ~= LocalPlayer() and self.owner:IsValid() and GetConVarNumber("sf_timebuffer_cl")>0 then
 			net.Start("starfall_report_error")
 			net.WriteEntity(self)
 			net.WriteString(msg.."\n"..traceback)
 			net.SendToServer()
 		end
+	end
+	
+	for inst, _ in pairs(SF.allInstances) do
+		inst:runScriptHook("starfallerror", inst.Types.Entity.Wrap(self), inst.Types.Player.Wrap(SERVER and self.owner or LocalPlayer()), msg)
 	end
 end
 
@@ -165,14 +168,12 @@ local function MenuOpen( ContextMenu, Option, Entity, Trace )
 	SubMenu:AddOption("Open Global Permissions", function ()
 		SF.Editor.openPermissionsPopup()
 	end)
-	if ent.instance then
-		if ent.instance.permissionRequest and ent.instance.permissionRequest.overrides and table.Count(ent.instance.permissionRequest.overrides) > 0
-				or ent.instance.permissionOverrides and table.Count(ent.instance.permissionOverrides) > 0 then
-			SubMenu:AddOption("Overriding Permissions", function ()
-				local pnl = vgui.Create("SFChipPermissions")
-				if pnl then pnl:OpenForChip(ent) end
-			end)
-		end
+	if ent.instance and ent.owner ~= SF.Superuser and (ent.instance.permissionRequest and ent.instance.permissionRequest.overrides and table.Count(ent.instance.permissionRequest.overrides) > 0
+				or ent.instance.permissionOverrides and table.Count(ent.instance.permissionOverrides) > 0) then
+		SubMenu:AddOption("Overriding Permissions", function ()
+			local pnl = vgui.Create("SFChipPermissions")
+			if pnl then pnl:OpenForChip(ent) end
+		end)
 	end
 end
 

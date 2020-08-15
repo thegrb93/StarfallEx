@@ -1,25 +1,25 @@
--------------------------------------------------------------------------------
--- Find functions
--------------------------------------------------------------------------------
-
---- Find library. Finds entities in various shapes.
--- @shared
-local find_library = SF.RegisterLibrary("find")
-
-local vunwrap = SF.UnwrapObject
-local checktype = SF.CheckType
+-- Global to all starfalls
 local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
 
 -- Register privileges
-do
-	local P = SF.Permissions
-	P.registerPrivilege("find", "Find", "Allows the user to access the find library")
-end
+SF.Permissions.registerPrivilege("find", "Find", "Allows the user to access the find library")
+
+--- Find library. Finds entities in various shapes.
+-- @name find
+-- @class library
+-- @libtbl find_library
+SF.RegisterLibrary("find")
+
+return function(instance)
+local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
+
+local find_library = instance.Libraries.find
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local plywrap = instance.Types.Player.Wrap
 
 local function convert(results, func)
-	if func then checkluatype (func, TYPE_FUNCTION) end
-	local wrap = SF.WrapObject
+	if func~=nil then checkluatype (func, TYPE_FUNCTION) end
+	local wrap = instance.WrapObject
 
 	local t = {}
 	if func then
@@ -45,10 +45,8 @@ end
 -- @param max Top corner
 -- @param filter Optional function to filter results
 -- @return An array of found entities
-function find_library.inBox (min, max, filter)
-	checkpermission(SF.instance, nil, "find")
-	checktype(min, SF.Types["Vector"])
-	checktype(max, SF.Types["Vector"])
+function find_library.inBox(min, max, filter)
+	checkpermission(instance, nil, "find")
 
 	local min, max = vunwrap(min), vunwrap(max)
 
@@ -60,9 +58,8 @@ end
 -- @param radius Sphere radius
 -- @param filter Optional function to filter results
 -- @return An array of found entities
-function find_library.inSphere (center, radius, filter)
-	checkpermission(SF.instance, nil, "find")
-	checktype(center, SF.Types["Vector"])
+function find_library.inSphere(center, radius, filter)
+	checkpermission(instance, nil, "find")
 	checkluatype (radius, TYPE_NUMBER)
 
 	local center = vunwrap(center)
@@ -78,9 +75,7 @@ end
 -- @param filter Optional function to filter results
 -- @return An array of found entities
 function find_library.inCone(pos, dir, distance, radius, filter)
-	checkpermission(SF.instance, nil, "find")
-	checktype(pos, SF.Types["Vector"])
-	checktype(dir, SF.Types["Vector"])
+	checkpermission(instance, nil, "find")
 	checkluatype (distance, TYPE_NUMBER)
 	checkluatype (radius, TYPE_NUMBER)
 
@@ -97,16 +92,12 @@ end
 -- @param filter Optional function to filter results
 -- @return An array of found entities
 function find_library.inRay(startpos, endpos, mins, maxs, filter)
-	checkpermission(SF.instance, nil, "find")
+	checkpermission(instance, nil, "find")
 
-	checktype(startpos, SF.Types["Vector"])
-	checktype(endpos, SF.Types["Vector"])
 	startpos = vunwrap(startpos)
 	endpos = vunwrap(endpos)
 
 	if mins ~= nil or maxs ~= nil then
-		checktype(mins, SF.Types["Vector"])
-		checktype(maxs, SF.Types["Vector"])
 		mins = vunwrap(mins)
 		maxs = vunwrap(maxs)
 	end
@@ -119,7 +110,7 @@ end
 -- @param filter Optional function to filter results
 -- @return An array of found entities
 function find_library.byClass(class, filter)
-	checkpermission(SF.instance, nil, "find")
+	checkpermission(instance, nil, "find")
 	checkluatype (class, TYPE_STRING)
 
 	return convert(ents.FindByClass(class), filter)
@@ -130,7 +121,7 @@ end
 -- @param filter Optional function to filter results
 -- @return An array of found entities
 function find_library.byName(name, filter)
-	checkpermission(SF.instance, nil, "find")
+	checkpermission(instance, nil, "find")
 	checkluatype (name, TYPE_STRING)
 
 	return convert(ents.FindByName(name), filter)
@@ -141,7 +132,7 @@ end
 -- @param filter Optional function to filter results
 -- @return An array of found entities
 function find_library.byModel(model, filter)
-	checkpermission(SF.instance, nil, "find")
+	checkpermission(instance, nil, "find")
 	checkluatype (model, TYPE_STRING)
 
 	return convert(ents.FindByModel(model), filter)
@@ -153,9 +144,8 @@ if SERVER then
 	-- @param pos Vector view point
 	-- @param filter Optional function to filter results
 	-- @return An array of found entities
-	function find_library.inPVS (pos, filter)
-		checkpermission(SF.instance, nil, "find")
-		checktype(pos, SF.Types["Vector"])
+	function find_library.inPVS(pos, filter)
+		checkpermission(instance, nil, "find")
 		
 		return convert(ents.FindInPVS(vunwrap(pos)), filter)
 	end
@@ -165,7 +155,7 @@ end
 -- @param filter Optional function to filter results
 -- @return An array of found entities
 function find_library.allPlayers(filter)
-	checkpermission(SF.instance, nil, "find")
+	checkpermission(instance, nil, "find")
 
 	return convert(player.GetAll(), filter)
 end
@@ -174,7 +164,7 @@ end
 -- @param filter Optional function to filter results
 -- @return An array of found entities
 function find_library.all(filter)
-	checkpermission(SF.instance, nil, "find")
+	checkpermission(instance, nil, "find")
 
 	return convert(ents.GetAll(), filter)
 end
@@ -220,4 +210,43 @@ function find_library.sortByClosest(ents, pos, furthest)
 		ret[i] = distances[i][2]
 	end
 	return ret
+end
+
+--- Finds the first player with the given name
+-- @param name Name to search for
+-- @param casesensitive Boolean should the match be case sensitive?
+-- @param exact Boolean should the name match exactly
+-- @return Table of found players
+function find_library.playersByName(name, casesensitive, exact)
+	checkpermission(instance, nil, "find")
+	checkluatype(name, TYPE_STRING)
+	if casesensitive~=nil then checkluatype(casesensitive, TYPE_BOOL) end
+	if exact~=nil then checkluatype(exact, TYPE_BOOL) end
+
+	local ret = {}
+	local getName
+	if casesensitive then
+		getName = function(ply) return ply:GetName() end
+	else
+		name = string.lower(name)
+		getName = function(ply) return string.lower(ply:GetName()) end
+	end
+
+	if exact then
+		for k, ply in ipairs(player.GetAll()) do
+			if getName(ply) == name then
+				ret[#ret+1] = plywrap(ply)
+			end
+		end
+	else
+		for k, ply in ipairs(player.GetAll()) do
+			if string.find(getName(ply), name, 1, true) then
+				ret[#ret+1] = plywrap(ply)
+			end
+		end
+	end
+
+	return ret
+end
+
 end

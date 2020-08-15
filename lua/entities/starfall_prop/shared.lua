@@ -7,3 +7,4 @@ ENT.Author          = "Sparky OvO"
 ENT.Spawnable       = false
 ENT.AdminSpawnable  = false
 
+ENT.IsSFProp = true

@@ -1,40 +1,38 @@
 -- Credits to Radon & Xandaros
-SF.VMatrix = {}
+local checkluatype = SF.CheckLuaType
+local dgetmeta = debug.getmetatable
+
 
 --- VMatrix type
-local vmatrix_methods, vmatrix_metamethods = SF.RegisterType("VMatrix")
-local wrap, unwrap = SF.CreateWrapper(vmatrix_metamethods, true, false, debug.getregistry().VMatrix)
-local vec_meta, vwrap, vunwrap, ang_meta, awrap, aunwrap
+-- @name VMatrix
+-- @class type
+-- @libtbl vmatrix_methods
+-- @libtbl vmatrix_meta
+SF.RegisterType("VMatrix", true, false, debug.getregistry().VMatrix)
 
-local dgetmeta = debug.getmetatable
-local checktype = SF.CheckType
-local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
 
-SF.AddHook("postload", function()
-	vec_meta = SF.Vectors.Metatable
-	vwrap = SF.Vectors.Wrap
-	vunwrap = SF.Vectors.Unwrap
+return function(instance)
 
-	ang_meta = SF.Angles.Metatable
-	awrap = SF.Angles.Wrap
-	aunwrap = SF.Angles.Unwrap
+local vmatrix_methods, vmatrix_meta, wrap, unwrap = instance.Types.VMatrix.Methods, instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
+local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 
-	--- Returns a new VMatrix
-	-- @return New VMatrix
-	SF.DefaultEnvironment.Matrix = function (t)
-		return wrap(Matrix(t))
-	end
-end)
+-- Only use this on normal tables
+local function vwrap2(tbl)
+	return setmetatable(tbl, vec_meta)
+end
 
-SF.VMatrix.Methods = vmatrix_methods
-SF.VMatrix.Metatable = vmatrix_metamethods
-SF.VMatrix.Wrap = wrap
-SF.VMatrix.Unwrap = unwrap
+--- Returns a new VMatrix
+-- @name builtins_library.Matrix
+-- @class function
+-- @return New VMatrix
+function instance.env.Matrix(t)
+	return wrap(Matrix(t))
+end
 
 --- tostring metamethod
 -- @return string representing the matrix.
-function vmatrix_metamethods:__tostring()
+function vmatrix_meta:__tostring()
 	return unwrap(self):__tostring()
 end
 
@@ -67,7 +65,6 @@ end
 --- Rotate the matrix
 -- @param ang Angle to rotate by
 function vmatrix_methods:rotate(ang)
-	checktype(ang, ang_meta)
 	unwrap(self):Rotate(aunwrap(ang))
 end
 
@@ -104,14 +101,12 @@ end
 --- Sets the scale
 -- @param vec New scale
 function vmatrix_methods:setScale(vec)
-	checktype(vec, vec_meta)
 	unwrap(self):SetScale(vunwrap(vec))
 end
 
 --- Scale the matrix
 -- @param vec Vector to scale by
 function vmatrix_methods:scale(vec)
-	checktype(vec, vec_meta)
 	unwrap(self):Scale(vunwrap(vec))
 end
 
@@ -125,35 +120,30 @@ end
 --- Sets the angles
 -- @param ang New angles
 function vmatrix_methods:setAngles(ang)
-	checktype(ang, ang_meta)
-	unwrap(self):SetAngles(SF.UnwrapObject(ang))
+	unwrap(self):SetAngles(aunwrap(ang))
 end
 
 --- Sets the translation
 -- @param vec New translation
 function vmatrix_methods:setTranslation(vec)
-	checktype(vec, vec_meta)
 	unwrap(self):SetTranslation(vunwrap(vec))
 end
 
 --- Sets the forward direction of the matrix. First column
 -- @param forward The forward vector
 function vmatrix_methods:setForward(forward)
-	checktype(forward, vec_meta)
 	unwrap(self):SetForward(vunwrap(forward))
 end
 
 --- Sets the right direction of the matrix. Negated second column
 -- @param right The right vector
 function vmatrix_methods:setRight(right)
-	checktype(right, vec_meta)
 	unwrap(self):SetRight(vunwrap(right))
 end
 
 --- Sets the up direction of the matrix. Third column
 -- @param up The up vector
 function vmatrix_methods:setUp(up)
-	checktype(up, vec_meta)
 	unwrap(self):SetUp(vunwrap(up))
 end
 
@@ -171,10 +161,21 @@ function vmatrix_methods:clone()
 	return wrap(Matrix(unwrap(self)))
 end
 
+--- Returns all 16 fields of the matrix in row-major order
+-- @return 16 numbers
+function vmatrix_methods:unpack()
+	return unwrap(self):Unpack()
+end
+
+--- Allows you to set all 16 fields in row-major order
+-- @param ... The 16 fields
+function vmatrix_methods:setUnpacked(...)
+	unwrap(self):SetUnpacked(...)
+end
+
 --- Copies the values from the second matrix to the first matrix. Self-Modifies
 -- @param src Second matrix
 function vmatrix_methods:set(src)
-	checktype(src, vmatrix_metamethods)
 	unwrap(self):Set(unwrap(src))
 end
 
@@ -209,7 +210,6 @@ end
 --- Translate the matrix
 -- @param vec Vector to translate by
 function vmatrix_methods:translate(vec)
-	checktype(vec, vec_meta)
 	unwrap(self):Translate(vunwrap(vec))
 end
 
@@ -223,8 +223,6 @@ end
 -- @param axis The normalized axis of rotation
 -- @param angle The angle of rotation in radians
 function vmatrix_methods:setAxisAngle(axis, ang)
-	checktype(axis, vec_meta)
-	
 	local x, y, z = axis[1], axis[2], axis[3]
 	local c = math.cos(ang)
 	local s = math.sin(ang)
@@ -238,14 +236,11 @@ function vmatrix_methods:setAxisAngle(axis, ang)
 	local ys = y*s
 	local zs = z*s
 	
-	local forward = Vector(c + x^2*cinv, xycinv + zs, xzcinv - ys)
-	local right = Vector(zs - xycinv, -c - y^2*cinv, -yzcinv - xs)
-	local up = Vector(xzcinv + ys, yzcinv - xs, c + z^2*cinv)
-	
-	local m = unwrap(self)
-	m:SetForward(forward)
-	m:SetRight(right)
-	m:SetUp(up)
+	unwrap(self):SetUnpacked(
+		c + x^2*cinv, xycinv - zs, xzcinv + ys, 0,
+		xycinv + zs, c + y^2*cinv, yzcinv - xs, 0,
+		xzcinv - ys, yzcinv + xs, c + z^2*cinv, 0,
+		0, 0, 0, 1)
 end
 
 --- Gets the rotation axis and angle of rotation of the rotation matrix
@@ -254,15 +249,14 @@ end
 function vmatrix_methods:getAxisAngle()
 	local epsilon = 0.00001
 
-	local m = unwrap(self):ToTable()
-	local m00, m01, m02 = unpack(m[1])
-	local m10, m11, m12 = unpack(m[2])
-	local m20, m21, m22 = unpack(m[3])
+	local m00, m01, m02, m03,
+		m10, m11, m12, m13,
+		m20, m21, m22, m23 = unwrap(self):Unpack()
 
 	if math.abs(m01-m10)< epsilon and math.abs(m02-m20)< epsilon and math.abs(m12-m21)< epsilon then
 		// singularity found
 		if math.abs(m01+m10) < epsilon and math.abs(m02+m20) < epsilon and math.abs(m12+m21) < epsilon and math.abs(m00+m11+m22-3) < epsilon then
-			return vwrap(Vector(1,0,0)), 0
+			return vwrap2({1,0,0}), 0
 		end
 		// otherwise this singularity is angle = math.pi
 		local xx = (m00+1)/2
@@ -273,86 +267,60 @@ function vmatrix_methods:getAxisAngle()
 		local yz = (m12+m21)/4
 		if xx > yy and xx > zz then
 			if xx < epsilon then
-				return vwrap(Vector(0, 0.7071, 0.7071)), math.pi
+				return vwrap2({0, 0.7071, 0.7071}), math.pi
 			else
 				local x = math.sqrt(xx)
-				return vwrap(Vector(x, xy/x, xz/x)), math.pi
+				return vwrap2({x, xy/x, xz/x}), math.pi
 			end
 		elseif yy > zz then
 			if yy < epsilon then
-				return vwrap(Vector(0.7071, 0, 0.7071)), math.pi
+				return vwrap2({0.7071, 0, 0.7071}), math.pi
 			else
 				local y = math.sqrt(yy)
-				return vwrap(Vector(y, xy/y, yz/y)), math.pi
+				return vwrap2({y, xy/y, yz/y}), math.pi
 			end
 		else
 			if zz < epsilon then
-				return vwrap(Vector(0.7071, 0.7071, 0)), math.pi
+				return vwrap2({0.7071, 0.7071, 0}), math.pi
 			else
 				local z = math.sqrt(zz)
-				return vwrap(Vector(z, xz/z, yz/z)), math.pi
+				return vwrap2({z, xz/z, yz/z}), math.pi
 			end
 		end
 	end
 
-	local axis = Vector(m21 - m12, m02 - m20, m10 - m01)
-	local s = axis:Length()
+	local axis = {m21 - m12, m02 - m20, m10 - m01}
+	local s = math.sqrt(axis[1]^2 + axis[2]^2 + axis[3]^2)
 	if math.abs(s) < epsilon then s=1 end
-	return vwrap(axis/s), math.acos(math.max(math.min(( m00 + m11 + m22 - 1)/2, 1), -1))
+	axis[1] = axis[1]/s
+	axis[2] = axis[2]/s
+	axis[3] = axis[3]/s
+	return vwrap2(axis), math.acos(math.max(math.min(( m00 + m11 + m22 - 1)/2, 1), -1))
 end
 
-
-local function transposeMatrix(mat, destination)
-	local mat_tbl = mat:ToTable()
-
-	destination:SetForward( Vector(unpack(mat_tbl[1])) )
-	destination:SetRight( -Vector(unpack(mat_tbl[2])) ) -- SetRight negates the vector
-	destination:SetUp( Vector(unpack(mat_tbl[3])) )
-	destination:SetTranslation( Vector(unpack(mat_tbl[4])) )
-
-	destination:SetField(4, 1, mat_tbl[1][4])
-	destination:SetField(4, 2, mat_tbl[2][4])
-	destination:SetField(4, 3, mat_tbl[3][4])
-	destination:SetField(4, 4, mat_tbl[4][4])
-end
-
---- Returns the transposed matrix
--- @return Transposed matrix
-function vmatrix_methods:getTransposed()
-	local result = Matrix()
-	transposeMatrix(unwrap(self), result)
-
-	return wrap(result)
-end
-
---- Transposes the matrix
-function vmatrix_methods:transpose()
-	local m = unwrap(self)
-	transposeMatrix(m, m)
-end
-
-function vmatrix_metamethods.__add(lhs, rhs)
-	checktype(lhs, vmatrix_metamethods)
-	checktype(rhs, vmatrix_metamethods)
-
+--- Adds two matrices (why would you do this?)
+-- @return Added matrix
+function vmatrix_meta.__add(lhs, rhs)
 	return wrap(unwrap(lhs) + unwrap(rhs))
 end
 
-function vmatrix_metamethods.__sub(lhs, rhs)
-	checktype(lhs, vmatrix_metamethods)
-	checktype(rhs, vmatrix_metamethods)
-
+--- Subtracts two matrices (why would you do this?)
+-- @return Subtracted matrix
+function vmatrix_meta.__sub(lhs, rhs)
 	return wrap(unwrap(lhs) - unwrap(rhs))
 end
 
-function vmatrix_metamethods.__mul(lhs, rhs)
-	checktype(lhs, vmatrix_metamethods)
+--- Multiplies two matrices
+-- @return Result matrix
+function vmatrix_meta.__mul(lhs, rhs)
 	local rhsmeta = dgetmeta(rhs)
-	if rhsmeta == vmatrix_metamethods then
+	if rhsmeta == vmatrix_meta then
 		return wrap(unwrap(lhs) * unwrap(rhs))
 	elseif rhsmeta == vec_meta then
 		return vwrap(unwrap(lhs) * vunwrap(rhs))
 	else
 		SF.Throw("Matrix must be multiplied with another matrix or vector on right hand side", 2)
 	end
+end
+
 end

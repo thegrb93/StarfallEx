@@ -1,36 +1,38 @@
---- HTTP Library
+-- Global to all starfalls
+local checkluatype = SF.CheckLuaType
+local registerprivilege = SF.Permissions.registerPrivilege
 
---- Http library. Requests content from urls.
--- @shared
-local http_library = SF.RegisterLibrary("http")
+
 local http_interval = CreateConVar("sf_http_interval", "0.5", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "Interval in seconds in which one http request can be made")
 local http_max_active = CreateConVar("sf_http_max_active", "3", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "The maximum amount of active http requests at the same time")
 
+registerprivilege("http.get", "HTTP Get method", "Allows the user to request html data", { client = { default = 1 }, urlwhitelist = { default = 2 } })
+registerprivilege("http.post", "HTTP Post method", "Allows the user to post html data", { client = { default = 1 }, urlwhitelist = { default = 2 } })
 
-SF.Permissions.registerPrivilege("http.get", "HTTP Get method", "Allows the user to request html data", { client = { default = 1 }, usergroups = { default = 3 }, urlwhitelist = { default = 2 } })
-SF.Permissions.registerPrivilege("http.post", "HTTP Post method", "Allows the user to post html data", { client = { default = 1 }, usergroups = { default = 3 }, urlwhitelist = { default = 2 } })
+--- Http library. Requests content from urls.
+-- @name http
+-- @class library
+-- @libtbl http_library
+SF.RegisterLibrary("http")
+
+return function(instance)
+local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 -- Initializes the lastRequest variable to a value which ensures that the first call to httpRequestReady returns true
 -- and the "active requests counter" to 0
-SF.AddHook("initialize", function(instance)
+instance:AddHook("initialize", function()
 	instance.data.http = {
 		lastRequest = 0,
 		active = 0
 	}
 end)
 
-local base64Digits = {}
-do
-	local base64Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-	
-	for i = 1, #base64Alphabet do
-		base64Digits[string.byte(base64Alphabet[i])] = i - 1
-	end
-end
+
+local http_library = instance.Libraries.http
 
 -- Returns an error when a http request was already triggered in the current interval
 -- or the maximum amount of simultaneous requests is currently active, returns true otherwise
-local function httpRequestReady (instance)
+local function httpRequestReady()
 	local httpData = instance.data.http
 	if CurTime() - httpData.lastRequest < http_interval:GetFloat() or httpData.active >= http_max_active:GetInt() then
 		SF.Throw("You can't run a new http request yet", 3)
@@ -39,7 +41,7 @@ local function httpRequestReady (instance)
 end
 
 -- Runs the appropriate callback after a http request
-local function runCallback(instance, callback)
+local function runCallback(callback)
 	return function(...)
 		if callback then
 			instance:runFunction(callback, ...)
@@ -50,7 +52,7 @@ end
 
 --- Checks if a new http request can be started
 function http_library.canRequest()
-	local httpData = SF.instance.data.http
+	local httpData = instance.data.http
 	return CurTime() - httpData.lastRequest >= http_interval:GetFloat() and httpData.active < http_max_active:GetInt()
 end
 
@@ -59,17 +61,16 @@ end
 -- @param callbackSuccess the function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)
 -- @param callbackFail the function to be called on request fail, taking the failing reason as an argument
 -- @param headers GET headers to be sent
-function http_library.get (url, callbackSuccess, callbackFail, headers)
-	local instance = SF.instance
-	SF.Permissions.check(instance, url, "http.get")
+function http_library.get(url, callbackSuccess, callbackFail, headers)
+	checkpermission(instance, url, "http.get")
 
-	httpRequestReady(instance)
+	httpRequestReady()
 
-	SF.CheckLuaType(url, TYPE_STRING)
-	SF.CheckLuaType(callbackSuccess, TYPE_FUNCTION)
-	if callbackFail ~= nil then SF.CheckLuaType(callbackFail, TYPE_FUNCTION) end
-	if headers ~= nil then
-		SF.CheckLuaType(headers, TYPE_TABLE)
+	checkluatype(url, TYPE_STRING)
+	checkluatype(callbackSuccess, TYPE_FUNCTION)
+	if callbackFail ~= nil then checkluatype(callbackFail, TYPE_FUNCTION) end
+	if headers~=nil then
+		checkluatype(headers, TYPE_TABLE)
 		for k, v in pairs(headers) do
 			if not isstring(k) or not isstring(v) then
 				SF.Throw("Headers can only contain string keys and string values", 2)
@@ -81,7 +82,7 @@ function http_library.get (url, callbackSuccess, callbackFail, headers)
 
 	instance.data.http.lastRequest = CurTime()
 	instance.data.http.active = instance.data.http.active + 1
-	http.Fetch(url, runCallback(instance, callbackSuccess), runCallback(instance, callbackFail), headers)
+	http.Fetch(url, runCallback(callbackSuccess), runCallback(callbackFail), headers)
 end
 
 --- Runs a new http POST request
@@ -90,12 +91,11 @@ end
 -- @param callbackSuccess optional function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)
 -- @param callbackFail optional function to be called on request fail, taking the failing reason as an argument
 -- @param headers optional POST headers to be sent
-function http_library.post (url, payload, callbackSuccess, callbackFail, headers)
-	local instance = SF.instance
-	SF.CheckLuaType(url, TYPE_STRING)
-	SF.Permissions.check(instance, url, "http.post")
+function http_library.post(url, payload, callbackSuccess, callbackFail, headers)
+	checkluatype(url, TYPE_STRING)
+	checkpermission(instance, url, "http.post")
 
-	httpRequestReady(instance)
+	httpRequestReady()
 
 	local request = {
 		url = url,
@@ -121,7 +121,7 @@ function http_library.post (url, payload, callbackSuccess, callbackFail, headers
 	end
 
 	if headers~=nil then
-		SF.CheckLuaType(headers, TYPE_TABLE)
+		checkluatype(headers, TYPE_TABLE)
 		
 		for k, v in pairs(headers) do
 			if not isstring(k) or not isstring(v) then
@@ -136,14 +136,14 @@ function http_library.post (url, payload, callbackSuccess, callbackFail, headers
 		request.headers = headers
 	end
 
-	if callbackSuccess ~= nil then SF.CheckLuaType(callbackSuccess, TYPE_FUNCTION) end
-	if callbackFail ~= nil then SF.CheckLuaType(callbackFail, TYPE_FUNCTION) end
+	if callbackSuccess ~= nil then checkluatype(callbackSuccess, TYPE_FUNCTION) end
+	if callbackFail ~= nil then checkluatype(callbackFail, TYPE_FUNCTION) end
 	
 	request.success = function(code, body, headers)
-		local callback = runCallback(instance, callbackSuccess)
+		local callback = runCallback(callbackSuccess)
 		callback(body, #body, headers, code)
 	end
-	request.failed = runCallback(instance, callbackFail)
+	request.failed = runCallback(callbackFail)
 
 	if CLIENT then SF.HTTPNotify(instance.player, url) end
 
@@ -154,103 +154,28 @@ function http_library.post (url, payload, callbackSuccess, callbackFail, headers
 end
 
 --- Converts data into base64 format or nil if the string is 0 length
+--@name http_library.base64Encode
+--@class function
 --@param data The data to convert
 --@return The converted data
-function http_library.base64Encode(data)
-	SF.CheckLuaType(data, TYPE_STRING)
-	return util.Base64Encode(data)
-end
+http_library.base64Encode = util.Base64Encode
 
 --- Converts data from base64 format
+--@name http_library.base64Decode
+--@class function
 --@param data The data to convert
---@param threaded Optional bool
 --@return The converted data
-function http_library.base64Decode(data, threaded)
-	SF.CheckLuaType(data, TYPE_STRING)
-
-	local thread
-	if threaded ~= nil then
-		if SF.CheckLuaType(threaded, TYPE_BOOL) then
-			thread = coroutine.running()
-
-			if not thread then
-				SF.Throw("Tried to use threading while not in a thread!", 2)
-			end
-		end
-	end
-
-	local bit_band, bit_rshift = bit.band, bit.rshift
-	local string_char, string_byte = string.char, string.byte
-	local coroutine_yield = coroutine.yield
-	local unpack = unpack
-
-	local digitBufferPos = 1
-	local digitBuffer = {}
-
-	local chunkBufferPos = 1
-	local chunkBuffer = {}
-
-	data = string.gsub(data, "=?=?$", "", 1)
-	data = string.gsub(data, "\n", "")
-	local dataLen = #data
-
-	for i = 1, dataLen - 3, 4 do
-		local b0, b1, b2, b3 = string_byte(data, i, i + 3)
-		local d0, d1, d2, d3 = base64Digits[b0], base64Digits[b1], base64Digits[b2], base64Digits[b3]
-
-		if not (d0 and d1 and d2 and d3) then
-			SF.Throw("Base64 string contains invalid characters", 2)
-		end
-
-		digitBuffer[digitBufferPos]     = 0x04 * d0                 + bit_rshift(d1, 4)
-		digitBuffer[digitBufferPos + 1] = 0x10 * bit_band(d1, 0x0F) + bit_rshift(d2, 2)
-		digitBuffer[digitBufferPos + 2] = 0x40 * bit_band(d2, 0x03) + d3
-
-		if digitBufferPos <= 7993 then
-			digitBufferPos = digitBufferPos + 3
-		else
-			chunkBuffer[chunkBufferPos] = string_char(unpack(digitBuffer))
-			chunkBufferPos = chunkBufferPos + 1
-
-			digitBufferPos = 1
-		end
-
-		if threaded then coroutine_yield() end
-	end
-
-	local bytesRemain = dataLen % 4
-	if bytesRemain ~= 0 then
-		local start = dataLen - bytesRemain + 1
-		local b0, b1, b2 = string_byte(data, start, start + 2)
-		local d0, d1, d2 = base64Digits[b0], base64Digits[b1], base64Digits[b2]
-
-		if not (d0 and d1 and (d2 or bytesRemain == 2)) then
-			SF.Throw("Base64 string contains invalid characters", 2)
-		end
-
-		digitBuffer[digitBufferPos] = 0x04 * d0 + bit_rshift(d1, 4)
-		digitBufferPos = digitBufferPos + 1
-
-		if d2 then
-			digitBuffer[digitBufferPos] = 0x10 * bit_band(d1, 0x0F) + bit_rshift(d2, 2)
-			digitBufferPos = digitBufferPos + 1
-		end
-	end
-
-	if digitBufferPos ~= 1 then
-		chunkBuffer[chunkBufferPos] = string_char(unpack(digitBuffer, 1, digitBufferPos - 1))
-	end
-
-	return table.concat(chunkBuffer)
-end
+http_library.base64Decode = util.Base64Decode
 
 --- Encodes illegal url characters to be legal
 --@param data The data to convert
 --@return The converted data
 function http_library.urlEncode(data)
-	SF.CheckLuaType(data, TYPE_STRING)
+	checkluatype(data, TYPE_STRING)
 	data = string.gsub(data, "[^%w_~%.%-%(%)!%*]", function(char)
 		return string.format("%%%02X", string.byte(char))
 	end)
 	return data
+end
+
 end

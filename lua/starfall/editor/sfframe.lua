@@ -68,7 +68,6 @@ Editor.NewTabOnOpenVar = CreateClientConVar("sf_editor_new_tab_on_open", "1", tr
 Editor.OpenOldTabsVar = CreateClientConVar("sf_editor_openoldtabs", "1", true, false)
 Editor.WorldClickerVar = CreateClientConVar("sf_editor_worldclicker", "0", true, false)
 Editor.LayoutVar = CreateClientConVar("sf_editor_layout", "0", true, false)
-Editor.UseLegacyHelper = CreateClientConVar("sf_helper_legacy", "0", true, false)
 Editor.StartHelperUndocked = CreateClientConVar("sf_helper_startundocked", "0", true, false)
 
 function SF.DefaultCode()
@@ -125,7 +124,7 @@ function Editor:GetFont(fontName, size, antialiasing)
 	if not self.CreatedFonts[name] then
 		self.CreatedFonts[name] = true
 		createFont(name, fontName, size, antialiasing)
-		timer.Simple(0, function() createFont(name, fontName, size, antialiasing) end) --Fix for bug explained there http://wiki.garrysmod.com/page/surface/CreateFont
+		timer.Simple(0, function() createFont(name, fontName, size, antialiasing) end) --Fix for bug explained there https://wiki.facepunch.com/gmod/surface.CreateFont
 	end
 
 	surface.SetFont(name)
@@ -628,9 +627,9 @@ function Editor:CreateTab(chosenfile, forcedTabHandler)
 		content.OnTextChanged = function()
 			self:UpdateTabText(sheet.Tab)
 		end
-		content.OnShortcut = function(_, code)
+		content.OnShortcut = function(_, code, shift)
 			if code == KEY_S then
-				self:SaveFile(self:GetChosenFile())
+				self:SaveFile(self:GetChosenFile(), false, shift)
 				self:Validate()
 			end
 		end
@@ -701,13 +700,6 @@ function Editor:CloseTab(_tab,dontask)
 
 	self:SaveTabs()
 
-	-- There's only one tab open, no need to actually close any tabs
-	if self:GetNumTabs() == 1 then
-		self:GetActiveTab():SetText("Generic")
-		self:NewScript(true)
-		return
-	end
-
 	-- Find the panel (for the scroller)
 	local tabscroller_sheetindex
 	for k, v in pairs(self.C.TabHolder.tabScroller.Panels) do
@@ -727,10 +719,7 @@ function Editor:CloseTab(_tab,dontask)
 					self:SetActiveTab(othertab)
 					self:SetLastTab()
 				else -- Reset the current tab (backup)
-					self:GetActiveTab():SetText("Generic")
-					self.C.TabHolder:InvalidateLayout()
-					self:NewScript(true)
-					return
+					self:NewTab()
 				end
 			else -- Change to the previous tab
 				self:SetActiveTab(self:GetLastTab())
@@ -741,10 +730,8 @@ function Editor:CloseTab(_tab,dontask)
 			if othertab and othertab:IsValid() then -- If that other tab is valid, use it
 				self:SetActiveTab(othertab)
 			else -- Reset the current tab (backup)
-				self:GetActiveTab():SetText("Generic")
 				self.C.TabHolder:InvalidateLayout()
-				self:NewScript(true)
-				return
+				self:NewTab()
 			end
 		end
 	end
@@ -789,7 +776,7 @@ function Editor:InitComponents()
 			end
 		}, "DButton")
 
-	self.C.ButtonHolder = self:AddComponent(vgui.Create("DPanel", self), -430-4, 4, 430, 22) -- Upper menu
+	self.C.ButtonHolder = self:AddComponent(vgui.Create("DPanel", self), -270-4, 4, 270, 22) -- Upper menu
 	self.C.ButtonHolder.Paint = function() end
 	-- AddComponent( panel, x, y, w, h )
 	-- if x, y, w, h is minus, it will stay relative to right or buttom border
@@ -1070,12 +1057,6 @@ function Editor:GetSettings()
 	function WorldClicker.OnChange(pnl, bVal)
 		self:GetParent():SetWorldClicker(bVal)
 	end
-
-	local LegacyHelper = vgui.Create("DCheckBoxLabel")
-	dlist:AddItem(LegacyHelper)
-	LegacyHelper:SetConVar("sf_helper_legacy")
-	LegacyHelper:SetText("Use legacy helper")
-	LegacyHelper:SizeToContents()
 
 	local UndockHelper = vgui.Create("DCheckBoxLabel")
 	dlist:AddItem(UndockHelper)
@@ -1520,7 +1501,7 @@ function Editor:GetCode()
 	end
 end
 
-function Editor:Open(Line, code, forcenewtab)
+function Editor:Open(Line, code, forcenewtab, checkFileExists)
 	timer.Create("sfautosave", 5, 0, function()
 		self:SaveTabs()
 	end)
@@ -1529,14 +1510,13 @@ function Editor:Open(Line, code, forcenewtab)
 	if code then
 		if not forcenewtab then
 			for i = 1, self:GetNumTabs() do
-				if self:GetTabContent(i).chosenfile == Line then
-					self:SetActiveTab(i)
-					self:SetCode(code)
-					return
-				elseif self:GetTabContent(i):GetCode() == code then
+				if self:GetTabContent(i):GetCode() == code then
 					self:SetActiveTab(i)
 					return
 				end
+			end
+			if checkFileExists and file.Exists("starfall/" .. Line, "DATA") and file.Read("starfall/" .. Line, "DATA")==code then
+				return
 			end
 		end
 		local title, tabtext = getPreferredTitles(Line, code)
@@ -1598,18 +1578,20 @@ function Editor:SaveFile(Line, close, SaveAs, Func)
 		return
 	end
 
-	file.Write(Line, self:GetCode())
+	if SF.FileWrite(Line, self:GetCode()) then
+		local panel = self.C.Val
+		timer.Simple(0, function() panel.SetText(panel, " Saved as " .. Line) end)
+		surface.PlaySound("ambient/water/drip3.wav")
 
-	local panel = self.C.Val
-	timer.Simple(0, function() panel.SetText(panel, " Saved as " .. Line) end)
-	surface.PlaySound("ambient/water/drip3.wav")
+		self:ChosenFile(Line)
+		self:UpdateTabText(self:GetActiveTab())
+		if close then
 
-	self:ChosenFile(Line)
-	self:UpdateTabText(self:GetActiveTab())
-	if close then
-
-		GAMEMODE:AddNotify("Source code saved as " .. Line .. ".", NOTIFY_GENERIC, 7)
-		self:Close()
+			GAMEMODE:AddNotify("Source code saved as " .. Line .. ".", NOTIFY_GENERIC, 7)
+			self:Close()
+		end
+	else
+		SF.AddNotify(LocalPlayer(), "Failed to save " .. Line, "ERROR", 7, "ERROR1")
 	end
 end
 
@@ -1683,17 +1665,18 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
 	SFHelp:Dock(RIGHT)
 	SFHelp:SetText("SFHelper")
 	SFHelp.DoClick = function()
-		if Editor.UseLegacyHelper:GetBool() then
-			if SF.Helper.Frame and SF.Helper.Frame:IsVisible() then
-				SF.Helper.Frame:Close()
-			else
-				SF.Helper.show()
-			end
+		if BRANCH == "unknown" then
+			gui.OpenURL(SF.Editor.HelperURL:GetString())
 		else
-			local sheet = self:CreateTab("", "helper")
-			self:SetActiveTab(sheet.Tab)
-			if Editor.StartHelperUndocked:GetBool() then
-				sheet.Tab.content:Undock()
+			local th = GetTabHandler("helper")
+			if th.htmldata then
+				local sheet = self:CreateTab("", "helper")
+				self:SetActiveTab(sheet.Tab)
+				if Editor.StartHelperUndocked:GetBool() then
+					sheet.Tab.content:Undock()
+				end
+			else
+				gui.OpenURL(SF.Editor.HelperURL:GetString())
 			end
 		end
 	end

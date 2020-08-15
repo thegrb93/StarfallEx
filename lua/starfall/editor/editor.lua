@@ -12,7 +12,6 @@ AddCSLuaFile("syntaxmodes/starfall.lua")
 AddCSLuaFile("sfframe.lua")
 AddCSLuaFile("sfderma.lua")
 AddCSLuaFile("docs.lua")
-AddCSLuaFile("sfhelper.lua")
 AddCSLuaFile("themes.lua")
 AddCSLuaFile("xml.lua")
 
@@ -45,11 +44,13 @@ SF.Editor.HelperURL = CreateConVar("sf_editor_helperurl", "http://thegrb93.githu
 ------------------
 
 if CLIENT then
-	include("docs.lua")
-	include("sfhelper.lua")
 	include("sfderma.lua")
 	include("sfframe.lua") -- Editor's frame
 	include("themes.lua")
+
+	if not file.Exists("starfall", "DATA") then
+		file.CreateDir("starfall")
+	end
 
 	-- Colors
 	SF.Editor.colors = {}
@@ -69,74 +70,64 @@ if CLIENT then
 		['"'] = "",
 	}
 
-
-	local function createLibraryMap ()
-
-		local libMap, libs = {}, {}
-
-		libMap["Environment"] = {}
-		for name, val in pairs(SF.DefaultEnvironment) do
-			table.insert(libMap["Environment"], name)
-			table.insert(libs, name)
-		end
-
-		for lib, tbl in pairs(SF.Libraries) do
-			libMap[lib] = {}
-			for name, val in pairs(tbl) do
-				table.insert(libMap[lib], name)
-				table.insert(libs, lib.."\\."..name)
-			end
-		end
-
-		for lib, tbl in pairs(SF.Types) do
-			if istable(tbl.__index) then
-				for name, val in pairs(tbl.__index) do
-					table.insert(libs, "\\:"..name)
+	function SF.Editor.init(callback)
+		if SF.Editor.initialized or SF.Editor.editor then return end
+		
+		if not SF.Docs then
+			if not SF.WaitingForDocs then
+				local docfile = file.Open("sf_docs.txt", "rb", "DATA")
+				if docfile then
+					SF.DocsData = docfile:Read(docfile:Size())
+					docfile:Close()
+				else
+					SF.DocsData = ""
 				end
+				SF.WaitingForDocs = {}
+				net.Start("starfall_docs")
+				net.WriteString(util.CRC(SF.DocsData))
+				net.SendToServer()
+				hook.Add("Think","SF_WaitingForDocs",function()
+					if SF.Docs then
+						SF.Editor.init()
+						for k, v in ipairs(SF.WaitingForDocs) do v() end
+						SF.WaitingForDocs = nil
+						hook.Remove("Think","SF_WaitingForDocs")
+					end
+				end)
 			end
+			SF.WaitingForDocs[#SF.WaitingForDocs+1] = callback
+			return
 		end
-
-		return libMap, table.concat(libs, "|")
-	end
-
-	function SF.Editor.init ()
-
-		if not file.Exists("starfall", "DATA") then
-			file.CreateDir("starfall")
-		end
-		if SF.Editor.editor then return end
 
 		SF.Editor.createEditor()
 		SF.Editor.initialized = true
-
-		SF.CallHook("editorinit")
 	end
 
-	function SF.Editor.open ()
-		if not SF.Editor.initialized then SF.Editor.init() end
+	function SF.Editor.open()
+		if not SF.Editor.initialized then SF.Editor.init(function() SF.Editor.open() end) return end
 		SF.Editor.editor:Open()
 		RunConsoleCommand("starfall_event", "editor_open")
 	end
 
-	function SF.Editor.openFile(fl,forceNewTab)
-		if not SF.Editor.initialized then SF.Editor.init() end
+	function SF.Editor.openFile(fl, forceNewTab)
+		if not SF.Editor.initialized then SF.Editor.init(function() SF.Editor.openFile(fl, forceNewTab) end) return end
 		SF.Editor.editor:Open(fl, nil, forceNewTab)
 	end
 
-	function SF.Editor.openWithCode(name, code,forceNewTab)
-		if not SF.Editor.initialized then SF.Editor.init() end
-		SF.Editor.editor:Open(name, code, forceNewTab)
+	function SF.Editor.openWithCode(name, code, forceNewTab, checkFileExists)
+		if not SF.Editor.initialized then SF.Editor.init(function() SF.Editor.openWithCode(name, code, forceNewTab, checkFileExists) end) return end
+		SF.Editor.editor:Open(name, code, forceNewTab, checkFileExists)
 	end
 
 	function SF.Editor.pasteCode(code)
 		SF.Editor.editor:PasteCode(code)
 	end
 
-	function SF.Editor.close ()
+	function SF.Editor.close()
 		SF.Editor.editor:Close()
 	end
 
-	function SF.Editor.getCode ()
+	function SF.Editor.getCode()
 		return SF.Editor.editor:GetCode() or ""
 	end
 
@@ -149,9 +140,9 @@ if CLIENT then
 	end
 
 	function SF.Editor.renameFile(oldFile, newFile)
-		local contents = file.Read(oldFile)
-		file.Write(newFile, contents)
-		if file.Read(newFile)==contents then
+		if file.Exists(newFile, "DATA") then
+			SF.AddNotify(LocalPlayer(), "Failed to rename. File already exists there.", "ERROR", 7, "ERROR1")
+		elseif SF.FileWrite(newFile, file.Read(oldFile)) then
 			file.Delete(oldFile)
 			SF.AddNotify(LocalPlayer(), "File renamed as " .. newFile .. ".", "GENERIC", 7, "DRIP3")
 			for i = 1, SF.Editor.editor:GetNumTabs() do
@@ -179,7 +170,7 @@ if CLIENT then
 		return files
 	end
 
-	function SF.Editor.createEditor ()
+	function SF.Editor.createEditor()
 		local editor = vgui.Create("StarfallEditorFrame") --Should define own frame later
 
 		if SF.Editor.editor then SF.Editor.editor:Remove() end
@@ -189,7 +180,7 @@ if CLIENT then
 			if v.Init then v:Init() end
 		end
 
-		editor:Setup("Starfall Editor (" .. SF.Version .. ")", "starfall", "Starfall")
+		editor:Setup("Starfall Editor (" .. GetGlobalString("SF.Version") .. ")", "starfall", "Starfall")
 	end
 
 	function SF.Editor.createGlobalPermissionsPanel(client, server)
@@ -233,12 +224,13 @@ if CLIENT then
 	-- @param mainfile Manual selection of which file should be main. Otherwise it's the open file
 	-- @return True if ok, false if a file was missing
 	-- @return A table with mainfile name and files
-	function SF.Editor.BuildIncludesTable(mainfile)
-		if not SF.Editor.editor then SF.Editor.init() end
+	function SF.Editor.BuildIncludesTable(mainfile, success, err)
+		if not SF.Editor.initialized then SF.Editor.init(function() SF.Editor.BuildIncludesTable(mainfile, success, err) end) return end
+		
 		local openfiles = SF.Editor.getOpenFiles()
 		if not (mainfile and (openfiles[mainfile] or file.Exists("starfall/" .. mainfile, "DATA"))) then
 			mainfile = SF.Editor.getOpenFile() or "main"
-			if #mainfile == 0 then return false, "Invalid main file" end
+			if #mainfile == 0 then err("Invalid main file") return end
 			openfiles[mainfile] = SF.Editor.getCode()
 		end
 
@@ -259,7 +251,7 @@ if CLIENT then
 			if openfiles[codepath] or file.Exists("starfall/" .. codepath, "DATA") then return codepath end
 		end
 
-		local function recursiveLoad (path, curdir)
+		local function recursiveLoad(path, curdir)
 			local code, codedir, codepath
 
 			local codepath = findCodePath(path, curdir)
@@ -317,66 +309,59 @@ if CLIENT then
 		end
 		local ok, msg = pcall(recursiveLoad, mainfile, string.GetPathFromFilename(mainfile))
 
-		local function findCycle (file, visited, recStack)
-			if not visited[file] then
-				--Mark the current file as visited and part of recursion stack
-				visited[file] = true
-				recStack[file] = true
+		if ok then
+			local function findCycle(file, visited, recStack)
+				if not visited[file] then
+					--Mark the current file as visited and part of recursion stack
+					visited[file] = true
+					recStack[file] = true
 
-				--Recurse for all the files included in this file
-				for k, v in pairs(ppdata.includes[file] or {}) do
-					if recStack[v] then
-						return true, file
-					elseif not visited[v] then
-						local cyclic, cyclicFile = findCycle(v, visited, recStack)
-						if cyclic then return true, cyclicFile end
+					--Recurse for all the files included in this file
+					for k, v in pairs(ppdata.includes[file] or {}) do
+						if recStack[v] then
+							return true, file
+						elseif not visited[v] then
+							local cyclic, cyclicFile = findCycle(v, visited, recStack)
+							if cyclic then return true, cyclicFile end
+						end
 					end
+				end
+
+				--Remove this file from the recursion stack
+				recStack[file] = false
+				return false, nil
+			end
+
+			local isCyclic = false
+			local cyclicFile = nil
+			for k, v in pairs(ppdata.includes or {}) do
+				local cyclic, file = findCycle(k, {}, {})
+				if cyclic then
+					isCyclic = true
+					cyclicFile = file
+					break
 				end
 			end
 
-			--Remove this file from the recursion stack
-			recStack[file] = false
-			return false, nil
-		end
-
-		local isCyclic = false
-		local cyclicFile = nil
-		for k, v in pairs(ppdata.includes or {}) do
-			local cyclic, file = findCycle(k, {}, {})
-			if cyclic then
-				isCyclic = true
-				cyclicFile = file
-				break
+			if isCyclic then
+				err("Loop in includes from: " .. cyclicFile) return
 			end
-		end
 
-		if isCyclic then
-			return false, "Loop in includes from: " .. cyclicFile
-		end
+			local clientmain = ppdata.clientmain and ppdata.clientmain[tbl.mainfile]
+			if clientmain and not tbl.files[clientmain] then
+				err("Clientmain not found: " .. clientmain) return
+			end
 
-		local clientmain = ppdata.clientmain and ppdata.clientmain[tbl.mainfile]
-		if clientmain and not tbl.files[clientmain] then
-			return false, "Clientmain not found: " .. clientmain
-		end
-
-		if ok then
-			return true, tbl
+			success(tbl)
 		else
 			local _1, _2, file = string.find(msg, "(Bad include%: .*)")
-			if file then
-				return false, file
-			else
-				error(msg, 0)
-			end
+			err(file or msg)
 		end
 	end
 
 	-- CLIENT ANIMATION
 
-	local busy_players = { }
-	hook.Add("EntityRemoved", "starfall_busy_animation", function (ply)
-		busy_players[ply] = nil
-	end)
+	local busy_players = SF.EntityTable("starfall_busy_animation")
 
 	local emitter = ParticleEmitter(vector_origin)
 
@@ -412,7 +397,8 @@ if CLIENT then
 			end
 		end
 	end)
-	concommand.Add("sf_editor_restart", function()
+	
+	local forceCloseEditor = function()
 		if not SF.Editor.initialized then return end
 		SF.Editor.editor:Close()
 		for k, v in pairs(SF.Editor.TabHandlers) do
@@ -421,15 +407,54 @@ if CLIENT then
 		SF.Editor.initialized = false
 		SF.Editor.editor:Remove()
 		SF.Editor.editor = nil
-		SF.Editor.open ()
+
+	end
+	
+	concommand.Add("sf_editor_reload", function()
+		pcall(forceCloseEditor)
+		include("starfall/editor/editor.lua")
 		print("Editor reloaded")
 	end)
-	concommand.Add("sf_editor_reload", function()
-		include("starfall/editor/editor.lua")
+	
+	local function initDocs(data)
+		local ok, docs
+		if data then
+			ok, docs = xpcall(function() return SF.StringToTable(util.Decompress(data)) end, debug.traceback)
+		end
+		if ok then
+			SF.Docs = docs
+		else
+			if docs then
+				ErrorNoHalt("There was an error decoding the docs. Rejoin to try again.\n" .. docs .. "\n")
+			else
+				ErrorNoHalt("There was an error transmitting the docs. Rejoin to try again.\n")
+			end
+			SF.AddNotify(LocalPlayer(), "Error processing Starfall documentation!", "GENERIC", 7, "DRIP3")
+		end
+	end
+	net.Receive("starfall_docs", function(len, ply)
+		if net.ReadBool() then
+			initDocs(SF.DocsData)
+			SF.DocsData = nil
+		else
+			SF.AddNotify(LocalPlayer(), "Downloading Starfall Documentation", "GENERIC", 7, "DRIP3")
+			net.ReadStream(nil, function(data)
+				local docfile = file.Open("sf_docs.txt", "wb", "DATA")
+				if docfile then
+					docfile:Write(data)
+					docfile:Close()
+					SF.AddNotify(LocalPlayer(), "Documentation saved to sf_docs.txt!", "GENERIC", 7, "DRIP3")
+				else
+					SF.AddNotify(LocalPlayer(), "Error saving Starfall documentation!", "GENERIC", 7, "DRIP3")
+				end
+				initDocs(data)
+			end)
+		end
 	end)
 elseif SERVER then
 
 	util.AddNetworkString("starfall_editor_status")
+	util.AddNetworkString("starfall_docs")
 
 	local starfall_event = {}
 
@@ -439,17 +464,40 @@ elseif SERVER then
 		return handler(ply, args)
 	end)
 
-	function starfall_event.editor_open (ply, args)
+	function starfall_event.editor_open(ply, args)
+		local t = ply.SF_NextEditorStatus
+		if t and CurTime()<t then return end
+		ply.SF_NextEditorStatus = CurTime()+0.1
+
 		net.Start("starfall_editor_status")
 		net.WriteEntity(ply)
 		net.WriteBit(true)
 		net.Broadcast()
 	end
 
-	function starfall_event.editor_close (ply, args)
+	function starfall_event.editor_close(ply, args)
+		local t = ply.SF_NextEditorStatus
+		if t and CurTime()<t then return end
+		ply.SF_NextEditorStatus = CurTime()+0.1
+
 		net.Start("starfall_editor_status")
 		net.WriteEntity(ply)
 		net.WriteBit(false)
 		net.Broadcast()
 	end
+	
+	net.Receive("starfall_docs", function(len, ply)
+		if not ply.SF_SentDocs then
+			ply.SF_SentDocs = true
+
+			net.Start("starfall_docs")
+			if SF.DocsCRC == net.ReadString() then
+				net.WriteBool(true)
+			else
+				net.WriteBool(false)
+				net.WriteStream(SF.Docs, nil, true)
+			end
+			net.Send(ply)
+		end
+	end)
 end

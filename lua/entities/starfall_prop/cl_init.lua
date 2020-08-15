@@ -1,7 +1,6 @@
 include("shared.lua")
 ENT.RenderGroup = RENDERGROUP_BOTH
 
-ENT.IsHologram = true
 ENT.DefaultMaterial = Material( "models/wireframe" )
 ENT.Material = ENT.DefaultMaterial
 
@@ -44,6 +43,18 @@ function ENT:GetRenderMesh()
 	end
 end
 
+function ENT:OnRemove()
+	-- This is required because snapshots can cause OnRemove to run even if it wasn't removed.
+	if self.rendermesh then
+		timer.Simple(0, function()
+			if self.rendermesh and not self:IsValid() then
+				self.rendermesh:Destroy()
+				self.rendermesh = nil
+			end
+		end)
+	end
+end
+
 net.Receive("starfall_custom_prop", function()
 	local index = net.ReadUInt(16)
 	local self, data
@@ -83,14 +94,16 @@ net.Receive("starfall_custom_prop", function()
 	end
 
 	SF.WaitForEntity(index, function(e)
-		if e:GetClass()=="starfall_prop" then
+		if e and e:GetClass()=="starfall_prop" then
 			self = e
 			applyData()
 		end
 	end)
 
 	net.ReadStream(nil, function(data_)
-		data = data_
-		applyData()
+		if data_ then
+			data = util.Decompress(data_)
+			applyData()
+		end
 	end)
 end)

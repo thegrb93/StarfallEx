@@ -175,72 +175,7 @@ SF.Preprocessor.SetGlobalDirective("clientmain", function(args, filename, data)
 	data.clientmain[filename] = args
 end)
 
---- Mark a file to be included in the upload.
--- This is required to use the file in require() and dofile()
--- @name include
--- @class directive
--- @param path Path to the file
--- @usage
--- \--@include lib/someLibrary.txt
---
--- require( "lib/someLibrary.txt" )
--- -- CODE
-
---- Mark a directory to be included in the upload.
--- This is optional to include all files in the directory in require() and dofile()
--- @name includedir
--- @class directive
--- @param path Path to the directory
--- @usage
--- \--@includedir lib
---
--- require( "lib/someLibraryInLib.txt" )
--- require( "lib/someOtherLibraryInLib.txt" )
--- -- CODE
-
---- Set the name of the script.
--- This will become the name of the tab and will show on the overlay of the processor
--- @name name
--- @class directive
--- @param name Name of the script
--- @usage
--- \--@name Awesome script
--- -- CODE
-
---- Set the author of the script.
--- This will set the author that will be shown on the overlay of the processor
--- @name author
--- @class directive
--- @param author Author of the script
--- @usage
--- \--@author TheAuthor
--- -- CODE
-
---- Set the model of the processor entity.
--- @name model
--- @class directive
--- @param model String of the model
--- @usage
--- \--@model models/props_junk/watermelon01.mdl
--- -- CODE
-
---- Set the current file to only run on the server. Shared is default
--- @name server
--- @class directive
--- @usage
--- \--@server
--- -- CODE
-
---- Set the current file to only run on the client. Shared is default
--- @name client
--- @class directive
--- @usage
--- \--@client
--- -- CODE
-
---- Set the client file to run as main. Can only be used in the main file.
--- @name clientmain
--- @class directive
--- @usage
--- \--@clientmain somefile.txt
--- -- CODE
+SF.Preprocessor.SetGlobalDirective("superuser", function(args, filename, data)
+	if not data.superuser then data.superuser = {} end
+	data.superuser[filename] = true
+end)

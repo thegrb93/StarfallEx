@@ -1,57 +1,5 @@
--------------------------------------------------------------------------------
--- PhysObj functions.
--------------------------------------------------------------------------------
-
-SF.PhysObjs = {}
-
---- PhysObj Type
--- @shared
-local physobj_methods, physobj_metatable = SF.RegisterType("PhysObj")
-local wrap, unwrap = SF.CreateWrapper(physobj_metatable, true, false)
-local checktype = SF.CheckType
+-- Global to all starfalls
 local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
-
-SF.PhysObjs.Methods = physobj_methods
-SF.PhysObjs.Metatable = physobj_metamethods
-SF.PhysObjs.Wrap = wrap
-SF.PhysObjs.Unwrap = unwrap
-
-local ewrap, eunwrap
-local owrap, ounwrap = SF.WrapObject, SF.UnwrapObject
-local ang_meta, vec_meta
-local vwrap, vunwrap, awrap, aunwrap, mwrap
-
-SF.AddHook("postload", function()
-	ang_meta = SF.Angles.Metatable
-	vec_meta = SF.Vectors.Metatable
-
-	ewrap = SF.Entities.Wrap
-	eunwrap = SF.Entities.Unwrap
-	vwrap = SF.Vectors.Wrap
-	vunwrap = SF.Vectors.Unwrap
-	awrap = SF.Angles.Wrap
-	aunwrap = SF.Angles.Unwrap
-	mwrap = SF.VMatrix.Wrap
-	
-	-- @name SF.DefaultEnvironment.FVPHYSICS
-	-- @class table
-	SF.DefaultEnvironment.FVPHYSICS = {
-		["CONSTRAINT_STATIC"] = FVPHYSICS_CONSTRAINT_STATIC,
-		["DMG_DISSOLVE"] = FVPHYSICS_DMG_DISSOLVE,
-		["DMG_SLICE"] = FVPHYSICS_DMG_SLICE,
-		["HEAVY_OBJECT"] = FVPHYSICS_HEAVY_OBJECT,
-		["MULTIOBJECT_ENTITY"] = FVPHYSICS_MULTIOBJECT_ENTITY,
-		["NO_IMPACT_DMG"] = FVPHYSICS_NO_IMPACT_DMG,
-		["NO_NPC_IMPACT_DMG"] = FVPHYSICS_NO_NPC_IMPACT_DMG,
-		["NO_PLAYER_PICKUP"] = FVPHYSICS_NO_PLAYER_PICKUP,
-		["NO_SELF_COLLISIONS"] = FVPHYSICS_NO_SELF_COLLISIONS,
-		["PART_OF_RAGDOLL"] = FVPHYSICS_PART_OF_RAGDOLL,
-		["PENETRATING"] = FVPHYSICS_PENETRATING,
-		["PLAYER_HELD"] = FVPHYSICS_PLAYER_HELD,
-		["WAS_THROWN"] = FVPHYSICS_WAS_THROWN,
-	}
-end)
 
 local function checkvector(v)
 	if v[1]<-1e12 or v[1]>1e12 or v[1]~=v[1] or
@@ -62,6 +10,25 @@ local function checkvector(v)
 
 	end
 end
+
+
+--- PhysObj Type
+-- @name PhysObj
+-- @class type
+-- @libtbl physobj_methods
+SF.RegisterType("PhysObj", true, false)
+
+
+return function(instance)
+local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
+
+
+local physobj_methods, physobj_meta, wrap, unwrap = instance.Types.PhysObj.Methods, instance.Types.PhysObj, instance.Types.PhysObj.Wrap, instance.Types.PhysObj.Unwrap
+local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
+
 
 --- Checks if the physics object is valid
 -- @shared
@@ -120,7 +87,6 @@ end
 -- @param vec The point to get velocity of in local reference frame
 -- @return Vector Local velocity of the physics object at the point
 function physobj_methods:getVelocityAtPoint(vec)
-	checktype(vec, vec_meta)
 	return vwrap(unwrap(self):GetVelocityAtPoint(vunwrap(vec)))
 end
 
@@ -163,7 +129,6 @@ end
 -- @param vec The vector to transform
 -- @return The transformed vector
 function physobj_methods:worldToLocal(vec)
-	checktype(vec, vec_meta)
 	return vwrap(unwrap(self):WorldToLocal(vunwrap(vec)))
 end
 
@@ -171,7 +136,6 @@ end
 -- @param vec The vector to transform
 -- @return The transformed vector
 function physobj_methods:localToWorld(vec)
-	checktype(vec, vec_meta)
 	return vwrap(unwrap(self):LocalToWorld(vunwrap(vec)))
 end
 
@@ -179,7 +143,6 @@ end
 -- @param vec The normal vector to transform
 -- @return The transformed vector
 function physobj_methods:worldToLocalVector(vec)
-	checktype(vec, vec_meta)
 	return vwrap(unwrap(self):WorldToLocalVector(vunwrap(vec)))
 end
 
@@ -187,22 +150,21 @@ end
 -- @param vec The normal vector to transform
 -- @return The transformed vector
 function physobj_methods:localToWorldVector(vec)
-	checktype(vec, vec_meta)
 	return vwrap(unwrap(self):LocalToWorldVector(vunwrap(vec)))
 end
 
---- Returns a table of MeshVertex structures where each 3 vertices represent a triangle. See: http://wiki.garrysmod.com/page/Structures/MeshVertex
+--- Returns a table of MeshVertex structures where each 3 vertices represent a triangle. See: http://wiki.facepunch.com/gmod/Structures/MeshVertex
 -- @return table of MeshVertex structures
-function physobj_methods:getMesh ()
+function physobj_methods:getMesh()
 	local mesh = unwrap(self):GetMesh()
-	return SF.Sanitize(mesh)
+	return instance.Sanitize(mesh)
 end
 
---- Returns a structured table, the physics mesh of the physics object. See: http://wiki.garrysmod.com/page/Structures/MeshVertex
+--- Returns a structured table, the physics mesh of the physics object. See: http://wiki.facepunch.com/gmod/Structures/MeshVertex
 -- @return table of MeshVertex structures
-function physobj_methods:getMeshConvexes ()
+function physobj_methods:getMeshConvexes()
 	local mesh = unwrap(self):GetMeshConvexes()
-	return SF.Sanitize(mesh)
+	return instance.Sanitize(mesh)
 end
 
 --- Sets the physical material of a physics object
@@ -210,7 +172,7 @@ end
 function physobj_methods:setMaterial(material)
 	checkluatype (material, TYPE_STRING)
 	local phys = unwrap(self)
-	checkpermission(SF.instance, phys:GetEntity(), "entities.setRenderProperty")
+	checkpermission(instance, phys:GetEntity(), "entities.setRenderProperty")
 	phys:SetMaterial(material)
 	if not phys:IsMoveable() then
 		phys:EnableMotion(true)
@@ -223,13 +185,12 @@ if SERVER then
 	-- @server
 	-- @param pos The position vector to set it to
 	function physobj_methods:setPos(pos)
-		checktype(pos, vec_meta)
 
 		pos = vunwrap(pos)
 		checkvector(pos)
 
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.setPos")
+		checkpermission(instance, phys:GetEntity(), "entities.setPos")
 		phys:SetPos(pos)
 	end
 
@@ -237,13 +198,12 @@ if SERVER then
 	-- @server
 	-- @param ang The angle to set it to
 	function physobj_methods:setAngles(ang)
-		checktype(ang, ang_meta)
 
 		ang = aunwrap(ang)
 		checkvector(ang)
 
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.setAngles")
+		checkpermission(instance, phys:GetEntity(), "entities.setAngles")
 		phys:SetAngles(ang)
 	end
 
@@ -251,13 +211,12 @@ if SERVER then
 	-- @server
 	-- @param vel The velocity vector to set it to
 	function physobj_methods:setVelocity(vel)
-		checktype(vel, vec_meta)
 
 		vel = vunwrap(vel)
 		checkvector(vel)
 
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.setVelocity")
+		checkpermission(instance, phys:GetEntity(), "entities.setVelocity")
 		phys:SetVelocity(vel)
 	end
 
@@ -272,7 +231,7 @@ if SERVER then
 		end
 
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.setMass")
+		checkpermission(instance, phys:GetEntity(), "entities.setMass")
 		phys:SetBuoyancyRatio(ratio)
 	end
 
@@ -280,23 +239,20 @@ if SERVER then
 	-- @server
 	-- @param force The force vector to apply
 	function physobj_methods:applyForceCenter(force)
-		checktype(force, vec_meta)
 
 		force = vunwrap(force)
 		checkvector(force)
 
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.applyForce")
+		checkpermission(instance, phys:GetEntity(), "entities.applyForce")
 		phys:ApplyForceCenter(force)
 	end
 
 	--- Applys an offset force to a physics object
 	-- @server
-	-- @param force The force vector to apply
-	-- @param position The position in world coordinates
+	-- @param force The force vector in world coordinates
+	-- @param position The force position in world coordinates
 	function physobj_methods:applyForceOffset(force, position)
-		checktype(force, vec_meta)
-		checktype(position, vec_meta)
 
 		force = vunwrap(force)
 		checkvector(force)
@@ -304,7 +260,7 @@ if SERVER then
 		checkvector(position)
 
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.applyForce")
+		checkpermission(instance, phys:GetEntity(), "entities.applyForce")
 		phys:ApplyForceOffset(force, position)
 	end
 
@@ -312,12 +268,11 @@ if SERVER then
 	-- @server
 	-- @param angvel The local angvel vector to set
 	function physobj_methods:setAngleVelocity(angvel)
-		checktype(angvel, vec_meta)
 		angvel = vunwrap(angvel)
 		checkvector(angvel)
 
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.applyForce")
+		checkpermission(instance, phys:GetEntity(), "entities.applyForce")
 
 		phys:AddAngleVelocity(angvel - phys:GetAngleVelocity())
 	end
@@ -326,12 +281,11 @@ if SERVER then
 	-- @server
 	-- @param angvel The local angvel vector to apply
 	function physobj_methods:addAngleVelocity(angvel)
-		checktype(angvel, vec_meta)
 		angvel = vunwrap(angvel)
 		checkvector(angvel)
 
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.applyForce")
+		checkpermission(instance, phys:GetEntity(), "entities.applyForce")
 
 		phys:AddAngleVelocity(angvel)
 	end
@@ -340,12 +294,11 @@ if SERVER then
 	-- @server
 	-- @param torque The world torque vector to apply
 	function physobj_methods:applyTorque(torque)
-		checktype(torque, vec_meta)
 		torque = vunwrap(torque)
 		checkvector(torque)
 
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.applyForce")
+		checkpermission(instance, phys:GetEntity(), "entities.applyForce")
 
 		phys:ApplyTorqueCenter(torque)
 	end
@@ -357,7 +310,7 @@ if SERVER then
 		checkluatype(mass, TYPE_NUMBER)
 		local phys = unwrap(self)
 		local ent = phys:GetEntity()
-		checkpermission(SF.instance, ent, "entities.setMass")
+		checkpermission(instance, ent, "entities.setMass")
 		local m = math.Clamp(mass, 1, 50000)
 		phys:SetMass(m)
 		duplicator.StoreEntityModifier(ent, "mass", { Mass = m })
@@ -368,7 +321,7 @@ if SERVER then
 	-- @param inertia The inertia vector to set it to
 	function physobj_methods:setInertia(inertia)
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.setInertia")
+		checkpermission(instance, phys:GetEntity(), "entities.setInertia")
 
 		local vec = vunwrap(inertia)
 		checkvector(vec)
@@ -382,18 +335,18 @@ if SERVER then
 	
 	local validGameFlags = FVPHYSICS_DMG_DISSOLVE + FVPHYSICS_DMG_SLICE + FVPHYSICS_HEAVY_OBJECT + FVPHYSICS_NO_IMPACT_DMG +
 		FVPHYSICS_NO_NPC_IMPACT_DMG + FVPHYSICS_NO_PLAYER_PICKUP
-	--- Adds game flags to the physics object. Some flags cannot be modified
-	-- @param flags The flags to add. FVPHYSICS enum. Can be:<br>
-	-- FVPHYSICS.DMG_DISSOLVE<br>
-	-- FVPHYSICS.DMG_SLICE<br>
-	-- FVPHYSICS.HEAVY_OBJECT<br>
-	-- FVPHYSICS.NO_IMPACT_DMG<br>
-	-- FVPHYSICS.NO_NPC_IMPACT_DMG<br>
-	-- FVPHYSICS.NO_PLAYER_PICKUP<br>
+	--- Adds game flags to the physics object. Some flags cannot be modified. Can be:
+	-- FVPHYSICS.DMG_DISSOLVE
+	-- FVPHYSICS.DMG_SLICE
+	-- FVPHYSICS.HEAVY_OBJECT
+	-- FVPHYSICS.NO_IMPACT_DMG
+	-- FVPHYSICS.NO_NPC_IMPACT_DMG
+	-- FVPHYSICS.NO_PLAYER_PICKUP
+	-- @param flags The flags to add. FVPHYSICS enum.
 	function physobj_methods:addGameFlags(flags)
 		checkluatype(flags, TYPE_NUMBER)
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.canTool")
+		checkpermission(instance, phys:GetEntity(), "entities.canTool")
 		local invalidFlags = bit.band(bit.bnot(validGameFlags), flags)
 		if invalidFlags == 0 then
 			phys:AddGameFlag(flags)
@@ -402,18 +355,18 @@ if SERVER then
 		end
 	end
 	
-	--- Clears game flags from the physics object. Some flags cannot be modified
-	-- @param flags The flags to add. FVPHYSICS enum. Can be:<br>
-	-- FVPHYSICS.DMG_DISSOLVE<br>
-	-- FVPHYSICS.DMG_SLICE<br>
-	-- FVPHYSICS.HEAVY_OBJECT<br>
-	-- FVPHYSICS.NO_IMPACT_DMG<br>
-	-- FVPHYSICS.NO_NPC_IMPACT_DMG<br>
-	-- FVPHYSICS.NO_PLAYER_PICKUP<br>
+	--- Clears game flags from the physics object. Some flags cannot be modified. Can be:
+	-- FVPHYSICS.DMG_DISSOLVE
+	-- FVPHYSICS.DMG_SLICE
+	-- FVPHYSICS.HEAVY_OBJECT
+	-- FVPHYSICS.NO_IMPACT_DMG
+	-- FVPHYSICS.NO_NPC_IMPACT_DMG
+	-- FVPHYSICS.NO_PLAYER_PICKUP
+	-- @param flags The flags to add. FVPHYSICS enum.
 	function physobj_methods:clearGameFlags(flags)
 		checkluatype(flags, TYPE_NUMBER)
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.canTool")
+		checkpermission(instance, phys:GetEntity(), "entities.canTool")
 		local invalidFlags = bit.band(bit.bnot(validGameFlags), flags)
 		if invalidFlags == 0 then
 			phys:ClearGameFlag(flags)
@@ -435,7 +388,7 @@ if SERVER then
 	-- @param grav Bool should the bone respect gravity?
 	function physobj_methods:enableGravity(grav)
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.enableGravity")
+		checkpermission(instance, phys:GetEntity(), "entities.enableGravity")
 		phys:EnableGravity(grav and true or false)
 		phys:Wake()
 	end
@@ -444,7 +397,7 @@ if SERVER then
 	-- @param drag Bool should the bone have air resistence?
 	function physobj_methods:enableDrag(drag)
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.enableDrag")
+		checkpermission(instance, phys:GetEntity(), "entities.enableDrag")
 		phys:EnableDrag(drag and true or false)
 	end
 
@@ -460,7 +413,7 @@ if SERVER then
 	function physobj_methods:setDragCoefficient(coeff)
 		checkluatype(coeff, TYPE_NUMBER)
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.enableDrag")
+		checkpermission(instance, phys:GetEntity(), "entities.enableDrag")
 		phys:SetDragCoefficient(coeff)
 	end
 
@@ -469,7 +422,7 @@ if SERVER then
 	function physobj_methods:setAngleDragCoefficient(coeff)
 		checkluatype(coeff, TYPE_NUMBER)
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.enableDrag")
+		checkpermission(instance, phys:GetEntity(), "entities.enableDrag")
 		phys:SetAngleDragCoefficient(coeff)
 	end
 
@@ -488,7 +441,7 @@ if SERVER then
 		checkluatype(linear, TYPE_NUMBER)
 		checkluatype(angular, TYPE_NUMBER)
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.setDamping")
+		checkpermission(instance, phys:GetEntity(), "entities.setDamping")
 		return phys:SetDamping(linear, angular)
 	end
 	
@@ -496,16 +449,34 @@ if SERVER then
 	-- @param move Bool should the bone move?
 	function physobj_methods:enableMotion(move)
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.enableMotion")
+		checkpermission(instance, phys:GetEntity(), "entities.enableMotion")
 		phys:EnableMotion(move and true or false)
 		phys:Wake()
+	end
+
+	--- Returns whether the physobj is asleep
+	-- @server
+	-- @return boolean if the physobj is asleep
+	function physobj_methods:isAsleep()
+		local phys = unwrap(self)
+		return phys:IsAsleep()
+	end
+
+	--- Makes a physobj go to sleep. (like it's frozen but interacting wakes it back up)
+	-- @server
+	function physobj_methods:sleep()
+		local phys = unwrap(self)
+		checkpermission(instance, phys:GetEntity(), "entities.applyForce")
+		phys:Sleep()
 	end
 
 	--- Makes a sleeping physobj wakeup
 	-- @server
 	function physobj_methods:wake()
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.applyForce")
+		checkpermission(instance, phys:GetEntity(), "entities.applyForce")
 		phys:Wake()
 	end
+end
+
 end

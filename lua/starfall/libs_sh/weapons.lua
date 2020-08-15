@@ -1,34 +1,21 @@
--------------------------------------------------------------------------------
--- Weapon functions.
--------------------------------------------------------------------------------
+-- Global to all starfalls
+local checkluatype = SF.CheckLuaType
 
-SF.Weapons = {}
+
 --- Weapon type
-local weapon_methods, weapon_metamethods = SF.RegisterType("Weapon")
+-- @name Weapon
+-- @class type
+-- @libtbl weapon_methods
+SF.RegisterType("Weapon", false, true, debug.getregistry().Weapon, "Entity")
 
-local checktype = SF.CheckType
-local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
 
-SF.Weapons.Methods = weapon_methods
-SF.Weapons.Metatable = weapon_metamethods
+return function(instance)
+local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
-local checktype = SF.CheckType
-local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
+local weapon_methods, weapon_meta, wrap, unwrap = instance.Types.Weapon.Methods, instance.Types.Weapon, instance.Types.Weapon.Wrap, instance.Types.Weapon.Unwrap
 
-local wrap, unwrap
-SF.AddHook("postload", function()
-	SF.ApplyTypeDependencies(weapon_methods, weapon_metamethods, SF.Entities.Metatable)
-	wrap, unwrap = SF.CreateWrapper(weapon_metamethods, true, false, debug.getregistry().Weapon, SF.Entities.Metatable)
 
-	SF.Weapons.Wrap = wrap
-	SF.Weapons.Unwrap = unwrap
-end)
-
---- To string
--- @shared
-function weapon_metamethods:__tostring()
+function weapon_meta:__tostring()
 	local ent = unwrap(self)
 	if not ent then return "(null entity)"
 	else return tostring(ent) end
@@ -39,98 +26,91 @@ end
 --- Returns Ammo in primary clip
 -- @shared
 -- @return amount of ammo
-function weapon_methods:clip1 ()
-	checktype(self, weapon_metamethods)
-	local ent = unwrap(self)
-	return ent:Clip1()
+function weapon_methods:clip1()
+	return unwrap(self):Clip1()
+end
+
+--- Returns Maximum ammo in primary clip
+-- @shared
+-- @return amount of ammo
+function weapon_methods:maxClip1()
+	return unwrap(self):GetMaxClip1()
 end
 
 --- Returns Ammo in secondary clip
 -- @shared
 -- @return amount of ammo
-function weapon_methods:clip2 ()
-	checktype(self, weapon_metamethods)
-	local ent = unwrap(self)
-	return ent:Clip2()
+function weapon_methods:clip2()
+	return unwrap(self):Clip2()
+end
+
+--- Returns Maximum ammo in secondary clip
+-- @shared
+-- @return amount of ammo
+function weapon_methods:maxClip2()
+	return unwrap(self):GetMaxClip2()
 end
 
 --- Returns the sequence enumeration number that the weapon is playing. Must be used on a view model.
 -- @shared
 -- @return number Current activity
-function weapon_methods:getActivity ()
-	checktype(self, weapon_metamethods)
-	local ent = unwrap(self)
-	return ent:GetActivity()
+function weapon_methods:getActivity()
+	return unwrap(self):GetActivity()
 end
 
 --- Returns the hold type of the weapon.
 -- @shared
 -- @return string Holdtype
-function weapon_methods:getHoldType ()
-	checktype(self, weapon_metamethods)
-	local ent = unwrap(self)
-	return ent:GetHoldType()
+function weapon_methods:getHoldType()
+	return unwrap(self):GetHoldType()
 end
 
 --- Gets the next time the weapon can primary fire.
 -- @shared
 -- @return The time, relative to CurTime
-function weapon_methods:getNextPrimaryFire ()
-	checktype(self, weapon_metamethods)
-	local ent = unwrap(self)
-	return ent:GetNextPrimaryFire()
+function weapon_methods:getNextPrimaryFire()
+	return unwrap(self):GetNextPrimaryFire()
 end
 
 --- Gets the next time the weapon can secondary fire.
 -- @shared
 -- @return The time, relative to CurTime
-function weapon_methods:getNextSecondaryFire ()
-	checktype(self, weapon_metamethods)
-	local ent = unwrap(self)
-	return ent:GetNextSecondaryFire()
+function weapon_methods:getNextSecondaryFire()
+	return unwrap(self):GetNextSecondaryFire()
 end
 
 --- Gets the primary ammo type of the given weapon.
 -- @shared
 -- @return Ammo number type
-function weapon_methods:getPrimaryAmmoType ()
-	checktype(self, weapon_metamethods)
-	local ent = unwrap(self)
-	return ent:GetPrimaryAmmoType()
+function weapon_methods:getPrimaryAmmoType()
+	return unwrap(self):GetPrimaryAmmoType()
 end
 
 --- Gets the secondary ammo type of the given weapon.
 -- @shared
 -- @return Ammo number type
-function weapon_methods:getSecondaryAmmoType ()
-	checktype(self, weapon_metamethods)
-	local ent = unwrap(self)
-	return ent:GetSecondaryAmmoType()
+function weapon_methods:getSecondaryAmmoType()
+	return unwrap(self):GetSecondaryAmmoType()
 end
 
 --- Returns whether the weapon is visible
 -- @shared
 -- @return Whether the weapon is visble or not
-function weapon_methods:isWeaponVisible ()
-	checktype(self, weapon_metamethods)
-	local ent = unwrap(self)
-	return ent:IsWeaponVisible()
+function weapon_methods:isWeaponVisible()
+	return unwrap(self):IsWeaponVisible()
 end
 
 --- Returns the time since a weapon was last fired at a float variable
 -- @shared
 -- @return Time the weapon was last shot
-function weapon_methods:lastShootTime ()
-	checktype(self, weapon_metamethods)
-	local ent = unwrap(self)
-	return ent:LastShootTime()
+function weapon_methods:lastShootTime()
+	return unwrap(self):LastShootTime()
 end
 
 --- Returns the tool mode of the toolgun
 -- @shared
 -- @return The tool mode of the toolgun
-function weapon_methods:getToolMode ()
-	checktype(self, weapon_metamethods)
+function weapon_methods:getToolMode()
 	local ent = unwrap(self)
 	return ent:GetClass()=="gmod_tool" and ent.Mode or ""
 end
@@ -139,18 +119,16 @@ if CLIENT then
 	--- Gets Display name of weapon
 	-- @client
 	-- @return string Display name of weapon
-	function weapon_methods:getPrintName ()
-		checktype(self, weapon_metamethods)
-		local ent = unwrap(self)
-		return ent:GetPrintName()
+	function weapon_methods:getPrintName()
+		return unwrap(self):GetPrintName()
 	end
 
 	--- Returns if the weapon is carried by the local player.
 	-- @client
 	-- @return whether or not the weapon is carried by the local player
-	function weapon_methods:isCarriedByLocalPlayer ()
-		checktype(self, weapon_metamethods)
-		local ent = unwrap(self)
-		return ent:IsCarriedByLocalPlayer()
+	function weapon_methods:isCarriedByLocalPlayer()
+		return unwrap(self):IsCarriedByLocalPlayer()
 	end
+end
+
 end

@@ -8,7 +8,7 @@ function ENT:Initialize()
 	self.name = "Generic ( No-Name )"
 end
 
-function ENT:OnRemove ()
+function ENT:OnRemove()
 	if self.instance then
 		self.instance:runScriptHook("removed")
 	end
@@ -25,6 +25,7 @@ function ENT:OnRemove ()
 end
 
 function ENT:GetOverlayText()
+	if self:GetColor().a == 0 then return "" end
 	local state = self:GetNWInt("State", 1)
 	local clientstr, serverstr
 	if self.instance then
@@ -61,28 +62,33 @@ end
 
 net.Receive("starfall_processor_download", function(len)
 
-	net.ReadStarfall(nil, function(ok, sfdata)
-		if sfdata.proc:IsValid() then
-			if ok then
-				if sfdata.owner:IsValid() then
-					sfdata.proc:SetupFiles(sfdata)
-				end
-			else
-				net.Start("starfall_processor_download")
-				net.WriteEntity(sfdata.proc)
-				net.SendToServer()
-			end
+	local sfdata = net.ReadStarfall(nil, function(ok, sfdata)
+		if ok and sfdata.proc:IsValid() and (sfdata.owner:IsValid() or sfdata.owner==SF.Superuser) then
+			sfdata.proc:SetupFiles(sfdata)
 		end
 	end)
+
+	if sfdata.proc:IsValid() then
+		sfdata.proc:Destroy()
+	end
 
 end)
 
 net.Receive("starfall_processor_link", function()
-	local component = net.ReadEntity()
-	local proc = net.ReadEntity()
-	if (component and component:IsValid()) and component.LinkEnt then
-		component:LinkEnt(proc)
+	local component, proc
+	
+	local function link()
+		if IsValid(component) and IsValid(proc) then
+			-- https://github.com/Facepunch/garrysmod-issues/issues/3127
+			local linkEnt = baseclass.Get(component:GetClass()).LinkEnt
+			if linkEnt and proc:GetClass()=="starfall_processor" then
+				linkEnt(component, proc)
+			end
+		end
 	end
+	
+	SF.WaitForEntity(net.ReadUInt(16), function(ent) component = ent link() end)
+	SF.WaitForEntity(net.ReadUInt(16), function(ent) proc = ent link() end)
 end)
 
 net.Receive("starfall_processor_used", function(len)
@@ -91,31 +97,14 @@ net.Receive("starfall_processor_used", function(len)
 	local activator = net.ReadEntity()
 	if not (chip and chip:IsValid()) then return end
 	if not (used and used:IsValid()) then return end
-	if not chip.instance then return end
+	local instance = chip.instance
+	if not instance then return end
 
-	chip.instance:runScriptHook("starfallused", SF.WrapObject( activator ), SF.WrapObject( used ))
+	instance:runScriptHook("starfallused", instance.WrapObject( activator ), instance.WrapObject( used ))
 
-	if activator == LocalPlayer() then
-		if chip.instance.permissionRequest and chip.instance.permissionRequest.showOnUse and not SF.Permissions.permissionRequestSatisfied( chip.instance ) then
-			local pnl = vgui.Create("SFChipPermissions")
-			if pnl then pnl:OpenForChip( chip ) end
-		end
-	end
-end)
-
-net.Receive("starfall_processor_destroy", function(len)
-	local proc = net.ReadEntity()
-	if proc:IsValid() then
-		proc:Destroy()
-	end
-end)
-
-hook.Add("NetworkEntityCreated", "starfall_chip_reset", function(ent)
-	-- Entity may not have its lua table yet so the only way is to check its class
-	if not ent.instance and ent:GetClass()=="starfall_processor" then
-		net.Start("starfall_processor_download")
-		net.WriteEntity(ent)
-		net.SendToServer()
+	if activator == LocalPlayer() and chip.owner ~= SF.Superuser and instance.permissionRequest and instance.permissionRequest.showOnUse and not SF.Permissions.permissionRequestSatisfied( instance ) then
+		local pnl = vgui.Create("SFChipPermissions")
+		if pnl then pnl:OpenForChip( chip ) end
 	end
 end)
 

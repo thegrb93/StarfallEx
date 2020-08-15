@@ -13,12 +13,12 @@ P.filename = SERVER and "sf_perms2_sv.txt" or "sf_perms2_cl.txt"
 --- Adds a provider implementation to the set used by this library.
 -- Providers must implement the {@link SF.Permissions.Provider} interface.
 -- @param provider the provider to be registered
-function P.registerProvider (provider)
+function P.registerProvider(provider)
 	P.providers[provider.id] = provider
 end
 
 --- Refreshes cache of settings in provider
-function P.refreshSettingsCache ()
+function P.refreshSettingsCache()
 	for i, provider in pairs(P.providers) do
 		local settings = {}
 
@@ -36,7 +36,7 @@ end
 -- @param provider the provider to be registered
 -- @param privileges table of privs this provider will be added to
 -- @param exclusive if true, this provider will replace all existing providers for the privilege. (Addons loaded later may add aditional providers)
-function P.registerCustomProvider (provider, privileges, exclusive)
+function P.registerCustomProvider(provider, privileges, exclusive)
 	P.providers[provider.id] = provider
 	for k,v in pairs(privileges) do
 		if exclusive then
@@ -50,10 +50,10 @@ end
 -- @param id unique identifier of the privilege being registered
 -- @param name Human readable name of the privilege
 -- @param description a short description of the privilege
-function P.registerPrivilege (id, name, description, arg)
+function P.registerPrivilege(id, name, description, arg)
 	arg = arg or {}
 	--All privileges should get usergroup
-	if not arg.usergroup then
+	if not arg.usergroups then
 		arg.usergroups = {}
 	end
 
@@ -64,7 +64,7 @@ end
 -- @param instance The instance checking permission
 -- @param target the object on which the action is being performed
 -- @param key a string identifying the action being performed
-function P.check (instance, target, key)
+function P.check(instance, target, key)
 	if not (instance.permissionOverrides and instance.permissionOverrides[key]) then
 		local notok, reason = P.permissionchecks[key](instance, target)
 		if notok then
@@ -73,7 +73,7 @@ function P.check (instance, target, key)
 	end
 end
 
-function P.hasAccess (instance, target, key)
+function P.hasAccess(instance, target, key)
 	if (instance.permissionOverrides and instance.permissionOverrides[key]) then
 		return true
 	else
@@ -96,22 +96,46 @@ end
 function P.buildPermissionCheck(privilegeid)
 	local privilege = P.privileges[privilegeid]	
 	local checks = {}
+	local allAllow = true
+	local anyBlock = false
 	for providerid, v in pairs(privilege[3]) do
 		if P.providers[providerid] then
-			checks[#checks+1] = P.providers[providerid].checks[v.setting]
+			local check = P.providers[providerid].checks[v.setting]
+			if check == "block" then
+				allAllow = false
+				anyBlock = true
+				break
+			elseif check ~= "allow" then
+				allAllow = false
+				checks[#checks+1] = check
+			end
 		end
 	end
-	P.permissionchecks[privilegeid] = function(instance, target)
-		for k, v in ipairs(checks) do
-			local ok, reason = v(instance, target)
-			if not ok then return true, reason end
+	if allAllow then
+		P.permissionchecks[privilegeid] = function() return false end
+	elseif anyBlock then
+		P.permissionchecks[privilegeid] = function() return true, "This function's permission is blocked!" end
+	elseif #checks==0 then
+		P.permissionchecks[privilegeid] = function() return false end
+	elseif #checks==1 then
+		local check = checks[1]
+		P.permissionchecks[privilegeid] = function(instance, target)
+			local ok, reason = check(instance, target)
+			return not ok, reason
 		end
-		return false
+	else
+		P.permissionchecks[privilegeid] = function(instance, target)
+			for k, v in ipairs(checks) do
+				local ok, reason = v(instance, target)
+				if not ok then return true, reason end
+			end
+			return false
+		end
 	end
 end
 
 -- Load the permission settings for each provider
-SF.AddHook("postload", function()
+function P.loadPermissionOptions()
 	local settings = util.JSONToTable(file.Read(P.filename) or "") or {}
 	for privilegeid, privilege in pairs(P.privileges) do
 		if settings[privilegeid] then
@@ -137,11 +161,11 @@ SF.AddHook("postload", function()
 		end
 		P.buildPermissionCheck(privilegeid)
 	end
-end)
+end
 
 -- Find and include all provider files.
 do
-	local function IncludeClientFile (file)
+	local function IncludeClientFile(file)
 		if SERVER then
 			AddCSLuaFile(file)
 		else

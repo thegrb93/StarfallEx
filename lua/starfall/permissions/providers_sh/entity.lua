@@ -2,6 +2,9 @@
 
 local isentity = isentity
 
+
+local owneraccess = CreateConVar("sf_permissions_entity_owneraccess", "0", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "Allows starfall chips owner to access their player entity")
+
 local P = {}
 P.id = "entities"
 P.name = "Entity Permissions"
@@ -21,6 +24,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 			P.checks = {
 				function(instance, target)
 					if isentity(target) and target:IsValid() then
+						if target == instance.player and owneraccess:GetBool() then return true end
 						if instance.player:IsSuperAdmin() then return true end
 						if target:CPPIGetOwner()==instance.player then
 							return true
@@ -33,6 +37,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 				end,
 				function(instance, target)
 					if isentity(target) and target:IsValid() then
+						if target == instance.player and owneraccess:GetBool() then return true end
 						if target:CPPICanTool(instance.player, "starfall_ent_lib") then
 							return true
 						else
@@ -44,6 +49,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 				end,
 				function(instance, target)
 					if isentity(target) and target:IsValid() then
+						if target == instance.player and owneraccess:GetBool() then return true end
 						if target:CPPICanPhysgun(instance.player) then
 							return true
 						else
@@ -53,12 +59,13 @@ hook.Add("Initialize","SF_PPInitialize",function()
 						return false, "Entity is invalid"
 					end
 				end,
-				function() return true end
+				"allow"
 			}
 		else
 			P.checks = {
 				function(instance, target)
 					if isentity(target) and target:IsValid() then
+						if target == instance.player and owneraccess:GetBool() then return true end
 						if instance.player:IsSuperAdmin() then return true end
 						if target:CPPIGetOwner()==instance.player then
 							return true
@@ -71,6 +78,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 				end,
 				function(instance, target)
 					if isentity(target) and target:IsValid() then
+						if target == instance.player and owneraccess:GetBool() then return true end
 						if target:CPPICanTool(instance.player, "starfall_ent_lib") then
 							return true
 						else
@@ -82,6 +90,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 				end,
 				function(instance, target)
 					if isentity(target) and target:IsValid() then
+						if target == instance.player and owneraccess:GetBool() then return true end
 						if target:CPPICanPhysgun(instance.player) then
 							return true
 						else
@@ -91,7 +100,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 						return false, "Entity is invalid"
 					end
 				end,
-				function() return true end
+				"allow"
 			}
 			local entmeta = FindMetaTable("Entity")
 			if not entmeta.CPPICanTool then P.checks[2] = P.checks[1] end
@@ -102,6 +111,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 			P.checks = {
 				function(instance, target)
 					if isentity(target) and target:IsValid() then
+						if target == instance.player and owneraccess:GetBool() then return true end
 						if instance.player:IsSuperAdmin() then return true end
 						if P.props[target]==instance.player then
 							return true
@@ -114,6 +124,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 				end,
 				function(instance, target)
 					if isentity(target) and target:IsValid() then
+						if target == instance.player and owneraccess:GetBool() then return true end
 						local pos = target:GetPos()
 						if hook.Run("CanTool", instance.player, SF.dumbTrace(target), "starfall_ent_lib") ~= false then
 							return true
@@ -126,6 +137,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 				end,
 				function(instance, target)
 					if isentity(target) and target:IsValid() then
+						if target == instance.player and owneraccess:GetBool() then return true end
 						if hook.Run("PhysgunPickup", instance.player, target) ~= false then
 							-- Some mods expect a release when there's a pickup involved.
 							hook.Run("PhysgunDrop", instance.player, target)
@@ -137,7 +149,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 						return false, "Entity is invalid"
 					end
 				end,
-				function() return true end
+				"allow"
 			}
 
 			P.props = setmetatable({},{__mode="k"})
@@ -208,7 +220,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 				end,
 				nil,
 				nil,
-				function() return true end
+				"allow"
 			}
 			P.checks[2] = P.checks[1]
 			P.checks[3] = P.checks[1]

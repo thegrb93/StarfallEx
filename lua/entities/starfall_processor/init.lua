@@ -2,7 +2,7 @@ AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include("shared.lua")
 
-function ENT:Initialize ()
+function ENT:Initialize()
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
@@ -62,7 +62,7 @@ function ENT:OnRemove()
 	self:Destroy()
 end
 
-function ENT:Think ()
+function ENT:Think()
 	if self.instance then
 		local bufferAvg = self.instance.cpu_average
 		self:SetNWInt("CPUus", math.Round(bufferAvg * 1000000))
@@ -71,6 +71,7 @@ function ENT:Think ()
 end
 
 function ENT:SendCode(recipient)
+	if not (self.mainfile and self.files) then return end
 	local sfdata = {
 		proc = self,
 		owner = self.owner,
@@ -83,9 +84,14 @@ function ENT:SendCode(recipient)
 			sfdata.files = {}
 			for filename, code in pairs(self.files) do
 				if ppdata.serverorclient[filename] == "server" then
+					local infodata = {}
 					if ppdata.scriptnames and ppdata.scriptnames[filename] then
-						sfdata.files[filename] = "--@name " .. ppdata.scriptnames[filename]
+						infodata[#infodata + 1] = "--@name " .. ppdata.scriptnames[filename]
 					end
+					if ppdata.scriptauthors and ppdata.scriptauthors[filename] then
+						infodata[#infodata + 1] = "--@author " .. ppdata.scriptauthors[filename]
+					end
+					sfdata.files[filename] = table.concat(infodata, "\n")
 				else
 					sfdata.files[filename] = code
 				end
@@ -103,12 +109,17 @@ function ENT:SendCode(recipient)
 			end
 		end
 	end
-	SF.SendStarfall("starfall_processor_download", sfdata, recipient)
+	SF.SendStarfall("starfall_processor_download", sfdata, recipient, function(ply)
+		local instance = self.instance
+		if instance then
+			instance:runScriptHook("clientinitialized", instance.Types.Player.Wrap(ply))
+		end
+	end)
 end
 
 function ENT:PreEntityCopy()
 	duplicator.ClearEntityModifier(self, "SFDupeInfo")
-	if self.instance then
+	if self.files and self.mainfile then
 		local info = WireLib and WireLib.BuildDupeInfo(self) or {}
 		info.starfall = SF.SerializeCode(self.files, self.mainfile)
 		info.starfalluserdata = self.starfalluserdata
@@ -124,7 +135,7 @@ local function EntityLookup(CreatedEntities)
 		if (ent and ent:IsValid()) then return ent else return default end
 	end
 end
-function ENT:PostEntityPaste (ply, ent, CreatedEntities)
+function ENT:PostEntityPaste(ply, ent, CreatedEntities)
 	if ent.EntityMods and ent.EntityMods.SFDupeInfo then
 		local info = ent.EntityMods.SFDupeInfo
 
@@ -149,11 +160,11 @@ local function dupefinished(TimedPasteData, TimedPasteDataCurrent)
 		end
 	end
 	if next(starfalls) then
-		local sanitized = SF.Sanitize(entList)
 		for k, v in pairs(starfalls) do
 			v:SetupFiles(v.sfdata)
-			if v.instance then
-				v.instance:runScriptHook("dupefinished", sanitized)
+			local instance = v.instance
+			if instance then
+				instance:runScriptHook("dupefinished", instance.Sanitize(entList))
 			end
 		end
 	end
@@ -161,38 +172,40 @@ end
 hook.Add("AdvDupe_FinishPasting", "SF_dupefinished", dupefinished)
 
 util.AddNetworkString("starfall_processor_download")
-util.AddNetworkString("starfall_processor_destroy")
 util.AddNetworkString("starfall_processor_used")
 util.AddNetworkString("starfall_processor_link")
-util.AddNetworkString("starfall_processor_update_links")
 util.AddNetworkString("starfall_report_error")
 
 -- Request code from the chip. If the chip doesn't have code yet add player to list to send when there is code.
 net.Receive("starfall_processor_download", function(len, ply)
 	local proc = net.ReadEntity()
 	if ply:IsValid() and proc:IsValid() then
-		if proc.mainfile and proc.files then
-			proc:SendCode(ply)
-		else
-			proc.SendQueue = proc.SendQueue or {}
-			proc.SendQueue[#proc.SendQueue + 1] = ply
-		end
+		proc:SendCode(ply)
 	end
 end)
 
-net.Receive("starfall_processor_update_links", function(len, ply)
-	local linked = net.ReadEntity()
-	if (linked.link and linked.link:IsValid()) then
+net.Receive("starfall_processor_link", function(len, ply)
+	local entIndex = net.ReadUInt(16)
+	local linked = Entity(entIndex)
+	if linked.link and linked.link:IsValid() and linked.LinkEnt then
 		linked:LinkEnt(linked.link, ply)
 	end
 end)
 
 net.Receive("starfall_report_error", function(len, ply)
 	local chip = net.ReadEntity()
-	if chip:IsValid() and not chip.ErroredPlayers[ply] and chip.owner ~= ply then
+	if chip:IsValid() and chip.owner:IsValid() and chip.ErroredPlayers and not chip.ErroredPlayers[ply] and chip.owner ~= ply then
 		chip.ErroredPlayers[ply] = true
-		SF.AddNotify(chip.owner, "Starfall: ("..chip.mainfile..") errored for player: ("..ply:Nick()..")", "ERROR", 7, "ERROR1")
+		SF.AddNotify(chip.owner, "Starfall: ("..chip.mainfile..") errored for player: ("..ply:Nick()..")", "ERROR", 7, "SILENT")
 		SF.Print(chip.owner, string.sub(net.ReadString(), 1, 2048))
 	end
+end)
+
+hook.Add("PlayerInitialSpawn","SF_Initialize_Processor",function(ply)
+	SF.WaitForPlayerInit(ply, "InitProcessor", function()
+		for k, v in ipairs(ents.FindByClass("starfall_processor")) do
+			v:SendCode(ply)
+		end
+	end)
 end)
 
