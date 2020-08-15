@@ -24,7 +24,9 @@ if CLIENT then
 		end
 		if not holo.userrenderbounds then
 			local mins, maxs = holo:GetModelBounds()
-			holo:SetRenderBounds(mins * scale, maxs * scale)
+			if mins then
+				holo:SetRenderBounds(mins * scale, maxs * scale)
+			end
 		end
 	end
 end
