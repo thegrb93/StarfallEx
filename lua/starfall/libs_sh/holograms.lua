@@ -241,11 +241,7 @@ if SERVER then
 
 		checkpermission(instance, holo, "hologram.setRenderProperty")
 
-		if SERVER then
-			holo:SetSuppressEngineLighting(suppress)
-		else
-			holo.GetSuppressEngineLighting = function() return suppress end
-		end
+		holo:SetSuppressEngineLighting(suppress)
 	end
 
 	--- Sets the hologram linear velocity
