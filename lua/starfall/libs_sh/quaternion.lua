@@ -13,8 +13,6 @@ local math_max = math.max
 local math_rad = math.rad
 local math_deg = math.deg
 
--------------------------------------
-
 local function quatPack(q, r, i, j, k)
 	q[1], q[2], q[3], q[4] = r, i, j, k
 end
@@ -22,8 +20,6 @@ end
 local function quatUnpack(q)
 	return q[1], q[2], q[3], q[4]
 end
-
--------------------------------------
 
 local function getQuatLenSqr(q)
 	return q[1]^2 + q[2]^2 + q[3]^2 + q[4]^2
@@ -44,8 +40,6 @@ end
 local function getQuatDot(lhs, rhs)
 	return lhs[1]*rhs[1] + lhs[2]*rhs[2] + lhs[3]*rhs[3] + lhs[4]*rhs[4]
 end
-
--------------------------------------
 
 local function quatNorm(q)
 	local len = getQuatLen(q)
@@ -170,7 +164,7 @@ return function(instance)
 
 local checktype = instance.CheckType
 local quat_methods, quat_meta = instance.Types.Quaternion.Methods, instance.Types.Quaternion
-local ent_methods = instance.Types.Entity.Methods
+local ents_methods = instance.Types.Entity.Methods
 local ang_methods, awrap, aunwrap = instance.Types.Angle.Methods, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_methods, vec_meta, vwrap, vunwrap = instance.Types.Vector.Methods, instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local mwrap = instance.Types.VMatrix.Wrap
@@ -820,7 +814,7 @@ end
 
 --- Converts entity angles to a quaternion
 -- @return Constructed quaternion
-function ent_methods:getQuaternion()
+function ents_methods:getQuaternion()
 	local ang = getent(self):GetAngles()
 	return wrap(quatFromAngle(ang))
 end
