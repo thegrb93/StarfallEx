@@ -269,6 +269,16 @@ if SERVER then
 		holo:SetLocalAngularVelocity(aunwrap(angvel))
 	end
 
+	--- Gets the hologram scale.
+	-- @shared
+	-- @return Vector scale
+	function hologram_methods:getScale()
+		local holo = getholo(self)
+		
+		checkpermission(instance, holo, "hologram.setRenderProperty")
+		
+		return vwrap(holo:GetScale())
+	end
 	
 
 else
@@ -432,6 +442,17 @@ else
 		holo:SetupBones()
 		holo:DrawModel()
 	end
+	
+	--- Gets the hologram scale.
+	-- @shared
+	-- @return Vector scale
+	function hologram_methods:getScale()
+		local holo = getholo(self)
+
+		checkpermission(instance, holo, "hologram.setRenderProperty")
+		
+		return vwrap(holo.scale)
+	end
 end
 
 --- Updates a clip plane
@@ -468,17 +489,6 @@ function hologram_methods:setClip(index, enabled, origin, normal, entity)
 	else
 		holo:SetClip(index, false)
 	end
-end
-
---- Gets the hologram scale.
--- @shared
--- @return Vector scale
-function hologram_methods:getScale()
-	local holo = getholo(self)
-
-	checkpermission(instance, holo, "hologram.setRenderProperty")
-
-	return vwrap(holo.scale)
 end
 
 --- Sets the model of a hologram
