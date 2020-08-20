@@ -27,7 +27,21 @@ function ENT:SetClip(index, enabled, normal, origin, entity)
 end
 
 function ENT:OnScaleChanged(name, old, scale)
-	SF.SetHologramScale(self, scale)
+	if scale == Vector(1, 1, 1) then
+		self.HoloMatrix = nil
+		self:DisableMatrix("RenderMultiply")
+	else
+		local scalematrix = Matrix()
+		scalematrix:Scale(scale)
+		self.HoloMatrix = scalematrix
+		self:EnableMatrix("RenderMultiply", scalematrix)
+	end
+	if not self.userrenderbounds then
+		local mins, maxs = self:GetModelBounds()
+		if mins then
+			self:SetRenderBounds(mins * scale, maxs * scale)
+		end
+	end
 end
 
 function ENT:Draw()

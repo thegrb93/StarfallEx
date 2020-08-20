@@ -7,29 +7,7 @@ registerprivilege("hologram.create", "Create hologram", "Allows the user to crea
 registerprivilege("hologram.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { entities = {} })
 
 local plyCount = SF.LimitObject("holograms", "holograms", 200, "The number of holograms allowed to spawn via Starfall scripts for a single player")
-
 local maxclips = CreateConVar("sf_holograms_maxclips", "8", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "The max number of clips per hologram entity")
-
-if CLIENT then
-	function SF.SetHologramScale(holo, scale)
-		holo.scale = scale
-		if scale == Vector(1, 1, 1) then
-			holo.HoloMatrix = nil
-			holo:DisableMatrix("RenderMultiply")
-		else
-			local scalematrix = Matrix()
-			scalematrix:Scale(scale)
-			holo.HoloMatrix = scalematrix
-			holo:EnableMatrix("RenderMultiply", scalematrix)
-		end
-		if not holo.userrenderbounds then
-			local mins, maxs = holo:GetModelBounds()
-			if mins then
-				holo:SetRenderBounds(mins * scale, maxs * scale)
-			end
-		end
-	end
-end
 
 local entmeta = FindMetaTable("Entity")
 local cl_hologram_meta = {
@@ -197,7 +175,7 @@ function holograms_library.create(pos, ang, model, scale)
 			holodata[holoent] = true
 
 			if scale~=nil then
-				SF.SetHologramScale(holoent, vunwrap(scale))
+				holoent:SetScale(vunwrap(scale))
 			end
 
 			plyCount:free(ply, -1)
@@ -221,31 +199,6 @@ function holograms_library.hologramsLeft()
 end
 
 if SERVER then
-	--- Sets the hologram scale. Basically the same as setRenderMatrix() with a scaled matrix
-	-- @shared
-	-- @param scale Vector new scale
-	function hologram_methods:setScale(scale)
-		local holo = getholo(self)
-		local scale = vunwrap(scale)
-
-		checkpermission(instance, holo, "hologram.setRenderProperty")
-
-		holo:SetScale(scale)
-	end
-
-	--- Suppress Engine Lighting of a hologram. Disabled by default.
-	-- @shared
-	-- @param suppress Boolean to represent if shading should be set or not.
-	function hologram_methods:suppressEngineLighting(suppress)
-		local holo = getholo(self)
-
-		checkluatype(suppress, TYPE_BOOL)
-
-		checkpermission(instance, holo, "hologram.setRenderProperty")
-
-		holo:SetSuppressEngineLighting(suppress)
-	end
-
 	--- Sets the hologram linear velocity
 	-- @server
 	-- @param vel New velocity
@@ -360,25 +313,6 @@ else
 			holo:DisableMatrix("RenderMultiply")
 		end
 	end
-
-	function hologram_methods:setScale(scale)
-		local holo = getholo(self)
-		local scale = vunwrap(scale)
-
-		checkpermission(instance, holo, "hologram.setRenderProperty")
-
-		SF.SetHologramScale(holo, scale)
-	end
-
-	function hologram_methods:suppressEngineLighting(suppress)
-		local holo = getholo(self)
-
-		checkluatype(suppress, TYPE_BOOL)
-
-		checkpermission(instance, holo, "hologram.setRenderProperty")
-
-		holo.suppressEngineLighting = suppress
-	end
 	
 	local holoChildrenMeta = { __mode = "k" }
 	
@@ -470,15 +404,44 @@ function hologram_methods:setClip(index, enabled, origin, normal, entity)
 	end
 end
 
+
+--- Sets the hologram scale. Basically the same as setRenderMatrix() with a scaled matrix
+-- @shared
+-- @param scale Vector new scale
+function hologram_methods:setScale(scale)
+	local holo = getholo(self)
+	local scale = vunwrap(scale)
+
+	checkpermission(instance, holo, "hologram.setRenderProperty")
+
+	holo:SetScale(scale)
+end
+	
 --- Gets the hologram scale.
 -- @shared
 -- @return Vector scale
 function hologram_methods:getScale()
+	return vwrap(getholo(self):GetScale())
+end
+
+--- Suppress Engine Lighting of a hologram. Disabled by default.
+-- @shared
+-- @param suppress Boolean to represent if shading should be set or not.
+function hologram_methods:suppressEngineLighting(suppress)
 	local holo = getholo(self)
+
+	checkluatype(suppress, TYPE_BOOL)
 
 	checkpermission(instance, holo, "hologram.setRenderProperty")
 
-	return vwrap(holo.scale)
+	holo:SetSuppressEngineLighting(suppress)
+end
+
+--- Suppress Engine Lighting of a hologram. Disabled by default.
+-- @shared
+-- @param suppress Boolean to represent if shading should be set or not.
+function hologram_methods:getSuppressEngineLighting()
+	return getholo(self):GetSuppressEngineLighting()
 end
 
 --- Sets the model of a hologram
