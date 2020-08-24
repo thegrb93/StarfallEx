@@ -22,6 +22,14 @@ local math_library = instance.Libraries.math
 -- @return Absolute value
 math_library.abs = math.abs
 
+--- Calculates the sign of a number
+-- @class function
+-- @param x The number to get the sign of
+-- @return -1 if negative, 1 if positive, 0 if 0
+function math_library.sign(x)
+	return (x<0 and 0) or (x>0 and 1) or 0
+end
+
 --- Calculates an angle in radians, between 0 and pi, which has the given cos value.
 -- @class function
 -- @param cos Cosine value in range of -1 to 1
