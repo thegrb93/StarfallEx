@@ -77,6 +77,7 @@ function ENT:SendCode(recipient)
 		owner = self.owner,
 		mainfile = self.mainfile,
 		files = self.files,
+		compressed = self.compressed,
 	}
 	local ppdata = self.instance and self.instance.ppdata
 	if ppdata then
@@ -115,6 +116,8 @@ function ENT:SendCode(recipient)
 			instance:runScriptHook("clientinitialized", instance.Types.Player.Wrap(ply))
 		end
 	end)
+	-- Store compressed code so server doesn't have to compress again
+	self.compressed = sfdata.compressed
 end
 
 function ENT:PreEntityCopy()
@@ -146,7 +149,7 @@ function ENT:PostEntityPaste(ply, ent, CreatedEntities)
 		if info.starfall then
 			local files, mainfile = SF.DeserializeCode(info.starfall)
 			self.starfalluserdata = info.starfalluserdata
-			self.sfdata = {owner = ply, files = files, mainfile = mainfile}
+			self.sfdupedata = {owner = ply, files = files, mainfile = mainfile}
 		end
 	end
 end
@@ -155,17 +158,18 @@ local function dupefinished(TimedPasteData, TimedPasteDataCurrent)
 	local entList = TimedPasteData[TimedPasteDataCurrent].CreatedEntities
 	local starfalls = {}
 	for k, v in pairs(entList) do
-		if IsValid(v) and v:GetClass() == "starfall_processor" and v.sfdata then
+		if IsValid(v) and v:GetClass() == "starfall_processor" and v.sfdupedata then
 			starfalls[#starfalls+1] = v
 		end
 	end
 	if next(starfalls) then
 		for k, v in pairs(starfalls) do
-			v:SetupFiles(v.sfdata)
+			v:SetupFiles(v.sfdupedata)
 			local instance = v.instance
 			if instance then
 				instance:runScriptHook("dupefinished", instance.Sanitize(entList))
 			end
+			v.sfdupedata = nil
 		end
 	end
 end
