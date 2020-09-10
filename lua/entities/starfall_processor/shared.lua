@@ -88,6 +88,7 @@ function ENT:SetupFiles(sfdata)
 	self.owner = sfdata.owner
 	self.files = sfdata.files
 	self.mainfile = sfdata.mainfile
+	self.compressed = sfdata.compressed
 
 	self:Compile()
 
