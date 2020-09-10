@@ -788,10 +788,10 @@ if CLIENT then
 				end
 			end
 			unwrapped[i] = vert
-			if threaded and i%100==0 then thread_yield() end
+			if threaded and i%100==0 and i<#verteces then thread_yield(#verteces - i) end
 		end
 
-		if threaded then thread_yield("last") end
+		if threaded then thread_yield(0) end
 		local mesh = Mesh()
 		mesh:BuildFromTriangles(unwrapped)
 		instance.data.meshes[mesh] = { ntriangles = ntriangles }
