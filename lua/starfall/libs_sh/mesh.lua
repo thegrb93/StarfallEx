@@ -39,6 +39,7 @@ function SF.ParseObj(obj, thread_yield, Vector, triangulate)
 			map.f = function(f) local i = #face face[i + 3] = f() face[i + 2] = f() face[i + 1] = f() end
 		end
 
+		local linen = 1
 		for line in lines do
 			local components = {}
 			local f = string.gmatch(line, "%S+")
@@ -60,7 +61,8 @@ function SF.ParseObj(obj, thread_yield, Vector, triangulate)
 					end
 				end
 			end
-			if thread_yield then thread_yield() end
+			if thread_yield and linen%100==0 then thread_yield() end
+			linen = linen + 1
 		end
 		timeToStop = true
 		::KeepGoing::
@@ -69,7 +71,7 @@ function SF.ParseObj(obj, thread_yield, Vector, triangulate)
 		if #face<3 or #face%3~=0 then SF.Throw("Expected a multiple of 3 vertices for the mesh's triangles.", 3) end
 
 		local vertices = {}
-		for _, v in ipairs(face) do
+		for k, v in ipairs(face) do
 			local vert = {}
 			local f = string.gmatch(v, "([^/]*)/?")
 			local posv = tonumber(f())
@@ -93,7 +95,7 @@ function SF.ParseObj(obj, thread_yield, Vector, triangulate)
 				SF.Throw("Invalid face normal index: "..tostring(normv), 3)
 			end
 			vertices[_] = vert
-			if thread_yield then thread_yield() end
+			if thread_yield and k%100==0 then thread_yield() end
 		end
 
 		SF.GenerateTangents(vertices, thread_yield, Vector)
@@ -115,6 +117,7 @@ function SF.GenerateTangents(vertices, thread_yield, Vector)
 	for i = 1, #vertices do
 		tan1[i] = Vector(0, 0, 0)
 		tan2[i] = Vector(0, 0, 0)
+		if thread_yield and i%100==0 then thread_yield() end
 	end
 
 	local v = Vector()
@@ -153,6 +156,7 @@ function SF.GenerateTangents(vertices, thread_yield, Vector)
 		add(tan2[i], tdir)
 		add(tan2[i+1], tdir)
 		add(tan2[i+2], tdir)
+		if thread_yield and i%100==0 then thread_yield() end
 	end
 	if thread_yield then thread_yield() end
 
@@ -166,6 +170,7 @@ function SF.GenerateTangents(vertices, thread_yield, Vector)
 		local w = dot(cross(n, t), tan2[i]) < 0 and -1 or 1
 
 		vertices[i].userdata = {tan[1], tan[2], tan[3], w}
+		if thread_yield and i%100==0 then thread_yield() end
 	end
 end
 
@@ -674,12 +679,13 @@ if CLIENT then
 end
 
 local mesh_library = instance.Libraries.mesh
-local thread_yield = instance.Libraries.coroutine.yield
+local thread_yield
 local vector, angle, worldtolocal
 instance:AddHook("initialize", function()
 	vector = instance.env.Vector
 	angle = instance.env.Angle
 	worldtolocal = instance.env.worldToLocal
+	thread_yield = instance.Libraries.coroutine.yield
 end)
 
 --- Parses obj data into a table of vertices, normals, texture coordinates, colors, and tangents
