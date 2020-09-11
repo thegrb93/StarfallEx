@@ -768,7 +768,7 @@ if CLIENT then
 
 	--- Creates a mesh from vertex data.
 	-- @param verteces Table containing vertex data. http://wiki.facepunch.com/gmod/Structures/MeshVertex
-	-- @param threaded Optional bool, use threading object that can be used to load the mesh over time to prevent hitting quota limit. The thread will yield with number of vertices remaining to be processed.
+	-- @param threaded Optional bool, use threading object that can be used to load the mesh over time to prevent hitting quota limit. The thread will yield with number of vertices remaining to be processed. After 0 is yielded, the final expensive phase starts.
 	-- @return Mesh object
 	-- @client
 	function mesh_library.createFromTable(verteces, threaded)
