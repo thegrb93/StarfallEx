@@ -81,7 +81,7 @@ function ENT:SendCode(recipient)
 	}
 	local ppdata = self.instance and self.instance.ppdata
 	if ppdata then
-		if ppdata.serverorclient then
+		if ppdata.serverorclient and not self.compressed then
 			sfdata.files = {}
 			for filename, code in pairs(self.files) do
 				if ppdata.serverorclient[filename] == "server" then
