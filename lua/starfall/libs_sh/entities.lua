@@ -985,6 +985,12 @@ function ents_methods:lookupSequence(animation)
 	return ent:LookupSequence(animation)
 end
 
+--- Gets the current playing sequence
+-- @return The sequence number
+function ents_methods:getSequence()
+	return getent(self):GetSequence()
+end
+
 --- Get the length of an animation
 -- @param id (Optional) The id of the sequence, or will default to the currently playing sequence
 -- @return Length of the animation in seconds
