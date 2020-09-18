@@ -1588,7 +1588,7 @@ function render_library.cursorPos(ply, screen)
 	end
 	
 	if screen~=nil then screen = getent(screen) else screen = renderdata.renderEnt end
-	if not screen.Transform then SF.Throw("Invalid screen", 2) end
+	if not (screen and screen.Transform) then SF.Throw("Invalid screen", 2) end
 
 	local Normal, Pos
 	-- Get monitor screen pos & size
