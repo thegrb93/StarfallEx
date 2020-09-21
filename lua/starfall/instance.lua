@@ -44,6 +44,7 @@ function SF.Instance.Compile(code, mainfile, player, data)
 
 	local instance = setmetatable({}, SF.Instance)
 	instance.data = data or {}
+	instance.stackn = 0
 	instance.hooks = {}
 	instance.scripts = {}
 	instance.source = code
@@ -454,6 +455,8 @@ end
 -- @return True if ok
 -- @return A table of values that the hook returned
 function SF.Instance:runWithOps(func, ...)
+	if self.stackn == 128 then return {false, SF.MakeError("sf stack overflow", 1, true, true)} end
+
 	local oldSysTime = SysTime() - self.cpu_total
 	local function cpuCheck()
 		self.cpu_total = SysTime() - oldSysTime
@@ -474,7 +477,9 @@ function SF.Instance:runWithOps(func, ...)
 	SF.runningOps = true
 	SF.OnRunningOps(true)
 	dsethook(cpuCheck, "", 2000)
+	self.stackn = self.stackn + 1
 	local tbl = { xpcall(func, xpcall_callback, ...) }
+	self.stackn = self.stackn - 1
 	dsethook(prevHook, mask, count)
 	SF.runningOps = prev
 	SF.OnRunningOps(prev)
