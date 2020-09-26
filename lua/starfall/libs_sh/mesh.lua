@@ -94,7 +94,7 @@ function SF.ParseObj(obj, thread_yield, Vector, triangulate)
 			else
 				SF.Throw("Invalid face normal index: "..tostring(normv), 3)
 			end
-			vertices[_] = vert
+			vertices[k] = vert
 			if thread_yield and k%100==0 then thread_yield() end
 		end
 
