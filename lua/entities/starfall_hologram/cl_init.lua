@@ -8,13 +8,6 @@ ENT.Material = ENT.DefaultMaterial
 function ENT:Initialize()
 	self.clips = {}
 	self.userrenderbounds = false
-	
-	if self:EntIndex() ~= -1 then
-		net.Start("starfall_hologram")
-		net.WriteEntity(self)
-		net.SendToServer()
-	end
-
 	self:OnScaleChanged(nil, nil, self:GetScale())
 end
 
