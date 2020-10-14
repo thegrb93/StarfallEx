@@ -75,7 +75,7 @@ else
 						SF.Editor.openWithCode(filename, code, nil, true)
 					end
 					-- Add mainfile last so it gets focus
-					SF.Editor.openWithCode(sfdata.mainfile, mainfile, nil, true)
+					SF.Editor.openWithCode(sfdata.mainfile, mainfile, nil, false)
 				else
 					SF.AddNotify(LocalPlayer(), "Error downloading SF code.", "ERROR", 7, "ERROR1")
 				end
