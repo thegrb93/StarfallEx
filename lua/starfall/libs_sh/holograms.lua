@@ -314,8 +314,6 @@ else
 		end
 	end
 	
-	local holoChildrenMeta = { __mode = "k" }
-	
 	--- Parents a hologram
 	-- @param ent Entity parent (nil to unparent)
 	-- @param attachment Optional attachment ID
@@ -332,7 +330,7 @@ else
 			checkluatype(attachment, TYPE_NUMBER)
 			
 			if not parent.sf_children then
-				parent.sf_children = setmetatable({}, holoChildrenMeta)
+				parent.sf_children = {}
 			end
 			
 			if holo.sf_parent then

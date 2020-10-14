@@ -47,7 +47,7 @@ local cunwrap = instance.Types.Color.Unwrap
 local getent
 instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
-	instance.data.collisionlisteners = setmetatable({},{__mode="k"})
+	instance.data.collisionlisteners = SF.EntityTable("CollisionListener")
 end)
 instance:AddHook("deinitialize", function()
 	for ent in next, instance.data.collisionlisteners do

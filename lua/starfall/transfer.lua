@@ -78,7 +78,7 @@ if SERVER then
 		end
 	end
 
-	local uploaddata = setmetatable({},{__mode="k"})
+	local uploaddata = SF.EntityTable("PlayerUploads")
 	function SF.RequestCode(ply, callback, mainfile)
 		if uploaddata[ply] and uploaddata[ply].timeout > CurTime() then return false end
 

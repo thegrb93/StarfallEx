@@ -152,7 +152,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 				"allow"
 			}
 
-			P.props = setmetatable({},{__mode="k"})
+			P.props = SF.EntityTable("PropProtection")
 			function SF.Permissions.getOwner(ent)
 				return P.props[ent] or NULL
 			end
