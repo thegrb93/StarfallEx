@@ -15,18 +15,12 @@ function net.ReadStarfall(ply, callback)
 
 	net.ReadStream(ply, function(data)
 		if data then
-			sfdata.compressed = data
-			data = util.Decompress(data)
-			if data then
-				local pos = 1
-				for k, v in pairs(headers) do
-					sfdata.files[v.name] = string.sub(data, pos, pos+v.size-1)
-					pos = pos + v.size
-				end
-				callback(true, sfdata)
-			else
-				callback(false, sfdata)
+			local pos = 1
+			for k, v in pairs(headers) do
+				sfdata.files[v.name] = string.sub(data, pos, pos+v.size-1)
+				pos = pos + v.size
 			end
+			callback(true, sfdata)
 		else
 			callback(false, sfdata)
 		end
@@ -50,19 +44,13 @@ function net.WriteStarfall(sfdata, callback)
 	local filecodes = {}
 	for filename, code in pairs(sfdata.files) do
 		if #filename > 255 then error("File name too large: " .. #filename .. " (max is 255)") end
+
 		net.WriteString(filename)
 		net.WriteUInt(#code, 32)
 		filecodes[#filecodes + 1] = code
 	end
-
-	local data
-	if sfdata.compressed then
-		data = sfdata.compressed
-	else
-		data = util.Compress(table.concat(filecodes))
-		sfdata.compressed = data
-	end
-	return net.WriteStream(data, callback, true)
+	local data = table.concat(filecodes)
+	return net.WriteStream(data, callback)
 end
 
 if SERVER then
