@@ -977,7 +977,9 @@ end
 -- @name client
 -- @class directive
 
---- Set the client file to run as main. Can only be used in the main file. --@clientmain somefile.txt
+--- Set the client file to run as main. Can only be used in the main file. The client file must be --@include'ed. The main file will not be sent to the client if you use this directive.
+-- --@include somefile.txt
+-- --@clientmain somefile.txt
 -- @name clientmain
 -- @class directive
 -- @param filename The file to run as main on client
