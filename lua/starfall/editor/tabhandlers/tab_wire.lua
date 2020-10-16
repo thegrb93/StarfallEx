@@ -664,20 +664,11 @@ function PANEL:OpenContextMenu()
 
 	if self:HasSelection() then
 		menu:AddOption("Cut", function()
-				if self:HasSelection() then
-					self.clipboard = self:GetSelection()
-					self.clipboard = string_gsub(self.clipboard, "\n", "\r\n")
-					SetClipboardText(self.clipboard)
-					self:SetSelection()
-				end
-			end)
+			self:Cut()
+		end)
 		menu:AddOption("Copy", function()
-				if self:HasSelection() then
-					self.clipboard = self:GetSelection()
-					self.clipboard = string_gsub(self.clipboard, "\n", "\r\n")
-					SetClipboardText(self.clipboard)
-				end
-			end)
+			self:Copy()
+		end)
 	end
 
 	menu:AddOption("Paste", function()
@@ -1102,7 +1093,6 @@ function PANEL:ClearHighlightedAreas() self.HighlightedAreas = nil end
 
 
 function PANEL:PaintTextOverlay()
-
 	if self.TextEntry:HasFocus() and self.Caret[2] - self.Scroll[2] >= 0 then
 		local lines = #self.RowTexts
 		local width, height = self.FontWidth, self.FontHeight
@@ -1383,7 +1373,7 @@ function PANEL:SetArea(selection, text, isundo, isredo, before, after)
 
 	end
 
-	local stop = { start[1] + #rows - 1, #(self:GetRowText(start[1] + #rows - 1)) + 1 }
+	stop = { start[1] + #rows - 1, #(self:GetRowText(start[1] + #rows - 1)) + 1 }
 
 	self:SetRowText(stop[1],self:GetRowText(stop[1]) .. remainder)
 	self:RecacheLine(stop[1])
@@ -1514,7 +1504,7 @@ local wire_expression2_editor_find_wrap_around = CreateClientConVar("wire_expres
 local wire_expression2_editor_find_dir = CreateClientConVar("wire_expression2_editor_find_dir", "1", true, false)
 
 function PANEL:HighlightFoundWord(caretstart, start, stop)
-	local caretstart = caretstart or self:CopyPosition(self.Start)
+	caretstart = caretstart or self:CopyPosition(self.Start)
 	if istable(start) then
 		self.Start = self:CopyPosition(start)
 	elseif isnumber(start) then
@@ -1553,42 +1543,29 @@ function PANEL:Find(str, looped)
 		local line = self:GetRowText(self.Start[1])
 		local text = line:sub(self.Start[2]) .. "\n"
 		text = text .. self:GetLinesAsText(self.Start[1] + 1)
-		if ignore_case then text = text:lower() end
-
-		local offset = 2
-		for loop = 1, 100 do
-			local start, stop = text:find(str, offset, not use_patterns)
-			if start and stop then
-				if whole_word_only then
-					local caretstart = self:MovePosition(self.Start, start)
-					caretstart = { caretstart[1], caretstart[2]-1 }
-					local caretstop = self:MovePosition(self.Start, stop)
-					caretstop = { caretstop[1], caretstop[2]-1 }
-					local wstart = self:getWordStart({ caretstart[1], caretstart[2] + 1 })
-					local wstop = self:getWordEnd({ caretstart[1], caretstart[2] + 1 })
-					if caretstart[1] == wstart[1] and caretstop[1] == wstop[1] and
-					caretstart[2] == wstart[2] and caretstop[2] + 1 == wstop[2] then
-						self:HighlightFoundWord(nil, caretstart, caretstop)
-						return true
-					else
-						offset = start + 1
-					end
-				else
-					self:HighlightFoundWord(nil, start-1, stop-1)
-					return true
-				end
-
-			else
-				break
-			end
-			if loop == 100 then error("\nInfinite loop protection enabled.\nPlease provide a detailed description of what you were doing when you got this error on www.wiremod.com.\n") return end
+ 		if ignore_case then text = text:lower() end
+ 
+		if not use_patterns then
+			str = string.PatternSafe(str)
+		end
+ 
+		if whole_word_only then
+			str = "%f[%w_]" .. str .. "%f[^%w_]"
 		end
 
-		if wrap_around then
-			self:SetCaret({ 1, 1 }, false)
-			self:Find(_str, (looped or 0) + 1)
-		end
-	else -- Up
+		local start, stop = text:find(str, 2)
+		if start and stop then
+ 			self:HighlightFoundWord(nil, start - 1, stop - 1)
+ 			return true
+ 		end
+ 
+ 		if wrap_around then
+ 			self:SetCaret({1, 1}, false)
+			return self:Find(_str, (looped or 0) + 1)
+ 		end
+
+		return false
+ 	else -- Up
 		local text = self:GetLinesAsText(self.Start[1]-1)
 		local line = self:GetRowText(self.Start[1])
 		text = text .. "\n" .. line:sub(1, self.Start[2]-1)
@@ -1596,58 +1573,41 @@ function PANEL:Find(str, looped)
 		str = string_reverse(str)
 		text = string_reverse(text)
 
-		if ignore_case then text = text:lower() end
-
-		local offset = 2
-		for loop = 1, 100 do
-			local start, stop = text:find(str, offset, not use_patterns)
-			if start and stop then
-
-				if whole_word_only then
-					local caretstart = self:MovePosition(self.Start, -start)
-					caretstart = { caretstart[1], caretstart[2]-1 }
-					local caretstop = self:MovePosition(self.Start, -stop)
-					caretstop = { caretstop[1], caretstop[2]-1 }
-					local wstart = self:getWordStart({ caretstart[1], caretstart[2] + 1 })
-					local wstop = self:getWordEnd({ caretstart[1], caretstart[2] + 1 })
-					if caretstart[1] == wstart[1] and caretstop[1] == wstop[1] and
-					caretstart[2] == wstart[2] and caretstop[2] + 1 == wstop[2] then
-						self:HighlightFoundWord(nil, caretstart, caretstop)
-						return true
-					else
-						offset = start + 1
-					end
-				else
-					self:HighlightFoundWord(nil, -(start-1), -(stop + 1))
-					return true
-				end
-
-			else
-				break
-			end
-			if loop == 100 then error("\nInfinite loop protection enabled.\nPlease provide a detailed description of what you were doing when you got this error on www.wiremod.com.\n") return end
+ 		if ignore_case then text = text:lower() end
+ 
+		if not use_patterns then
+			str = string.PatternSafe(str)
 		end
+ 
+ 		if whole_word_only then
+			str = "%f[%w_]" .. str .. "%f[^%w_]"
+ 		end
 
-		if wrap_around then
-			self:SetCaret({ #self.Rows, #self.Rows[#self.Rows] }, false)
-			self:Find(_str, (looped or 0) + 1)
-		end
-	end
-	return false
+		local start, stop = text:find(str, 2)
+		if start and stop then
+ 			self:HighlightFoundWord( nil, -(start-1), -(stop+1) )
+ 			return true
+ 		end
+ 
+ 		if wrap_around then
+ 			self:SetCaret( { #self.Rows,#self.Rows[#self.Rows] }, false )
+			return self:Find( _str, (looped or 0) + 1 )
+ 		end
+
+ 		return false
+ 	end
 end
 
 function PANEL:Replace(str, replacewith)
 	if str == "" or str == replacewith then return end
 
-	local ignore_case = wire_expression2_editor_find_ignore_case:GetBool()
 	local use_patterns = wire_expression2_editor_find_use_patterns:GetBool()
 
 	local selection = self:GetSelection()
 
 	local _str = str
 	if not use_patterns then
-		str = str:gsub("[%-%^%$%(%)%%%.%[%]%*%+%?]", "%%%1")
-		replacewith = replacewith:gsub("%%", "%%%1")
+		str = string.PatternSafe(str)
 	end
 
 	if selection:match(str) ~= nil then
@@ -1666,19 +1626,24 @@ function PANEL:ReplaceAll(str, replacewith)
 	local use_patterns = wire_expression2_editor_find_use_patterns:GetBool()
 
 	if not use_patterns then
-		str = str:gsub("[%-%^%$%(%)%%%.%[%]%*%+%?]", "%%%1")
-		replacewith = replacewith:gsub("%%", "%%%1")
+		str = string.PatternSafe(str)
+		if ignore_case then
+			str = str:lower()
+		end
+	end
+
+	local pattern
+	if whole_word_only then
+		pattern = "%f[%w_]()" .. str .. "%f[^%w_]()"
+	else
+		pattern = "()" .. str .. "()"
 	end
 
 	local txt = self:GetCode()
 
 	if ignore_case then
 		local txt2 = txt -- Store original cased copy
-		str = str:lower() -- Lowercase everything
 		txt = txt:lower() -- Lowercase everything
-
-		local pattern = "()"..str.."()"
-		if whole_word_only then pattern = "[^a-zA-Z0-9_]()"..str.."()[^a-zA-Z0-9_]" end
 
 		local positions = {}
 
@@ -1696,15 +1661,7 @@ function PANEL:ReplaceAll(str, replacewith)
 		self:SelectAll()
 		self:SetSelection(txt2)
 	else
-		if whole_word_only then
-			local pattern = "([^a-zA-Z0-9_])"..str.."([^a-zA-Z0-9_])"
-			txt = " " .. txt
-			txt = string_gsub(txt, pattern, "%1"..replacewith.."%2")
-			txt = string_gsub(txt, pattern, "%1"..replacewith.."%2")
-			txt = string_sub(txt, 2)
-		else
-			txt = string_gsub(txt, str, replacewith)
-		end
+		txt = string_gsub( txt, pattern, replacewith )
 
 		self:SelectAll()
 		self:SetSelection(txt)
@@ -1719,7 +1676,7 @@ function PANEL:CountFinds(str)
 	local use_patterns = wire_expression2_editor_find_use_patterns:GetBool()
 
 	if not use_patterns then
-		str = str:gsub("[%-%^%$%(%)%%%.%[%]%*%+%?]", "%%%1")
+		str = string.PatternSafe(str)
 	end
 
 	local txt = self:GetCode()
@@ -1730,26 +1687,22 @@ function PANEL:CountFinds(str)
 	end
 
 	if whole_word_only then
-		local pattern = "([^a-zA-Z0-9_])"..str.."([^a-zA-Z0-9_])"
-		txt = " " .. txt
-		local num1, num2 = 0, 0
-		txt, num1 = txt:gsub(pattern, "%1%2")
-		if txt == "" then return num1 end
-		txt, num2 = txt:gsub(pattern, "%1%2")
-		return num1 + num2
-	else
-		local num
-		txt, num = txt:gsub(str, "")
-		return num
+		str = "%f[%w_]()" .. str .. "%f[^%w_]()"
 	end
+
+	return select(2, string_gsub(txt, str, ""))
 end
 
 function PANEL:FindAllWords(str)
 	if str == "" then return end
 
 	local txt = self:GetCode()
-	-- [^a-zA-Z0-9_] ensures we only find whole words, and the gsub escapes any regex command characters that happen to be in str
-	local pattern = "[^a-zA-Z0-9_]()" .. str:gsub("[%-%^%$%(%)%%%.%[%]%*%+%?]", "%%%1") .. "()[^a-zA-Z0-9_]"
+	-- %f[set] is a 'frontier' pattern - it matches an empty string at a position such that the
+	-- next character belongs to set and the previous character does not belong to set.
+	-- The beginning and the end of the string are handled as if they were the character '\0'.
+	-- As a special case, the empty capture () captures the current string position (a number).
+	--   - https://www.lua.org/manual/5.3/manual.html#6.4.1
+	local pattern = "%f[%w_]()" .. string.PatternSafe(str) .. "%f[^%w_]()"
 
 	local ret = {}
 	for start, stop in txt:gmatch(pattern) do
@@ -2661,10 +2614,10 @@ function PANEL:GetTokenAtPosition(caret)
 	if not line then return nil end
 	line = line[2]
 	if line then
-		local startindex = 1
+		local startindex = 0
 		for index, data in ipairs(line) do
 			startindex = startindex + #data[1]
-			if startindex >= column then return data,index end
+			if startindex >= column then return data, index end
 		end
 	end
 end
