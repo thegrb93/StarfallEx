@@ -1566,7 +1566,7 @@ function PANEL:Find(str, looped)
 
 		return false
  	else -- Up
-		local text = self:GetLinesAsText(self.Start[1]-1)
+		local text = self:GetLinesAsText(1, self.Start[1]-1)
 		local line = self:GetRowText(self.Start[1])
 		text = text .. "\n" .. line:sub(1, self.Start[2]-1)
 
