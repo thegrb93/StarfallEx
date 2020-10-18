@@ -1588,7 +1588,7 @@ function Editor:SaveFile(Line, close, SaveAs, Func)
 		timer.Simple(0, function() panel.SetText(panel, " Saved as " .. Line) end)
 		surface.PlaySound("ambient/water/drip3.wav")
 
-		self:ChosenFile(Line)
+		self:ChosenFile(Line, self:GetCode())
 		self:UpdateTabText(self:GetActiveTab())
 		if close then
 
