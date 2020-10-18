@@ -1407,9 +1407,15 @@ function Editor:GetChosenFile()
 	return self:GetCurrentTabContent().chosenfile
 end
 
-function Editor:ChosenFile(Line)
+function Editor:ChosenFile(Line, code)
 	self:GetCurrentTabContent().chosenfile = Line
-	self:GetCurrentTabContent().savedCode = Line and file.Read(Line) or nil
+	if not code then
+		code = Line and file.Read(Line)
+		if code then
+			code = string.gsub(code, "[\r\t]", {["\r"]="", ["\t"]="    "})
+		end
+	end
+	self:GetCurrentTabContent().savedCode = code
 
 	if Line then
 		self:SubTitle("Editing: " .. Line)
@@ -1466,7 +1472,6 @@ end
 
 function Editor:SetCode(code)
 	self:GetCurrentTabContent():SetCode(code)
-	self.savebuffer = self:GetCode()
 	self:Validate()
 	self:ExtractName()
 end
@@ -1622,8 +1627,8 @@ function Editor:LoadFile(Line, forcenewtab)
 			tab = self:GetActiveTab()
 		end
 		self:SetActiveTab(tab)
-		self:ChosenFile(Line)
 		self:SetCode(str)
+		self:ChosenFile(Line, self:GetCode())
 		self:UpdateTabText(tab)
 		self.C.TabHolder:InvalidateLayout()
 	end

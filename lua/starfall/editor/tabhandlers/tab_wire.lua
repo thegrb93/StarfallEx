@@ -840,8 +840,7 @@ function PANEL:OnMouseReleased(code)
 end
 
 function PANEL:SetCode(text)
-	text = string_gsub(text, "\r", "")
-	text = string_gsub(text, "\t", "    ")
+	text = string_gsub(text, "[\r\t]", {["\r"]="", ["\t"]="    "})
 	if text == self:GetCode() then return end
 	self.Rows = {}
 	self.RowTexts = {}
