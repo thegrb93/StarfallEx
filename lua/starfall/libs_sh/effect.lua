@@ -49,7 +49,7 @@ end
 --- Returns number of effects able to be created
 -- @return number of effects able to be created
 function effect_library.effectsLeft()
-	return instance.data.effects.burst:check()
+	return plyEffectBurst:check()
 end
 
 --- Plays the effect
