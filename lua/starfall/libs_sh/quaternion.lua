@@ -571,9 +571,9 @@ function quat_methods:getAbsolute()
 	return getQuatLenSqr(self)
 end
 
---- Returns conjecture of the quaternion
--- @return Quaternion's conjecture
-function quat_methods:getConjecture()
+--- Returns conjugate of the quaternion
+-- @return Quaternion's conjugate
+function quat_methods:getConjugate()
 	local ret = clone(self)
 	quatConj(ret)
 	return ret
