@@ -136,7 +136,8 @@ SF.StructWrapper = {
 			__newindex = function(t, k, v)
 				cache[k] = v
 			end,
-			__metatable = ""
+			__metatable = "StructWrapper",
+			__tostring = function() return "StructWrapper" end,
 		})
 	end
 }
