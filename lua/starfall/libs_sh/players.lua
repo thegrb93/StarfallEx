@@ -85,9 +85,9 @@ end)
 
 if SERVER then
 	instance:AddHook("deinitialize", function()
-		for k, pl in pairs(player.GetAll()) do
-			if pl.sfhudenabled and pl.sfhudenabled.link == instance.data.entity then
-				pl:SetViewEntity()
+		for k, ply in pairs(player.GetAll()) do
+			if instance:isHUDActive(ply) then
+				ply:SetViewEntity()
 			end
 		end
 	end)
@@ -110,6 +110,7 @@ local function getply(self)
 		SF.Throw("Entity is not valid.", 3)
 	end
 end
+instance.Types.Player.GetPlayer = getply
 
 
 function player_meta:__tostring()
@@ -431,13 +432,11 @@ if SERVER then
 	-- @server
 	-- @param ent Entity to set the player's view entity to, or nothing to reset it
 	function player_methods:setViewEntity(ent)
-		local pl = getply(self)
-		if ent~=nil then
-			ent = getent(ent)
-		end
+		local ply = getply(self)
+		if ent~=nil then ent = getent(ent) end
 
-		if (pl.sfhudenabled and pl.sfhudenabled:IsValid()) and pl.sfhudenabled.link == instance.data.entity then
-			pl:SetViewEntity(ent)
+		if instance:isHUDActive(ply) then
+			ply:SetViewEntity(ent)
 		end
 	end
 

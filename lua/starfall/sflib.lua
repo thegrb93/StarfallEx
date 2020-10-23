@@ -1083,8 +1083,7 @@ else
 
 	net.Receive("starfall_chatprint", function ()
 		local recv = {}
-		local n = net.ReadUInt(32)
-		for i = 1, n do
+		for i = 1, net.ReadUInt(32) do
 			recv[i] = net.ReadType()
 		end
 		chat.AddText(unpack(recv))

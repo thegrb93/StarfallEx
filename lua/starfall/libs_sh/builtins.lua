@@ -29,6 +29,11 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 
 local builtins_library = instance.env
 
+local getply
+instance:AddHook("initialize", function()
+	getply = instance.Types.Player.GetPlayer
+end)
+
 --- Built in values. These don't need to be loaded; they are in the default builtins_library.
 -- @name builtins
 -- @shared
@@ -394,60 +399,89 @@ end
 
 local function argsToChat(...)
 	local n = select('#', ...)
-	local input = { ... }
-	local output = {}
-	local color = false
+	local input = {...}
+	local defaultColor = true
+	local length = 0
+	local size = 0
 	for i = 1, n do
 		local val = input[i]
 		local add
 		if dgetmeta(val) == col_meta then
-			color = true
+			defaultColor = false
 			add = Color(val[1], val[2], val[3])
 		else
 			add = tostring(val)
 		end
-		output[i] = add
+		input[i] = add
 	end
 	-- Combine the strings with tabs
 	local processed = {}
-	if not color then processed[1] = Color(151, 211, 255) end
+	if defaultColor then processed[1] = Color(151, 211, 255) size = 4 end
 	local i = 1
 	while i <= n do
-		if isstring(output[i]) then
+		if isstring(input[i]) then
 			local j = i + 1
-			while j <= n and isstring(output[j]) do
+			while j <= n and isstring(input[j]) do
 				j = j + 1
 			end
 			if i==(j-1) then
-				processed[#processed + 1] = output[i]
+				local result = input[i]
+				length = length + #result
+				size = size + #result + 2
+				processed[#processed + 1] = result
 			else
-				processed[#processed + 1] = table.concat({ unpack(output, i, j) }, "\t")
+				local result = table.concat(input, "\t", i, j-1)
+				length = length + #result
+				size = size + #result + 2
+				processed[#processed + 1] = result
 			end
 			i = j
 		else
-			processed[#processed + 1] = output[i]
+			processed[#processed + 1] = input[i]
 			i = i + 1
+			size = size + 4 + 2
 		end
 	end
-	return processed
+	return processed, length, size
 end
 
 if SERVER then
-	--- Prints a message to the player's chat.
-	-- @shared
-	-- @param ... Values to print
-	function builtins_library.print(...)
-		local tbl = argsToChat(...)
-
+	local function sendPrintToPlayer(ply, data)
 		net.Start("starfall_chatprint")
-		net.WriteUInt(#tbl, 32)
-		for i, v in ipairs(tbl) do
+		net.WriteUInt(#data, 32)
+		for i, v in ipairs(data) do
 			net.WriteType(v)
 		end
-		local bytes = net.BytesWritten()
-		net.Send(instance.player)
-	
-		printBurst:use(instance.player, bytes)
+		net.Send(ply)
+	end
+
+	--- Prints a message to the player's chat.
+	-- @shared
+	-- @param ... Values to print. Colors before text will set the text color
+	function builtins_library.print(...)
+		local data, strlen, size = argsToChat(...)
+		printBurst:use(instance.player, size)
+		sendPrintToPlayer(instance.player, data)
+	end
+
+	--- Prints a message to a target player's chat as long as they're connected to a hud.
+	-- @shared
+	-- @param ply The target player. If in CLIENT, then ply is the client player and this param is omitted
+	-- @param ... Values to print. Colors before text will set the text color
+	function builtins_library.printHud(ply, ...)
+		ply = getply(ply)
+		if not ply:IsPlayer() then SF.Throw("Expected a target player!", 2) end
+		if not instance:isHUDActive(ply) then SF.Throw("Player isn't connected to a hud!", 2) end
+
+		local data, strlen, size = argsToChat(builtins_library.Color(5,125,222), "[SF] ", builtins_library.Color(255,255,255), ...)
+		if strlen > 52 then SF.Throw("The max printHud string size is 52 chars!", 2) end
+		printBurst:use(instance.player, size)
+		for k, v in ipairs(data) do
+			if isstring(v) then
+				data[k] = string.gsub(v, "[\r\n%z\t]", "")
+			end
+		end
+		sendPrintToPlayer(ply, data)
 	end
 
 	--- Prints a table to player's chat
@@ -520,6 +554,18 @@ else
 		if instance.player == LocalPlayer() then
 			chat.AddText(unpack(argsToChat(...)))
 		end
+	end
+
+	function builtins_library.printHud(...)
+		if not instance:isHUDActive() then SF.Throw("Player isn't connected to a hud!", 2) end
+		local data, strlen, size = argsToChat(builtins_library.Color(5,125,222), "[SF] ", builtins_library.Color(255,255,255), ...)
+		if strlen > 52 then SF.Throw("The max printHud string size is 52 chars!", 2) end
+		for k, v in ipairs(data) do
+			if isstring(v) then
+				data[k] = string.gsub(v, "[\r\n\0\t]", "")
+			end
+		end
+		chat.AddText(unpack(data))
 	end
 
 	function builtins_library.printTable(tbl)

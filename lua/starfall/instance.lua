@@ -678,7 +678,16 @@ hook.Add("Think", "SF_Think", function()
 	end
 end)
 
-if CLIENT then
+if SERVER then
+	function SF.Instance:isHUDActive(ply)
+		for hud, tbl in pairs(SF.ActiveHuds) do
+			if hud.link == self.data.entity and tbl[ply] then
+				return true
+			end
+		end
+		return false
+	end
+else
 --- Check if a HUD Component is connected to the SF instance
 -- @return true if a HUD Component is connected
 	function SF.Instance:isHUDActive()

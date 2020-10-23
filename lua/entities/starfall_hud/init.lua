@@ -14,6 +14,8 @@ function ENT:Initialize()
 	self:SetUseType(SIMPLE_USE)
 end
 
+SF.ActiveHuds = setmetatable({},{__index=function(t,k) local r={} t[k]=r return r end})
+
 function ENT:SetHudEnabled(ply, mode)
 	net.Start("starfall_hud_set_enabled")
 		net.WriteEntity(self)
@@ -34,7 +36,7 @@ function ENT:SetHudEnabled(ply, mode)
 				net.Send(ply)
 			end
 		end
-		ply.sfhudenabled = self
+		SF.ActiveHuds[self][ply] = true
 	end
 
 	local function disconnect()
@@ -51,7 +53,7 @@ function ENT:SetHudEnabled(ply, mode)
 				net.Send(ply)
 			end
 		end
-		ply.sfhudenabled = nil
+		SF.ActiveHuds[self][ply] = nil
 		ply:SetViewEntity()
 	end
 
@@ -65,6 +67,7 @@ function ENT:SetHudEnabled(ply, mode)
 end
 
 function ENT:OnRemove()
+	SF.ActiveHuds[self] = nil
 	net.Start("starfall_hud_set_enabled")
 		net.WriteEntity(self)
 		net.WriteInt(0, 8)
