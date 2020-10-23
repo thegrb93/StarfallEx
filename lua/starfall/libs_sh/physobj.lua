@@ -477,6 +477,25 @@ if SERVER then
 		checkpermission(instance, phys:GetEntity(), "entities.applyForce")
 		phys:Wake()
 	end
+	
+	--- Returns table of tables of friction data of a contact against the physobj
+	-- @server
+	-- @return Table of tables of data. Each table will contain:
+	-- PhysObj Other - The other physics object we came in contact with
+	-- number EnergyAbsorbed -
+	-- number FrictionCoefficient -
+	-- number NormalForce -
+	-- Vector Normal - Direction of the friction event
+	-- Vector ContactPoint - Contact point of the friction event
+	-- number Material - Surface Property ID of our physics obj
+	-- number MaterialOther - Surface Property ID of the physics obj we came in contact with
+	function physobj_methods:getFrictionSnapshot()
+		local result = {}
+		for k, v in ipairs(unwrap(self):GetFrictionSnapshot()) do
+			result[k] = SF.StructWrapper(instance, v)
+		end
+		return result
+	end
 end
 
 end
