@@ -131,7 +131,6 @@ if CLIENT then
 		checkpermission(instance, ent, "entities.setRenderProperty")
 
 		if material then
-			local t = debug.getmetatable(material)
 			ent.Material = instance.Types.LockedMaterial.Unwrap(material)
 		else
 			ent.Material = ent.DefaultMaterial
