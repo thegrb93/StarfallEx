@@ -1325,4 +1325,93 @@ function ents_methods:getBrushPlaneCount()
 	return getent(self):GetBrushPlaneCount()
 end
 
+--- Gets a datatable angle
+-- @shared
+-- @param key The number key. Valid keys are 0 - 31
+-- @return The angle or nil if it doesn't exist
+function ents_methods:getDTAngle(key)
+	checkluatype(key, TYPE_NUMBER)
+	if key<0 or key>31 then SF.Throw("Key must be a int in range 0 - 31") end
+	return awrap(getent(self):GetDTAngle(key))
+end
+
+--- Gets a datatable boolean
+-- @shared
+-- @param key The number key. Valid keys are 0 - 31
+-- @return The boolean or nil if it doesn't exist
+function ents_methods:getDTBool(key)
+	checkluatype(key, TYPE_NUMBER)
+	if key<0 or key>31 then SF.Throw("Key must be a int in range 0 - 31") end
+	return getent(self):GetDTBool(key)
+end
+
+--- Gets a datatable entity
+-- @shared
+-- @param key The number key. Valid keys are 0 - 31
+-- @return The entity or nil if it doesn't exist
+function ents_methods:getDTEntity(key)
+	checkluatype(key, TYPE_NUMBER)
+	if key<0 or key>31 then SF.Throw("Key must be a int in range 0 - 31") end
+	return owrap(getent(self):GetDTEntity(key))
+end
+
+--- Gets a datatable float
+-- @shared
+-- @param key The number key. Valid keys are 0 - 31
+-- @return The float or nil if it doesn't exist
+function ents_methods:getDTFloat(key)
+	checkluatype(key, TYPE_NUMBER)
+	if key<0 or key>31 then SF.Throw("Key must be a int in range 0 - 31") end
+	return getent(self):GetDTFloat(key)
+end
+
+--- Gets a datatable int
+-- @shared
+-- @param key The number key. Valid keys are 0 - 31
+-- @return The int or nil if it doesn't exist
+function ents_methods:getDTInt(key)
+	checkluatype(key, TYPE_NUMBER)
+	if key<0 or key>31 then SF.Throw("Key must be a int in range 0 - 31") end
+	return getent(self):GetDTInt(key)
+end
+
+--- Gets a datatable string
+-- @shared
+-- @param key The number key. Valid keys are 0 - 31
+-- @return The string or nil if it doesn't exist
+function ents_methods:getDTString(key)
+	checkluatype(key, TYPE_NUMBER)
+	if key<0 or key>31 then SF.Throw("Key must be a int in range 0 - 31") end
+	return getent(self):GetDTString(key)
+end
+
+--- Gets a datatable vector
+-- @shared
+-- @param key The number key. Valid keys are 0 - 31
+-- @return The vector or nil if it doesn't exist
+function ents_methods:getDTVector(key)
+	checkluatype(key, TYPE_NUMBER)
+	if key<0 or key>31 then SF.Throw("Key must be a int in range 0 - 31") end
+	return vwrap(getent(self):GetDTVector(key))
+end
+
+--- Gets a networked variable of an entity
+-- @shared
+-- @param key The string key to get
+-- @return The object associated with that key or nil if it's not set
+function ents_methods:getNWVar(key)
+	checkluatype(key, TYPE_STRING)
+	-- GetNW* returns whatever the key is tied to regardless of the function name
+	local result = getent(self):GetNWEntity(key)
+	if result == NULL then return end
+	return owrap(result)
+end
+
+--- Gets the table of all networked things on an entity
+-- @shared
+-- @return The table of networked objects
+function ents_methods:getNWVarTable()
+	return instance.Sanitize(getent(self):GetNWVarTable())
+end
+
 end
