@@ -4,6 +4,7 @@ local registerprivilege = SF.Permissions.registerPrivilege
 
 -- Register privileges
 registerprivilege("prop.create", "Create prop", "Allows the user to create props")
+registerprivilege("prop.createRagdoll", "Create a ragdoll", "Allows the user to create ragdolls")
 registerprivilege("prop.createCustom", "Create custom prop", "Allows the user to create custom props")
 
 
@@ -113,6 +114,56 @@ function props_library.create(pos, ang, model, frozen)
 	end
 
 	return ewrap(propent)
+end
+
+--- Creates a ragdoll
+-- @server
+-- @param model Model path
+-- @param frozen True to spawn the entity in a frozen state. Default = False
+-- @return The ragdoll entity
+function props_library.createRagdoll(model, frozen)
+    checkpermission(instance, nil, "prop.createRagdoll")
+    checkluatype(model, TYPE_STRING)
+    frozen = frozen and true or false
+
+    local ply = instance.player
+    model = SF.CheckRagdoll(model, ply)
+    if not model then SF.Throw("Invalid model", 2) end
+
+    plyPropBurst:use(ply, 1)
+    plyCount:checkuse(ply, 1)
+    if ply ~= SF.Superuser and gamemode.Call("PlayerSpawnRagdoll", ply, model)==false then SF.Throw("Another hook prevented the ragdoll from spawning", 2) end
+
+    local propdata = instance.data.props
+    local ent = ents.Create("prop_ragdoll")
+    register(ent, instance)
+    ent:SetModel(model)
+    ent:Spawn()
+
+    if not ent:GetModel() then ent:Remove() SF.Throw("Invalid model", 2) end
+
+    if frozen then
+        for I = 0, ent:GetPhysicsObjectCount() - 1 do
+            local obj = ent:GetPhysicsObjectNum(I)
+            if obj:IsValid() then
+                obj:EnableMotion(false)
+            end
+        end
+    end
+
+    if ply ~= SF.Superuser then
+        gamemode.Call("PlayerSpawnedRagdoll", ply, model, ent)
+
+        if propdata.undo then
+            undo.Create("Ragdoll")
+                undo.SetPlayer(ply)
+                undo.AddEntity(ent)
+            undo.Finish("Ragdoll (" .. tostring(model) .. ")")
+        end
+        ply:AddCleanup("ragdolls", ent)
+    end
+
+    return ewrap(ent)
 end
 
 --- Creates a custom prop.

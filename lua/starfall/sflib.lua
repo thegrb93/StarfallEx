@@ -910,6 +910,16 @@ function SF.CheckModel(model, player)
 	return false
 end
 
+function SF.CheckRagdoll(model)
+	if #model > 260 then return false end
+	model = SF.NormalizePath(string.lower(model))
+	if util.IsValidRagdoll(model) then
+		return model
+	end
+	return false
+end
+
+
 --- Returns a path with all .. accounted for
 function SF.NormalizePath(path)
 	local null = string.find(path, "\x00", 1, true)
