@@ -3,20 +3,20 @@ local registerprivilege = SF.Permissions.registerPrivilege
 local IsValid = IsValid
 
 -- Create permission types.
-registerprivilege("particle.attach", "Allow users to create particle", { client = {}, entities = {} })
+registerprivilege("particleEffect.attach", "Allow users to create particle effect", { client = {}, entities = {} })
 
 
---- Particle library.
--- @name particle
+--- ParticleEffect library.
+-- @name particleEffect
 -- @class library
--- @libtbl particle_library
-SF.RegisterLibrary("particle")
+-- @libtbl particleef_library
+SF.RegisterLibrary("particleEffect")
 
---- Particle type
--- @name Particle
+--- ParticleEffect type
+-- @name ParticleEffect
 -- @class type
--- @libtbl particle_methods
-SF.RegisterType("Particle", false, false)
+-- @libtbl particleef_methods
+SF.RegisterType("ParticleEffect", false, false)
 
 
 return function(instance)
@@ -24,7 +24,7 @@ local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check
 
 local getent
 instance:AddHook("initialize", function()
-	instance.data.particle = {
+	instance.data.particleEffect = {
 		particles = {},
 	}
 
@@ -32,7 +32,7 @@ instance:AddHook("initialize", function()
 end)
 
 instance:AddHook("deinitialize", function()
-	local particles = instance.data.particle.particles
+	local particles = instance.data.particleEffect.particles
 	local p = next(particles)
 	-- Remove all
 	while p do
@@ -44,10 +44,10 @@ instance:AddHook("deinitialize", function()
 	end
 end)
 
-local particle_library = instance.Libraries.particle
-local particle_methods = instance.Types.Particle.Methods
+local particleef_library = instance.Libraries.particleEffect
+local particleef_methods = instance.Types.ParticleEffect.Methods
 
-local particle_meta, wrap, unwrap = instance.Types.Particle, instance.Types.Particle.Wrap, instance.Types.Particle.Unwrap
+local particle_meta, wrap, unwrap = instance.Types.ParticleEffect, instance.Types.ParticleEffect.Wrap, instance.Types.ParticleEffect.Unwrap
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 
@@ -58,56 +58,56 @@ end
 
 local function checkValid(emitter)
 	if not (emitter and emitter:IsValid()) then
-		SF.Throw("Particle emitter is no longer valid.", 2)
+		SF.Throw("ParticleEffect emitter is no longer valid.", 2)
 	end
 end
 
 
---- Attaches a particle to an entity.
+--- Attaches a particleEffect to an entity.
 -- @param entity Entity to attach to
--- @param particle Name of the particle
+-- @param name Name of the particle effect
 -- @param pattach PATTACH enum
 -- @param options Table of options
--- @return Particle type.
-function particle_library.attach(entity, particle, pattach, options)
-	checkpermission(instance, entity, "particle.attach")
+-- @return ParticleEffect type.
+function particleef_library.attach(entity, name, pattach, options)
+	checkpermission(instance, entity, "particleEffect.attach")
 
-	checkluatype (particle, TYPE_STRING)
+	checkluatype (name, TYPE_STRING)
 	checkluatype (pattach, TYPE_NUMBER)
 	checkluatype (options, TYPE_TABLE)
 
 	local entity = getent(entity)
 
-	if badParticle(particle) then
-		SF.Throw("Invalid particle path: " .. particle, 2)
+	if badParticle(name) then
+		SF.Throw("Invalid particle effect path: " .. name, 2)
 	end
 
 
 
-	local PEffect = entity:CreateParticleEffect(particle,pattach,options)
+	local PEffect = entity:CreateParticleEffect(name,pattach,options)
 
 	if not (PEffect and PEffect:IsValid()) then
-		SF.Throw("Invalid particle system.", 2)
+		SF.Throw("Invalid particle effect system.", 2)
 	end
 
-	instance.data.particle.particles[PEffect] = true
+	instance.data.particleEffect.particles[PEffect] = true
 
 	return wrap(PEffect)
 
 end
 
 
---- Gets if the particle is valid or not.
+--- Gets if the particle effect is valid or not.
 -- @return Is valid or not
-function particle_methods:isValid()
+function particleef_methods:isValid()
 	local uw = unwrap(self)
 
 	return uw and uw:IsValid()
 
 end
 
---- Starts emission of the particle.
-function particle_methods:startEmission()
+--- Starts emission of the particle effect.
+function particleef_methods:startEmission()
 	local uw = unwrap(self)
 
 	checkValid(uw)
@@ -118,8 +118,8 @@ function particle_methods:startEmission()
 end
 
 
---- Stops emission of the particle.
-function particle_methods:stopEmission()
+--- Stops emission of the particle effect.
+function particleef_methods:stopEmission()
 	local uw = unwrap(self)
 
 	checkValid(uw)
@@ -129,8 +129,8 @@ function particle_methods:stopEmission()
 
 end
 
---- Stops emission of the particle and destroys the object.
-function particle_methods:destroy()
+--- Stops emission of the particle effect and destroys the object.
+function particleef_methods:destroy()
 	local uw = unwrap(self)
 
 	if (uw and uw:IsValid()) then
@@ -139,8 +139,8 @@ function particle_methods:destroy()
 
 end
 
---- Restarts emission of the particle.
-function particle_methods:restart()
+--- Restarts emission of the particle effect.
+function particleef_methods:restart()
 	local uw = unwrap(self)
 
 	checkValid(uw)
@@ -151,9 +151,9 @@ function particle_methods:restart()
 end
 
 
---- Restarts emission of the particle.
+--- Restarts emission of the particle effect.
 -- @return bool finished
-function particle_methods:isFinished()
+function particleef_methods:isFinished()
 	local uw = unwrap(self)
 
 	if (uw and uw:IsValid()) then
@@ -165,9 +165,9 @@ function particle_methods:isFinished()
 end
 
 
---- Sets the sort origin for given particle system. This is used as a helper to determine which particles are in front of which.
+--- Sets the sort origin for given particle effect system. This is used as a helper to determine which particles are in front of which.
 -- @param vector Sort Origin
-function particle_methods:setSortOrigin(origin)
+function particleef_methods:setSortOrigin(origin)
 	local uw = unwrap(self)
 
 	checkValid(uw)
@@ -181,7 +181,7 @@ end
 --- Sets a value for given control point.
 -- @param number Control Point ID (0-63)
 -- @param vector Value
-function particle_methods:setControlPoint(id,value)
+function particleef_methods:setControlPoint(id,value)
 	local uw = unwrap(self)
 
 	checkluatype (id, TYPE_NUMBER)
@@ -197,7 +197,7 @@ end
 --- Essentially makes child control point follow the parent entity.
 -- @param number Child Control Point ID (0-63)
 -- @param entity Entity parent
-function particle_methods:setControlPointEntity(id,entity)
+function particleef_methods:setControlPointEntity(id,entity)
 	local uw = unwrap(self)
 	local entity = getent(entity)
 
@@ -214,7 +214,7 @@ end
 --- Sets the forward direction for given control point.
 -- @param number Control Point ID (0-63)
 -- @param vector Forward
-function particle_methods:setForwardVector(id,value)
+function particleef_methods:setForwardVector(id,value)
 	local uw = unwrap(self)
 
 	checkluatype (id, TYPE_NUMBER)
@@ -229,7 +229,7 @@ end
 --- Sets the right direction for given control point.
 -- @param number Control Point ID (0-63)
 -- @param vector Right
-function particle_methods:setRightVector(id,value)
+function particleef_methods:setRightVector(id,value)
 	local uw = unwrap(self)
 
 	checkluatype (id, TYPE_NUMBER)
@@ -245,7 +245,7 @@ end
 --- Sets the right direction for given control point.
 -- @param number Control Point ID (0-63)
 -- @param vector Right
-function particle_methods:setUpVector(id,value)
+function particleef_methods:setUpVector(id,value)
 	local uw = unwrap(self)
 
 	checkluatype (id, TYPE_NUMBER)
@@ -260,7 +260,7 @@ end
 --- Sets the forward direction for given control point.
 -- @param number Child Control Point ID (0-63)
 -- @param number Parent
-function particle_methods:setControlPointParent(id,value)
+function particleef_methods:setControlPointParent(id,value)
 	local uw = unwrap(self)
 
 	checkluatype (id, TYPE_NUMBER)
