@@ -60,7 +60,7 @@ function ENT:SetHudEnabled(ply, mode)
 	if mode == 1 then
 		connect()
 	elseif mode == -1 then
-		if ply.sfhudenabled then disconnect() else connect() end
+		if SF.ActiveHuds[self][ply] then disconnect() else connect() end
 	else
 		disconnect()
 	end
@@ -79,7 +79,7 @@ function ENT:Use(ply)
 
 	if not self.link then return end
 
-	if ply:IsPlayer() and ply.sfhudenabled then
+	if ply:IsPlayer() and SF.ActiveHuds[self][ply] then
 		net.Start("starfall_processor_used")
 			net.WriteEntity(self)
 			net.WriteEntity(ply)
