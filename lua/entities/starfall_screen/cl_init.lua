@@ -18,7 +18,6 @@ function ENT:Initialize()
 	net.SendToServer()
 
 	local info = self.Monitor_Offsets[self:GetModel()]
-	print(info)
 	if not info then
 		local mins = self:OBBMins()
 		local maxs = self:OBBMaxs()
