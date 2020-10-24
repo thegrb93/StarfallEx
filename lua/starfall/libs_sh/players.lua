@@ -135,6 +135,13 @@ function player_methods:getArmor()
 	return getply(self):Armor()
 end
 
+--- Returns maximum armor capacity
+-- @shared
+-- @return Armor limit
+function player_methods:getMaxArmor()
+	return getply(self):GetMaxArmor()
+end
+
 --- Returns whether the player is crouching
 -- @shared
 -- @return True if player crouching
