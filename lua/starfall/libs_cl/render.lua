@@ -33,6 +33,7 @@ local RT_Material = CreateMaterial("SF_RT_Material", "UnlitGeneric", {
 	["$vertexcolor"] = 1,
 	["$vertexalpha"] = 1
 })
+SF.RT_Material = RT_Material
 
 local validfonts = {
 	akbar = "Akbar",
@@ -221,6 +222,21 @@ SF.hookAdd("PostDrawHUD", nil, canRenderHudSafeArgs)
 SF.hookAdd("CalcView", nil, canCalcview, returnCalcview)
 SF.hookAdd("SetupWorldFog", nil, canRenderHudSafeArgs, function() return true end)
 SF.hookAdd("SetupSkyboxFog", nil, canRenderHudSafeArgs, function() return true end)
+
+hook.Add("ShouldDrawLocalPlayer", "SF_DrawLocalPlayerInRenderView", function()
+	if renderingView and drawViewerInView then
+		cam.Start3D()
+		cam.End3D()
+		return true
+	end
+end)
+-- A fix for render view being rendered improperly when using a clipping plane.
+-- PreDrawHalos is used, because PreDrawHUD isn't always called. This results in halos not being affected by clipping planes.
+hook.Add("PreDrawHalos", "SF_DisableRenderViewClipping", function()
+	if renderingView then
+		render.EnableClipping(false)
+	end
+end)
 
 --- Render library. Screens are 512x512 units. Most functions require
 -- that you be in the rendering hook to call, otherwise an error is
@@ -1835,22 +1851,6 @@ function render_library.renderView(tbl)
 	renderdata.isRendering = true
 end
 
-hook.Add("ShouldDrawLocalPlayer", "SF_DrawLocalPlayerInRenderView", function()
-	if renderingView and drawViewerInView then
-		cam.Start3D()
-		cam.End3D()
-		return true
-	end
-end)
-
--- A fix for render view being rendered improperly when using a clipping plane.
--- PreDrawHalos is used, because PreDrawHUD isn't always called. This results in halos not being affected by clipping planes.
-hook.Add("PreDrawHalos", "SF_DisableRenderViewClipping", function()
-	if renderingView then
-		render.EnableClipping(false)
-	end
-end)
-
 --- Returns whether render.renderView is being executed.
 function render_library.isInRenderView()
 	return renderingView
@@ -2000,6 +2000,7 @@ function render_library.setFogHeight(height)
 	render.SetFogZ(height)
 end
 
+
 --- Checks whether the hardware supports HDR
 -- @return True if supported
 render_library.supportsHDR = render.SupportsHDR
@@ -2007,6 +2008,18 @@ render_library.supportsHDR = render.SupportsHDR
 --- Checks whether HDR is enabled. Hardware support, map and client settings are all taken into account
 -- @return True if available
 render_library.getHDREnabled = render.GetHDREnabled
+
+--- Sets the overlay of the chip to a user's rendertarget
+-- @param name The name of the RT to use or nil to set it back to normal
+function render_library.setChipOverlay(name)
+    local rt
+    if name~=nil then
+        checkluatype(name, TYPE_STRING)
+        rt = renderdata.rendertargets[name]
+        if not rt then SF.Throw("Invalid Rendertarget", 2) end
+    end
+    instance.data.entity:SetCustomOverlay(rt)
+end
 
 end
 
