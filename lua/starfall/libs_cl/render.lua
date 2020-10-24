@@ -1054,9 +1054,10 @@ end
 -- @param y Top left corner y integer coordinate
 -- @param w Width
 -- @param h Height
-function render_library.drawRectOutline(x, y, w, h)
+-- @param thickness Optional inset border width
+function render_library.drawRectOutline(x, y, w, h, thickness)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	surface.DrawOutlinedRect(x, y, w, h)
+	surface.DrawOutlinedRect(x, y, w, h, thickness)
 end
 
 --- Draws a circle outline
@@ -1998,6 +1999,14 @@ function render_library.setFogHeight(height)
 	
 	render.SetFogZ(height)
 end
+
+--- Checks whether the hardware supports HDR
+-- @return True if supported
+render_library.supportsHDR = render.SupportsHDR
+
+--- Checks whether HDR is enabled. Hardware support, map and client settings are all taken into account
+-- @return True if available
+render_library.getHDREnabled = render.GetHDREnabled
 
 end
 
