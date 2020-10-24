@@ -552,7 +552,7 @@ else
 
 	function builtins_library.print(...)
 		if instance.player == LocalPlayer() then
-			chat.AddText(unpack(argsToChat(...)))
+			chat.AddText(unpack((argsToChat(...))))
 		end
 	end
 
