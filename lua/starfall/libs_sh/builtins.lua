@@ -562,7 +562,7 @@ else
 		if strlen > 52 then SF.Throw("The max printHud string size is 52 chars!", 2) end
 		for k, v in ipairs(data) do
 			if isstring(v) then
-				data[k] = string.gsub(v, "[\r\n\0\t]", "")
+				data[k] = string.gsub(v, "[\r\n%z\t]", "")
 			end
 		end
 		chat.AddText(unpack(data))
