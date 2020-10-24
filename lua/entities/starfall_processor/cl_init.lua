@@ -49,6 +49,39 @@ function ENT:GetOverlayText()
 	return "- Starfall Processor -\n[ " .. self.name .. " ]"..authorstr.."\nServer CPU: " .. serverstr .. "\nClient CPU: " .. clientstr
 end
 
+function ENT:Think()
+	local lookedAt = self:BeingLookedAtByLocalPlayer()
+	self.lookedAt = lookedAt
+
+	if lookedAt then
+		if not self.CustomOverlay then
+			AddWorldTip( self:EntIndex(), self:GetOverlayText(), 0.5, self:GetPos(), self )
+		end
+		halo.Add( { self }, color_white, 1, 1, 1, true, true )
+	end
+end
+
+function ENT:SetCustomOverlay(rt)
+	self.CustomOverlay = rt
+
+	if rt then
+		hook.Add("HUDPaint", self, self.DrawCustomOverlay)
+	else
+		hook.Remove("HUDPaint", self)
+	end
+end
+
+function ENT:DrawCustomOverlay()
+	if self.lookedAt then
+		local pos = self:GetPos():ToScreen()
+
+		SF.RT_Material:SetTexture("$basetexture", self.CustomOverlay)
+		render.SetMaterial( SF.RT_Material )
+		render.DrawQuad( Vector(pos.x-128,pos.y-300,0), Vector(pos.x+128,pos.y-300,0), Vector(pos.x+128,pos.y-44,0), Vector(pos.x-128,pos.y-44,0) )
+	end
+end
+
+
 if WireLib then
 	function ENT:DrawTranslucent()
 		self:DrawModel()
