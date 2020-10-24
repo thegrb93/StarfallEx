@@ -18,6 +18,7 @@ function ENT:Initialize()
 	net.SendToServer()
 
 	local info = self.Monitor_Offsets[self:GetModel()]
+	print(info)
 	if not info then
 		local mins = self:OBBMins()
 		local maxs = self:OBBMaxs()
@@ -36,6 +37,11 @@ function ENT:Initialize()
 			}
 	end
 
+	self.ScreenInfo = info
+	self:SetScreenMatrix(info)
+end
+
+function ENT:SetScreenMatrix(info)
 	local rotation, translation, translation2, scale = Matrix(), Matrix(), Matrix(), Matrix()
 	rotation:SetAngles(info.rot)
 	translation:SetTranslation(info.offset)
@@ -43,7 +49,6 @@ function ENT:Initialize()
 	scale:SetScale(Vector(info.RS, info.RS, info.RS))
 
 	self.ScreenMatrix = translation * rotation * scale * translation2
-	self.ScreenInfo = info
 	self.Aspect = info.RatioX
 	self.Scale = info.RS
 	self.Origin = info.offset
@@ -446,3 +451,18 @@ ENT.Monitor_Offsets = {
 		z	=	192,
 	}
 }
+
+SF.CustomScreenInfo = {
+	Name	=	"Custom Screen",
+	RS	=	2,
+	RatioX	=	1,
+	offset	=	Vector(0, 0, 10),
+	rot	=	Angle(0, 90, 180),
+	x1	=	-512,
+	x2	=	512,
+	y1	=	-512,
+	y2	=	512,
+	z	=	0,
+}
+
+ENT.Monitor_Offsets["models/maxofs2d/button_02.mdl"] = SF.CustomScreenInfo

@@ -1996,7 +1996,7 @@ function render_library.setFogHeight(height)
 	checkpermission(instance, nil, "render.fog")
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype(height, TYPE_NUMBER)
-	
+
 	render.SetFogZ(height)
 end
 
@@ -2012,13 +2012,38 @@ render_library.getHDREnabled = render.GetHDREnabled
 --- Sets the overlay of the chip to a user's rendertarget
 -- @param name The name of the RT to use or nil to set it back to normal
 function render_library.setChipOverlay(name)
-    local rt
-    if name~=nil then
-        checkluatype(name, TYPE_STRING)
-        rt = renderdata.rendertargets[name]
-        if not rt then SF.Throw("Invalid Rendertarget", 2) end
-    end
-    instance.data.entity:SetCustomOverlay(rt)
+	local rt
+	if name~=nil then
+		checkluatype(name, TYPE_STRING)
+		rt = renderdata.rendertargets[name]
+		if not rt then SF.Throw("Invalid Rendertarget", 2) end
+	end
+	instance.data.entity:SetCustomOverlay(rt)
+end
+
+--- Using the custom screen model, sets the screen offset and size as long as its within bounds of -1024 to 1024 units
+-- @param x number The x offset of the screen
+-- @param y number The y offset of the screen
+-- @param w number The width of the screen
+-- @param h number The height of the screen
+function render_library.setScreenDimensions(screen, x, y, w, h)
+	checkluatype(x, TYPE_NUMBER)
+	checkluatype(y, TYPE_NUMBER)
+	checkluatype(w, TYPE_NUMBER)
+	checkluatype(h, TYPE_NUMBER)
+	local halfw, halfh = w/2, h/2
+	if x-halfw<-1024 or y-halfh<-1024 or w<1 or h<1 or x+halfw>1024 or y+halfh>1024 then SF.Throw("The specified dimensions exceeds the bounds!", 2) end
+	screen = getent(screen)
+	local custominfo = SF.CustomScreenInfo
+	if screen.ScreenInfo.Name ~= custominfo.Name then SF.Throw("Expected a custom screen. Make sure the selected screen is the 'custom screen' model!", 2) end
+
+	screen:SetScreenMatrix{
+		RS = w/1024,
+		RatioX = h/w,
+		offset = custominfo.offset + Vector(y, x, 0),
+		rot = custominfo.rot,
+	}
+	screen:SetRenderBounds(Vector(-1024, -1024, -10), Vector(1024, 1024, 10))
 end
 
 end

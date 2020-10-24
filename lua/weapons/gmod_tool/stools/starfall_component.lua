@@ -294,7 +294,7 @@ if CLIENT then
 			icon:SetModel(model)
 			icon.Model = model
 			icon:SetSize(64, 64)
-			icon:SetTooltip(model)
+			icon:SetTooltip(v.Name)
 			modelPanel:AddPanel(icon, { ["starfall_component_Model"] = model })
 		end
 		modelPanel:SortByMember("Model", false)
