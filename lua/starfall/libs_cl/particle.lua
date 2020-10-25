@@ -52,12 +52,14 @@ instance:AddHook("deinitialize", function()
 end)
 
 --- Creates a ParticleEmitter data structure
--- @param position The particle emitter's position
+-- @param position vector The particle emitter's position
+-- @param use3D boolean Create the emitter in 3D mode
 -- @return ParticleEmitter Object
-function particle_library.create(position)
+function particle_library.create(position, use3D)
+	checkluatype(use3D, TYPE_BOOL)
 	checkpermission(instance, nil, "particle.create")
 	plyEmitterCount:use(instance.player, 1)
-	local emitter = ParticleEmitter(vunwrap(position), false)
+	local emitter = ParticleEmitter(vunwrap(position), use3D)
 	instance.data.particle.emitters[emitter] = true
 	return pewrap(emitter)
 end
