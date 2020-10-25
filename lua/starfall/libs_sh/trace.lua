@@ -167,6 +167,13 @@ function trace_library.decal(name, start, endpos, filter)
 	util.Decal( name, start, endpos, filter )
 end
 
+--- Returns the contents of the position specified.
+-- @param position The position to get the CONTENTs of
+-- @return Contents bitflag, see trace.CONTENTS_*
+function trace_library.pointContents(position)
+	return util.PointContents(vunwrap(position))
+end
+
 
 -- Material Enumeration
 -- @name trace.MAT
