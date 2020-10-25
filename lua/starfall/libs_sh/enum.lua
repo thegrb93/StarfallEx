@@ -555,9 +555,8 @@ env.COLLISION_GROUP = {
 	["WORLD"] = COLLISION_GROUP_WORLD
 }
 
---- ENUMs of mesh types. To be used with mesh.generate. Clientside only.
+--- ENUMs of mesh types. To be used with mesh.generate.
 -- @name builtins_library.MATERIAL
--- @client
 -- @class table
 -- @field MATERIAL_LINES
 -- @field MATERIAL_LINE_LOOP
@@ -578,9 +577,8 @@ env.MATERIAL = {
 	["TRIANGLE_STRIP"] = MATERIAL_TRIANGLE_STRIP
 }
 
---- ENUMs of fog modes to use with render.setFogMode. Clientside only.
+--- ENUMs of fog modes to use with render.setFogMode.
 -- @name builtins_library.MATERIAL_FOG
--- @client
 -- @class table
 -- @field NONE
 -- @field LINEAR
