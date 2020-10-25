@@ -509,6 +509,7 @@ env.GESTURE_SLOT = {
 
 --- ENUMs of collision groups for use with entity:setCollisionGroup
 -- @name builtins_library.COLLISION_GROUP
+-- @class table
 -- @field NONE
 -- @field DEBRIS
 -- @field DEBRIS_TRIGGER
@@ -554,8 +555,9 @@ env.COLLISION_GROUP = {
 	["WORLD"] = COLLISION_GROUP_WORLD
 }
 
---- ENUMs of mesh types. To be used with mesh.generate
+--- ENUMs of mesh types. To be used with mesh.generate.
 -- @name builtins_library.MATERIAL
+-- @class table
 -- @field MATERIAL_LINES
 -- @field MATERIAL_LINE_LOOP
 -- @field MATERIAL_LINE_STRIP
@@ -575,8 +577,9 @@ env.MATERIAL = {
 	["TRIANGLE_STRIP"] = MATERIAL_TRIANGLE_STRIP
 }
 
---- ENUMs of fog modes to use with render.setFogMode
+--- ENUMs of fog modes to use with render.setFogMode.
 -- @name builtins_library.MATERIAL_FOG
+-- @class table
 -- @field NONE
 -- @field LINEAR
 -- @field LINEAR_BELOW_FOG_Z
@@ -584,6 +587,124 @@ env.MATERIAL_FOG = {
 	["NONE"] = MATERIAL_FOG_NONE,
 	["LINEAR"] = MATERIAL_FOG_LINEAR,
 	["LINEAR_BELOW_FOG_Z"] = MATERIAL_FOG_LINEAR_BELOW_FOG_Z,
+}
+
+--- ENUMs used as trace masks in the trace library. These are simply combinations of the CONTENTS enums.
+-- @name builtins_library.MASK
+-- @class table
+-- @field OPAQUE_AND_NPCS
+-- @field SOLID
+-- @field OPAQUE
+-- @field PLAYERSOLID_BRUSHONLY
+-- @field BLOCKLOS
+-- @field SHOT_HULL
+-- @field ALL
+-- @field VISIBLE
+-- @field NPCWORLDSTATIC
+-- @field DEADSOLID
+-- @field SPLITAREAPORTAL
+-- @field CURRENT
+-- @field BLOCKLOS_AND_NPCS
+-- @field SHOT
+-- @field NPCSOLID
+-- @field SOLID_BRUSHONLY
+-- @field VISIBLE_AND_NPCS
+-- @field NPCSOLID_BRUSHONLY
+-- @field SHOT_PORTAL
+-- @field WATER
+-- @field PLAYERSOLID
+env.MASK = {
+	["OPAQUE_AND_NPCS"] = MASK_OPAQUE_AND_NPCS,
+	["SOLID"] = MASK_SOLID,
+	["OPAQUE"] = MASK_OPAQUE,
+	["PLAYERSOLID_BRUSHONLY"] = MASK_PLAYERSOLID_BRUSHONLY,
+	["BLOCKLOS"] = MASK_BLOCKLOS,
+	["SHOT_HULL"] = MASK_SHOT_HULL,
+	["ALL"] = MASK_ALL,
+	["VISIBLE"] = MASK_VISIBLE,
+	["NPCWORLDSTATIC"] = MASK_NPCWORLDSTATIC,
+	["DEADSOLID"] = MASK_DEADSOLID,
+	["SPLITAREAPORTAL"] = MASK_SPLITAREAPORTAL,
+	["CURRENT"] = MASK_CURRENT,
+	["BLOCKLOS_AND_NPCS"] = MASK_BLOCKLOS_AND_NPCS,
+	["SHOT"] = MASK_SHOT,
+	["NPCSOLID"] = MASK_NPCSOLID,
+	["SOLID_BRUSHONLY"] = MASK_SOLID_BRUSHONLY,
+	["VISIBLE_AND_NPCS"] = MASK_VISIBLE_AND_NPCS,
+	["NPCSOLID_BRUSHONLY"] = MASK_NPCSOLID_BRUSHONLY,
+	["SHOT_PORTAL"] = MASK_SHOT_PORTAL,
+	["WATER"] = MASK_WATER,
+	["PLAYERSOLID"] = MASK_PLAYERSOLID	
+}
+
+--- ENUMs used as masks in the trace library.
+-- @name builtins_library.CONTENTS
+-- @class table
+-- @field CURRENT_270
+-- @field DETAIL
+-- @field IGNORE_NODRAW_OPAQUE
+-- @field BLOCKLOS
+-- @field GRATE
+-- @field CURRENT_0
+-- @field AREAPORTAL
+-- @field DEBRIS
+-- @field MONSTERCLIP
+-- @field SLIME
+-- @field WINDOW
+-- @field LADDER
+-- @field CURRENT_180
+-- @field TRANSLUCENT
+-- @field EMPTY
+-- @field TEAM2
+-- @field CURRENT_UP
+-- @field TESTFOGVOLUME
+-- @field TEAM1
+-- @field AUX
+-- @field CURRENT_DOWN
+-- @field ORIGIN
+-- @field TEAM3
+-- @field MOVEABLE
+-- @field PLAYERCLIP
+-- @field SOLID
+-- @field TEAM4
+-- @field MONSTER
+-- @field HITBOX
+-- @field CURRENT_90
+-- @field OPAQUE
+-- @field WATER
+env.CONTENTS = {
+	["CURRENT_270"] = CONTENTS_CURRENT_270,
+	["DETAIL"] = CONTENTS_DETAIL,
+	["IGNORE_NODRAW_OPAQUE"] = CONTENTS_IGNORE_NODRAW_OPAQUE,
+	["BLOCKLOS"] = CONTENTS_BLOCKLOS,
+	["GRATE"] = CONTENTS_GRATE,
+	["CURRENT_0"] = CONTENTS_CURRENT_0,
+	["AREAPORTAL"] = CONTENTS_AREAPORTAL,
+	["DEBRIS"] = CONTENTS_DEBRIS,
+	["MONSTERCLIP"] = CONTENTS_MONSTERCLIP,
+	["SLIME"] = CONTENTS_SLIME,
+	["WINDOW"] = CONTENTS_WINDOW,
+	["LADDER"] = CONTENTS_LADDER,
+	["CURRENT_180"] = CONTENTS_CURRENT_180,
+	["TRANSLUCENT"] = CONTENTS_TRANSLUCENT,
+	["EMPTY"] = CONTENTS_EMPTY,
+	["TEAM2"] = CONTENTS_TEAM2,
+	["CURRENT_UP"] = CONTENTS_CURRENT_UP,
+	["TESTFOGVOLUME"] = CONTENTS_TESTFOGVOLUME,
+	["TEAM1"] = CONTENTS_TEAM1,
+	["AUX"] = CONTENTS_AUX,
+	["CURRENT_DOWN"] = CONTENTS_CURRENT_DOWN,
+	["ORIGIN"] = CONTENTS_ORIGIN,
+	["TEAM3"] = CONTENTS_TEAM3,
+	["MOVEABLE"] = CONTENTS_MOVEABLE,
+	["PLAYERCLIP"] = CONTENTS_PLAYERCLIP,
+	["SOLID"] = CONTENTS_SOLID,
+	["TEAM4"] = CONTENTS_TEAM4,
+	["MONSTER"] = CONTENTS_MONSTER,
+	["HITBOX"] = CONTENTS_HITBOX,
+	["CURRENT_90"] = CONTENTS_CURRENT_90,
+	["OPAQUE"] = CONTENTS_OPAQUE,
+	["WATER"] = CONTENTS_WATER	
 }
 
 end
