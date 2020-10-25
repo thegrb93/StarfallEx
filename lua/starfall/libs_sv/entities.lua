@@ -25,6 +25,7 @@ registerprivilege("entities.setDamping", "Set Damping", "Allows the user to chan
 registerprivilege("entities.remove", "Remove", "Allows the user to remove entities", { entities = {} })
 registerprivilege("entities.ignite", "Ignite", "Allows the user to ignite entities", { entities = {} })
 registerprivilege("entities.canTool", "CanTool", "Whether or not the user can use the toolgun on the entity", { entities = {} })
+registerprivilege("entities.use", "Use", "Whether or not the user can use the entity", { entities = {} })
 
 local function checkvector(v)
 	if v[1]<-1e12 or v[1]>1e12 or v[1]~=v[1] or
@@ -446,6 +447,17 @@ function ents_methods:extinguish()
 	checkpermission(instance, ent, "entities.ignite")
 
 	ent:Extinguish()
+end
+
+--- Simulate a Use action on the entity by the chip owner
+-- @param usetype The USE_ enum use type. (Default: USE_ON)
+-- @param value The use value (Default: 0)
+function ents_methods:use(usetype, value)
+    local ent = getent(self)
+    checkpermission(instance, ent, "entities.use")
+    if usetype~=nil then checkluatype(usetype, TYPE_NUMBER) end
+    if value~=nil then checkluatype(value, TYPE_NUMBER) end
+    ent:Use(instance.player, instance.data.entity, usetype, value)
 end
 
 --- Sets the entity frozen state
