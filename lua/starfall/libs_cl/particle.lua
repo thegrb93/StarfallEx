@@ -130,7 +130,7 @@ end
 
 --- Returns number of particles left able to be created from the emitter
 -- @return number
-function particle_library.particlesLeft()
+function particleem_methods:getParticlesLeft()
 	return cv_particle_count:GetInt() - peunwrap(self):GetNumActiveParticles()
 end
 
