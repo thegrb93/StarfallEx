@@ -6,6 +6,7 @@ ENT.RenderGroup = RENDERGROUP_BOTH
 
 function ENT:Initialize()
 	self.name = "Generic ( No-Name )"
+	self.OverlayFade = 0
 end
 
 function ENT:OnRemove()
@@ -73,11 +74,16 @@ end
 
 function ENT:DrawCustomOverlay()
 	if self.lookedAt then
+		self.OverlayFade = math.min(self.OverlayFade + FrameTime()*2, 1)
+	else
+		self.OverlayFade = math.max(self.OverlayFade - FrameTime()*2, 0)
+	end
+	if self.OverlayFade > 0 then
 		local pos = self:GetPos():ToScreen()
 
 		SF.RT_Material:SetTexture("$basetexture", self.CustomOverlay)
 		render.SetMaterial( SF.RT_Material )
-		render.DrawQuad( Vector(pos.x-128,pos.y-300,0), Vector(pos.x+128,pos.y-300,0), Vector(pos.x+128,pos.y-44,0), Vector(pos.x-128,pos.y-44,0) )
+		render.DrawQuad( Vector(pos.x-128,pos.y-300,0), Vector(pos.x+128,pos.y-300,0), Vector(pos.x+128,pos.y-44,0), Vector(pos.x-128,pos.y-44,0), Color(255,255,255,self.OverlayFade*255) )
 	end
 end
 
