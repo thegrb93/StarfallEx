@@ -480,6 +480,17 @@ if SERVER then
 	function player_methods:lastHitGroup()
 		return getply(self):LastHitGroup()
 	end
+
+	--- Sets a player's eye angles
+	-- @param ang New angles
+	function player_methods:setEyeAngles(ang)
+		local ent = getent(self)
+		local ang = aunwrap(ang)
+
+		checkpermission(instance, ent, "entities.setEyeAngles")
+
+		ent:SetEyeAngles(ang)
+	end
 end
 
 --- Returns whether or not the player is pushing the key.
