@@ -19,6 +19,21 @@ env.NOTIFY = {
 	["CLEANUP"] = NOTIFY_CLEANUP
 }
 
+--- Align enum for drawing text
+-- @name builtins_library.TEXT_ALIGN
+-- @class table
+-- @field LEFT Align the text on the left
+-- @field CENTER Align the text in center
+-- @field RIGHT Align the text on the right
+-- @field TOP Align the text on the top
+-- @field BOTTOM Align the text on the bottom
+env.TEXT_ALIGN = {
+	["LEFT"] = TEXT_ALIGN_LEFT,
+	["CENTER"] = TEXT_ALIGN_CENTER,
+	["RIGHT"] = TEXT_ALIGN_RIGHT,
+	["TOP"] = TEXT_ALIGN_TOP,
+	["BOTTOM"] = TEXT_ALIGN_BOTTOM
+}
 
 --- ENUMs of keyboard keys for use with input library
 -- @name builtins_library.KEY

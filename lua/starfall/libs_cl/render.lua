@@ -21,6 +21,7 @@ registerprivilege("render.fog", "Render Fog", "Allows the user to control fog", 
 local cv_max_rendertargets = CreateConVar("sf_render_maxrendertargets", "20", { FCVAR_ARCHIVE })
 local cv_max_maxrenderviewsperframe = CreateConVar("sf_render_maxrenderviewsperframe", "2", { FCVAR_ARCHIVE })
 
+
 hook.Add("PreRender", "SF_PreRender_ResetRenderedViews", function()
 	for instance, _ in pairs(SF.allInstances) do
 		instance.data.render.renderedViews = 0
@@ -247,6 +248,13 @@ end)
 SF.RegisterLibrary("render")
 
 
+--- The Markup type is used to easily format and draw text. Use render.parseMarkup(str, maxwidth) to create one.
+-- @name Markup
+-- @class type
+-- @libtbl markup_methods
+SF.RegisterType("Markup", true, false)
+
+
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
@@ -262,6 +270,7 @@ local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 local matrix_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
+local markup_methods, markwrap, markunwrap = instance.Types.Markup.Methods, instance.Types.Markup.Wrap, instance.Types.Markup.Unwrap
 local mtlunwrap = instance.Types.LockedMaterial.Unwrap
 
 
@@ -1374,39 +1383,48 @@ end
 
 --- Constructs a markup object for quick styled text drawing.
 -- @param str The markup string to parse
--- @param maxsize The max width of the markup
+-- @param maxsize The max width of the markup (default nil)
 -- @return The markup object. See https://wiki.facepunch.com/gmod/markup.Parse
 function render_library.parseMarkup(str, maxsize)
 	checkluatype (str, TYPE_STRING)
-	checkluatype (maxsize, TYPE_NUMBER)
+	if maxsize~=nil then checkluatype (maxsize, TYPE_NUMBER) end
 
-	local marked = markup.Parse(str, maxsize)
+	return markwrap(markup.Parse(str, maxsize))
+end
 
-	for i, block in ipairs(marked.blocks) do
-		local color = block.colour
+--- Draw the markup object
+-- @param x number The x offset
+-- @param y number The x offset
+-- @param xalign number The x TEXT_ALIGN (default TEXT_ALIGN.LEFT)
+-- @param yalign number The y TEXT_ALIGN (default TEXT_ALIGN.TOP)
+-- @param a number The alpha to draw it with. (default 255)
+function markup_methods:draw(x, y, xalign, yalign, a)
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	checkluatype(x, TYPE_NUMBER)
+	checkluatype(y, TYPE_NUMBER)
+	if xalign~=nil then checkluatype(xalign, TYPE_NUMBER) end
+	if yalign~=nil then checkluatype(yalign, TYPE_NUMBER) end
+	if a~=nil then checkluatype(a, TYPE_NUMBER) end
+	markunwrap(self):Draw(x, y, xalign, yalign, a)
+end
 
-		if getmetatable(color) then
-			block.colour = {
-				r = color.r,
-				g = color.g,
-				b = color.b,
-				a = color.a
-			}
-		end
-	end
+--- Get the object width
+-- @return number The width of the object
+function markup_methods:getWidth()
+	markunwrap(self):GetWidth()
+end
 
-	local index = {
-		draw = marked.Draw,
-		getWidth = marked.GetWidth,
-		getHeight = marked.GetHeight,
-		getSize = marked.Size
-	}
+--- Get the object height
+-- @return number The height of the object
+function markup_methods:getHeight()
+	markunwrap(self):GetHeight()
+end
 
-	return setmetatable(marked, {
-		__newindex = function() end,
-		__index = index,
-		__metatable = ""
-	})
+--- Get the object size
+-- @return number The width of the object
+-- @return number The height of the object
+function markup_methods:getSize()
+	markunwrap(self):Size()
 end
 
 --- Draws a polygon.
