@@ -80,7 +80,7 @@ end)
 add("EntityRemoved")
 add("PropBreak")
 add("EntityFireBullets", nil, function(instance, ent, data)
-	return true, { instance.WrapObject(ent), SF.StructWrapper(instance, data) }
+	return true, { instance.WrapObject(ent), SF.StructWrapper(instance, data, "Bullet") }
 end)
 
 -- Other

@@ -315,7 +315,7 @@ local function addCollisions(func)
 		if next(entity_collisions)==nil then
 			timer.Simple(0, function()
 				for i=1, #entity_collisions do
-					instance:runFunction(func, SF.StructWrapper(instance, entity_collisions[i]))
+					instance:runFunction(func, SF.StructWrapper(instance, entity_collisions[i], "CollisionData"))
 					entity_collisions[i] = nil
 				end
 			end)

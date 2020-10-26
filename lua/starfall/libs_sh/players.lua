@@ -359,7 +359,7 @@ end
 function player_methods:getEyeTrace()
 	checkpermission(instance, nil, "trace")
 
-	return SF.StructWrapper(instance, getply(self):GetEyeTrace())
+	return SF.StructWrapper(instance, getply(self):GetEyeTrace(), "TraceResult")
 end
 
 --- Returns the player's current view entity

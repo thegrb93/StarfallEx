@@ -81,7 +81,7 @@ function trace_library.trace(start, endpos, filter, mask, colgroup, ignworld)
 		ignoreworld = ignworld,
 	}
 
-	return SF.StructWrapper(instance, util.TraceLine(trace))
+	return SF.StructWrapper(instance, util.TraceLine(trace), "TraceResult")
 end
 
 --- Does a swept-AABB trace
@@ -119,7 +119,7 @@ function trace_library.traceHull(start, endpos, minbox, maxbox, filter, mask, co
 		maxs = maxbox
 	}
 
-	return SF.StructWrapper(instance, util.TraceHull(trace))
+	return SF.StructWrapper(instance, util.TraceHull(trace), "TraceResult")
 end
 
 --- Does a ray box intersection returning the position hit, normal, and trace fraction, or nil if not hit.

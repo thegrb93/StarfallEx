@@ -121,7 +121,7 @@ end
 
 --- Returns a class that wraps a structure and caches indexes
 SF.StructWrapper = {
-	__call = function(p, instance, data)
+	__call = function(p, instance, data, name)
 		local cache = {}
 		return setmetatable({}, {
 			__index = function(t, k)
@@ -136,8 +136,8 @@ SF.StructWrapper = {
 			__newindex = function(t, k, v)
 				cache[k] = v
 			end,
-			__metatable = "StructWrapper",
-			__tostring = function() return "StructWrapper" end,
+			__metatable = name,
+			__tostring = function() return name end,
 		})
 	end
 }
