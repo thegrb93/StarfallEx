@@ -414,7 +414,21 @@ function hologram_methods:setScale(scale)
 
 	holo:SetScale(scale)
 end
+
+--- Sets the hologram size in game units
+-- @shared
+-- @param size Vector new size in game units
+function hologram_methods:setSize(size)
+	local holo = getholo(self)
+	local size = vunwrap(size)
 	
+	checkpermission(instance, holo, "hologram.setRenderProperty")
+	
+	local bounds = holo:OBBMaxs() - holo:OBBMins()
+	local scale = Vector(size[1] / bounds[1], size[2] / bounds[2], size[3] / bounds[3])
+	holo:SetScale(scale)
+end
+
 --- Gets the hologram scale.
 -- @shared
 -- @return Vector scale
