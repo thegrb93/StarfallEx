@@ -186,9 +186,9 @@ function hook_library.runRemote(recipient, ...)
 	for k, _ in pairs(recipients) do
 		local result
 		if k==instance then
-			result = { true, hookrun("remote", ewrap(instance.data.entity), pwrap(instance.player), ...) }
+			result = { true, hookrun("remote", ewrap(instance.entity), pwrap(instance.player), ...) }
 		else
-			result = k:runScriptHookForResult("remote", k.Types.Entity.Wrap(instance.data.entity), k.Types.Player.Wrap(instance.player), unpack(k.Sanitize(unsanitized), 1, argn))
+			result = k:runScriptHookForResult("remote", k.Types.Entity.Wrap(instance.entity), k.Types.Player.Wrap(instance.player), unpack(k.Sanitize(unsanitized), 1, argn))
 		end
 
 		if result[1] and result[2]~=nil then

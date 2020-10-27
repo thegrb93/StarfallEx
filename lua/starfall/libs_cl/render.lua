@@ -595,7 +595,7 @@ end
 function render_library.setBackgroundColor(col, screen)
 	if screen then
 		screen = getent(screen)
-		if screen.link ~= instance.data.entity then
+		if screen.link ~= instance.entity then
 			SF.Throw("Entity has to be linked!", 2)
 		end
 	else
@@ -2036,7 +2036,7 @@ function render_library.setChipOverlay(name)
 		rt = renderdata.rendertargets[name]
 		if not rt then SF.Throw("Invalid Rendertarget", 2) end
 	end
-	instance.data.entity:SetCustomOverlay(rt)
+	instance.entity:SetCustomOverlay(rt)
 end
 
 --- Using the custom screen model, sets the screen offset and size as long as its within bounds of -1024 to 1024 units

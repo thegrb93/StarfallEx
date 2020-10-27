@@ -43,7 +43,7 @@ end)
 --- Returns the entity representing a processor that this script is running on.
 -- @return Starfall entity
 function builtins_library.chip()
-	return ewrap(instance.data.entity)
+	return ewrap(instance.entity)
 end
 
 --- Returns whoever created the chip
@@ -510,14 +510,14 @@ if SERVER then
 		if #str>max then
 			SF.Throw("The userdata limit is " .. string.Comma(max) .. " bytes", 2)
 		end
-		instance.data.entity.starfalluserdata = str
+		instance.entity.starfalluserdata = str
 	end
 
 	--- Gets the chip's userdata that the duplicator tool loads
 	-- @server
 	-- @return String data
 	function builtins_library.getUserdata()
-		return instance.data.entity.starfalluserdata or ""
+		return instance.entity.starfalluserdata or ""
 	end
 else
 	--- Sets the chip's display name
@@ -525,7 +525,7 @@ else
 	-- @param name Name
 	function builtins_library.setName(name)
 		checkluatype(name, TYPE_STRING)
-		local e = instance.data.entity
+		local e = instance.entity
 		if (e and e:IsValid()) then
 			e.name = string.sub(name, 1, 256)
 		end
