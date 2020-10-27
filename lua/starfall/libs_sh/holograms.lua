@@ -415,7 +415,7 @@ function hologram_methods:setScale(scale)
 	holo:SetScale(scale)
 end
 
---- Sets the hologram size based on its bounding box
+--- Sets the hologram size in game units
 -- @shared
 -- @param size Vector new size in game units
 function hologram_methods:setSize(size)
