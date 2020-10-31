@@ -4,6 +4,8 @@
 SF.Modules = {}
 SF.Types = {}
 SF.Libraries = {}
+SF.BlockedUsers = {}
+SF.ResourceCounters = {}
 SF.Superuser = {IsValid = function() return false end}
 local dgetmeta = debug.getmetatable
 
@@ -85,6 +87,36 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 		end
 	end
 end)
+
+do
+	local f = file.Open("sf_blockedusers.txt","r","DATA")
+	if f then
+		while not f:EndOfFile() do
+			SF.BlockedUsers[f:ReadLine()] = true
+		end
+		f:Close()
+	end
+end
+
+function SF.BlockUser(ply)
+	local id = ply:SteamID()
+	if SF.BlockedUsers[id] then return end
+	SF.BlockedUsers[id] = true
+	local f = file.Open("sf_blockedusers.txt","a","DATA")
+	f:Write(id.."\n")
+	f:Close()
+end
+
+function SF.UnblockUser(ply)
+	local id = ply:SteamID()
+	if not SF.BlockedUsers[id] then return end
+	SF.BlockedUsers[id] = nil
+	local f = file.Open("sf_blockedusers.txt","w","DATA")
+	for id, v in pairs(SF.BlockedUsers) do
+		f:Write(id.."\n")
+	end
+	f:Close()
+end
 
 
 -------------------------------------------------------------------------------

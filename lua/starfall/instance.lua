@@ -36,14 +36,15 @@ SF.playerInstances = {}
 -- @param data The table to set instance.data to. Default is a new table.
 -- @return True if no errors, false if errors occured.
 -- @return The compiled instance, or the error message.
-function SF.Instance.Compile(code, mainfile, player, data)
+function SF.Instance.Compile(code, mainfile, player, entity)
 	if isstring(code) then
 		mainfile = mainfile or "generic"
 		code = { [mainfile] = code }
 	end
 
 	local instance = setmetatable({}, SF.Instance)
-	instance.data = data or {}
+	instance.entity = entity
+	instance.data = {}
 	instance.stackn = 0
 	instance.hooks = {}
 	instance.scripts = {}
@@ -77,6 +78,10 @@ function SF.Instance.Compile(code, mainfile, player, data)
 				quotaRun = SF.Instance.runWithoutOps
 			end
 		else
+			if SF.BlockedUsers[player:SteamID()] then
+				return false, { message = "User has blocked this player's starfalls", traceback = "" }
+			end
+
 			if SF.softLockProtection:GetBool() then
 				quotaRun = SF.Instance.runWithOps
 			elseif SF.softLockProtectionOwner:GetBool() and LocalPlayer() ~= player then
@@ -681,7 +686,7 @@ end)
 if SERVER then
 	function SF.Instance:isHUDActive(ply)
 		for hud, tbl in pairs(SF.ActiveHuds) do
-			if hud.link == self.data.entity and tbl[ply] then
+			if hud.link == self.entity and tbl[ply] then
 				return true
 			end
 		end
@@ -694,7 +699,7 @@ else
 		if self.hudoverride ~= nil then return self.hudoverride end
 		local foundlink
 		for hud, _ in pairs(SF.ActiveHuds) do
-			if hud.link == self.data.entity then
+			if hud.link == self.entity then
 				return true
 			end
 		end

@@ -7,6 +7,8 @@ SF.Permissions.registerPrivilege("effect.play", "Effect", "Allows the user to pl
 
 local plyEffectBurst = SF.BurstObject("effects", "effects", 60, 5, "Rate effects can be spawned per second.", "Number of effects that can be spawned in a short time.")
 
+SF.ResourceCounters.Effects = {icon = "icon16/bullet_star.png", count = function(ply) return plyEffectBurst.max-plyEffectBurst:check(ply) end}
+
 local effect_blacklist = {
 	dof_node = true
 }

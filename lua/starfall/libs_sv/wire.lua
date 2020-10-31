@@ -34,7 +34,7 @@ local getent
 instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
 
-	local ent = instance.data.entity
+	local ent = instance.entity
 	instance.data.wirecache = {}
 	instance.data.wirecachevals = {}
 	if ent.Inputs == nil then
@@ -249,7 +249,7 @@ function wire_library.adjustInputs(names, types)
 	checkpermission(instance, nil, "wire.setInputs")
 	checkluatype(names, TYPE_TABLE)
 	checkluatype(types, TYPE_TABLE)
-	local ent = instance.data.entity
+	local ent = instance.entity
 	if not ent then SF.Throw("No entity to create inputs on", 2) end
 
 	if #names ~= #types then SF.Throw("Table lengths not equal", 2) end
@@ -277,7 +277,7 @@ function wire_library.adjustOutputs(names, types)
 	checkpermission(instance, nil, "wire.setOutputs")
 	checkluatype(names, TYPE_TABLE)
 	checkluatype(types, TYPE_TABLE)
-	local ent = instance.data.entity
+	local ent = instance.entity
 	if not ent then SF.Throw("No entity to create outputs on", 2) end
 
 	if #names ~= #types then SF.Throw("Table lengths not equal", 2) end
@@ -356,7 +356,7 @@ end
 
 --- Returns the wirelink representing this entity.
 function wire_library.self()
-	local ent = instance.data.entity
+	local ent = instance.entity
 	if not ent then SF.Throw("No entity", 2) end
 	return wlwrap(ent)
 end
@@ -442,7 +442,7 @@ local function parseEntity(ent, io)
 		ent = eunwrap(ent)
 		checkpermission(instance, ent, "wire.get" .. io)
 	else
-		ent = instance.data.entity or nil
+		ent = instance.entity or nil
 	end
 
 	if not (ent and ent:IsValid()) then SF.Throw("Invalid source") end
@@ -641,7 +641,7 @@ end
 wire_library.ports = setmetatable({}, {
 	__index = function(self, name)
 		local data = instance.data
-		local input = data.entity.Inputs[name]
+		local input = instance.entity.Inputs[name]
 		if input then
 			if data.wirecache[name]==input.Value then return data.wirecachevals[name] end
 			local ret = inputConverters[input.Type](input.Value)
@@ -654,7 +654,7 @@ wire_library.ports = setmetatable({}, {
 	__newindex = function(self, name, value)
 		checkluatype(name, TYPE_STRING)
 
-		local ent = instance.data.entity
+		local ent = instance.entity
 		local output = ent.Outputs[name]
 		if output then
 			Wire_TriggerOutput(ent, name, outputConverters[output.Type](value))

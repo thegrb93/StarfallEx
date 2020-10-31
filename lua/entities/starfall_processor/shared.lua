@@ -25,7 +25,7 @@ function ENT:Compile()
 	self.error = nil
 
 	if not (self.mainfile and self.files and self.files[self.mainfile]) then return end
-	local ok, instance = SF.Instance.Compile(self.files, self.mainfile, self.owner, { entity = self })
+	local ok, instance = SF.Instance.Compile(self.files, self.mainfile, self.owner, self)
 	if not ok then self:Error(instance) return end
 
 	if instance.ppdata.scriptnames and instance.mainfile and instance.ppdata.scriptnames[instance.mainfile] then

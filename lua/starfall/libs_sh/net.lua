@@ -116,7 +116,7 @@ function net_library.send(target, unreliable)
 	netBurst:use(instance.player, instance.data.net.size)
 
 	net.Start("SF_netmessage", unreliable)
-	net.WriteEntity(instance.data.entity)
+	net.WriteEntity(instance.entity)
 	local data = instance.data.net.data
 	for i = 1, #data do
 		local args = data[i][2]

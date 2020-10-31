@@ -1716,3 +1716,176 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
 end
 
 vgui.Register("StarfallEditorFrame", Editor, "DFrame")
+
+-- Starfall Users
+PANEL  = {}
+
+function PANEL:Block(ply)
+	SF.BlockUser(ply)
+	for k, v in pairs(ents.FindByClass("starfall_processor")) do 
+		if v.owner == ply then
+			v:Error({message = "Blocked by user", traceback = ""})
+		end
+	end
+end
+
+function PANEL:Unblock(ply)
+	SF.UnblockUser(ply)
+	for k, v in pairs(ents.FindByClass("starfall_processor")) do 
+		if v.owner == ply then
+			v:Compile()
+		end
+	end
+end
+
+function PANEL:UpdatePlayers(players)
+	local sortedplayers = {}
+	for ply in pairs(self.players) do
+		local plyname = ply:GetName()
+		sortedplayers[#sortedplayers+1] = {ply = ply, name = plyname, namel = string.lower(plyname)}
+	end
+	table.sort(sortedplayers, function(a,b) return a.namel<b.namel end)
+
+	self.scrollPanel:Clear()
+	for _, tbl in ipairs(sortedplayers) do
+		local ply = tbl.ply
+
+		local header = vgui.Create("StarfallPanel")
+		header:DockMargin(0, 5, 0, 0)
+		header:SetSize(0, 32)
+		header:Dock(TOP)
+		header:SetBackgroundColor(Color(0,0,0,20))
+		
+		local blocked = SF.BlockedUsers[ply:SteamID()]~=nil
+		local button = vgui.Create("StarfallButton", header)
+		button.active = blocked
+		button:SetText(blocked and "Unblock" or "Block")
+		button:DockMargin(0, 0, 3, 0)
+		button:Dock(LEFT)
+
+		button.DoClick = function()
+			if blocked then self:Unblock(ply) else self:Block(ply) end
+			blocked = not blocked
+			button:SetText(blocked and "Unblock" or "Block")
+		end
+		button:DockMargin(0, 0, 3, 0)
+		button:Dock(LEFT)
+
+		local avatar = vgui.Create("AvatarImage", header)
+		avatar:SetPlayer(ply)
+		avatar:SetSize(32, 32)
+		avatar:DockMargin(0, 0, 3, 0)
+		avatar:Dock(LEFT)
+
+		local nametext = vgui.Create("DLabel", header)
+		nametext:SetFont("DermaDefault")
+		nametext:SetColor(Color(255, 255, 255))
+		nametext:SetText(tbl.name)
+		nametext:DockMargin(5, 0, 5, 0)
+		nametext:Dock(LEFT)
+		nametext:SizeToContents()
+
+		local counters = {}
+		for k, v in pairs(SF.ResourceCounters) do
+			local counter = vgui.Create("StarfallPanel", header)
+			counter:DockMargin(0, 0, 3, 0)
+			counter:SetSize(16, 32)
+			counter:Dock(LEFT)
+			counter:SetBackgroundColor(Color(0,0,0,20))
+			
+			local icon = vgui.Create("DImage", counter)
+			icon:SetImage(v.icon)
+			icon:DockMargin(0, 0, 0, 0)
+			icon:SetSize(16, 16)
+			icon:Dock(TOP)
+			
+			local count = vgui.Create("DLabel", counter)
+			count:SetFont("DermaDefault")
+			count:SetColor(Color(255, 255, 255))
+			count:DockMargin(0, 0, 3, 0)
+			count:Dock(BOTTOM)
+			count:SizeToContents()
+			
+			counters[#counters+1] = function()
+				if blocked then
+					count:SetText("0")
+				else
+					count:SetText(tostring(v.count(ply)))
+				end
+				count:SizeToContents()
+			end
+		end
+		header.counters = counters
+
+		self.scrollPanel:AddItem(header)
+	end
+end
+
+function PANEL:CheckPlayersChanged()
+	local players = {}
+	for k, v in pairs(player.GetAll()) do
+		if SF.playerInstances[v] or SF.BlockedUsers[v:SteamID()] then
+			players[v] = true
+		end
+	end
+	for v in pairs(self.players) do
+		if not players[v] then
+			self.players = players
+			self:UpdatePlayers()
+			return
+		end
+	end
+	for v in pairs(players) do
+		if not self.players[v] then
+			self.players = players
+			self:UpdatePlayers()
+			return
+		end
+	end
+end
+
+function PANEL:Think()
+	self:CheckPlayersChanged()
+
+	for _, header in pairs(self.scrollPanel:GetCanvas():GetChildren()) do
+		for _, counter in pairs(header.counters) do
+			counter()
+		end
+	end
+end
+
+function PANEL:Init()
+	self.players = {}
+	self.scrollPanel = vgui.Create("DScrollPanel", self)
+	self.scrollPanel:Dock(FILL)
+	self.scrollPanel:SetPaintBackgroundEnabled(false)
+end
+
+vgui.Register( "StarfallUsers", PANEL, "StarfallFrame" )
+
+local userPanel
+list.Set( "DesktopWindows", "StarfallUsers", {
+
+	title		= "Starfall List",
+	icon		= "radon/starfall2",
+	width		= 960,
+	height		= 700,
+	onewindow	= true,
+	init		= function( icon, window )
+		window:Remove()
+		RunConsoleCommand("sf_userlist")
+	end
+} )
+
+concommand.Add("sf_userlist", function()
+	if userPanel and userPanel:IsValid() then return end
+
+	userPanel = vgui.Create("StarfallUsers")
+	userPanel:SetTitle( "Starfall List" )
+	userPanel:SetSize( 400, ScrH()*0.5 )
+	userPanel:SetSizable(true)
+	userPanel:Center()
+	userPanel:SetDeleteOnClose(true)
+	userPanel:Open()
+end)
+

@@ -457,7 +457,7 @@ function ents_methods:use(usetype, value)
     checkpermission(instance, ent, "entities.use")
     if usetype~=nil then checkluatype(usetype, TYPE_NUMBER) end
     if value~=nil then checkluatype(value, TYPE_NUMBER) end
-    ent:Use(instance.player, instance.data.entity, usetype, value)
+    ent:Use(instance.player, instance.entity, usetype, value)
 end
 
 --- Sets the entity frozen state
