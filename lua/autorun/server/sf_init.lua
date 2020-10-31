@@ -6,18 +6,7 @@ AddCSLuaFile("starfall/netstream.lua")
 AddCSLuaFile("starfall/transfer.lua")
 AddCSLuaFile("starfall/editor/editor.lua")
 
-resource.AddFile("materials/models/spacecode/glass.vmt")
-resource.AddFile("materials/models/spacecode/sfchip.vmt")
-resource.AddFile("materials/models/spacecode/sfpcb.vmt")
-resource.AddFile("materials/radon/starfall2.vmt")
-resource.AddFile("materials/radon/arrow_left.png")
-resource.AddFile("materials/radon/arrow_right.png")
-resource.AddFile("models/spacecode/sfchip.mdl")
-resource.AddFile("models/spacecode/sfchip_medium.mdl")
-resource.AddFile("models/spacecode/sfchip_small.mdl")
-resource.AddFile("resource/fonts/DejaVuSansMono.ttf")
-resource.AddFile("resource/fonts/RobotoMono.ttf")
-resource.AddFile("resource/fonts/FontAwesome.ttf")
+resource.AddWorkshop("2273610511")
 
 SF = {}
 SF.Version = "StarfallEx"
