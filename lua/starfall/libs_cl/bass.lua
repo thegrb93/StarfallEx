@@ -8,6 +8,8 @@ registerprivilege("bass.play2D", "Play sounds in global game context with `bass`
 
 local plyCount = SF.LimitObject("bass", "bass sounds", 20, "The number of sounds allowed to be playing via Starfall client at once")
 
+SF.ResourceCounters.Bass = {icon = "icon16/sound_add.png", count = function(ply) return plyCount:get(ply).val end}
+
 local function deleteSound(ply, sound)
 	if sound:IsValid() then sound:Stop() end
 	plyCount:free(ply, 1)

@@ -1752,60 +1752,66 @@ function PANEL:UpdatePlayers(players)
 
 		local header = vgui.Create("StarfallPanel")
 		header:DockMargin(0, 5, 0, 0)
-		header:SetSize(0, 20)
+		header:SetSize(0, 32)
 		header:Dock(TOP)
 		header:SetBackgroundColor(Color(0,0,0,20))
 		
+		local blocked = SF.BlockedUsers[ply:SteamID()]~=nil
 		local button = vgui.Create("StarfallButton", header)
-		button.active = SF.BlockedUsers[ply:SteamID()]~=nil
-		button:SetText(button.active and "Unblock" or "Block")
+		button.active = blocked
+		button:SetText(blocked and "Unblock" or "Block")
 		button:DockMargin(0, 0, 3, 0)
 		button:Dock(LEFT)
 
 		button.DoClick = function()
-			if button.active then self:Unblock(ply) else self:Block(ply) end
-			button.active = not button.active
-			button:SetText(button.active and "Unblock" or "Block")
+			if blocked then self:Unblock(ply) else self:Block(ply) end
+			blocked = not blocked
+			button:SetText(blocked and "Unblock" or "Block")
 		end
 		button:DockMargin(0, 0, 3, 0)
 		button:Dock(LEFT)
 
 		local avatar = vgui.Create("AvatarImage", header)
 		avatar:SetPlayer(ply)
-		avatar:DockMargin(0, 0, 0, 0)
+		avatar:SetSize(32, 32)
+		avatar:DockMargin(0, 0, 3, 0)
 		avatar:Dock(LEFT)
 
 		local nametext = vgui.Create("DLabel", header)
 		nametext:SetFont("DermaDefault")
 		nametext:SetColor(Color(255, 255, 255))
 		nametext:SetText(tbl.name)
-		nametext:DockMargin(5, 0, 0, 0)
+		nametext:DockMargin(5, 0, 5, 0)
 		nametext:Dock(LEFT)
 		nametext:SizeToContents()
 
 		local counters = {}
 		for k, v in pairs(SF.ResourceCounters) do
 			local counter = vgui.Create("StarfallPanel", header)
-			counter:DockMargin(0, 0, 0, 0)
-			counter:SetSize(20, 20)
+			counter:DockMargin(0, 0, 3, 0)
+			counter:SetSize(16, 32)
 			counter:Dock(LEFT)
 			counter:SetBackgroundColor(Color(0,0,0,20))
 			
 			local icon = vgui.Create("DImage", counter)
 			icon:SetImage(v.icon)
 			icon:DockMargin(0, 0, 0, 0)
-			icon:SetSize(0, 15)
+			icon:SetSize(16, 16)
 			icon:Dock(TOP)
 			
 			local count = vgui.Create("DLabel", counter)
 			count:SetFont("DermaDefault")
 			count:SetColor(Color(255, 255, 255))
-			count:DockMargin(0, 0, 0, 0)
-			count:Dock(TOP)
+			count:DockMargin(0, 0, 3, 0)
+			count:Dock(BOTTOM)
 			count:SizeToContents()
 			
 			counters[#counters+1] = function()
-				count:SetText(tostring(v.object.num))
+				if blocked then
+					count:SetText("0")
+				else
+					count:SetText(tostring(v.count(ply)))
+				end
 				count:SizeToContents()
 			end
 		end
@@ -1855,11 +1861,9 @@ function PANEL:Init()
 	self.scrollPanel:SetPaintBackgroundEnabled(false)
 end
 
-function PANEL:Paint(w,h)
-end
+vgui.Register( "StarfallUsers", PANEL, "StarfallFrame" )
 
-vgui.Register( "StarfallUsers", PANEL, "DPanel" )
-
+local userPanel
 list.Set( "DesktopWindows", "StarfallUsers", {
 
 	title		= "Starfall List",
@@ -1868,14 +1872,20 @@ list.Set( "DesktopWindows", "StarfallUsers", {
 	height		= 700,
 	onewindow	= true,
 	init		= function( icon, window )
-
-		window:SetTitle( "Starfall List" )
-		window:SetSize( math.min( ScrW() - 16, window:GetWide() ), math.min( ScrH() - 16, window:GetTall() ) )
-		window:SetSizable( true )
-		window:Center()
-
-		local users = window:Add( "StarfallUsers" )
-		users:Dock( FILL )
+		window:Remove()
+		RunConsoleCommand("sf_userlist")
 	end
 } )
+
+concommand.Add("sf_userlist", function()
+	if userPanel and userPanel:IsValid() then return end
+
+	userPanel = vgui.Create("StarfallUsers")
+	userPanel:SetTitle( "Starfall List" )
+	userPanel:SetSize( 400, ScrH()*0.5 )
+	userPanel:SetSizable(true)
+	userPanel:Center()
+	userPanel:SetDeleteOnClose(true)
+	userPanel:Open()
+end)
 

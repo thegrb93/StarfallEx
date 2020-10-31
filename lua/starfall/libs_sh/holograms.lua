@@ -9,7 +9,7 @@ registerprivilege("hologram.setRenderProperty", "RenderProperty", "Allows the us
 local plyCount = SF.LimitObject("holograms", "holograms", 200, "The number of holograms allowed to spawn via Starfall scripts for a single player")
 local maxclips = CreateConVar("sf_holograms_maxclips", "8", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "The max number of clips per hologram entity")
 
-SF.ResourceCounters.Holograms = {icon = "icon16/bricks.png", object = plyCount}
+SF.ResourceCounters.Holograms = {icon = "icon16/bricks.png", count = function(ply) return plyCount:get(ply).val end}
 
 local entmeta = FindMetaTable("Entity")
 local cl_hologram_meta = {

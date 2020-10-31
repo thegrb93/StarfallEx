@@ -5,6 +5,8 @@ local IsValid = IsValid
 -- Create permission types.
 registerprivilege("particleEffect.attach", "Allow users to create particle effect", { client = {}, entities = {} })
 
+local plyCount = SF.LimitObject("particleeffects", "particle effects", 16, "The number of created particle effects via Starfall per client at once")
+SF.ResourceCounters.ParticleEffects = {icon = "icon16/asterisk_orange.png", count = function(ply) return plyCount:get(ply).val end}
 
 --- ParticleEffect library.
 -- @name particleEffect
@@ -32,15 +34,12 @@ instance:AddHook("initialize", function()
 end)
 
 instance:AddHook("deinitialize", function()
-	local particles = instance.data.particleEffect.particles
-	local p = next(particles)
 	-- Remove all
-	while p do
+	for p in pairs(instance.data.particleEffect.particles) do
 		if p:IsValid() then
 			p:StopEmissionAndDestroyImmediately()
 		end
-		particles[p] = nil
-		p = next(particles)
+		plyCount:free(instance.player, 1)
 	end
 end)
 
@@ -81,7 +80,7 @@ function particleef_library.attach(entity, name, pattach, options)
 	if badParticle(name) then
 		SF.Throw("Invalid particle effect path: " .. name, 2)
 	end
-
+	plyCount:use(instance.player, 1)
 
 
 	local PEffect = entity:CreateParticleEffect(name,pattach,options)
@@ -135,6 +134,7 @@ function particleef_methods:destroy()
 
 	if (uw and uw:IsValid()) then
 		uw:StopEmissionAndDestroyImmediately()
+		plyCount:free(instance.player, 1)
 	end
 
 end
