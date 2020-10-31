@@ -7,7 +7,7 @@ TOOL.ConfigName		= ""
 -- ------------------------------- Sending / Receiving ------------------------------- --
 
 TOOL.ClientConVar["Model"] = "models/hunter/plates/plate2x2.mdl"
-TOOL.ClientConVar["ModelHUD"] = "models/maxofs2d/button_02.mdl"
+TOOL.ClientConVar["ModelHUD"] = "models/bull/dynamicbuttonsf.mdl"
 TOOL.ClientConVar["Type"] = "1"
 TOOL.ClientConVar["parent"] = "0"
 TOOL.ClientConVar["createflat"] = "0"

@@ -464,4 +464,4 @@ SF.CustomScreenInfo = {
 	z	=	0,
 }
 
-ENT.Monitor_Offsets["models/maxofs2d/button_02.mdl"] = SF.CustomScreenInfo
+ENT.Monitor_Offsets["models/bull/dynamicbuttonsf.mdl"] = SF.CustomScreenInfo
