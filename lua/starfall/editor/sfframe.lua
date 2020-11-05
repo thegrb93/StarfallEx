@@ -1800,6 +1800,7 @@ function PANEL:UpdatePlayers(players)
 			counter:SetSize(16, 32)
 			counter:Dock(LEFT)
 			counter:SetBackgroundColor(Color(0,0,0,20))
+			counter:SetTooltip(k)
 			
 			local icon = vgui.Create("DImage", counter)
 			icon:SetImage(v.icon)
