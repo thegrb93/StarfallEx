@@ -141,7 +141,7 @@ net.Receive("starfall_processor_used", function(len)
 
 	instance:runScriptHook("starfallused", instance.WrapObject( activator ), instance.WrapObject( used ))
 
-	if activator == LocalPlayer() and chip.owner ~= SF.Superuser and instance.permissionRequest and instance.permissionRequest.showOnUse and not SF.Permissions.permissionRequestSatisfied( instance ) then
+	if activator == LocalPlayer() and instance.player ~= SF.Superuser and instance.permissionRequest and instance.permissionRequest.showOnUse and not SF.Permissions.permissionRequestSatisfied( instance ) then
 		local pnl = vgui.Create("SFChipPermissions")
 		if pnl then pnl:OpenForChip( chip ) end
 	end
