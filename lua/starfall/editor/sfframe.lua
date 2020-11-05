@@ -56,7 +56,15 @@ end
 local Editor = {}
 
 local function GetTabHandler(name)
-	return SF.Editor.TabHandlers[name or SF.Editor.CurrentTabHandler:GetString()]
+	if name then return SF.Editor.TabHandlers[name] end
+	local handler = SF.Editor.TabHandlers[SF.Editor.CurrentTabHandler:GetString()]
+	if not handler then
+		local handlern
+		for k, v in pairs(SF.Editor.TabHandlers) do if v.IsEditor then handlern, handler = k, v break end end
+		if not handlern then error("No editors found!") end
+		SF.Editor.CurrentTabHandler:SetString(handlern)
+	end
+	return handler
 end
 -- ----------------------------------------------------------------------
 -- Fonts
