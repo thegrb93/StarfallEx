@@ -69,6 +69,7 @@ end
 
 --- Writes to a file
 -- @param path Filepath relative to data/sf_filedata/.
+-- @param data The data to write
 -- @return True if OK, nil if error
 function file_library.write(path, data)
 	checkpermission (instance, path, "file.write")
