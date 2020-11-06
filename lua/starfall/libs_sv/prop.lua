@@ -520,7 +520,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		if data ~= nil then checkluatype(data, TYPE_TABLE) else data = {} end
 		if data.Model and isstring(data.Model) then
 			data.Model = SF.CheckModel(data.Model, ply)
-			if not model then SF.Throw("Invalid model", 2) end
+			if not data.Model then SF.Throw("Invalid model", 2) end
 		end
 
 		for k, v in pairs(data) do
