@@ -8,19 +8,14 @@ function net.ReadStarfall(ply, callback)
 	end
 	sfdata.mainfile = net.ReadString()
 
-	local headers = {}
-	for I=1, net.ReadUInt(8) do
-		headers[#headers + 1] = {name = net.ReadString(), size = net.ReadUInt(32)}
-	end
-
 	net.ReadStream(ply, function(data)
 		if data then
-			local pos = 1
-			for k, v in pairs(headers) do
-				sfdata.files[v.name] = string.sub(data, pos, pos+v.size-1)
-				pos = pos + v.size
+			sfdata.files = SF.DecompressFiles(data)
+			if sfdata.files then
+				callback(true, sfdata)
+			else
+				callback(false, sfdata)
 			end
-			callback(true, sfdata)
 		else
 			callback(false, sfdata)
 		end
@@ -37,20 +32,51 @@ function net.WriteStarfall(sfdata, callback)
 	end
 	net.WriteString(sfdata.mainfile)
 
-	local numfiles = table.Count(sfdata.files)
-	if numfiles > 255 then error("Number of files exceeds the current maximum (256)") end
-	net.WriteUInt(numfiles, 8)
+	if sfdata.compressed then
+		return net.WriteStream(sfdata.compressed, callback, true)
+	else
+		local data = SF.CompressFiles(sfdata.files)
+		return net.WriteStream(data, callback, true)
+	end
+end
+
+function SF.CompressFiles(files)
+	local header = SF.StringStream()
+	header:writeInt32(table.Count(files))
 	
 	local filecodes = {}
-	for filename, code in pairs(sfdata.files) do
+	for filename, code in pairs(files) do
 		if #filename > 255 then error("File name too large: " .. #filename .. " (max is 255)") end
-
-		net.WriteString(filename)
-		net.WriteUInt(#code, 32)
+		header:writeString(filename)
+		header:writeInt32(#code)
 		filecodes[#filecodes + 1] = code
 	end
-	local data = table.concat(filecodes)
-	return net.WriteStream(data, callback)
+	local headerdata = header:getString()
+	local headersize = SF.StringStream()
+	headersize:writeInt32(#headerdata)
+	table.insert(filecodes, 1, headersize:getString())
+	table.insert(filecodes, 2, headerdata)
+	filecodes = table.concat(filecodes)
+	if #filecodes > 64000000 then error("Too much file data!") end
+	return util.Compress(filecodes)
+end
+
+function SF.DecompressFiles(data)
+	local files = {}
+	data = util.Decompress(data)
+	local headersize = SF.StringStream(string.sub(data, 1, 4))
+	headersize = headersize:readUInt32()
+	local header = SF.StringStream(string.sub(data, 5, 4+headersize))
+	local headers = {}
+	for i=1, header:readUInt32() do
+		headers[#headers + 1] = {name = header:readString(), size = header:readUInt32()}
+	end
+	local pos = headersize+5
+	for k, v in pairs(headers) do
+		files[v.name] = string.sub(data, pos, pos+v.size-1)
+		pos = pos + v.size
+	end
+	return files
 end
 
 if SERVER then

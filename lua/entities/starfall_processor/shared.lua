@@ -24,8 +24,8 @@ function ENT:Compile()
 
 	self.error = nil
 
-	if not (self.mainfile and self.files and self.files[self.mainfile]) then return end
-	local ok, instance = SF.Instance.Compile(self.files, self.mainfile, self.owner, self)
+	if not (self.sfdata and self.sfdata.files and self.sfdata.files[self.sfdata.mainfile]) then return end
+	local ok, instance = SF.Instance.Compile(self.sfdata.files, self.sfdata.mainfile, self.owner, self)
 	if not ok then self:Error(instance) return end
 
 	if instance.ppdata.scriptnames and instance.mainfile and instance.ppdata.scriptnames[instance.mainfile] then
@@ -85,13 +85,53 @@ function ENT:Destroy()
 end
 
 function ENT:SetupFiles(sfdata)
+	self.sfdata = sfdata
 	self.owner = sfdata.owner
-	self.files = sfdata.files
-	self.mainfile = sfdata.mainfile
 
 	self:Compile()
 
 	if SERVER then
+		local sfsenddata = {
+			owner = sfdata.owner,
+			files = {},
+			mainfile = sfdata.mainfile,
+			proc = self
+		}
+		self.sfsenddata = sfsenddata
+		for k, v in pairs(sfdata.files) do sfsenddata.files[k] = v end
+
+		local ppdata = self.instance and self.instance.ppdata
+		if ppdata then
+			if ppdata.serverorclient then
+				for filename, code in pairs(sfsenddata.files) do
+					if ppdata.serverorclient[filename] == "server" then
+						local infodata = {"-- Server only"}
+						if ppdata.scriptnames and ppdata.scriptnames[filename] then
+							infodata[#infodata + 1] = "--@name " .. ppdata.scriptnames[filename]
+						end
+						if ppdata.scriptauthors and ppdata.scriptauthors[filename] then
+							infodata[#infodata + 1] = "--@author " .. ppdata.scriptauthors[filename]
+						end
+						sfsenddata.files[filename] = table.concat(infodata, "\n")
+					else
+						sfsenddata.files[filename] = code
+					end
+				end
+			end
+			local clientmain = ppdata.clientmain and ppdata.clientmain[sfdata.mainfile]
+			if clientmain then
+				if sfsenddata.files[clientmain] then
+					sfsenddata.mainfile = clientmain
+				else
+					clientmain = SF.NormalizePath(string.GetPathFromFilename(sfdata.mainfile)..clientmain)
+					if sfsenddata.files[clientmain] then
+						sfsenddata.mainfile = clientmain
+					end
+				end
+			end
+		end
+		sfsenddata.compressed = SF.CompressFiles(sfsenddata.files)
+
 		if self.instance and self.instance.ppdata.models and self.instance.mainfile then
 			local model = self.instance.ppdata.models[self.instance.mainfile]
 			if model and SF.CheckModel(model, self.owner) then
@@ -168,8 +208,9 @@ local function MenuOpen( ContextMenu, Option, Entity, Trace )
 	SubMenu:AddOption("Open Global Permissions", function ()
 		SF.Editor.openPermissionsPopup()
 	end)
-	if ent.instance and ent.owner ~= SF.Superuser and (ent.instance.permissionRequest and ent.instance.permissionRequest.overrides and table.Count(ent.instance.permissionRequest.overrides) > 0
-				or ent.instance.permissionOverrides and table.Count(ent.instance.permissionOverrides) > 0) then
+	local instance = ent.instance
+	if instance and instance.player ~= SF.Superuser and (instance.permissionRequest and instance.permissionRequest.overrides and table.Count(instance.permissionRequest.overrides) > 0
+				or instance.permissionOverrides and table.Count(instance.permissionOverrides) > 0) then
 		SubMenu:AddOption("Overriding Permissions", function ()
 			local pnl = vgui.Create("SFChipPermissions")
 			if pnl then pnl:OpenForChip(ent) end

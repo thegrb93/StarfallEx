@@ -71,45 +71,8 @@ function ENT:Think()
 end
 
 function ENT:SendCode(recipient)
-	if not (self.mainfile and self.files) then return end
-	local sfdata = {
-		proc = self,
-		owner = self.owner,
-		mainfile = self.mainfile,
-		files = self.files,
-	}
-	local ppdata = self.instance and self.instance.ppdata
-	if ppdata then
-		if ppdata.serverorclient then
-			sfdata.files = {}
-			for filename, code in pairs(self.files) do
-				if ppdata.serverorclient[filename] == "server" then
-					local infodata = {}
-					if ppdata.scriptnames and ppdata.scriptnames[filename] then
-						infodata[#infodata + 1] = "--@name " .. ppdata.scriptnames[filename]
-					end
-					if ppdata.scriptauthors and ppdata.scriptauthors[filename] then
-						infodata[#infodata + 1] = "--@author " .. ppdata.scriptauthors[filename]
-					end
-					sfdata.files[filename] = table.concat(infodata, "\n")
-				else
-					sfdata.files[filename] = code
-				end
-			end
-		end
-		local clientmain = ppdata.clientmain and ppdata.clientmain[sfdata.mainfile]
-		if clientmain then
-			if sfdata.files[clientmain] then
-				sfdata.mainfile = clientmain
-			else
-				clientmain = SF.NormalizePath(string.GetPathFromFilename(sfdata.mainfile)..clientmain)
-				if sfdata.files[clientmain] then
-					sfdata.mainfile = clientmain
-				end
-			end
-		end
-	end
-	SF.SendStarfall("starfall_processor_download", sfdata, recipient, function(ply)
+	if not self.sfsenddata then return end
+	SF.SendStarfall("starfall_processor_download", self.sfsenddata, recipient, function(ply)
 		local instance = self.instance
 		if instance then
 			instance:runScriptHook("clientinitialized", instance.Types.Player.Wrap(ply))
@@ -119,9 +82,9 @@ end
 
 function ENT:PreEntityCopy()
 	duplicator.ClearEntityModifier(self, "SFDupeInfo")
-	if self.files and self.mainfile then
+	if self.sfdata then
 		local info = WireLib and WireLib.BuildDupeInfo(self) or {}
-		info.starfall = SF.SerializeCode(self.files, self.mainfile)
+		info.starfall = SF.SerializeCode(self.sfdata.files, self.sfdata.mainfile)
 		info.starfalluserdata = self.starfalluserdata
 		duplicator.StoreEntityModifier(self, "SFDupeInfo", info)
 	end
