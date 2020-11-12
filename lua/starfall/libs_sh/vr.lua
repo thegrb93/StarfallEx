@@ -136,4 +136,63 @@ function vr_library.getRightHandPose( ply )
 	return vwrap( pos ), awrap( ang )
 end
 
+if CLIENT then
+
+local env = instance.env
+
+--- VRmod library enums
+-- @name vr_library.VR
+-- @class table
+-- @field GENERIC
+-- @field ERROR
+-- @field UNDO
+-- @field HINT
+-- @field CLEANUP
+env.VR = {
+	["BOOLEAN_PRIMARYFIRE"] = "boolean_primaryfire",
+	["VECTOR1_PRIMARYFIRE"] = "vector1_primaryfire",
+	["BOOLEAN_SECONDARYFIRE"] = "boolean_secondaryfire",
+	["BOOLEAN_CHANGEWEAPON"] = "boolean_changeweapon",
+	["BOOLEAN_USE"] = "boolean_use",
+	["BOOLEAN_SPAWNMENU"] = "boolean_spawnmenu",
+	["VECTOR2_WALKDIRECTION"] = "vector2_walkdirection",
+	["BOOLEAN_WALK"] = "boolean_walk",
+	["BOOLEAN_FLASHLIGHT"] = "boolean_flashlight",
+	["BOOLEAN_TURNLEFT"] = "boolean_turnleft",
+	["BOOLEAN_TURNRIGHT"] = "boolean_turnright",
+	["VECTOR2_SMOOTHTURN"] = "vector2_smoothturn",
+	["BOOLEAN_CHAT"] = "boolean_chat",
+	["BOOLEAN_RELOAD"] = "boolean_reload",
+	["BOOLEAN_JUMP"] = "boolean_jump",
+	["BOOLEAN_LEFT_PICKUP"] = "boolean_left_pickup",
+	["BOOLEAN_RIGHT_PICKUP"] = "boolean_right_pickup",
+	["BOOLEAN_UNDO"] = "boolean_undo",
+	["BOOLEAN_SPRINT"] = "boolean_sprint",
+	["VECTOR1_FORWARD"] = "vector1_forward",
+	["VECTOR1_REVERSE"] = "vector1_reverse",
+	["BOOLEAN_TURBO"] = "boolean_turbo",
+	["VECTOR2_STEER"] = "vector2_steer",
+	["BOOLEAN_HANDBRAKE"] = "boolean_handbrake",
+	["BOOLEAN_EXIT"] = "boolean_exit",
+	["BOOLEAN_TURRET"] = "boolean_turret",
+}
+
+--- returns the left hand's pose
+-- @class function
+-- @param actionname to check control of, check VR enums
+-- @return boolean, vector or table of input
+function vr_library.getInput( actionname )
+	checkluatype(actionname, TYPE_STRING) 
+	local var = vrmod.GetInput( actionname )
+	--PrintTable( var )
+	if TypeID( var ) == TYPE_BOOL or TypeID( var ) == TYPE_NUMBER then
+		return var
+	elseif TypeID( var ) == TYPE_TABLE then
+		return vwrap( Vector( var.x, var.y, 0 ) )
+	end
+	return var
+end
+
+end
+
 end
