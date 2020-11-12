@@ -143,11 +143,33 @@ local env = instance.env
 --- VRmod library enums
 -- @name vr_library.VR
 -- @class table
--- @field GENERIC
--- @field ERROR
--- @field UNDO
--- @field HINT
--- @field CLEANUP
+-- @field BOOLEAN_PRIMARYFIRE
+-- @field VECTOR1_PRIMARYFIRE
+-- @field BOOLEAN_SECONDARYFIRE
+-- @field BOOLEAN_CHANGEWEAPON
+-- @field BOOLEAN_USE
+-- @field BOOLEAN_SPAWNMENU
+-- @field VECTOR2_WALKDIRECTION
+-- @field BOOLEAN_WALK
+-- @field BOOLEAN_FLASHLIGHT
+-- @field BOOLEAN_TURNLEFT
+-- @field BOOLEAN_TURNRIGHT
+-- @field VECTOR2_SMOOTHTURN
+-- @field BOOLEAN_CHAT
+-- @field BOOLEAN_RELOAD
+-- @field BOOLEAN_JUMP
+-- @field BOOLEAN_LEFT_PICKUP
+-- @field BOOLEAN_RIGHT_PICKUP
+-- @field BOOLEAN_UNDO
+-- @field BOOLEAN_SPRINT
+-- @field VECTOR1_FORWARD
+-- @field VECTOR1_REVERSE
+-- @field BOOLEAN_TURBO
+-- @field VECTOR2_STEER
+-- @field BOOLEAN_HANDBRAKE
+-- @field BOOLEAN_EXIT
+-- @field BOOLEAN_TURRET
+
 env.VR = {
 	["BOOLEAN_PRIMARYFIRE"] = "boolean_primaryfire",
 	["VECTOR1_PRIMARYFIRE"] = "vector1_primaryfire",
@@ -177,18 +199,17 @@ env.VR = {
 	["BOOLEAN_TURRET"] = "boolean_turret",
 }
 
---- returns the left hand's pose
+--- returns the a controller's input state, may return boolean, number or vector.
 -- @class function
 -- @param actionname to check control of, check VR enums
--- @return boolean, vector or table of input
+-- @return boolean, vector or number of input
 function vr_library.getInput( actionname )
 	checkluatype(actionname, TYPE_STRING) 
 	local var = vrmod.GetInput( actionname )
-	--PrintTable( var )
 	if TypeID( var ) == TYPE_BOOL or TypeID( var ) == TYPE_NUMBER then
 		return var
 	elseif TypeID( var ) == TYPE_TABLE then
-		return vwrap( Vector( var.x, var.y, 0 ) )
+		return vwrap( Vector( var.x, var.y or 0, 0 ) )
 	end
 	return var
 end
