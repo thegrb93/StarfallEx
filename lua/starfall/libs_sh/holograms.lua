@@ -174,6 +174,7 @@ function holograms_library.create(pos, ang, model, scale)
 			
 			debug.setmetatable(holoent, cl_hologram_meta)
 
+			holoent:Spawn()
 			holodata[holoent] = true
 
 			if scale~=nil then
