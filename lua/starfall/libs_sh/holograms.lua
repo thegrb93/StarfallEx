@@ -179,6 +179,8 @@ function holograms_library.create(pos, ang, model, scale)
 
 			if scale~=nil then
 				holoent:SetScale(vunwrap(scale))
+			else
+				holoent:SetScale(Vector(1,1,1))
 			end
 
 			plyCount:free(ply, -1)
