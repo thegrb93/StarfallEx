@@ -380,6 +380,8 @@ end
 --- This gets called every time a boolean controller input action changes state
 -- @name VRInput
 -- @class hook
+-- @param actionname Name of the input
+-- @param boolean State of the input
 -- @client
 SF.hookAdd("VRMod_Input", "vrinput")
 
