@@ -20,13 +20,13 @@ local plywrap, plyunwrap = instance.Types.Player.Wrap, instance.Types.Player.Unw
 local hookAdd = SF.hookAdd
 
 --- Called when a player enters VR
--- @name vrStart
+-- @name VRStart
 -- @class hook
 -- @param ply Player entering VR
 SF.hookAdd("VRMod_Start", "vrstart")
 
 --- Called when a player exits VR
--- @name vrExit
+-- @name VRExit
 -- @class hook
 -- @param ply Player exiting VR
 SF.hookAdd("VRMod_Exit", "vrexit")
