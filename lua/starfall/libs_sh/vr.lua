@@ -9,6 +9,8 @@ SF.RegisterLibrary("vr")
 
 return function(instance)
 
+if vrmod then --only add these functions if vrmod is installed
+
 local vr_library = instance.Libraries.vr
 
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
@@ -16,8 +18,6 @@ local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, in
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local plywrap, plyunwrap = instance.Types.Player.Wrap, instance.Types.Player.Unwrap
-
-local hookAdd = SF.hookAdd
 
 --- Called when a player enters VR
 -- @name VRStart
@@ -403,6 +403,8 @@ SF.hookAdd("VRMod_PreRenderRight", "vrprerenderright", canRenderHudSafeArgs)
 -- @client
 SF.hookAdd("VRMod_PostRender", "vrpostrender", canRenderHudSafeArgs)
 
+
+end
 
 end
 
