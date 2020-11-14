@@ -1,7 +1,9 @@
 
 local checkluatype = SF.CheckLuaType
 
---- VRMod library https://steamcommunity.com/sharedfiles/filedetails/?id=2132574168
+--- VRMod Library 
+-- Addon and module: https://steamcommunity.com/sharedfiles/filedetails/?id=1678408548
+-- Follow install instructions on the addon's page.
 -- @name vr
 -- @class library
 -- @libtbl vr_library
