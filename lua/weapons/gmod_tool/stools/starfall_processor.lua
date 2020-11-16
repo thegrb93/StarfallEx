@@ -154,10 +154,10 @@ function TOOL:RightClick(trace)
 		local ent = trace.Entity
 
 		if ent and ent:IsValid() and ent:GetClass() == "starfall_processor" then
-			if ent.mainfile then
+			if ent.sfdata then
 				net.Start("starfall_openeditor")
 				net.WriteBool(true)
-				net.WriteStarfall(ent)
+				net.WriteStarfall(ent.sfdata)
 				net.Send(ply)
 			end
 		else
