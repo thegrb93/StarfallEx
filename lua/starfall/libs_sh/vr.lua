@@ -172,9 +172,10 @@ if CLIENT then
 function vr_library.getInput(actionname)
 	checkluatype(actionname, TYPE_STRING) 
 	local var = vrmod.GetInput(actionname)
-	if TypeID(var) == TYPE_BOOL or TypeID(var) == TYPE_NUMBER then
+	local typeid = TypeID(var)
+	if typeid == TYPE_BOOL or typeid == TYPE_NUMBER then
 		return var
-	elseif TypeID(var) == TYPE_TABLE then
+	elseif typeid == TYPE_TABLE then
 		return vwrap(Vector(var.x, var.y or 0, 0))
 	end
 	return var
