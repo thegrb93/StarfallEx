@@ -1,5 +1,6 @@
 
 local checkluatype = SF.CheckLuaType
+local haspermission = SF.Permissions.hasAccess
 
 --- VRMod Library 
 -- Addon and module: https://steamcommunity.com/sharedfiles/filedetails/?id=1678408548
