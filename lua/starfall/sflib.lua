@@ -951,6 +951,20 @@ function SF.CheckRagdoll(model)
 	return false
 end
 
+local drawEntityClasses = {
+	["prop_physics"] = true,
+	["prop_ragdoll"] = true,
+	["prop_vehicle_jeep"] = true,
+	["prop_vehicle_airboat"] = true,
+	["prop_vehicle_prisoner_pod"] = true,
+}
+function SF.CanDrawEntity(ent)
+	if not drawEntityClasses[ent:GetClass()] then return false end
+	if ent.RenderOverride then return false end
+	if ent:IsEffectActive(EF_BONEMERGE) then return false end
+	return true
+end
+
 
 --- Returns a path with all .. accounted for
 function SF.NormalizePath(path)

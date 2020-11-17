@@ -152,10 +152,20 @@ if CLIENT then
 		ent.userrenderbounds = true
 	end
 	
+	local canDrawEntity = SF.CanDrawEntity
+	--- Returns whether or not the entity can be drawn using Entity.draw function
+	-- @client
+	function ents_methods:canDraw()
+		return canDrawEntity(getent(self))
+	end
+	
+	--- Draws entity, requires 3D rendering context
+	-- @client
 	function ents_methods:draw()
 		if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 		
 		local ent = getent(self)
+		if not canDrawEntity(ent) then SF.Throw("Can't draw this entity.", 2) end
 		ent:SetupBones()
 		ent:DrawModel()
 	end
