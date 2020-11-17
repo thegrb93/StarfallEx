@@ -31,6 +31,10 @@ if CLIENT then
 -- @client
 SF.hookAdd("VRMod_Input", "vrinput")
 
+local function canRenderHudSafeArgs(instance, ...)
+	return instance:isHUDActive() and (instance.player == SF.Superuser or haspermission(instance, nil, "render.hud")), {...}
+end
+
 --- Called before rendering the game. Any code that you want to run once per frame should be put here. HUD is required.
 -- @name VRPreRender
 -- @class hook
@@ -72,16 +76,14 @@ end)
 -- @param target player to check
 -- @return boolean true if player is in VR
 function vr_library.isPlayerInVR(ply)
-	local ply = getply(ply)
-	return vrmod.IsPlayerInVR(ply)
+	return vrmod.IsPlayerInVR(getply(ply))
 end
 
 --- Checks wether the player is using empty hands
 -- @param target player to check
 -- @return boolean true if player is using empty hands
 function vr_library.usingEmptyHands(ply)
-	local ply = getply(ply)
-	return vrmod.UsingEmptyHands(ply)
+	return vrmod.UsingEmptyHands(getply(ply))
 end
 
 --HMD
@@ -90,16 +92,14 @@ end
 -- @param target player to get the HMD position from
 -- @return vector position
 function vr_library.getHMDPos(ply)
-	local ply = getply(ply)
-	return vwrap(vrmod.GetHMDPos(ply))
+	return vwrap(vrmod.GetHMDPos(getply(ply)))
 end
 
 --- returns the HMD angles
 -- @param target player to get the HMD angles from
 -- @return angle angles
 function vr_library.getHMDAng(ply)
-	local ply = getply(ply)
-	return awrap(vrmod.GetHMDAng(ply))
+	return awrap(vrmod.GetHMDAng(getply(ply)))
 end
 
 --- returns the HMD pose
@@ -107,8 +107,7 @@ end
 -- @return vector position 
 -- @return angle angles
 function vr_library.getHMDPose(ply)
-	local ply = getply(ply) 
-	local pos, ang = vrmod.GetHMDPose(ply)
+	local pos, ang = vrmod.GetHMDPose(getply(ply))
 	return vwrap(pos), awrap(ang)
 end
 
@@ -118,16 +117,14 @@ end
 -- @param target player to get the left hand position from
 -- @return vector position
 function vr_library.getLeftHandPos(ply)
-	local ply = getply(ply)
-	return vwrap(vrmod.GetLeftHandPos(ply))
+	return vwrap(vrmod.GetLeftHandPos(getply(ply)))
 end
 
 --- returns the left hand angles
 -- @param target player to get the left hand angles from
 -- @return angle angles
 function vr_library.getLeftHandAng(ply)
-	local ply = getply(ply)
-	return awrap(vrmod.GetLeftHandAng(ply))
+	return awrap(vrmod.GetLeftHandAng(getply(ply)))
 end
 
 --- returns the left hand pose
@@ -135,8 +132,7 @@ end
 -- @return vector position 
 -- @return angle angles
 function vr_library.getLeftHandPose(ply)
-	local ply = getply(ply)
-	local pos, ang = vrmod.GetLeftHandPose(ply)
+	local pos, ang = vrmod.GetLeftHandPose(getply(ply))
 	return vwrap(pos), awrap(ang)
 end
 
@@ -146,16 +142,14 @@ end
 -- @param target player to get the right hand position from
 -- @return vector position
 function vr_library.getRightHandPos(ply)
-	local ply = getply(ply)
-	return vwrap(vrmod.GetRightHandPos(ply))
+	return vwrap(vrmod.GetRightHandPos(getply(ply)))
 end
 
 --- returns the left hand angles
 -- @param target player to get the right hand angles from
 -- @return angle angles
 function vr_library.getRightHandAng(ply)
-	local ply = getply(ply)
-	return awrap(vrmod.GetRightHandAng(ply))
+	return awrap(vrmod.GetRightHandAng(getply(ply)))
 end
 
 --- returns the left hand pose
@@ -163,8 +157,7 @@ end
 -- @return vector position 
 -- @return angle angles
 function vr_library.getRightHandPose(ply)
-	local ply = getply(ply)
-	local pos, ang = vrmod.GetRightHandPose(ply)
+	local pos, ang = vrmod.GetRightHandPose(getply(ply))
 	return vwrap(pos), awrap(ang)
 end
 
@@ -316,10 +309,6 @@ end
 -- @client
 function vr_library.getRightEyePos()
 	return vwrap(vrmod.GetRightEyePos())
-end
-
-local function canRenderHudSafeArgs(instance, ...)
-	return instance:isHUDActive() and (instance.player == SF.Superuser or haspermission(instance, nil, "render.hud")), {...}
 end
 
 end
