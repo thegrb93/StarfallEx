@@ -58,7 +58,7 @@ end
 
 return function(instance)
 
-if not vrmod return end --only add these functions if vrmod is installed
+if not vrmod then return end --only add these functions if vrmod is installed
 
 local vr_library = instance.Libraries.vr
 
