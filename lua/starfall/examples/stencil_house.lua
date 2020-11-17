@@ -1,4 +1,4 @@
---@name Entdraw
+--@name Stencil House
 --@author Name
 --@shared
 
@@ -12,7 +12,6 @@ if SERVER then
             { pos = Vector(-28, -28, 17), ang = Angle(0, 45, 0),  mdl = "models/maxofs2d/companion_doll.mdl" },
             { pos = Vector(32, 20, 17),   ang = Angle(0, 15, 0),  mdl = "models/props_junk/TrafficCone001a.mdl" },
             { pos = Vector(0, 0, 90),     ang = Angle(0, 0, 0),   mdl = "models/props_wasteland/prison_lamp001c.mdl" },
-            { pos = Vector(0, 0, 50),     ang = Angle(45, 45, 0), mdl = "models/hunter/blocks/cube05x05x05.mdl" },
         },
         unaffected = {
             { pos = Vector(0, 0, 0),      ang = Angle(0, 0, 0),   mdl = "models/hunter/plates/plate2x2.mdl" },
@@ -72,22 +71,16 @@ if SERVER then
         end
     end)
     
-else -- CLIENT
-    
-    STENCIL_ALWAYS = 8
-    STENCIL_KEEP = 1
-    STENCIL_REPLACE = 3
-    STENCIL_EQUAL = 3
-    STENCIL_NOTEQUAL = 6
+else
     
     local function resetStencil()
         render.setStencilWriteMask(0xFF)
         render.setStencilTestMask(0xFF)
         render.setStencilReferenceValue(0)
-        render.setStencilCompareFunction(STENCIL_ALWAYS)
-        render.setStencilPassOperation(STENCIL_KEEP)
-        render.setStencilFailOperation(STENCIL_KEEP)
-        render.setStencilZFailOperation(STENCIL_KEEP)
+        render.setStencilCompareFunction(STENCIL.ALWAYS)
+        render.setStencilPassOperation(STENCIL.KEEP)
+        render.setStencilFailOperation(STENCIL.KEEP)
+        render.setStencilZFailOperation(STENCIL.KEEP)
         render.clearStencil()
     end
     
@@ -95,6 +88,12 @@ else -- CLIENT
     local function drawEnts()
         for _, ent in ipairs(ents) do
             ent:draw()
+        end
+    end
+    
+    local function noDrawEnts(hide)
+        for _, ent in ipairs(ents) do
+            ent:setNoDraw(hide)
         end
     end
     
@@ -107,22 +106,22 @@ else -- CLIENT
                 resetStencil()
                 render.setStencilEnable(true)
                 render.setStencilReferenceValue(1)
-                render.setStencilCompareFunction(STENCIL_EQUAL)
-                render.setStencilFailOperation(STENCIL_REPLACE)
+                render.setStencilCompareFunction(STENCIL.EQUAL)
+                render.setStencilFailOperation(STENCIL.REPLACE)
                 drawEnts()
-                render.clearBuffersObeyStencil(0, 148, 133, 255, false)
+                render.clearBuffersObeyStencil(128, 0, 255, 255, false)
                 render.setStencilEnable(false)
             end
         },{
-            name = "Selective",
+            name = "Reverse",
             draw = function()
                 resetStencil()
                 render.setStencilEnable(true)
                 render.setStencilReferenceValue(1)
-                render.setStencilCompareFunction(STENCIL_NOTEQUAL)
-                render.setStencilPassOperation(STENCIL_REPLACE)
+                render.setStencilCompareFunction(STENCIL.NOTEQUAL)
+                render.setStencilPassOperation(STENCIL.REPLACE)
                 drawEnts()
-                render.clearBuffersObeyStencil(0, 148, 133, 255, false)
+                render.clearBuffersObeyStencil(128, 0, 255, 255, false)
                 render.setStencilEnable(false)
             end
         },{
@@ -131,22 +130,20 @@ else -- CLIENT
                 resetStencil()
                 render.setStencilEnable(true)
                 render.setStencilReferenceValue(1)
-                render.setStencilCompareFunction(STENCIL_ALWAYS)
-                render.setStencilZFailOperation(STENCIL_REPLACE)
+                render.setStencilCompareFunction(STENCIL.ALWAYS)
+                render.setStencilZFailOperation(STENCIL.REPLACE)
                 drawEnts()
-                render.setStencilCompareFunction( STENCIL_EQUAL )
-                render.clearBuffersObeyStencil(0, 148, 133, 255, false)
+                render.setStencilCompareFunction(STENCIL.EQUAL)
+                render.clearBuffersObeyStencil(128, 0, 255, 255, false)
             end
         },{
             name = "Window",
-            pre  = function()
-                for _, ent in ipairs(ents) do ent:setNoDraw(true) end
-            end,
+            pre  = function() noDrawEnts(true) end,
             draw = function()
                 resetStencil()
                 render.setStencilEnable(true)
                 render.setStencilReferenceValue(1)
-                render.setStencilCompareFunction(STENCIL_EQUAL)
+                render.setStencilCompareFunction(STENCIL.EQUAL)
                 render.clearStencilBufferRectangle(512, 256, 1024, 768, 1)
                 drawEnts()
                 render.setStencilEnable(false)
@@ -155,20 +152,23 @@ else -- CLIENT
                 render.setColor(Color(255,50,100))
                 render.drawRectOutline(512, 256, 512, 512, 5)
             end,
-            post = function()
-                for _, ent in ipairs(ents) do ent:setNoDraw(false) end
-            end,
+            post = function() noDrawEnts(false) end
         }
     }
     
     local current_mode, mode_data
     local function changeMode(id)
-        if mode_data and mode_data.post then mode_data.post() end
+        if mode_data and mode_data.post then
+            mode_data.post()
+        end
         
         current_mode = id or current_mode % #modes + 1
         mode_data = modes[current_mode]
         
-        if mode_data.pre then mode_data.pre() end
+        if mode_data.pre then
+            mode_data.pre()
+        end
+        
         if mode_data.draw then
             hook.add("PostDrawOpaqueRenderables", "DrawProps", mode_data.draw)
         else
@@ -176,31 +176,24 @@ else -- CLIENT
         end
     end
     
-    hook.add("InputPressed", "ChangeMode", function(button)
-        if button == KEY.E then
-            if not current_mode then
-                print("Please wait... props are yet to be received!")
-            else
-                changeMode()
-            end
-        end
+    hook.add("InputPressed", "ChangeMode", function(key)
+        if key == KEY.E then changeMode() end
     end)
     
-    local function init()
-        changeMode(1)
-        print("Props received!")
-        print("Press 'E' to change the mode...")
-        
-        if player() == owner() then
-            render.setHUDActive(true)
-        end
-        
-        hook.add("DrawHUD", "", function()
-            if mode_data.hud then mode_data.hud() end
+    if player() == owner() then render.setHUDActive(true) end
+    hook.add("DrawHUD", "", function()
+        if not current_mode then
             render.setColor(Color(255,255,255))
-            render.drawText(512, 256, "Mode: "..mode_data.name.. "   (E to change)")
-        end)
-    end
+            render.drawText(522, 266, "Waiting for props...")
+        else
+            if mode_data.hud then
+                mode_data.hud()
+            end
+            render.setColor(Color(255,255,255))
+            render.drawText(522, 266, "Mode: "..mode_data.name)
+            render.drawText(522, 290, "Press E to change the mode")
+        end
+    end)
     
     net.receive("", function()
         local count = net.readUInt(8)
@@ -208,7 +201,9 @@ else -- CLIENT
             net.readEntity(function(ent)
                 if not ent or not ent:isValid() then return end
                 table.insert(ents, ent)
-                if #ents == count then init() end
+                if #ents == count then
+                    changeMode(1)
+                end
             end)
         end
     end)
