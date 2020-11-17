@@ -151,6 +151,14 @@ if CLIENT then
 		ent:SetRenderBounds(vunwrap(mins), vunwrap(maxs))
 		ent.userrenderbounds = true
 	end
+	
+	function ents_methods:draw()
+		if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+		
+		local ent = getent(self)
+		ent:SetupBones()
+		ent:DrawModel()
+	end
 end
 
 local soundsByEntity = SF.EntityTable("emitSoundsByEntity", function(e, t)
