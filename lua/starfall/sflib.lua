@@ -748,7 +748,7 @@ do
 		local time = CurTime()
 		for index, v in pairs(waitingEntities) do
 			local ent = Entity(index)
-			if ent:IsValid() then
+			if ent:IsValid() or ent:IsWorld() then
 				for _, func in ipairs(v) do func(ent) end
 				waitingEntities[index] = nil
 			elseif time>v.timeout then
