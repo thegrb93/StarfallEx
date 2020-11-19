@@ -952,6 +952,7 @@ function SF.CheckRagdoll(model)
 end
 
 local drawEntityClasses = {
+	["player"] = true,
 	["prop_physics"] = true,
 	["prop_ragdoll"] = true,
 	["prop_vehicle_jeep"] = true,
@@ -959,10 +960,7 @@ local drawEntityClasses = {
 	["prop_vehicle_prisoner_pod"] = true,
 }
 function SF.CanDrawEntity(ent)
-	if not drawEntityClasses[ent:GetClass()] then return false end
-	if ent.RenderOverride then return false end
-	if ent:IsEffectActive(EF_BONEMERGE) then return false end
-	return true
+	return drawEntityClasses[ent:GetClass()] and ent.RenderOverride==nil
 end
 
 

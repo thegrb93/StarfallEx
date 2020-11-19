@@ -159,7 +159,7 @@ if CLIENT then
 		return canDrawEntity(getent(self))
 	end
 	
-	--- Draws entity, requires 3D rendering context
+	--- Draws the entity, requires 3D rendering context
 	-- @client
 	function ents_methods:draw()
 		if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
