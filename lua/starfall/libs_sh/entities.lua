@@ -154,12 +154,16 @@ if CLIENT then
 	
 	local canDrawEntity = SF.CanDrawEntity
 	--- Returns whether or not the entity can be drawn using Entity.draw function
+	-- Checks Entity against a predefined class whitelist
+	-- Entities that have RenderOverride defined or are parented cannot be drawn
 	-- @client
 	function ents_methods:canDraw()
 		return canDrawEntity(getent(self))
 	end
 	
 	--- Draws the entity, requires 3D rendering context
+	-- Only certain, whitelisted entities can be drawn. They can't be parented or have RenderOverride defined
+	-- Use Entity.canDraw to check if you can draw the entity
 	-- @client
 	function ents_methods:draw()
 		if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
