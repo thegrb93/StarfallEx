@@ -197,7 +197,7 @@ else
     
     net.receive("", function()
         local count = net.readUInt(8)
-        for i = 1, 8 do
+        for i = 1, count do
             net.readEntity(function(ent)
                 if not ent or not ent:isValid() then return end
                 table.insert(ents, ent)
