@@ -722,4 +722,65 @@ env.CONTENTS = {
 	["WATER"] = CONTENTS_WATER	
 }
 
+
+--- VRmod library enums
+-- @name vr_library.VR
+-- @class table
+-- @client
+-- @field BOOLEAN_PRIMARYFIRE
+-- @field VECTOR1_PRIMARYFIRE
+-- @field BOOLEAN_SECONDARYFIRE
+-- @field BOOLEAN_CHANGEWEAPON
+-- @field BOOLEAN_USE
+-- @field BOOLEAN_SPAWNMENU
+-- @field VECTOR2_WALKDIRECTION
+-- @field BOOLEAN_WALK
+-- @field BOOLEAN_FLASHLIGHT
+-- @field BOOLEAN_TURNLEFT
+-- @field BOOLEAN_TURNRIGHT
+-- @field VECTOR2_SMOOTHTURN
+-- @field BOOLEAN_CHAT
+-- @field BOOLEAN_RELOAD
+-- @field BOOLEAN_JUMP
+-- @field BOOLEAN_LEFT_PICKUP
+-- @field BOOLEAN_RIGHT_PICKUP
+-- @field BOOLEAN_UNDO
+-- @field BOOLEAN_SPRINT
+-- @field VECTOR1_FORWARD
+-- @field VECTOR1_REVERSE
+-- @field BOOLEAN_TURBO
+-- @field VECTOR2_STEER
+-- @field BOOLEAN_HANDBRAKE
+-- @field BOOLEAN_EXIT
+-- @field BOOLEAN_TURRET
+
+env.VR = {
+	["BOOLEAN_PRIMARYFIRE"] = "boolean_primaryfire",
+	["VECTOR1_PRIMARYFIRE"] = "vector1_primaryfire",
+	["BOOLEAN_SECONDARYFIRE"] = "boolean_secondaryfire",
+	["BOOLEAN_CHANGEWEAPON"] = "boolean_changeweapon",
+	["BOOLEAN_USE"] = "boolean_use",
+	["BOOLEAN_SPAWNMENU"] = "boolean_spawnmenu",
+	["VECTOR2_WALKDIRECTION"] = "vector2_walkdirection",
+	["BOOLEAN_WALK"] = "boolean_walk",
+	["BOOLEAN_FLASHLIGHT"] = "boolean_flashlight",
+	["BOOLEAN_TURNLEFT"] = "boolean_turnleft",
+	["BOOLEAN_TURNRIGHT"] = "boolean_turnright",
+	["VECTOR2_SMOOTHTURN"] = "vector2_smoothturn",
+	["BOOLEAN_CHAT"] = "boolean_chat",
+	["BOOLEAN_RELOAD"] = "boolean_reload",
+	["BOOLEAN_JUMP"] = "boolean_jump",
+	["BOOLEAN_LEFT_PICKUP"] = "boolean_left_pickup",
+	["BOOLEAN_RIGHT_PICKUP"] = "boolean_right_pickup",
+	["BOOLEAN_UNDO"] = "boolean_undo",
+	["BOOLEAN_SPRINT"] = "boolean_sprint",
+	["VECTOR1_FORWARD"] = "vector1_forward",
+	["VECTOR1_REVERSE"] = "vector1_reverse",
+	["BOOLEAN_TURBO"] = "boolean_turbo",
+	["VECTOR2_STEER"] = "vector2_steer",
+	["BOOLEAN_HANDBRAKE"] = "boolean_handbrake",
+	["BOOLEAN_EXIT"] = "boolean_exit",
+	["BOOLEAN_TURRET"] = "boolean_turret",
+}
+
 end
