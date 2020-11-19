@@ -40,21 +40,13 @@ end
 -- @name VRPreRender
 -- @class hook
 -- @client
-SF.hookAdd("VRMod_PreRender", "vrprerender", canRenderHudSafeArgs)
+SF.hookAdd("VRMod_PreRender", "vrprerenderleft", canRenderHudSafeArgs)
 
 --- Called before rendering the right eye. This along with the previous hook can be used to render different things in different eyes. HUD is required.
 -- @name VRPreRenderRight
 -- @class hook
 -- @client
 SF.hookAdd("VRMod_PreRenderRight", "vrprerenderright", canRenderHudSafeArgs)
-
---- Called after rendering the game. HUD is required.
--- @name VRPostRender
--- @class hook
--- @client
-SF.hookAdd("VRMod_PostRender", "vrpostrender", canRenderHudSafeArgs)
-
-end 
 
 return function(instance)
 
