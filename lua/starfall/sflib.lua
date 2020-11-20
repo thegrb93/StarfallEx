@@ -951,6 +951,18 @@ function SF.CheckRagdoll(model)
 	return false
 end
 
+local drawEntityClasses = {
+	["starfall_prop"] = true,
+	["prop_physics"] = true,
+	["prop_ragdoll"] = true,
+	["prop_vehicle_jeep"] = true,
+	["prop_vehicle_airboat"] = true,
+	["prop_vehicle_prisoner_pod"] = true,
+}
+function SF.CanDrawEntity(ent)
+	return drawEntityClasses[ent:GetClass()] and not ent:GetParent():IsValid() and ent.RenderOverride==nil
+end
+
 
 --- Returns a path with all .. accounted for
 function SF.NormalizePath(path)

@@ -151,6 +151,28 @@ if CLIENT then
 		ent:SetRenderBounds(vunwrap(mins), vunwrap(maxs))
 		ent.userrenderbounds = true
 	end
+	
+	local canDrawEntity = SF.CanDrawEntity
+	--- Returns whether or not the entity can be drawn using Entity.draw function
+	-- Checks Entity against a predefined class whitelist
+	-- Entities that have RenderOverride defined or are parented cannot be drawn
+	-- @client
+	function ents_methods:canDraw()
+		return canDrawEntity(getent(self))
+	end
+	
+	--- Draws the entity, requires 3D rendering context
+	-- Only certain, whitelisted entities can be drawn. They can't be parented or have RenderOverride defined
+	-- Use Entity.canDraw to check if you can draw the entity
+	-- @client
+	function ents_methods:draw()
+		if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+		
+		local ent = getent(self)
+		if not canDrawEntity(ent) then SF.Throw("Can't draw this entity.", 2) end
+		ent:SetupBones()
+		ent:DrawModel()
+	end
 end
 
 local soundsByEntity = SF.EntityTable("emitSoundsByEntity", function(e, t)

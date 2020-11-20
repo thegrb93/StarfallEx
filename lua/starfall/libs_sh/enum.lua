@@ -722,6 +722,41 @@ env.CONTENTS = {
 	["WATER"] = CONTENTS_WATER	
 }
 
+--- ENUMs of stencil comparisons and operations
+--@field NEVER
+--@field LESS
+--@field EQUAL
+--@field LESSEQUAL
+--@field GREATER
+--@field NOTEQUAL
+--@field GREATEREQUAL
+--@field ALWAYS
+--@field KEEP
+--@field ZERO
+--@field REPLACE
+--@field INCRSAT
+--@field DECRSAT
+--@field INVERT
+--@field INCR
+--@field DECR
+env.STENCIL = {
+	NEVER = STENCIL_NEVER,
+	LESS = STENCIL_LESS,
+	EQUAL = STENCIL_EQUAL,
+	LESSEQUAL = STENCIL_LESSEQUAL,
+	GREATER = STENCIL_GREATER,
+	NOTEQUAL = STENCIL_NOTEQUAL,
+	GREATEREQUAL = STENCIL_GREATEREQUAL,
+	ALWAYS = STENCIL_ALWAYS,
+	KEEP = STENCIL_KEEP,
+	ZERO = STENCIL_ZERO,
+	REPLACE = STENCIL_REPLACE,
+	INCRSAT = STENCIL_INCRSAT,
+	DECRSAT = STENCIL_DECRSAT,
+	INVERT = STENCIL_INVERT,
+	INCR = STENCIL_INCR,
+	DECR = STENCIL_DECR
+}
 
 --- VRmod library enums
 -- @name vr_library.VR
@@ -753,7 +788,6 @@ env.CONTENTS = {
 -- @field BOOLEAN_HANDBRAKE
 -- @field BOOLEAN_EXIT
 -- @field BOOLEAN_TURRET
-
 env.VR = {
 	["BOOLEAN_PRIMARYFIRE"] = "boolean_primaryfire",
 	["VECTOR1_PRIMARYFIRE"] = "vector1_primaryfire",
