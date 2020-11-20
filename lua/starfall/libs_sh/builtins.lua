@@ -416,7 +416,7 @@ local function argsToChat(...)
 	end
 	-- Combine the strings with tabs
 	local processed = {}
-	if defaultColor then processed[1] = Color(151, 211, 255) size = 4 end
+	if defaultColor then processed[1] = SERVER and Color(151, 211, 255) or Color(231, 219, 116) size = 4 end
 	local i = 1
 	while i <= n do
 		if isstring(input[i]) then

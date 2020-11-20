@@ -149,7 +149,7 @@ function ENT:GetResolution()
 end
 
 ENT.Monitor_Offsets = {
-	["models//cheeze/pcb/pcb4.mdl"] = {
+	["models/cheeze/pcb/pcb4.mdl"] = {
 		Name	=	"pcb4.mdl",
 		RS	=	0.0625,
 		RatioX	=	1,
@@ -161,7 +161,7 @@ ENT.Monitor_Offsets = {
 		y2	=	16,
 		z	=	0.5,
 	},
-	["models//cheeze/pcb/pcb5.mdl"] = {
+	["models/cheeze/pcb/pcb5.mdl"] = {
 		Name	=	"pcb5.mdl",
 		RS	=	0.0625,
 		RatioX	=	0.508,
@@ -173,7 +173,7 @@ ENT.Monitor_Offsets = {
 		y2	=	16,
 		z	=	0.5,
 	},
-	["models//cheeze/pcb/pcb6.mdl"] = {
+	["models/cheeze/pcb/pcb6.mdl"] = {
 		Name	=	"pcb6.mdl",
 		RS	=	0.09375,
 		RatioX	=	0.762,
@@ -185,7 +185,7 @@ ENT.Monitor_Offsets = {
 		y2	=	24,
 		z	=	0.5,
 	},
-	["models//cheeze/pcb/pcb7.mdl"] = {
+	["models/cheeze/pcb/pcb7.mdl"] = {
 		Name	=	"pcb7.mdl",
 		RS	=	0.125,
 		RatioX	=	1,
@@ -197,7 +197,7 @@ ENT.Monitor_Offsets = {
 		y2	=	32,
 		z	=	0.5,
 	},
-	["models//cheeze/pcb/pcb8.mdl"] = {
+	["models/cheeze/pcb/pcb8.mdl"] = {
 		Name	=	"pcb8.mdl",
 		RS	=	0.125,
 		RatioX	=	0.668,
