@@ -23,30 +23,30 @@ SF.hookAdd("VRMod_Start", "vrstart")
 SF.hookAdd("VRMod_Exit", "vrexit")
 
 if CLIENT then
+	--- This gets called every time a boolean controller input action changes state
+	-- @name VRInput
+	-- @class hook
+	-- @param actionname Name of the input
+	-- @param boolean State of the input
+	-- @client
+	SF.hookAdd("VRMod_Input", "vrinput")
 
---- This gets called every time a boolean controller input action changes state
--- @name VRInput
--- @class hook
--- @param actionname Name of the input
--- @param boolean State of the input
--- @client
-SF.hookAdd("VRMod_Input", "vrinput")
+	local function canRenderHudSafeArgs(instance, ...)
+		return instance:isHUDActive() and (instance.player == SF.Superuser or haspermission(instance, nil, "render.hud")), {...}
+	end
 
-local function canRenderHudSafeArgs(instance, ...)
-	return instance:isHUDActive() and (instance.player == SF.Superuser or haspermission(instance, nil, "render.hud")), {...}
+	--- Called before rendering the game. Any code that you want to run once per frame should be put here. HUD is required.
+	-- @name VRPreRender
+	-- @class hook
+	-- @client
+	SF.hookAdd("VRMod_PreRender", "vrprerenderleft", canRenderHudSafeArgs)
+
+	--- Called before rendering the right eye. This along with the previous hook can be used to render different things in different eyes. HUD is required.
+	-- @name VRPreRenderRight
+	-- @class hook
+	-- @client
+	SF.hookAdd("VRMod_PreRenderRight", "vrprerenderright", canRenderHudSafeArgs)
 end
-
---- Called before rendering the game. Any code that you want to run once per frame should be put here. HUD is required.
--- @name VRPreRender
--- @class hook
--- @client
-SF.hookAdd("VRMod_PreRender", "vrprerenderleft", canRenderHudSafeArgs)
-
---- Called before rendering the right eye. This along with the previous hook can be used to render different things in different eyes. HUD is required.
--- @name VRPreRenderRight
--- @class hook
--- @client
-SF.hookAdd("VRMod_PreRenderRight", "vrprerenderright", canRenderHudSafeArgs)
 
 return function(instance)
 
@@ -156,155 +156,152 @@ end
 
 if CLIENT then
 
-
-
---- returns the a controller's input state, may return boolean, number or vector.
--- @param actionname to check control of, check VR enums
--- @return boolean, vector or number of input
--- @client
-function vr_library.getInput(actionname)
-	checkluatype(actionname, TYPE_STRING) 
-	local var = vrmod.GetInput(actionname)
-	local typeid = TypeID(var)
-	if typeid == TYPE_BOOL or typeid == TYPE_NUMBER then
+	--- returns the a controller's input state, may return boolean, number or vector.
+	-- @param actionname to check control of, check VR enums
+	-- @return boolean, vector or number of input
+	-- @client
+	function vr_library.getInput(actionname)
+		checkluatype(actionname, TYPE_STRING) 
+		local var = vrmod.GetInput(actionname)
+		local typeid = TypeID(var)
+		if typeid == TYPE_BOOL or typeid == TYPE_NUMBER then
+			return var
+		elseif typeid == TYPE_TABLE then
+			return vwrap(Vector(var.x, var.y or 0, 0))
+		end
 		return var
-	elseif typeid == TYPE_TABLE then
-		return vwrap(Vector(var.x, var.y or 0, 0))
 	end
-	return var
-end
 
 
--- HMD
+	-- HMD
 
---- returns the HMD velocity
--- @return vector velocity
--- @client
-function vr_library.getHMDVelocity()
-	return vwrap(vrmod.GetHMDVelocity())
-end
+	--- returns the HMD velocity
+	-- @return vector velocity
+	-- @client
+	function vr_library.getHMDVelocity()
+		return vwrap(vrmod.GetHMDVelocity())
+	end
 
---- returns the HMD angular velocity
--- @return vector angular velocity
--- @client
-function vr_library.getHMDAngularVelocity()
-	return vwrap(vrmod.GetHMDVelocity())
-end
+	--- returns the HMD angular velocity
+	-- @return vector angular velocity
+	-- @client
+	function vr_library.getHMDAngularVelocity()
+		return vwrap(vrmod.GetHMDVelocity())
+	end
 
---- returns the HMD velocities, position and angular
--- @return vector velocity
--- @return vector angular velocity
--- @client
-function vr_library.getHMDVelocities()
-	local v1, v2 = vrmod.GetHMDVelocities()
-	return vwrap(v1), vwrap(v2)
-end
+	--- returns the HMD velocities, position and angular
+	-- @return vector velocity
+	-- @return vector angular velocity
+	-- @client
+	function vr_library.getHMDVelocities()
+		local v1, v2 = vrmod.GetHMDVelocities()
+		return vwrap(v1), vwrap(v2)
+	end
 
---Left hand
+	--Left hand
 
---- returns the left hand velocity
--- @return vector velocity
--- @client
-function vr_library.getLeftHandVelocity()
-	return vwrap(vrmod.GetLeftHandVelocity())
-end
+	--- returns the left hand velocity
+	-- @return vector velocity
+	-- @client
+	function vr_library.getLeftHandVelocity()
+		return vwrap(vrmod.GetLeftHandVelocity())
+	end
 
---- returns the left hand angular velocity
--- @return vector angular velocity
--- @client
-function vr_library.getLeftHandAngularVelocity()
-	return vwrap(vrmod.GetLeftHandAngularVelocity())
-end
+	--- returns the left hand angular velocity
+	-- @return vector angular velocity
+	-- @client
+	function vr_library.getLeftHandAngularVelocity()
+		return vwrap(vrmod.GetLeftHandAngularVelocity())
+	end
 
---- returns the left hand velocities, position and angular
--- @return vector velocity
--- @return vector angular velocity
--- @client
-function vr_library.getLeftHandVelocities()
-	local v1, v2 = vrmod.GetLeftHandVelocities()
-	return vwrap(v1), vwrap(v2)
-end
+	--- returns the left hand velocities, position and angular
+	-- @return vector velocity
+	-- @return vector angular velocity
+	-- @client
+	function vr_library.getLeftHandVelocities()
+		local v1, v2 = vrmod.GetLeftHandVelocities()
+		return vwrap(v1), vwrap(v2)
+	end
 
---Right hand
+	--Right hand
 
---- returns the right hand velocity
--- @return vector velocity
--- @client
-function vr_library.getRightHandVelocity()
-	return vwrap(vrmod.GetRightHandVelocity())
-end
+	--- returns the right hand velocity
+	-- @return vector velocity
+	-- @client
+	function vr_library.getRightHandVelocity()
+		return vwrap(vrmod.GetRightHandVelocity())
+	end
 
---- returns the right hand angular velocity
--- @return vector angular velocity
--- @client
-function vr_library.getRightHandAngularVelocity()
-	return vwrap(vrmod.GetRightHandAngularVelocity())
-end
+	--- returns the right hand angular velocity
+	-- @return vector angular velocity
+	-- @client
+	function vr_library.getRightHandAngularVelocity()
+		return vwrap(vrmod.GetRightHandAngularVelocity())
+	end
 
---- returns the right hand velocities, position and angular
--- @return vector velocity
--- @return vector angular velocity
--- @client
-function vr_library.getRightHandVelocities()
-	local v1, v2 = vrmod.GetRightHandVelocities()
-	return vwrap(v1), vwrap(v2)
-end
+	--- returns the right hand velocities, position and angular
+	-- @return vector velocity
+	-- @return vector angular velocity
+	-- @client
+	function vr_library.getRightHandVelocities()
+		local v1, v2 = vrmod.GetRightHandVelocities()
+		return vwrap(v1), vwrap(v2)
+	end
 
---TODO: Add
---vrmod.SetLeftHandPose(vector pos, angle ang)
---vrmod.SetRightHandPose(vector pos, angle ang)
---only usable in VR Prerender hook AND SF Hud
+	--TODO: Add
+	--vrmod.SetLeftHandPose(vector pos, angle ang)
+	--vrmod.SetRightHandPose(vector pos, angle ang)
+	--only usable in VR Prerender hook AND SF Hud
 
---Add those finger functions...
+	--Add those finger functions...
 
---Playspace
+	--Playspace
 
---- returns the playspace position
--- @return vector position
--- @client
-function vr_library.getOriginPos()
-	return vwrap(vrmod.GetOriginPos())
-end
+	--- returns the playspace position
+	-- @return vector position
+	-- @client
+	function vr_library.getOriginPos()
+		return vwrap(vrmod.GetOriginPos())
+	end
 
---- returns the playspace angles
--- @return angle angles
--- @client
-function vr_library.getOriginAng()
-	return awrap(vrmod.GetOriginAng())
-end
+	--- returns the playspace angles
+	-- @return angle angles
+	-- @client
+	function vr_library.getOriginAng()
+		return awrap(vrmod.GetOriginAng())
+	end
 
---- returns the playspace position and angles
--- @return vector position
--- @return angle angles
--- @client
-function vr_library.getOrigin()
-	local pos, ang = vrmod.GetOrigin()
-	return vwrap(pos), awrap(ang)
-end
+	--- returns the playspace position and angles
+	-- @return vector position
+	-- @return angle angles
+	-- @client
+	function vr_library.getOrigin()
+		local pos, ang = vrmod.GetOrigin()
+		return vwrap(pos), awrap(ang)
+	end
 
---eyes GetEyePos
+	--eyes GetEyePos
 
---- returns position of the eye that is currently being used for rendering.
--- @return vector position
--- @client
-function vr_library.getEyePos()
-	return vwrap(vrmod.GetEyePos())
-end
+	--- returns position of the eye that is currently being used for rendering.
+	-- @return vector position
+	-- @client
+	function vr_library.getEyePos()
+		return vwrap(vrmod.GetEyePos())
+	end
 
---- returns position of the left eye
--- @return vector position
--- @client
-function vr_library.getLeftEyePos()
-	return vwrap(vrmod.GetLeftEyePos())
-end
+	--- returns position of the left eye
+	-- @return vector position
+	-- @client
+	function vr_library.getLeftEyePos()
+		return vwrap(vrmod.GetLeftEyePos())
+	end
 
---- returns position of the right eye
--- @return vector position
--- @client
-function vr_library.getRightEyePos()
-	return vwrap(vrmod.GetRightEyePos())
-end
-
+	--- returns position of the right eye
+	-- @return vector position
+	-- @client
+	function vr_library.getRightEyePos()
+		return vwrap(vrmod.GetRightEyePos())
+	end
 end
 
 end
