@@ -175,7 +175,7 @@ function TOOL:Reload(trace)
 	local ply = self:GetOwner()
 	local sf = trace.Entity
 
-	if sf:IsValid() and sf:GetClass() == "starfall_processor" and sf.mainfile then
+	if sf:IsValid() and sf:GetClass() == "starfall_processor" and sf.sfdata.mainfile then
 		if CLIENT then return true end
 
 		if not SF.RequestCode(ply, function(sfdata)
