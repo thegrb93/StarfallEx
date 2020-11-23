@@ -101,6 +101,7 @@ end
 function ENT:PostEntityPaste(ply, ent, CreatedEntities)
 	if ent.EntityMods and ent.EntityMods.SFDupeInfo then
 		local info = ent.EntityMods.SFDupeInfo
+		if not ply then ply = NULL end
 
 		if WireLib then
 			WireLib.ApplyDupeInfo(ply, ent, info, EntityLookup(CreatedEntities))
@@ -122,13 +123,11 @@ local function dupefinished(TimedPasteData, TimedPasteDataCurrent)
 			starfalls[#starfalls+1] = v
 		end
 	end
-	if next(starfalls) then
-		for k, v in pairs(starfalls) do
-			v:SetupFiles(v.sfdata)
-			local instance = v.instance
-			if instance then
-				instance:runScriptHook("dupefinished", instance.Sanitize(entList))
-			end
+	for k, v in pairs(starfalls) do
+		v:SetupFiles(v.sfdata)
+		local instance = v.instance
+		if instance then
+			instance:runScriptHook("dupefinished", instance.Sanitize(entList))
 		end
 	end
 end

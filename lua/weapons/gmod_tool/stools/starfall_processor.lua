@@ -18,7 +18,7 @@ if SERVER then
 	util.AddNetworkString("starfall_openeditor")
 
 	function MakeSF(pl, Pos, Ang, model, inputs, outputs)
-		if not pl:CheckLimit("starfall_processor") then return false end
+		if pl and not pl:CheckLimit("starfall_processor") then return false end
 
 		local sf = ents.Create("starfall_processor")
 		if not (sf and sf:IsValid()) then return false end
@@ -45,8 +45,10 @@ if SERVER then
 			sf.Outputs = WireLib.AdjustSpecialOutputs(sf, outputs[1], outputs[2])
 		end
 
-		pl:AddCount("starfall_processor", sf)
-		pl:AddCleanup("starfall_processor", sf)
+		if pl then
+			pl:AddCount("starfall_processor", sf)
+			pl:AddCleanup("starfall_processor", sf)
+		end
 
 		return sf
 	end
