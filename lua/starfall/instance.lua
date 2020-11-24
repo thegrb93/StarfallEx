@@ -58,7 +58,9 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 		SF.Preprocessor.ParseDirectives(filename, source, instance.ppdata)
 	end
 
-	if player ~= SF.Superuser and instance.ppdata.superuser and instance.ppdata.superuser[mainfile] then
+	if player:IsWorld() then
+		player = SF.Superuser
+	elseif instance.ppdata.superuser and instance.ppdata.superuser[mainfile] then
 		if player:IsSuperAdmin() then
 			player = SF.Superuser
 		else

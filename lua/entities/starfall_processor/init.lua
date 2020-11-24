@@ -101,7 +101,7 @@ end
 function ENT:PostEntityPaste(ply, ent, CreatedEntities)
 	if ent.EntityMods and ent.EntityMods.SFDupeInfo then
 		local info = ent.EntityMods.SFDupeInfo
-		if not ply then ply = NULL end
+		if not ply then ply = game.GetWorld() end
 
 		if WireLib then
 			WireLib.ApplyDupeInfo(ply, ent, info, EntityLookup(CreatedEntities))
