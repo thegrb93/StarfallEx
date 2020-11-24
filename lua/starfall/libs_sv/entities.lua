@@ -820,5 +820,13 @@ function ents_methods:getCreationID()
 	return ent:GetCreationID()
 end
 
+--- Makes a prop_physics usable. PlayerUse hook will be called when a player uses it
+function ents_methods:makeUsable()
+	local ent = getent(self)
+	checkpermission(instance, ent, "entities.canTool")
+	if ent:GetClass()~="prop_physics" then SF.Throw("The entity must be a prop_physics!", 2) end
+	ent:Fire("addoutput", "spawnflags 256")
+end
+	
 
 end
