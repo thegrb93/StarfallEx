@@ -380,20 +380,14 @@ local function printTableX(t, indent, alreadyprinted)
 		for k, v in builtins_library.pairs(t) do
 			if SF.GetType(v) == "table" and not alreadyprinted[v] then
 				alreadyprinted[v] = true
-				local s = string.rep("\t", indent) .. tostring(k) .. ":"
-				if SERVER then printBurst:use(ply, #s) end
-				ply:ChatPrint(s)
+				builtins_library.print(string.rep("\t", indent) .. tostring(k) .. ":")
 				printTableX(v, indent + 1, alreadyprinted)
 			else
-				local s = string.rep("\t", indent) .. tostring(k) .. "\t=\t" .. tostring(v)
-				if SERVER then printBurst:use(ply, #s) end
-				ply:ChatPrint(s)
+				builtins_library.print(string.rep("\t", indent) .. tostring(k) .. "\t=\t" .. tostring(v))
 			end
 		end
 	else
-		local s = string.rep("\t", indent).."{}"
-		if SERVER then printBurst:use(ply, #s) end
-		ply:ChatPrint(s)
+		builtins_library.print(string.rep("\t", indent).."{}")
 	end
 end
 
