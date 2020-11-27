@@ -328,8 +328,8 @@ function ss_methods:readFloat()
 	return UnpackIEEE754Float(t[1], t[2], t[3], t[4])
 end
 
---- Reads a 4 byte IEEE754 float from the byte stream and advances the buffer pointer.
---@return The float32 at this position
+--- Reads a 8 byte IEEE754 double from the byte stream and advances the buffer pointer.
+--@return The double at this position
 function ss_methods:readDouble()
 	local t = self:readBytesEndian(self.pos, self.pos+7)
 	self.pos = self.pos + 8
