@@ -87,6 +87,7 @@ end
 function ENT:SetupFiles(sfdata)
 	self.sfdata = sfdata
 	self.owner = sfdata.owner
+	self.proc = self
 
 	self:Compile()
 
