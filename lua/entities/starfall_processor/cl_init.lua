@@ -103,7 +103,7 @@ net.Receive("starfall_processor_download", function(len)
 
 	local owner, proc, sfdata
 	local function setupFiles()
-		if not (owner and (owner:IsValid() or owner:IsWorld())) then return end
+		if not (owner and ((owner:IsValid() and owner:IsPlayer()) or owner:IsWorld())) then return end
 		if not (proc and proc:IsValid()) then return end
 		if not sfdata then return end
 		proc:SetupFiles(sfdata)
