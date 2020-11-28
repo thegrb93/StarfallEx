@@ -3,8 +3,10 @@
 function net.ReadStarfall(ply, callback)
 	local sfdata = {files = {}}
 	if CLIENT then
-		sfdata.proc = net.ReadEntity()
-		sfdata.owner = net.ReadEntity()
+		sfdata.procindex = net.ReadUInt(16)
+		sfdata.proc = Entity(sfdata.procindex)
+		sfdata.ownerindex = net.ReadUInt(16)
+		sfdata.owner = Entity(sfdata.ownerindex)
 	end
 	sfdata.mainfile = net.ReadString()
 
@@ -27,8 +29,8 @@ end
 function net.WriteStarfall(sfdata, callback)
 	if #sfdata.mainfile > 255 then error("Main file name too large: " .. #sfdata.mainfile .. " (max is 255)") end
 	if SERVER then
-		net.WriteEntity(sfdata.proc)
-		net.WriteEntity(sfdata.owner)
+		net.WriteUInt(sfdata.proc:EntIndex(), 16)
+		net.WriteUInt(sfdata.owner:EntIndex(), 16)
 	end
 	net.WriteString(sfdata.mainfile)
 

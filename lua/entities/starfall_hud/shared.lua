@@ -11,7 +11,8 @@ ENT.Spawnable       = false
 
 
 function ENT:LinkEnt(ent, transmit)
-	if self.link ~= ent then
+	local changed = self.link ~= ent
+	if changed then
 		local oldlink = self.link
 		self.link = ent
 
@@ -27,12 +28,11 @@ function ENT:LinkEnt(ent, transmit)
 				instance:runScriptHook("componentlinked", instance.WrapObject(self))
 			end
 		end
-
-		if SERVER then
-			net.Start("starfall_processor_link")
-			net.WriteUInt(self:EntIndex(), 16)
-			net.WriteUInt(ent:EntIndex(), 16)
-			if transmit then net.Send(transmit) else net.Broadcast() end
-		end
+	end
+	if SERVER and (changed or transmit) then
+		net.Start("starfall_processor_link")
+		net.WriteUInt(self:EntIndex(), 16)
+		net.WriteUInt(ent:EntIndex(), 16)
+		if transmit then net.Send(transmit) else net.Broadcast() end
 	end
 end

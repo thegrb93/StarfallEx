@@ -101,15 +101,31 @@ end
 
 net.Receive("starfall_processor_download", function(len)
 
-	local sfdata = net.ReadStarfall(nil, function(ok, sfdata)
-		if ok and sfdata.proc:IsValid() and (sfdata.owner:IsValid() or sfdata.owner==SF.Superuser) then
-			sfdata.proc:SetupFiles(sfdata)
+	local owner, proc, sfdata
+	local function setupFiles()
+		if not (owner and (owner:IsValid() or owner:IsWorld())) then return end
+		if not (proc and proc:IsValid()) then return end
+		if not sfdata then return end
+		proc:SetupFiles(sfdata)
+	end
+
+	local sfdata = net.ReadStarfall(nil, function(ok, sfdata_)
+		if ok then
+			sfdata = sfdata_
+			setupFiles()
 		end
 	end)
 
-	if sfdata.proc:IsValid() then
-		sfdata.proc:Destroy()
-	end
+	SF.WaitForEntity(sfdata.procindex, function(proc_)
+		proc = proc_
+		if proc and proc.Destroy then proc:Destroy() end
+		setupFiles()
+	end)
+
+	SF.WaitForEntity(sfdata.ownerindex, function(owner_)
+		owner = owner_
+		setupFiles()
+	end)
 
 end)
 
