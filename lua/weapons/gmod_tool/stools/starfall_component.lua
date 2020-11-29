@@ -16,7 +16,7 @@ cleanup.Register("starfall_components")
 local MakeComponent
 
 if SERVER then
-	CreateConVar('sbox_maxstarfall_components', 3, { FCVAR_REPLICATED, FCVAR_NOTIFY, FCVAR_ARCHIVE })
+	CreateConVar('sbox_maxstarfall_components', 10, { FCVAR_REPLICATED, FCVAR_NOTIFY, FCVAR_ARCHIVE })
 
 	function MakeComponent(class, pl, Pos, Ang, model)
 		if not pl:CheckLimit("starfall_components") then return false end
