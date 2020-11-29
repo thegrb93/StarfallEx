@@ -147,11 +147,13 @@ if LocalPlayer() ~= instance.player then return end
 
 local socket_data = {}
 socket_data.sockets = {}
+socket_data.originals = {}
 instance.data.socket = socket_data
 
 local function socket_hook(sock_fn)
-	return function(...)
-		local obj, err = sock_fn(...)
+	socket_data.originals[sock_fn] = socket[sock_fn]
+	socket[sock_fn] = function(...)
+		local obj, err = socket_data.originals[sock_fn](...)
 		if obj ~= nil then
 			socket_data.sockets[#socket_data.sockets + 1] = obj
 		end
@@ -159,17 +161,26 @@ local function socket_hook(sock_fn)
 	end
 end
 
-socket.tcp = socket_hook(socket.tcp)
-socket.udp = socket_hook(socket.udp)
-socket.connect = socket_hook(socket.connect)
-socket.bind = socket_hook(socket.bind)
-
 instance:AddHook("deinitialize", function()
+	local originals = instance.data.socket.originals
 	local socket_list = instance.data.socket.sockets
 	for i = 1, #socket_list do
 		socket_list[i]:close()
 	end
+	for name, fn in pairs(originals) do
+		socket[name] = fn
+	end
 end)
+
+socket_hook("tcp")
+socket_hook("tcp4")
+socket_hook("tcp6")
+socket_hook("udp")
+socket_hook("udp4")
+socket_hook("udp6")
+socket_hook("connect")
+-- connect4 and connect6 call socket.connect
+socket_hook("bind")
 
 instance.env.socket = socket
 
