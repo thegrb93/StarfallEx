@@ -143,9 +143,34 @@ SF.RegisterLibrary("socket")
 
 return function(instance)
 
+if LocalPlayer() ~= instance.player then return end
 
-if LocalPlayer() == instance.player then
-	instance.env.socket = socket
+local socket_data = {}
+socket_data.sockets = {}
+instance.data.socket = socket_data
+
+local function socket_hook(sock_fn)
+	return function(...)
+		local obj, err = sock_fn(...)
+		if obj ~= nil then
+			socket_data.sockets[#socket_data.sockets + 1] = obj
+		end
+		return obj, err
+	end
 end
+
+socket.tcp = socket_hook(socket.tcp)
+socket.udp = socket_hook(socket.udp)
+socket.connect = socket_hook(socket.connect)
+socket.bind = socket_hook(socket.bind)
+
+instance:AddHook("deinitialize", function()
+	local socket_list = instance.data.socket.sockets
+	for i = 1, #socket_list do
+		socket_list[i]:close()
+	end
+end)
+
+instance.env.socket = socket
 
 end
