@@ -147,17 +147,15 @@ if LocalPlayer() ~= instance.player then return end
 
 local socket_data = {}
 socket_data.sockets = {}
-socket_data.originals = {}
 instance.data.socket = socket_data
 
-local function socket_hook(sock_fn)
-	socket_data.originals[sock_fn] = socket[sock_fn]
-	socket[sock_fn] = function(...)
-		local obj, err = socket_data.originals[sock_fn](...)
-		if obj ~= nil then
-			socket_data.sockets[#socket_data.sockets + 1] = obj
+local function create_proxy_function(original_function)
+	return function(...)
+		local sock, err = original_function(...)
+		if sock ~= nil then
+			socket_data.sockets[#socket_data.sockets + 1] = sock
 		end
-		return obj, err
+		return sock, err
 	end
 end
 
@@ -167,21 +165,22 @@ instance:AddHook("deinitialize", function()
 	for i = 1, #socket_list do
 		socket_list[i]:close()
 	end
-	for name, fn in pairs(originals) do
-		socket[name] = fn
-	end
 end)
 
-socket_hook("tcp")
-socket_hook("tcp4")
-socket_hook("tcp6")
-socket_hook("udp")
-socket_hook("udp4")
-socket_hook("udp6")
-socket_hook("connect")
--- connect4 and connect6 call socket.connect
-socket_hook("bind")
+local socket_proxy = {}
+setmetatable(socket_proxy, { __index = socket })
 
-instance.env.socket = socket
+socket_proxy.tcp = create_proxy_function(socket.tcp)
+socket_proxy.tcp4 = create_proxy_function(socket.tcp4)
+socket_proxy.tcp6 = create_proxy_function(socket.tcp6)
+socket_proxy.udp = create_proxy_function(socket.udp)
+socket_proxy.udp4 = create_proxy_function(socket.udp4)
+socket_proxy.udp6 = create_proxy_function(socket.udp6)
+socket_proxy.connect = create_proxy_function(socket.connect)
+socket_proxy.connect4 = create_proxy_function(socket.connect4)
+socket_proxy.connect6 = create_proxy_function(socket.connect6)
+socket_proxy.bind = create_proxy_function(socket.bind)
+
+instance.env.socket = socket_proxy
 
 end
