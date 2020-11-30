@@ -152,12 +152,27 @@ instance.data.socket = socket_data
 local function create_sock_proxy(sock)
 	local sock_proxy = {
 		close = function(s, ...)
-			local underlying_socket = s.__index
+			local underlying_socket = getmetatable(s).sock
 			socket_data.sockets[underlying_socket] = nil
 			return underlying_socket:close(...)
 		end,
-		__index = sock
 	}
+	setmetatable(sock_proxy, {
+		sock = sock,
+		__index = function(tbl, key)
+			local underlying_socket = getmetatable(tbl).sock
+			local underlying_value = underlying_socket[key]
+			if type(underlying_value) == "function" then
+				return function(s, ...)
+					local meta = getmetatable(s)
+					if meta ~= nil then s = meta.sock or s end
+					return underlying_value(s, ...)
+				end
+			else
+				return underlying_value
+			end
+		end
+	})
 	return sock_proxy
 end
 
