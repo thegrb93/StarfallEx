@@ -198,17 +198,6 @@ function holograms_library.create(pos, ang, model, scale)
 	end
 end
 
---- Removes all holograms created by the calling chip
-function holograms_library.removeAll()
-	if CLIENT and instance.data.render.isRendering then SF.Throw("Cannot remove while in rendering hook!", 2) end
-	
-	for holoent, _ in pairs(instance.data.holograms.holos) do
-		holoent:RemoveCallOnRemove("starfall_hologram_delete")
-		hologramOnDestroy(holoent, instance.data.holograms.holos, instance.player)
-		holoent:Remove()
-	end
-end
-
 --- Checks if a user can spawn anymore holograms.
 -- @return True if user can spawn holograms, False if not.
 function holograms_library.canSpawn()
