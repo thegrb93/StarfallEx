@@ -2137,7 +2137,7 @@ end
 -- @param boolean isDrawingDepth Whether the current draw is writing depth.
 -- @param boolean isDrawSkybox Whether the current draw is drawing the skybox.
 
---- Called when the engine wants to calculate the player's view
+--- Called when the engine wants to calculate the player's view. (Only works with HUD)
 -- @name calcview
 -- @class hook
 -- @client
