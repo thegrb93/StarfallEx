@@ -483,6 +483,7 @@ if SERVER then
 	end
 
 	--- Sets a player's eye angles
+	-- @server
 	-- @param ang New angles
 	function player_methods:setEyeAngles(ang)
 		local ent = getent(self)
