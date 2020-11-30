@@ -149,11 +149,24 @@ local socket_data = {}
 socket_data.sockets = {}
 instance.data.socket = socket_data
 
+local function create_sock_proxy(sock)
+	local sock_proxy = {
+		close = function(s, ...)
+			local underlying_socket = s.__index
+			socket_data.sockets[underlying_socket] = nil
+			return underlying_socket:close(...)
+		end,
+		__index = sock
+	}
+	return sock_proxy
+end
+
 local function create_proxy_function(original_function)
 	return function(...)
 		local sock, err = original_function(...)
 		if sock ~= nil then
-			socket_data.sockets[#socket_data.sockets + 1] = sock
+			socket_data.sockets[sock] = sock
+			sock = create_sock_proxy(sock)
 		end
 		return sock, err
 	end
@@ -162,8 +175,8 @@ end
 instance:AddHook("deinitialize", function()
 	local originals = instance.data.socket.originals
 	local socket_list = instance.data.socket.sockets
-	for i = 1, #socket_list do
-		socket_list[i]:close()
+	for _, sock in pairs(socket_list) do
+		sock:close()
 	end
 end)
 
