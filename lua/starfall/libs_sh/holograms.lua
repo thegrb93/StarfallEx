@@ -189,6 +189,22 @@ function holograms_library.create(pos, ang, model, scale)
 	end
 end
 
+--- Removes all holograms created by the calling chip
+-- @return number of holograms removed
+function holograms_library.removeAll()
+	if CLIENT and instance.data.render.isRendering then SF.Throw("Cannot remove while in rendering hook!", 2) end
+	
+	local holos = instance.data.holograms.holos
+	local removedHolos = 0
+	
+	for holo, _ in pairs(holos) do
+		if CLIENT then checkpermission(instance, holo, "hologram.create") end
+		holo:Remove()
+		removedHolos = removedHolos + 1
+	end
+	return removedHolos
+end
+
 --- Checks if a user can spawn anymore holograms.
 -- @return True if user can spawn holograms, False if not.
 function holograms_library.canSpawn()
