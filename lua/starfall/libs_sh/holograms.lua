@@ -79,6 +79,22 @@ local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
 
+local function removeHolo(holo)
+	if CLIENT and instance.data.render.isRendering then SF.Throw("Cannot remove while in rendering hook!", 2) end
+	if not holo:IsValid() or not holo.IsSFHologram then return end
+
+	holo:RemoveCallOnRemove("starfall_hologram_delete")
+	hologramOnDestroy(holo, instance.data.holograms.holos, instance.player)
+
+	holo:Remove()
+end
+
+local function removeAllHolos()
+	for holoent, _ in pairs(instance.data.holograms.holos) do 
+		removeHolo(holoent) 
+	end
+end
+
 local getent
 instance:AddHook("initialize", function()
 	instance.data.holograms = {holos = {}}
@@ -87,17 +103,10 @@ instance:AddHook("initialize", function()
 end)
 
 instance:AddHook("deinitialize", function()
-	local holos = instance.data.holograms.holos
-	for holo, _ in pairs(holos) do
-		if holo:IsValid() then
-			holo:RemoveCallOnRemove("starfall_hologram_delete")
-			hologramOnDestroy(holo, holos, instance.player)
-			if CLIENT then
-				timer.Simple(0,function() holo:Remove() end)
-			else
-				holo:Remove()
-			end
-		end
+	if SERVER then
+		removeAllHolos()
+	else
+		timer.Simple(0, removeAllHolos)
 	end
 end)
 
@@ -263,16 +272,6 @@ else
 		checkpermission(instance, holo, "hologram.setRenderProperty")
 
 		holo:SetAngles(ang)
-	end
-
-	--- Removes a hologram
-	function hologram_methods:remove()
-		local holo = getholo(self)
-		if instance.data.render.isRendering then SF.Throw("Cannot remove while in rendering hook!", 2) end
-
-		checkpermission(instance, holo, "hologram.create")
-
-		holo:Remove()
 	end
 
 	--- Sets the texture filtering function when viewing a close texture
@@ -541,6 +540,20 @@ function hologram_methods:removeEffects(effect)
 	checkpermission(instance, holo, "entities.setRenderProperty")
 	
 	holo:RemoveEffects(effect)
+end
+
+--- Removes a hologram
+-- @shared
+function hologram_methods:remove()
+	local holo = getholo(self)
+	checkpermission(instance, holo, "hologram.create")
+	removeHolo(holo)
+end
+
+--- Removes all holograms created by the calling chip
+-- @shared
+function holograms_library.removeAll()
+	removeAllHolos()
 end
 
 
