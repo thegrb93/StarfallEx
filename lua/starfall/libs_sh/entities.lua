@@ -214,18 +214,22 @@ function ents_methods:stopSound(snd)
 	ent:StopSound(snd)
 end
 
---- Returns a list of entities linked to a processor
+--- Returns a list of components to a processor or vehicles to a HUD
 -- @return A list of components linked to the entity
 function ents_methods:getLinkedComponents()
 	local ent = getent(self)
-	if ent:GetClass() ~= "starfall_processor" then SF.Throw("The target must be a starfall_processor", 2) end
-
 	local list = {}
-	for k, v in ipairs(ents.FindByClass("starfall_screen")) do
-		if v.link == ent then list[#list+1] = ewrap(v) end
-	end
-	for k, v in ipairs(ents.FindByClass("starfall_hud")) do
-		if v.link == ent then list[#list+1] = ewrap(v) end
+	if ent:GetClass() == "starfall_processor" then
+		for k, v in ipairs(ents.FindByClass("starfall_screen")) do
+			if v.link == ent then list[#list+1] = ewrap(v) end
+		end
+		for k, v in ipairs(ents.FindByClass("starfall_hud")) do
+			if v.link == ent then list[#list+1] = ewrap(v) end
+		end
+	elseif ent:GetClass() == "starfall_hud" and SERVER then
+		for k, v in pairs(SF.HudVehicleLinks) do if v == ent then list[#list+1] = owrap(k) end end
+	else
+		SF.Throw("The target must be a starfall_processor or starfall_hud", 2)
 	end
 
 	return list

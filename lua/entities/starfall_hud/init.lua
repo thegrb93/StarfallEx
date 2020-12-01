@@ -5,6 +5,7 @@ include('shared.lua')
 util.AddNetworkString("starfall_hud_set_enabled")
 
 local vehiclelinks = SF.EntityTable("vehicleLinks")
+SF.HudVehicleLinks = vehiclelinks
 
 function ENT:Initialize()
 	self.BaseClass.Initialize(self)
