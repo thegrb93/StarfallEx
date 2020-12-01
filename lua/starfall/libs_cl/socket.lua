@@ -145,76 +145,21 @@ return function(instance)
 
 if LocalPlayer() ~= instance.player then return end
 
-local socket_data = {}
--- maps userdata sockets to proxy sockets
-socket_data.sockets = {}
-instance.data.socket = socket_data
-
-local function sock_proxy_get_underlying(prx)
-	return getmetatable(prx).sock
-end
-
-local function sock_proxy_get_underlying_value(prx, key)
-	local underlying_socket = getmetatable(prx).sock
-	return underlying_socket[key]
-end
-
-local function sock_proxy_create(sock)
-	local sock_proxy = {
-		close = function(prx, ...)
-			local underlying_socket = sock_proxy_get_underlying(prx)
-			socket_data.sockets[underlying_socket] = nil
-			return underlying_socket:close(...)
-		end,
-		accept = function(prx, ...)
-			local underlying_socket = sock_proxy_get_underlying(prx)
-			local client, err = underlying_socket:accept(...)
-			if client ~= nil then
-				local client_proxy = sock_proxy_create(client)
-				socket_data.sockets[client] = client_proxy
-
-				client = client_proxy
-			end
-			return client, err
-		end,
-	}
-	setmetatable(sock_proxy, {
-		sock = sock,
-		__index = function(prx, key)
-			local underlying_value = sock_proxy_get_underlying_value(prx, key)
-			if type(underlying_value) == "function" then
-				return function(s, ...)
-					local meta = getmetatable(prx)
-					if meta ~= nil then s = meta.sock or s end
-					return underlying_value(s, ...)
-				end
-			else
-				return underlying_value
-			end
-		end
-	})
-
-	return sock_proxy
-end
+local socket_list = setmetatable({},{__mode="k"})
 
 local function create_proxy_function(original_function)
 	return function(...)
 		local sock, err = original_function(...)
 		if sock ~= nil then
-			local prx = sock_proxy_create(sock)
-			socket_data.sockets[sock] = prx
-
-			sock = prx
+			socket_list[sock] = true
 		end
 		return sock, err
 	end
 end
 
 instance:AddHook("deinitialize", function()
-	local originals = instance.data.socket.originals
-	local socket_list = instance.data.socket.sockets
-	for sock, _ in pairs(socket_list) do
-		sock:close()
+	for socket in pairs(socket_list) do
+		socket:close()
 	end
 end)
 
@@ -231,45 +176,6 @@ socket_proxy.connect = create_proxy_function(socket.connect)
 socket_proxy.connect4 = create_proxy_function(socket.connect4)
 socket_proxy.connect6 = create_proxy_function(socket.connect6)
 socket_proxy.bind = create_proxy_function(socket.bind)
-socket_proxy.select = function(rcv, snd, ...)
-	local rcv_underlying = nil
-	local snd_underlying = nil
-	if rcv ~= nil then
-		rcv_underlying = {}
-		for i = 1, #rcv do
-			rcv_underlying[i] = sock_proxy_get_underlying(rcv[i])
-		end
-	end
-	if snd ~= nil then
-		snd_underlying = {}
-		for i = 1, #snd do
-			snd_underlying[i] = sock_proxy_get_underlying(snd[i])
-		end
-	end
-
-	rcv_underlying, snd_underlying, err = socket.select(rcv_underlying, snd_underlying, ...)
-
-	rcv = {}
-	snd = {}
-
-	for i = 1, #rcv_underlying do
-		local prx = socket_data.sockets[rcv_underlying[i]]
-		rcv[i] = prx
-		rcv[prx] = i
-	end
-	for i = 1, #snd_underlying do
-		local prx = socket_data.sockets[snd_underlying[i]]
-		snd[i] = prx
-		snd[prx] = i
-	end
-	return rcv, snd, err
-end
-socket_proxy.sink = function(mode, prx)
-	return socket.sink(mode, sock_proxy_get_underlying(prx))
-end
-socket_proxy.source = function(mode, prx, ...)
-	return socket.source(mode, sock_proxy_get_underlying(prx), ...)
-end
 
 instance.env.socket = socket_proxy
 
