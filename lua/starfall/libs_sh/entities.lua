@@ -226,8 +226,10 @@ function ents_methods:getLinkedComponents()
 		for k, v in ipairs(ents.FindByClass("starfall_hud")) do
 			if v.link == ent then list[#list+1] = ewrap(v) end
 		end
-	elseif ent:GetClass() == "starfall_hud" and SERVER then
-		for k, v in pairs(SF.HudVehicleLinks) do if v == ent then list[#list+1] = owrap(k) end end
+	elseif ent:GetClass() == "starfall_hud" then
+		if SERVER then
+			for k, v in pairs(SF.HudVehicleLinks) do if v == ent then list[#list+1] = owrap(k) end end
+		end
 	else
 		SF.Throw("The target must be a starfall_processor or starfall_hud", 2)
 	end
