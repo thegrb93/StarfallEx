@@ -214,7 +214,7 @@ function ents_methods:stopSound(snd)
 	ent:StopSound(snd)
 end
 
---- Returns a list of components to a processor or vehicles to a HUD
+--- Returns a list of components linked to a processor or vehicles linked to a HUD
 -- @return A list of components linked to the entity
 function ents_methods:getLinkedComponents()
 	local ent = getent(self)
