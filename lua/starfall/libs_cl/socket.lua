@@ -143,9 +143,40 @@ SF.RegisterLibrary("socket")
 
 return function(instance)
 
+if LocalPlayer() ~= instance.player then return end
 
-if LocalPlayer() == instance.player then
-	instance.env.socket = socket
+local socket_list = setmetatable({},{__mode="k"})
+
+local function create_proxy_function(original_function)
+	return function(...)
+		local sock, err = original_function(...)
+		if sock ~= nil then
+			socket_list[sock] = true
+		end
+		return sock, err
+	end
 end
+
+instance:AddHook("deinitialize", function()
+	for socket in pairs(socket_list) do
+		socket:close()
+	end
+end)
+
+local socket_proxy = {}
+setmetatable(socket_proxy, { __index = socket })
+
+socket_proxy.tcp = create_proxy_function(socket.tcp)
+socket_proxy.tcp4 = create_proxy_function(socket.tcp4)
+socket_proxy.tcp6 = create_proxy_function(socket.tcp6)
+socket_proxy.udp = create_proxy_function(socket.udp)
+socket_proxy.udp4 = create_proxy_function(socket.udp4)
+socket_proxy.udp6 = create_proxy_function(socket.udp6)
+socket_proxy.connect = create_proxy_function(socket.connect)
+socket_proxy.connect4 = create_proxy_function(socket.connect4)
+socket_proxy.connect6 = create_proxy_function(socket.connect6)
+socket_proxy.bind = create_proxy_function(socket.bind)
+
+instance.env.socket = socket_proxy
 
 end
