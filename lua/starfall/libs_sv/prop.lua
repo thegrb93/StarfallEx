@@ -324,6 +324,7 @@ function props_library.createComponent(pos, ang, class, model, frozen)
 
 		ply:AddCount("starfall_components", comp)
 		ply:AddCleanup("starfall_components", comp)
+		gamemode.Call("PlayerSpawnedSENT", ply, comp)
 	end
 
 	return ewrap(comp)
