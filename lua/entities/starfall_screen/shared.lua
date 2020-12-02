@@ -32,7 +32,7 @@ function ENT:LinkEnt(ent, transmit)
 	if SERVER and (changed or transmit) then
 		net.Start("starfall_processor_link")
 		net.WriteUInt(self:EntIndex(), 16)
-		net.WriteUInt(ent:EntIndex(), 16)
+		net.WriteUInt(ent and ent:IsValid() and ent:EntIndex() or 0, 16)
 		if transmit then net.Send(transmit) else net.Broadcast() end
 	end
 end
