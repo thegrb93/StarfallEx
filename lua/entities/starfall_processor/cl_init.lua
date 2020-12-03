@@ -136,7 +136,7 @@ net.Receive("starfall_processor_link", function()
 	local component, proc
 	
 	local function link()
-		if (IsValid(component) or component:IsWorld()) and IsValid(proc) then
+		if component and (component:IsValid() or component:IsWorld()) and proc and proc:IsValid() then
 			-- https://github.com/Facepunch/garrysmod-issues/issues/3127
 			local linkEnt = baseclass.Get(component:GetClass()).LinkEnt
 			if linkEnt and proc:GetClass()=="starfall_processor" then
