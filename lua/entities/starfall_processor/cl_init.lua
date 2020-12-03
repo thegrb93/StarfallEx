@@ -117,7 +117,7 @@ net.Receive("starfall_processor_download", function(len)
 	end)
 
 	SF.WaitForEntity(sfdata.procindex, function(proc_)
-		if proc_:GetClass()~="starfall_processor" then return end
+		if not (proc_ and proc_:GetClass()=="starfall_processor") then return end
 		proc = proc_
 		proc:Destroy()
 		setupFiles()
