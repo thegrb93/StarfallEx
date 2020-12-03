@@ -746,13 +746,17 @@ do
 	local function entIsReady(ent)
 		if ent:IsWorld() then return true end
 		if ent:IsValid() then
-			-- https://github.com/Facepunch/garrysmod-issues/issues/3127
-			local class = baseclass.Get(ent:GetClass())
-			local n = next(class)
-			if n then
-				return ent[n]==class[n]
+			if ent:IsPlayer() then
+				return pcall(ent.UniqueID, ent)
 			else
-				return true
+				-- https://github.com/Facepunch/garrysmod-issues/issues/3127
+				local class = baseclass.Get(ent:GetClass())
+				local n = next(class)
+				if n then
+					return ent[n]==class[n]
+				else
+					return true
+				end
 			end
 		end
 		return false
