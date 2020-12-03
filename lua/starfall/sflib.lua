@@ -747,7 +747,7 @@ do
 		if ent:IsWorld() then return true end
 		if ent:IsValid() then
 			if ent:IsPlayer() then
-				return pcall(ent.UniqueID, ent)
+				return pcall(ent.SteamID, ent)
 			else
 				-- https://github.com/Facepunch/garrysmod-issues/issues/3127
 				local class = baseclass.Get(ent:GetClass())
