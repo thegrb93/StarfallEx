@@ -106,8 +106,7 @@ net.Receive("starfall_processor_download", function(len)
 		if not (owner and ((owner:IsValid() and owner:IsPlayer()) or owner:IsWorld())) then return end
 		if not (proc and proc:IsValid()) then return end
 		if not sfdata then return end
-		-- https://github.com/Facepunch/garrysmod-issues/issues/3127
-		baseclass.Get("starfall_processor").SetupFiles(proc, sfdata)
+		proc:SetupFiles(sfdata)
 	end
 
 	local sfdata = net.ReadStarfall(nil, function(ok, sfdata_)
@@ -120,8 +119,7 @@ net.Receive("starfall_processor_download", function(len)
 	SF.WaitForEntity(sfdata.procindex, function(proc_)
 		if proc_:GetClass()~="starfall_processor" then return end
 		proc = proc_
-		-- https://github.com/Facepunch/garrysmod-issues/issues/3127
-		baseclass.Get("starfall_processor").Destroy(proc)
+		proc:Destroy()
 		setupFiles()
 	end)
 
@@ -137,11 +135,7 @@ net.Receive("starfall_processor_link", function()
 	
 	local function link()
 		if component and (component:IsValid() or component:IsWorld()) and proc and proc:IsValid() then
-			-- https://github.com/Facepunch/garrysmod-issues/issues/3127
-			local linkEnt = baseclass.Get(component:GetClass()).LinkEnt
-			if linkEnt and proc:GetClass()=="starfall_processor" then
-				linkEnt(component, proc)
-			end
+			component:LinkEnt(proc)
 		end
 	end
 	

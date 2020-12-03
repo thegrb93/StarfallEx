@@ -743,12 +743,26 @@ function SF.CheckLuaType(val, typ, level, msg)
 end
 
 do
+	local function entIsReady(ent)
+		if ent:IsWorld() then return true end
+		if ent:IsValid() then
+			-- https://github.com/Facepunch/garrysmod-issues/issues/3127
+			local class = baseclass.Get(ent:GetClass())
+			local n = next(class)
+			if n then
+				return ent[n]==class[n]
+			else
+				return true
+			end
+		end
+		return false
+	end
 	local waitingEntities = {}
 	local function findWaitingEntities()
 		local time = CurTime()
 		for index, v in pairs(waitingEntities) do
 			local ent = Entity(index)
-			if ent:IsValid() or ent:IsWorld() then
+			if entIsReady(ent) then
 				for _, func in ipairs(v) do func(ent) end
 				waitingEntities[index] = nil
 			elseif time>v.timeout then
@@ -761,7 +775,7 @@ do
 
 	function SF.WaitForEntity(index, callback)
 		local ent = Entity(index)
-		if ent:IsValid() then
+		if entIsReady(ent) then
 			callback(ent)
 		else
 			if next(waitingEntities) == nil then hook.Add("Think", "SF_WaitingForEntities", findWaitingEntities) end
