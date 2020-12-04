@@ -1124,10 +1124,10 @@ end
 -- @param y Top left corner y
 -- @param w Width
 -- @param h Height
--- @param startU Texture mapping at rectangle origin
--- @param startV Texture mapping at rectangle origin
--- @param endV Texture mapping at rectangle end
--- @param endV Texture mapping at rectangle end
+-- @param startU Texture mapping at rectangle's origin U
+-- @param startV Texture mapping at rectangle's origin V
+-- @param endU Texture mapping at rectangle's end U
+-- @param endV Texture mapping at rectangle's end V
 -- @param UVHack If enabled, will scale the UVs to compensate for internal bug. Should be true for user created materials.
 function render_library.drawTexturedRectUVFast(x, y, w, h, startU, startV, endU, endV, UVHack)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
@@ -2042,10 +2042,11 @@ function render_library.setChipOverlay(name)
 end
 
 --- Using the custom screen model, sets the screen offset and size as long as its within bounds of -1024 to 1024 units
--- @param x number The x offset of the screen
--- @param y number The y offset of the screen
--- @param w number The width of the screen
--- @param h number The height of the screen
+-- @param screen The custom screen to be resized
+-- @param x The x offset of the screen
+-- @param y The y offset of the screen
+-- @param w The width of the screen
+-- @param h The height of the screen
 function render_library.setScreenDimensions(screen, x, y, w, h)
 	checkluatype(x, TYPE_NUMBER)
 	checkluatype(y, TYPE_NUMBER)
