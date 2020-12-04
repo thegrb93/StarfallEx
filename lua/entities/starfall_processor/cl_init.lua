@@ -26,7 +26,6 @@ function ENT:OnRemove()
 end
 
 function ENT:GetOverlayText()
-	if self:GetColor().a == 0 then return "" end
 	local state = self:GetNWInt("State", 1)
 	local clientstr, serverstr
 	if self.instance then
@@ -55,10 +54,12 @@ function ENT:Think()
 	self.lookedAt = lookedAt
 
 	if lookedAt then
-		if not self.CustomOverlay then
+		if self.CustomOverlay then
+			halo.Add( { self }, color_white, 1, 1, 1, true, true )
+		elseif not self:GetNoDraw() and self:GetColor().a > 0 then
 			AddWorldTip( self:EntIndex(), self:GetOverlayText(), 0.5, self:GetPos(), self )
+			halo.Add( { self }, color_white, 1, 1, 1, true, true )
 		end
-		halo.Add( { self }, color_white, 1, 1, 1, true, true )
 	end
 end
 
