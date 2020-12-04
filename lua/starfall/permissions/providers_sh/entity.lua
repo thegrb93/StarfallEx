@@ -3,7 +3,13 @@
 local isentity = isentity
 
 
-local owneraccess = CreateConVar("sf_permissions_entity_owneraccess", "0", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "Allows starfall chips owner to access their player entity")
+local owneraccess
+if SERVER then
+	owneraccess = CreateConVar("sf_permissions_entity_owneraccess", "0", { FCVAR_ARCHIVE }, "Allows starfall chip's owner to access their player entity")
+	CreateConVar("sf_permissions_entity_owneraccess_cl", "1", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "Allows starfall chip's owner to access their clientside player entity")
+else
+	owneraccess = CreateConVar("sf_permissions_entity_owneraccess_cl", "1", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "Allows starfall chip's owner to access their clientside player entity")
+end
 
 local P = {}
 P.id = "entities"
