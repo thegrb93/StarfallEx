@@ -1226,6 +1226,86 @@ function render_library.drawTexturedRectRotated(x, y, w, h, rot)
 	render.DrawQuad(quad_v1, quad_v2, quad_v3, quad_v4, currentcolor)
 end
 
+--- Draws RGB color channel tables to current render target.
+-- @param w Width of image to be drawn.
+-- @param h Height of image to be drawn.
+-- @param dataR Red channel data.
+-- @param dataG Green channel data.
+-- @param dataB Blue channel data.
+function render_library.drawPixelsRGB(w, h, dataR, dataG, dataB) 
+    if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not renderdata.usingRT then SF.Throw("Cannot use this function outside of a rendertarget.", 2) end
+    for i = 1, w*h do
+        render.SetViewPort((i-1)%w,math.floor((i-1)/w),1,1)
+        render.Clear(dataR[i], dataG[i], dataB[i], 255)
+    end
+	render.SetViewPort(unpack(renderdata.oldViewPort))
+end
+
+--- Draws RGBA color channel tables to current render target.
+-- @param w Width of image to be drawn.
+-- @param h Height of image to be drawn.
+-- @param dataR Red channel data.
+-- @param dataG Green channel data.
+-- @param dataB Blue channel data.
+-- @param dataA Alpha channel data.
+function render_library.drawPixelsRGBA(w, h, dataR, dataG, dataB, dataA) 
+    if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not renderdata.usingRT then SF.Throw("Cannot use this function outside of a rendertarget.", 2) end
+    for i = 1, w*h do
+        render.SetViewPort((i-1)%w,math.floor((i-1)/w),1,1)
+        render.Clear(dataR[i], dataG[i], dataB[i], dataA[i])
+    end
+	render.SetViewPort(unpack(renderdata.oldViewPort))
+end
+--- Draws region of RGB color channel tables to current render target.
+-- @param dstX Destination x coordinate
+-- @param dstY Destination y coordinate
+-- @param srcX Source x coordinate
+-- @param srcY Source y coordinate
+-- @param srcW Source original width
+-- @param srcH Source original height
+-- @param subrectW Width of subrect
+-- @param subrectH Height of subrect
+-- @param dataR Red channel data.
+-- @param dataG Green channel data.
+-- @param dataB Blue channel data.
+function render_library.drawPixelsSubrectRGB(dstX, dstY, srcX, srcY, srcW, srcH, subrectW, subrectH, dataR, dataG, dataB) 
+    if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not renderdata.usingRT then SF.Throw("Cannot use this function outside of a rendertarget.", 2) end
+    for i = 0, subrectW*subrectH-1 do
+    local subX, subY = i%subrectW, math.floor(i/subrectW)
+    local srcIndex = (srcY+subY)*srcW+srcX+subX
+        render.SetViewPort(dstX+subX,dstY+subY,1,1)
+        render.Clear(dataR[srcIndex], dataG[srcIndex], dataB[srcIndex], 255)
+    end
+	render.SetViewPort(unpack(renderdata.oldViewPort))
+end
+--- Draws region of RGBA color channel tables to current render target.
+-- @param dstX Destination x coordinate
+-- @param dstY Destination y coordinate
+-- @param srcX Source x coordinate
+-- @param srcY Source y coordinate
+-- @param srcW Source original width
+-- @param srcH Source original height
+-- @param subrectW Width of subrect
+-- @param subrectH Height of subrect
+-- @param dataR Red channel data.
+-- @param dataG Green channel data.
+-- @param dataB Blue channel data.
+-- @param dataA Alpha channel data.
+function render_library.drawPixelsSubrectRGBA(dstX, dstY, srcX, srcY, srcW, srcH, subrectW, subrectH, dataR, dataG, dataB, dataA) 
+    if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not renderdata.usingRT then SF.Throw("Cannot use this function outside of a rendertarget.", 2) end
+    for i = 0, subrectW*subrectH-1 do
+    local subX, subY = i%subrectW, math.floor(i/subrectW)
+    local srcIndex = (srcY+subY)*srcW+srcX+subX
+        render.SetViewPort(dstX+subX,dstY+subY,1,1)
+        render.Clear(dataR[srcIndex], dataG[srcIndex], dataB[srcIndex], dataA[srcIndex])
+    end
+	render.SetViewPort(unpack(renderdata.oldViewPort))
+end
+
 --- Draws a line. Use 3D functions for float coordinates
 -- @param x1 X start integer coordinate
 -- @param y1 Y start integer coordinate
