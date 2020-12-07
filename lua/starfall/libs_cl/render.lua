@@ -1274,8 +1274,8 @@ function render_library.drawPixelsSubrectRGB(dstX, dstY, srcX, srcY, srcW, srcH,
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if not renderdata.usingRT then SF.Throw("Cannot use this function outside of a rendertarget.", 2) end
 	for i = 0, subrectW*subrectH-1 do
-	local subX, subY = i%subrectW, math.floor(i/subrectW)
-	local srcIndex = (srcY+subY)*srcW+srcX+subX
+		local subX, subY = i%subrectW, math.floor(i/subrectW)
+		local srcIndex = (srcY+subY)*srcW+srcX+subX+1
 		render.SetViewPort(dstX+subX,dstY+subY,1,1)
 		render.Clear(dataR[srcIndex], dataG[srcIndex], dataB[srcIndex], 255)
 	end
@@ -1298,8 +1298,8 @@ function render_library.drawPixelsSubrectRGBA(dstX, dstY, srcX, srcY, srcW, srcH
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if not renderdata.usingRT then SF.Throw("Cannot use this function outside of a rendertarget.", 2) end
 	for i = 0, subrectW*subrectH-1 do
-	local subX, subY = i%subrectW, math.floor(i/subrectW)
-	local srcIndex = (srcY+subY)*srcW+srcX+subX
+		local subX, subY = i%subrectW, math.floor(i/subrectW)
+		local srcIndex = (srcY+subY)*srcW+srcX+subX+1
 		render.SetViewPort(dstX+subX,dstY+subY,1,1)
 		render.Clear(dataR[srcIndex], dataG[srcIndex], dataB[srcIndex], dataA[srcIndex])
 	end
