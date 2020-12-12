@@ -746,8 +746,8 @@ do
 	local function entIsReady(ent)
 		if ent:IsWorld() then return true end
 		if ent:IsValid() then
-			if ent:IsPlayer() then
-				return pcall(ent.SteamID, ent)
+			if ent:GetClass()=="player" then
+				return ent:IsPlayer()
 			else
 				-- https://github.com/Facepunch/garrysmod-issues/issues/3127
 				local n = next(baseclass.Get(ent:GetClass()))
