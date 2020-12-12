@@ -750,13 +750,8 @@ do
 				return pcall(ent.SteamID, ent)
 			else
 				-- https://github.com/Facepunch/garrysmod-issues/issues/3127
-				local class = baseclass.Get(ent:GetClass())
-				local n = next(class)
-				if n then
-					return ent[n]==class[n]
-				else
-					return true
-				end
+				local n = next(baseclass.Get(ent:GetClass()))
+				return n==nil or ent[n]~=nil
 			end
 		end
 		return false
