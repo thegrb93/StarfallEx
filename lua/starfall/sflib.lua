@@ -746,11 +746,12 @@ do
 	local function entIsReady(ent)
 		if ent:IsWorld() then return true end
 		if ent:IsValid() then
-			if ent:GetClass()=="player" then
+			local class = ent:GetClass()
+			if class=="player" then
 				return ent:IsPlayer()
 			else
 				-- https://github.com/Facepunch/garrysmod-issues/issues/3127
-				local n = next(baseclass.Get(ent:GetClass()))
+				local n = next(baseclass.Get(class))
 				return n==nil or ent[n]~=nil
 			end
 		end
