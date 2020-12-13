@@ -132,6 +132,8 @@ local function prepareRender(data)
 	data.noStencil = false
 	data.isScenic = false
 	data.needRT = false
+	data.oldW = ScrW()
+	data.oldH = ScrH()
 end
 
 local dummyrt = GetRenderTarget("starfall_dummyrt", 32, 32)
@@ -139,12 +141,10 @@ local function prepareRenderOffscreen(data)
 	prepareRender(data)
 	data.noStencil = false
 	data.needRT = true
-	data.oldViewPort = { 0, 0, ScrW(), ScrH() }
-	render.SetViewPort(0, 0, 1024, 1024)
+	render.PushRenderTarget(dummyrt, 0, 0, 1024, 1024)
 	cam.Start2D()
 	view_matrix_stack[#view_matrix_stack + 1] = "End2D"
 	render.SetStencilEnable(false)
-	render.SetRenderTarget(dummyrt)
 	data.usingRT = true
 end
 
@@ -305,9 +305,8 @@ instance:AddHook("cleanup", function(hook)
 			if renderingView then
 				render.SetRenderTarget(renderingViewRt)
 			else
-				render.SetRenderTarget()
+				render.PopRenderTarget()
 			end
-			render.SetViewPort(unpack(renderdata.oldViewPort))
 			renderdata.usingRT = false
 		end
 		for i = #view_matrix_stack, 1, -1 do
@@ -839,7 +838,7 @@ function render_library.drawBlurEffect(blurx, blury, passes)
 	passes = math.Clamp(blurx, 0, 100)
 
 	local rt = render.GetRenderTarget()
-	local w, h = renderdata.oldViewPort[3], renderdata.oldViewPort[4]
+	local w, h = renderdata.oldW, renderdata.oldH
 	local aspectRatio = w / h
 
 	render.BlurRenderTarget(rt, blurx*aspectRatio, blury, passes)
@@ -893,21 +892,21 @@ function render_library.selectRenderTarget(name)
 		local rt = renderdata.rendertargets[name]
 		if not rt then SF.Throw("Invalid Rendertarget", 2) end
 
-		if not renderdata.usingRT then
-			renderdata.oldViewPort = { 0, 0, ScrW(), ScrH() }
-			render.SetViewPort(0, 0, 1024, 1024)
+		if renderdata.usingRT then
+			render.SetRenderTarget(rt)
+		else
+			render.PushRenderTarget(rt, 0, 0, 1024, 1024)
 			cam.Start2D()
 			view_matrix_stack[#view_matrix_stack + 1] = "End2D"
 			render.SetStencilEnable(false)
+			renderdata.usingRT = true
 		end
-		render.SetRenderTarget(rt)
-		renderdata.usingRT = true
 	else
 		if renderdata.usingRT and not renderdata.needRT then
 			if renderingView then
 				render.SetRenderTarget(renderingViewRt)
 			else
-				render.SetRenderTarget()
+				render.PopRenderTarget()
 			end
 
 			local i = #view_matrix_stack
@@ -915,7 +914,6 @@ function render_library.selectRenderTarget(name)
 				cam[view_matrix_stack[i]]()
 				view_matrix_stack[i] = nil
 			end
-			render.SetViewPort(unpack(renderdata.oldViewPort))
 			renderdata.usingRT = false
 			if renderdata.noStencil then -- Revert ALL stencil settings from screen
 				render.SetStencilEnable(true)
@@ -1239,7 +1237,7 @@ function render_library.drawPixelsRGB(w, h, dataR, dataG, dataB)
 		render.SetViewPort((i-1)%w,math.floor((i-1)/w),1,1)
 		render.Clear(dataR[i], dataG[i], dataB[i], 255)
 	end
-	render.SetViewPort(unpack(renderdata.oldViewPort))
+	render.SetViewPort(0, 0, 1024, 1024)
 end
 
 --- Draws RGBA color channel tables to current render target.
@@ -1256,7 +1254,7 @@ function render_library.drawPixelsRGBA(w, h, dataR, dataG, dataB, dataA)
 		render.SetViewPort((i-1)%w,math.floor((i-1)/w),1,1)
 		render.Clear(dataR[i], dataG[i], dataB[i], dataA[i])
 	end
-	render.SetViewPort(unpack(renderdata.oldViewPort))
+	render.SetViewPort(0, 0, 1024, 1024)
 end
 --- Draws region of RGB color channel tables to current render target.
 -- @param dstX Destination x coordinate
@@ -1279,7 +1277,7 @@ function render_library.drawPixelsSubrectRGB(dstX, dstY, srcX, srcY, srcW, srcH,
 		render.SetViewPort(dstX+subX,dstY+subY,1,1)
 		render.Clear(dataR[srcIndex], dataG[srcIndex], dataB[srcIndex], 255)
 	end
-	render.SetViewPort(unpack(renderdata.oldViewPort))
+	render.SetViewPort(0, 0, 1024, 1024)
 end
 --- Draws region of RGBA color channel tables to current render target.
 -- @param dstX Destination x coordinate
@@ -1303,7 +1301,7 @@ function render_library.drawPixelsSubrectRGBA(dstX, dstY, srcX, srcY, srcW, srcH
 		render.SetViewPort(dstX+subX,dstY+subY,1,1)
 		render.Clear(dataR[srcIndex], dataG[srcIndex], dataB[srcIndex], dataA[srcIndex])
 	end
-	render.SetViewPort(unpack(renderdata.oldViewPort))
+	render.SetViewPort(0, 0, 1024, 1024)
 end
 
 --- Draws a line. Use 3D functions for float coordinates
@@ -1774,7 +1772,7 @@ function render_library.readPixel(x, y)
 	return cwrap(Color(r, g, b, 255))
 end
 
---- Returns the render context's width and height
+--- Returns the render context's width and height. If a rendertarget is selected, will return 1024, 1024
 -- @class function
 -- @return the X size of the current render context
 -- @return the Y size of the current render context
@@ -1782,23 +1780,15 @@ function render_library.getResolution()
 	if renderdata.renderEnt and renderdata.renderEnt.GetResolution then
 		return renderdata.renderEnt:GetResolution()
 	end
-	if renderdata.usingRT then
-		return renderdata.oldViewPort[3], renderdata.oldViewPort[4]
-	else
-		return ScrW(), ScrH()
-	end
+	return ScrW(), ScrH()
 end
 
---- Returns width and height of the game window. If a rendertarget is selected, will return 1024, 1024
+--- Returns width and height of the game window
 -- @class function
 -- @return the X size of the game window
 -- @return the Y size of the game window
 function render_library.getGameResolution()
-	if renderdata.usingRT then
-		return renderdata.oldViewPort[3], renderdata.oldViewPort[4]
-	else
-		return ScrW(), ScrH()
-	end
+	return renderdata.oldW, renderdata.oldH
 end
 
 --- Does a trace and returns the color of the textel the trace hits.
