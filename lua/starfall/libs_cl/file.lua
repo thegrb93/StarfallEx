@@ -33,17 +33,16 @@ SF.RegisterType("File", true, false)
 -- Temp file cache class
 local TempFileCache = {}
 do
-
 	function TempFileCache:Initialize()
 		local entries = {}
 		local files, dirs = file.Find("sf_filedatatemp/*", "DATA")
 		for k, plyid in ipairs(dirs) do
 			local dir = "sf_filedatatemp/"..plyid
-			files = file.Find("*", dir, "DATA")
+			files = file.Find(dir.."/*", "DATA")
 			if next(files)==nil then SF.DeleteFolder(dir) else
 				for k, filen in ipairs(files) do
 					local path = dir.."/"..filen
-					local time, size = file.Time(path), file.Size(path)
+					local time, size = file.Time(path, "DATA"), file.Size(path, "DATA")
 					entries[path] = {path = path, plyid = plyid, time = time, size = size}
 				end
 			end
@@ -116,7 +115,7 @@ do
 		-- Sort by time
 		table.sort(check.plyentries, function(a,b) return a.time>b.time end)
 
-		while (check.plycount >= cv_temp_maxfiles:GetInt() or cv_temp_maxusersize:GetFloat()*1e6) and #check.plyentries>0 do
+		while (check.plycount >= cv_temp_maxfiles:GetInt() or check.plysize >= cv_temp_maxusersize:GetFloat()*1e6) and #check.plyentries>0 do
 			local entry = table.remove(check.plyentries)
 			file.Delete(entry.path)
 			if not file.Exists(entry.path, "DATA") then
@@ -218,36 +217,37 @@ end
 -- @param data The data to write
 -- @return The generated path for your temp file
 function file_library.writeTemp(filename, data)
-    checkluatype(filename, TYPE_STRING)
-    checkluatype(data, TYPE_STRING)
-    if #filename > 128 then SF.Throw("Filename is too long!", 2) end
-    if tempfilewrites >= cv_temp_maxfiles:GetInt() then SF.Throw("Exceeded max number of files allowed to write!", 2) end
+	checkluatype(filename, TYPE_STRING)
+	checkluatype(data, TYPE_STRING)
 
-    checkpermission (instance, nil, "file.writeTemp")
+	checkpermission (instance, nil, "file.writeTemp")
+	if tempfilewrites >= cv_temp_maxfiles:GetInt() then SF.Throw("Exceeded max number of files allowed to write!", 2) end
 
-    filename = string.lower(string.GetFileFromFilename(filename))
-    local ext = string.GetExtensionFromFilename(filename)
-    if ext~="txt" and ext~="dat" then SF.Throw("File name must end with .txt or .dat extension!", 2) end
+	if #filename > 128 then SF.Throw("Filename is too long!", 2) end
 
-    local path = TempFileCache:Write(instance.player:SteamID64(), filename, data)
-    tempfilewrites = tempfilewrites + 1
-    return path
+	local allowedExtensions = {["txt"] = true,["jpg"] = true,["png"] = true,["vtf"] = true,["dat"] = true,["json"] = true,["vmt"] = true}
+	if not allowedExtensions[string.GetExtensionFromFilename(filename)] then SF.Throw("File name must end with .txt, .jpg, .png, .vtf, .json, .vmt, or .dat extension!", 2) end
+	filename = string.lower(string.GetFileFromFilename(filename))
+
+	local path = TempFileCache:Write(instance.player:SteamID64(), filename, data)
+	tempfilewrites = tempfilewrites + 1
+	return path
 end
 
 --- Returns the path of a temp file if it exists. Otherwise returns nil
 -- @param filename The temp file name. Must be only a file and not a path
 -- @return The path to the temp file or nil if it doesn't exist
 function file_library.existsTemp(filename)
-    checkluatype(filename, TYPE_STRING)
-    if #filename > 128 then SF.Throw("Filename is too long!", 2) end
-    filename = string.lower(string.GetFileFromFilename(filename))
-    local ext = string.GetExtensionFromFilename(filename)
-    if ext~="txt" and ext~="dat" then SF.Throw("File name must end with .txt or .dat extension!", 2) end
+	checkluatype(filename, TYPE_STRING)
+	if #filename > 128 then SF.Throw("Filename is too long!", 2) end
+	filename = string.lower(string.GetFileFromFilename(filename))
+	local ext = string.GetExtensionFromFilename(filename)
+	if ext~="txt" and ext~="dat" then SF.Throw("File name must end with .txt or .dat extension!", 2) end
 
-    local path = "sf_filedatatemp/"..instance.player:SteamID64().."/"..filename
-    if file.Exists(path, "DATA") then
-        return "data/"..path
-    end
+	local path = "sf_filedatatemp/"..instance.player:SteamID64().."/"..filename
+	if file.Exists(path, "DATA") then
+		return "data/"..path
+	end
 end
 
 --- Appends a string to the end of a file
