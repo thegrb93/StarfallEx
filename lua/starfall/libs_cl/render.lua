@@ -179,7 +179,7 @@ local renderhooks = {
 }
 
 
-SF.hookAdd("PostDrawHUD", "renderoffscreen", function(instance)
+SF.hookAdd("PreRender", "renderoffscreen", function(instance)
 	return (instance.player == SF.Superuser or haspermission(instance, nil, "render.offscreen")), {}
 end)
 
