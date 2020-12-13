@@ -653,6 +653,25 @@ function SF.FileWrite(path, data)
 	return file.Read(path)==data
 end
 
+function SF.DeleteFolder(folder)
+	local folders = {folder}
+	while #folders > 0 do
+		local folder = folders[#folders]
+		local files, directories = file.Find(folder.."/*", "DATA")
+		for I = 1, #files do
+			file.Delete(folder .. "/" .. files[I])
+		end
+		if #directories == 0 then
+			file.Delete(folder)
+			folders[#folders] = nil
+		else
+			for I = 1, #directories do
+				folders[#folders + 1] = folder .. "/" .. directories[I]
+			end
+		end
+	end
+end
+
 --- Throws an error like the throw function in builtins
 -- @param msg Message
 -- @param level Which level in the stacktrace to blame
