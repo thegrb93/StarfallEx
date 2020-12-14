@@ -400,7 +400,8 @@ SF.Errormeta = {
 -- @param level Which level in the stacktrace to blame
 -- @param uncatchable Makes this exception uncatchable
 -- @param prependinfo The error message needs file and line number info
-function SF.MakeError(msg, level, uncatchable, prependinfo)
+-- @param userdata User's own error data that starfall's pcall will return if it exists
+function SF.MakeError(msg, level, uncatchable, prependinfo, userdata)
 	level = 1 + (level or 1)
 	local info = debug.getinfo(level, "Sl")
 	if not info then
@@ -423,7 +424,8 @@ function SF.MakeError(msg, level, uncatchable, prependinfo)
 		line = info.currentline,
 		message = prependinfo and (info.short_src..":"..info.currentline..": "..msg) or msg,
 		uncatchable = uncatchable,
-		traceback = traceback
+		traceback = traceback,
+		userdata = userdata
 	}, SF.Errormeta)
 end
 
@@ -656,9 +658,9 @@ end
 -- @param msg Message
 -- @param level Which level in the stacktrace to blame
 -- @param uncatchable Makes this exception uncatchable
-function SF.Throw(msg, level, uncatchable)
+function SF.Throw(msg, level, uncatchable, userdata)
 	local level = 1 + (level or 1)
-	error(SF.MakeError(msg, level, uncatchable, true), level)
+	error(SF.MakeError(msg, level, uncatchable, true, userdata), level)
 end
 
 --- Throws a type error

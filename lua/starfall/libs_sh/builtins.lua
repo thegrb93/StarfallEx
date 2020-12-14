@@ -838,8 +838,10 @@ function builtins_library.pcall(func, ...)
 
 	if ok then return unpack(vret) end
 
-	if istable(err) then
-		if err.uncatchable then
+	if dgetmeta(err)==SF.Errormeta then
+		if err.userdata~=nil then
+			err = err.userdata
+		elseif err.uncatchable or uncatchable[err.msg] then
 			error(err)
 		end
 	elseif uncatchable[err] then
@@ -868,8 +870,10 @@ function builtins_library.xpcall(func, callback, ...)
 	if ok then return unpack(vret) end
 
 	local err, traceback = errData[1], errData[2]
-	if istable(err) then
-		if err.uncatchable then
+	if dgetmeta(err)==SF.Errormeta then
+		if err.userdata~=nil then
+			err = err.userdata
+		elseif err.uncatchable or uncatchable[err.msg] then
 			error(err)
 		end
 	elseif uncatchable[err] then
@@ -887,8 +891,10 @@ function builtins_library.try(func, catch)
 	local ok, err = pcall(func)
 	if ok then return end
 
-	if istable(err) then
-		if err.uncatchable then
+	if dgetmeta(err)==SF.Errormeta then
+		if err.userdata~=nil then
+			err = err.userdata
+		elseif err.uncatchable or uncatchable[err.msg] then
 			error(err)
 		end
 	elseif uncatchable[err] then
@@ -911,7 +917,9 @@ end
 -- @class function
 -- @param msg Message string
 -- @param level Which level in the stacktrace to blame. Defaults to 1. 0 for no stacktrace.
-builtins_library.error = builtins_library.error
+function builtins_library.error(msg, level)
+	SF.Throw(msg, 1 + (level or 1), false, msg)
+end
 
 --- If the result of the first argument is false or nil, an error is thrown with the second argument as the message.
 -- @name builtins_library.assert
