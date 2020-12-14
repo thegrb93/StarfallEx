@@ -476,9 +476,9 @@ end
 
 --- Animates a hologram
 -- @shared
--- @param animation number or string name
--- @param frame Optional int (Default 0) The starting frame number
--- @param rate Optional float (Default 1) Frame speed
+-- @param animation number or string name. Does nothing if nil
+-- @param frame Optional int (Default 0) The starting frame number. Does nothing if nil
+-- @param rate Optional float (Default 1) Frame speed. Does nothing if nil
 function hologram_methods:setAnimation(animation, frame, rate)
 	local holo = getholo(self)
 	checkpermission(instance, holo, "hologram.setRenderProperty")
@@ -489,22 +489,19 @@ function hologram_methods:setAnimation(animation, frame, rate)
 		SF.ThrowTypeError("number or string", SF.GetType(animation), 2)
 	end
 
-	if frame == nil then
-		frame = 0
-	else
+	if animation~=nil then
+		checkluatype(animation, TYPE_NUMBER)
+		holo:ResetSequence(animation)
+		holo.AutomaticFrameAdvance = animation~=-1
+	end
+	if frame ~= nil then
 		checkluatype(frame, TYPE_NUMBER)
+		holo:SetCycle(frame)
 	end
-	if rate == nil then
-		rate = 1
-	else
+	if rate ~= nil then
 		checkluatype(rate, TYPE_NUMBER)
+		holo:SetPlaybackRate(rate)
 	end
-
-	holo.AutomaticFrameAdvance = animation~=-1
-
-	holo:ResetSequence(animation)
-	holo:SetCycle(frame)
-	holo:SetPlaybackRate(rate)
 end
 
 --- Applies engine effects to the hologram
