@@ -197,6 +197,12 @@ function file_library.read(path)
 	return file.Read("sf_filedata/" .. SF.NormalizePath(path), "DATA")
 end
 
+
+local allowedExtensions = {["txt"] = true,["jpg"] = true,["png"] = true,["vtf"] = true,["dat"] = true,["json"] = true,["vmt"] = true}
+local function checkExtension(filename)
+	if not allowedExtensions[string.GetExtensionFromFilename(filename)] then SF.Throw("File name must end with .txt, .jpg, .png, .vtf, .json, .vmt, or .dat extension!", 3) end
+end
+
 --- Writes to a file
 -- @param path Filepath relative to data/sf_filedata/.
 -- @param data The data to write
@@ -205,6 +211,8 @@ function file_library.write(path, data)
 	checkpermission (instance, path, "file.write")
 	checkluatype (path, TYPE_STRING)
 	checkluatype (data, TYPE_STRING)
+
+	checkExtension(path)
 
 	local f = file.Open("sf_filedata/" .. SF.NormalizePath(path), "wb", "DATA")
 	if not f then SF.Throw("Couldn't open file for writing.", 2) return end
@@ -224,9 +232,7 @@ function file_library.writeTemp(filename, data)
 	if tempfilewrites >= cv_temp_maxfiles:GetInt() then SF.Throw("Exceeded max number of files allowed to write!", 2) end
 
 	if #filename > 128 then SF.Throw("Filename is too long!", 2) end
-
-	local allowedExtensions = {["txt"] = true,["jpg"] = true,["png"] = true,["vtf"] = true,["dat"] = true,["json"] = true,["vmt"] = true}
-	if not allowedExtensions[string.GetExtensionFromFilename(filename)] then SF.Throw("File name must end with .txt, .jpg, .png, .vtf, .json, .vmt, or .dat extension!", 2) end
+	checkExtension(filename)
 	filename = string.lower(string.GetFileFromFilename(filename))
 
 	local path = TempFileCache:Write(instance.player:SteamID64(), filename, data)
@@ -239,10 +245,10 @@ end
 -- @return The path to the temp file or nil if it doesn't exist
 function file_library.existsTemp(filename)
 	checkluatype(filename, TYPE_STRING)
+
 	if #filename > 128 then SF.Throw("Filename is too long!", 2) end
+	checkExtension(filename)
 	filename = string.lower(string.GetFileFromFilename(filename))
-	local ext = string.GetExtensionFromFilename(filename)
-	if ext~="txt" and ext~="dat" then SF.Throw("File name must end with .txt or .dat extension!", 2) end
 
 	local path = "sf_filedatatemp/"..instance.player:SteamID64().."/"..filename
 	if file.Exists(path, "DATA") then
