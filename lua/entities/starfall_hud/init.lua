@@ -14,6 +14,7 @@ function ENT:Initialize()
 	self:SetSolid(SOLID_VPHYSICS)
 	self:SetUseType(SIMPLE_USE)
 
+	self.enabled = false
 	self:AddEFlags( EFL_FORCE_CHECK_TRANSMIT )
 end
 
@@ -21,12 +22,12 @@ function ENT:UpdateTransmitState()
 	return TRANSMIT_ALWAYS
 end
 
-SF.ActiveHuds = setmetatable({},{__index=function(t,k) local r={} t[k]=r return r end})
+function ENT:SetHudEnabled(ply, enabled)
+	self.enabled = enabled
 
-function ENT:SetHudEnabled(ply, mode)
 	net.Start("starfall_hud_set_enabled")
 		net.WriteEntity(self)
-		net.WriteInt(mode, 8)
+		net.WriteInt(enabled, 8)
 	net.Send(ply)
 
 	local function connect()
@@ -43,7 +44,6 @@ function ENT:SetHudEnabled(ply, mode)
 				net.Send(ply)
 			end
 		end
-		SF.ActiveHuds[self][ply] = true
 	end
 
 	local function disconnect()
@@ -60,38 +60,19 @@ function ENT:SetHudEnabled(ply, mode)
 				net.Send(ply)
 			end
 		end
-		SF.ActiveHuds[self][ply] = nil
 		ply:SetViewEntity()
 	end
 
-	if mode == 1 then
+	if enabled then
 		connect()
-	elseif mode == -1 then
-		if SF.ActiveHuds[self][ply] then disconnect() else connect() end
 	else
 		disconnect()
 	end
 end
 
-function ENT:OnRemove()
-	SF.ActiveHuds[self] = nil
-	net.Start("starfall_hud_set_enabled")
-		net.WriteEntity(self)
-		net.WriteInt(0, 8)
-	net.Broadcast()
-end
-
 function ENT:Use(ply)
-	self:SetHudEnabled(ply, -1)
-
-	if not self.link then return end
-
-	if ply:IsPlayer() and SF.ActiveHuds[self][ply] then
-		net.Start("starfall_processor_used")
-			net.WriteEntity(self)
-			net.WriteEntity(ply)
-		net.Broadcast()
-	end
+	if not (self.link and self.link:IsValid()) then ply:ChatPrint("This hud isn't linked to a chip!") return end
+	self:SetHudEnabled(ply, not self.enabled)
 end
 
 function ENT:LinkVehicle(ent)
@@ -154,7 +135,7 @@ function ENT:PostEntityPaste(ply, ent, CreatedEntities)
 		if info.link then
 			local e = CreatedEntities[info.link]
 			if (e and e:IsValid()) then
-				self:LinkEnt(e)
+				SF.LinkEnt(self, e)
 			end
 		end
 

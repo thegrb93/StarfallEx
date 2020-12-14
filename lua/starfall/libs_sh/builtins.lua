@@ -467,7 +467,7 @@ if SERVER then
 	function builtins_library.printHud(ply, ...)
 		ply = getply(ply)
 		if not ply:IsPlayer() then SF.Throw("Expected a target player!", 2) end
-		if not instance:isHUDActive(ply) then SF.Throw("Player isn't connected to a hud!", 2) end
+		if not instance.entity:isHUDActive(ply) then SF.Throw("Player isn't connected to a hud!", 2) end
 
 		local data, strlen, size = argsToChat(builtins_library.Color(5,125,222), "[SF] ", builtins_library.Color(255,255,255), ...)
 		if strlen > 52 then SF.Throw("The max printHud string size is 52 chars!", 2) end
@@ -553,7 +553,7 @@ else
 	end
 
 	function builtins_library.printHud(...)
-		if not instance:isHUDActive() then SF.Throw("Player isn't connected to a hud!", 2) end
+		if not instance.entity:isHUDActive() then SF.Throw("Player isn't connected to a hud!", 2) end
 		local data, strlen, size = argsToChat(builtins_library.Color(5,125,222), "[SF] ", builtins_library.Color(255,255,255), ...)
 		if strlen > 52 then SF.Throw("The max printHud string size is 52 chars!", 2) end
 		for k, v in ipairs(data) do
@@ -978,6 +978,25 @@ function builtins_library.localToWorld(localPos, localAng, originPos, originAngl
 	)
 
 	return vwrap(worldPos), awrap(worldAngles)
+end
+
+--- Sets the current instance to allow HUD drawing. Only works if player is in your vehicle or if it's ran on yourself
+--@param ply The player to enable the hud on. If CLIENT, will be forced to player()
+--@param active Whether hud hooks should be active. true to force on, false to force off, nil to restore default.
+function builtins_library.setHUDActive(ply, active)
+	ply = SERVER and getply(ply) or LocalPlayer()
+	checkluatype(active, TYPE_BOOL)
+
+	if ply==instance.player or instance.player==SF.SuperUser then
+		SF.EnableHud(ply, instance.entity, nil, active, true)
+	else
+		local vehicle = ply:GetVehicle()
+		if vehicle:IsValid() and SF.Permissions.getOwner(vehicle)==instance.player then
+			SF.EnableHud(ply, instance.entity, vehicle, active, true)
+		else
+			SF.Throw("Player must be sitting in owner's vehicle or be owner of the chip!", 2)
+		end
+	end
 end
 
 --- Creates a 'middleclass' class object that can be used similarly to Java/C++ classes. See https://github.com/kikito/middleclass for examples.

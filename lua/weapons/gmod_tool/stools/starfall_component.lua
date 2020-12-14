@@ -210,14 +210,14 @@ function TOOL:RightClick(trace)
 		if not (self.Component and self.Component:IsValid()) then self:SetStage(0) return end
 		if self.Component:GetClass()=="starfall_screen" and ent:GetClass()=="starfall_processor" then
 
-			self.Component:LinkEnt(ent)
+			SF.LinkEnt(self.Component, ent)
 			self:SetStage(0)
 			SF.AddNotify(ply, "Linked to starfall successfully.", "GENERIC" , 4, "DRIP2")
 			return true
 
 		elseif self.Component:GetClass()=="starfall_hud" and ent:GetClass()=="starfall_processor" then
 
-			self.Component:LinkEnt(ent)
+			SF.LinkEnt(self.Component, ent)
 			self:SetStage(0)
 			SF.AddNotify(ply, "Linked to starfall successfully.", "GENERIC" , 4, "DRIP2")
 			return true
@@ -242,10 +242,10 @@ function TOOL:Reload(trace)
 	local ent = trace.Entity
 
 	if ent:GetClass()=="starfall_screen" then
-		ent:LinkEnt(nil)
+		SF.LinkEnt(ent, nil)
 		return true
 	elseif ent:GetClass()=="starfall_hud" then
-		ent:LinkEnt(nil)
+		SF.LinkEnt(ent, nil)
 		ent:LinkVehicle(nil)
 		return true
 	end

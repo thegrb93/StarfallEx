@@ -7,6 +7,7 @@ ENT.RenderGroup = RENDERGROUP_BOTH
 function ENT:Initialize()
 	self.name = "Generic ( No-Name )"
 	self.OverlayFade = 0
+	self.ActiveHuds = {}
 end
 
 function ENT:OnRemove()

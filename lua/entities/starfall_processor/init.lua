@@ -13,6 +13,7 @@ function ENT:Initialize()
 	self:SetNWInt("State", self.States.None)
 	self:SetColor(Color(255, 0, 0, self:GetColor().a))
 	self.ErroredPlayers = {}
+	self.ActiveHuds = {}
 end
 
 function ENT:UpdateTransmitState()
@@ -149,8 +150,8 @@ end)
 net.Receive("starfall_processor_link", function(len, ply)
 	local entIndex = net.ReadUInt(16)
 	local linked = Entity(entIndex)
-	if linked.link and linked.link:IsValid() and linked.LinkEnt then
-		linked:LinkEnt(linked.link, ply)
+	if linked.link and linked.link:IsValid() then
+		SF.LinkEnt(linked, linked.link, ply)
 	end
 end)
 

@@ -66,10 +66,10 @@ function ENT:Compile()
 	end
 
 	for k, v in ipairs(ents.FindByClass("starfall_screen")) do
-		if v.link == self then v.link = nil v:LinkEnt(self) end
+		if v.link == self then v.link = nil SF.LinkEnt(v, self) end
 	end
 	for k, v in ipairs(ents.FindByClass("starfall_hud")) do
-		if v.link == self then v.link = nil v:LinkEnt(self) end
+		if v.link == self then v.link = nil SF.LinkEnt(v, self) end
 	end
 end
 
@@ -231,3 +231,107 @@ properties.Add( "starfall", {
 	MenuOpen = MenuOpen,
 	Action = function ( self, ent ) end
 } )
+
+
+function ENT:IsHUDActive(ply)
+	return self.ActiveHuds[ply or LocalPlayer()]
+end
+
+local hudsToSync = setmetatable({},{__index=function(t,k) local r={} t[k]=r return r end})
+local function syncHud(ply, chip, activator, enabled)
+	if next(hudsToSync)==nil then
+		hook.Add("Think","SF_SyncHud",function()
+			for ply, v in pairs(hudsToSync) do
+				for chip, tbl in pairs(v) do
+					net.Start("starfall_hud_set_enabled")
+					net.WriteEntity(ply)
+					net.WriteEntity(chip)
+					net.WriteEntity(tbl[1])
+					net.WriteBool(tbl[2])
+					if SERVER then net.Send(ply) else net.SendToServer() end
+				end
+				hudsToSync[ply] = nil
+			end
+			hook.Remove("Think","SF_SyncHud")
+		end)
+	end
+	hudsToSync[ply][chip] = {activator or game.GetWorld(), enabled}
+end
+
+net.Receive("starfall_hud_set_enabled" , function()
+	local ply = net.ReadEntity()
+	local chip = net.ReadEntity()
+	local activator = net.ReadEntity()
+	local enabled = net.ReadBool()
+	if ply:IsValid() and ply:IsPlayer() and chip:IsValid() and chip.ActiveHuds then
+		SF.EnableHud(ply, chip, activator, enabled)
+	end
+end)
+
+if SERVER then
+	function SF.EnableHud(ply, chip, activator, enabled, sync)
+		local huds = chip.ActiveHuds
+		if activator and activator:IsValid() then
+			local n = "SF_HUD"..activator:EntIndex()
+			local function disconnect(sync)
+				huds[ply] = nil
+				hook.Remove("EntityRemoved", n)
+				hook.Remove("PlayerLeaveVehicle", n)
+				if sync then syncHud(ply, chip, enabled) end
+			end
+			if enabled then
+				huds[ply] = true
+				hook.Add("EntityRemoved",n,function(e) if e==ply or e==activator then disconnect(true) end end)
+				if activator:IsVehicle() then
+					hook.Add("PlayerLeaveVehicle",n,function(p,v) if p==ply or v==activator then disconnect(true) end end)
+				end
+			else
+				disconnect(sync)
+			end
+		else
+			huds[ply] = enabled or nil
+		end
+		local instance = chip.instance
+		if instance then
+			instance:runScriptHook(enabled and "hudconnected" or "huddisconnected", instance.WrapObject(activator))
+		end
+		if sync then syncHud(ply, chip, activator, enabled) end
+	end
+else
+	function SF.EnableHud(ply, chip, activator, enabled, sync)
+		chip.ActiveHuds[ply] = enabled or nil
+		local instance = chip.instance
+		if instance then
+			instance:runScriptHook(enabled and "hudconnected" or "huddisconnected", instance.WrapObject(activator))
+		end
+		if sync then syncHud(ply, chip, activator, enabled) end
+	end
+end
+
+function SF.LinkEnt(self, ent, transmit)
+	local changed = self.link ~= ent
+	if changed then
+		local oldlink = self.link
+		self.link = ent
+
+		if oldlink and oldlink:IsValid() then
+			local instance = oldlink.instance
+			if instance then
+				instance:runScriptHook("componentunlinked", instance.WrapObject(self))
+			end
+		end
+		if ent and ent:IsValid() then
+			local instance = ent.instance
+			if instance then
+				instance:runScriptHook("componentlinked", instance.WrapObject(self))
+			end
+		end
+	end
+	if SERVER and (changed or transmit) then
+		net.Start("starfall_processor_link")
+		net.WriteUInt(self:EntIndex(), 16)
+		net.WriteUInt(ent and ent:IsValid() and ent:EntIndex() or 0, 16)
+		if transmit then net.Send(transmit) else net.Broadcast() end
+	end
+end
+

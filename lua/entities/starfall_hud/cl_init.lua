@@ -15,7 +15,6 @@ function ENT:Draw()
 	self:DrawModel()
 end
 
-SF.ActiveHuds = {}
 local ConnectHUD, DisconnectHUD
 
 local Hint_FirstPrint = true
