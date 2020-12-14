@@ -490,7 +490,6 @@ function hologram_methods:setAnimation(animation, frame, rate)
 	end
 
 	if animation~=nil then
-		checkluatype(animation, TYPE_NUMBER)
 		holo:ResetSequence(animation)
 		holo.AutomaticFrameAdvance = animation~=-1
 	end
