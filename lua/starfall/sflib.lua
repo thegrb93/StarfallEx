@@ -1356,7 +1356,13 @@ do
 	string_library.endsWith = string.EndsWith string_library.EndsWith = string.EndsWith
 	string_library.explode = string.Explode string_library.Explode = string.Explode
 	string_library.find = string.find
-	string_library.format = string.format
+	function string_library.format(s, ...)
+		checkluatype(s, TYPE_STRING)
+		for i=1, select("#",...) do
+			if istable(select(i, ...)) then SF.Throw("Cannot use table in string.format!", 2) end
+		end
+		return string.format(s, ...)
+	end
 	string_library.formattedTime = string.FormattedTime string_library.FormattedTime = string.FormattedTime
 	string_library.getChar = string.GetChar string_library.GetChar = string.GetChar
 	string_library.getExtensionFromFilename = string.GetExtensionFromFilename string_library.GetExtensionFromFilename = string.GetExtensionFromFilename
