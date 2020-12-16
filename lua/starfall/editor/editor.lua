@@ -77,7 +77,7 @@ if CLIENT then
 			if not SF.WaitingForDocs then
 				local docfile = file.Open("sf_docs.txt", "rb", "DATA")
 				if docfile then
-					SF.DocsData = docfile:Read(docfile:Size())
+					SF.DocsData = docfile:Read(docfile:Size()) or ""
 					docfile:Close()
 				else
 					SF.DocsData = ""
