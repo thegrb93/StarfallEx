@@ -158,7 +158,10 @@ end
 --@class function
 --@param data The data to convert
 --@return The converted data
-http_library.base64Encode = util.Base64Encode
+function http_library.base64Encode(data)
+	checkluatype(data, TYPE_STRING)
+	return string.gsub(util.Base64Encode(data),"\n","")
+end
 
 --- Converts data from base64 format
 --@name http_library.base64Decode
