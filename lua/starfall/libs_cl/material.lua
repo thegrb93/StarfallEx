@@ -233,7 +233,7 @@ local function NextInTextureQueue()
 						render.PopRenderTarget()
 
 						hook.Remove("PreRender","SF_HTMLPanelCopyTexture")
-						if requestTbl.CallbackDone then requestTbl.CallbackDone() end
+						if requestTbl.CallbackDone then timer.Simple(0, requestTbl.CallbackDone) end
 						table.remove(LoadingTextureQueue, 1)
 						timer.Simple(0, NextInTextureQueue)
 					end)
