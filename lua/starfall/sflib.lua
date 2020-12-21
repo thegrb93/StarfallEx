@@ -782,7 +782,7 @@ do
 		else
 			if next(waitingEntities) == nil then hook.Add("Think", "SF_WaitingForEntities", findWaitingEntities) end
 			local indexTbl = waitingEntities[index]
-			if not indexTbl then indexTbl = {timeout = CurTime()+5} waitingEntities[index] = indexTbl end
+			if not indexTbl then indexTbl = {timeout = CurTime()+60} waitingEntities[index] = indexTbl end
 			indexTbl[#indexTbl+1] = callback
 		end
 	end
