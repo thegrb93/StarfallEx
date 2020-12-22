@@ -135,7 +135,7 @@ net.Receive("starfall_processor_link", function()
 	local component, proc
 	
 	local function link()
-		if component and (component:IsValid() or component:IsWorld()) and proc and proc:IsValid() then
+		if component and component:IsValid() and proc and (proc:IsValid() or proc:IsWorld()) then
 			component:LinkEnt(proc)
 		end
 	end
