@@ -871,7 +871,9 @@ do
 		end
 
 		typeToString(tbl)
-		return ss:getString()
+		local ret = ss:getString()
+		ss, tableLookup = nil, nil
+		return ret
 	end
 
 	--- Convert string data to table
@@ -911,7 +913,9 @@ do
 			return t
 		end
 
-		return stringToType()
+		local ret = stringToType()
+		ss, tableLookup = nil, nil
+		return ret
 	end
 end
 
@@ -1511,7 +1515,7 @@ do
 			if #sendToClientTbl>0 then
 				local files = {}
 				for k, path in pairs(sendToClientTbl) do
-					files[name..":"..path] = SF.Modules[name][path].source
+					files[name..":"..path] = file.Read(path, "LUA")
 				end
 				net.Start("sf_receivelibrary")
 				net.WriteBool(false)

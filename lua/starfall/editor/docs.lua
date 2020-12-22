@@ -208,6 +208,7 @@ for name, mod in pairs(SF.Modules) do
 	for filename, data in pairs(mod) do
 		curfile = filename
 		scan(data.source, realm(filename))
+		data.source = nil
 	end
 end
 processMembers()
