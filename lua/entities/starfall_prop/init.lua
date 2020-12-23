@@ -27,10 +27,8 @@ function ENT:TransmitData(recip)
 	return stream
 end
 
-hook.Add("PlayerInitialSpawn","SF_Initialize_Custom_Props",function(ply)
-	SF.WaitForPlayerInit(ply, "InitProps", function()
-		for k, v in ipairs(ents.FindByClass("starfall_prop")) do
-			v:TransmitData(ply)
-		end
-	end)
+SF.WaitForPlayerInit(function(ply)
+	for k, v in ipairs(ents.FindByClass("starfall_prop")) do
+		v:TransmitData(ply)
+	end
 end)

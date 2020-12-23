@@ -788,18 +788,22 @@ do
 	end
 end
 
-function SF.WaitForPlayerInit(ply, name, func)
-	local n = "SF_WaitForPlayerInit"..name..ply:EntIndex()
+local playerinithooks = {}
+hook.Add("PlayerInitialSpawn","SF_PlayerInitialize",function(ply)
+	local n = "SF_WaitForPlayerInit"..ply:EntIndex()
 	hook.Add("SetupMove", n, function(ply2, mv, cmd)
 		if ply:IsValid() then
 			if ply == ply2 and not cmd:IsForced() then
-				func()
+				for _, v in ipairs(playerinithooks) do v(ply) end
 				hook.Remove("SetupMove", n)
 			end
 		else
 			hook.Remove("SetupMove", n)
 		end
 	end)
+end)
+function SF.WaitForPlayerInit(func)
+	playerinithooks[#playerinithooks+1] = func
 end
 
 

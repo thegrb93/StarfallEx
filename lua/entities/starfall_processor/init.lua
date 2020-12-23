@@ -163,11 +163,9 @@ net.Receive("starfall_report_error", function(len, ply)
 	end
 end)
 
-hook.Add("PlayerInitialSpawn","SF_Initialize_Processor",function(ply)
-	SF.WaitForPlayerInit(ply, "InitProcessor", function()
-		for k, v in ipairs(ents.FindByClass("starfall_processor")) do
-			v:SendCode(ply)
-		end
-	end)
+SF.WaitForPlayerInit(function(ply)
+	for k, v in ipairs(ents.FindByClass("starfall_processor")) do
+		v:SendCode(ply)
+	end
 end)
 
