@@ -147,10 +147,12 @@ builtins_library.unpack = unpack
 builtins_library.setmetatable = setmetatable
 
 --- Returns the metatable of an object. Doesn't work on most internal metatables
--- @param tbl Table to get metatable of
+-- @param tbl Table (or string) to get metatable of
 -- @return The metatable of tbl
 builtins_library.getmetatable = function(tbl)
-	checkluatype(tbl, TYPE_TABLE)
+	if not isstring(tbl) then -- allow either string or table
+		checkluatype(tbl, TYPE_TABLE)
+	end
 	return getmetatable(tbl)
 end
 
