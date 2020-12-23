@@ -8,6 +8,8 @@ function ENT:Initialize()
 	self:SetMoveType(MOVETYPE_NOCLIP)
 	self:DrawShadow(false)
 
+	self:AddEFlags( EFL_FORCE_CHECK_TRANSMIT )
+
 	self.clips = {}
 	self.clipdata = ""
 
@@ -16,6 +18,10 @@ function ENT:Initialize()
 
 	self.updateClip = false
 	self.AutomaticFrameAdvance = false
+end
+
+function ENT:UpdateTransmitState()
+	return TRANSMIT_ALWAYS
 end
 
 util.AddNetworkString("starfall_hologram_clips")

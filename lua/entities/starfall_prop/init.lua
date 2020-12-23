@@ -11,6 +11,12 @@ function ENT:Initialize()
 	self:SetSolid(SOLID_VPHYSICS)
 	self:EnableCustomCollisions(true)
 	self:DrawShadow(false)
+
+	self:AddEFlags( EFL_FORCE_CHECK_TRANSMIT )
+end
+
+function ENT:UpdateTransmitState()
+	return TRANSMIT_ALWAYS
 end
 
 function ENT:TransmitData(recip)
