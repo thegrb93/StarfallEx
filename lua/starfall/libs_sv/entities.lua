@@ -537,7 +537,7 @@ end
 function ents_methods:isValidPhys()
 	local ent = getent(self)
 	local phys = ent:GetPhysicsObject()
-	return phys ~= nil
+	return phys:IsValid()
 end
 
 --- Returns true if the entity is being held by a player. Either by Physics gun, Gravity gun or Use-key.
