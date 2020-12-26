@@ -9,6 +9,12 @@ function ENT:Initialize()
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
 	self:SetUseType(SIMPLE_USE)
+
+	self:AddEFlags( EFL_FORCE_CHECK_TRANSMIT )
+end
+
+function ENT:UpdateTransmitState()
+	return TRANSMIT_ALWAYS
 end
 
 -- Sends a net message to all clients about the use.

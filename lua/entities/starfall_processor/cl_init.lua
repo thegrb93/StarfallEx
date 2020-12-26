@@ -101,47 +101,31 @@ else
 end
 
 net.Receive("starfall_processor_download", function(len)
-
-	local owner, proc, sfdata
-	local function setupFiles()
-		if not (owner and ((owner:IsValid() and owner:IsPlayer()) or owner:IsWorld())) then return end
-		if not (proc and proc:IsValid()) then return end
-		if not sfdata then return end
-		proc:SetupFiles(sfdata)
-	end
-
-	local sfdata = net.ReadStarfall(nil, function(ok, sfdata_)
+	net.ReadStarfall(nil, function(ok, sfdata)
 		if ok then
-			sfdata = sfdata_
-			setupFiles()
+			SF.WaitForConditions(function(timedout)
+				local proc, owner = Entity(sfdata.procindex), Entity(sfdata.ownerindex)
+				if proc:GetClass()=="starfall_processor" and SF.EntIsReady(proc) and SF.EntIsReady(owner) and (owner:IsPlayer() or owner:IsWorld()) then
+					sfdata.owner = owner
+					proc:Destroy()
+					proc:SetupFiles(sfdata)
+					return true
+				end
+			end, 10)
 		end
 	end)
-
-	SF.WaitForEntity(sfdata.procindex, function(proc_)
-		if not (proc_ and proc_:GetClass()=="starfall_processor") then return end
-		proc = proc_
-		proc:Destroy()
-		setupFiles()
-	end)
-
-	SF.WaitForEntity(sfdata.ownerindex, function(owner_)
-		owner = owner_
-		setupFiles()
-	end)
-
 end)
 
 net.Receive("starfall_processor_link", function()
-	local component, proc
-	
-	local function link()
-		if component and component:IsValid() and proc and (proc:IsValid() or proc:IsWorld()) then
+	local componenti = net.ReadUInt(16)
+	local proci = net.ReadUInt(16)
+	SF.WaitForConditions(function(timedout)
+		local component, proc = Entity(componenti), Entity(proci)
+		if SF.EntIsReady(component) and SF.EntIsReady(proc) then
 			component:LinkEnt(proc)
+			return true
 		end
-	end
-	
-	SF.WaitForEntity(net.ReadUInt(16), function(ent) component = ent link() end)
-	SF.WaitForEntity(net.ReadUInt(16), function(ent) proc = ent link() end)
+	end, 10)
 end)
 
 net.Receive("starfall_processor_used", function(len)

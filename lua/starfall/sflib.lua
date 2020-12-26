@@ -61,9 +61,8 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 	end
 	sanitizeTypeMeta("", {__index = sf_string_index})
 	
-	if not WireLib then WireLib = {} end
-	if not WireLib.PatchedDuplicator then
-		WireLib.PatchedDuplicator = true
+	if not (WireLib and WireLib.PatchedDuplicator) then
+		if WireLib then WireLib.PatchedDuplicator = true end
 
 		local localPos
 
@@ -744,48 +743,56 @@ function SF.CheckLuaType(val, typ, level, msg)
 	end
 end
 
-do
-	local function entIsReady(ent)
-		if ent:IsWorld() then return true end
-		if ent:IsValid() then
-			local class = ent:GetClass()
-			if class=="player" then
-				return ent:IsPlayer()
-			else
-				-- https://github.com/Facepunch/garrysmod-issues/issues/3127
-				local n = next(baseclass.Get(class))
-				return n==nil or ent[n]~=nil
-			end
-		end
-		return false
-	end
-	local waitingEntities = {}
-	local function findWaitingEntities()
-		local time = CurTime()
-		for index, v in pairs(waitingEntities) do
-			local ent = Entity(index)
-			if entIsReady(ent) then
-				for _, func in ipairs(v) do func(ent) end
-				waitingEntities[index] = nil
-			elseif time>v.timeout then
-				for _, func in ipairs(v) do func() end
-				waitingEntities[index] = nil
-			end
-		end
-		if next(waitingEntities) == nil then hook.Remove("Think", "SF_WaitingForEntities") end
-	end
-
-	function SF.WaitForEntity(index, callback)
-		local ent = Entity(index)
-		if entIsReady(ent) then
-			callback(ent)
+function SF.EntIsReady(ent)
+	if ent:IsWorld() then return true end
+	if ent:IsValid() then
+		-- https://github.com/Facepunch/garrysmod-issues/issues/3127
+		local class = ent:GetClass()
+		if class=="player" then
+			return ent:IsPlayer()
 		else
-			if next(waitingEntities) == nil then hook.Add("Think", "SF_WaitingForEntities", findWaitingEntities) end
-			local indexTbl = waitingEntities[index]
-			if not indexTbl then indexTbl = {timeout = CurTime()+60} waitingEntities[index] = indexTbl end
-			indexTbl[#indexTbl+1] = callback
+			local n = next(baseclass.Get(class))
+			return n==nil or ent[n]~=nil
 		end
 	end
+	return false
+end
+
+local waitingConditions = {}
+function SF.WaitForConditions(callback, timeout)
+	if not callback() then
+		if #waitingConditions == 0 then
+			hook.Add("Think", "SF_WaitingForConditions", function()
+				local time = CurTime()
+				local i = 1
+				while i <= #waitingConditions do
+					local v = waitingConditions[i]
+					if v.callback() then
+						table.remove(waitingConditions, i)
+					elseif time>v.timeout then
+						v.callback(true)
+						table.remove(waitingConditions, i)
+					else
+						i = i + 1
+					end
+				end
+				if #waitingConditions == 0 then hook.Remove("Think", "SF_WaitingForConditions") end
+			end)
+		end
+		waitingConditions[#waitingConditions+1] = {condition = condition, callback = callback, timeout = CurTime()+timeout}
+	end
+end
+
+function SF.WaitForEntity(index, callback)
+	SF.WaitForConditions(function(timeout)
+		local ent=Entity(index)
+		if SF.EntIsReady(ent) then
+			callback(ent)
+			return true
+		elseif timeout then
+			callback(nil)
+		end
+	end, 10)
 end
 
 local playerinithooks = {}
