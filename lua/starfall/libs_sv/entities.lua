@@ -552,8 +552,7 @@ end
 -- @server
 -- @return Boolean if the entity is a constraint
 function ents_methods:isConstraint()
-	local ent = getent(self)
-	return ent:IsConstraint()
+	return getent(self):IsConstraint()
 end
 
 --- Sets entity gravity
