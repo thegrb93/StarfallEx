@@ -548,6 +548,14 @@ function ents_methods:isPlayerHolding()
 	return ent:IsPlayerHolding()
 end
 
+---Returns if the entity is a constraint.
+-- @server
+-- @return Boolean if the entity is a constraint
+function ents_methods:isConstraint()
+	local ent = getent(self)
+	return ent:IsConstraint()
+end
+
 --- Sets entity gravity
 -- @param grav Bool should the entity respect gravity?
 function ents_methods:enableGravity(grav)
