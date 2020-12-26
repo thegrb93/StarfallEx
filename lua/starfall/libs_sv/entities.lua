@@ -577,7 +577,7 @@ end
 function ents_methods:isValidPhys()
 	local ent = getent(self)
 	local phys = ent:GetPhysicsObject()
-	return phys ~= nil
+	return phys:IsValid()
 end
 
 --- Returns true if the entity is being held by a player. Either by Physics gun, Gravity gun or Use-key.
@@ -586,6 +586,13 @@ end
 function ents_methods:isPlayerHolding()
 	local ent = getent(self)
 	return ent:IsPlayerHolding()
+end
+
+---Returns if the entity is a constraint.
+-- @server
+-- @return Boolean if the entity is a constraint
+function ents_methods:isConstraint()
+	return getent(self):IsConstraint()
 end
 
 --- Sets entity gravity
