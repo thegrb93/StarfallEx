@@ -779,7 +779,7 @@ function SF.WaitForConditions(callback, timeout)
 				if #waitingConditions == 0 then hook.Remove("Think", "SF_WaitingForConditions") end
 			end)
 		end
-		waitingConditions[#waitingConditions+1] = {condition = condition, callback = callback, timeout = CurTime()+timeout}
+		waitingConditions[#waitingConditions+1] = {callback = callback, timeout = CurTime()+timeout}
 	end
 end
 
