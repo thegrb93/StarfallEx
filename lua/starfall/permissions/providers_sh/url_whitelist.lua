@@ -199,3 +199,8 @@ pattern [[([%w-_]+)%.neocities%.org/(.+)]]
 --- Examples:
 --- https://i1.sndcdn.com/artworks-000046176006-0xtkjy-large.jpg
 pattern [[(%w+)%.sndcdn%.com/(.+)]]
+
+-- Shoutcast
+--- Examples:
+--- http://yp.shoutcast.com/sbin/tunein-station.pls?id=567807
+simple [[yp.shoutcast.com]]
