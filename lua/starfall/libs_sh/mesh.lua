@@ -778,6 +778,7 @@ if CLIENT then
 
 		local nvertices = #verteces
 		if nvertices<3 or nvertices%3~=0 then SF.Throw("Expected a multiple of 3 vertices for the mesh's triangles.", 2) end
+		if nvertices > 65535 then SF.Throw("The max number of vertices for a mesh is 65535.", 2) end
 		local ntriangles = nvertices / 3
 
 		plyTriangleCount:checkuse(instance.player, ntriangles)
@@ -821,6 +822,7 @@ if CLIENT then
 
 		local meshes = SF.ParseObj(obj, threaded and thread_yield, Vector, triangulate)
 		for name, vertices in pairs(meshes) do
+			if #vertices > 65535 then SF.Throw("The max number of vertices for a mesh is 65535.", 2) end
 			local ntriangles = #vertices / 3
 			plyTriangleCount:use(instance.player, ntriangles)
 			plyMeshCount:use(instance.player, 1)
