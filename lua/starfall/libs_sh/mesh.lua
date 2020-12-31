@@ -630,7 +630,8 @@ SF.QuickHull = quickhull
 -- Register privileges
 SF.Permissions.registerPrivilege("mesh", "Create custom mesh", "Allows users to create custom meshes for rendering.", { client = {} })
 
-local plyTriangleCount = SF.LimitObject("mesh_triangles", "total mesh triangles", 200000, "How many triangles total can be loaded for meshes.")
+-- 1M triangles is about 195.4M VRAM
+local plyTriangleCount = SF.LimitObject("mesh_triangles", "total mesh triangles", 1000000, "How many triangles total can be loaded for meshes.")
 local plyTriangleRenderBurst = SF.BurstObject("mesh_triangles", "rendered triangles", 50000, 50000, "Number of triangles that can be rendered per frame", "Number of triangles that can be drawn in a short period of time", 60)
 local plyMeshCount = SF.LimitObject("mesh", "total meshes", 1000, "How many meshes total can be loaded.")
 
