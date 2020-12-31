@@ -105,7 +105,7 @@ net.Receive("starfall_processor_download", function(len)
 		if ok then
 			SF.WaitForConditions(function(timedout)
 				local proc, owner = Entity(sfdata.procindex), Entity(sfdata.ownerindex)
-				if proc:GetClass()=="starfall_processor" and SF.EntIsReady(proc) and SF.EntIsReady(owner) and (owner:IsPlayer() or owner:IsWorld()) then
+				if SF.EntIsReady(proc) and proc:GetClass()=="starfall_processor" and SF.EntIsReady(owner) and (owner:IsPlayer() or owner:IsWorld()) then
 					sfdata.owner = owner
 					proc:Destroy()
 					proc:SetupFiles(sfdata)
