@@ -7,7 +7,7 @@ ENT.Material = ENT.DefaultMaterial
 
 function ENT:Initialize()
 	self.clips = {}
-	self.userrenderbounds = false
+	self.sf_userrenderbounds = false
 	self:OnScaleChanged(nil, nil, self:GetScale())
 end
 
@@ -29,7 +29,7 @@ function ENT:OnScaleChanged(name, old, scale)
 		self.HoloMatrix = scalematrix
 		self:EnableMatrix("RenderMultiply", scalematrix)
 	end
-	if not self.userrenderbounds then
+	if not self.sf_userrenderbounds then
 		local mins, maxs = self:GetModelBounds()
 		if mins then
 			self:SetRenderBounds(mins * scale, maxs * scale)
@@ -118,6 +118,10 @@ end)
 hook.Add("NetworkEntityCreated", "starfall_hologram_rescale", function(holo)
 	if holo.IsSFHologram and holo.HoloMatrix then
 		holo:EnableMatrix("RenderMultiply", holo.HoloMatrix)
+	end
+	local sf_userrenderbounds = holo.sf_userrenderbounds
+	if sf_userrenderbounds then
+		holo:SetRenderBounds(sf_userrenderbounds[1], sf_userrenderbounds[2])
 	end
 end)
 

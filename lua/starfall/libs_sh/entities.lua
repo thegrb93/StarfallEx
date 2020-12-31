@@ -148,8 +148,9 @@ if CLIENT then
 
 		checkpermission(instance, ent, "entities.setRenderProperty")
 
-		ent:SetRenderBounds(vunwrap(mins), vunwrap(maxs))
-		ent.userrenderbounds = true
+		mins, maxs = vunwrap(mins), vunwrap(maxs)
+		ent:SetRenderBounds(mins, maxs)
+		ent.sf_userrenderbounds = {mins, maxs}
 	end
 	
 	local canDrawEntity = SF.CanDrawEntity
