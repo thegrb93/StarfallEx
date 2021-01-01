@@ -121,7 +121,7 @@ net.Receive("starfall_processor_link", function()
 	local proci = net.ReadUInt(16)
 	SF.WaitForConditions(function(timedout)
 		local component, proc = Entity(componenti), Entity(proci)
-		if SF.EntIsReady(component) and SF.EntIsReady(proc) then
+		if SF.EntIsReady(component) and SF.EntIsReady(proc) and component.LinkEnt then
 			component:LinkEnt(proc)
 			return true
 		end
