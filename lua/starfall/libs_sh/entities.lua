@@ -438,7 +438,7 @@ end
 -- @shared
 -- @class function
 -- @return Number renderfx, https://wiki.facepunch.com/gmod/Enums/kRenderFx
-function ent_methods:getRenderFX()
+function ents_methods:getRenderFX()
 	return getent(self):GetRenderFX()
 end
 
