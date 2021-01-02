@@ -759,6 +759,10 @@ env.STENCIL = {
 }
 
 --- Texture filtering ENUMs
+-- @field NONE
+-- @field POINT
+-- @field LINEAR
+-- @field ANISOTROPIC
 env.TEXFILTER = {
 	NONE = TEXFILTER.NONE,
 	POINT = TEXFILTER.POINT,
