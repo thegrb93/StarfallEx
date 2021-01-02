@@ -414,6 +414,14 @@ function ents_methods:setRenderMode(rendermode)
 	if SERVER then duplicator.StoreEntityModifier(ent, "colour", { RenderMode = rendermode }) end
 end
 
+--- Gets the render mode of the entity
+-- @shared
+-- @class function
+-- @return Number render mode, https://wiki.facepunch.com/gmod/Enums/RENDERMODE
+function ents_methods:getRenderMode()
+	return getent(self):GetRenderMode()
+end
+
 --- Sets the renderfx of the entity
 -- @shared
 -- @class function
@@ -430,6 +438,14 @@ function ents_methods:setRenderFX(renderfx)
 
 	ent:SetRenderFX(renderfx)
 	if SERVER then duplicator.StoreEntityModifier(ent, "colour", { RenderFX = renderfx }) end
+end
+
+--- Gets the renderfx of the entity
+-- @shared
+-- @class function
+-- @return Number renderfx, https://wiki.facepunch.com/gmod/Enums/kRenderFx
+function ent_methods:getRenderFX()
+	return getent(self):GetRenderFX()
 end
 
 --- Gets the parent of an entity
