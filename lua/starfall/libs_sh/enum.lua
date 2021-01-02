@@ -758,6 +758,14 @@ env.STENCIL = {
 	DECR = STENCIL_DECR
 }
 
+--- Texture filtering ENUMs
+env.TEXFILTER = {
+	NONE = TEXFILTER.NONE,
+	POINT = TEXFILTER.POINT,
+	LINEAR = TEXFILTER.LINEAR,
+	ANISOTROPIC = TEXFILTER.ANISOTROPIC
+}
+
 --- VRmod library enums
 -- @name vr_library.VR
 -- @class table
