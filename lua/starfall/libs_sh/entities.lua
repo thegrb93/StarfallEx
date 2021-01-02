@@ -468,8 +468,7 @@ end
 -- @shared
 -- @return number index of the attachment the entity is parented to or 0
 function ents_methods:getAttachmentParent()
-	local ent = getent(self)
-	return ent:GetParentAttachment()
+	return getent(self):GetParentAttachment()
 end
 
 --- Gets the attachment index via the entity and it's attachment name
@@ -477,8 +476,7 @@ end
 -- @param name
 -- @return number of the attachment index, or 0 if it doesn't exist
 function ents_methods:lookupAttachment(name)
-	local ent = getent(self)
-	return ent:LookupAttachment(name)
+	return getent(self):LookupAttachment(name)
 end
 
 --- Gets the position and angle of an attachment
