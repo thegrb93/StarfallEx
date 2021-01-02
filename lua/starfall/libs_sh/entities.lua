@@ -422,7 +422,7 @@ function ents_methods:getRenderMode()
 	return getent(self):GetRenderMode()
 end
 
---- Sets the renderfx of the entity
+--- Sets the renderfx of the entity, most effects require entity's alpha to be less than 255 to take effect
 -- @shared
 -- @class function
 -- @param renderfx Number, renderfx to use. http://wiki.facepunch.com/gmod/Enums/kRenderFx
