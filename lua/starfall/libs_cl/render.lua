@@ -469,6 +469,20 @@ function render_library.setStencilWriteMask(mask)
 	render.SetStencilWriteMask(mask)
 end
 
+--- Resets stencil operations to their default behavior
+function render_library.resetStencil()
+	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
+	
+	render.SetStencilWriteMask(0xFF)
+	render.SetStencilTestMask(0xFF)
+	render.SetStencilReferenceValue(0)
+	render.SetStencilCompareFunction(STENCIL_ALWAYS)
+	render.SetStencilPassOperation(STENCIL_KEEP)
+	render.SetStencilFailOperation(STENCIL_KEEP)
+	render.SetStencilZFailOperation(STENCIL_KEEP)
+	render.ClearStencil()
+end
+
 -- ------------------------------------------------------------------ --
 
 --- Pushes a matrix onto the matrix stack.

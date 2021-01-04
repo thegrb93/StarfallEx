@@ -758,6 +758,98 @@ env.STENCIL = {
 	DECR = STENCIL_DECR
 }
 
+--- ENUMs of texture filtering modes
+-- @field NONE
+-- @field POINT
+-- @field LINEAR
+-- @field ANISOTROPIC
+env.TEXFILTER = {
+	NONE = TEXFILTER.NONE,
+	POINT = TEXFILTER.POINT,
+	LINEAR = TEXFILTER.LINEAR,
+	ANISOTROPIC = TEXFILTER.ANISOTROPIC
+}
+
+--- ENUMs of entity render modes to be used with Entity.setRenderMode
+-- @field NORMAL
+-- @field TRANSCOLOR
+-- @field TRANSTEXTURE
+-- @field GLOW
+-- @field TRANSALPHA
+-- @field TRANSADD
+-- @field ENVIROMENTAL
+-- @field TRANSADDFRAMEBLEND
+-- @field TRANSALPHADD
+-- @field WORLDGLOW
+-- @field NONE
+env.RENDERMODE = {
+	NORMAL = RENDERMODE_NORMAL,
+	TRANSCOLOR = RENDERMODE_TRANSCOLOR,
+	TRANSTEXTURE = RENDERMODE_TRANSTEXTURE,
+	GLOW = RENDERMODE_GLOW,
+	TRANSALPHA = RENDERMODE_TRANSALPHA,
+	TRANSADD = RENDERMODE_TRANSADD,
+	ENVIROMENTAL = RENDERMODE_ENVIROMENTAL,
+	TRANSADDFRAMEBLEND = RENDERMODE_TRANSADDFRAMEBLEND,
+	TRANSALPHADD = RENDERMODE_TRANSALPHADD,
+	WORLDGLOW = RENDERMODE_WORLDGLOW,
+	NONE = RENDERMODE_NONE
+}
+
+--- ENUMs of entity renderfx to be used with Entity.setRenderFX
+-- @field NONE
+-- @field PULSESLOW
+-- @field PULSEFAST
+-- @field PULSESLOWWIDE
+-- @field PULSEFASTWIDE
+-- @field FADESLOW
+-- @field FADEFAST
+-- @field SOLIDSLOW
+-- @field SOLIDFAST
+-- @field STROBESLOW
+-- @field STROBEFAST
+-- @field STROBEFASTER
+-- @field FLICKERSLOW
+-- @field FLICKERFAST
+-- @field NODISSIPATION
+-- @field DISTORT
+-- @field HOLOGRAM
+-- @field EXPLODE
+-- @field GLOWSHELL
+-- @field CLAMPMINSCALE
+-- @field RAIN
+-- @field SNOW
+-- @field SPOTLIGHT
+-- @field RAGDOLL
+-- @field PULSEFASTWIDER
+env.RENDERFX = {
+	NONE = kRenderFxNone,
+	PULSESLOW = kRenderFxPulseSlow,
+	PULSEFAST = kRenderFxPulseFast,
+	PULSESLOWWIDE = kRenderFxPulseSlowWide,
+	PULSEFASTWIDE = kRenderFxPulseFastWide,
+	FADESLOW = kRenderFxFadeSlow,
+	FADEFAST = kRenderFxFadeFast,
+	SOLIDSLOW = kRenderFxSolidSlow,
+	SOLIDFAST = kRenderFxSolidFast,
+	STROBESLOW = kRenderFxStrobeSlow,
+	STROBEFAST = kRenderFxStrobeFast,
+	STROBEFASTER = kRenderFxStrobeFaster,
+	FLICKERSLOW = kRenderFxFlickerSlow,
+	FLICKERFAST = kRenderFxFlickerFast,
+	NODISSIPATION = kRenderFxNoDissipation,
+	DISTORT = kRenderFxDistort,
+	HOLOGRAM = kRenderFxHologram,
+	EXPLODE = kRenderFxExplode,
+	GLOWSHELL = kRenderFxGlowShell,
+	CLAMPMINSCALE = kRenderFxClampMinScale,
+	RAIN = kRenderFxEnvRain,
+	SNOW = kRenderFxEnvSnow,
+	SPOTLIGHT = kRenderFxSpotlight,
+	RAGDOLL = kRenderFxRagdoll,
+	PULSEFASTWIDER = kRenderFxPulseFastWider
+}
+
 --- VRmod library enums
 -- @name vr_library.VR
 -- @class table

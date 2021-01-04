@@ -332,16 +332,14 @@ end
 -- @return The bodygroup value
 function ents_methods:getBodygroup(id)
 	checkluatype(id, TYPE_NUMBER)
-	local ent = getent(self)
-	return ent:GetBodygroup(id)
+	return getent(self):GetBodygroup(id)
 end
 
 --- Returns a list of all bodygroups of the entity
 -- @shared
 -- @return Bodygroups as a table of BodyGroupDatas. https://wiki.facepunch.com/gmod/Structures/BodyGroupData
 function ents_methods:getBodygroups()
-	local ent = getent(self)
-	return ent:GetBodyGroups()
+	return getent(self):GetBodyGroups()
 end
 
 --- Returns the bodygroup index of the entity with given name
@@ -350,8 +348,7 @@ end
 -- @return The bodygroup index
 function ents_methods:lookupBodygroup(name)
 	checkluatype(name, TYPE_STRING)
-	local ent = getent(self)
-	return ent:FindBodygroupByName(name)
+	return getent(self):FindBodygroupByName(name)
 end
 
 --- Returns the bodygroup name of the entity with given index
@@ -360,8 +357,7 @@ end
 -- @return The bodygroup name
 function ents_methods:getBodygroupName(id)
 	checkluatype(id, TYPE_NUMBER)
-	local ent = getent(self)
-	return ent:GetBodygroupName(id)
+	return getent(self):GetBodygroupName(id)
 end
 
 --- Sets the skin of the entity
@@ -384,16 +380,14 @@ end
 -- @shared
 -- @return Skin number
 function ents_methods:getSkin()
-	local ent = getent(self)
-	return ent:GetSkin()
+	return getent(self):GetSkin()
 end
 
 --- Returns the amount of skins of the entity
 -- @shared
 -- @return The amount of skins
 function ents_methods:getSkinCount()
-	local ent = getent(self)
-	return ent:SkinCount()
+	return getent(self):SkinCount()
 end
 
 --- Sets the render mode of the entity
@@ -414,7 +408,15 @@ function ents_methods:setRenderMode(rendermode)
 	if SERVER then duplicator.StoreEntityModifier(ent, "colour", { RenderMode = rendermode }) end
 end
 
---- Sets the renderfx of the entity
+--- Gets the render mode of the entity
+-- @shared
+-- @class function
+-- @return Number render mode, https://wiki.facepunch.com/gmod/Enums/RENDERMODE
+function ents_methods:getRenderMode()
+	return getent(self):GetRenderMode()
+end
+
+--- Sets the renderfx of the entity, most effects require entity's alpha to be less than 255 to take effect
 -- @shared
 -- @class function
 -- @param renderfx Number, renderfx to use. http://wiki.facepunch.com/gmod/Enums/kRenderFx
@@ -432,28 +434,33 @@ function ents_methods:setRenderFX(renderfx)
 	if SERVER then duplicator.StoreEntityModifier(ent, "colour", { RenderFX = renderfx }) end
 end
 
+--- Gets the renderfx of the entity
+-- @shared
+-- @class function
+-- @return Number renderfx, https://wiki.facepunch.com/gmod/Enums/kRenderFx
+function ents_methods:getRenderFX()
+	return getent(self):GetRenderFX()
+end
+
 --- Gets the parent of an entity
 -- @shared
 -- @return Entity's parent or nil
 function ents_methods:getParent()
-	local ent = getent(self)
-	return ewrap(ent:GetParent())
+	return ewrap(getent(self):GetParent())
 end
 
 --- Gets the children (the parented entities) of an entity
 -- @shared
 -- @return table of parented children
 function ents_methods:getChildren()
-	local ent = getent(self)
-	return instance.Sanitize(ent:GetChildren())
+	return instance.Sanitize(getent(self):GetChildren())
 end
 
 --- Gets the attachment index the entity is parented to
 -- @shared
 -- @return number index of the attachment the entity is parented to or 0
 function ents_methods:getAttachmentParent()
-	local ent = getent(self)
-	return ent:GetParentAttachment()
+	return getent(self):GetParentAttachment()
 end
 
 --- Gets the attachment index via the entity and it's attachment name
@@ -461,8 +468,7 @@ end
 -- @param name
 -- @return number of the attachment index, or 0 if it doesn't exist
 function ents_methods:lookupAttachment(name)
-	local ent = getent(self)
-	return ent:LookupAttachment(name)
+	return getent(self):LookupAttachment(name)
 end
 
 --- Gets the position and angle of an attachment
@@ -470,8 +476,7 @@ end
 -- @param index The index of the attachment
 -- @return vector position, and angle orientation or nil if the attachment doesn't exist
 function ents_methods:getAttachment(index)
-	local ent = getent(self)
-	local t = ent:GetAttachment(index)
+	local t = getent(self):GetAttachment(index)
 	if t then
 		return vwrap(t.Pos), awrap(t.Ang)
 	end
@@ -737,32 +742,28 @@ end
 -- @shared
 -- @return The numerical index of the entity
 function ents_methods:entIndex()
-	local ent = getent(self)
-	return ent:EntIndex()
+	return getent(self):EntIndex()
 end
 
 --- Returns the class of the entity
 -- @shared
 -- @return The string class name
 function ents_methods:getClass()
-	local ent = getent(self)
-	return ent:GetClass()
+	return getent(self):GetClass()
 end
 
 --- Returns the position of the entity
 -- @shared
 -- @return The position vector
 function ents_methods:getPos()
-	local ent = getent(self)
-	return vwrap(ent:GetPos())
+	return vwrap(getent(self):GetPos())
 end
 
 --- Returns how submerged the entity is in water
 -- @shared
 -- @return The water level. 0 none, 1 slightly, 2 at least halfway, 3 all the way
 function ents_methods:getWaterLevel()
-	local ent = getent(self)
-	return ent:WaterLevel()
+	return getent(self):WaterLevel()
 end
 
 --- Returns the ragdoll bone index given a bone name
@@ -771,8 +772,7 @@ end
 -- @return The bone index
 function ents_methods:lookupBone(name)
 	checkluatype(name, TYPE_STRING)
-	local ent = getent(self)
-	return ent:LookupBone(name)
+	return getent(self):LookupBone(name)
 end
 
 --- Returns the matrix of the entity's bone. Note: this method is slow/doesnt work well if the entity isn't animated.
@@ -780,26 +780,23 @@ end
 -- @param bone Bone index. (def 0)
 -- @return The matrix
 function ents_methods:getBoneMatrix(bone)
-	local ent = getent(self)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
 
-	return mwrap(ent:GetBoneMatrix(bone))
+	return mwrap(getent(self):GetBoneMatrix(bone))
 end
 
 --- Returns the world transform matrix of the entity
 -- @shared
 -- @return The matrix
 function ents_methods:getMatrix()
-	local ent = getent(self)
-	return mwrap(ent:GetWorldTransformMatrix())
+	return mwrap(getent(self):GetWorldTransformMatrix())
 end
 
 --- Returns the number of an entity's bones
 -- @shared
 -- @return Number of bones
 function ents_methods:getBoneCount()
-	local ent = getent(self)
-	return ent:GetBoneCount()
+	return getent(self):GetBoneCount()
 end
 
 --- Returns the name of an entity's bone
@@ -807,9 +804,8 @@ end
 -- @param bone Bone index. (def 0)
 -- @return Name of the bone
 function ents_methods:getBoneName(bone)
-	local ent = getent(self)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
-	return ent:GetBoneName(bone)
+	return getent(self):GetBoneName(bone)
 end
 
 --- Returns the parent index of an entity's bone
@@ -817,9 +813,8 @@ end
 -- @param bone Bone index. (def 0)
 -- @return Parent index of the bone
 function ents_methods:getBoneParent(bone)
-	local ent = getent(self)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
-	return ent:GetBoneParent(bone)
+	return getent(self):GetBoneParent(bone)
 end
 
 --- Returns the bone's position and angle in world coordinates
@@ -828,9 +823,8 @@ end
 -- @return Position of the bone
 -- @return Angle of the bone
 function ents_methods:getBonePosition(bone)
-	local ent = getent(self)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
-	local pos, ang = ent:GetBonePosition(bone)
+	local pos, ang = getent(self):GetBonePosition(bone)
 	return vwrap(pos), awrap(ang)
 end
 
@@ -846,8 +840,7 @@ end
 -- @shared
 -- @return The position vector of the outer bounding box center
 function ents_methods:obbCenter()
-	local ent = getent(self)
-	return vwrap(ent:OBBCenter())
+	return vwrap(getent(self):OBBCenter())
 end
 
 --- Returns the world position of the entity's outer bounding box
@@ -862,16 +855,14 @@ end
 -- @shared
 -- @return The min bounding box vector
 function ents_methods:obbMins()
-	local ent = getent(self)
-	return vwrap(ent:OBBMins())
+	return vwrap(getent(self):OBBMins())
 end
 
 --- Returns max local bounding box vector of the entity
 -- @shared
 -- @return The max bounding box vector
 function ents_methods:obbMaxs()
-	local ent = getent(self)
-	return vwrap(ent:OBBMaxs())
+	return vwrap(getent(self):OBBMaxs())
 end
 
 --- Returns Entity axis aligned bounding box in world coordinates
@@ -879,8 +870,7 @@ end
 -- @return The min bounding box vector
 -- @return The max bounding box vector
 function ents_methods:worldSpaceAABB()
-	local ent = getent(self)
-	local a, b = ent:WorldSpaceAABB() 
+	local a, b = getent(self):WorldSpaceAABB() 
 	return vwrap(a), vwrap(b)
 end
 
@@ -908,8 +898,7 @@ end
 -- @shared
 -- @return The angle
 function ents_methods:getAngles()
-	local ent = getent(self)
-	return awrap(ent:GetAngles())
+	return awrap(getent(self):GetAngles())
 end
 
 --- Returns the mass of the entity
@@ -938,8 +927,7 @@ end
 -- @shared
 -- @return The velocity vector
 function ents_methods:getVelocity()
-	local ent = getent(self)
-	return vwrap(ent:GetVelocity())
+	return vwrap(getent(self):GetVelocity())
 end
 
 --- Returns the angular velocity of the entity
@@ -968,9 +956,7 @@ end
 -- @param data Local space vector
 -- @return data as world space vector
 function ents_methods:localToWorld(data)
-	local ent = getent(self)
-
-	return vwrap(ent:LocalToWorld(vunwrap(data)))
+	return vwrap(getent(self):LocalToWorld(vunwrap(data)))
 end
 
 --- Converts an angle in entity local space to world space
@@ -978,10 +964,7 @@ end
 -- @param data Local space angle
 -- @return data as world space angle
 function ents_methods:localToWorldAngles(data)
-	local ent = getent(self)
-	local data = aunwrap(data)
-
-	return awrap(ent:LocalToWorldAngles(data))
+	return awrap(getent(self):LocalToWorldAngles(aunwrap(data)))
 end
 
 --- Converts a vector in world space to entity local space
@@ -989,9 +972,7 @@ end
 -- @param data World space vector
 -- @return data as local space vector
 function ents_methods:worldToLocal(data)
-	local ent = getent(self)
-
-	return vwrap(ent:WorldToLocal(vunwrap(data)))
+	return vwrap(getent(self):WorldToLocal(vunwrap(data)))
 end
 
 --- Converts an angle in world space to entity local space
@@ -999,20 +980,16 @@ end
 -- @param data World space angle
 -- @return data as local space angle
 function ents_methods:worldToLocalAngles(data)
-	local ent = getent(self)
-	local data = aunwrap(data)
-
-	return awrap(ent:WorldToLocalAngles(data))
+	return awrap(getent(self):WorldToLocalAngles(aunwrap(data)))
 end
 
 --- Gets the animation number from the animation name
 -- @param animation Name of the animation
 -- @return Animation index or -1 if invalid
 function ents_methods:lookupSequence(animation)
-	local ent = getent(self)
 	checkluatype(animation, TYPE_STRING)
 
-	return ent:LookupSequence(animation)
+	return getent(self):LookupSequence(animation)
 end
 
 --- Gets the current playing sequence
@@ -1045,8 +1022,7 @@ end
 -- @param pose Pose parameter name
 -- @return Value of the pose parameter
 function ents_methods:getPose(pose)
-	local ent = getent(self)
-	return ent:GetPoseParameter(pose)
+	return getent(self):GetPoseParameter(pose)
 end
 
 --- Returns a table of flexname -> flexid pairs for use in flex functions.
@@ -1101,8 +1077,7 @@ end
 --- Gets the scale of the entity flexes
 -- @return The scale of the flexes
 function ents_methods:getFlexScale()
-	local ent = getent(self)
-	return ent:GetFlexScale()
+	return getent(self):GetFlexScale()
 end
 
 --- Sets the scale of the entity flexes
@@ -1124,32 +1099,28 @@ end
 -- @shared
 -- @return Model of the entity
 function ents_methods:getModel()
-	local ent = getent(self)
-	return ent:GetModel()
+	return getent(self):GetModel()
 end
 
 --- Gets the max health of an entity
 -- @shared
 -- @return Max Health of the entity
 function ents_methods:getMaxHealth()
-	local ent = getent(self)
-	return ent:GetMaxHealth()
+	return getent(self):GetMaxHealth()
 end
 
 --- Gets the health of an entity
 -- @shared
 -- @return Health of the entity
 function ents_methods:getHealth()
-	local ent = getent(self)
-	return ent:Health()
+	return getent(self):Health()
 end
 
 --- Gets the entitiy's eye angles
 -- @shared
 -- @return Angles of the entity's eyes
 function ents_methods:getEyeAngles()
-	local ent = getent(self)
-	return awrap(ent:EyeAngles())
+	return awrap(getent(self):EyeAngles())
 end
 
 --- Gets the entity's eye position
@@ -1157,8 +1128,7 @@ end
 -- @return Eye position of the entity
 -- @return In case of a ragdoll, the position of the second eye
 function ents_methods:getEyePos()
-	local ent = getent(self)
-	local pos1, pos2 = ent:EyePos()
+	local pos1, pos2 = getent(self):EyePos()
 	if pos2 then
 		return vwrap(pos1), vwrap(pos2)
 	end
@@ -1170,17 +1140,19 @@ end
 -- @class function
 -- @return String material
 function ents_methods:getMaterial()
-	local ent = getent(self)
-	return ent:GetMaterial() or ""
+	return getent(self):GetMaterial() or ""
 end
 
 --- Gets an entities' submaterial
 -- @shared
 -- @class function
+-- @param index Number index of the sub material
 -- @return String material
 function ents_methods:getSubMaterial(index)
-	local ent = getent(self)
-	return ent:GetSubMaterial(index) or ""
+	checkluatype(index, TYPE_NUMBER)
+	if index<0 or index>31 then SF.Throw("Index must be an int in range 0 - 31") end
+	
+	return getent(self):GetSubMaterial(index) or ""
 end
 
 --- Gets an entities' material list
@@ -1188,40 +1160,35 @@ end
 -- @class function
 -- @return Material
 function ents_methods:getMaterials()
-	local ent = getent(self)
-	return ent:GetMaterials() or {}
+	return getent(self):GetMaterials() or {}
 end
 
 --- Gets the entity's up vector
 -- @shared
 -- @return Vector up
 function ents_methods:getUp()
-	local ent = getent(self)
-	return vwrap(ent:GetUp())
+	return vwrap(getent(self):GetUp())
 end
 
 --- Gets the entity's right vector
 -- @shared
 -- @return Vector right
 function ents_methods:getRight()
-	local ent = getent(self)
-	return vwrap(ent:GetRight())
+	return vwrap(getent(self):GetRight())
 end
 
 --- Gets the entity's forward vector
 -- @shared
 -- @return Vector forward
 function ents_methods:getForward()
-	local ent = getent(self)
-	return vwrap(ent:GetForward())
+	return vwrap(getent(self):GetForward())
 end
 
 --- Returns the timer.curtime() time the entity was created on
 -- @shared
 -- @return Seconds relative to server map start
 function ents_methods:getCreationTime()
-	local ent = getent(self)
-	return ent:GetCreationTime()
+	return getent(self):GetCreationTime()
 end
 
 --- Checks if an engine effect is applied to the entity
@@ -1231,8 +1198,7 @@ end
 function ents_methods:isEffectActive(effect)
 	checkluatype(effect, TYPE_NUMBER)
 	
-	local ent = getent(self)
-	return ent:IsEffectActive(effect)
+	return getent(self):IsEffectActive(effect)
 end
 
 --- Marks entity as persistent, disallowing players from physgunning it. Persistent entities save on server shutdown when sbox_persist is set
@@ -1249,8 +1215,7 @@ end
 -- @shared
 -- @return True if the entity is persistent 
 function ents_methods:getPersistent()
-	local ent = getent(self)
-	return ent:GetPersistent()
+	return getent(self):GetPersistent()
 end
 
 --- Returns the game assigned owner of an entity. This doesn't take CPPI into account and will return nil for most standard entities.
@@ -1258,8 +1223,7 @@ end
 -- @shared
 -- @return Owner
 function ents_methods:entOwner()
-	local ent = getent(self)
-	return owrap(ent:GetOwner())
+	return owrap(getent(self):GetOwner())
 end
 
 --- Gets the bounds (min and max corners) of a hit box.
@@ -1327,8 +1291,7 @@ end
 -- @shared
 -- @return Table of SurfaceInfos if the entity has a brush model, or no value otherwise.
 function ents_methods:getBrushSurfaces()
-	local ent = getent(self)
-	local t = ent:GetBrushSurfaces()
+	local t = getent(self):GetBrushSurfaces()
 	if not t then return end
 	local out = {}
 	for k,surface in ipairs(t) do
