@@ -723,22 +723,24 @@ env.CONTENTS = {
 }
 
 --- ENUMs of stencil comparisons and operations
---@field NEVER
---@field LESS
---@field EQUAL
---@field LESSEQUAL
---@field GREATER
---@field NOTEQUAL
---@field GREATEREQUAL
---@field ALWAYS
---@field KEEP
---@field ZERO
---@field REPLACE
---@field INCRSAT
---@field DECRSAT
---@field INVERT
---@field INCR
---@field DECR
+-- @name builtins_library.STENCIL
+-- @class table
+-- @field NEVER
+-- @field LESS
+-- @field EQUAL
+-- @field LESSEQUAL
+-- @field GREATER
+-- @field NOTEQUAL
+-- @field GREATEREQUAL
+-- @field ALWAYS
+-- @field KEEP
+-- @field ZERO
+-- @field REPLACE
+-- @field INCRSAT
+-- @field DECRSAT
+-- @field INVERT
+-- @field INCR
+-- @field DECR
 env.STENCIL = {
 	NEVER = STENCIL_NEVER,
 	LESS = STENCIL_LESS,
@@ -759,6 +761,8 @@ env.STENCIL = {
 }
 
 --- ENUMs of texture filtering modes
+-- @name builtins_library.TEXFILTER
+-- @class table
 -- @field NONE
 -- @field POINT
 -- @field LINEAR
@@ -771,6 +775,8 @@ env.TEXFILTER = {
 }
 
 --- ENUMs of entity render modes to be used with Entity.setRenderMode
+-- @name builtins_library.RENDERMODE
+-- @class table
 -- @field NORMAL
 -- @field TRANSCOLOR
 -- @field TRANSTEXTURE
@@ -797,6 +803,8 @@ env.RENDERMODE = {
 }
 
 --- ENUMs of entity renderfx to be used with Entity.setRenderFX
+-- @name builtins_library.RENDERFX
+-- @class table
 -- @field NONE
 -- @field PULSESLOW
 -- @field PULSEFAST
