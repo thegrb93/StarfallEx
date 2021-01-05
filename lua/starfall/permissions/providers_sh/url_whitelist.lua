@@ -106,12 +106,16 @@ simple [[bitbucket.org]]
 ---  https://raw.github.com/github/explore/master/topics/lua/lua.png
 ---  https://gist.github.com/Cheatoid/0b60ab327d0baf6baa0c64808ec92138/raw
 ---  https://user-images.githubusercontent.com/13347909/103649539-ef956e80-4f5e-11eb-94dc-d22ee20380e9.png
+---  https://avatars2.githubusercontent.com/u/6713261?s=460&v=4
 
 simple [[raw.githubusercontent.com]]
 simple [[gist.githubusercontent.com]]
 simple [[raw.github.com]]
 simple [[gist.github.com]]
+simple [[api.github.com]]
+simple [[cloud.githubusercontent.com]]
 simple [[user-images.githubusercontent.com]]
+pattern [[avatars(%d*)%.githubusercontent%.com/(.+)]]
 
 -- teknik
 simple [[u.teknik.io]]
