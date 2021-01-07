@@ -103,9 +103,16 @@ simple [[bitbucket.org]]
 --- Examples:
 ---  https://gist.githubusercontent.com/LUModder/f2b1c0c9bf98224f9679/raw/5644006aae8f0a8b930ac312324f46dd43839189/sh_sbdc.lua
 ---  https://raw.githubusercontent.com/LUModder/FWP/master/weapon_template.txt
+---  https://raw.github.com/github/explore/master/topics/lua/lua.png
+---  https://user-images.githubusercontent.com/13347909/103649539-ef956e80-4f5e-11eb-94dc-d22ee20380e9.png
+---  https://avatars2.githubusercontent.com/u/6713261?s=460&v=4
 
 simple [[raw.githubusercontent.com]]
 simple [[gist.githubusercontent.com]]
+simple [[raw.github.com]]
+simple [[cloud.githubusercontent.com]]
+simple [[user-images.githubusercontent.com]]
+pattern [[avatars(%d*)%.githubusercontent%.com/(.+)]]
 
 -- teknik
 simple [[u.teknik.io]]
