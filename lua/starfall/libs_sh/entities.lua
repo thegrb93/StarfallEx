@@ -825,6 +825,7 @@ end
 function ents_methods:getBonePosition(bone)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
 	local pos, ang = getent(self):GetBonePosition(bone)
+	if not pos then SF.Throw("Invalid bone ("..bone..")!",2) end
 	return vwrap(pos), awrap(ang)
 end
 
