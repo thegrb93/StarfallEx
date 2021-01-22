@@ -1505,20 +1505,20 @@ end
 --- Get the object width
 -- @return number The width of the object
 function markup_methods:getWidth()
-	markunwrap(self):GetWidth()
+	return markunwrap(self):GetWidth()
 end
 
 --- Get the object height
 -- @return number The height of the object
 function markup_methods:getHeight()
-	markunwrap(self):GetHeight()
+	return markunwrap(self):GetHeight()
 end
 
 --- Get the object size
 -- @return number The width of the object
 -- @return number The height of the object
 function markup_methods:getSize()
-	markunwrap(self):Size()
+	return markunwrap(self):Size()
 end
 
 --- Draws a polygon.
