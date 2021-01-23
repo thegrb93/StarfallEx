@@ -327,7 +327,9 @@ os_library.clock = os.clock
 -- @param time Time to use for the format
 -- @return If format is equal to '*t' or '!*t' then it will return a table with DateData structure, otherwise a string
 os_library.date = function(format, time)
-	if format~=nil and string.find(format, "%%[^%%aAbBcCdDSHeUmMjIpwxXzZyY]") then SF.Throw("Bad date format", 2) end
+	if format~=nil then
+		for v in string.gmatch(format, "%%(.?)") do if not string.match(v, "[%%aAbBcCdDSHeUmMjIpwxXzZyY]") then SF.Throw("Bad date format", 2) end end
+	end
 	return os.date(format, time)
 end
 
