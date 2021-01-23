@@ -475,4 +475,22 @@ bit_library.tohex = bit.tohex
 --@param endian The endianness of number types. "big" or "little" (default "little")
 bit_library.stringstream = SF.StringStream
 
+--- Converts a table to string serializing data types as best as it can
+-- @shared
+-- @param t The table to serialize
+-- @return The serialized data
+function bit_library.tableToString(t)
+	checkluatype(t, TYPE_TABLE)
+	return SF.TableToString(t, instance)
+end
+
+--- Converts serialized string data to table
+-- @shared
+-- @param s The serialized string data
+-- @return The deserialized table
+function bit_library.stringToTable(s)
+	checkluatype(s, TYPE_STRING)
+	return SF.StringToTable(s, instance)
+end
+
 end
