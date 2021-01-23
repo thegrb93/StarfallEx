@@ -68,7 +68,7 @@ end
 --- Runs a new http POST request
 -- @param url http target url
 -- @param payload optional POST payload to be sent, can be both table and string. When table is used, the request body is encoded as application/x-www-form-urlencoded
--- @param callbackSuccess optional function to be called on request success, taking the arguments body (string), length (string), headers (table) and code (number)
+-- @param callbackSuccess optional function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)
 -- @param callbackFail optional function to be called on request fail, taking the failing reason as an argument
 -- @param headers optional POST headers to be sent
 function http_library.post(url, payload, callbackSuccess, callbackFail, headers)
