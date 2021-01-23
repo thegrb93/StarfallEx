@@ -6,8 +6,10 @@ local registerprivilege = SF.Permissions.registerPrivilege
 local http_interval = CreateConVar("sf_http_interval", "0.5", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "Interval in seconds in which one http request can be made")
 local http_max_active = CreateConVar("sf_http_max_active", "3", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "The maximum amount of active http requests at the same time")
 
-registerprivilege("http.get", "HTTP Get method", "Allows the user to request html data", { client = { default = 1 }, urlwhitelist = { default = 2 } })
+registerprivilege("http.get", "HTTP Get method", "Allows the user to request html data", { client = {}, urlwhitelist = { default = 2 } })
 registerprivilege("http.post", "HTTP Post method", "Allows the user to post html data", { client = { default = 1 }, urlwhitelist = { default = 2 } })
+
+local requests = SF.EntityTable("playerHTTPRequests")
 
 --- Http library. Requests content from urls.
 -- @name http
@@ -18,27 +20,7 @@ SF.RegisterLibrary("http")
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
--- Initializes the lastRequest variable to a value which ensures that the first call to httpRequestReady returns true
--- and the "active requests counter" to 0
-instance:AddHook("initialize", function()
-	instance.data.http = {
-		lastRequest = 0,
-		active = 0
-	}
-end)
-
-
 local http_library = instance.Libraries.http
-
--- Returns an error when a http request was already triggered in the current interval
--- or the maximum amount of simultaneous requests is currently active, returns true otherwise
-local function httpRequestReady()
-	local httpData = instance.data.http
-	if CurTime() - httpData.lastRequest < http_interval:GetFloat() or httpData.active >= http_max_active:GetInt() then
-		SF.Throw("You can't run a new http request yet", 3)
-	end
-	return true
-end
 
 -- Runs the appropriate callback after a http request
 local function runCallback(callback)
@@ -46,14 +28,13 @@ local function runCallback(callback)
 		if callback then
 			instance:runFunction(callback, ...)
 		end
-		instance.data.http.active = instance.data.http.active - 1
+		requests[instance.player] = nil
 	end
 end
 
 --- Checks if a new http request can be started
 function http_library.canRequest()
-	local httpData = instance.data.http
-	return CurTime() - httpData.lastRequest >= http_interval:GetFloat() and httpData.active < http_max_active:GetInt()
+	return not requests[instance.player]
 end
 
 --- Runs a new http GET request
@@ -64,7 +45,8 @@ end
 function http_library.get(url, callbackSuccess, callbackFail, headers)
 	checkpermission(instance, url, "http.get")
 
-	httpRequestReady()
+	if requests[instance.player] then SF.Throw("You can't run a new http request yet", 2) end
+	requests[instance.player] = true
 
 	checkluatype(url, TYPE_STRING)
 	checkluatype(callbackSuccess, TYPE_FUNCTION)
@@ -80,22 +62,21 @@ function http_library.get(url, callbackSuccess, callbackFail, headers)
 
 	if CLIENT then SF.HTTPNotify(instance.player, url) end
 
-	instance.data.http.lastRequest = CurTime()
-	instance.data.http.active = instance.data.http.active + 1
 	http.Fetch(url, runCallback(callbackSuccess), runCallback(callbackFail), headers)
 end
 
 --- Runs a new http POST request
 -- @param url http target url
 -- @param payload optional POST payload to be sent, can be both table and string. When table is used, the request body is encoded as application/x-www-form-urlencoded
--- @param callbackSuccess optional function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)
+-- @param callbackSuccess optional function to be called on request success, taking the arguments body (string), length (string), headers (table) and code (number)
 -- @param callbackFail optional function to be called on request fail, taking the failing reason as an argument
 -- @param headers optional POST headers to be sent
 function http_library.post(url, payload, callbackSuccess, callbackFail, headers)
 	checkluatype(url, TYPE_STRING)
 	checkpermission(instance, url, "http.post")
 
-	httpRequestReady()
+	if requests[instance.player] then SF.Throw("You can't run a new http request yet", 2) end
+	requests[instance.player] = true
 
 	local request = {
 		url = url,
@@ -138,7 +119,6 @@ function http_library.post(url, payload, callbackSuccess, callbackFail, headers)
 
 	if callbackSuccess ~= nil then checkluatype(callbackSuccess, TYPE_FUNCTION) end
 	if callbackFail ~= nil then checkluatype(callbackFail, TYPE_FUNCTION) end
-	
 	request.success = function(code, body, headers)
 		local callback = runCallback(callbackSuccess)
 		callback(body, #body, headers, code)
@@ -146,9 +126,6 @@ function http_library.post(url, payload, callbackSuccess, callbackFail, headers)
 	request.failed = runCallback(callbackFail)
 
 	if CLIENT then SF.HTTPNotify(instance.player, url) end
-
-	instance.data.http.lastRequest = CurTime()
-	instance.data.http.active = instance.data.http.active + 1
 
 	HTTP(request)
 end
