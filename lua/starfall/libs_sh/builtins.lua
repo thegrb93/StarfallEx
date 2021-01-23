@@ -467,7 +467,7 @@ if SERVER then
 	function builtins_library.printHud(ply, ...)
 		ply = getply(ply)
 		if not ply:IsPlayer() then SF.Throw("Expected a target player!", 2) end
-		if not instance.entity:isHUDActive(ply) then SF.Throw("Player isn't connected to a hud!", 2) end
+		if not instance:IsHUDActive(ply) then SF.Throw("Player isn't connected to a hud!", 2) end
 
 		local data, strlen, size = argsToChat(builtins_library.Color(5,125,222), "[SF] ", builtins_library.Color(255,255,255), ...)
 		if strlen > 52 then SF.Throw("The max printHud string size is 52 chars!", 2) end
@@ -553,7 +553,7 @@ else
 	end
 
 	function builtins_library.printHud(...)
-		if not instance.entity:isHUDActive() then SF.Throw("Player isn't connected to a hud!", 2) end
+		if not instance:IsHUDActive() then SF.Throw("Player isn't connected to a hud!", 2) end
 		local data, strlen, size = argsToChat(builtins_library.Color(5,125,222), "[SF] ", builtins_library.Color(255,255,255), ...)
 		if strlen > 52 then SF.Throw("The max printHud string size is 52 chars!", 2) end
 		for k, v in ipairs(data) do
@@ -988,11 +988,11 @@ function builtins_library.setHUDActive(ply, active)
 	checkluatype(active, TYPE_BOOL)
 
 	if ply==instance.player or instance.player==SF.SuperUser then
-		SF.EnableHud(ply, instance.entity, nil, active, true)
+		SF.EnableHud(ply, instance.entity, nil, active)
 	else
 		local vehicle = ply:GetVehicle()
 		if vehicle:IsValid() and SF.Permissions.getOwner(vehicle)==instance.player then
-			SF.EnableHud(ply, instance.entity, vehicle, active, true)
+			SF.EnableHud(ply, instance.entity, vehicle, active)
 		else
 			SF.Throw("Player must be sitting in owner's vehicle or be owner of the chip!", 2)
 		end

@@ -39,7 +39,7 @@ local notification_library = instance.Libraries.notification
 ---NOTIFY.CLEANUP
 -- @param length Time in seconds to display the notification (Max length of 30)
 function notification_library.addLegacy(text, type, length)
-	if instance.entity:isHUDActive() then
+	if instance.entity:IsHUDActive() then
 		checkpermission(instance, nil, "notification.hud")
 	else
 		checkpermission(instance, nil, "notification")
@@ -56,7 +56,7 @@ end
 -- @param id String index of the notification
 -- @param text The text to display
 function notification_library.addProgress(id, text)
-	if instance.entity:isHUDActive() then
+	if instance.entity:IsHUDActive() then
 		checkpermission(instance, nil, "notification.hud")
 	else
 		checkpermission(instance, nil, "notification")
@@ -83,7 +83,7 @@ end
 --- Removes the notification with the given index after 0.8 seconds
 -- @param id String index of the notification to kill
 function notification_library.kill(id)
-	if instance.entity:isHUDActive() then
+	if instance.entity:IsHUDActive() then
 		checkpermission(instance, nil, "notification.hud")
 	else
 		checkpermission(instance, nil, "notification")

@@ -14,7 +14,7 @@ function ENT:Initialize()
 	self:SetSolid(SOLID_VPHYSICS)
 	self:SetUseType(SIMPLE_USE)
 
-	self.enabled = false
+	self.enabled = {}
 	self:AddEFlags( EFL_FORCE_CHECK_TRANSMIT )
 end
 
@@ -22,64 +22,17 @@ function ENT:UpdateTransmitState()
 	return TRANSMIT_ALWAYS
 end
 
-function ENT:SetHudEnabled(ply, enabled)
-	self.enabled = enabled
-
-	net.Start("starfall_hud_set_enabled")
-		net.WriteEntity(self)
-		net.WriteInt(enabled, 8)
-	net.Send(ply)
-
-	local function connect()
-		if (self.link and self.link:IsValid()) then
-			local instance = self.link.instance
-			if instance then
-				instance:runScriptHook("hudconnected", instance.WrapObject(self))
-			end
-			
-			if self.locksControls then
-				net.Start("starfall_lock_control")
-					net.WriteEntity(self.link)
-					net.WriteBool(true)
-				net.Send(ply)
-			end
-		end
-	end
-
-	local function disconnect()
-		if (self.link and self.link:IsValid()) then
-			local instance = self.link.instance
-			if instance then
-				instance:runScriptHook("huddisconnected", instance.WrapObject(self))
-			end
-
-			if self.locksControls then
-				net.Start("starfall_lock_control")
-					net.WriteEntity(self.link)
-					net.WriteBool(false)
-				net.Send(ply)
-			end
-		end
-		ply:SetViewEntity()
-	end
-
-	if enabled then
-		connect()
-	else
-		disconnect()
-	end
-end
-
 function ENT:Use(ply)
 	if not (self.link and self.link:IsValid()) then ply:ChatPrint("This hud isn't linked to a chip!") return end
-	self:SetHudEnabled(ply, not self.enabled)
+	local enabled = not self.enabled[ply]
+	self.enabled[ply] = enabled or nil
+	SF.EnableHud(ply, self.link, self, enabled)
 end
 
 function ENT:LinkVehicle(ent)
 	if ent then
 		vehiclelinks[ent] = self
 	else
-		--Clear links
 		for k, v in pairs(vehiclelinks) do
 			if self == v then
 				vehiclelinks[k] = nil
@@ -89,22 +42,10 @@ function ENT:LinkVehicle(ent)
 end
 
 hook.Add("PlayerEnteredVehicle", "Starfall_HUD_PlayerEnteredVehicle", function(ply, vehicle)
+	if not (self.link and self.link:IsValid()) then return end
 	for k, v in pairs(vehiclelinks) do
 		if vehicle == k and v:IsValid() then
-			vehicle:CallOnRemove("remove_sf_hud"..v:EntIndex(), function()
-				if v:IsValid() and ply:IsValid() then
-					v:SetHudEnabled(ply, 0)
-				end
-			end)
-			v:SetHudEnabled(ply, 1)
-		end
-	end
-end)
-
-hook.Add("PlayerLeaveVehicle", "Starfall_HUD_PlayerLeaveVehicle", function(ply, vehicle)
-	for k, v in pairs(vehiclelinks) do
-		if vehicle == k and v:IsValid() then
-			v:SetHudEnabled(ply, 0)
+			SF.EnableHud(ply, self.link, vehicle, true)
 		end
 	end
 end)

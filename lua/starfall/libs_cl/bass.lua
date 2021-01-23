@@ -50,7 +50,7 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 
 local function not3D(flags)
 	for flag in string.gmatch(string.lower(flags), "%S+") do if flag=="3d" then return false end end
-	if instance.entity:isHUDActive() then return false end
+	if instance.entity:IsHUDActive() then return false end
 	return true
 end
 

@@ -32,7 +32,7 @@ if CLIENT then
 	SF.hookAdd("VRMod_Input", "vrinput")
 
 	local function canRenderHudSafeArgs(instance, ...)
-		return instance.entity:isHUDActive() and (instance.player == SF.Superuser or haspermission(instance, nil, "render.hud")), {...}
+		return instance.entity:IsHUDActive() and (instance.player == SF.Superuser or haspermission(instance, nil, "render.hud")), {...}
 	end
 
 	--- Called before rendering the game. Any code that you want to run once per frame should be put here. HUD is required.
