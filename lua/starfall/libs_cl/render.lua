@@ -18,6 +18,7 @@ registerprivilege("render.effects", "Render Effects", "Allows the user to render
 registerprivilege("render.calcview", "Render CalcView", "Allows the use of the CalcView hook", { client = {} })
 registerprivilege("render.fog", "Render Fog", "Allows the user to control fog", { client = {} })
 
+local cv_max_fonts = CreateConVar("sf_render_maxfonts", "30", { FCVAR_ARCHIVE })
 local cv_max_rendertargets = CreateConVar("sf_render_maxrendertargets", "20", { FCVAR_ARCHIVE })
 local cv_max_maxrenderviewsperframe = CreateConVar("sf_render_maxrenderviewsperframe", "2", { FCVAR_ARCHIVE })
 
@@ -36,25 +37,7 @@ local RT_Material = CreateMaterial("SF_RT_Material", "UnlitGeneric", {
 })
 SF.RT_Material = RT_Material
 
-local validfonts = {
-	akbar = "Akbar",
-	coolvetica = "Coolvetica",
-	roboto = "Roboto",
-	["roboto mono"] = "Roboto Mono",
-	["fontawesome"] = "FontAwesome",
-	["courier new"] = "Courier New",
-	verdana = "Verdana",
-	arial = "Arial",
-	halflife2 = "HalfLife2",
-	hl2mp = "hl2mp",
-	csd = "csd",
-	tahoma = "Tahoma",
-	trebuchet = "Trebuchet",
-	["trebuchet ms"] = "Trebuchet MS",
-	["dejavu sans mono"] = "DejaVu Sans Mono",
-	["lucida console"] = "Lucida Console",
-	["times new roman"] = "Times New Roman"
-}
+local playerFonts = SF.EntityTable("playerFonts")
 
 local defined_fonts = {
 	DebugFixed = true,
@@ -79,11 +62,16 @@ local defined_fonts = {
 	DermaDefault = true,
 	DermaDefaultBold = true,
 	DermaLarge = true,
+	GModNotify = true,
+	ScoreboardDefault = true,
+	ScoreboardDefaultTitle = true,
+	GModToolName = true,
+	GModToolSubtitle = true,
+	GModToolHelp = true,
+	GModToolScreen = true,
+	ContentHeader = true,
+	GModWorldtip = true,
 }
--- Using an already defined font's name will use its font
-for k, v in pairs(defined_fonts) do
-	validfonts[string.lower(k)] = k
-end
 
 local currentcolor
 local defaultFont
@@ -1358,17 +1346,14 @@ end
 -- \- Times New Roman
 
 function render_library.createFont(font, size, weight, antialias, additive, shadow, outline, blur, extended)
-	font = validfonts[string.lower(font)]
-	if not font then SF.Throw("invalid font", 2) end
-
 	size = tonumber(size) or 16
 	weight = tonumber(weight) or 400
 	blur = tonumber(blur) or 0
-	antialias = antialias and true or false
-	additive = additive and true or false
-	shadow = shadow and true or false
-	outline = outline and true or false
-	extended = extended and true or false
+	antialias = tobool(antialias)
+	additive = tobool(additive)
+	shadow = tobool(shadow)
+	outline = tobool(outline)
+	extended = tobool(extended)
 
 	local name = string.format("sf_screen_font_%s_%d_%d_%d_%d%d%d%d%d",
 		font, size, weight, blur,
@@ -1379,10 +1364,15 @@ function render_library.createFont(font, size, weight, antialias, additive, shad
 		extended and 1 or 0)
 
 	if not defined_fonts[name] then
+		local fontCount = playerFonts[instance.player] or 0
+		if fontCount == cv_max_fonts:GetInt() then SF.Throw("You have reached the max created fonts!", 2) end
+		playerFonts[instance.player] = fontCount + 1
+
 		surface.CreateFont(name, { size = size, weight = weight,
 			antialias = antialias, additive = additive, font = font,
 			shadow = shadow, outline = outline, blur = blur,
 			extended = extended })
+
 		defined_fonts[name] = true
 	end
 	return name
