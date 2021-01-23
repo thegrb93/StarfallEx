@@ -1,7 +1,7 @@
 
 local checkluatype = SF.CheckLuaType
 
-SF.Permissions.registerPrivilege("convar", "Read ConVars", "Allows Starfall to read your game settings", { client = { default = 1 } })
+SF.Permissions.registerPrivilege("convar", "Read ConVars", "Allows Starfall to read your game settings", { client = {} })
 
 
 --- ConVar library https://wiki.facepunch.com/gmod/ConVar
