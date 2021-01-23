@@ -42,10 +42,11 @@ function ENT:LinkVehicle(ent)
 end
 
 hook.Add("PlayerEnteredVehicle", "Starfall_HUD_PlayerEnteredVehicle", function(ply, vehicle)
-	if not (self.link and self.link:IsValid()) then return end
 	for k, v in pairs(vehiclelinks) do
 		if vehicle == k and v:IsValid() then
-			SF.EnableHud(ply, self.link, vehicle, true)
+			if v.link and v.link:IsValid() then
+				SF.EnableHud(ply, v.link, vehicle, true)
+			end
 		end
 	end
 end)

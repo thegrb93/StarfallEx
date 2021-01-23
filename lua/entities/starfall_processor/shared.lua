@@ -284,7 +284,7 @@ if SERVER then
 						net.WriteBool(false)
 					net.Send(ply)
 				end
-				if sync then syncHud(ply, chip, activator, enabled) end
+				if sync then syncHud(ply, chip, activator, false) end
 			end
 			if enabled then
 				huds[ply] = true
