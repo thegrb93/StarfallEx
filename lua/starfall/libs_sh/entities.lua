@@ -849,7 +849,7 @@ function ents_methods:getManipulateBoneJiggle(bone)
 	return getent(self):GetManipulateBoneJiggle(bone)
 end
 
---- Returns the vector manipulate position of the bone (relative to its default angle)
+--- Returns the vector manipulate position of the bone (relative to its default position)
 -- @shared
 -- @param bone Bone index. (def 0)
 -- @return Manipulate position of the bone
