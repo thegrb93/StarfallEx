@@ -20,7 +20,7 @@ net.Receive("SF_netmessage", function(len, ply)
 			instance.data.net.ply = ply
 			if ply then ply = instance.Types.Player.Wrap(ply) end
 
-			local recv = netReceives[name]
+			local recv = instance.data.net.receives[name]
 			if recv then
 				instance:runFunction(recv, len, ply)
 			else
@@ -45,7 +45,7 @@ local netStarted = false
 local netSize = 0
 local netData
 local netReceives = {}
-instance.data.net = {}
+instance.data.net = {receives = netReceives}
 instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
 end)
