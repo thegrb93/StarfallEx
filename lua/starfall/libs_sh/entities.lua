@@ -835,7 +835,9 @@ end
 -- @return Manipulate angle of the bone
 function ents_methods:getManipulateBoneAngles(bone)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
-	return awrap(getent(self):GetManipulateBoneAngles(bone))
+	local ang = getent(self):GetManipulateBoneAngles(bone)
+	if not ang then SF.Throw("Invalid bone ("..bone..")!",2) end
+	return awrap(ang)
 end
 
 --- Returns the number manipulate jiggle of the bone (0 - 255)
@@ -853,7 +855,9 @@ end
 -- @return Manipulate position of the bone
 function ents_methods:getManipulateBonePosition(bone)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
-	return vwrap(getent(self):GetManipulateBonePosition(bone))
+	local pos = getent(self):GetManipulateBonePosition(bone)
+	if not pos then SF.Throw("Invalid bone ("..bone..")!",2) end
+	return vwrap(pos)
 end
 
 --- Returns the vector manipulate scale of the bone 
@@ -862,7 +866,9 @@ end
 -- @return Manipulate scale of the bone
 function ents_methods:getManipulateBoneScale(bone)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
-	return vwrap(getent(self):GetManipulateBoneScale(bone))
+	local scale = getent(self):GetManipulateBoneScale(bone)
+	if not scale then SF.Throw("Invalid bone ("..bone..")!",2) end
+	return vwrap(scale)
 end
 
 --- Returns the x, y, z size of the entity's outer bounding box (local to the entity)
