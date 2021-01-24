@@ -834,21 +834,17 @@ end
 -- @param bone Bone index. (def 0)
 -- @return Manipulate angle of the bone
 function ents_methods:getManipulateBoneAngles(bone)
-	local ent = getent(self)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
-	local ang = ent:GetManipulateBoneAngles(bone)
-	return awrap(ang)
+	return awrap(getent(self):GetManipulateBoneAngles(bone))
 end
 
---- Returns the number manipulate jiggle of the bone
+--- Returns the number manipulate jiggle of the bone (0 - 255)
 -- @shared
 -- @param bone Bone index. (def 0)
 -- @return Manipulate jiggle of the bone
 function ents_methods:getManipulateBoneJiggle(bone)
-	local ent = getent(self)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
-	local jig = ent:GetManipulateBoneJiggle(bone)
-	return jig
+	return getent(self):GetManipulateBoneJiggle(bone)
 end
 
 --- Returns the vector manipulate position of the bone (local to the entity)
@@ -856,21 +852,17 @@ end
 -- @param bone Bone index. (def 0)
 -- @return Manipulate position of the bone
 function ents_methods:getManipulateBonePosition(bone)
-	local ent = getent(self)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
-	local pos = ent:GetManipulateBonePosition(bone)
-	return vwrap(pos)
+	return vwrap(getent(self):GetManipulateBonePosition(bone))
 end
 
---- Returns the vector manipulate scale of the bone
+--- Returns the vector manipulate scale of the bone 
 -- @shared
 -- @param bone Bone index. (def 0)
--- @return Manipulate jiggle of the bone
+-- @return Manipulate scale of the bone
 function ents_methods:getManipulateBoneScale(bone)
-	local ent = getent(self)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
-	local scale = ent:GetManipulateBoneScale(bone)
-	return vwrap(scale)
+	return vwrap(getent(self):GetManipulateBoneScale(bone))
 end
 
 --- Returns the x, y, z size of the entity's outer bounding box (local to the entity)
