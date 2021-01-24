@@ -17,7 +17,7 @@ net.Receive("SF_netmessage", function(len, ply)
 		if instance and instance.runScriptHook then
 			local name = net.ReadString()
 			len = len - 16 - (#name + 1) * 8 -- This gets rid of the 2-byte entity, and the null-terminated string, making this now quantify the length of the user's net message
-			netPly = ply
+			instance.data.net.ply = ply
 			if ply then ply = instance.Types.Player.Wrap(ply) end
 
 			local recv = netReceives[name]
@@ -45,7 +45,7 @@ local netStarted = false
 local netSize = 0
 local netData
 local netReceives = {}
-local netPly
+instance.data.net = {}
 instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
 end)
@@ -248,7 +248,7 @@ function net_library.readStream(cb)
 		target = instance.player
 	else
 		streamOwner = SF.Superuser
-		target = netPly
+		target = instance.data.net.ply
 	end
 	streams[streamOwner] = net.ReadStream((SERVER and target or nil), function(data)
 		instance:runFunction(cb, data)

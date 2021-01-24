@@ -33,12 +33,12 @@ local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check
 
 
 local getent
+local constraints = {}
+local constraintsClean = true
 instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
 end)
 
-local constraints = {}
-local constraintsClean = true
 instance:AddHook("deinitialize", function()
 	if constraintsClean then
 		for ent, _ in pairs(constraints) do

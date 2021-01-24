@@ -74,6 +74,13 @@ local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
 
+local getent
+local holograms = {}
+instance:AddHook("initialize", function()
+	getent = instance.Types.Entity.GetEntity
+	hologram_meta.__tostring = ent_meta.__tostring
+end)
+
 local function hologramOnDestroy(holo)
 	holograms[holo] = nil
 	plyCount:free(instance.player, 1)
@@ -94,13 +101,6 @@ local function removeAllHolos()
 		removeHolo(holoent) 
 	end
 end
-
-local getent
-local holograms = {}
-instance:AddHook("initialize", function()
-	getent = instance.Types.Entity.GetEntity
-	hologram_meta.__tostring = ent_meta.__tostring
-end)
 
 instance:AddHook("deinitialize", function()
 	if SERVER then

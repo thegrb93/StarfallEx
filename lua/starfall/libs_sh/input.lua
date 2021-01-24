@@ -125,7 +125,7 @@ return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 local getent
-local lockedControlCooldown
+local lockedControlCooldown = 0
 instance.data.input = {controlsLocked = false}
 
 instance:AddHook("initialize", function()
@@ -290,7 +290,7 @@ function input_library.lockControls(enabled)
 	end
 
 	if enabled then
-		if lockedControlCooldown and lockedControlCooldown > CurTime() then
+		if lockedControlCooldown > CurTime() then
 			SF.Throw("Cannot lock the player's controls yet", 2)
 		end
 		lockedControlCooldown = CurTime() + 10
@@ -311,8 +311,7 @@ end
 -- @client
 -- @return Whether the player's control can be locked
 function input_library.canLockControls()
-	return SF.IsHUDActive(instance.entity) and
-		(not lockedControlCooldown or lockedControlCooldown <= CurTime())
+	return SF.IsHUDActive(instance.entity) and lockedControlCooldown <= CurTime()
 end
 
 
