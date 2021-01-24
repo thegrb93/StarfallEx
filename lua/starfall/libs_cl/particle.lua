@@ -40,13 +40,9 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 
-
-instance:AddHook("initialize", function()
-	instance.data.particle = {emitters = {}}
-end)
-
+local emitters = {}
 instance:AddHook("deinitialize", function()
-	for emitter in pairs(instance.data.particle.emitters) do
+	for emitter in pairs(emitters) do
 		emitter:Finish()
 		plyEmitterCount:free(instance.player, 1)
 	end
@@ -61,7 +57,7 @@ function particle_library.create(position, use3D)
 	checkpermission(instance, nil, "particle.create")
 	plyEmitterCount:use(instance.player, 1)
 	local emitter = ParticleEmitter(vunwrap(position), use3D)
-	instance.data.particle.emitters[emitter] = true
+	emitters[emitter] = true
 	return pewrap(emitter)
 end
 
@@ -84,7 +80,7 @@ end
 -- @return A Particle object
 function particleem_methods:add(material, position, startSize, endSize, startLength, endLength, startAlpha, endAlpha, dieTime)
 	self = peunwrap(self)
-	if not instance.data.particle.emitters[self] then SF.Throw("Tried to use invalid emitter!", 2) end
+	if not emitters[self] then SF.Throw("Tried to use invalid emitter!", 2) end
 
 	if self:GetNumActiveParticles() > cv_particle_count:GetInt() then
 		SF.Throw("Exeeded the maximum number of particles for this emitter!", 2)
@@ -121,7 +117,7 @@ end
 function particleem_methods:destroy()
 	local emitter = peunwrap(self)
 	emitter:Finish()
-	instance.data.particle.emitters[emitter] = nil
+	emitters[emitter] = nil
 	plyEmitterCount:free(instance.player, 1)
 end
 

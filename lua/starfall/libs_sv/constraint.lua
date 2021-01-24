@@ -34,13 +34,13 @@ local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check
 
 local getent
 instance:AddHook("initialize", function()
-	instance.data.constraints = {constraints = {}}
 	getent = instance.Types.Entity.GetEntity
 end)
 
+local constraints = {}
+local constraintsClean = true
 instance:AddHook("deinitialize", function()
-	if instance.data.constraints.clean ~= false then --Return true on nil too
-		local constraints = instance.data.constraints.constraints
+	if constraintsClean then
 		for ent, _ in pairs(constraints) do
 			if (ent and ent:IsValid()) then
 				ent:RemoveCallOnRemove("starfall_constraint_delete")
@@ -73,7 +73,6 @@ local function checkConstraint(e, t)
 end
 
 local function register(ent, instance)
-	local constraints = instance.data.constraints.constraints
 	local ply = instance.player
 	ent:CallOnRemove("starfall_constraint_delete", constraintOnDestroy, constraints, ply)
 	plyCount:free(ply, -1)
@@ -487,7 +486,7 @@ end
 --- Sets whether the chip should remove created constraints when the chip is removed
 -- @param on Boolean whether the constraints should be cleaned or not
 function constraint_library.setConstraintClean(on)
-	instance.data.constraints.clean = on
+	constraintsClean = on
 end
 
 --- Checks how many constraints can be spawned

@@ -29,14 +29,14 @@ return function(instance)
 if not (WireLib and WireLib.CreateInputs) then return end
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
+local wirecache = {}
+local wirecachevals = {}
 
 local getent
 instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
 
 	local ent = instance.entity
-	instance.data.wirecache = {}
-	instance.data.wirecachevals = {}
 	if ent.Inputs == nil then
 		WireLib.CreateInputs(ent, {})
 	end
@@ -640,13 +640,12 @@ end
 -- @name wire_library.ports
 wire_library.ports = setmetatable({}, {
 	__index = function(self, name)
-		local data = instance.data
 		local input = instance.entity.Inputs[name]
 		if input then
 			if data.wirecache[name]==input.Value then return data.wirecachevals[name] end
 			local ret = inputConverters[input.Type](input.Value)
-			data.wirecache[name] = input.Value
-			data.wirecachevals[name] = ret
+			wirecache[name] = input.Value
+			wirecachevals[name] = ret
 			return ret
 		end
 	end,

@@ -28,13 +28,13 @@ SF.RegisterLibrary("prop")
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
-instance:AddHook("initialize", function()
-	instance.data.props = {props = {}}
-end)
+local props = {}
+local propClean = true
+local propUndo = false
 
 instance:AddHook("deinitialize", function()
-	if instance.data.props.clean ~= false then --Return true on nil too
-		for prop, _ in pairs(instance.data.props.props) do
+	if propClean then
+		for prop, _ in pairs(props) do
 			prop:Remove()
 		end
 	end
@@ -50,13 +50,13 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 local function propOnDestroy(ent)
 	local ply = instance.player
 	plyCount:free(ply, 1)
-	instance.data.props.props[ent] = nil
+	props[ent] = nil
 end
 
 local function register(ent)
 	ent:CallOnRemove("starfall_prop_delete", propOnDestroy)
 	plyCount:free(instance.player, -1)
-	instance.data.props.props[ent] = true
+	props[ent] = true
 end
 
 --- Creates a prop
@@ -83,7 +83,6 @@ function props_library.create(pos, ang, model, frozen)
 	plyCount:checkuse(ply, 1)
 	if ply ~= SF.Superuser and gamemode.Call("PlayerSpawnProp", ply, model)==false then SF.Throw("Another hook prevented the prop from spawning", 2) end
 
-	local propdata = instance.data.props
 	local propent = ents.Create("prop_physics")
 	register(propent, instance)
 	propent:SetPos(pos)
@@ -104,7 +103,7 @@ function props_library.create(pos, ang, model, frozen)
 	if ply ~= SF.Superuser then
 		gamemode.Call("PlayerSpawnedProp", ply, model, propent)
 
-		if propdata.undo then
+		if propUndo then
 			undo.Create("Prop")
 				undo.SetPlayer(ply)
 				undo.AddEntity(propent)
@@ -134,7 +133,6 @@ function props_library.createRagdoll(model, frozen)
     plyCount:checkuse(ply, 1)
     if ply ~= SF.Superuser and gamemode.Call("PlayerSpawnRagdoll", ply, model)==false then SF.Throw("Another hook prevented the ragdoll from spawning", 2) end
 
-    local propdata = instance.data.props
     local ent = ents.Create("prop_ragdoll")
     register(ent, instance)
     ent:SetModel(model)
@@ -154,7 +152,7 @@ function props_library.createRagdoll(model, frozen)
     if ply ~= SF.Superuser then
         gamemode.Call("PlayerSpawnedRagdoll", ply, model, ent)
 
-        if propdata.undo then
+        if propUndo then
             undo.Create("Ragdoll")
                 undo.SetPlayer(ply)
                 undo.AddEntity(ent)
@@ -224,8 +222,6 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 
 	plyVertexCount:free(-totalVertices)
 
-	local propdata = instance.data.props
-
 	local propent = ents.Create("starfall_prop")
 	register(propent, instance)
 	propent.streamdata = streamdata
@@ -249,7 +245,7 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	if ply ~= SF.Superuser then
 		gamemode.Call("PlayerSpawnedProp", ply, "starfall_prop", propent)
 
-		if propdata.undo then
+		if propUndo then
 			undo.Create("Prop")
 				undo.SetPlayer(ply)
 				undo.AddEntity(propent)
@@ -290,8 +286,6 @@ function props_library.createComponent(pos, ang, class, model, frozen)
 	model = SF.CheckModel(model, ply)
 	if not model then SF.Throw("Invalid model", 2) end
 
-	local propdata = instance.data.props
-
 	if not ply:CheckLimit("starfall_components") then SF.Throw("Limit of components reached!", 2) end
 	plyPropBurst:use(ply, 1)
 	plyCount:checkuse(ply, 1)
@@ -318,7 +312,7 @@ function props_library.createComponent(pos, ang, class, model, frozen)
 	end
 
 	if ply ~= SF.Superuser then
-		if propdata.undo then
+		if propUndo then
 			undo.Create(class)
 				undo.SetPlayer(ply)
 				undo.AddEntity(comp)
@@ -391,7 +385,6 @@ function props_library.createSent(pos, ang, class, frozen, data)
 	local vehicle = list.GetForEdit("Vehicles")[class]
 	local sent2 = list.GetForEdit("starfall_creatable_sent")[class]
 
-	local propdata = instance.data.props
 	local entity
 	local hookcall
 
@@ -591,7 +584,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		end
 
 		if ply ~= SF.Superuser then
-			if propdata.undo then
+			if propUndo then
 				undo.Create("SF")
 					undo.SetPlayer(ply)
 					undo.AddEntity(entity)
@@ -634,13 +627,13 @@ end
 --- Sets whether the chip should remove created props when the chip is removed
 -- @param on Boolean whether the props should be cleaned or not
 function props_library.setPropClean(on)
-	instance.data.props.clean = on
+	propClean = on
 end
 
 --- Sets whether the props should be undo-able
 -- @param on Boolean whether the props should be undo-able
 function props_library.setPropUndo(on)
-	instance.data.props.undo = on
+	propUndo = on
 end
 
 end

@@ -48,11 +48,6 @@ if CLIENT then
 	end)
 end
 
-local function hologramOnDestroy(holo, holodata, ply)
-	holodata[holo] = nil
-	plyCount:free(ply, 1)
-end
-
 
 --- Library for creating and manipulating physics-less models AKA "Holograms".
 -- @name holograms
@@ -79,25 +74,30 @@ local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
 
+local function hologramOnDestroy(holo)
+	holograms[holo] = nil
+	plyCount:free(instance.player, 1)
+end
+
 local function removeHolo(holo)
 	if CLIENT and instance.data.render.isRendering then SF.Throw("Cannot remove while in rendering hook!", 2) end
 	if not holo:IsValid() or not holo.IsSFHologram then return end
 
 	holo:RemoveCallOnRemove("starfall_hologram_delete")
-	hologramOnDestroy(holo, instance.data.holograms.holos, instance.player)
+	hologramOnDestroy(holo)
 
 	holo:Remove()
 end
 
 local function removeAllHolos()
-	for holoent, _ in pairs(instance.data.holograms.holos) do 
+	for holoent, _ in pairs(holograms) do 
 		removeHolo(holoent) 
 	end
 end
 
 local getent
+local holograms = {}
 instance:AddHook("initialize", function()
-	instance.data.holograms = {holos = {}}
 	getent = instance.Types.Entity.GetEntity
 	hologram_meta.__tostring = ent_meta.__tostring
 end)
@@ -146,7 +146,6 @@ function holograms_library.create(pos, ang, model, scale)
 	local ang = aunwrap(ang)
 
 	local ply = instance.player
-	local holodata = instance.data.holograms.holos
 
 	plyCount:checkuse(ply, 1)
 
@@ -157,12 +156,12 @@ function holograms_library.create(pos, ang, model, scale)
 			holoent:SetPos(SF.clampPos(pos))
 			holoent:SetAngles(ang)
 			holoent:SetModel(model)
-			holoent:CallOnRemove("starfall_hologram_delete", hologramOnDestroy, holodata, ply)
+			holoent:CallOnRemove("starfall_hologram_delete", hologramOnDestroy)
 			holoent:Spawn()
 
 			if ply ~= SF.Superuser then gamemode.Call("PlayerSpawnedSENT", ply, holoent) end
 
-			holodata[holoent] = true
+			holograms[holoent] = true
 
 			if scale~=nil then
 				holoent:SetScale(vunwrap(scale))
@@ -179,12 +178,12 @@ function holograms_library.create(pos, ang, model, scale)
 			holoent:SetAngles(ang)
 			holoent:SetModel(model)
 			holoent:SetRenderMode(RENDERGROUP_TRANSLUCENT)
-			holoent:CallOnRemove("starfall_hologram_delete", hologramOnDestroy, holodata, ply)
+			holoent:CallOnRemove("starfall_hologram_delete", hologramOnDestroy)
 			
 			debug.setmetatable(holoent, cl_hologram_meta)
 
 			holoent:Spawn()
-			holodata[holoent] = true
+			holograms[holoent] = true
 
 			if scale~=nil then
 				holoent:SetScale(vunwrap(scale))

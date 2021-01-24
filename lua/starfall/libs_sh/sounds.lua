@@ -42,14 +42,14 @@ SF.RegisterType("Sound", true, false)
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
+local sounds = {}
 local getent
 instance:AddHook("initialize", function()
-	instance.data.sounds = {sounds = {}}
 	getent = instance.Types.Entity.GetEntity
 end)
 
 instance:AddHook("deinitialize", function()
-	for s, ent in pairs(instance.data.sounds.sounds) do
+	for s, ent in pairs(sounds) do
 		deleteSound(instance.player, ent, s)
 	end
 end)
@@ -88,7 +88,7 @@ function sounds_library.create(ent, path, nofilter)
 	local snds = soundsByEntity[e]
 	if not snds then snds = {} soundsByEntity[e] = snds end
 	snds[soundPatch] = true
-	instance.data.sounds.sounds[soundPatch] = e
+	sounds[soundPatch] = e
 
 	return wrap(soundPatch)
 end
@@ -129,7 +129,6 @@ end
 --- Removes the sound from the game so new one can be created if limit is reached
 function sound_methods:destroy()
 	local snd = unwrap(self)
-	local sounds = instance.data.sounds.sounds
 	if snd and sounds[snd] then
 		deleteSound(instance.player, sounds[snd], snd)
 		sounds[snd] = nil

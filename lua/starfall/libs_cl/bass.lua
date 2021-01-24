@@ -32,12 +32,9 @@ return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 -- Register functions to be called when the chip is initialised and deinitialised
-instance:AddHook("initialize", function()
-	instance.data.bass = {sounds = {}}
-end)
-
+local sounds = {}
 instance:AddHook("deinitialize", function()
-	for s, _ in pairs(instance.data.bass.sounds) do
+	for s in pairs(sounds) do
 		deleteSound(instance.player, s)
 	end
 end)
@@ -84,7 +81,7 @@ function bass_library.loadFile(path, flags, callback)
 				snd:Stop()
 				plyCount:free(instance.player, 1)
 			else
-				instance.data.bass.sounds[snd] = true
+				sounds[snd] = true
 				instance:runFunction(callback, wrap(snd), 0, "")
 			end
 		end
@@ -119,7 +116,7 @@ function bass_library.loadURL(path, flags, callback)
 				snd:Stop()
 				plyCount:free(instance.player, 1)
 			else
-				instance.data.bass.sounds[snd] = true
+				sounds[snd] = true
 				instance:runFunction(callback, wrap(snd), 0, "")
 			end
 		end
@@ -137,7 +134,6 @@ end
 --- Removes the sound from the game so new one can be created if limit is reached
 function bass_methods:destroy()
 	local snd = unwrap(self)
-	local sounds = instance.data.bass.sounds
 	if snd and sounds[snd] then
 		deleteSound(instance.player, snd)
 		sounds[snd] = nil

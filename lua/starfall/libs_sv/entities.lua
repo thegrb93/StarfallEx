@@ -47,12 +47,12 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 local cunwrap = instance.Types.Color.Unwrap
 
 local getent
+local collisionlisteners = {}
 instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
-	instance.data.collisionlisteners = SF.EntityTable("CollisionListener")
 end)
 instance:AddHook("deinitialize", function()
-	for ent in next, instance.data.collisionlisteners do
+	for ent in pairs(collisionlisteners) do
 		if ent:IsValid() then
 			if ent:GetClass() ~= "starfall_prop" then
 				ent:RemoveCallback("PhysicsCollide", ent.SF_CollisionCallback)
@@ -360,7 +360,7 @@ function ents_methods:addCollisionListener(func)
 		if ent.PhysicsCollide then SF.Throw("The entity is already listening to collisions!", 2) end
 		function ent:PhysicsCollide( data, phys ) callback(data) end
 	end
-	instance.data.collisionlisteners[ent] = true
+	collisionlisteners[ent] = true
 end
 
 --- Removes a collision listening hook from the entity so that a new one can be added
@@ -375,7 +375,7 @@ function ents_methods:removeCollisionListener()
 		if not ent.PhysicsCollide then SF.Throw("The entity isn't listening to collisions!", 2) end
 		ent.PhysicsCollide = nil
 	end
-	instance.data.collisionlisteners[ent] = nil
+	collisionlisteners[ent] = nil
 end
 
 --- Sets whether an entity's shadow should be drawn

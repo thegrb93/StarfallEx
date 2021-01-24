@@ -25,17 +25,14 @@ return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 local getent
+local particleEffects = {}
 instance:AddHook("initialize", function()
-	instance.data.particleEffect = {
-		particles = {},
-	}
-
 	getent = instance.Types.Entity.GetEntity
 end)
 
 instance:AddHook("deinitialize", function()
 	-- Remove all
-	for p in pairs(instance.data.particleEffect.particles) do
+	for p in pairs(particleEffects) do
 		if p:IsValid() then
 			p:StopEmissionAndDestroyImmediately()
 		end
@@ -89,7 +86,7 @@ function particleef_library.attach(entity, name, pattach, options)
 		SF.Throw("Invalid particle effect system.", 2)
 	end
 
-	instance.data.particleEffect.particles[PEffect] = true
+	particleEffects[PEffect] = true
 
 	return wrap(PEffect)
 
