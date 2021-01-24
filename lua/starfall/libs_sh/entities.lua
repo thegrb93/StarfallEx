@@ -829,7 +829,7 @@ function ents_methods:getBonePosition(bone)
 	return vwrap(pos), awrap(ang)
 end
 
---- Returns the angle manipulate angle of the bone (local to the entity)
+--- Returns the manipulate angle of the bone (relative to its default angle)
 -- @shared
 -- @param bone Bone index. (def 0)
 -- @return Manipulate angle of the bone
@@ -849,7 +849,7 @@ function ents_methods:getManipulateBoneJiggle(bone)
 	return getent(self):GetManipulateBoneJiggle(bone)
 end
 
---- Returns the vector manipulate position of the bone (local to the entity)
+--- Returns the vector manipulate position of the bone (relative to its default angle)
 -- @shared
 -- @param bone Bone index. (def 0)
 -- @return Manipulate position of the bone
