@@ -39,8 +39,9 @@ end
 
 function ENT:Draw()
 	local clipCount = 0
+	local prevClip
 	if next(self.clips) then
-		render.EnableClipping(true)
+		prevClip = render.EnableClipping(true)
 		for _, clip in pairs(self.clips) do
 			local clipent = clip.entity
 			if clipent and clipent:IsValid() then
@@ -68,10 +69,12 @@ function ENT:Draw()
 	if filter_mag then render.PopFilterMag() end
 	if filter_min then render.PopFilterMin() end
 
-	for i=1, clipCount do
-		render.PopCustomClipPlane()
+	if next(self.clips) then
+		for i=1, clipCount do
+			render.PopCustomClipPlane()
+		end
+		render.EnableClipping(prevClip)
 	end
-	render.EnableClipping(false)
 	
 	if self.AutomaticFrameAdvance then
 		self:FrameAdvance(0)
