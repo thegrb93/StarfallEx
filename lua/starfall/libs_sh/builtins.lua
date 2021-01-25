@@ -982,7 +982,7 @@ end
 
 --- Sets the current instance to allow HUD drawing. Only works if player is in your vehicle or if it's ran on yourself
 --@param ply The player to enable the hud on. If CLIENT, will be forced to player()
---@param active Whether hud hooks should be active. true to force on, false to force off, nil to restore default.
+--@param active Whether hud hooks should be active. true to force on, false to force off.
 function builtins_library.setHUDActive(ply, active)
 	ply = SERVER and getply(ply) or LocalPlayer()
 	checkluatype(active, TYPE_BOOL)
