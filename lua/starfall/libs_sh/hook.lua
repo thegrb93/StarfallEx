@@ -376,14 +376,14 @@ end
 -- @name PhysgunDrop
 -- @class hook
 -- @shared
--- @param ply Player droppig the entity
+-- @param ply Player dropping the entity
 -- @param ent Entity being dropped
 
 --- Called when a player switches their weapon
 -- @name PlayerSwitchWeapon
 -- @class hook
 -- @shared
--- @param ply Player droppig the entity
+-- @param ply Player changing weapon
 -- @param oldwep Old weapon
 -- @param newweapon New weapon
 
