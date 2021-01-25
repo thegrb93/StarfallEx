@@ -232,11 +232,6 @@ properties.Add( "starfall", {
 	Action = function ( self, ent ) end
 } )
 
-
-function ENT:IsHUDActive(ply)
-	return self.ActiveHuds[ply or LocalPlayer()]
-end
-
 local hudsToSync = setmetatable({},{__index=function(t,k) local r={} t[k]=r return r end})
 local function syncHud(ply, chip, activator, enabled)
 	if next(hudsToSync)==nil then

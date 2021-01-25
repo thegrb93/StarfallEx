@@ -258,7 +258,7 @@ function input_library.enableCursor(enabled)
 	checkluatype(enabled, TYPE_BOOL)
 	checkpermission(instance, nil, "input")
 
-	if not instance.entity:IsHUDActive() then
+	if not SF.IsHUDActive(instance.entity) then
 		SF.Throw("No HUD component connected", 2)
 	end
 
@@ -283,7 +283,7 @@ function input_library.lockControls(enabled)
 	checkluatype(enabled, TYPE_BOOL)
 	checkpermission(instance, nil, "input")
 
-	if not instance.entity:IsHUDActive() and (enabled or not instance.data.input.controlsLocked) then
+	if not SF.IsHUDActive(instance.entity) and (enabled or not instance.data.input.controlsLocked) then
 		SF.Throw("No HUD component connected", 2)
 	end
 
@@ -309,7 +309,7 @@ end
 -- @client
 -- @return Whether the player's control can be locked
 function input_library.canLockControls()
-	return instance.entity:IsHUDActive() and
+	return SF.IsHUDActive(instance.entity) and
 		(not instance.data.lockedControlCooldown or instance.data.lockedControlCooldown <= CurTime())
 end
 

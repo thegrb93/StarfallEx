@@ -180,11 +180,11 @@ SF.hookAdd("PreDrawOpaqueRenderables", "hologrammatrix", function(instance, draw
 end)
 
 local function canRenderHudSafeArgs(instance, ...)
-	return instance.entity:IsHUDActive() and (instance.player == SF.Superuser or haspermission(instance, nil, "render.hud")), {...}
+	return SF.IsHUDActive(instance.entity) and (instance.player == SF.Superuser or haspermission(instance, nil, "render.hud")), {...}
 end
 
 local function canCalcview(instance, ply, pos, ang, fov, znear, zfar)
-	return instance.entity:IsHUDActive() and (instance.player == SF.Superuser or haspermission(instance, nil, "render.calcview")), {instance.Types.Vector.Wrap(pos), instance.Types.Angle.Wrap(ang), fov, znear, zfar}
+	return SF.IsHUDActive(instance.entity) and (instance.player == SF.Superuser or haspermission(instance, nil, "render.calcview")), {instance.Types.Vector.Wrap(pos), instance.Types.Angle.Wrap(ang), fov, znear, zfar}
 end
 
 local function returnCalcview(instance, tbl)
@@ -1806,7 +1806,7 @@ end
 
 --- Checks if a hud component is connected to the Starfall Chip
 function render_library.IsHUDActive()
-	return instance.entity:IsHUDActive()
+	return SF.IsHUDActive(instance.entity)
 end
 
 --- Renders the scene with the specified viewData to the current active render target.
