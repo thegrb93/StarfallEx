@@ -467,7 +467,7 @@ if SERVER then
 	function builtins_library.printHud(ply, ...)
 		ply = getply(ply)
 		if not ply:IsPlayer() then SF.Throw("Expected a target player!", 2) end
-		if not instance:IsHUDActive(ply) then SF.Throw("Player isn't connected to a hud!", 2) end
+		if not SF.IsHUDActive(instance.entity, ply) then SF.Throw("Player isn't connected to a hud!", 2) end
 
 		local data, strlen, size = argsToChat(builtins_library.Color(5,125,222), "[SF] ", builtins_library.Color(255,255,255), ...)
 		if strlen > 52 then SF.Throw("The max printHud string size is 52 chars!", 2) end
