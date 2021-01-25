@@ -66,10 +66,10 @@ function ENT:Compile()
 	end
 
 	for k, v in ipairs(ents.FindByClass("starfall_screen")) do
-		if v.link == self then v.link = nil SF.LinkEnt(v, self) end
+		if v.link == self then instance:runScriptHook("componentlinked", instance.WrapObject(v)) end
 	end
 	for k, v in ipairs(ents.FindByClass("starfall_hud")) do
-		if v.link == self then v.link = nil SF.LinkEnt(v, self) end
+		if v.link == self then instance:runScriptHook("componentlinked", instance.WrapObject(v)) end
 	end
 end
 
