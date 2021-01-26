@@ -12,7 +12,7 @@ local plySoundBurst = SF.BurstObject("sounds", "sounds", 10, 5, "The rate at whi
 SF.ResourceCounters.Sounds = {icon = "icon16/sound.png", count = function(ply) return plyCount:get(ply).val end}
 
 local soundsByEntity = SF.EntityTable("soundsByEntity", function(e, t)
-	for snd, _ in pairs(t) do
+	for snd in pairs(t) do
 		snd:Stop()
 	end
 end, true)
@@ -97,7 +97,7 @@ end
 --- Returns if a sound is able to be created
 -- @return If it is possible to make a sound
 function sounds_library.canCreate()
-	return plyCount:check(instance.player) > 0 and plySoundBurst:check(instance.player) >= 1
+	return plyCount:check(instance.player) > 0 and plySoundBurst:check(instance.player) >= 1 and SF.Permissions.hasAccess(instance, nil, "sound.create")
 end
 
 --- Returns the number of sounds left that can be created
