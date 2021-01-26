@@ -9,7 +9,7 @@ SF.RegisterLibrary("game")
 return function(instance)
 
 local game_library = instance.Libraries.game
-local vwrap = instance.Types.Vector.Wrap
+local vwrap, ewrap = instance.Types.Vector.Wrap, instance.Types.Entity.Wrap
 
 --- Returns the map name
 -- @name game_library.getMap
@@ -53,6 +53,13 @@ game_library.getMaxPlayers = game.MaxPlayers
 -- @param str String identifier of the game, eg. 'cstrike'
 -- @return True if the game is mounted
 game_library.isMounted = IsMounted
+
+--- Returns the worldspawn entity
+-- @name game_library.getWorld
+-- @return entity world
+function game_library.getWorld()
+	return ewrap(game.GetWorld())
+end
 
 if CLIENT then
 	--- Returns if the game has focus or not, i.e. will return false if the game is minimized
