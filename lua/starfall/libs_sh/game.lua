@@ -60,6 +60,12 @@ game_library.isMounted = IsMounted
 -- @return number time scale
 game_library.getTimeScale = game.GetTimeScale
 
+--- Returns the number of seconds between each gametick
+-- @name game_library.getTickInterval
+-- @class function
+-- @return number interval
+game_library.getTickInterval = engine.TickInterval
+
 --- Returns AmmoData for given id
 -- @param number id, see https://wiki.facepunch.com/gmod/Default_Ammo_Types
 -- @return table AmmoData, see https://wiki.facepunch.com/gmod/Structures/AmmoData
