@@ -227,15 +227,17 @@ end
 --- Sets the entity's friction multiplier
 -- @param number friction
 function ents_methods:setFriction(friction)
+	local ent = getent(self)
 	checkpermission(instance, ent, "entities.CanTool")
-	getent(self):SetFriction(friction)
+	ent:SetFriction(friction)
 end
 
 --- Sets the elasticity of the entity
 -- @param number elasticity
 function ents_methods:setElasticity(elasticity)
+	local ent = getent(self)
 	checkpermission(instance, ent, "entities.CanTool")
-	getent(self):SetElasticity(elasticity)
+	ent:SetElasticity(elasticity)
 end
 	
 --- Applies linear force to the entity
