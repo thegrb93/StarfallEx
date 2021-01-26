@@ -54,6 +54,12 @@ game_library.getMaxPlayers = game.MaxPlayers
 -- @return True if the game is mounted
 game_library.isMounted = IsMounted
 
+--- Returns the game time scale
+-- @name game_library.getTimeScale
+-- @class function
+-- @return number time scale
+game_library.getTimeScale = game.GetTimeScale
+
 --- Returns the worldspawn entity
 -- @return entity world
 function game_library.getWorld()
