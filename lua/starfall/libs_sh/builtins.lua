@@ -262,18 +262,6 @@ function builtins_library.hasPermission(perm, obj)
 	return SF.Permissions.hasAccess(instance, ounwrap(obj), perm)
 end
 
---- Gets the distance between a line and a point in 3d space
--- @param lineStart Start of the line
--- @param lineEnd End of the line
--- @param pointPos Position of the point
--- @return number Distance from line
--- @return vector Nearest point on line
--- @return number Distance along line from start
-function builtins_library.distanceToLine(lineStart, lineEnd, pointPos)
-	local nearDist, nearPoint, startDist = util.DistanceToLine(vunwrap(lineStart), vunwrap(lineEnd), vunwrap(pointPos))
-	return nearDist, vwrap(nearPoint), startDist
-end
-
 if CLIENT then
 
 	--- Called when local client changed instance permissions

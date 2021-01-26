@@ -375,4 +375,16 @@ function math_library.lerpVector(ratio, from, to)
 	return vwrap(LerpVector(ratio, vunwrap(from), vunwrap(to)))
 end
 
+--- Gets the distance between a line and a point in 3d space
+-- @param lineStart Start of the line
+-- @param lineEnd End of the line
+-- @param pointPos Position of the point
+-- @return number Distance from line
+-- @return vector Nearest point on line
+-- @return number Distance along line from start
+function math_library.distanceToLine(lineStart, lineEnd, pointPos)
+	local nearDist, nearPoint, startDist = util.DistanceToLine(vunwrap(lineStart), vunwrap(lineEnd), vunwrap(pointPos))
+	return nearDist, vwrap(nearPoint), startDist
+end
+
 end
