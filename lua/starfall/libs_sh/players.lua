@@ -238,7 +238,7 @@ end
 -- @shared
 -- @return Entity
 function player_methods:getEntityInUse()
-	return wrap(getply(self):GetEntityInUse())
+	return instance.WrapObject(getply(self):GetEntityInUse())
 end
 
 --- Returns the player's shoot position
