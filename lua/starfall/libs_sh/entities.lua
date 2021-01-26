@@ -537,6 +537,12 @@ function ents_methods:getPhysicsObjectNum(id)
 	return pwrap(getent(self):GetPhysicsObjectNum(id))
 end
 
+--- Returns the elasticity of the entity
+-- @return number elasticity
+function ents_methods:getElasticity()
+	return getent(self):GetElasticity()
+end
+
 --- Sets the elasticity of the entity
 -- @shared
 -- @param number elasticity

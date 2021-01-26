@@ -224,12 +224,6 @@ function ents_methods:getFriction()
 	return getent(self):GetFriction()
 end
 
---- Returns the elasticity of the entity
--- @return number elasticity
-function ents_methods:getElasticity()
-	return getent(self):GetElasticity()
-end
-
 --- Sets the entity's friction multiplier
 -- @param number friction
 function ents_methods:setFriction(friction)
