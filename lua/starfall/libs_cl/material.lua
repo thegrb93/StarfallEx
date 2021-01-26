@@ -731,14 +731,11 @@ function material_methods:setTextureURL(key, url, cb, done)
 	if prefix=="http" or prefix=="https" then
 		checkpermission (instance, url, "material.urlcreate")
 		if #url>2000 then SF.Throw("URL is too long!", 2) end
-		url = string.gsub(url, "[^%w _~%.%-/:]", function(str)
-			return string.format("%%%02X", string.byte(str))
-		end)
 		SF.HTTPNotify(instance.player, url)
 	else
 		checkpermission (instance, nil, "material.datacreate")
-		url = string.match(url, "data:image/[%w%+]+;base64,[%w/%+%=]+") -- No $ at end etc so there can be cariage return etc, we'll skip that part anyway
-		if not url then
+		-- Capture 'data' so that a huge return isn't generated
+		if not string.match(url, "^(data):image/[%w%+]+;base64,[%w/%+%=]+$") then
 			SF.Throw("Texture data isn't proper base64 encoded image.", 2)
 		end
 	end
