@@ -9,7 +9,7 @@ SF.RegisterLibrary("game")
 return function(instance)
 
 local game_library = instance.Libraries.game
-local vwrap = instance.Types.Vector.Wrap
+local vwrap, ewrap = instance.Types.Vector.Wrap, instance.Types.Entity.Wrap
 
 --- Returns the map name
 -- @name game_library.getMap
@@ -53,6 +53,31 @@ game_library.getMaxPlayers = game.MaxPlayers
 -- @param str String identifier of the game, eg. 'cstrike'
 -- @return True if the game is mounted
 game_library.isMounted = IsMounted
+
+--- Returns the game time scale
+-- @name game_library.getTimeScale
+-- @class function
+-- @return number time scale
+game_library.getTimeScale = game.GetTimeScale
+
+--- Returns the number of seconds between each gametick
+-- @name game_library.getTickInterval
+-- @class function
+-- @return number interval
+game_library.getTickInterval = engine.TickInterval
+
+--- Returns AmmoData for given id
+-- @param number id, see https://wiki.facepunch.com/gmod/Default_Ammo_Types
+-- @return table AmmoData, see https://wiki.facepunch.com/gmod/Structures/AmmoData
+function game_library.getAmmoData(id)
+	return game.GetAmmoData(id)
+end
+
+--- Returns the worldspawn entity
+-- @return entity world
+function game_library.getWorld()
+	return ewrap(game.GetWorld())
+end
 
 if CLIENT then
 	--- Returns if the game has focus or not, i.e. will return false if the game is minimized
