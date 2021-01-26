@@ -60,6 +60,13 @@ game_library.isMounted = IsMounted
 -- @return number time scale
 game_library.getTimeScale = game.GetTimeScale
 
+--- Returns AmmoData for given id
+-- @param number id, see https://wiki.facepunch.com/gmod/Default_Ammo_Types
+-- @return table AmmoData, see https://wiki.facepunch.com/gmod/Structures/AmmoData
+function game_library.getAmmoData(id)
+	return game.GetAmmoData(id)
+end
+
 --- Returns the worldspawn entity
 -- @return entity world
 function game_library.getWorld()
