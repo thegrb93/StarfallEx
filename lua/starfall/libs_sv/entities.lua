@@ -217,6 +217,28 @@ function ents_methods:addAngleVelocity(angvel)
 
 	phys:AddAngleVelocity(angvel)
 end
+
+--- Returns how much friction the entity has, default is 1 (100%)
+-- @return number friction
+function ents_methods:getFriction()
+	return getent(self):GetFriction()
+end
+
+--- Sets the entity's friction multiplier
+-- @param number friction
+function ents_methods:setFriction(friction)
+	local ent = getent(self)
+	checkpermission(instance, ent, "entities.canTool")
+	ent:SetFriction(friction)
+end
+
+--- Sets the elasticity of the entity
+-- @param number elasticity
+function ents_methods:setElasticity(elasticity)
+	local ent = getent(self)
+	checkpermission(instance, ent, "entities.canTool")
+	ent:SetElasticity(elasticity)
+end
 	
 --- Applies linear force to the entity
 -- @param vec The force vector
