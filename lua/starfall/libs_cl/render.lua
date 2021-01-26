@@ -2144,10 +2144,10 @@ end
 --- Makes the screen shake, client must be connected to a HUD.
 -- @param number amplitude
 -- @param number frequency (Hz)
--- @param number duration
+-- @param number duration, Max 10 seconds.
 function render_library.screenShake(amplitude, frequency, duration)
 	if instance:isHUDActive() then
-		util.ScreenShake(Vector(0, 0, 0), amplitude, frequency, duration, 0)
+		util.ScreenShake(Vector(0, 0, 0), amplitude, frequency, math.Clamp(duration, 0, 10), 0)
 	end
 end
 
