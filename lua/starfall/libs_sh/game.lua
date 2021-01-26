@@ -55,7 +55,6 @@ game_library.getMaxPlayers = game.MaxPlayers
 game_library.isMounted = IsMounted
 
 --- Returns the worldspawn entity
--- @name game_library.getWorld
 -- @return entity world
 function game_library.getWorld()
 	return ewrap(game.GetWorld())
