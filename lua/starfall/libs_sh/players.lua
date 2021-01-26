@@ -227,7 +227,6 @@ function player_methods:getRunSpeed()
 	return getply(self):GetRunSpeed()
 end
 
-
 --- Returns the player's duck speed 
 -- @shared
 -- @return Duck speed in seconds
@@ -241,11 +240,6 @@ end
 function player_methods:getEntityInUse()
 	return wrap(getply(self):GetEntityInUse())
 end
-
-
-
-
-
 
 --- Returns the player's shoot position
 -- @shared
