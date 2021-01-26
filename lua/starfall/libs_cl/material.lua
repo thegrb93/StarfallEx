@@ -731,7 +731,7 @@ function material_methods:setTextureURL(key, url, cb, done)
 	if prefix=="http" or prefix=="https" then
 		checkpermission (instance, url, "material.urlcreate")
 		if #url>2000 then SF.Throw("URL is too long!", 2) end
-		url = string.gsub(url, "[\"\'<>]", function(str)
+		url = string.gsub(url, "[^%w _~%.%-/:=%?&]", function(str)
 			return string.format("%%%02X", string.byte(str))
 		end)
 		SF.HTTPNotify(instance.player, url)
