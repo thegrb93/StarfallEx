@@ -660,7 +660,6 @@ end
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
-local haspermission = instance.player ~= SF.Superuser and SF.Permissions.hasAccess or function() return true end
 
 
 if CLIENT then
@@ -895,22 +894,14 @@ if CLIENT then
 	-- @return Number of triangles that can be created
 	-- @client
 	function mesh_library.trianglesLeft()
-		if haspermission(instance, nil, "mesh") then
-			return plyTriangleCount:check(instance.player)
-		else
-			return 0
-		end
+		return plyTriangleCount:check(instance.player)
 	end
 
 	--- Returns how many triangles can be rendered
 	-- @return Number of triangles that can be rendered
 	-- @client
 	function mesh_library.trianglesLeftRender()
-		if haspermission(instance, nil, "mesh") then
-			return plyTriangleRenderBurst:check(instance.player)
-		else
-			return 0
-		end
+		return plyTriangleRenderBurst:check(instance.player)
 	end
 
 	local meshgenerating = false
