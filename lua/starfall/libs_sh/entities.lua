@@ -1139,7 +1139,8 @@ function ents_methods:getModel()
 	return getent(self):GetModel()
 end
 
---- Returns the entity's model bounds
+--- Returns the entity's model bounds. This is different than the collision bounds/hull.
+--  This is not scaled with Entity:SetModelScale and will return the model's original, unmodified mins and maxs.
 -- @shared
 -- @return Minimum vector of the bounds
 -- @return Maximum vector of the bounds
