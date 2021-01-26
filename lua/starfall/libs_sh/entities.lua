@@ -543,13 +543,6 @@ function ents_methods:getElasticity()
 	return getent(self):GetElasticity()
 end
 
---- Sets the elasticity of the entity
--- @shared
--- @param number elasticity
-function ents_methods:setElasticity(elasticity)
-	getent(self):SetElasticity(elasticity)
-end
-
 --- Gets the color of an entity
 -- @shared
 -- @return Color
