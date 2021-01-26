@@ -234,7 +234,7 @@ function player_methods:getDuckSpeed()
 	return getply(self):GetDuckSpeed()
 end
 
---- Returns the entity currently in use by the player
+--- Returns the entity the player is currently using, like func_tank mounted turrets or +use prop pickups.
 -- @shared
 -- @return Entity
 function player_methods:getEntityInUse()
