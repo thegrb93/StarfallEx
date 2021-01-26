@@ -234,7 +234,7 @@ function player_methods:getDuckSpeed()
 	return getply(self):GetDuckSpeed()
 end
 
---- Returns the entity the player is using
+--- Returns the entity currently in use by the player
 -- @shared
 -- @return Entity
 function player_methods:getEntityInUse()
