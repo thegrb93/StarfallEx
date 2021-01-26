@@ -228,7 +228,7 @@ end
 -- @param number friction
 function ents_methods:setFriction(friction)
 	local ent = getent(self)
-	checkpermission(instance, ent, "entities.CanTool")
+	checkpermission(instance, ent, "entities.canTool")
 	ent:SetFriction(friction)
 end
 
@@ -236,7 +236,7 @@ end
 -- @param number elasticity
 function ents_methods:setElasticity(elasticity)
 	local ent = getent(self)
-	checkpermission(instance, ent, "entities.CanTool")
+	checkpermission(instance, ent, "entities.canTool")
 	ent:SetElasticity(elasticity)
 end
 	
