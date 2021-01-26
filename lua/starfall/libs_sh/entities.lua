@@ -537,6 +537,14 @@ function ents_methods:getPhysicsObjectNum(id)
 	return pwrap(getent(self):GetPhysicsObjectNum(id))
 end
 
+--- Sets the elasticity of the entity
+-- @shared
+-- @param number elasticity
+function ents_methods:setElasticity(elasticity)
+	local ent = getent(self)
+	return ent:SetElasticity(elasticity)
+end
+
 --- Gets the color of an entity
 -- @shared
 -- @return Color

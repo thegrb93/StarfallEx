@@ -217,6 +217,27 @@ function ents_methods:addAngleVelocity(angvel)
 
 	phys:AddAngleVelocity(angvel)
 end
+
+--- Returns how much friction the entity has, default is 1 (100%)
+-- @return number friction
+function ents_methods:getFriction()
+	local ent = getent(self)
+	return ent:GetFriction()
+end
+
+--- Returns the elasticity of the entity
+-- @return number elasticity
+function ents_methods:getElasticity()
+	local ent = getent(self)
+	return ent:GetElasticity()
+end
+
+--- Sets the entity's friction multiplier
+-- @param number friction
+function ents_methods:setFriction(friction)
+	local ent = getent(self)
+	return ent:SetFriction(friction)
+end
 	
 --- Applies linear force to the entity
 -- @param vec The force vector
