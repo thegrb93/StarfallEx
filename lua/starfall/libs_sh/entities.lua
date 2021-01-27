@@ -1145,6 +1145,37 @@ function ents_methods:getModel()
 	return getent(self):GetModel()
 end
 
+--- Returns the entity's model bounds. This is different than the collision bounds/hull.
+-- This is not scaled with Entity:SetModelScale and will return the model's original, unmodified mins and maxs.
+-- @shared
+-- @return Minimum vector of the bounds
+-- @return Maximum vector of the bounds
+function ents_methods:getModelBounds()
+	local minvec, maxvec = getent(self):GetModelBounds()
+	return vwrap(minvec), vwrap(maxvec)
+end
+
+--- Returns the contents of the entity's current model
+-- @shared
+-- @return number contents of the entity's model. https://wiki.facepunch.com/gmod/Enums/CONTENTS
+function ents_methods:getModelContents()
+	return getent(self):GetModelContents()
+end
+
+--- Returns the model's radius
+-- @shared
+-- @return number radius of the model
+function ents_methods:getModelRadius()
+	return getent(self):GetModelRadius()
+end
+
+--- Returns the model's scale
+-- @shared
+-- @return number scale of the model
+function ents_methods:getModelScale()
+	return getent(self):GetModelScale()
+end
+
 --- Gets the max health of an entity
 -- @shared
 -- @return Max Health of the entity
