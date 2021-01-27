@@ -265,7 +265,10 @@ local allowed_components = {
 	["starfall_screen"] = true,
 	["starfall_hud"] = true,
 }
---- Creates starfall component.\n Allowed components:\n starfall_hud\n starfall_screen
+--- Creates starfall component
+-- Allowed components:
+-- starfall_hud
+-- starfall_screen
 -- @param pos Position of created component
 -- @param ang Angle of created component
 -- @param class Class of created component
