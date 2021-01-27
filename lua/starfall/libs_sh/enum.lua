@@ -917,4 +917,80 @@ env.VR = {
 	["BOOLEAN_TURRET"] = "boolean_turret",
 }
 
+--- ENUMs describing surface material. Used in TraceResult
+-- @name builtins_library.MAT
+-- @class table
+-- @field ANTLION
+-- @field BLOODYFLESH
+-- @field CONCRETE
+-- @field DIRT
+-- @field EGGSHELL
+-- @field FLESH
+-- @field GRATE
+-- @field ALIENFLESH
+-- @field CLIP
+-- @field SNOW
+-- @field PLASTIC
+-- @field METAL
+-- @field SAND
+-- @field FOLIAGE
+-- @field COMPUTER
+-- @field SLOSH
+-- @field TILE
+-- @field GRASS
+-- @field VENT
+-- @field WOOD
+-- @field DEFAULT
+-- @field GLASS
+-- @field WARPSHIELD
+env.MAT = {
+	ANTLION = MAT_ANTLION,
+	BLOODYFLESH = MAT_BLOODYFLESH,
+	CONCRETE = MAT_CONCRETE,
+	DIRT = MAT_DIRT,
+	EGGSHELL = MAT_EGGSHELL,
+	FLESH = MAT_FLESH,
+	GRATE = MAT_GRATE,
+	ALIENFLESH = MAT_ALIENFLESH,
+	CLIP = MAT_CLIP,
+	SNOW = MAT_SNOW,
+	PLASTIC = MAT_PLASTIC,
+	METAL = MAT_METAL,
+	SAND = MAT_SAND,
+	FOLIAGE = MAT_FOLIAGE,
+	COMPUTER = MAT_COMPUTER,
+	SLOSH = MAT_SLOSH,
+	TILE = MAT_TILE,
+	GRASS = MAT_GRASS,
+	VENT = MAT_VENT,
+	WOOD = MAT_WOOD,
+	DEFAULT = MAT_DEFAULT,
+	GLASS = MAT_GLASS,
+	WARPSHIELD = MAT_WARPSHIELD,
+}
+
+--- Player and NPC hitgroup ENUMs
+-- @name builtins_library.HITGROUP
+-- @class table
+-- @field GENERIC
+-- @field HEAD
+-- @field CHEST
+-- @field STOMACH
+-- @field LEFTARM
+-- @field RIGHTARM
+-- @field LEFTLEG
+-- @field RIGHTLEG
+-- @field GEAR
+env.HITGROUP = {
+	GENERIC = HITGROUP_GENERIC,
+	HEAD = HITGROUP_HEAD,
+	CHEST = HITGROUP_CHEST,
+	STOMACH = HITGROUP_STOMACH,
+	LEFTARM = HITGROUP_LEFTARM,
+	RIGHTARM = HITGROUP_RIGHTARM,
+	LEFTLEG = HITGROUP_LEFTLEG,
+	RIGHTLEG = HITGROUP_RIGHTLEG,
+	GEAR = HITGROUP_GEAR,
+}
+
 end
