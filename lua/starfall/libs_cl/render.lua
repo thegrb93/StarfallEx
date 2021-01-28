@@ -264,12 +264,6 @@ local markup_methods, markwrap, markunwrap = instance.Types.Markup.Methods, inst
 local mtlunwrap = instance.Types.LockedMaterial.Unwrap
 
 
-render_library.TEXT_ALIGN_LEFT = TEXT_ALIGN_LEFT
-render_library.TEXT_ALIGN_CENTER = TEXT_ALIGN_CENTER
-render_library.TEXT_ALIGN_RIGHT = TEXT_ALIGN_RIGHT
-render_library.TEXT_ALIGN_TOP = TEXT_ALIGN_TOP
-render_library.TEXT_ALIGN_BOTTOM = TEXT_ALIGN_BOTTOM
-
 instance:AddHook("prepare", function(hook)
 	local renderPrepare = renderhooks[hook]
 	if renderPrepare then renderPrepare(renderdata) end
@@ -2261,12 +2255,3 @@ end
 -- @field y Y coordinate
 -- @field u U coordinate (optional, default is 0)
 -- @field v V coordinate (optional, default is 0)
-
---- 
--- @name render_library.Text align enum
--- @class table
--- @field TEXT_ALIGN_LEFT
--- @field TEXT_ALIGN_CENTER
--- @field TEXT_ALIGN_RIGHT
--- @field TEXT_ALIGN_TOP
--- @field TEXT_ALIGN_BOTTOM
