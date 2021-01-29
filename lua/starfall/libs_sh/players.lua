@@ -5,6 +5,8 @@ local registerprivilege = SF.Permissions.registerPrivilege
 if SERVER then
 	-- Register privileges
 	registerprivilege("player.dropweapon", "DropWeapon", "Drops a weapon from the player", { entities = {} })
+else
+	registerprivilege("player.getFriendStatus", "FriendStatus", "Whether friend status can be retrieved", { client = { default = 1 } })
 end
 
 -- Player animation
@@ -524,6 +526,7 @@ if CLIENT then
 	-- @client
 	-- @return One of: "friend", "blocked", "none", "requested"
 	function player_methods:getFriendStatus()
+		checkpermission(instance, nil, "player.getFriendStatus")
 		return getply(self):GetFriendStatus()
 	end
 
