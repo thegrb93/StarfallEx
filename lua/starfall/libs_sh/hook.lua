@@ -20,6 +20,8 @@ if SERVER then
 	-- Server hooks
 	add("GravGunOnPickedUp")
 	add("GravGunOnDropped")
+	add("OnPlayerPhysicsPickup")
+	add("OnPlayerPhysicsDrop")
 	add("OnPhysgunFreeze")
 	add("OnPhysgunReload")
 	add("PlayerDeath")
@@ -233,6 +235,21 @@ end
 -- @server
 -- @param ply Player dropping the object
 -- @param ent Entity being dropped
+
+--- Called when an entity is being picked up by +use
+-- @name OnPlayerPhysicsPickup
+-- @class hook
+-- @server
+-- @param ply Player picking up an object
+-- @param ent Entity being picked up
+
+--- Called when an entity is being dropped or thrown by +use
+-- @name OnPlayerPhysicsDrop
+-- @class hook
+-- @server
+-- @param ply Player dropping the object
+-- @param ent Entity being dropped
+-- @param thrown Whether the entity was thrown or dropped
 
 --- Called when an entity is being frozen
 -- @name OnPhysgunFreeze
