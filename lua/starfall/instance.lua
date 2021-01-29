@@ -685,30 +685,6 @@ hook.Add("Think", "SF_Think", function()
 	end
 end)
 
-if SERVER then
-	function SF.Instance:isHUDActive(ply)
-		for hud, tbl in pairs(SF.ActiveHuds) do
-			if hud.link == self.entity and tbl[ply] then
-				return true
-			end
-		end
-		return false
-	end
-else
---- Check if a HUD Component is connected to the SF instance
--- @return true if a HUD Component is connected
-	function SF.Instance:isHUDActive()
-		if self.hudoverride ~= nil then return self.hudoverride end
-		local foundlink
-		for hud, _ in pairs(SF.ActiveHuds) do
-			if hud.link == self.entity then
-				return true
-			end
-		end
-		return false
-	end
-end
-
 --- Errors the instance. Should only be called from the tips of the call tree (aka from places such as the hook library, timer library, the entity's think function, etc)
 function SF.Instance:Error(err)
 	if self.error then return end

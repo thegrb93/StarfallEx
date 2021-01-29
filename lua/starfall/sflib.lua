@@ -1052,6 +1052,11 @@ function SF.dumbTrace(entity, pos)
 	return dumbtrace
 end
 
+function SF.IsHUDActive(ent, ply)
+	local tbl = ent.ActiveHuds
+	return tbl and tbl[SERVER and (ply or error("Missing player arg")) or LocalPlayer()]
+end
+
 -- ------------------------------------------------------------------------- --
 
 local serialize_replace_regex = "[\"\n]"

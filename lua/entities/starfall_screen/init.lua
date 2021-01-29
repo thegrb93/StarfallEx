@@ -55,7 +55,7 @@ function ENT:PostEntityPaste(ply, ent, CreatedEntities)
 		if info.link then
 			local e = CreatedEntities[info.link]
 			if (e and e:IsValid()) then
-				self:LinkEnt(e)
+				SF.LinkEnt(self, e)
 			end
 		end
 	end

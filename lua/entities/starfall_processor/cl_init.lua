@@ -7,6 +7,7 @@ ENT.RenderGroup = RENDERGROUP_BOTH
 function ENT:Initialize()
 	self.name = "Generic ( No-Name )"
 	self.OverlayFade = 0
+	self.ActiveHuds = {}
 end
 
 function ENT:OnRemove()
@@ -121,8 +122,8 @@ net.Receive("starfall_processor_link", function()
 	local proci = net.ReadUInt(16)
 	SF.WaitForConditions(function(timedout)
 		local component, proc = Entity(componenti), Entity(proci)
-		if SF.EntIsReady(component) and SF.EntIsReady(proc) and component.LinkEnt then
-			component:LinkEnt(proc)
+		if SF.EntIsReady(component) and SF.EntIsReady(proc) then
+			SF.LinkEnt(component, proc)
 			return true
 		end
 	end, 10)

@@ -113,7 +113,7 @@ function ents_methods:linkComponent(e)
 		checkpermission(instance, link, "entities.canTool")
 
 		if link:GetClass()=="starfall_processor" and (ent:GetClass()=="starfall_screen" or ent:GetClass()=="starfall_hud") then
-			ent:LinkEnt(link)
+			SF.LinkEnt(ent, link)
 		elseif link:IsVehicle() and ent:GetClass()=="starfall_hud" then
 			ent:LinkVehicle(link)
 		else
@@ -121,9 +121,9 @@ function ents_methods:linkComponent(e)
 		end
 	else
 		if ent:GetClass()=="starfall_screen" then
-			ent:LinkEnt(nil)
+			SF.LinkEnt(ent, nil)
 		elseif ent:GetClass()=="starfall_hud" then
-			ent:LinkEnt(nil)
+			SF.LinkEnt(ent, nil)
 			ent:LinkVehicle(nil)
 		else
 			SF.Throw("Invalid Link Entity", 2)

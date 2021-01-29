@@ -180,11 +180,11 @@ SF.hookAdd("PreDrawOpaqueRenderables", "hologrammatrix", function(instance, draw
 end)
 
 local function canRenderHudSafeArgs(instance, ...)
-	return instance:isHUDActive() and (instance.player == SF.Superuser or haspermission(instance, nil, "render.hud")), {...}
+	return SF.IsHUDActive(instance.entity) and (instance.player == SF.Superuser or haspermission(instance, nil, "render.hud")), {...}
 end
 
 local function canCalcview(instance, ply, pos, ang, fov, znear, zfar)
-	return instance:isHUDActive() and (instance.player == SF.Superuser or haspermission(instance, nil, "render.calcview")), {instance.Types.Vector.Wrap(pos), instance.Types.Angle.Wrap(ang), fov, znear, zfar}
+	return SF.IsHUDActive(instance.entity) and (instance.player == SF.Superuser or haspermission(instance, nil, "render.calcview")), {instance.Types.Vector.Wrap(pos), instance.Types.Angle.Wrap(ang), fov, znear, zfar}
 end
 
 local function returnCalcview(instance, tbl)
@@ -1799,8 +1799,8 @@ function render_library.traceSurfaceColor(vec1, vec2)
 end
 
 --- Checks if a hud component is connected to the Starfall Chip
-function render_library.isHUDActive()
-	return instance:isHUDActive()
+function render_library.IsHUDActive()
+	return SF.IsHUDActive(instance.entity)
 end
 
 --- Renders the scene with the specified viewData to the current active render target.
@@ -1990,14 +1990,6 @@ function render_library.popCustomClipPlane()
 	render.PopCustomClipPlane()
 
 	pushedClippingPlanes = pushedClippingPlanes - 1
-end
-
---- Sets the current instance to allow HUD drawing. Only works for owner of the chip
---@param active Whether hud hooks should be active. true to force on, false to force off, nil to restore default.
-function render_library.setHUDActive(active)
-	if active ~= nil then checkluatype(active, TYPE_BOOL) end
-	if LocalPlayer()~=instance.player then SF.Throw("This function only works for the owner of the chip!", 2) end
-	instance.hudoverride = active
 end
 
 --- Calculates the light color of a certain surface

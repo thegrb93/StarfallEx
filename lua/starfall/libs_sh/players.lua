@@ -88,7 +88,7 @@ end)
 if SERVER then
 	instance:AddHook("deinitialize", function()
 		for k, ply in pairs(player.GetAll()) do
-			if instance:isHUDActive(ply) then
+			if SF.IsHUDActive(instance.entity, ply) then
 				ply:SetViewEntity()
 			end
 		end
@@ -459,7 +459,7 @@ if SERVER then
 		local ply = getply(self)
 		if ent~=nil then ent = getent(ent) end
 
-		if instance:isHUDActive(ply) then
+		if SF.IsHUDActive(instance.entity, ply) then
 			ply:SetViewEntity(ent)
 		end
 	end
