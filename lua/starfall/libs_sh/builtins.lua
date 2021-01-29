@@ -980,14 +980,15 @@ function builtins_library.localToWorld(localPos, localAng, originPos, originAngl
 	return vwrap(worldPos), awrap(worldAngles)
 end
 
---- Sets the current instance to allow HUD drawing. Only works if player is in your vehicle or if it's ran on yourself
+--- Sets the current instance to allow HUD drawing. Only works if player is in your vehicle or
+-- if it's ran on yourself or if the player is connected to your hud and you want to disconnect them
 --@param ply The player to enable the hud on. If CLIENT, will be forced to player()
 --@param active Whether hud hooks should be active. true to force on, false to force off.
-function builtins_library.setHUDActive(ply, active)
+function builtins_library.enableHud(ply, active)
 	ply = SERVER and getply(ply) or LocalPlayer()
 	checkluatype(active, TYPE_BOOL)
 
-	if ply==instance.player or instance.player==SF.SuperUser then
+	if ply==instance.player or instance.player==SF.SuperUser or (not active and SF.IsHUDActive(instance.entity)) then
 		SF.EnableHud(ply, instance.entity, nil, active)
 	else
 		local vehicle = ply:GetVehicle()

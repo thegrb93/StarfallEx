@@ -309,25 +309,30 @@ if SERVER then
 else
 	local Hint_FirstPrint = true
 	function SF.EnableHud(ply, chip, activator, enabled, dontsync)
-		chip.ActiveHuds[ply] = enabled or nil
+		enabled = enabled or nil
+		local changed = chip.ActiveHuds[ply] ~= enabled
+		chip.ActiveHuds[ply] = enabled
 
-		if enabled then
-			if (Hint_FirstPrint) then
-				LocalPlayer():ChatPrint("Starfall HUD Enabled. NOTE: Type 'sf_hud_unlink' in the console to disconnect yourself from all HUDs.")
-				Hint_FirstPrint = nil
+		if changed then
+			local enabledBy = chip.owner and chip.owner:IsValid() and (" by "..chip.owner:Nick()) or ""
+			if enabled then
+				if (Hint_FirstPrint) then
+					LocalPlayer():ChatPrint("Starfall HUD enabled"..enabledBy..". NOTE: Type 'sf_hud_unlink' in the console to disconnect yourself from all HUDs.")
+					Hint_FirstPrint = nil
+				else
+					LocalPlayer():ChatPrint("Starfall HUD enabled"..enabledBy..".")
+				end
 			else
-				LocalPlayer():ChatPrint("Starfall HUD Enabled.")
+				LocalPlayer():ChatPrint("Starfall HUD disconnected"..enabledBy..".")
 			end
-		else
-			LocalPlayer():ChatPrint("Starfall HUD Disconnected.")
-		end
 
-		local instance = chip.instance
-		if instance then
-			instance:runScriptHook(enabled and "hudconnected" or "huddisconnected", instance.WrapObject(activator))
-			instance:RunHook(enabled and "starfall_hud_connected" or "starfall_hud_disconnected", activator)
+			local instance = chip.instance
+			if instance then
+				instance:runScriptHook(enabled and "hudconnected" or "huddisconnected", instance.WrapObject(activator))
+				instance:RunHook(enabled and "starfall_hud_connected" or "starfall_hud_disconnected", activator)
+			end
+			if not dontsync then syncHud(ply, chip, activator, enabled) end
 		end
-		if not dontsync then syncHud(ply, chip, activator, enabled) end
 	end
 
 	concommand.Add("sf_hud_unlink", function()
