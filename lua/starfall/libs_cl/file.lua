@@ -198,9 +198,9 @@ function file_library.read(path)
 end
 
 
-local allowedExtensions = {["txt"] = true,["jpg"] = true,["png"] = true,["vtf"] = true,["dat"] = true,["json"] = true,["vmt"] = true}
+local allowedExtensions = {["txt"]=true,["dat"]=true,["json"]=true,["xml"]=true,["csv"]=true,["jpg"]=true,["jpeg"]=true,["png"]=true,["vtf"]=true,["vmt"]=true,["mp3"]=true,["wav"]=true,["ogg"]=true}
 local function checkExtension(filename)
-	if not allowedExtensions[string.GetExtensionFromFilename(filename)] then SF.Throw("File name must end with .txt, .jpg, .png, .vtf, .json, .vmt, or .dat extension!", 3) end
+	if not allowedExtensions[string.GetExtensionFromFilename(filename)] then SF.Throw("Invalid file extension!", 3) end
 end
 
 --- Writes to a file
