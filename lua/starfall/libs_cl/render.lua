@@ -2127,6 +2127,18 @@ function render_library.setScreenDimensions(screen, x, y, w, h)
 	screen:SetRenderBounds(Vector(-1024, -1024, -10), Vector(1024, 1024, 10))
 end
 
+--- Makes the screen shake, client must be connected to a HUD.
+-- @param number amplitude
+-- @param number frequency (Hz)
+-- @param number duration, Max 10 seconds.
+function render_library.screenShake(amplitude, frequency, duration)
+	checkluatype (amplitude, TYPE_NUMBER)
+	checkluatype (frequency, TYPE_NUMBER)
+	checkluatype (duration, TYPE_NUMBER)
+	if not instance:isHUDActive() then SF.Throw("Player isn't connected to HUD!", 2) end
+	util.ScreenShake(Vector(0, 0, 0), amplitude, frequency, math.Clamp(duration, 0, 10), 0)
+end
+
 end
 
 --- Called when a frame is requested to be drawn on screen. (2D/3D Context)
