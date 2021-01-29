@@ -635,14 +635,6 @@ local plyTriangleCount = SF.LimitObject("mesh_triangles", "total mesh triangles"
 local plyTriangleRenderBurst = SF.BurstObject("mesh_triangles", "rendered triangles", 50000, 50000, "Number of triangles that can be rendered per frame", "Number of triangles that can be drawn in a short period of time", 60)
 local plyMeshCount = SF.LimitObject("mesh", "total meshes", 1000, "How many meshes total can be loaded.")
 
-local function destroyMesh(ply, mesh, meshdata)
-	plyTriangleCount:free(ply, meshdata[mesh].ntriangles)
-	plyMeshCount:free(ply, 1)
-	mesh:Destroy()
-	meshdata[mesh] = nil
-end
-
-
 --- Mesh library.
 -- @name mesh
 -- @class library
@@ -661,22 +653,6 @@ end
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
-
-if CLIENT then
-	-- Register functions to be called when the chip is initialised and deinitialised
-	instance:AddHook("initialize", function()
-		instance.data.meshes = {}
-	end)
-
-	instance:AddHook("deinitialize", function()
-		local meshes = instance.data.meshes
-		local mesh = next(meshes)
-		while mesh do
-			destroyMesh(instance.player, mesh, meshes)
-			mesh = next(meshes)
-		end
-	end)
-end
 
 local mesh_library = instance.Libraries.mesh
 local thread_yield
@@ -739,6 +715,21 @@ function mesh_library.generateTangents(vertices)
 end
 
 if CLIENT then
+	local meshData = {}
+	instance.data.meshes = meshData
+
+	local function destroyMesh(ply, mesh)
+		plyTriangleCount:free(ply, meshData[mesh].ntriangles)
+		plyMeshCount:free(ply, 1)
+		mesh:Destroy()
+		meshData[mesh] = nil
+	end
+
+	instance:AddHook("deinitialize", function()
+		for mesh in pairs(meshData) do
+			destroyMesh(instance.player, mesh)
+		end
+	end)
 
 	local mesh_methods, mesh_meta, wrap, unwrap = instance.Types.Mesh.Methods, instance.Types.Mesh, instance.Types.Mesh.Wrap, instance.Types.Mesh.Unwrap
 	local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
@@ -801,7 +792,7 @@ if CLIENT then
 		if threaded then thread_yield(0) end
 		local mesh = Mesh()
 		mesh:BuildFromTriangles(unwrapped)
-		instance.data.meshes[mesh] = { ntriangles = ntriangles }
+		meshData[mesh] = { ntriangles = ntriangles }
 		plyTriangleCount:use(instance.player, ntriangles)
 		plyMeshCount:use(instance.player, 1)
 		return wrap(mesh)
@@ -829,7 +820,7 @@ if CLIENT then
 
 			local mesh = Mesh()
 			mesh:BuildFromTriangles(vertices)
-			instance.data.meshes[mesh] = { ntriangles = ntriangles }
+			meshData[mesh] = { ntriangles = ntriangles }
 			meshes[name] = wrap(mesh)
 			if threaded then thread_yield() end
 		end
@@ -845,7 +836,7 @@ if CLIENT then
 		plyMeshCount:use(instance.player, 1)
 		
 		local mesh = Mesh()
-		instance.data.meshes[mesh] = { ntriangles = 0 }
+		meshData[mesh] = { ntriangles = 0 }
 		return wrap(mesh)
 	end
 
@@ -946,7 +937,7 @@ if CLIENT then
 			mesh.Begin(prim_type, prim_count)
 		else
 			mesh_obj = unwrap(mesh_obj)
-			local mesh_tbl = instance.data.meshes[mesh_obj]
+			local mesh_tbl = meshData[mesh_obj]
 			if not mesh_tbl then SF.Throw("Tried to use invalid mesh.", 2) end
 			if mesh_tbl.ntriangles ~= 0 then SF.Throw("mesh.generate requires an empty mesh to populate.", 2) end
 			-- Seems to be opengl error, while windows can opt-in to use opengl there is no way to check i think?
@@ -1036,10 +1027,9 @@ if CLIENT then
 	-- @client
 	function mesh_methods:draw()
 		local mesh = unwrap(self)
-		local data = instance.data
-		local meshdata = data.meshes[mesh]
+		local meshdata = meshData[mesh]
 		if not meshdata then SF.Throw("Tried to use invalid mesh.", 2) end
-		if not data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+		if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 		plyTriangleRenderBurst:use(instance.player, meshdata.ntriangles)
 		mesh:Draw()
 	end
@@ -1048,9 +1038,9 @@ if CLIENT then
 	-- @client
 	function mesh_methods:destroy()
 		local mesh = unwrap(self)
-		if not instance.data.meshes[mesh] then SF.Throw("Tried to use invalid mesh.", 2) end
+		if not meshData[mesh] then SF.Throw("Tried to use invalid mesh.", 2) end
 		if meshgenerating == mesh then SF.Throw("Cannot destroy mesh currently being generated.", 2) end
-		destroyMesh(instance.player, mesh, instance.data.meshes)
+		destroyMesh(instance.player, mesh)
 	end
 end
 

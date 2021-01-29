@@ -14,13 +14,11 @@ SF.RegisterLibrary("timer")
 
 return function(instance)
 
-instance:AddHook("initialize", function()
-	instance.data.timers = {}
-	instance.data.timer_count = 0
-end)
+local timers = {}
+local timer_count = 0
 
 instance:AddHook("deinitialize", function()
-	for name, _ in pairs(instance.data.timers) do
+	for name, _ in pairs(timers) do
 		timer.Remove(name)
 	end
 end)
@@ -63,8 +61,8 @@ local function mangle_simpletimer_name()
 end
 
 local function createTimer(name, delay, reps, func, simple)
-	if instance.data.timer_count > max_timers:GetInt() then SF.Throw("Max timers exceeded!", 2) end
-	instance.data.timer_count = instance.data.timer_count + 1
+	if timer_count > max_timers:GetInt() then SF.Throw("Max timers exceeded!", 2) end
+	timer_count = timer_count + 1
 
 	local timername
 	if simple then
@@ -78,8 +76,8 @@ local function createTimer(name, delay, reps, func, simple)
 		if timerdata.reps ~= 0 then
 			timerdata.reps = timerdata.reps - 1
 			if timerdata.reps<=0 then
-				instance.data.timer_count = instance.data.timer_count - 1
-				instance.data.timers[timername] = nil
+				timer_count = timer_count - 1
+				timers[timername] = nil
 			end
 		end
 		instance:runFunction(timerdata.func)
@@ -87,7 +85,7 @@ local function createTimer(name, delay, reps, func, simple)
 
 	timer.Create(timername, math.max(delay, 0.001), reps, timerCallback)
 
-	instance.data.timers[timername] = timerdata
+	timers[timername] = timerdata
 end
 
 --- Creates (and starts) a timer
@@ -117,9 +115,9 @@ function timer_library.remove(name)
 	checkluatype(name, TYPE_STRING)
 
 	local timername = mangle_timer_name(name)
-	if instance.data.timers[timername] then
-		instance.data.timer_count = instance.data.timer_count - 1
-		instance.data.timers[timername] = nil
+	if timers[timername] then
+		timer_count = timer_count - 1
+		timers[timername] = nil
 		timer.Remove(timername)
 	end
 end
@@ -160,7 +158,7 @@ function timer_library.adjust(name, delay, reps, func)
 	checkluatype(delay, TYPE_NUMBER)
 
 	local timername = mangle_timer_name(name)
-	local data = instance.data.timers[timername]
+	local data = timers[timername]
 
 	if data then
 		if reps~=nil then checkluatype(reps, TYPE_NUMBER) data.reps = reps end
@@ -219,7 +217,7 @@ end
 --- Returns number of available timers
 -- @return Number of available timers
 function timer_library.getTimersLeft()
-	return max_timers:GetInt() - instance.data.timer_count
+	return max_timers:GetInt() - timer_count
 end
 
 end

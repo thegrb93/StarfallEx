@@ -322,17 +322,10 @@ local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap
 local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 local matrix_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
 
--- Register functions to be called when the chip is initialised and deinitialised
-instance:AddHook("initialize", function()
-	instance.data.material = {
-		usermaterials = {}
-	}
-end)
-
+local usermaterials = {}
 instance:AddHook("deinitialize", function()
-	for k, v in pairs(instance.data.material.usermaterials) do
+	for k in pairs(usermaterials) do
 		material_bank:free(instance.player, k)
-		instance.data.material.usermaterials[k] = nil
 	end
 end)
 
@@ -487,7 +480,7 @@ function material_library.create(shader)
 	if not allowed_shaders[shader] then SF.Throw("Tried to use unsupported shader: "..shader, 2) end
 	local m = material_bank:use(instance.player, shader)
 	if not m then SF.Throw("Exceeded the maximum user materials", 2) end
-	instance.data.material.usermaterials[m] = true
+	usermaterials[m] = true
 	return wrap(m)
 end
 
@@ -536,7 +529,7 @@ function material_methods:destroy()
 	sf2sensitive[self] = nil
 	dsetmeta(self, nil)
 
-	instance.data.material.usermaterials[m] = nil
+	usermaterials[m] = nil
 	material_bank:free(instance.player, m)
 end
 function lmaterial_methods:destroy()

@@ -15,13 +15,9 @@ SF.RegisterLibrary("notification")
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
-
-instance:AddHook("initialize", function()
-	instance.data.notifications = {}
-end)
-
+local notifications = {}
 instance:AddHook("deinitialize", function()
-	for n, _ in pairs(instance.data.notifications) do
+	for n, _ in pairs(notifications) do
 		notification.Kill( n )
 	end
 end)
@@ -77,7 +73,7 @@ function notification_library.addProgress(id, text)
 	end
 
 	notification.AddProgress( id, text )
-	instance.data.notifications[id] = true
+	notifications[id] = true
 end
 
 --- Removes the notification with the given index after 0.8 seconds
@@ -92,9 +88,9 @@ function notification_library.kill(id)
 
 	id = "SF:"..instance.player:SteamID64()..id
 
-	if instance.data.notifications[id] then
+	if notifications[id] then
 		notification.Kill( id )
-		instance.data.notifications[id] = nil
+		notifications[id] = nil
 	end
 end
 

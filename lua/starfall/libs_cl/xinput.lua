@@ -19,16 +19,14 @@ SF.RegisterLibrary("xinput")
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
-instance:AddHook("initialize", function()
-	instance.data.xinputRumble = {}
-	for i = 0, 3 do
-		instance.data.xinputRumble[i] = {0, 0}
-	end
-end)
+local xinputRumble = {}
+for i = 0, 3 do
+	xinputRumble[i] = {0, 0}
+end
 
 instance:AddHook("deinitialize", function()
 	for i = 0, 3 do
-		local rumble = instance.data.xinputRumble[i]
+		local rumble = xinputRumble[i]
 		if rumble[1] > 0 or rumble[2] > 0 then
 			xinput.setRumble(i, 0, 0)
 		end
@@ -91,8 +89,8 @@ function xinput_library.setRumble(id, softPercent, hardPercent)
 	checkluatype(id, TYPE_NUMBER)
 	id = math.floor(id)
 	xinput.setRumble(id, softPercent, hardPercent) -- Does the rest of the type checking
-	instance.data.xinputRumble[id][1] = softPercent
-	instance.data.xinputRumble[id][2] = hardPercent
+	xinputRumble[id][1] = softPercent
+	xinputRumble[id][2] = hardPercent
 end
 
 end

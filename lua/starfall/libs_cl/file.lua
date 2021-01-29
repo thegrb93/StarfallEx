@@ -27,13 +27,9 @@ SF.RegisterType("File", true, false)
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
--- Register functions to be called when the chip is initialised and deinitialised
-instance:AddHook("initialize", function()
-	instance.data.files = {}
-end)
-
+local files = {}
 instance:AddHook("deinitialize", function()
-	for file, _ in pairs(instance.data.files) do
+	for file, _ in pairs(files) do
 		file:Close()
 	end
 end)
@@ -53,7 +49,7 @@ function file_library.open(path, mode)
 	checkluatype (mode, TYPE_STRING)
 	local f = file.Open("sf_filedata/" .. SF.NormalizePath(path), mode, "DATA")
 	if f then
-		instance.data.files[f] = true
+		files[f] = true
 		return wrap(f)
 	end
 end
@@ -158,7 +154,7 @@ end
 --- Flushes and closes the file. The file must be opened again to use a new file object.
 function file_methods:close()
 	local f = unwrap(self)
-	instance.data.files[f] = nil
+	files[f] = nil
 	f:Close()
 end
 

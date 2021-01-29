@@ -84,15 +84,10 @@ SF.RegisterType("Light", true, false)
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
-
--- Register functions to be called when the chip is initialised and deinitialised
-instance:AddHook("initialize", function()
-	instance.data.light = {lights={}}
-end)
-
+local lights = {}
+instance.data.light = {lights = lights}
 instance:AddHook("deinitialize", function()
-	local lights = instance.data.light.lights
-	for light, _ in pairs(lights) do
+	for light in pairs(lights) do
 		gSFLights[light.slot] = nil
 	end
 end)
@@ -111,7 +106,7 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 -- @param color The color of the light
 -- @return Dynamic light
 function light_library.create(pos, size, brightness, color)
-	if table.Count(instance.data.light.lights) >= 256 then SF.Throw("Too many lights have already been allocated (max 256)", 2) end
+	if table.Count(lights) >= 256 then SF.Throw("Too many lights have already been allocated (max 256)", 2) end
 	if maxSize:GetFloat() == 0 then SF.Throw("sf_light_maxsize is set to 0", 2) end
 	checkpermission(instance, nil, "light.create")
 	checkluatype(size, TYPE_NUMBER)
@@ -126,7 +121,7 @@ function light_library.create(pos, size, brightness, color)
 		dietime = 1
 	}
 
-	instance.data.light.lights[light] = true
+	lights[light] = true
 	gSFLights[slot] = light
 
 	return wrap(light)
