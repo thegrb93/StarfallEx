@@ -2146,9 +2146,11 @@ end
 -- @param number frequency (Hz)
 -- @param number duration, Max 10 seconds.
 function render_library.screenShake(amplitude, frequency, duration)
-	if instance:isHUDActive() then
-		util.ScreenShake(Vector(0, 0, 0), amplitude, frequency, math.Clamp(duration, 0, 10), 0)
-	end
+	checkluatype (amplitude, TYPE_NUMBER)
+	checkluatype (frequency, TYPE_NUMBER)
+	checkluatype (duration, TYPE_NUMBER)
+	if not instance:isHUDActive() then SF.Throw("Player isn't connected to HUD!", 2) end
+	util.ScreenShake(Vector(0, 0, 0), amplitude, frequency, math.Clamp(duration, 0, 10), 0)
 end
 
 end
