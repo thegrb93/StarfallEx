@@ -521,12 +521,14 @@ end
 
 if CLIENT then
 	--- Returns the relationship of the player to the local client
+	-- @client
 	-- @return One of: "friend", "blocked", "none", "requested"
 	function player_methods:getFriendStatus()
 		return getply(self):GetFriendStatus()
 	end
 
 	--- Returns whether the local player has muted the player
+	-- @client
 	-- @return True if the player was muted
 	function player_methods:isMuted()
 		return getply(self):IsMuted()
