@@ -13,9 +13,9 @@ registerprivilege("file.open", "Get a file object", "Allows the user to use a fi
 file.CreateDir("sf_filedata/")
 file.CreateDir("sf_filedatatemp/")
 
-local cv_temp_maxfiles = CreateConVar("sf_file_tempmax", "256", { FCVAR_ARCHIVE }, "The max number of files a player can store")
-local cv_temp_maxusersize = CreateConVar("sf_file_tempmaxusersize", "64", { FCVAR_ARCHIVE }, "The max total of megabytes a player can store")
-local cv_temp_maxsize = CreateConVar("sf_file_tempmaxsize", "128", { FCVAR_ARCHIVE }, "The max total of megabytes allowed in cache")
+local cv_temp_maxfiles = CreateConVar("sf_file_tempmax", "256", { FCVAR_ARCHIVE }, "The max number of files a player can store in temp")
+local cv_temp_maxusersize = CreateConVar("sf_file_tempmaxusersize", "64", { FCVAR_ARCHIVE }, "The max total of megabytes a player can store in temp")
+local cv_temp_maxsize = CreateConVar("sf_file_tempmaxsize", "128", { FCVAR_ARCHIVE }, "The max total of megabytes allowed in temp")
 
 --- File functions. Allows modification of files.
 -- @name file
@@ -163,7 +163,7 @@ local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check
 local files = {}
 local tempfilewrites = 0
 instance:AddHook("deinitialize", function()
-	for file, _ in pairs(files) do
+	for file in pairs(files) do
 		file:Close()
 	end
 end)
