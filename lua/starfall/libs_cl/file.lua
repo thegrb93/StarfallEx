@@ -4,12 +4,18 @@ local registerprivilege = SF.Permissions.registerPrivilege
 -- Register privileges
 registerprivilege("file.read", "Read files", "Allows the user to read files from data/sf_filedata directory", { client = { default = 1 } })
 registerprivilege("file.write", "Write files", "Allows the user to write files to data/sf_filedata directory", { client = { default = 1 } })
+registerprivilege("file.writeTemp", "Write temporary files", "Allows the user to write temp files to data/sf_filedatatemp directory", { client = { default = 1 } })
 registerprivilege("file.exists", "File existence check", "Allows the user to determine whether a file in data/sf_filedata exists", { client = { default = 1 } })
 registerprivilege("file.find", "File find", "Allows the user to see what files are in data/sf_filedata", { client = { default = 1 } })
 registerprivilege("file.findInGame", "File find in garrysmod", "Allows the user to see what files are in garrysmod", { client = { default = 1 } })
 registerprivilege("file.open", "Get a file object", "Allows the user to use a file object", { client = { default = 1 } })
 
 file.CreateDir("sf_filedata/")
+file.CreateDir("sf_filedatatemp/")
+
+local cv_temp_maxfiles = CreateConVar("sf_file_tempmax", "256", { FCVAR_ARCHIVE }, "The max number of files a player can store in temp")
+local cv_temp_maxusersize = CreateConVar("sf_file_tempmaxusersize", "64", { FCVAR_ARCHIVE }, "The max total of megabytes a player can store in temp")
+local cv_temp_maxsize = CreateConVar("sf_file_tempmaxsize", "128", { FCVAR_ARCHIVE }, "The max total of megabytes allowed in temp")
 
 --- File functions. Allows modification of files.
 -- @name file
@@ -24,12 +30,140 @@ SF.RegisterLibrary("file")
 SF.RegisterType("File", true, false)
 
 
+-- Temp file cache class
+local TempFileCache = {}
+do
+	function TempFileCache:Initialize()
+		local entries = {}
+		local files, dirs = file.Find("sf_filedatatemp/*", "DATA")
+		for k, plyid in ipairs(dirs) do
+			local dir = "sf_filedatatemp/"..plyid
+			files = file.Find(dir.."/*", "DATA")
+			if next(files)==nil then SF.DeleteFolder(dir) else
+				for k, filen in ipairs(files) do
+					local path = dir.."/"..filen
+					local time, size = file.Time(path, "DATA"), file.Size(path, "DATA")
+					entries[path] = {path = path, plyid = plyid, time = time, size = size}
+				end
+			end
+		end
+		self.entries = entries
+	end
+
+	function TempFileCache:Write(plyid, filename, data)
+		local dir = "sf_filedatatemp/"..plyid
+		local path = dir.."/"..filename
+		local ok, reason = self:CheckSize(plyid, path, #data)
+		if ok then
+			if self.entries[path] then
+				file.Delete(path)
+				if file.Exists(path, "DATA") then SF.Throw("The existing file is currently locked!", 3) end
+			end
+			self.entries[path] = {path = path, plyid = plyid, time = os.time(), size = #data}
+			file.CreateDir(dir)
+			print("[SF] Writing temp file: " .. path)
+			local f = file.Open(path, "wb", "DATA")
+			if not f then SF.Throw("Couldn't open file for writing!", 3) end
+			f:Write(data)
+			f:Close()
+			return "data/"..path
+		else
+			SF.Throw(reason, 3)
+		end
+	end
+
+	function TempFileCache:CheckSize(plyid, path, size)
+		local plyentries = {}
+		local plysize = size
+		local plycount = 1
+		local totalsize = size
+		for k, v in pairs(self.entries) do
+			if k~=path then
+				if v.plyid == plyid then
+					plycount = plycount + 1
+					plysize = plysize + v.size
+					plyentries[#plyentries+1] = v
+				end
+				totalsize = totalsize + v.size
+			end
+		end
+
+		local check = {plyentries = plyentries, plysize = plysize, plycount = plycount, totalsize = totalsize}
+		if check.plycount >= cv_temp_maxfiles:GetInt() then
+			self:CleanPly(check)
+			if check.plycount >= cv_temp_maxfiles:GetInt() then
+				return false, "Reached the file count limit!"
+			end
+		end
+		if check.plysize >= cv_temp_maxusersize:GetFloat()*1e6 then
+			self:CleanPly(check)
+			if check.plysize >= cv_temp_maxusersize:GetFloat()*1e6 then
+				return false, "Your temp file folder is full!"
+			end
+		end
+		if check.totalsize >= cv_temp_maxsize:GetFloat()*1e6 then
+			self:Clean(check)
+			if check.totalsize >= cv_temp_maxsize:GetFloat()*1e6 then
+				return false, "The temp file cache has reached its limit!"
+			end
+		end
+		return true
+	end
+
+	-- Clean based on the file count and per player size limit
+	function TempFileCache:CleanPly(check)
+		-- Sort by time
+		table.sort(check.plyentries, function(a,b) return a.time>b.time end)
+
+		while (check.plycount >= cv_temp_maxfiles:GetInt() or check.plysize >= cv_temp_maxusersize:GetFloat()*1e6) and #check.plyentries>0 do
+			local entry = table.remove(check.plyentries)
+			file.Delete(entry.path)
+			if not file.Exists(entry.path, "DATA") then
+				check.plysize = check.plysize - entry.size
+				check.plycount = check.plycount - 1
+				self.entries[entry.path] = nil
+			end
+		end
+	end
+
+	-- Clean based on the total size limit
+	function TempFileCache:CleanAll(check)
+		-- First sort by players not connected
+		local connectedplys = {}
+		local disconnectedplys = {}
+		for path, v in pairs(self.entries) do
+			if player.GetBySteamID64(v.plyid) then
+				connectedplys[#connectedplys+1] = v
+			else
+				disconnectedplys[#disconnectedplys+1] = v
+			end
+		end
+		-- Sort by time
+		table.sort(connectedplys, function(a,b) return a.time>b.time end)
+		table.sort(disconnectedplys, function(a,b) return a.time>b.time end)
+		local sorted = table.Add(connectedplys, disconnectedplys)
+
+		while check.totalsize >= cv_temp_maxsize:GetFloat()*1e6 and #sorted>0 do
+			local entry = table.remove(sorted)
+			file.Delete(entry.path)
+			if not file.Exists(entry.path, "DATA") then
+				check.totalsize = check.totalsize - entry.size
+				self.entries[entry.path] = nil
+			end
+		end
+	end
+
+	TempFileCache:Initialize()
+end
+
+
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 local files = {}
+local tempfilewrites = 0
 instance:AddHook("deinitialize", function()
-	for file, _ in pairs(files) do
+	for file in pairs(files) do
 		file:Close()
 	end
 end)
@@ -63,6 +197,12 @@ function file_library.read(path)
 	return file.Read("sf_filedata/" .. SF.NormalizePath(path), "DATA")
 end
 
+
+local allowedExtensions = {["txt"]=true,["dat"]=true,["json"]=true,["xml"]=true,["csv"]=true,["jpg"]=true,["jpeg"]=true,["png"]=true,["vtf"]=true,["vmt"]=true,["mp3"]=true,["wav"]=true,["ogg"]=true}
+local function checkExtension(filename)
+	if not allowedExtensions[string.GetExtensionFromFilename(filename)] then SF.Throw("Invalid file extension!", 3) end
+end
+
 --- Writes to a file
 -- @param path Filepath relative to data/sf_filedata/.
 -- @param data The data to write
@@ -72,10 +212,48 @@ function file_library.write(path, data)
 	checkluatype (path, TYPE_STRING)
 	checkluatype (data, TYPE_STRING)
 
+	checkExtension(path)
+
 	local f = file.Open("sf_filedata/" .. SF.NormalizePath(path), "wb", "DATA")
 	if not f then SF.Throw("Couldn't open file for writing.", 2) return end
 	f:Write(data)
 	f:Close()
+end
+
+--- Writes a temporary file. Throws an error if it is unable to.
+-- @param filename The name to give the file. Must be only a file and not a path
+-- @param data The data to write
+-- @return The generated path for your temp file
+function file_library.writeTemp(filename, data)
+	checkluatype(filename, TYPE_STRING)
+	checkluatype(data, TYPE_STRING)
+
+	checkpermission (instance, nil, "file.writeTemp")
+	if tempfilewrites >= cv_temp_maxfiles:GetInt() then SF.Throw("Exceeded max number of files allowed to write!", 2) end
+
+	if #filename > 128 then SF.Throw("Filename is too long!", 2) end
+	checkExtension(filename)
+	filename = string.lower(string.GetFileFromFilename(filename))
+
+	local path = TempFileCache:Write(instance.player:SteamID64(), filename, data)
+	tempfilewrites = tempfilewrites + 1
+	return path
+end
+
+--- Returns the path of a temp file if it exists. Otherwise returns nil
+-- @param filename The temp file name. Must be only a file and not a path
+-- @return The path to the temp file or nil if it doesn't exist
+function file_library.existsTemp(filename)
+	checkluatype(filename, TYPE_STRING)
+
+	if #filename > 128 then SF.Throw("Filename is too long!", 2) end
+	checkExtension(filename)
+	filename = string.lower(string.GetFileFromFilename(filename))
+
+	local path = "sf_filedatatemp/"..instance.player:SteamID64().."/"..filename
+	if file.Exists(path, "DATA") then
+		return "data/"..path
+	end
 end
 
 --- Appends a string to the end of a file

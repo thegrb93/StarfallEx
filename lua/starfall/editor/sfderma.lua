@@ -381,23 +381,7 @@ function PANEL:DoRightClick(node)
 					"Delete",
 					function ()
 						-- Recursive delete
-						local folders = {}
-						folders[#folders + 1] = node:GetFolder()
-						while #folders > 0 do
-							local folder = folders[#folders]
-							local files, directories = file.Find(folder.."/*", "DATA")
-							for I = 1, #files do
-								file.Delete(folder .. "/" .. files[I])
-							end
-							if #directories == 0 then
-								file.Delete(folder)
-								folders[#folders] = nil
-							else
-								for I = 1, #directories do
-									folders[#folders + 1] = folder .. "/" .. directories[I]
-								end
-							end
-						end
+						SF.DeleteFolder(node:GetFolder())
 						SF.AddNotify(LocalPlayer(), "Folder deleted: " .. node:GetFolder(), "GENERIC", 7, "DRIP3")
 						self:ReloadTree()
 					end,
