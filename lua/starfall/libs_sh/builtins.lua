@@ -988,7 +988,7 @@ function builtins_library.enableHud(ply, active)
 	ply = SERVER and getply(ply) or LocalPlayer()
 	checkluatype(active, TYPE_BOOL)
 
-	if ply==instance.player or instance.player==SF.SuperUser or (not active and SF.IsHUDActive(instance.entity)) then
+	if ply==instance.player or instance.player==SF.SuperUser or (not active and SF.IsHUDActive(instance.entity, ply)) then
 		SF.EnableHud(ply, instance.entity, nil, active)
 	else
 		local vehicle = ply:GetVehicle()
