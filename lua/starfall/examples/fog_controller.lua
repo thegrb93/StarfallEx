@@ -31,5 +31,5 @@ hook.add("SetupWorldFog", "", setupFog)
 hook.add("SetupSkyboxFog", "", setupFog)
 
 if player() == owner() then
-    render.setHUDActive(true)
+    enableHud(nil, true)
 end

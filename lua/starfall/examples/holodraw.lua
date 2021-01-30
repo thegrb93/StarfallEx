@@ -54,7 +54,7 @@ if CLIENT then
     end)
     
     if player() == owner() then
-        render.setHUDActive(true)
+        enableHud(nil, true)
     end
 else
     

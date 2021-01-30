@@ -180,7 +180,7 @@ else
         if key == KEY.E then changeMode() end
     end)
     
-    if player() == owner() then render.setHUDActive(true) end
+    if player() == owner() then enableHud(nil, true) end
     hook.add("DrawHUD", "", function()
         if not current_mode then
             render.setColor(Color(255,255,255))
