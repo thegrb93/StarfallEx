@@ -309,6 +309,19 @@ if CLIENT then
 		return SF.Permissions.permissionRequestSatisfied( instance )
 	end
 
+	local sentPermRequest = false
+	--- Opens the permission request dialogue if the player is connected to HUD. setupPermissionRequest must be called first
+	--@client
+	function builtins_library.sendPermissionRequest()
+		if not SF.IsHUDActive(instance.entity) then SF.Throw("Player isn't connected to HUD!", 2) end
+		if sentPermRequest then SF.Throw("Can only send the permission request once!", 2) end
+		if instance.permissionRequest and not SF.Permissions.permissionRequestSatisfied( instance ) then
+			sentPermRequest = true
+			local pnl = vgui.Create("SFChipPermissions")
+			if pnl then pnl:OpenForChip(instance.entity) end
+		end
+	end
+
 end
 
 
