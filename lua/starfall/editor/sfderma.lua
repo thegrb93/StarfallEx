@@ -1068,3 +1068,129 @@ function PANEL:GetColor(...)
 	return self.mixer:GetColor(...)
 end
 vgui.Register( "StarfallColorPicker", PANEL, "StarfallFrame" )
+
+
+PANEL = {}
+
+local fontCache = {}
+function PANEL:getFont(tab)
+	local font = tab.font or "Arial"
+	local extended = tab.extended and 1 or 0
+	local size = tab.size or 13
+	local weight = tab.weight or 500
+	local blursize = tab.blursize or 0
+	local scanlines = tab.scanlines or 0
+	local antialias = (tab.antialias != false) and 1 or 0
+	local underline = tab.underline and 1 or 0
+	local italic = tab.italic and 1 or 0
+	local strikeout = tab.strikeout and 1 or 0
+	local symbol = tab.symbol and 1 or 0
+	local rotary = tab.rotary and 1 or 0
+	local shadow = tab.shadow and 1 or 0
+	local additive = tab.additive and 1 or 0
+	local outline = tab.outline and 1 or 0
+	local fontname = string.format("sf_%s_%f_%f_%f_%f_%f_%f_%f_%f_%f_%f_%f_%f_%f_%f", font, extended, size, weight, blursize, scanlines, antialias, underline, italic, strikeout, symbol, rotary, shadow, additive, outline)
+	if not fontCache[fontname] then
+		surface.CreateFont( fontname, tab )
+		fontCache[fontname] = true
+	end
+	return fontname
+end
+
+function PANEL:Init()
+	local preview = vgui.Create( "DPanel", self )
+	preview:Dock(TOP)
+	preview:SetTall(100)
+	preview.Paint = function()
+		draw.SimpleText( "This is font preview", self.Font)
+	end
+	self.preview = preview
+
+	local form = vgui.Create("DForm", self)
+	form:Dock(FILL)
+	form.Header:SetVisible(false)
+	form.Paint = function () end
+	form.PerformLayout = function() end
+	local _old = form.AddItem
+	form.AddItem = function(form, left, right)
+		_old(form,left,right)
+		if left then
+			if left.SetDark then left:SetDark(false) end
+		end
+		if right then
+			if right.SetDark then right:SetDark(false) end
+		end
+
+		return left,right
+	end
+
+	self.FontData = {
+		font = "Arial",
+		extended = false,
+		size = 13,
+		weight = 500,
+		blursize = 0,
+		scanlines = 0,
+		antialias = true,
+		underline = false,
+		italic = false,
+		strikeout = false,
+		symbol = false,
+		rotary = false,
+		shadow = false,
+		additive = false,
+		outline = false,
+	}
+
+	local function setupItem(item, name)
+		item:SetValue(self.FontData[name])
+		item.OnChange = function(_, val)
+			if val != nil then
+				self.FontData[name] = val
+			else
+				self.FontData[name] = item:GetValue()
+			end
+		end
+	end
+
+	setupItem(form:TextEntry("Font Name:"), "font")
+	setupItem(form:NumberWang("Size:", nil, 1, 100), "size")
+	setupItem(form:NumberWang("Weight:", nil, 0, 1000), "weight")
+	setupItem(form:NumberWang("Blur size:", nil, 0, 100, 2), "blursize")
+	setupItem(form:NumberWang("Scanlines:", nil, 0, 100, 2), "scanlines")
+	setupItem(form:CheckBox("Extended:"), "extended")
+	setupItem(form:CheckBox("antialias:"), "antialias")
+	setupItem(form:CheckBox("underline:"), "underline")
+	setupItem(form:CheckBox("italic:"), "italic")
+	setupItem(form:CheckBox("strikeout:"), "strikeout")
+	setupItem(form:CheckBox("symbol:"), "symbol")
+	setupItem(form:CheckBox("rotary:"), "rotary")
+	setupItem(form:CheckBox("shadow:"), "shadow")
+	setupItem(form:CheckBox("additive:"), "additive")
+	setupItem(form:CheckBox("outline:"), "outline")
+	form:Button("Preview").DoClick = function()
+		self.Font = self:getFont(self.FontData)
+	end
+	form:Button("Copy Code").DoClick = function()
+		SetClipboardText("render.createFont("..table.concat({
+			"\""..self.FontData.font.."\"",
+			self.FontData.size,
+			self.FontData.weight,
+			tostring(self.FontData.antialias),
+			-- tostring(self.FontData.scanlines,
+			-- tostring(self.FontData.underline,
+			-- tostring(self.FontData.italic,
+			-- tostring(self.FontData.strikeout,
+			-- tostring(self.FontData.symbol,
+			-- tostring(self.FontData.rotary,
+			tostring(self.FontData.additive),
+			tostring(self.FontData.shadow),
+			tostring(self.FontData.outline),
+			self.FontData.blursize,
+			tostring(self.FontData.extended)},",")..")")
+	end
+	self:SetSize(300,600)
+	self:Center()
+end
+
+vgui.Register( "StarfallFontPicker", PANEL, "StarfallFrame" )
