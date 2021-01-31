@@ -514,6 +514,13 @@ if SERVER then
 	function player_methods:getPacketLoss()
 		return getply(self):PacketLoss()
 	end
+	
+	--- Returns the time in seconds since the player connected
+	-- @server
+	-- @return number Time
+	function player_methods:getTimeConnected()
+		return getply(self):TimeConnected()
+	end
 end
 
 --- Returns whether or not the player is pushing the key.
