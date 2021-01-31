@@ -507,6 +507,13 @@ if SERVER then
 
 		ent:SetEyeAngles(ang)
 	end
+	
+	--- Returns the packet loss of the client
+	-- @server
+	-- @return number Packets lost
+	function player_methods:getPacketLoss()
+		return getply(self):PacketLoss()
+	end
 end
 
 --- Returns whether or not the player is pushing the key.
