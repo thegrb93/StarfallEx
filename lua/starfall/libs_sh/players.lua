@@ -517,9 +517,16 @@ if SERVER then
 	
 	--- Returns the time in seconds since the player connected
 	-- @server
-	-- @return number Time
+	-- @return number Time connected
 	function player_methods:getTimeConnected()
 		return getply(self):TimeConnected()
+	end
+	
+	--- Returns the number of seconds that the player has been timing out for
+	-- @server
+	-- @return number Timeout seconds
+	function player_methods:getTimeoutSeconds()
+		return getply(self):GetTimeoutSeconds()
 	end
 end
 
