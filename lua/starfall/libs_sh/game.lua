@@ -87,13 +87,13 @@ if CLIENT then
 	-- @return boolean True if the game is focused
 	game_library.hasFocus = system.HasFocus
 	
-	--- Returns the direction and how obstructed the map's sun is
+	--- Returns the direction and how obstructed the map's sun is or nil if it doesn't exist
 	-- @client
 	-- @return vector The direction of the sun
 	-- @return number How obstructed the sun is 0 to 1.
 	function game_library.getSunInfo()
 		local info = util.GetSunInfo()
-		return vwrap(info.direction), info.obstruction
+		if info then return vwrap(info.direction), info.obstruction end
 	end
 end
 
