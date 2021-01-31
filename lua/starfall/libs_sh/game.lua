@@ -93,7 +93,7 @@ if CLIENT then
 	-- @return number How obstructed the sun is 0 to 1.
 	function game_library.getSunInfo()
 		local info = util.GetSunInfo()
-		return vwrap(info.direction), info.obstruction
+		if info then return vwrap(info.direction), info.obstruction end
 	end
 end
 
