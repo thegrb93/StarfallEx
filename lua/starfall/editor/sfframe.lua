@@ -1673,7 +1673,6 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
 	self.C.Browser.tree:Setup(nLocation)
 
 	local SFHelp = vgui.Create("StarfallButton", self.C.ButtonHolder)
-	-- SFHelp:SetSize(58, 20)
 	SFHelp:DockMargin(2, 0, 0, 0)
 	SFHelp:Dock(RIGHT)
 	SFHelp:SetText("SFHelper")
@@ -1697,7 +1696,6 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
 
 	-- Add "Sound Browser" button
 	local SoundBrw = vgui.Create("StarfallButton", self.C.ButtonHolder)
-	-- SoundBrw:SetSize(85, 20)
 	SoundBrw:DockMargin(2, 0, 0, 0)
 	SoundBrw:Dock(RIGHT)
 	SoundBrw:SetText("Sound Browser")
@@ -1717,7 +1715,6 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
 
 	--Add "Model Viewer" button
 	local FontEditor = vgui.Create("StarfallButton", self.C.ButtonHolder)
-	-- FontEditor:SetSize(85, 20)
 	FontEditor:DockMargin(2, 0, 0, 0)
 	FontEditor:Dock(RIGHT)
 	FontEditor:SetText("Font Editor")
