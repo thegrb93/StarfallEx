@@ -784,7 +784,7 @@ function Editor:InitComponents()
 			end
 		}, "DButton")
 
-	self.C.ButtonHolder = self:AddComponent(vgui.Create("DPanel", self), -270-4, 4, 270, 22) -- Upper menu
+	self.C.ButtonHolder = self:AddComponent(vgui.Create("DPanel", self), -400-4, 4, 400, 22) -- Upper menu
 	self.C.ButtonHolder.Paint = function() end
 	-- AddComponent( panel, x, y, w, h )
 	-- if x, y, w, h is minus, it will stay relative to right or buttom border
@@ -1673,7 +1673,7 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
 	self.C.Browser.tree:Setup(nLocation)
 
 	local SFHelp = vgui.Create("StarfallButton", self.C.ButtonHolder)
-	SFHelp:SetSize(58, 20)
+	-- SFHelp:SetSize(58, 20)
 	SFHelp:DockMargin(2, 0, 0, 0)
 	SFHelp:Dock(RIGHT)
 	SFHelp:SetText("SFHelper")
@@ -1697,20 +1697,16 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
 
 	-- Add "Sound Browser" button
 	local SoundBrw = vgui.Create("StarfallButton", self.C.ButtonHolder)
-	SoundBrw:SetSize(85, 20)
+	-- SoundBrw:SetSize(85, 20)
 	SoundBrw:DockMargin(2, 0, 0, 0)
 	SoundBrw:Dock(RIGHT)
 	SoundBrw:SetText("Sound Browser")
 	SoundBrw.DoClick = function() RunConsoleCommand("wire_sound_browser_open") end
 	self.C.SoundBrw = SoundBrw
 
-	self:NewTab()
-	if Editor.OpenOldTabsVar:GetBool() then
-		self:OpenOldTabs()
-	end
 	--Add "Model Viewer" button
 	local ModelViewer = vgui.Create("StarfallButton", self.C.ButtonHolder)
-	ModelViewer:SetSize(85, 20)
+	-- ModelViewer:SetSize(85, 20)
 	ModelViewer:DockMargin(2, 0, 0, 0)
 	ModelViewer:Dock(RIGHT)
 	ModelViewer:SetText("Model Viewer")
@@ -1719,6 +1715,28 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
 	end
 	self.C.ModelViewer = ModelViewer
 
+	--Add "Model Viewer" button
+	local FontEditor = vgui.Create("StarfallButton", self.C.ButtonHolder)
+	-- FontEditor:SetSize(85, 20)
+	FontEditor:DockMargin(2, 0, 0, 0)
+	FontEditor:Dock(RIGHT)
+	FontEditor:SetText("Font Editor")
+	FontEditor.DoClick = function()
+		if self.fontEditor and self.fontEditor:IsValid() then return end
+
+		self.fontEditor = vgui.Create("StarfallFontPicker")
+		self.fontEditor:SetTitle( "Font Editor" )
+		self.fontEditor:SetSizable(true)
+		self.fontEditor:SetDeleteOnClose(true)
+		self.fontEditor:Open()
+	end
+	self.C.FontEditor = FontEditor
+
+
+	self:NewTab()
+	if Editor.OpenOldTabsVar:GetBool() then
+		self:OpenOldTabs()
+	end
 	self:InvalidateLayout()
 
 end

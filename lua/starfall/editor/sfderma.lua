@@ -1072,6 +1072,31 @@ vgui.Register( "StarfallColorPicker", PANEL, "StarfallFrame" )
 
 PANEL = {}
 
+local fontCache = {}
+function PANEL:getFont(tab)
+	local font = tab.font or "Arial"
+	local extended = tab.extended and 1 or 0
+	local size = tab.size or 13
+	local weight = tab.weight or 500
+	local blursize = tab.blursize or 0
+	local scanlines = tab.scanlines or 0
+	local antialias = (tab.antialias != false) and 1 or 0
+	local underline = tab.underline and 1 or 0
+	local italic = tab.italic and 1 or 0
+	local strikeout = tab.strikeout and 1 or 0
+	local symbol = tab.symbol and 1 or 0
+	local rotary = tab.rotary and 1 or 0
+	local shadow = tab.shadow and 1 or 0
+	local additive = tab.additive and 1 or 0
+	local outline = tab.outline and 1 or 0
+	local fontname = string.format("sf_%s_%f_%f_%f_%f_%f_%f_%f_%f_%f_%f_%f_%f_%f_%f", font, extended, size, weight, blursize, scanlines, antialias, underline, italic, strikeout, symbol, rotary, shadow, additive, outline)
+	if not fontCache[fontname] then
+		surface.CreateFont( fontname, tab )
+		fontCache[fontname] = true
+	end
+	return fontname
+end
+
 function PANEL:Init()
 	local preview = vgui.Create( "DPanel", self )
 	preview:Dock(TOP)
@@ -1080,7 +1105,6 @@ function PANEL:Init()
 		draw.SimpleText( "This is font preview", self.Font)
 	end
 	self.preview = preview
-
 
 	local form = vgui.Create("DForm", self)
 	form:Dock(FILL)
@@ -1145,9 +1169,27 @@ function PANEL:Init()
 	setupItem(form:CheckBox("additive:"), "additive")
 	setupItem(form:CheckBox("outline:"), "outline")
 	form:Button("Preview").DoClick = function()
-		self.Font = SF.Editor.getFont(self.FontData)
+		self.Font = self:getFont(self.FontData)
 	end
-	self:SetSize(300,500)
+	form:Button("Copy Code").DoClick = function()
+		SetClipboardText("render.createFont("..table.concat({
+			"\""..self.FontData.font.."\"",
+			self.FontData.size,
+			self.FontData.weight,
+			tostring(self.FontData.antialias),
+			-- tostring(self.FontData.scanlines,
+			-- tostring(self.FontData.underline,
+			-- tostring(self.FontData.italic,
+			-- tostring(self.FontData.strikeout,
+			-- tostring(self.FontData.symbol,
+			-- tostring(self.FontData.rotary,
+			tostring(self.FontData.additive),
+			tostring(self.FontData.shadow),
+			tostring(self.FontData.outline),
+			self.FontData.blursize,
+			tostring(self.FontData.extended)},",")..")")
+	end
+	self:SetSize(300,600)
 	self:Center()
 end
 
