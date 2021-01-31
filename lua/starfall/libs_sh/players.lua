@@ -535,6 +535,18 @@ if SERVER then
 	function player_methods:isTimingOut()
 		return getply(self):IsTimingOut()
 	end
+	
+	--- Forces the player to say the first argument
+	-- Only works on the chip's owner.
+	-- @server
+	-- @param text The text to force the player to say
+	-- @param teamOnly bool Team chat only?, Defaults to false.
+	function player_methods:say(text, teamOnly)
+		checkluatype(text, TYPE_STRING)
+		local ply = getply(self)
+		if instance.player ~= ply then SF.Throw("This function can only be used on yourself!", 2) end
+		ply:Say(text, teamOnly) 
+	end
 end
 
 --- Returns whether or not the player is pushing the key.
