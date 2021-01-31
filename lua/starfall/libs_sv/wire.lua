@@ -642,7 +642,7 @@ wire_library.ports = setmetatable({}, {
 	__index = function(self, name)
 		local input = instance.entity.Inputs[name]
 		if input then
-			if data.wirecache[name]==input.Value then return data.wirecachevals[name] end
+			if wirecache[name]==input.Value then return wirecachevals[name] end
 			local ret = inputConverters[input.Type](input.Value)
 			wirecache[name] = input.Value
 			wirecachevals[name] = ret
