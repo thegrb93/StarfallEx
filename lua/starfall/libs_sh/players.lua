@@ -528,6 +528,13 @@ if SERVER then
 	function player_methods:getTimeoutSeconds()
 		return getply(self):GetTimeoutSeconds()
 	end
+	
+	--- Returns true if the player is timing out
+	-- @server
+	-- @return bool isTimingOut
+	function player_methods:isTimingOut()
+		return getply(self):IsTimingOut()
+	end
 end
 
 --- Returns whether or not the player is pushing the key.
