@@ -407,7 +407,7 @@ end
 
 -- TODO: Fix this function
 local function extractNameFromCode(str)
-	return str:match("@name ([^\r\n]+)")
+	return str:match("@name +([^\r\n]+)")
 end
 
 local function getPreferredTitles(Line, code)

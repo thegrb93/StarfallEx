@@ -230,39 +230,13 @@ function TOOL:Think()
 end
 
 if CLIENT then
-	--[[	TODO
-		
-			for editor script:
-		- display @name directive instead of filepath
-		- display realm
-		
-			for instance chip:
-		- display name, authros, ops
-		
-		- better particles
-		- search for a good font, mb starfall already has some good ones
-		- mb turn off world tooltip for sf chips, optional turned off by default tho
-		- convar to disable custom screen
-		- loads of optimization
-		
-	]]--
 	
 	surface.CreateFont("StarfallToolTitle", {
 		font = "Arial",
 		extended = false,
 		size = 64,
 		weight = 500,
-		blursize = 0,
-		scanlines = 0,
 		antialias = true,
-		underline = false,
-		italic = false,
-		strikeout = false,
-		symbol = false,
-		rotary = false,
-		shadow = false,
-		additive = false,
-		outline = false,
 	})
 	
 	surface.CreateFont("StarfallToolSmall", {
@@ -270,71 +244,35 @@ if CLIENT then
 		extended = false,
 		size = 35,
 		weight = 500,
-		blursize = 0,
-		scanlines = 0,
 		antialias = true,
-		underline = false,
-		italic = false,
-		strikeout = false,
-		symbol = false,
-		rotary = false,
-		shadow = false,
-		additive = false,
-		outline = false,
 	})
 	
-	local colors = {
-		bg = Color(33,33,33, 50),
-		fg = Color(255,255,255),
-		sf = Color(20,100,255),
-		sv = Color(0,161,255),
-		cl = Color(255,191,0),
-	}
+	local bgcolor = Color(33,33,33,50)
 	
-	local function setRandomFlake(flake, frac, prvVel, fromBottom)
-		flake.y = fromBottom and math.random(255+30,255+60) or math.random(-30,-60)
-		--flake.x = 235/self.starCount*id
-		flake.x = 255 * frac
-		flake.xvel = prvVel * 0.3 + math.Rand(-0.1,0.1)
-		flake.yvel = math.Rand(0.5,1) * (fromBottom and -1 or 1)
-		flake.ang = math.Rand(0.5, 1)
-		flake.angvel = math.Rand(0.5, 1)
-		flake.size = math.random(50,80)
-		flake.color = Color(math.random(0,40), math.random(120,190), math.random(200,255))
+	local function setRandomStar(star, frac, prvVel, y)
+		star.y = math.random(y-15,y+15)
+		--star.x = 235/self.starCount*id
+		star.x = 255 * frac
+		star.xvel = prvVel * 0.3 + math.Rand(-0.1,0.1)
+		star.yvel = math.Rand(0.5,1) * (fromBottom and -1 or 1)
+		star.ang = math.Rand(0.5, 1)
+		star.angvel = math.Rand(0.5, 1)
+		star.size = math.random(50,80)
+		star.color = Color(math.random(0,40), math.random(120,190), math.random(200,255))
 	end
 	
 	function TOOL:Deploy()
 		self.starCount = 8
-		self.starflakes = {}
+		self.stars = {}
 		
 		for i = 1, self.starCount do
-			local flake = {}
-			setRandomFlake(flake, i / self.starCount, 0)
-			self.starflakes[i] = flake
+			local star = {}
+			setRandomStar(star, i / self.starCount, 0, math.random(0, 255))
+			self.stars[i] = star
 		end
 		
 		self.prvEyeYaw = 0
 		self.deployed = true
-	end
-	
-	local fileData = nil
-	local function updateFileData()
-		
-		local path = SF.Editor.getOpenFile()
-		if not path then return end
-		
-		local file = file.Read("starfall/"..path, "DATA")
-		if not file then return end
-		
-		local ppdata = {}
-		SF.Preprocessor.ParseDirectives("v", file, ppdata)
-		
-		fileData = {
-			name   = ppdata.scriptnames.v,
-			author = ppdata.scriptauthors.v,
-			realm  = ppdata.serverorclient.v or "shared"
-		}
-		
 	end
 	
 	local starMat, sfToolMat, sfToolRt
@@ -371,61 +309,51 @@ if CLIENT then
 			local velX = vel.x / 10000
 			
 			-- cover the default texture
-			surface.SetDrawColor(colors.bg)
+			surface.SetDrawColor(bgcolor)
 			surface.DrawRect(0,0,w,h)
 			
 			-- render the particles
 			surface.SetMaterial(starMat)
-			for i = 1, self.starCount do
+			for i, star in ipairs(self.stars) do
+				star.yvel = star.yvel + velX
+				star.xvel = star.xvel + eyeYawVel/30 + velY/6000
 				
-				local flake = self.starflakes[i]
+				star.x = star.x + star.xvel
+				star.y = star.y + star.yvel
+				star.ang = star.ang + star.angvel
 				
-				flake.yvel = flake.yvel + velX
-				flake.xvel = flake.xvel + eyeYawVel/30 + velY/6000
-				
-				flake.x = flake.x + flake.xvel
-				flake.y = flake.y + flake.yvel
-				flake.ang = flake.ang + flake.angvel
-				
-				flake.angvel = flake.angvel + flake.xvel / 1000
+				star.angvel = star.angvel + star.xvel / 1000
 
-				local flakeAlpha = 255+60-flake.y
+				local starAlpha = 255+60-star.y
 				
-				if flakeAlpha <= 0 or flake.y < -60 then
-					setRandomFlake(self.starflakes[i], i / self.starCount, flake.xvel, flake.y < -60)
-				elseif flake.x < -30 then
-					flake.x = w + 30
-				elseif flake.x > w + 30 then
-					flake.x = -30
+				if starAlpha <= 0 or star.y < -60 then
+					setRandomStar(self.stars[i], i / #self.stars, star.xvel, star.y < -60 and 271 or -15)
+				elseif star.x < -30 then
+					star.x = w + 30
+				elseif star.x > w + 30 then
+					star.x = -30
 				end
 				
-				surface.SetDrawColor(flake.color.r, flake.color.g, flake.color.b, flakeAlpha)
-				surface.DrawTexturedRectRotated(flake.x, flake.y, flake.size, flake.size, flake.ang)
-				
+				surface.SetDrawColor(star.color.r, star.color.g, star.color.b, starAlpha)
+				surface.DrawTexturedRectRotated(star.x, star.y, star.size, star.size, star.ang)
 			end
 			
+			draw.SimpleTextOutlined("Starfall", "StarfallToolTitle", w/2, 60, Color(255,255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 4, bgcolor)
 			
-			draw.SimpleTextOutlined("Starfall", "StarfallToolTitle", w/2, 40, Color(255,255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 4, colors.bg)
-			
-			local ent = ply:GetEyeTraceNoCursor().Entity
-			
-			if ent and ent:IsValid() and ent:GetClass() == "starfall_processor" and ent.instance then
-				
-				-- this will return nil sometimes, find out why
-				--draw.SimpleTextOutlined(ent.instance.ppdata.scriptnames.main, "StarfallToolSmall", w/2, h/2, Color(255,255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 4, colors.bg)
-				
-			elseif SF.Editor then
-				
-				--draw.SimpleTextOutlined(SF.Editor.getOpenFile() or "main", "StarfallToolSmall", w/2, h/2, Color(255,255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 4, colors.bg)
-				
+			local ent = ply:GetEyeTrace().Entity
+			local mainfile, size
+			if ent and ent:IsValid() and ent:GetClass() == "starfall_processor" and ent.instance and ent.instance.mainfile then
+				mainfile = ent.instance.mainfile
+				size = #ent.instance.source[mainfile]
+			elseif SF.Editor.editor then
+				mainfile = SF.Editor.getOpenFile() or "<unsaved file>"
+				size = #SF.Editor.getCode()
 			end
-			--[[
-				ppdata:
-			scriptauthors:
-					main	=	
-			scriptnames:
-					main	=	Cipeczka
-			]]
+			if mainfile then
+				draw.SimpleTextOutlined(mainfile, "StarfallToolSmall", 10, 180, Color(255,255,255), TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM, 4, bgcolor)
+				draw.SimpleTextOutlined(math.Round(size/1000, 1).."kB", "StarfallToolSmall", 10, 185, Color(255,255,255), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 4, bgcolor)
+			end
+
 		render.PopRenderTarget()
 		
 		surface.SetDrawColor( 255, 255, 255, 255 )
@@ -433,8 +361,6 @@ if CLIENT then
 		surface.DrawTexturedRect( 0, 0, w, h )
 	
 	end
-
-	local lastclick = CurTime()
 
 	local function GotoDocs(button)
 		gui.OpenURL(SF.Editor.HelperURL:GetString())
