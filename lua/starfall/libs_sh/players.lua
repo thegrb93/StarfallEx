@@ -544,7 +544,10 @@ if SERVER then
 	function player_methods:say(text, teamOnly)
 		checkluatype(text, TYPE_STRING)
 		local ply = getply(self)
-		if instance.player ~= ply then SF.Throw("Player:say can only be used on yourself!", 2) end
+		if instance.player ~= ply then SF.Throw("Player say can only be used on yourself!", 2) end
+		local cd = ply.sf_say_cd or 0
+		if CurTime() < cd then SF.Throw("Player say must wait 0.5s between calls!", 2) end
+		ply.sf_say_cd = CurTime() + 0.5
 		ply:Say(text, teamOnly) 
 	end
 end
