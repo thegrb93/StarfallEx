@@ -509,6 +509,49 @@ if SERVER then
 
 		ent:SetEyeAngles(ang)
 	end
+	
+	--- Returns the packet loss of the client
+	-- @server
+	-- @return number Packets lost
+	function player_methods:getPacketLoss()
+		return getply(self):PacketLoss()
+	end
+	
+	--- Returns the time in seconds since the player connected
+	-- @server
+	-- @return number Time connected
+	function player_methods:getTimeConnected()
+		return getply(self):TimeConnected()
+	end
+	
+	--- Returns the number of seconds that the player has been timing out for
+	-- @server
+	-- @return number Timeout seconds
+	function player_methods:getTimeoutSeconds()
+		return getply(self):GetTimeoutSeconds()
+	end
+	
+	--- Returns true if the player is timing out
+	-- @server
+	-- @return bool isTimingOut
+	function player_methods:isTimingOut()
+		return getply(self):IsTimingOut()
+	end
+	
+	--- Forces the player to say the first argument
+	-- Only works on the chip's owner.
+	-- @server
+	-- @param text The text to force the player to say
+	-- @param teamOnly bool Team chat only?, Defaults to false.
+	function player_methods:say(text, teamOnly)
+		checkluatype(text, TYPE_STRING)
+		if teamOnly~=nil then checkluatype(teamOnly, TYPE_BOOL) end
+		local ply = getply(self)
+		if instance.player ~= ply then SF.Throw("Player say can only be used on yourself!", 2) end
+		if CurTime() < (ply.sf_say_cd or 0) then SF.Throw("Player say must wait 0.5s between calls!", 2) end
+		ply.sf_say_cd = CurTime() + 0.5
+		ply:Say(text, teamOnly) 
+	end
 end
 
 --- Returns whether or not the player is pushing the key.
