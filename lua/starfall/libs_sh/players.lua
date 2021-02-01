@@ -543,6 +543,7 @@ if SERVER then
 	-- @param teamOnly bool Team chat only?, Defaults to false.
 	function player_methods:say(text, teamOnly)
 		checkluatype(text, TYPE_STRING)
+		if teamOnly~=nil then checkluatype(teamOnly, TYPE_BOOL) end
 		local ply = getply(self)
 		if instance.player ~= ply then SF.Throw("Player say can only be used on yourself!", 2) end
 		if CurTime() < (ply.sf_say_cd or 0) then SF.Throw("Player say must wait 0.5s between calls!", 2) end
