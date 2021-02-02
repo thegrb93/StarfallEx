@@ -566,7 +566,7 @@ else
 	end
 
 	function builtins_library.printHud(...)
-		if not instance:IsHUDActive() then SF.Throw("Player isn't connected to a hud!", 2) end
+		if not SF.IsHUDActive(instance.entity) then SF.Throw("Player isn't connected to a hud!", 2) end
 		local data, strlen, size = argsToChat(builtins_library.Color(5,125,222), "[SF] ", builtins_library.Color(255,255,255), ...)
 		if strlen > 52 then SF.Throw("The max printHud string size is 52 chars!", 2) end
 		for k, v in ipairs(data) do
