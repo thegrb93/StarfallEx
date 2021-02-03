@@ -1799,7 +1799,7 @@ function render_library.traceSurfaceColor(vec1, vec2)
 end
 
 --- Checks if a hud component is connected to the Starfall Chip
-function render_library.IsHUDActive()
+function render_library.isHUDActive()
 	return SF.IsHUDActive(instance.entity)
 end
 
@@ -2135,7 +2135,7 @@ function render_library.screenShake(amplitude, frequency, duration)
 	checkluatype (amplitude, TYPE_NUMBER)
 	checkluatype (frequency, TYPE_NUMBER)
 	checkluatype (duration, TYPE_NUMBER)
-	if not instance:isHUDActive() then SF.Throw("Player isn't connected to HUD!", 2) end
+	if not SF.IsHUDActive(instance.entity) then SF.Throw("Player isn't connected to HUD!", 2) end
 	util.ScreenShake(Vector(0, 0, 0), amplitude, frequency, math.Clamp(duration, 0, 10), 0)
 end
 
