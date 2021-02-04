@@ -476,7 +476,6 @@ bit_library.tohex = bit.tohex
 bit_library.stringstream = SF.StringStream
 
 --- Converts a table to string serializing data types as best as it can
--- @shared
 -- @param t The table to serialize
 -- @return The serialized data
 function bit_library.tableToString(t)
@@ -485,12 +484,29 @@ function bit_library.tableToString(t)
 end
 
 --- Converts serialized string data to table
--- @shared
 -- @param s The serialized string data
 -- @return The deserialized table
 function bit_library.stringToTable(s)
 	checkluatype(s, TYPE_STRING)
 	return SF.StringToTable(s, instance)
 end
+
+--- Compresses a string
+--@param s String to compress
+--@return Compressed string
+function bit_library.compress(s)
+	checkluatype(s, TYPE_STRING)
+	return util.Compress(s)
+end
+
+--- Decompresses a string
+-- @param s FastLZ compressed string to decode
+-- @return Decompressed string or nil if the input was invalid
+function bit_library.decompress(s)
+	checkluatype(s, TYPE_STRING)
+	return util.Decompress(s)
+end
+
+instance.env.fastlz = {compress = bit_library.compress, decompress = bit_library.decompress}
 
 end
