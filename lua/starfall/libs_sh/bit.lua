@@ -500,7 +500,7 @@ function bit_library.compress(s)
 end
 
 --- Decompresses a string
--- @param s FastLZ compressed string to decode
+-- @param s Compressed string to decode
 -- @return Decompressed string or nil if the input was invalid
 function bit_library.decompress(s)
 	checkluatype(s, TYPE_STRING)
