@@ -6,8 +6,8 @@
 -- Making a screen this way means that you do not need to run a render hook 24/7, thus using less clientside cpu time
 -- This is especially useful in applications where the screen does not need to be updated very often
 
-local scrSize = 72 -- size of the screen in source units
-local FPS = 69 -- how many frames to draw per second
+local scrSize = 69 -- size of the screen in source units
+local FPS = 30 -- how many frames to draw every second
 
 -- Create a render target to draw onto
 render.createRenderTarget("screenRT")
@@ -15,7 +15,7 @@ render.createRenderTarget("screenRT")
 local screenMat = material.create("UnlitGeneric") 
 -- Set the material's texture to the render target that we've just created
 screenMat:setTextureRenderTarget("$basetexture", "screenRT") 
--- Clear the materials flags
+-- Clear the material's flags
 screenMat:setInt("$flags", 0)
 
 -- Create the screen hologram
@@ -26,7 +26,7 @@ screen:setParent(chip())
 -- Set the screen hologram's material to the material that we created earlier
 screen:setMaterial("!" .. screenMat:getName())
 
--- create a function to update the screen, in future we will call this whenver the screen needs to be updated
+-- create a function to update the screen, in future we will call this whenever the screen needs to be updated
 local function updateScreen()
     -- create a renderoffscreen hook, no need for a render hook as we are not drawing to a hud/screen
     hook.add("renderoffscreen","",function()
