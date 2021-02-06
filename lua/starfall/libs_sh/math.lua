@@ -387,4 +387,16 @@ function math_library.distanceToLine(lineStart, lineEnd, pointPos)
 	return nearDist, vwrap(nearPoint), startDist
 end
 
+--- Gets the distance between a line and a point in 3d space
+-- @param uniqueName The seed for the random value
+-- @param Min The minimum value of the random range
+-- @param Max The maximum value of the random range
+-- @param additionalSeed The additional seed, defaults to 0.
+-- @return number Distance from line
+function math_library.SharedRandom(uniqueName, Min, Max, additionalSeed)
+	checkluatype(uniqueName, TYPE_STRING)
+	checkluatype(additionalSeed, TYPE_NUMBER)
+	return util.SharedRandom(uniqueName, Min, Max, additionalSeed)
+end
+
 end
