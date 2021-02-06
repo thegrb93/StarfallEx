@@ -86,6 +86,13 @@ function game_library.steamIDFrom64(id)
 	return util.SteamIDFrom64(id)
 end
 
+--- Given a STEAM_0 style Steam ID will return a 64bit Steam ID
+-- @param id The STEAM_0 style id
+-- @return string 64bit Steam ID
+function game_library.steamIDTo64(id)
+	return util.SteamIDTo64(id)
+end
+
 if CLIENT then
 	--- Returns if the game has focus or not, i.e. will return false if the game is minimized
 	-- @name game_library.hasFocus
