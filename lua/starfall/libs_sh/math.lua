@@ -404,4 +404,28 @@ function math_library.intersectRayWithPlane(rayOrigin, rayDirection, planePositi
 	return vwrap(intersect)
 end
 
+--- Performs a "ray" box intersection and returns position, normal and the fraction
+-- @param rayStart Origin/start position of the ray
+-- @param rayDelta The ray vector itself. This can be thought of as: the ray end point relative to the start point.
+-- @param boxOrigin The center of the box
+-- @param boxAngles The angles of the box
+-- @param boxMins The min position of the box
+-- @param boxMaxs The max position of the box
+-- @return vector Hit position, nil if not hit
+-- @return vector Normal/direction vector, nil if not hit
+-- @return number Fraction of trace used, nil if not hit
+function math_library.intersectRayWithOBB(rayStart, rayDelta, boxOrigin, boxAngles, boxMins, boxMaxs)
+	rayStart, rayDelta, boxOrigin = vunwrap(rayStart), vunwrap(rayDelta), vunwrap(boxOrigin)
+	boxAngles, boxMins, boxMaxs = aunwrap(boxAngles), vunwrap(boxMins), vunwrap(boxMaxs)
+	checkluatype(rayStart, TYPE_VECTOR)
+	checkluatype(rayDelta, TYPE_VECTOR)
+	checkluatype(boxOrigin, TYPE_VECTOR)
+	checkluatype(boxMins, TYPE_VECTOR)
+	checkluatype(boxMaxs, TYPE_VECTOR)
+	checkluatype(boxAngles, TYPE_ANGLE)
+	local hitPos, hitNormal, frac = util.IntersectRayWithOBB(rayStart, rayDelta, boxOrigin, boxAngles, boxMins, boxMaxs)
+	if not hitPos then return nil end
+	return vwrap(hitPos), vwrap(hitNormal), frac
+end
+
 end
