@@ -9,7 +9,7 @@ SF.RegisterLibrary("game")
 return function(instance)
 
 local game_library = instance.Libraries.game
-local vwrap, ewrap = instance.Types.Vector.Wrap, instance.Types.Entity.Wrap
+local vwrap, vunwrap, ewrap = instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap, instance.Types.Entity.Wrap
 
 --- Returns the map name
 -- @name game_library.getMap
@@ -95,6 +95,15 @@ if CLIENT then
 		local info = util.GetSunInfo()
 		if info then return vwrap(info.direction), info.obstruction end
 	end
+	
+	--- Check whether the skybox is visible from the point specified
+	-- @client
+	-- @param position The position to check the skybox visibility from
+	-- @return bool Whether the skybox is visible from the position
+	function game_library.isSkyboxVisibleFromPoint(position)
+		return util.IsSkyboxVisibleFromPoint(vunwrap(position))
+	end
+	
 else
 	--- Returns a table of all SteamIDs that have a usergroup
 	-- @name game_library.getUserGroups
