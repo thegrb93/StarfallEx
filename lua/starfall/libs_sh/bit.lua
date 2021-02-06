@@ -209,7 +209,7 @@ function ss_methods:write(data)
 end
 
 --- Reads the specified number of bytes from the buffer and advances the buffer pointer.
---@param n How many bytes to read
+--@param length How many bytes to read
 --@return A string containing the bytes
 function ss_methods:read(length)
 	local ret = {}
@@ -257,10 +257,41 @@ function ss_methods:seek(pos)
 end
 
 --- Move the internal pointer by amount i
---@param i The offset
--- function ss_methods:skip(i)
-	-- self.pos = self.pos + i
--- end
+--@param length The offset
+function ss_methods:skip(length)
+	while length>0 do
+		local cur = self[self.index]
+		if cur then
+			local sublength = math.min(#cur - self.subindex + 1, length)
+			length = length - sublength
+			self.subindex = self.subindex + sublength
+			if self.subindex>#cur then
+				self.index = self.index + 1
+				self.subindex = 1
+			end
+		else
+			self.index = #self.index + 1
+			self.subindex = 1
+			break
+		end
+	end
+	while length<0 do
+		local cur = self[self.index]
+		if cur then
+			local sublength = math.max(-self.subindex, length)
+			length = length - sublength
+			self.subindex = self.subindex + sublength
+			if self.subindex<1 then
+				self.index = self.index - 1
+				self.subindex = self[self.index] and #self[self.index] or 1
+			end
+		else
+			self.index = 1
+			self.subindex = 1
+			break
+		end
+	end
+end
 
 --- Returns the internal position of the byte reader.
 --@return The buffer position
