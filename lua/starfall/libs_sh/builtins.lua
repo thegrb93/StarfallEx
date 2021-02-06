@@ -177,12 +177,6 @@ builtins_library.SERVER = SERVER
 -- @return Boolean
 builtins_library.isFirstTimePredicted = IsFirstTimePredicted
 
---- Returns the current date formatted like '2012-10-31 18-00-00'
--- @name builtins_library.dateStamp
--- @class function
--- @return string date
-builtins_library.dateStamp = util.DateStamp
-
 --- Returns the current count for this Think's CPU Time.
 -- This value increases as more executions are done, may not be exactly as you want.
 -- If used on screens, will show 0 if only rendering is done. Operations must be done in the Think loop for them to be counted.

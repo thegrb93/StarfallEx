@@ -118,13 +118,6 @@ if CLIENT then
 		return util.IsSkyboxVisibleFromPoint(vunwrap(position))
 	end
 	
-else
-	--- Returns a table of all SteamIDs that have a usergroup
-	-- @name game_library.getUserGroups
-	-- @server
-	-- @class function
-	-- @return table The table of users. see https://wiki.facepunch.com/gmod/util.GetUserGroups
-	game_library.getUserGroups = util.GetUserGroups
 end
 
 end
