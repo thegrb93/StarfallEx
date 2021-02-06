@@ -79,6 +79,13 @@ function game_library.getWorld()
 	return ewrap(game.GetWorld())
 end
 
+--- Given a 64bit SteamID will return a STEAM_0: style Steam ID
+-- @param id The 64 bit Steam ID
+-- @return string STEAM_0 style Steam ID
+function game_library.steamIDFrom64(id)
+	return util.SteamIDFrom64(id)
+end
+
 if CLIENT then
 	--- Returns if the game has focus or not, i.e. will return false if the game is minimized
 	-- @name game_library.hasFocus
