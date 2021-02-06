@@ -95,6 +95,13 @@ if CLIENT then
 		local info = util.GetSunInfo()
 		if info then return vwrap(info.direction), info.obstruction end
 	end
+else
+	--- Returns a table of all SteamIDs that have a usergroup
+	-- @name game_library.getUserGroups
+	-- @server
+	-- @class function
+	-- @return table The table of users. see https://wiki.facepunch.com/gmod/util.GetUserGroups
+	game_library.getUserGroups = util.GetUserGroups
 end
 
 end
