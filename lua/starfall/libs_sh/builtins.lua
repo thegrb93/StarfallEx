@@ -528,6 +528,19 @@ if SERVER then
 	function builtins_library.getUserdata()
 		return instance.entity.starfalluserdata or ""
 	end
+	
+	--- Applies explosion damage to all entities in the specified radius
+	-- @server
+	-- @param inflictor The entity that caused the damage
+	-- @param damageOrigin The center of the explosion
+	-- @param damageRadius The radius in which entities will be damaged
+	-- @param damage The amount of damage to be applied
+	function builtins_library.blastDamage(inflictor, damageOrigin, damageRadius, damage)
+		inflictor, damageOrigin = ounwrap(inflictor), vunwrap(damageOrigin)
+		checkluatype(inflictor, TYPE_ENTITY)
+		checkluatype(damageOrigin, TYPE_VECTOR)
+		util.BlastDamage(inflictor, instance.player, damageOrigin, math.Clamp(damageRadius, 0, 1500), damage)
+	end
 else
 	--- Sets the chip's display name
 	-- @client
