@@ -533,7 +533,7 @@ if SERVER then
 	-- @server
 	-- @param inflictor The entity that caused the damage
 	-- @param damageOrigin The center of the explosion
-	-- @param damageRadius The radius in which entities will be damaged
+	-- @param damageRadius The radius in which entities will be damaged (0 - 1500)
 	-- @param damage The amount of damage to be applied
 	function builtins_library.blastDamage(inflictor, damageOrigin, damageRadius, damage)
 		util.BlastDamage(eunwrap(inflictor), instance.player, vunwrap(damageOrigin), math.Clamp(damageRadius, 0, 1500), damage)
