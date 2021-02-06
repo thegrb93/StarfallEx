@@ -536,10 +536,7 @@ if SERVER then
 	-- @param damageRadius The radius in which entities will be damaged
 	-- @param damage The amount of damage to be applied
 	function builtins_library.blastDamage(inflictor, damageOrigin, damageRadius, damage)
-		inflictor, damageOrigin = ounwrap(inflictor), vunwrap(damageOrigin)
-		checkluatype(inflictor, TYPE_ENTITY)
-		checkluatype(damageOrigin, TYPE_VECTOR)
-		util.BlastDamage(inflictor, instance.player, damageOrigin, math.Clamp(damageRadius, 0, 1500), damage)
+		util.BlastDamage(eunwrap(inflictor), instance.player, vunwrap(damageOrigin), math.Clamp(damageRadius, 0, 1500), damage)
 	end
 else
 	--- Sets the chip's display name
