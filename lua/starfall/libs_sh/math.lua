@@ -399,7 +399,9 @@ function math_library.intersectRayWithPlane(rayOrigin, rayDirection, planePositi
 	checkluatype(rayDirection, TYPE_VECTOR)
 	checkluatype(planePosition, TYPE_VECTOR)
 	checkluatype(planeNormal, TYPE_VECTOR)
-	return util.IntersectRayWithPlane(rayOrigin, rayDirection, planePosition, planeNormal)
+	local intersect = util.IntersectRayWithPlane(rayOrigin, rayDirection, planePosition, planeNormal)
+	if not intersect then return nil end
+	return vwrap(intersect)
 end
 
 end
