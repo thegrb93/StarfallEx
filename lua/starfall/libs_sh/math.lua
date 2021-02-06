@@ -387,4 +387,19 @@ function math_library.distanceToLine(lineStart, lineEnd, pointPos)
 	return nearDist, vwrap(nearPoint), startDist
 end
 
+--- Performs a ray-plane intersection and returns the hit position or nil
+-- @param rayOrigin Origin/start position of the ray
+-- @param rayDirection The direction of the ray as a normal vector
+-- @param planePosition Any point on the plane
+-- @param planeNormal The normal vector of the plane
+-- @return vector The position of intersection, nil if not hit
+function math_library.intersectRayWithPlane(rayOrigin, rayDirection, planePosition, planeNormal)
+	rayOrigin, rayDirection, planePosition, planeNormal = vunwrap(rayOrigin), vunwrap(rayDirection), vunwrap(planePosition), vunwrap(planeNormal)
+	checkluatype(rayOrigin, TYPE_VECTOR)
+	checkluatype(rayDirection, TYPE_VECTOR)
+	checkluatype(planePosition, TYPE_VECTOR)
+	checkluatype(planeNormal, TYPE_VECTOR)
+	return util.IntersectRayWithPlane(rayOrigin, rayDirection, planePosition, planeNormal)
+end
+
 end
