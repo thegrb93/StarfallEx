@@ -25,8 +25,7 @@ local ss_meta_big = {
 
 function SF.StringStream(stream, i, endian)
 	local ret = setmetatable({
-		buffer = {},
-		index = 1
+		index = 1,
 		subindex = 1
 	}, ss_meta)
 	
@@ -69,7 +68,7 @@ local function PackIEEE754Float(number)
 			end
 		end
 		mantissa = math.floor(math.ldexp(mantissa, 23) + 0.5)
-		return mantissa % 0x100
+		return mantissa % 0x100,
 				math.floor(mantissa / 0x100) % 0x100,
 				(exponent % 2) * 0x80 + math.floor(mantissa / 0x10000),
 				sign + math.floor(exponent / 2)
@@ -129,7 +128,7 @@ local function PackIEEE754Double(number)
 			end
 		end
 		mantissa = math.floor(math.ldexp(mantissa, 52) + 0.5)
-		return mantissa % 0x100
+		return mantissa % 0x100,
 				math.floor(mantissa / 0x100) % 0x100,
 				math.floor(mantissa / 0x10000) % 0x100,
 				math.floor(mantissa / 0x1000000) % 0x100,
@@ -248,9 +247,9 @@ function ss_methods:seek(pos)
 	local length = 0
 	for i, v in ipairs(self) do
 		length = length + #v
-		if length > pos then
+		if length >= pos then
 			self.index = i
-			self.subindex = pos - (length - #v) + 1
+			self.subindex = pos - (length - #v)
 			break
 		end
 	end
@@ -403,7 +402,7 @@ function ss_methods:readUntil(byte)
 			ret[#ret+1] = string.sub(cur, self.subindex, find)
 			self.subindex = find+1
 			if self.subindex > #cur then
-				self.index = self.index = 1
+				self.index = self.index + 1
 				self.subindex = 1
 			end
 		else
