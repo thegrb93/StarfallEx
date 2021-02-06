@@ -14,69 +14,26 @@ local ss_meta = {
 		return string.format("Stringstream [%u,%u]",self.pos, #self.buffer)
 	end
 }
+local ss_methods_big = setmetatable({},{__index=ss_methods})
+local ss_meta_big = {
+	__index = ss_methods_big,
+	__metatable = "StringStream",
+	__tostring = function(self)
+		return string.format("Stringstream [%u,%u]",self.pos, #self.buffer)
+	end
+}
+
 function SF.StringStream(stream, i, endian)
-	if stream~=nil then checkluatype(stream, TYPE_STRING) else stream = "" end
-	if i~=nil then checkluatype(i, TYPE_NUMBER) else i = 1 end
-	
 	local ret = setmetatable({
 		buffer = {},
-		pos = 1
+		index = 1
+		subindex = 1
 	}, ss_meta)
 	
-	ret:write(stream)
-	ret:seek(i)
-	ret:setEndian(endian or "little")
+	if stream~=nil then checkluatype(stream, TYPE_STRING) ret:write(stream) end
+	if i~=nil then checkluatype(i, TYPE_NUMBER) ret:seek(i) end
 	
 	return ret
-end
-
-local function checkErr(n)
-	if n==math.huge or n==-math.huge or n~=n then
-		SF.Throw("Can't convert error float to integer!", 4)
-	end
-end
-
-local function ByterizeInt(n)
-	checkErr(n)
-	n = (n < 0) and (4294967296 + n) or n
-	return math.floor(n/16777216)%256, math.floor(n/65536)%256, math.floor(n/256)%256, n%256
-end
-
-local function ByterizeShort(n)
-	checkErr(n)
-	n = (n < 0) and (65536 + n) or n
-	return math.floor(n/256)%256, n%256
-end
-
-local function ByterizeByte(n)
-	checkErr(n)
-	n = (n < 0) and (256 + n) or n
-	return n%256
-end
-
-local function twos_compliment(x,bits)
-	local limit = math.ldexp(1, bits - 1)
-	if x>limit then return x - limit*2 else return x end
-end
-
-local function toString(buffer, start, stop)
-	-- Max unpack is 7997
-	local chartbl = {}
-	for i=start, stop, 7997 do
-		chartbl[#chartbl + 1] = string.char(unpack(buffer, i, math.min(i+7997-1, stop)))
-	end
-	return table.concat(chartbl)
-end
-
-local function fromString(str, buffer, p)
-	-- Max string.byte is 8000
-	for i=1, #str, 8000 do
-		local b = {string.byte(str, i, math.min(i+8000-1, #str))}
-		for o=1, #b do
-			buffer[p] = b[o]
-			p = p + 1
-		end
-	end
 end
 
 --Credit https://stackoverflow.com/users/903234/rpfeltz
@@ -85,11 +42,11 @@ local function PackIEEE754Float(number)
 	if number == 0 then
 		return 0x00, 0x00, 0x00, 0x00
 	elseif number == math.huge then
-		return 0x7F, 0x80, 0x00, 0x00
+		return 0x00, 0x00, 0x80, 0x7F
 	elseif number == -math.huge then
-		return 0xFF, 0x80, 0x00, 0x00
+		return 0x00, 0x00, 0x80, 0xFF
 	elseif number ~= number then
-		return 0xFF, 0xC0, 0x00, 0x00
+		return 0x00, 0x00, 0xC0, 0xFF
 	else
 		local sign = 0x00
 		if number < 0 then
@@ -103,7 +60,7 @@ local function PackIEEE754Float(number)
 			exponent = 0
 		elseif exponent > 0 then
 			if exponent >= 0xFF then
-				return sign + 0x7F, 0x80, 0x00, 0x00
+				return 0x00, 0x00, 0x80, sign + 0x7F
 			elseif exponent == 1 then
 				exponent = 0
 			else
@@ -112,13 +69,13 @@ local function PackIEEE754Float(number)
 			end
 		end
 		mantissa = math.floor(math.ldexp(mantissa, 23) + 0.5)
-		return sign + math.floor(exponent / 2),
-				(exponent % 2) * 0x80 + math.floor(mantissa / 0x10000),
+		return mantissa % 0x100
 				math.floor(mantissa / 0x100) % 0x100,
-				mantissa % 0x100
+				(exponent % 2) * 0x80 + math.floor(mantissa / 0x10000),
+				sign + math.floor(exponent / 2)
 	end
 end
-local function UnpackIEEE754Float(b1, b2, b3, b4)
+local function UnpackIEEE754Float(b4, b3, b2, b1)
 	local exponent = (b1 % 0x80) * 0x02 + math.floor(b2 / 0x80)
 	local mantissa = math.ldexp(((b2 % 0x80) * 0x100 + b3) * 0x100 + b4, -23)
 	if exponent == 0xFF then
@@ -145,11 +102,11 @@ local function PackIEEE754Double(number)
 	if number == 0 then
 		return 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 	elseif number == math.huge then
-		return 0x7F, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+		return 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF0, 0x7F
 	elseif number == -math.huge then
-		return 0xFF, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+		return 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF0, 0xFF
 	elseif number ~= number then
-		return 0xFF, 0xF8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+		return 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF8, 0xFF
 	else
 		local sign = 0x00
 		if number < 0 then
@@ -163,7 +120,7 @@ local function PackIEEE754Double(number)
 			exponent = 0
 		elseif exponent > 0 then
 			if exponent >= 0x7FF then
-				return sign + 0x7F, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+				return 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF0, sign + 0x7F
 			elseif exponent == 1 then
 				exponent = 0
 			else
@@ -172,17 +129,17 @@ local function PackIEEE754Double(number)
 			end
 		end
 		mantissa = math.floor(math.ldexp(mantissa, 52) + 0.5)
-		return sign + math.floor(exponent / 0x10),
-				(exponent % 0x10) * 0x10 + math.floor(mantissa / 0x1000000000000),
-				math.floor(mantissa / 0x10000000000) % 0x100,
-				math.floor(mantissa / 0x100000000) % 0x100,
-				math.floor(mantissa / 0x1000000) % 0x100,
-				math.floor(mantissa / 0x10000) % 0x100,
+		return mantissa % 0x100
 				math.floor(mantissa / 0x100) % 0x100,
-				mantissa % 0x100
+				math.floor(mantissa / 0x10000) % 0x100,
+				math.floor(mantissa / 0x1000000) % 0x100,
+				math.floor(mantissa / 0x100000000) % 0x100,
+				math.floor(mantissa / 0x10000000000) % 0x100,
+				(exponent % 0x10) * 0x10 + math.floor(mantissa / 0x1000000000000),
+				sign + math.floor(exponent / 0x10)
 	end
 end
-local function UnpackIEEE754Double(b1, b2, b3, b4, b5, b6, b7, b8)
+local function UnpackIEEE754Double(b8, b7, b6, b5, b4, b3, b2, b1)
 	local exponent = (b1 % 0x80) * 0x10 + math.floor(b2 / 0x10)
 	local mantissa = math.ldexp(((((((b2 % 0x10) * 0x100 + b3) * 0x100 + b4) * 0x100 + b5) * 0x100 + b6) * 0x100 + b7) * 0x100 + b8, -52)
 	if exponent == 0x7FF then
@@ -210,144 +167,225 @@ end
 --@param endian The endianness of number types. "big" or "little" (default "little")
 function ss_methods:setEndian(endian)
 	if endian == "little" then
-		function self:readBytesEndian(start, stop)
-			local t = {}
-			for i=stop, start, -1 do
-				t[#t+1] = self.buffer[i]
-			end
-			return t
-		end
-		function self:writeBytesEndian(start, stop, t)
-			local o = #t
-			for i=start, stop do
-				self.buffer[i] = t[o]
-				o = o - 1
-			end
-		end
+		setmetatable(self, ss_meta)
 	elseif endian == "big" then
-		function self:readBytesEndian(start, stop)
-			local t = {}
-			for i=start, stop do
-				t[#t+1] = self.buffer[i]
-			end
-			return t
-		end
-		function self:writeBytesEndian(start, stop, t)
-			local o = 1
-			for i=start, stop do
-				self.buffer[i] = t[o]
-				o = o + 1
-			end
-		end
+		setmetatable(self, ss_meta_big)
 	else
-		SF.Throw("Invalid endian specified", 2)
+		error("Invalid endian specified", 2)
 	end
 end
 
---- Sets internal pointer to i. The position will be clamped to [1, buffersize+1]
---@param i The position
-function ss_methods:seek(i)
-	self.pos = math.Clamp(i, 1, #self.buffer + 1)
-end
-
---- Move the internal pointer by amount i
---@param i The offset
-function ss_methods:skip(i)
-	self.pos = self.pos + i
-end
-
---- Returns the internal position of the byte reader.
---@return The buffer position
-function ss_methods:tell()
-	return self.pos
-end
-
---- Tells the size of the byte stream.
---@return The buffer size
-function ss_methods:size()
-	return #self.buffer
+--- Writes the given string and advances the buffer pointer.
+--@param data A string of data to write
+function ss_methods:write(data)
+	if self.index > #self then -- Most often case
+		self[self.index] = data
+		self.index = self.index + 1
+		self.subindex = 1
+	else
+		local i = 1
+		local length = #data
+		while length > 0 do
+			if self.index > #self then -- End of buffer
+				self[self.index] = string.sub(data, i)
+				self.index = self.index + 1
+				self.subindex = 1
+				break
+			else
+				local cur = self[self.index]
+				local sublength = math.min(#cur - self.subindex + 1, length)
+				self[self.index] = string.sub(cur,1,self.subindex-1) .. string.sub(data,i,i+sublength-1) .. string.sub(cur,self.subindex+sublength)
+				length = length - sublength
+				i = i + sublength
+				if length > 0 then
+					self.index = self.index + 1
+					self.subindex = 1
+				else
+					self.subindex = self.subindex + sublength
+				end
+			end
+		end
+	end
 end
 
 --- Reads the specified number of bytes from the buffer and advances the buffer pointer.
 --@param n How many bytes to read
 --@return A string containing the bytes
-function ss_methods:read(n)
-	n = math.max(n, 0)
-	local str = toString(self.buffer, self.pos, self.pos+n-1)
-	self.pos = self.pos + n
-	return str
+function ss_methods:read(length)
+	local ret = {}
+	while length > 0 do
+		local cur = self[self.index]
+		if cur then
+			if self.subindex == 1 and length >= #cur then
+				ret[#ret+1] = cur
+				self.index = self.index + 1
+				length = length - #cur
+			else
+				local sublength = math.min(#cur - self.subindex + 1, length)
+				ret[#ret+1] = string.sub(cur, self.subindex, self.subindex + sublength - 1)
+				length = length - sublength
+				if length > 0 then
+					self.index = self.index + 1
+					self.subindex = 1
+				else
+					self.subindex = self.subindex + sublength
+				end
+			end
+		else
+			break
+		end
+	end
+	return table.concat(ret)
+end
+
+--- Sets internal pointer to i. The position will be clamped to [1, buffersize+1]
+--@param i The position
+function ss_methods:seek(pos)
+	if pos < 1 then error("Index must be 1 or greater", 2) end
+	self.index = #self+1
+	self.subindex = 1
+
+	local length = 0
+	for i, v in ipairs(self) do
+		length = length + #v
+		if length > pos then
+			self.index = i
+			self.subindex = pos - (length - #v) + 1
+			break
+		end
+	end
+end
+
+--- Move the internal pointer by amount i
+--@param i The offset
+-- function ss_methods:skip(i)
+	-- self.pos = self.pos + i
+-- end
+
+--- Returns the internal position of the byte reader.
+--@return The buffer position
+function ss_methods:tell()
+	local length = 0
+	for i, v in ipairs(self) do
+		if i==self.index then
+			return length + self.subindex
+		end
+		length = length + #v
+	end
+	return length+1
+end
+
+--- Tells the size of the byte stream.
+--@return The buffer size
+function ss_methods:size()
+	local length = 0
+	for i, v in ipairs(self) do
+		length = length + #v
+	end
+	return length
 end
 
 --- Reads an unsigned 8-bit (one byte) integer from the byte stream and advances the buffer pointer.
 --@return The uint8 at this position
 function ss_methods:readUInt8()
-	local ret = self.buffer[self.pos]
-	self.pos = self.pos + 1
-	return ret
+	return string.byte(self:read())
+end
+function ss_methods_big:readUInt8()
+	return string.byte(self:read())
 end
 
 --- Reads an unsigned 16 bit (two byte) integer from the byte stream and advances the buffer pointer.
 --@return The uint16 at this position
 function ss_methods:readUInt16()
-	local t = self:readBytesEndian(self.pos, self.pos+1)
-	self.pos = self.pos + 2
-	return t[1] * 0x100 + t[2]
+	local a,b = string.byte(self:read(2), 1, 2)
+	return b * 0x100 + a
+end
+function ss_methods_big:readUInt16()
+	local a,b = string.byte(self:read(2), 1, 2)
+	return a * 0x100 + b
 end
 
 --- Reads an unsigned 32 bit (four byte) integer from the byte stream and advances the buffer pointer.
 --@return The uint32 at this position
 function ss_methods:readUInt32()
-	local t = self:readBytesEndian(self.pos, self.pos+3)
-	self.pos = self.pos + 4
-	return t[1] * 0x1000000 + t[2] * 0x10000 + t[3] * 0x100 + t[4]
+	local a,b,c,d = string.byte(self:read(4), 1, 4)
+	return d * 0x1000000 + c * 0x10000 + b * 0x100 + a
+end
+function ss_methods_big:readUInt32()
+	local a,b,c,d = string.byte(self:read(4), 1, 4)
+	return a * 0x1000000 + b * 0x10000 + c * 0x100 + d
 end
 
 --- Reads a signed 8-bit (one byte) integer from the byte stream and advances the buffer pointer.
 --@return The int8 at this position
 function ss_methods:readInt8()
-	return twos_compliment(self:readUInt8(),8)
+	local x = self:readUInt8()
+	if x>=0x80 then x = x - 0x100 end
+	return x
 end
 
 --- Reads a signed 16-bit (two byte) integer from the byte stream and advances the buffer pointer.
 --@return The int16 at this position
 function ss_methods:readInt16()
-	return twos_compliment(self:readUInt16(),16)
+	local x = self:readUInt16()
+	if x>=0x8000 then x = x - 0x10000 end
+	return x
 end
 
 --- Reads a signed 32-bit (four byte) integer from the byte stream and advances the buffer pointer.
 --@return The int32 at this position
 function ss_methods:readInt32()
-	return twos_compliment(self:readUInt32(),32)
+	local x = self:readUInt32()
+	if x>0x80000000 then x = x - 0x100000000 end
+	return x
 end
 
 --- Reads a 4 byte IEEE754 float from the byte stream and advances the buffer pointer.
 --@return The float32 at this position
 function ss_methods:readFloat()
-	local t = self:readBytesEndian(self.pos, self.pos+3)
-	self.pos = self.pos + 4
-	return UnpackIEEE754Float(t[1], t[2], t[3], t[4])
+	return UnpackIEEE754Float(string.byte(self:read(4), 1, 4))
+end
+function ss_methods_big:readFloat()
+	local a,b,c,d = string.byte(self:read(4), 1, 4)
+	return UnpackIEEE754Float(d, c, b, a)
 end
 
 --- Reads a 8 byte IEEE754 double from the byte stream and advances the buffer pointer.
 --@return The double at this position
 function ss_methods:readDouble()
-	local t = self:readBytesEndian(self.pos, self.pos+7)
-	self.pos = self.pos + 8
-	return UnpackIEEE754Double(t[1], t[2], t[3], t[4], t[5], t[6], t[7], t[8])
+	return UnpackIEEE754Double(string.byte(self:read(8), 1, 8))
+end
+function ss_methods_big:readDouble()
+	local a,b,c,d = string.byte(self:read(4), 1, 4)
+	return UnpackIEEE754Float(d, c, b, a)
 end
 
 --- Reads until the given byte and advances the buffer pointer.
 --@param byte The byte to read until (in number form)
 --@return The string of bytes read
 function ss_methods:readUntil(byte)
-	local endpos = nil
-	for i=self.pos, #self.buffer do
-		if self.buffer[i] == byte then endpos = i break end
+	local ret = {}
+	for i=self.index, #self do
+		local cur = self[self.index]
+		local find = string.find(cur, byte, self.subindex, true)
+		if find then
+			ret[#ret+1] = string.sub(cur, self.subindex, find)
+			self.subindex = find+1
+			if self.subindex > #cur then
+				self.index = self.index = 1
+				self.subindex = 1
+			end
+		else
+			if self.subindex == 1 then
+				ret[#ret+1] = cur
+			else
+				ret[#ret+1] = string.sub(cur, self.subindex)
+			end
+			self.index = self.index + 1
+			self.subindex = 1
+		end
 	end
-	endpos = endpos or #self.buffer
-	local str = toString(self.buffer, self.pos, endpos)
-	self.pos = endpos + 1
-	return str
+	return table.concat(ret)
 end
 
 --- returns a null terminated string, reads until "\x00" and advances the buffer pointer.
@@ -357,65 +395,71 @@ function ss_methods:readString()
 	return string.sub(s, 1, #s-1)
 end
 
---- Writes the given string and advances the buffer pointer.
---@param bytes A string of bytes to write
-function ss_methods:write(bytes)
-	fromString(bytes, self.buffer, self.pos)
-	self.pos = self.pos + #bytes
-end
-
 --- Writes a byte to the buffer and advances the buffer pointer.
 --@param x An int8 to write
 function ss_methods:writeInt8(x)
-	self.buffer[self.pos] = ByterizeByte(x)
-	self.pos = self.pos + 1
+	if x==math.huge or x==-math.huge or x~=x then error("Can't convert error float to integer!", 2) end
+	if x < 0 then x = x + 0x100 end
+	self:write(string.char(x%0x100))
 end
 
 --- Writes a short to the buffer and advances the buffer pointer.
 --@param x An int16 to write
 function ss_methods:writeInt16(x)
-	self:writeBytesEndian(self.pos, self.pos + 1, { ByterizeShort(x) })
-	self.pos = self.pos + 2
+	if x==math.huge or x==-math.huge or x~=x then error("Can't convert error float to integer!", 2) end
+	if x < 0 then x = x + 0x10000 end
+	self:write(string.char(x%0x100, math.floor(x/0x100)%0x100))
+end
+function ss_methods_big:writeInt16(x)
+	if x==math.huge or x==-math.huge or x~=x then error("Can't convert error float to integer!", 2) end
+	if x < 0 then x = x + 0x10000 end
+	self:write(math.floor(x/0x100)%0x100, string.char(x%0x100))
 end
 
 --- Writes an int to the buffer and advances the buffer pointer.
 --@param x An int32 to write
 function ss_methods:writeInt32(x)
-	self:writeBytesEndian(self.pos, self.pos + 3, { ByterizeInt(x) })
-	self.pos = self.pos + 4
+	if x==math.huge or x==-math.huge or x~=x then error("Can't convert error float to integer!", 2) end
+	if x < 0 then x = x + 0x100000000 end
+	self:write(string.char(x%0x100, math.floor(x/0x100)%0x100, math.floor(x/0x10000)%0x100, math.floor(x/0x1000000)%0x100))
+end
+function ss_methods_big:writeInt32(x)
+	if x==math.huge or x==-math.huge or x~=x then error("Can't convert error float to integer!", 2) end
+	if x < 0 then x = x + 0x100000000 end
+	self:write(string.char(math.floor(x/0x1000000)%0x100, math.floor(x/0x10000)%0x100, math.floor(x/0x100)%0x100), x%0x100)
 end
 
 --- Writes a 4 byte IEEE754 float to the byte stream and advances the buffer pointer.
 --@param x The float to write
 function ss_methods:writeFloat(x)
-	self:writeBytesEndian(self.pos, self.pos + 3, { PackIEEE754Float(x) })
-	self.pos = self.pos + 4
+	self:write(string.char(PackIEEE754Float(x)))
+end
+function ss_methods_big:writeFloat(x)
+	local a,b,c,d = PackIEEE754Float(x)
+	self:write(string.char(d,c,b,a))
 end
 
 --- Writes a 8 byte IEEE754 double to the byte stream and advances the buffer pointer.
 --@param x The double to write
 function ss_methods:writeDouble(x)
-	self:writeBytesEndian(self.pos, self.pos + 7, { PackIEEE754Double(x) })
-	self.pos = self.pos + 8
+	self:write(string.char(PackIEEE754Double(x)))
+end
+function ss_methods_big:writeDouble(x)
+	local a,b,c,d,e,f,g,h = PackIEEE754Double(x)
+	self:write(string.char(h,g,f,e,d,c,b,a))
 end
 
 --- Writes a string to the buffer putting a null at the end and advances the buffer pointer.
 --@param string The string of bytes to write
 function ss_methods:writeString(string)
 	self:write(string)
-	self:writeInt8(0)
+	self:write("\0")
 end
 
 --- Returns the buffer as a string
 --@return The buffer as a string
 function ss_methods:getString()
-	return toString(self.buffer, 1, #self.buffer)
-end
-
---- Returns the internal buffer
---@return The buffer table
-function ss_methods:getBuffer()
-	return self.buffer
+	return table.concat(self)
 end
 
 
