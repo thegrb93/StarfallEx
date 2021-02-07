@@ -397,6 +397,7 @@ end
 --@param byte The byte to read until (in number form)
 --@return The string of bytes read
 function ss_methods:readUntil(byte)
+	byte = string.char(byte)
 	local ret = {}
 	for i=self.index, #self do
 		local cur = self[self.index]
@@ -408,6 +409,7 @@ function ss_methods:readUntil(byte)
 				self.index = self.index + 1
 				self.subindex = 1
 			end
+			break
 		else
 			if self.subindex == 1 then
 				ret[#ret+1] = cur
