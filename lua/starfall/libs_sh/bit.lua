@@ -29,8 +29,11 @@ function SF.StringStream(stream, i, endian)
 		subindex = 1
 	}, ss_meta)
 	
-	if stream~=nil then checkluatype(stream, TYPE_STRING) ret:write(stream) end
-	if i~=nil then checkluatype(i, TYPE_NUMBER) ret:seek(i) end
+	if stream~=nil then
+		checkluatype(stream, TYPE_STRING)
+		ret:write(stream)
+		if i~=nil then checkluatype(i, TYPE_NUMBER) ret:seek(i) else ret:seek(1) end
+	end
 	
 	return ret
 end
@@ -318,10 +321,10 @@ end
 --- Reads an unsigned 8-bit (one byte) integer from the byte stream and advances the buffer pointer.
 --@return The uint8 at this position
 function ss_methods:readUInt8()
-	return string.byte(self:read())
+	return string.byte(self:read(1))
 end
 function ss_methods_big:readUInt8()
-	return string.byte(self:read())
+	return string.byte(self:read(1))
 end
 
 --- Reads an unsigned 16 bit (two byte) integer from the byte stream and advances the buffer pointer.
