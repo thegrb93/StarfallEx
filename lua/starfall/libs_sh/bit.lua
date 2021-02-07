@@ -369,7 +369,7 @@ end
 --@return The int32 at this position
 function ss_methods:readInt32()
 	local x = self:readUInt32()
-	if x>0x80000000 then x = x - 0x100000000 end
+	if x>=0x80000000 then x = x - 0x100000000 end
 	return x
 end
 
@@ -389,8 +389,8 @@ function ss_methods:readDouble()
 	return UnpackIEEE754Double(string.byte(self:read(8), 1, 8))
 end
 function ss_methods_big:readDouble()
-	local a,b,c,d = string.byte(self:read(4), 1, 4)
-	return UnpackIEEE754Float(d, c, b, a)
+	local a,b,c,d,e,f,g,h = string.byte(self:read(8), 1, 8)
+	return UnpackIEEE754Double(h, g, f, e, d, c, b, a)
 end
 
 --- Reads until the given byte and advances the buffer pointer.
