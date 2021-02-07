@@ -9,7 +9,7 @@ SF.RegisterLibrary("game")
 return function(instance)
 
 local game_library = instance.Libraries.game
-local vwrap, ewrap = instance.Types.Vector.Wrap, instance.Types.Entity.Wrap
+local vwrap, vunwrap, ewrap = instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap, instance.Types.Entity.Wrap
 
 --- Returns the map name
 -- @name game_library.getMap
@@ -79,6 +79,20 @@ function game_library.getWorld()
 	return ewrap(game.GetWorld())
 end
 
+--- Given a 64bit SteamID will return a STEAM_0: style Steam ID
+-- @param id The 64 bit Steam ID
+-- @return string STEAM_0 style Steam ID
+function game_library.steamIDFrom64(id)
+	return util.SteamIDFrom64(id)
+end
+
+--- Given a STEAM_0 style Steam ID will return a 64bit Steam ID
+-- @param id The STEAM_0 style id
+-- @return string 64bit Steam ID
+function game_library.steamIDTo64(id)
+	return util.SteamIDTo64(id)
+end
+
 if CLIENT then
 	--- Returns if the game has focus or not, i.e. will return false if the game is minimized
 	-- @name game_library.hasFocus
@@ -95,6 +109,15 @@ if CLIENT then
 		local info = util.GetSunInfo()
 		if info then return vwrap(info.direction), info.obstruction end
 	end
+	
+	--- Check whether the skybox is visible from the point specified
+	-- @client
+	-- @param position The position to check the skybox visibility from
+	-- @return bool Whether the skybox is visible from the position
+	function game_library.isSkyboxVisibleFromPoint(position)
+		return util.IsSkyboxVisibleFromPoint(vunwrap(position))
+	end
+	
 end
 
 end
