@@ -1,4 +1,7 @@
+-- Global to all starfalls
+local registerprivilege = SF.Permissions.registerPrivilege
 
+if SERVER then registerprivilege("blast.create", "Blast damage", "Allows the user to create explosions", { usergroups = { default = 1 } }) end
 
 --- Game functions
 -- @name game
@@ -7,9 +10,11 @@
 SF.RegisterLibrary("game")
 
 return function(instance)
+local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 local game_library = instance.Libraries.game
-local vwrap, vunwrap, ewrap = instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap, instance.Types.Entity.Wrap
+local ewrap, eunwrap = instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local vwrap, vunwrap = instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 
 --- Returns the map name
 -- @name game_library.getMap
@@ -93,14 +98,27 @@ function game_library.steamIDTo64(id)
 	return util.SteamIDTo64(id)
 end
 
-if CLIENT then
+if SERVER then
+
+	--- Applies explosion damage to all entities in the specified radius
+	-- @server
+	-- @param damageOrigin The center of the explosion
+	-- @param damageRadius The radius in which entities will be damaged (0 - 1500)
+	-- @param damage The amount of damage to be applied
+	function game_library.blastDamage(damageOrigin, damageRadius, damage)
+		checkpermission(instance, nil, "blast.create")
+		util.BlastDamage(instance.entity, instance.player, vunwrap(damageOrigin), math.Clamp(damageRadius, 0, 1500), damage)
+	end
+
+else
+
 	--- Returns if the game has focus or not, i.e. will return false if the game is minimized
 	-- @name game_library.hasFocus
 	-- @client
 	-- @class function
 	-- @return boolean True if the game is focused
 	game_library.hasFocus = system.HasFocus
-	
+
 	--- Returns the direction and how obstructed the map's sun is or nil if it doesn't exist
 	-- @client
 	-- @return vector The direction of the sun
@@ -109,7 +127,7 @@ if CLIENT then
 		local info = util.GetSunInfo()
 		if info then return vwrap(info.direction), info.obstruction end
 	end
-	
+
 	--- Check whether the skybox is visible from the point specified
 	-- @client
 	-- @param position The position to check the skybox visibility from
@@ -117,7 +135,7 @@ if CLIENT then
 	function game_library.isSkyboxVisibleFromPoint(position)
 		return util.IsSkyboxVisibleFromPoint(vunwrap(position))
 	end
-	
+
 end
 
 end
