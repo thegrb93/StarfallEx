@@ -2128,9 +2128,9 @@ function render_library.setScreenDimensions(screen, x, y, w, h)
 end
 
 --- Makes the screen shake, client must be connected to a HUD.
--- @param number amplitude
--- @param number frequency (Hz)
--- @param number duration, Max 10 seconds.
+-- @param amplitude
+-- @param frequency (Hz)
+-- @param duration, Max 10 seconds.
 function render_library.screenShake(amplitude, frequency, duration)
 	checkluatype (amplitude, TYPE_NUMBER)
 	checkluatype (frequency, TYPE_NUMBER)
