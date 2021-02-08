@@ -49,7 +49,8 @@ function SF.CompressFiles(files)
 	local filecodes = {}
 	for filename, code in pairs(files) do
 		if #filename > 255 then error("File name too large: " .. #filename .. " (max is 255)") end
-		header:writeString(filename)
+		header:writeInt32(#filename)
+		header:write(filename)
 		header:writeInt32(#code)
 		filecodes[#filecodes + 1] = code
 	end
@@ -71,7 +72,7 @@ function SF.DecompressFiles(data)
 	local header = SF.StringStream(string.sub(data, 5, 4+headersize))
 	local headers = {}
 	for i=1, header:readUInt32() do
-		headers[#headers + 1] = {name = header:readString(), size = header:readUInt32()}
+		headers[#headers + 1] = {name = header:read(header:readUInt32()), size = header:readUInt32()}
 	end
 	local pos = headersize+5
 	for k, v in pairs(headers) do

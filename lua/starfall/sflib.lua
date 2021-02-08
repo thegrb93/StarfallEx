@@ -1475,7 +1475,7 @@ include("transfer.lua")
 
 do
 	local function compileModule(source, path)
-		local ok, init = xpcall(function() local r = (source and CompileString(source, path) or CompileFile(path)) r=r() return r end, debug.traceback)
+		local ok, init = xpcall(function() local r = (source and CompileString(source, path) or CompileFile(path)) r=r and r() return r end, debug.traceback)
 		if not ok then
 			ErrorNoHalt("[SF] Attempt to load bad module: " .. path .. "\n" .. init .. "\n")
 			init = nil
