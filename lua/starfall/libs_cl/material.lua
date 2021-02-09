@@ -346,11 +346,12 @@ end
 --- Gets a texture from a material
 -- @param path The path of the material (don't include .vmt in the path)
 -- @param texture The texture key to get
--- @return The texture's name
+-- @return The texture's name or nil if texture key isn't found
 function material_library.getTexture(path, texture)
 	checkluatype(path, TYPE_STRING)
 	checkluatype(texture, TYPE_STRING)
-	return Material(path):GetTexture(texture):GetName()
+	local tex = Material(path):GetTexture(texture)
+	if tex then return tex:GetName() end
 end
 
 --- Returns a table of keyvalues from a material
