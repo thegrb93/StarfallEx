@@ -29,10 +29,14 @@ function SF.StringStream(stream, i, endian)
 		subindex = 1
 	}, ss_meta)
 	
-	if stream~=nil then
+	if stream ~= nil then
 		checkluatype(stream, TYPE_STRING)
 		ret:write(stream)
 		if i~=nil then checkluatype(i, TYPE_NUMBER) ret:seek(i) else ret:seek(1) end
+	end
+	if endian ~= nil then
+		checkluatype(endian, TYPE_STRING)
+		ret:setEndian(endian)
 	end
 	
 	return ret
