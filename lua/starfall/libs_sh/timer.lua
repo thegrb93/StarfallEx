@@ -106,6 +106,8 @@ end
 -- @param delay the time, in second, to set the timer to
 -- @param func the function to call when the timer is fired
 function timer_library.simple(delay, func)
+	checkluatype(delay, TYPE_NUMBER)
+	checkluatype(func, TYPE_FUNCTION)
 	createTimer("", delay, 1, func, true)
 end
 
