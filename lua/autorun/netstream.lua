@@ -1,4 +1,7 @@
---Here a stream library by thegrb93 which allows sending large streams of data without overflowing the reliable channel
+--A net extension which allows sending large streams of data without overflowing the reliable channel
+--Keep it in lua/autorun so it will be shared between addons
+AddCSLuaFile()
+
 net.Stream = {}
 net.Stream.ReadStreamQueues = {}            --This holds a read stream for each player, or one read stream for the server if running on the CLIENT
 net.Stream.WriteStreams = {}            --This holds the write streams

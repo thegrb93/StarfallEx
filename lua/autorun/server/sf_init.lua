@@ -2,7 +2,6 @@ AddCSLuaFile("starfall/sflib.lua")
 AddCSLuaFile("starfall/instance.lua")
 AddCSLuaFile("starfall/preprocessor.lua")
 AddCSLuaFile("starfall/permissions/core.lua")
-AddCSLuaFile("starfall/netstream.lua")
 AddCSLuaFile("starfall/transfer.lua")
 AddCSLuaFile("starfall/editor/editor.lua")
 
