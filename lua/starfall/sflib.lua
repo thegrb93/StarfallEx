@@ -1470,7 +1470,6 @@ include("instance.lua")
 include("preprocessor.lua")
 include("permissions/core.lua")
 include("editor/editor.lua")
-include("netstream.lua")
 include("transfer.lua")
 
 do
