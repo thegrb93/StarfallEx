@@ -230,18 +230,15 @@ function SidebarElement(props)
               (
                 <div className = {"collapse " + (collapsed ? "collapsed" : "expanded")} onClick = {() => dispatch({type:"TOGGLE_COLLAPSE", value: path})}>
                   <span>{collapsed ? "-" : "+"}</span>
-                  <Icon type={iconType} value={icon} />
-                  {linkElement}
                 </div>
               )
               :
               (
-                <div className = "collapse-placeholder">
-                  <Icon type={iconType} value={icon} />
-                  {linkElement}
-                </div>
+                <div className = "collapse-placeholder"></div>
               )
             }
+            <Icon type={iconType} value={icon} />
+            {linkElement}
           </div>
           {!collapsed && hasChildren &&
           (
