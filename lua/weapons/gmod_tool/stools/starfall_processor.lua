@@ -248,6 +248,8 @@ if CLIENT then
 	})
 	
 	local bgcolor = Color(33,33,33,50)
+	local bgcolor_solid = ColorAlpha(bgcolor, 255)
+	local is_linux = system.IsLinux()
 	
 	local function setRandomStar(star, frac, prvVel, y)
 		star.y = math.random(y-15,y+15)
@@ -355,6 +357,12 @@ if CLIENT then
 			end
 
 		render.PopRenderTarget()
+		
+		-- On Linux the original tool background is still visible
+		if is_linux then
+			surface.SetDrawColor(bgcolor_solid)
+			surface.DrawRect(0, 0, w, h)
+		end
 		
 		surface.SetDrawColor( 255, 255, 255, 255 )
 		surface.SetMaterial( sfToolMat )
