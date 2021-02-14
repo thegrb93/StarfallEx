@@ -5,6 +5,33 @@ local dgetmeta = debug.getmetatable
 local math_Clamp = math.Clamp
 local clamp = function(v) return math_Clamp(v, 0, 255) end
 
+local string_sub = string.sub
+local hex_to_rgb = {
+	[3] = function(v) return {
+		tonumber("0x"..v[1])*17,
+		tonumber("0x"..v[2])*17,
+		tonumber("0x"..v[3])*17,
+		255
+	} end,
+	[4] = function(v) return {
+		tonumber("0x"..v[1])*17,
+		tonumber("0x"..v[2])*17,
+		tonumber("0x"..v[3])*17,
+		tonumber("0x"..v[4])*17
+	} end,
+	[6] = function(v) return {
+		tonumber("0x"..string_sub(v,1,2)),
+		tonumber("0x"..string_sub(v,3,4)),
+		tonumber("0x"..string_sub(v,5,6)),
+		255
+	} end,
+	[8] = function(v) return {
+		tonumber("0x"..string_sub(v,1,2)),
+		tonumber("0x"..string_sub(v,3,4)),
+		tonumber("0x"..string_sub(v,5,6)),
+		tonumber("0x"..string_sub(v,7,8))
+	} end,
+}
 
 --- Color type
 -- @name Color
@@ -33,17 +60,31 @@ end
 --- Creates a table struct that resembles a Color
 -- @name builtins_library.Color
 -- @class function
--- @param r - Red
+-- @param r - Red or string hexadecimal color
 -- @param g - Green
 -- @param b - Blue
 -- @param a - Alpha
 -- @return New color
-instance.env.Color = function (r, g, b, a)
-	if r~=nil then checkluatype(r, TYPE_NUMBER) else r = 255 end
-	if g~=nil then checkluatype(g, TYPE_NUMBER) else g = 255 end
-	if b~=nil then checkluatype(b, TYPE_NUMBER) else b = 255 end
-	if a~=nil then checkluatype(a, TYPE_NUMBER) else a = 255 end
-	return wrap({ r, g, b, a })
+function instance.env.Color(r, g, b, a)
+	if isstring(r) then
+		if r[1] == "#" then r = string.sub(r, 2) end
+		if string.match(r, "%X") then
+			SF.Throw("Invalid characters in hexadecimal color", 2)
+		else
+			local h2r = hex_to_rgb[#r]
+			if h2r then
+				return wrap(h2r(r))
+			else
+				SF.Throw("Invalid hexadecimal color length", 2)
+			end
+		end
+	else
+		if r~=nil then checkluatype(r, TYPE_NUMBER) else r = 255 end
+		if g~=nil then checkluatype(g, TYPE_NUMBER) else g = 255 end
+		if b~=nil then checkluatype(b, TYPE_NUMBER) else b = 255 end
+		if a~=nil then checkluatype(a, TYPE_NUMBER) else a = 255 end
+		return wrap({ r, g, b, a })
+	end
 end
 
 -- Lookup table.
@@ -153,6 +194,17 @@ end
 function color_methods:hsvToRGB()
 	local rgb = HSVToColor(math.Clamp(self[1] % 360, 0, 360), math.Clamp(self[2], 0, 1), math.Clamp(self[3], 0, 1))
 	return wrap({ rgb.r, rgb.g, rgb.b, (rgb.a or 255) })
+end
+
+local tohex = bit.tohex
+--- Returns a hexadecimal string representation of the color
+-- @return String hexadecimal color
+function color_methods:getHex()
+	if self[4] == 255 then
+		return tohex(self[1], 2)..tohex(self[2], 2)..tohex(self[3], 2)
+	else
+		return tohex(self[1], 2)..tohex(self[2], 2)..tohex(self[3], 2)..tohex(self[4], 2)
+	end
 end
 
 --- Round the color values. Self-Modifies.
