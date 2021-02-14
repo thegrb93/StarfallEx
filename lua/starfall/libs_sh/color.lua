@@ -197,14 +197,14 @@ function color_methods:hsvToRGB()
 end
 
 --- Returns a hexadecimal string representation of the color
--- @param discard_alpha Optional boolean, whether to drop the alpha channel
+-- @param alpha Optional boolean, whether to include the alpha channel, False by default
 -- @return String hexadecimal color
-function color_methods:toHex(discard_alpha)
-	if discard_alpha~=nil then checkluatype(discard_alpha, TYPE_BOOL) end
-	if discard_alpha then
-		return string.format("%X%X%X", self[1], self[2], self[3])
-	else
+function color_methods:toHex(alpha)
+	if alpha~=nil then checkluatype(alpha, TYPE_BOOL) end
+	if alpha then
 		return string.format("%X%X%X%X", self[1], self[2], self[3], self[4])
+	else
+		return string.format("%X%X%X", self[1], self[2], self[3])
 	end
 end
 
