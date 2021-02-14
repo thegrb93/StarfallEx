@@ -196,14 +196,15 @@ function color_methods:hsvToRGB()
 	return wrap({ rgb.r, rgb.g, rgb.b, (rgb.a or 255) })
 end
 
-local bit_tohex = bit.tohex
 --- Returns a hexadecimal string representation of the color
+-- @param discard_alpha Optional boolean, whether to drop the alpha channel
 -- @return String hexadecimal color
-function color_methods:getHex()
-	if self[4] == 255 then
-		return bit_tohex(self[1], 2)..bit_tohex(self[2], 2)..bit_tohex(self[3], 2)
+function color_methods:toHex(discard_alpha)
+	if discard_alpha~=nil then checkluatype(discard_alpha, TYPE_BOOL) end
+	if discard_alpha then
+		return string.format("%X%X%X", self[1], self[2], self[3])
 	else
-		return bit_tohex(self[1], 2)..bit_tohex(self[2], 2)..bit_tohex(self[3], 2)..bit_tohex(self[4], 2)
+		return string.format("%X%X%X%X", self[1], self[2], self[3], self[4])
 	end
 end
 
