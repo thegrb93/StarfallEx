@@ -196,14 +196,14 @@ function color_methods:hsvToRGB()
 	return wrap({ rgb.r, rgb.g, rgb.b, (rgb.a or 255) })
 end
 
-local tohex = bit.tohex
+local bit_tohex = bit.tohex
 --- Returns a hexadecimal string representation of the color
 -- @return String hexadecimal color
 function color_methods:getHex()
 	if self[4] == 255 then
-		return tohex(self[1], 2)..tohex(self[2], 2)..tohex(self[3], 2)
+		return bit_tohex(self[1], 2)..bit_tohex(self[2], 2)..bit_tohex(self[3], 2)
 	else
-		return tohex(self[1], 2)..tohex(self[2], 2)..tohex(self[3], 2)..tohex(self[4], 2)
+		return bit_tohex(self[1], 2)..bit_tohex(self[2], 2)..bit_tohex(self[3], 2)..bit_tohex(self[4], 2)
 	end
 end
 
