@@ -197,7 +197,7 @@ function color_methods:hsvToRGB()
 end
 
 --- Returns a hexadecimal string representation of the color
--- @param alpha Optional boolean, whether to include the alpha channel, False by default
+-- @param alpha Optional boolean whether to include the alpha channel, False by default
 -- @return String hexadecimal color
 function color_methods:toHex(alpha)
 	if alpha~=nil then checkluatype(alpha, TYPE_BOOL) end
