@@ -2204,29 +2204,29 @@ end
 -- @name predrawopaquerenderables
 -- @class hook
 -- @client
--- @param boolean isDrawingDepth Whether the current draw is writing depth.
--- @param boolean isDrawSkybox Whether the current draw is drawing the skybox.
+-- @param depth Boolean whether the current draw is writing depth
+-- @param skybox Boolean whether the current draw is drawing the skybox
 
 --- Called after opaque entities are drawn. (Only works with HUD) (3D context)
 -- @name postdrawopaquerenderables
 -- @class hook
 -- @client
--- @param boolean isDrawingDepth Whether the current draw is writing depth.
--- @param boolean isDrawSkybox Whether the current draw is drawing the skybox.
+-- @param depth Boolean whether the current draw is writing depth
+-- @param skybox Boolean whether the current draw is drawing the skybox
 
 --- Called before translucent entities are drawn. (Only works with HUD) (3D context)
 -- @name predrawtranslucentrenderables
 -- @class hook
 -- @client
--- @param depth Boolean, whether the current draw is writing depth
--- @param skybox Boolean, whether the current draw is drawing the skybox
+-- @param depth Boolean whether the current draw is writing depth
+-- @param skybox Boolean whether the current draw is drawing the skybox
 
 --- Called after translucent entities are drawn. (Only works with HUD) (3D context)
 -- @name postdrawtranslucentrenderables
 -- @class hook
 -- @client
--- @param depth Boolean, whether the current draw is writing depth
--- @param skybox Boolean, whether the current draw is drawing the skybox
+-- @param depth Boolean whether the current draw is writing depth
+-- @param skybox Boolean whether the current draw is drawing the skybox
 
 --- Called when the engine wants to calculate the player's view. Only works if connected to Starfall HUD
 -- @name calcview
