@@ -202,9 +202,9 @@ end
 function color_methods:toHex(alpha)
 	if alpha~=nil then checkluatype(alpha, TYPE_BOOL) end
 	if alpha then
-		return string.format("%02X%02X%02X%02X", self[1], self[2], self[3], self[4])
+		return string.format("%02x%02x%02x%02x", self[1], self[2], self[3], self[4])
 	else
-		return string.format("%02X%02X%02X", self[1], self[2], self[3])
+		return string.format("%02x%02x%02x", self[1], self[2], self[3])
 	end
 end
 
