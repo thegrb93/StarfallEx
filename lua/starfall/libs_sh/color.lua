@@ -8,28 +8,28 @@ local clamp = function(v) return math_Clamp(v, 0, 255) end
 local string_sub = string.sub
 local hex_to_rgb = {
 	[3] = function(v) return {
-		tonumber("0x"..v[1])*17,
-		tonumber("0x"..v[2])*17,
-		tonumber("0x"..v[3])*17,
+		tonumber(v[1], 16),
+		tonumber(v[2], 16),
+		tonumber(v[3], 16),
 		255
 	} end,
 	[4] = function(v) return {
-		tonumber("0x"..v[1])*17,
-		tonumber("0x"..v[2])*17,
-		tonumber("0x"..v[3])*17,
-		tonumber("0x"..v[4])*17
+		tonumber(v[1], 16),
+		tonumber(v[2], 16),
+		tonumber(v[3], 16),
+		tonumber(v[4], 16)
 	} end,
 	[6] = function(v) return {
-		tonumber("0x"..string_sub(v,1,2)),
-		tonumber("0x"..string_sub(v,3,4)),
-		tonumber("0x"..string_sub(v,5,6)),
+		tonumber(string_sub(v,1,2), 16),
+		tonumber(string_sub(v,3,4), 16),
+		tonumber(string_sub(v,5,6), 16),
 		255
 	} end,
 	[8] = function(v) return {
-		tonumber("0x"..string_sub(v,1,2)),
-		tonumber("0x"..string_sub(v,3,4)),
-		tonumber("0x"..string_sub(v,5,6)),
-		tonumber("0x"..string_sub(v,7,8))
+		tonumber(string_sub(v,1,2), 16),
+		tonumber(string_sub(v,3,4), 16),
+		tonumber(string_sub(v,5,6), 16),
+		tonumber(string_sub(v,7,8), 16),
 	} end,
 }
 
