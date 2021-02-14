@@ -29,7 +29,7 @@ local hex_to_rgb = {
 		tonumber(string_sub(v,1,2), 16),
 		tonumber(string_sub(v,3,4), 16),
 		tonumber(string_sub(v,5,6), 16),
-		tonumber(string_sub(v,7,8), 16),
+		tonumber(string_sub(v,7,8), 16)
 	} end,
 }
 
