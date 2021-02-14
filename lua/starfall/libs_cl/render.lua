@@ -157,6 +157,8 @@ local renderhooks = {
 	renderscene = prepareRenderScene,
 	predrawopaquerenderables = prepareRender,
 	postdrawopaquerenderables = prepareRender,
+	predrawtranslucentrenderables = prepareRender,
+	postdrawtranslucentrenderables = prepareRender,
 	vrprerenderleft = prepareRender,
 	vrprerenderright = prepareRender,
 	predrawhud = prepareRender,
@@ -208,6 +210,8 @@ SF.hookAdd("HUDShouldDraw", nil, canRenderHudSafeArgs, function(instance, args)
 end)
 SF.hookAdd("PreDrawOpaqueRenderables", nil, canRenderHudSafeArgs)
 SF.hookAdd("PostDrawOpaqueRenderables", nil, canRenderHudSafeArgs)
+SF.hookAdd("PreDrawTranslucentRenderables", nil, canRenderHudSafeArgs)
+SF.hookAdd("PostDrawTranslucentRenderables", nil, canRenderHudSafeArgs)
 SF.hookAdd("PreDrawHUD", nil, canRenderHudSafeArgs)
 SF.hookAdd("PostDrawHUD", nil, canRenderHudSafeArgs)
 SF.hookAdd("CalcView", nil, canCalcview, returnCalcview)
@@ -2209,6 +2213,20 @@ end
 -- @client
 -- @param boolean isDrawingDepth Whether the current draw is writing depth.
 -- @param boolean isDrawSkybox Whether the current draw is drawing the skybox.
+
+--- Called before translucent entities are drawn. (Only works with HUD) (3D context)
+-- @name predrawtranslucentrenderables
+-- @class hook
+-- @client
+-- @param depth Boolean, whether the current draw is writing depth
+-- @param skybox Boolean, whether the current draw is drawing the skybox
+
+--- Called after translucent entities are drawn. (Only works with HUD) (3D context)
+-- @name postdrawtranslucentrenderables
+-- @class hook
+-- @client
+-- @param depth Boolean, whether the current draw is writing depth
+-- @param skybox Boolean, whether the current draw is drawing the skybox
 
 --- Called when the engine wants to calculate the player's view. Only works if connected to Starfall HUD
 -- @name calcview
