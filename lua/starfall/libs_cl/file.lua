@@ -220,6 +220,19 @@ function file_library.write(path, data)
 	f:Close()
 end
 
+--- Reads a temp file's data if it exists. Otherwise returns nil
+-- @param filename The temp file name. Must be only a file and not a path
+-- @return The data of the temp file or nil if it doesn't exist
+function file_library.readTemp(filename)
+	checkluatype(filename, TYPE_STRING)
+
+	if #filename > 128 then SF.Throw("Filename is too long!", 2) end
+	checkExtension(filename)
+	filename = string.lower(string.GetFileFromFilename(filename))
+
+	return file.Read("sf_filedatatemp/"..instance.player:SteamID64().."/"..filename, "DATA")
+end
+
 --- Writes a temporary file. Throws an error if it is unable to.
 -- @param filename The name to give the file. Must be only a file and not a path
 -- @param data The data to write
