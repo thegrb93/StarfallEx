@@ -5,31 +5,31 @@ local dgetmeta = debug.getmetatable
 local math_Clamp = math.Clamp
 local clamp = function(v) return math_Clamp(v, 0, 255) end
 
-local string_sub = string.sub
+local math_floor = math.floor
 local hex_to_rgb = {
 	[3] = function(v) return {
-		tonumber(v[1], 16) * 17,
-		tonumber(v[2], 16) * 17,
-		tonumber(v[3], 16) * 17,
-		255
+		math_floor(v / 0x100) % 0x10 * 0x11,
+		math_floor(v / 0x010) % 0x10 * 0x11,
+		v % 0x10 * 0x11,
+		0xFF
 	} end,
 	[4] = function(v) return {
-		tonumber(v[1], 16) * 17,
-		tonumber(v[2], 16) * 17,
-		tonumber(v[3], 16) * 17,
-		tonumber(v[4], 16) * 17
+		math_floor(v / 0x1000) % 0x10 * 0x11,
+		math_floor(v / 0x0100) % 0x10 * 0x11,
+		math_floor(v / 0x0010) % 0x10 * 0x11,
+		v % 0x10 * 0x11,
 	} end,
 	[6] = function(v) return {
-		tonumber(string_sub(v,1,2), 16),
-		tonumber(string_sub(v,3,4), 16),
-		tonumber(string_sub(v,5,6), 16),
-		255
+		math_floor(v / 0x10000) % 0x100,
+		math_floor(v / 0x00100) % 0x100,
+		v % 0x100,
+		0xFF
 	} end,
 	[8] = function(v) return {
-		tonumber(string_sub(v,1,2), 16),
-		tonumber(string_sub(v,3,4), 16),
-		tonumber(string_sub(v,5,6), 16),
-		tonumber(string_sub(v,7,8), 16)
+		math_floor(v / 0x1000000) % 0x100,
+		math_floor(v / 0x0010000) % 0x100,
+		math_floor(v / 0x0000100) % 0x100,
+		v % 0x100
 	} end,
 }
 
@@ -67,16 +67,12 @@ end
 -- @return New color
 function instance.env.Color(r, g, b, a)
 	if isstring(r) then
-		if r[1] == "#" then r = string.sub(r, 2) end
-		if string.match(r, "%X") then
-			SF.Throw("Invalid characters in hexadecimal color", 2)
+		local hex = string.match(r, "^#?(%x+)$") or SF.Throw("Invalid hexadecimal color", 2)
+		local h2r = hex_to_rgb[#hex]
+		if h2r then
+			return wrap(h2r(tonumber(hex, 16)))
 		else
-			local h2r = hex_to_rgb[#r]
-			if h2r then
-				return wrap(h2r(r))
-			else
-				SF.Throw("Invalid hexadecimal color length", 2)
-			end
+			SF.Throw("Invalid hexadecimal color length")
 		end
 	else
 		if r~=nil then checkluatype(r, TYPE_NUMBER) else r = 255 end
