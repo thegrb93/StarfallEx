@@ -72,7 +72,7 @@ function instance.env.Color(r, g, b, a)
 		if h2r then
 			return wrap(h2r(tonumber(hex, 16)))
 		else
-			SF.Throw("Invalid hexadecimal color length")
+			SF.Throw("Invalid hexadecimal color length", 2)
 		end
 	else
 		if r~=nil then checkluatype(r, TYPE_NUMBER) else r = 255 end
