@@ -18,7 +18,7 @@ local ss_meta = {
 	__index = ss_methods,
 	__metatable = "StringStream",
 	__tostring = function(self)
-		return string.format("Stringstream [%u,%u]",self.pos, #self.buffer)
+		return string.format("Stringstream [%u,%u]", self:tell(), self:size())
 	end
 }
 local ss_methods_big = setmetatable({},{__index=ss_methods})
@@ -26,7 +26,7 @@ local ss_meta_big = {
 	__index = ss_methods_big,
 	__metatable = "StringStream",
 	__tostring = function(self)
-		return string.format("Stringstream [%u,%u]",self.pos, #self.buffer)
+		return string.format("Stringstream [%u,%u]", self:tell(), self:size())
 	end
 }
 
