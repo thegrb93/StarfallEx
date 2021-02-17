@@ -5,30 +5,30 @@ local dgetmeta = debug.getmetatable
 local math_Clamp = math.Clamp
 local clamp = function(v) return math_Clamp(v, 0, 255) end
 
-local math_rshift = math.rshift
+local bit_rshift = bit.rshift
 local hex_to_rgb = {
 	[3] = function(v) return {
-		math_rshift(v, 8) % 0x10 * 0x11,
-		math_rshift(v, 4) % 0x10 * 0x11,
+		bit_rshift(v, 8) % 0x10 * 0x11,
+		bit_rshift(v, 4) % 0x10 * 0x11,
 		v % 0x10 * 0x11,
 		0xFF
 	} end,
 	[4] = function(v) return {
-		math_rshift(v, 12) % 0x10 * 0x11,
-		math_rshift(v, 8) % 0x10 * 0x11,
-		math_rshift(v, 4) % 0x10 * 0x11,
+		bit_rshift(v, 12) % 0x10 * 0x11,
+		bit_rshift(v, 8) % 0x10 * 0x11,
+		bit_rshift(v, 4) % 0x10 * 0x11,
 		v % 0x10 * 0x11,
 	} end,
 	[6] = function(v) return {
-		math_rshift(v, 16) % 0x100,
-		math_rshift(v, 8) % 0x100,
+		bit_rshift(v, 16) % 0x100,
+		bit_rshift(v, 8) % 0x100,
 		v % 0x100,
 		0xFF
 	} end,
 	[8] = function(v) return {
-		math_rshift(v, 24) % 0x100,
-		math_rshift(v, 16) % 0x100,
-		math_rshift(v, 8) % 0x100,
+		bit_rshift(v, 24) % 0x100,
+		bit_rshift(v, 16) % 0x100,
+		bit_rshift(v, 8) % 0x100,
 		v % 0x100
 	} end,
 }
