@@ -98,7 +98,7 @@ net.Receive("starfall_hologram_clips", function()
 	local function applyHologram(self)
 		if self and self.IsSFHologram then
 			local clips = {}
-			for i=1, math.Round(#clipdata.buffer/34) do
+			for i=1, math.Round(clipdata:size()/34) do
 				local index = clipdata:readDouble()
 				local clip = {
 					normal = Vector(clipdata:readFloat(), clipdata:readFloat(), clipdata:readFloat()),
