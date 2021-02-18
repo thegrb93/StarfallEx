@@ -121,7 +121,7 @@ local parseAttributes = {
 		t[#t+1] = value
 	end,
 	["param"] = function(parsing, value)
-		local name, description = string.match(value, "%s*([%w_]+)%s*(.*)")
+		local name, description = string.match(value, "%s*([%w_%.]+)%s*(.*)")
 		if name then
 			local t = parsing.params
 			if not t then t = {} parsing.params = t end
