@@ -52,8 +52,8 @@ string_library.comma = sfstring.Comma
 
 --- Returns the binary bytecode of the given function.
 -- @class function
--- @param The function to get the bytecode of
--- @param True to strip the debug data, false to keep it. Defaults to false
+-- @param func The function to get the bytecode of
+-- @param strip True to strip the debug data, false to keep it. Defaults to false
 -- @return The bytecode
 string_library.dump = sfstring.dump
 
@@ -142,7 +142,7 @@ string_library.gmatch = sfstring.gmatch
 -- @param str String which should be modified.
 -- @param pattern The pattern that defines what should be matched and eventually be replaced.
 -- @param replacement If string: matched sequence will be replaced with it; If table: matched sequence will be used as key; If function: matches will be passed as parameters to the function (return to replace)
--- @param Optional maximum number of replacements to be made
+-- @param max Optional maximum number of replacements to be made
 -- @return String with replaced parts
 -- @return Replacements count
 string_library.gsub = sfstring.gsub
@@ -258,7 +258,7 @@ string_library.startWith = sfstring.StartWith
 
 --- Removes the extension of a path
 -- @class function
--- @param The file-path to change
+-- @param path The file-path to change
 -- @return Path without the extension
 string_library.stripExtension = sfstring.StripExtension
 
