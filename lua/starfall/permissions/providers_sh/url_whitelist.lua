@@ -79,6 +79,11 @@ simple [[onedrive.live.com/redir]]
 
 simple [[docs.google.com/uc]]
 
+-- Backblaze B2
+--- Examples:
+--- https://f002.backblazeb2.com/file/djje-CDN/ShareX/0221/1613775658.png
+pattern [[(%w+)%.backblazeb2%.com/(.+)]]
+
 -- Imgur
 --- Examples:
 ---  http://i.imgur.com/abcd123.xxx
