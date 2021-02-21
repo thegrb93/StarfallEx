@@ -78,6 +78,7 @@ simple [[onedrive.live.com/redir]]
 ---  https://docs.google.com/uc?export=download&confirm=UYyi&id=0BxUpZqVaDxVPeENDM1RtZDRvaTA
 
 simple [[docs.google.com/uc]]
+simple [[drive.google.com/uc]]
 
 -- Backblaze B2
 --- Examples:
