@@ -670,9 +670,8 @@ function quat_methods:getEulerAngle()
 	if len_sqrt == 0 then
 		return awrap(Angle(0, 0, 0))
 	else
-		local q = clone(self)
-		quatNorm(q)
-		local q1, q2, q3, q4 = quatUnpack(q)
+		local q1, q2, q3, q4 = quatUnpack(self)
+		q1, q2, q3, q4 = q1 / len_sqrt, q2 / len_sqrt, q3 / len_sqrt, q4 / len_sqrt
 		
 		local x = Vector(q1*q1 + q2*q2 - q3*q3 - q4*q4, 2*q3*q2 + 2*q4*q1, 2*q4*q2 - 2*q3*q1)
 		local y = Vector(2*q2*q3 - 2*q4*q1, q1*q1 - q2*q2 + q3*q3 - q4*q4, 2*q2*q1 + 2*q3*q4)
@@ -682,7 +681,7 @@ function quat_methods:getEulerAngle()
 		if ang[2] > 180 then ang[2] = ang[2] - 360 end
 		
 		local yaw = Vector(0, 1, 0)
-		yaw:Rotate(Angle(0, ang[1], 0))
+		yaw:Rotate(Angle(0, ang[2], 0))
 		
 		ang[3] = math_deg(math_acos(math_clamp(y:Dot(yaw), -1, 1)))
 		local dot = q1*q2 + q3*q4
