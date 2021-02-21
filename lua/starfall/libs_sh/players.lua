@@ -394,6 +394,12 @@ function player_methods:getViewModel()
 	return owrap(getply(self):GetViewModel(0))
 end
 
+--- Returns the camera punch offset angle
+-- @return The angle of the view offset
+function player_methods:getViewPunchAngles()
+	return awrap(getply(self):GetViewPunchAngles())
+end
+
 --- Returns a table of weapons the player is carrying
 -- @shared
 -- @return Table of weapons
