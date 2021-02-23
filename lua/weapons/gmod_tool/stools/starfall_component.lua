@@ -295,6 +295,11 @@ if CLIENT then
 			icon.Model = model
 			icon:SetSize(64, 64)
 			icon:SetTooltip(v.Name)
+			icon.OpenMenu = function( button )
+				local menu = DermaMenu()
+				menu:AddOption( "#spawnmenu.menu.copy", function() SetClipboardText( model ) end ):SetIcon( "icon16/page_copy.png" )
+				menu:Open()
+			end
 			modelPanel:AddPanel(icon, { ["starfall_component_Model"] = model })
 		end
 		modelPanel:SortByMember("Model", false)
