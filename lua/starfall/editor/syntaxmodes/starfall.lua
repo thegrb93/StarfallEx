@@ -629,21 +629,22 @@ function EDITOR:SyntaxColorLine(row)
 	return cols
 end
 
+local incBlock = {["function"]=true,["then"]=true,["do"]=true}
+local decBlock = {["end"]=true,["elseif"]=true}
 local BracketPairs = {
 	["{"] = {Removes = {["}"]=true}, Adds = {["{"]=true}},
 	["["] = {Removes = {["]"]=true}, Adds = {["["]=true}},
 	["("] = {Removes = {[")"]=true}, Adds = {["("]=true}},
-	["then"] = {Adds = {["function"]=true,["then"]=true,["do"]=true}, Removes = {["end"]=true,["else"]=true,["elseif"]=true}},
-	["function"] = {Adds = {["function"]=true,["then"]=true,["do"]=true}, Removes = {["end"]=true,["else"]=true,["elseif"]=true}},
-	["do"] = {Adds = {["function"]=true,["then"]=true,["do"]=true}, Removes = {["end"]=true,["else"]=true,["elseif"]=true}},
-	["else"] = {Adds = {["function"]=true,["then"]=true,["do"]=true,["else"]=true}, Removes = {["end"]=true,["elseif"]=true}},
+	["then"] = {Adds = incBlock, Removes = decBlock},
+	["function"] = {Adds = incBlock, Removes = decBlock},
+	["do"] = {Adds = incBlock, Removes = decBlock},
 }
 local BracketPairs2 = {
 	["}"] = {Adds = {["}"]=true}, Removes = {["{"]=true}},
 	["]"] = {Adds = {["]"]=true}, Removes = {["["]=true}},
 	[")"] = {Adds = {[")"]=true}, Removes = {["("]=true}},
-	["end"] = {Removes = {["function"]=true,["then"]=true,["do"]=true}, Adds = {["end"]=true, ["else"]=true,["elseif"]=true}},
-	["elseif"] = {Removes = {["function"]=true,["then"]=true,["do"]=true}, Adds = {["end"]=true, ["else"]=true,["elseif"]=true}},
+	["end"] = {Removes = incBlock, Adds = decBlock},
+	["elseif"] = {Removes = incBlock, Adds = decBlock},
 }
 
 function EDITOR:PopulateContextMenu(menu)
@@ -778,9 +779,6 @@ function EDITOR:PaintTextOverlay()
 						x = x + #text
 						cBracketPos = x
 						continue
-					end
-					if text == "else" then
-						text = "then"
 					end
 					if lookup[bracket].Adds[text] then
 						sum = sum + 1
