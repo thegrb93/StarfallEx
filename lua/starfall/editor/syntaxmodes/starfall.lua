@@ -633,18 +633,19 @@ local BracketPairs = {
 	["{"] = {Removes = {["}"]=true}, Adds = {["{"]=true}},
 	["["] = {Removes = {["]"]=true}, Adds = {["["]=true}},
 	["("] = {Removes = {[")"]=true}, Adds = {["("]=true}},
-	["then"] = {Adds = {["function"]=true,["then"]=true}, Removes = {["end"]=true, ["else"]=true,["elseif"]=true}},
-	["function"] = {Adds = {["function"]=true,["then"]=true}, Removes = {["end"]=true, ["else"]=true,["elseif"]=true}},
-	["else"] = {Adds = {["function"]=true,["then"]=true, ["else"]=true}, Removes = {["end"]=true,["elseif"]=true}},
+	["then"] = {Adds = {["function"]=true,["then"]=true,["do"]=true}, Removes = {["end"]=true,["else"]=true,["elseif"]=true}},
+	["function"] = {Adds = {["function"]=true,["then"]=true,["do"]=true}, Removes = {["end"]=true,["else"]=true,["elseif"]=true}},
+	["do"] = {Adds = {["function"]=true,["then"]=true,["do"]=true}, Removes = {["end"]=true,["else"]=true,["elseif"]=true}},
+	["else"] = {Adds = {["function"]=true,["then"]=true,["do"]=true,["else"]=true}, Removes = {["end"]=true,["elseif"]=true}},
 }
 local BracketPairs2 = {
 	["}"] = {Adds = {["}"]=true}, Removes = {["{"]=true}},
 	["]"] = {Adds = {["]"]=true}, Removes = {["["]=true}},
 	[")"] = {Adds = {[")"]=true}, Removes = {["("]=true}},
-	["end"] = {Removes = {["function"]=true,["then"]=true}, Adds = {["end"]=true, ["else"]=true,["elseif"]=true}},
-	["elseif"] = {Removes = {["function"]=true,["then"]=true}, Adds = {["end"]=true, ["else"]=true,["elseif"]=true}},
-
+	["end"] = {Removes = {["function"]=true,["then"]=true,["do"]=true}, Adds = {["end"]=true, ["else"]=true,["elseif"]=true}},
+	["elseif"] = {Removes = {["function"]=true,["then"]=true,["do"]=true}, Adds = {["end"]=true, ["else"]=true,["elseif"]=true}},
 }
+
 function EDITOR:PopulateContextMenu(menu)
 	local caret = self:CursorToCaret()
 	if not caret then return end
