@@ -629,8 +629,8 @@ function EDITOR:SyntaxColorLine(row)
 	return cols
 end
 
-local incBlock = {["function"]=true,["then"]=true,["do"]=true}
-local decBlock = {["end"]=true,["elseif"]=true}
+local incBlock = {["function"]=true,["then"]=true,["do"]=true,["else"]=true}
+local decBlock = {["end"]=true,["elseif"]=true,["else"]=true}
 local BracketPairs = {
 	["{"] = {Removes = {["}"]=true}, Adds = {["{"]=true}},
 	["["] = {Removes = {["]"]=true}, Adds = {["["]=true}},
@@ -638,6 +638,7 @@ local BracketPairs = {
 	["then"] = {Adds = incBlock, Removes = decBlock},
 	["function"] = {Adds = incBlock, Removes = decBlock},
 	["do"] = {Adds = incBlock, Removes = decBlock},
+	["else"] = {Adds = incBlock, Removes = decBlock},
 }
 local BracketPairs2 = {
 	["}"] = {Adds = {["}"]=true}, Removes = {["{"]=true}},
@@ -737,7 +738,7 @@ function EDITOR:PaintTextOverlay()
 		local tokens = self:GetRowCache(line)
 		local length = 0
 		if BracketPairs[bracket] then
-			local lookup = BracketPairs
+			local lookup = BracketPairs[bracket]
 			while line < lines and not y do
 				tokens = self:GetRowCache(line)
 				if not tokens then break end
@@ -749,10 +750,13 @@ function EDITOR:PaintTextOverlay()
 						cBracketPos = x
 						continue
 					end
-					if lookup[bracket].Adds[text] then
-						sum = sum + 1
-					elseif lookup[bracket].Removes[text] then
+					if lookup.Removes[text] and sum>0 then
 						sum = sum - 1
+						if lookup.Adds[text] and sum>0 then
+							sum = sum + 1
+						end
+					elseif lookup.Adds[text] then
+						sum = sum + 1
 					end
 					if sum < 0 then return end
 					if sum == 0 then
@@ -767,7 +771,7 @@ function EDITOR:PaintTextOverlay()
 				line = line + 1
 			end
 		else--Reverse search
-			local lookup = BracketPairs2
+			local lookup = BracketPairs2[bracket]
 			startPos = bracketindex
 			line = self.Caret[1]
 			tokens = self:GetRowCache(line)
@@ -780,10 +784,13 @@ function EDITOR:PaintTextOverlay()
 						cBracketPos = x
 						continue
 					end
-					if lookup[bracket].Adds[text] then
-						sum = sum + 1
-					elseif lookup[bracket].Removes[text] then
+					if lookup.Removes[text] and sum>0 then
 						sum = sum - 1
+						if lookup.Adds[text] and sum>0 then
+							sum = sum + 1
+						end
+					elseif lookup.Adds[text] then
+						sum = sum + 1
 					end
 					if sum == 0 then
 						y = line
