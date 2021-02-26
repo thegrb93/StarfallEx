@@ -147,7 +147,7 @@ export default function Sidebar(props)
     switch(action.type)
     {
       case "SEARCH":
-        if(action.value.length>2){
+        if(action.value.length>2 || action.value.length==0){
           for(const key in newState.items)
           {
             performSearch(newState.items[key], action.value);
