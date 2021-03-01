@@ -29,21 +29,27 @@ local timer_library = instance.Libraries.timer
 -- ------------------------- Time ------------------------- --
 
 --- Returns the uptime of the server in seconds (to at least 4 decimal places)
+-- You should not use this for timing real world events as it is synchronized with the server, use realtime instead
+-- @return number Curtime in seconds
 function timer_library.curtime()
 	return CurTime()
 end
 
 --- Returns the uptime of the game/server in seconds (to at least 4 decimal places)
+-- Ideal for timing real world events since it updates local to the realm thinking, being clientside FPS or server tickrate
+-- @return number Realtime in seconds
 function timer_library.realtime()
 	return RealTime()
 end
 
 --- Returns a highly accurate time in seconds since the start up, ideal for benchmarking.
+-- @return number The time in seconds since start up
 function timer_library.systime()
 	return SysTime()
 end
 
 --- Returns time between frames on client and ticks on server. Same thing as G.FrameTime in GLua
+-- @return number The time between frames / ticks depending on realm
 function timer_library.frametime()
 	return FrameTime()
 end
