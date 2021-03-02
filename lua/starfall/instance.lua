@@ -130,6 +130,10 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 		end
 	end
 
+	instance.whitelistedEnvs = setmetatable({
+		[instance.env] = true
+	}, {__mode = 'k'})
+
 	instance.startram = collectgarbage("count")
 
 	return true, instance

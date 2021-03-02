@@ -778,13 +778,17 @@ function builtins_library.loadstring(str, name)
 end
 
 --- Lua's setfenv
--- Works like setfenv, but is restricted on functions
--- @param func Function to change builtins_library of
--- @param tbl New builtins_library
--- @return func with builtins_library set to tbl
-function builtins_library.setfenv(func, tbl)
-	if not isfunction(func) or getfenv(func) == _G then SF.Throw("Main Thread is protected!", 2) end
-	return setfenv(func, tbl)
+-- Sets the environment of either the stack level or the function specified.
+-- Note that this function will throw an error if you try to use it on anything outside of your sandbox.
+-- @param funcOrStackLevel Function or stack level to set the environment of
+-- @param tbl New environment
+-- @return Function with environment set to tbl
+function builtins_library.setfenv(location, environment)
+	if instance.whitelistedEnvs[getfenv(location)] then
+		instance.whitelistedEnvs[environment] = true
+		return setfenv(location, environment)
+	end
+	SF.Throw("cannot change environment of given object", 2)
 end
 
 --- Gets an SF type's methods table
@@ -798,12 +802,16 @@ function builtins_library.getMethods(sfType)
 	end
 end
 
---- Simple version of Lua's getfenv
--- Returns the current builtins_library
--- @return Current builtins_library
-function builtins_library.getfenv()
-	local fenv = getfenv(2)
-	if fenv ~= _G then return fenv end
+--- Lua's getfenv
+-- Returns the environment of either the stack level or the function specified.
+-- Note that this function will return nil if the return value would be anything other than builtins_library or an environment you have passed to setfenv.
+-- @param funcOrStackLevel Function or stack level to get the environment of
+-- @return Environment table (or nil, if restricted)
+function builtins_library.getfenv(location)
+	local fenv = getfenv(location or 2)
+	if instance.whitelistedEnvs[fenv] then
+		return fenv
+	end
 end
 
 --- GLua's debug.getinfo()
