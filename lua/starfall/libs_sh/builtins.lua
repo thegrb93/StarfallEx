@@ -784,6 +784,13 @@ end
 -- @param tbl New environment
 -- @return Function with environment set to tbl
 function builtins_library.setfenv(location, environment)
+	if location == nil then
+		location = 2
+	elseif isnumber(location) then
+		location = location+1 -- This makes setfenv appear as though it's not detoured.
+	elseif not isfunction(location) then
+		SF.ThrowTypeError("function or number", SF.GetType(location), 2)
+	end
 	if instance.whitelistedEnvs[getfenv(location)] then
 		instance.whitelistedEnvs[environment] = true
 		return setfenv(location, environment)
@@ -808,7 +815,14 @@ end
 -- @param funcOrStackLevel Function or stack level to get the environment of
 -- @return Environment table (or nil, if restricted)
 function builtins_library.getfenv(location)
-	local fenv = getfenv(location or 2)
+	if location == nil then
+		location = 2
+	elseif isnumber(location) then
+		location = location+1 -- This makes getfenv appear as though it's not detoured.
+	elseif not isfunction(location) then
+		SF.ThrowTypeError("function or number", SF.GetType(location), 2)
+	end
+	local fenv = getfenv(location)
 	if instance.whitelistedEnvs[fenv] then
 		return fenv
 	end
