@@ -797,8 +797,8 @@ function builtins_library.setfenv(location, environment)
 	elseif not isfunction(location) then
 		SF.ThrowTypeError("function or number", SF.GetType(location), 2)
 	end
-	if instance.whitelistedEnvs[getfenv(location)] then
-		instance.whitelistedEnvs[environment] = true
+	if whitelistedEnvs[getfenv(location)] then
+		whitelistedEnvs[environment] = true
 		return setfenv(location, environment)
 	end
 	SF.Throw("cannot change environment of given object", 2)
@@ -818,7 +818,7 @@ function builtins_library.getfenv(location)
 		SF.ThrowTypeError("function or number", SF.GetType(location), 2)
 	end
 	local fenv = getfenv(location)
-	if instance.whitelistedEnvs[fenv] then
+	if whitelistedEnvs[fenv] then
 		return fenv
 	end
 end
