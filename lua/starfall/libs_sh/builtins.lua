@@ -777,6 +777,12 @@ function builtins_library.loadstring(str, name)
 	return func
 end
 
+-- Used for getfenv and setfenv.
+local whitelistedEnvs = setmetatable({
+	[instance.env] = true
+}, {__mode = 'k'})
+instance.whitelistedEnvs = whitelistedEnvs
+
 --- Lua's setfenv
 -- Sets the environment of either the stack level or the function specified.
 -- Note that this function will throw an error if you try to use it on anything outside of your sandbox.
@@ -798,17 +804,6 @@ function builtins_library.setfenv(location, environment)
 	SF.Throw("cannot change environment of given object", 2)
 end
 
---- Gets an SF type's methods table
--- @param sfType Name of SF type
--- @return Table of the type's methods which can be edited or iterated
-function builtins_library.getMethods(sfType)
-	checkluatype(sfType, TYPE_STRING)
-	local typemeta = instance.Types[sfType]
-	if typemeta then
-		return typemeta.Methods
-	end
-end
-
 --- Lua's getfenv
 -- Returns the environment of either the stack level or the function specified.
 -- Note that this function will return nil if the return value would be anything other than builtins_library or an environment you have passed to setfenv.
@@ -825,6 +820,17 @@ function builtins_library.getfenv(location)
 	local fenv = getfenv(location)
 	if instance.whitelistedEnvs[fenv] then
 		return fenv
+	end
+end
+
+--- Gets an SF type's methods table
+-- @param sfType Name of SF type
+-- @return Table of the type's methods which can be edited or iterated
+function builtins_library.getMethods(sfType)
+	checkluatype(sfType, TYPE_STRING)
+	local typemeta = instance.Types[sfType]
+	if typemeta then
+		return typemeta.Methods
 	end
 end
 
