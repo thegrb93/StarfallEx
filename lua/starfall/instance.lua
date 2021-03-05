@@ -479,8 +479,10 @@ function SF.Instance:runWithOps(func, ...)
 		end
 	end
 
+	local prevInstance = SF.runningInstance
 	local prevHook, mask, count = dgethook()
 	local prev = SF.runningOps
+	SF.runningInstance = self
 	SF.runningOps = true
 	SF.OnRunningOps(true)
 	dsethook(cpuCheck, "", 2000)
@@ -490,6 +492,7 @@ function SF.Instance:runWithOps(func, ...)
 	dsethook(prevHook, mask, count)
 	SF.runningOps = prev
 	SF.OnRunningOps(prev)
+	SF.runningInstance = prevInstance
 
 	if tbl[1] then
 		--Do another cpu check in case the debug hook wasn't called
@@ -511,7 +514,11 @@ end
 -- @return True if ok
 -- @return A table of values that the hook returned
 function SF.Instance:runWithoutOps(func, ...)
-	return { xpcall(func, xpcall_callback, ...) }
+	local prevInstance = SF.runningInstance
+	SF.runningInstance = self
+	local tbl = { xpcall(func, xpcall_callback, ...) }
+	SF.runningInstance = prevInstance
+	return tbl
 end
 
 --- Runs the scripts inside of the instance. This should be called once after

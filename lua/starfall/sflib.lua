@@ -19,22 +19,22 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 					local myMetaFunc = myMeta and myMeta[k]
 					if myMetaFunc then
 						meta[k] = function(...)
-							if SF.runningOps then return myMetaFunc(...) else return v(...) end
+							if SF.runningInstance then return myMetaFunc(...) else return v(...) end
 						end
 					else
 						meta[k] = function(...)
-							if not SF.runningOps then return v(...) end
+							if not SF.runningInstance then return v(...) end
 						end
 					end
 				elseif istable(v) and k=="__index" then
 					local myMetaFunc = myMeta and myMeta[k]
 					if myMetaFunc then
 						meta[k] = function(t,k)
-							if SF.runningOps then return myMetaFunc(t,k) else return rawget(t,k) end
+							if SF.runningInstance then return myMetaFunc(t,k) else return rawget(t,k) end
 						end
 					else
 						meta[k] = function(t,k)
-							if not SF.runningOps then return rawget(t,k) end
+							if not SF.runningInstance then return rawget(t,k) end
 						end
 					end
 				end
@@ -48,16 +48,21 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 	sanitizeTypeMeta(function() end)
 	sanitizeTypeMeta(coroutine.create(function() end))
 
-	local string_library = SF.SafeStringLib
 	local function sf_string_index(self, key)
-		local val = string_library[key]
-		if (val) then
-			return val
-		elseif (tonumber(key)) then
-			return self:sub(key, key)
-		else
-			SF.Throw("attempt to index a string value with bad key ('" .. tostring(key) .. "' is not part of the string library)", 2)
+		local instance_string = SF.runningInstance.Libraries.string
+		local value = rawget(instance_string, key)
+		if value then
+			return value
 		end
+		local meta = debug.getmetatable(instance_string)
+		if not meta then
+			return
+		end
+		local __index = rawget(meta, '__index') -- To avoid any metatable set on the metatable itself
+		if not __index then
+			return
+		end
+		return __index(self, key)
 	end
 	sanitizeTypeMeta("", {__index = sf_string_index})
 	
