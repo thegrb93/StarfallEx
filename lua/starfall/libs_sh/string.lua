@@ -14,6 +14,15 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 local string_library = instance.Libraries.string
 local sfstring = SF.SafeStringLib
 
+-- Handles numerical string indexes, e.g: ('abc')[2] == 'b'
+setmetatable(string_library, {
+	__index = function(self, k)
+		if isstring(self) and isnumber(k) then
+			return string.sub(self, k, k)
+		end
+	end
+})
+
 --- Converts color to a string.
 -- @class function
 -- @param color The color to put in the string
