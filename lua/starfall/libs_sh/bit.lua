@@ -456,7 +456,7 @@ end
 function ss_methods_big:writeInt16(x)
 	if x==math_huge or x==-math_huge or x~=x then error("Can't convert error float to integer!", 2) end
 	if x < 0 then x = x + 0x10000 end
-	self:write(bit_rshift(x, 8)%0x100, string.char(x%0x100))
+	self:write(string.char(bit_rshift(x, 8)%0x100, x%0x100))
 end
 
 --- Writes an int to the buffer and advances the buffer pointer.
@@ -469,7 +469,7 @@ end
 function ss_methods_big:writeInt32(x)
 	if x==math_huge or x==-math_huge or x~=x then error("Can't convert error float to integer!", 2) end
 	if x < 0 then x = x + 0x100000000 end
-	self:write(string.char(bit_rshift(x, 24)%0x100, bit_rshift(x, 16)%0x100, bit_rshift(x, 8)%0x100), x%0x100)
+	self:write(string.char(bit_rshift(x, 24)%0x100, bit_rshift(x, 16)%0x100, bit_rshift(x, 8)%0x100, x%0x100))
 end
 
 --- Writes a 4 byte IEEE754 float to the byte stream and advances the buffer pointer.
