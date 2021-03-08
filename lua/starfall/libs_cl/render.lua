@@ -1147,7 +1147,7 @@ end
 -- @param h Height
 -- @param startU Texture mapping at rectangle origin
 -- @param startV Texture mapping at rectangle origin
--- @param endV Texture mapping at rectangle end
+-- @param endU Texture mapping at rectangle end
 -- @param endV Texture mapping at rectangle end
 function render_library.drawTexturedRectUV(x, y, w, h, startU, startV, endU, endV)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
