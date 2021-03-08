@@ -312,7 +312,6 @@ end
 -- @return Boolean of whether the bass is valid.
 function bass_methods:isValid()
 	local uw = unwrap(self)
-
 	return uw and uw:IsValid()
 end
 
@@ -321,9 +320,29 @@ end
 -- @return The right sound level, a value between 0 and 1.
 function bass_methods:getLevels()
 	local uw = unwrap(self)
-
-	if (uw and uw:IsValid()) then
+	if uw and uw:IsValid() then
 		return uw:GetLevel()
+	end
+end
+
+--- Gets the relative volume between the left and right audio channels.
+-- @return number The pan. -1 for only left, 0 for centered, 1 for only right.
+function bass_methods:getPan()
+	local uw = unwrap(self)
+	if uw and uw:IsValid() then
+		return uw:GetPan()
+	end
+end
+
+--- Sets the relative volume of the left and right channels.
+-- @param number Relative volume between the left and right channels. -1 means only in left channel, 0 is center and 1 is only in the right channel.
+function bass_methods:setPan(pan)
+	checkluatype(pan, TYPE_NUMBER)
+	checkpermission(instance, nil, "sound.modify")
+
+	local uw = unwrap(self)
+	if uw and uw:IsValid() then
+		uw:SetPan( math.Clamp(pan, -1, 1) )
 	end
 end
 
