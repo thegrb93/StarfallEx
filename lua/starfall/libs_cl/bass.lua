@@ -247,8 +247,6 @@ end
 function bass_methods:getLength()
 	local uw = unwrap(self)
 
-	checkpermission(instance, nil, "sound.modify")
-
 	if (uw and uw:IsValid()) then
 		return uw:GetLength()
 	end
@@ -272,8 +270,6 @@ end
 function bass_methods:getTime()
 	local uw = unwrap(self)
 
-	checkpermission(instance, nil, "sound.modify")
-
 	if (uw and uw:IsValid()) then
 		return uw:GetTime()
 	end
@@ -284,8 +280,6 @@ end
 -- @return Table containing DFT magnitudes, each between 0 and 1.
 function bass_methods:getFFT(n)
 	local uw = unwrap(self)
-
-	checkpermission(instance, nil, "sound.modify")
 
 	if (uw and uw:IsValid()) then
 		local arr = {}
@@ -298,8 +292,6 @@ end
 -- @return Boolean of whether the sound channel is streamed online.
 function bass_methods:isOnline()
 	local uw = unwrap(self)
-
-	checkpermission(instance, nil, "sound.modify")
 
 	if (uw and uw:IsValid()) then
 		return uw:IsOnline()
@@ -334,15 +326,36 @@ function bass_methods:getPan()
 	end
 end
 
---- Sets the relative volume of the left and right channels.
--- @param number Relative volume between the left and right channels. -1 means only in left channel, 0 is center and 1 is only in the right channel.
+--- Sets the relative volume of the left and right channels. Can only be -1, 0 or 1.
+-- @param number Relative integer volume between the left and right channels. -1 means only in left channel, 0 is center and 1 is only in the right channel.
 function bass_methods:setPan(pan)
 	checkluatype(pan, TYPE_NUMBER)
 	checkpermission(instance, nil, "sound.modify")
 
 	local uw = unwrap(self)
 	if uw and uw:IsValid() then
-		uw:SetPan( math.Clamp(pan, -1, 1) )
+		-- If we ever use / add Set3DEnabled to SF, remember to change this Is3D to Get3DEnabled
+		if uw:Is3D() then SF.Throw("You cannot set the pan of a 3D Bass Object!", 2) end
+		uw:SetPan( pan )
+	end
+end
+
+--- Retrieves the number of bits per sample of the sound channel.
+-- Doesn't work for mp3 and ogg files.
+-- @return number Floating point number of bits per sample, or 0 if unknown.
+function bass_methods:getBitsPerSample()
+	local uw = unwrap(self)
+	if uw and uw:IsValid() then
+		return uw:GetBitsPerSample()
+	end
+end
+
+--- Returns the average bit rate of the sound channel.
+-- @return number The average bit rate of the sound channel.
+function bass_methods:getAverageBitRate()
+	local uw = unwrap(self)
+	if uw and uw:IsValid() then
+		return uw:GetAverageBitRate()
 	end
 end
 
