@@ -51,7 +51,13 @@ end
 --- Returns number of effects able to be created
 -- @return number of effects able to be created
 function effect_library.effectsLeft()
-	return plyEffectBurst:check()
+	return plyEffectBurst:check(instance.player)
+end
+
+--- Returns whether there are any effects able to be played
+-- @return boolean If an effect can be played
+function effect_library.canCreate()
+	return plyEffectBurst:check(instance.player)>=1
 end
 
 --- Plays the effect
