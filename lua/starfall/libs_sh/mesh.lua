@@ -939,9 +939,8 @@ if CLIENT then
 			mesh_obj = unwrap(mesh_obj)
 			local mesh_tbl = meshData[mesh_obj]
 			if not mesh_tbl then SF.Throw("Tried to use invalid mesh.", 2) end
+			-- Garrysmod bug, crash if mesh isn't empty
 			if mesh_tbl.ntriangles ~= 0 then SF.Throw("mesh.generate requires an empty mesh to populate.", 2) end
-			-- Seems to be opengl error, while windows can opt-in to use opengl there is no way to check i think?
-			if not system.IsWindows() and mesh_tbl.ntriangles>0 then SF.Throw("Linux can't mesh.generate on a non-empty mesh", 2) end
 			plyTriangleCount:use(instance.player, tri_count)
 			mesh_tbl.ntriangles = tri_count
 			meshgenerating = mesh_obj
