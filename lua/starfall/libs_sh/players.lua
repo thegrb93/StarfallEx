@@ -292,20 +292,6 @@ function player_methods:isFrozen()
 	return getply(self):IsFrozen()
 end
 
---- Returns whether the player is an NPC
--- @shared
--- @return True if player is an NPC
-function player_methods:isNPC()
-	return getply(self):IsNPC()
-end
-
---- Returns whether the player is a player
--- @shared
--- @return True if player is player
-function player_methods:isPlayer()
-	return getply(self):IsPlayer()
-end
-
 --- Returns whether the player is a super admin
 -- @shared
 -- @return True if player is super admin
