@@ -248,13 +248,13 @@ function bass_methods:getLevels()
 end
 
 --- Gets the relative volume between the left and right audio channels.
--- @return number The pan. -1 for only left, 0 for centered, 1 for only right.
+-- @return number The pan. -1 to 1 for relative left to right
 function bass_methods:getPan()
 	return getsnd(self):GetPan()
 end
 
---- Sets the relative volume of the left and right channels. Can only be -1, 0 or 1.
--- @param number Relative integer volume between the left and right channels. -1 means only in left channel, 0 is center and 1 is only in the right channel.
+--- Sets the relative volume of the left and right channels.
+-- @param number Relative integer volume between the left and right channels. Values must be -1 to 1 for relative left to right
 function bass_methods:setPan(pan)
 	checkluatype(pan, TYPE_NUMBER)
 
