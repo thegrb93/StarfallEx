@@ -5,6 +5,7 @@ local registerprivilege = SF.Permissions.registerPrivilege
 -- Register privileges
 registerprivilege("constraints.weld", "Weld", "Allows the user to weld two entities", { entities = {} })
 registerprivilege("constraints.axis", "Axis", "Allows the user to axis two entities", { entities = {} })
+registerprivilege("constraints.keepupright", "Keepupright", "Allows the user to keep an entity upright", { entities = {} })
 registerprivilege("constraints.ballsocket", "Ballsocket", "Allows the user to ballsocket two entities", { entities = {} })
 registerprivilege("constraints.ballsocketadv", "BallsocketAdv", "Allows the user to advanced ballsocket two entities", { entities = {} })
 registerprivilege("constraints.slider", "Slider", "Allows the user to slider two entities", { entities = {} })
@@ -54,7 +55,8 @@ end)
 local constraint_library = instance.Libraries.constraint
 
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
-local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local vwrap, vunwrap = instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local awrap, aunwrap = instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 
 local function checkConstraint(e, t)
 	if e then
@@ -383,8 +385,8 @@ end
 --- Nocollides two entities
 -- @param e1 The first entity
 -- @param e2 The second entity
--- @param bone1 Number bone of the first entity
--- @param bone2 Number bone of the second entity
+-- @param bone1 Number bone of the first entity (default 0)
+-- @param bone2 Number bone of the second entity (default 0)
 -- @server
 function constraint_library.nocollide(e1, e2, bone1, bone2)
 
@@ -405,6 +407,32 @@ function constraint_library.nocollide(e1, e2, bone1, bone2)
 	local ent = constraint.NoCollide(ent1, ent2, bone1, bone2)
 	if ent then
 		register(ent, instance)
+	end
+end
+
+--- Applies a keepupright constraint on an entity
+-- @param e The entity
+-- @param ang The upright angle
+-- @param bone Number bone of the entity (default 0)
+-- @param lim The strength of the constraint (default 5000)
+-- @server
+function constraint_library.keepupright(e, ang, bone, lim)
+	plyCount:checkuse(instance.player, 1)
+
+	e = eunwrap(e)
+	ang = aunwrap(ang)
+
+	checkConstraint(e, "constraints.keepupright")
+
+	bone = bone or 0
+	lim = lim or 5000
+
+	checkluatype(bone, TYPE_NUMBER)
+	checkluatype(lim, TYPE_NUMBER)
+
+	local c = constraint.Keepupright(e, ang, bone, lim)
+	if c then
+		register(c, instance)
 	end
 end
 
