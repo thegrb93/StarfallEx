@@ -50,18 +50,10 @@ local keywords = {
 setmetatable(keywords, { __index = function(tbl, index) return {} end })
 setmetatable(storageTypes, { __index = function(tbl, index) return {} end })
 
-local directives = {
-	["@name"] = 0,
-	["@author"] = 0,
-	["@include"] = 0,
-	["@includedir"] = 0,
-	["@shared"] = 0,
-	["@client"] = 0,
-	["@server"] = 0,
-	["@clientmain"] = 0,
-	["@superuser"] = 0,
-	["@model"] = 0,
-}
+-- Get directives from the preprocessor so we don't have to hard-code them here.
+-- Allows for addons to make their own directives that properly highlight.
+local directives = SF.Preprocessor.directives
+
 --Color scheme:
 --{foreground color, background color, fontStyle}
 --Style can be: 0 - normal  1 - italic 2 - bold
@@ -581,7 +573,7 @@ function EDITOR:SyntaxColorLine(row)
 				self.tokendata = "" -- we dont need that anymore as we already added it
 
 				self:NextPattern("[%S]*") -- Find first word
-				if directives[self.tokendata] then --Directive
+				if directives[self.tokendata:sub(2)] then -- Search directives created with SF.Preprocessor.SetGlobalDirective
 					tokenname = "directive"
 				end
 				self:NextPattern(".*") -- Rest of comment/directive

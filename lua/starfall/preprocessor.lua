@@ -170,6 +170,8 @@ SF.Preprocessor.SetGlobalDirective("client", function(args, filename, data)
 	data.serverorclient[filename] = "client"
 end)
 
+SF.Preprocessor.SetGlobalDirective("shared", function() end)
+
 SF.Preprocessor.SetGlobalDirective("clientmain", function(args, filename, data)
 	if not data.clientmain then data.clientmain = {} end
 	data.clientmain[filename] = args

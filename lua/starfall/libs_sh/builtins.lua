@@ -1087,6 +1087,10 @@ end
 -- @name client
 -- @class directive
 
+--- Set the current file to run on both the server and client. This is enabled by default. --@shared
+-- @name shared
+-- @class directive
+
 --- Set the client file to run as main. Can only be used in the main file. The client file must be --@include'ed. The main file will not be sent to the client if you use this directive.
 -- --@include somefile.txt
 -- --@clientmain somefile.txt
