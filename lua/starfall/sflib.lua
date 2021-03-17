@@ -11,6 +11,10 @@ local dgetmeta = debug.getmetatable
 
 -- Make sure this is done after metatables have been set
 hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
+	local function shouldUseSandboxedMethods()
+		local instance = SF.runningOps
+		return instance and instance.whitelistedEnvs[getfenv(3)]
+	end
 	local function sanitizeTypeMeta(theType, myMeta)
 		local meta = debug.getmetatable(theType)
 		if meta then
@@ -19,22 +23,34 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 					local myMetaFunc = myMeta and myMeta[k]
 					if myMetaFunc then
 						meta[k] = function(...)
-							if SF.runningOps then return myMetaFunc(...) else return v(...) end
+							if shouldUseSandboxedMethods() then
+								return myMetaFunc(...)
+							else
+								return v(...)
+							end
 						end
 					else
 						meta[k] = function(...)
-							if not SF.runningOps then return v(...) end
+							if not shouldUseSandboxedMethods() then
+								return v(...)
+							end
 						end
 					end
 				elseif istable(v) and k=="__index" then
 					local myMetaFunc = myMeta and myMeta[k]
 					if myMetaFunc then
 						meta[k] = function(t,k)
-							if SF.runningOps then return myMetaFunc(t,k) else return rawget(t,k) end
+							if shouldUseSandboxedMethods() then
+								return myMetaFunc(t,k)
+							else
+								return rawget(t,k)
+							end
 						end
 					else
 						meta[k] = function(t,k)
-							if not SF.runningOps then return rawget(t,k) end
+							if not shouldUseSandboxedMethods() then
+								return rawget(t,k)
+							end
 						end
 					end
 				end
