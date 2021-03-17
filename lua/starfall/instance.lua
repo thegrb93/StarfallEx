@@ -479,11 +479,9 @@ function SF.Instance:runWithOps(func, ...)
 		end
 	end
 
-	local prevInstance = SF.runningInstance
 	local prevHook, mask, count = dgethook()
 	local prev = SF.runningOps
-	SF.runningInstance = self
-	SF.runningOps = true
+	SF.runningOps = self
 	SF.OnRunningOps(true)
 	dsethook(cpuCheck, "", 2000)
 	self.stackn = self.stackn + 1
@@ -492,7 +490,6 @@ function SF.Instance:runWithOps(func, ...)
 	dsethook(prevHook, mask, count)
 	SF.runningOps = prev
 	SF.OnRunningOps(prev)
-	SF.runningInstance = prevInstance
 
 	if tbl[1] then
 		--Do another cpu check in case the debug hook wasn't called
