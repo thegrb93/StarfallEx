@@ -106,6 +106,14 @@ function sounds_library.soundsLeft()
 	return math.min(plyCount:check(instance.player), plySoundBurst:check(instance.player))
 end
 
+--- Returns the sound duration in seconds. May not work for all file-types on linux/macos
+-- @param path String path to the sound file
+-- @return Number duration in seconds
+function sounds_library.duration(path)
+    checkluatype(path, TYPE_STRING)
+    return SoundDuration(path)
+end
+
 --------------------------------------------------
 
 --- Starts to play the sound.
