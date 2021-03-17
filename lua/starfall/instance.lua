@@ -426,11 +426,10 @@ end
 
 --- Overridable hook for pcall-based hook systems
 -- Gets called when inside a starfall context
--- @param running Are we executing a starfall context?
-function SF.OnRunningOps(running)
+-- @param instance The currently running instance, or nil if none
+function SF.OnRunningOps(instance)
 	-- override me
 end
-SF.runningOps = false
 
 local function safeThrow(self, msg, nocatch, force)
 	local source = debug.getinfo(3, "S").short_src
@@ -482,14 +481,14 @@ function SF.Instance:runWithOps(func, ...)
 	local prevHook, mask, count = dgethook()
 	local prev = SF.runningOps
 	SF.runningOps = self
-	SF.OnRunningOps(true)
+	SF.OnRunningOps(self)
 	dsethook(cpuCheck, "", 2000)
 	self.stackn = self.stackn + 1
 	local tbl = { xpcall(func, xpcall_callback, ...) }
 	self.stackn = self.stackn - 1
 	dsethook(prevHook, mask, count)
 	SF.runningOps = prev
-	SF.OnRunningOps(not not prev)
+	SF.OnRunningOps(prev)
 
 	if tbl[1] then
 		--Do another cpu check in case the debug hook wasn't called
@@ -513,10 +512,10 @@ end
 function SF.Instance:runWithoutOps(func, ...)
 	local prev = SF.runningOps
 	SF.runningOps = self
-	SF.OnRunningOps(true)
+	SF.OnRunningOps(self)
 	local tbl = { xpcall(func, xpcall_callback, ...) }
 	SF.runningOps = prev
-	SF.OnRunningOps(not not prev)
+	SF.OnRunningOps(prev)
 	return tbl
 end
 
@@ -659,8 +658,8 @@ hook.Add("Think", "SF_Think", function()
 
 	-- Check and attempt recovery from potential failures
 	if SF.runningOps then
-		SF.runningOps = false
-		SF.OnRunningOps(false)
+		SF.runningOps = nil
+		SF.OnRunningOps(nil)
 		ErrorNoHalt("[Starfall] ERROR: This should not happen, bad addons?\n")
 	end
 
