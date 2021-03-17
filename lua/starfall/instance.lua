@@ -513,8 +513,10 @@ end
 function SF.Instance:runWithoutOps(func, ...)
 	local prev = SF.runningOps
 	SF.runningOps = self
+	SF.OnRunningOps(true)
 	local tbl = { xpcall(func, xpcall_callback, ...) }
 	SF.runningOps = prev
+	SF.OnRunningOps(not not prev)
 	return tbl
 end
 
