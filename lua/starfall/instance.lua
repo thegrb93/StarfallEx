@@ -489,7 +489,7 @@ function SF.Instance:runWithOps(func, ...)
 	self.stackn = self.stackn - 1
 	dsethook(prevHook, mask, count)
 	SF.runningOps = prev
-	SF.OnRunningOps(prev)
+	SF.OnRunningOps(not not prev)
 
 	if tbl[1] then
 		--Do another cpu check in case the debug hook wasn't called
