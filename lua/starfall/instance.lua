@@ -511,10 +511,10 @@ end
 -- @return True if ok
 -- @return A table of values that the hook returned
 function SF.Instance:runWithoutOps(func, ...)
-	local prevInstance = SF.runningInstance
-	SF.runningInstance = self
+	local prev = SF.runningOps
+	SF.runningOps = self
 	local tbl = { xpcall(func, xpcall_callback, ...) }
-	SF.runningInstance = prevInstance
+	SF.runningOps = prev
 	return tbl
 end
 
