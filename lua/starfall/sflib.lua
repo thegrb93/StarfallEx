@@ -16,7 +16,7 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 	local rawget = rawget
 	local SF = SF
 	local function sanitizeTypeMeta(theType, myMeta)
-		local meta = debug.getmetatable(theType)
+		local meta = dgetmeta(theType)
 		if meta then
 			for k, v in pairs(meta) do
 				if isfunction(v) then
@@ -71,7 +71,7 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 		if value then
 			return value
 		end
-		local meta = debug.getmetatable(instance_string)
+		local meta = dgetmeta(instance_string)
 		if not meta then
 			return
 		end
