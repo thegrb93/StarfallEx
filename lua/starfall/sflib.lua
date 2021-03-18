@@ -11,10 +11,10 @@ local dgetmeta = debug.getmetatable
 
 -- Make sure this is done after metatables have been set
 hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
-	local function shouldUseSandboxedMethods()
-		local instance = SF.runningOps
-		return instance and instance.whitelistedEnvs[getfenv(3)]
-	end
+	local _G = _G
+	local getfenv = getfenv
+	local rawget = rawget
+	local SF = SF
 	local function sanitizeTypeMeta(theType, myMeta)
 		local meta = debug.getmetatable(theType)
 		if meta then
@@ -23,7 +23,7 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 					local myMetaFunc = myMeta and myMeta[k]
 					if myMetaFunc then
 						meta[k] = function(...)
-							if shouldUseSandboxedMethods() then
+							if SF.runningOps and getfenv(3) ~= _G then
 								return myMetaFunc(...)
 							else
 								return v(...)
@@ -31,7 +31,7 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 						end
 					else
 						meta[k] = function(...)
-							if not shouldUseSandboxedMethods() then
+							if not SF.runningOps or getfenv(3) == _G then
 								return v(...)
 							end
 						end
@@ -40,7 +40,7 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 					local myMetaFunc = myMeta and myMeta[k]
 					if myMetaFunc then
 						meta[k] = function(t,k)
-							if shouldUseSandboxedMethods() then
+							if SF.runningOps and getfenv(3) ~= _G then
 								return myMetaFunc(t,k)
 							else
 								return rawget(t,k)
@@ -48,7 +48,7 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 						end
 					else
 						meta[k] = function(t,k)
-							if not shouldUseSandboxedMethods() then
+							if not SF.runningOps or getfenv(3) == _G then
 								return rawget(t,k)
 							end
 						end
@@ -57,6 +57,7 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 			end
 		end
 	end
+
 
 	sanitizeTypeMeta(nil)
 	sanitizeTypeMeta(true)
