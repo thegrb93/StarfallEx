@@ -23,7 +23,7 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 					local myMetaFunc = myMeta and myMeta[k]
 					if myMetaFunc then
 						meta[k] = function(...)
-							if SF.runningOps and getfenv(3) ~= _G then
+							if SF.runningOps and getfenv(2) ~= _G then
 								return myMetaFunc(...)
 							else
 								return v(...)
@@ -31,7 +31,7 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 						end
 					else
 						meta[k] = function(...)
-							if not SF.runningOps or getfenv(3) == _G then
+							if not SF.runningOps or getfenv(2) == _G then
 								return v(...)
 							end
 						end
@@ -40,7 +40,7 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 					local myMetaFunc = myMeta and myMeta[k]
 					if myMetaFunc then
 						meta[k] = function(t,k)
-							if SF.runningOps and getfenv(3) ~= _G then
+							if SF.runningOps and getfenv(2) ~= _G then
 								return myMetaFunc(t,k)
 							else
 								return rawget(t,k)
@@ -48,7 +48,7 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 						end
 					else
 						meta[k] = function(t,k)
-							if not SF.runningOps or getfenv(3) == _G then
+							if not SF.runningOps or getfenv(2) == _G then
 								return rawget(t,k)
 							end
 						end
