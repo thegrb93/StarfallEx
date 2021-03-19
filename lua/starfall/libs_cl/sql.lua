@@ -15,8 +15,8 @@ local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check
 local sql_library = instance.Libraries.sql
 
 --- Performs a query on the local SQLite database.
--- @param query The query to execute.
--- @return Query results as a table, nil if the query returned no data.
+-- @param string query The query to execute.
+-- @return table? Query results as a table, nil if the query returned no data.
 function sql_library.query(query)
 	checkpermission(instance, nil, "sql")
 	checkluatype(query, TYPE_STRING)
@@ -30,8 +30,8 @@ function sql_library.query(query)
 end
 
 --- Checks if a table exists within the local SQLite database.
--- @param tabname The table to check for.
--- @return False if the table does not exist, true if it does.
+-- @param string tabname The table to check for.
+-- @return boolean False if the table does not exist, true if it does.
 function sql_library.tableExists(tabname)
 	checkpermission(instance, nil, "sql")
 	checkluatype(tabname, TYPE_STRING)
@@ -40,8 +40,8 @@ function sql_library.tableExists(tabname)
 end
 
 --- Removes a table within the local SQLite database.
--- @param tabname The table to remove.
--- @return True if the table was successfully removed, false if not.
+-- @param string tabname The table to remove.
+-- @return boolean True if the table was successfully removed, false if not.
 function sql_library.tableRemove(tabname)
 	checkpermission(instance, nil, "sql")
 	checkluatype(tabname, TYPE_STRING)
@@ -52,9 +52,9 @@ function sql_library.tableRemove(tabname)
 end
 
 --- Escapes dangerous characters and symbols from user input used in an SQLite SQL Query.
--- @param str The string to be escaped.
--- @param bNoQuotes Set this as true, and the function will not wrap the input string in apostrophes.
--- @return The escaped input.
+-- @param string str The string to be escaped.
+-- @param boolean bNoQuotes Set this as true, and the function will not wrap the input string in apostrophes.
+-- @return string The escaped input.
 function sql_library.SQLStr(str, bNoQuotes)
 	checkpermission(instance, nil, "sql")
 	checkluatype(str, TYPE_STRING)

@@ -8,7 +8,7 @@
 
 SF.RegisterType("SurfaceInfo",true,false,debug.getregistry().SurfaceInfo)
 
-return function(instance) 
+return function(instance)
 
 local surfaceinfo_methods, surfaceinfo_meta, swrap, sunwrap = instance.Types.SurfaceInfo.Methods, instance.Types.SurfaceInfo, instance.Types.SurfaceInfo.Wrap, instance.Types.SurfaceInfo.Unwrap
 
@@ -24,7 +24,7 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 if SERVER then
 	--- Returns the brush surface's material.
 	-- @shared
-	-- @return In SERVER, the material name, and in CLIENT, the Material object.
+	-- @return any In SERVER, the material name, and in CLIENT, the Material object.
 	function surfaceinfo_methods:getMaterial()
 		return sunwrap(self):GetMaterial():GetName()
 	end
@@ -38,7 +38,7 @@ end
 
 --- Returns a list of vertices the brush surface is built from.
 -- @shared
--- @return A list of Vector points. This will usually be 4 corners of a quadrilateral in counter-clockwise order.
+-- @return table List of Vector points. This will usually be 4 corners of a quadrilateral in counter-clockwise order.
 function surfaceinfo_methods:getVertices()
     local t = sunwrap(self):GetVertices()
     local out = {}
@@ -52,7 +52,7 @@ end
 --- Checks if the brush surface is a nodraw surface, meaning it will not be drawn by the engine.
 -- This internally checks the SURFDRAW_NODRAW flag.
 -- @shared
--- @return Returns true if this surface won't be drawn.
+-- @return boolean If this surface won't be drawn.
 function surfaceinfo_methods:isNoDraw()
     return sunwrap(self):IsNoDraw()
 end
@@ -60,7 +60,7 @@ end
 --- Checks if the brush surface is displaying the skybox.
 -- This internally checks the SURFDRAW_SKY flag.
 -- @shared
--- @return Returns true if the surface is the sky.
+-- @return boolean If the surface is the sky.
 function surfaceinfo_methods:isSky()
     return sunwrap(self):IsSky()
 end
@@ -68,7 +68,7 @@ end
 --- Checks if the brush surface is water.
 -- This internally checks the SURFDRAW_WATER flag.
 -- @shared
--- @return Returns true if the surface is water.
+-- @return boolean If the surface is water.
 function surfaceinfo_methods:isWater()
     return sunwrap(self):IsWater()
 end

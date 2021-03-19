@@ -26,14 +26,14 @@ end)
 local notification_library = instance.Libraries.notification
 
 --- Displays a standard notification.
--- @param text The text to display
--- @param type Determines the notification method.
+-- @param string text The text to display
+-- @param number type Determines the notification method.
 ---NOTIFY.GENERIC
 ---NOTIFY.ERROR
 ---NOTIFY.UNDO
 ---NOTIFY.HINT
 ---NOTIFY.CLEANUP
--- @param length Time in seconds to display the notification (Max length of 30)
+-- @param number length Time in seconds to display the notification (Max length of 30)
 function notification_library.addLegacy(text, type, length)
 	if SF.IsHUDActive(instance.entity) then
 		checkpermission(instance, nil, "notification.hud")
@@ -49,8 +49,8 @@ end
 
 
 --- Displays a notification with an animated progress bar, will persist unless killed or chip is removed.
--- @param id String index of the notification
--- @param text The text to display
+-- @param string id String index of the notification
+-- @param string text The text to display
 function notification_library.addProgress(id, text)
 	if SF.IsHUDActive(instance.entity) then
 		checkpermission(instance, nil, "notification.hud")
@@ -77,7 +77,7 @@ function notification_library.addProgress(id, text)
 end
 
 --- Removes the notification with the given index after 0.8 seconds
--- @param id String index of the notification to kill
+-- @param string id String index of the notification to kill
 function notification_library.kill(id)
 	if SF.IsHUDActive(instance.entity) then
 		checkpermission(instance, nil, "notification.hud")

@@ -121,19 +121,20 @@ local parseAttributes = {
 		t[#t+1] = value
 	end,
 	["param"] = function(parsing, value)
-		local name, description = string.match(value, "%s*([%w_%.]+)%s*(.*)")
-		if name then
+		local type, name, description = string.match(value, "%s*([%w_%.%?]+)%s*([%w_%.]+)%s*(.*)")
+		if type then
 			local t = parsing.params
 			if not t then t = {} parsing.params = t end
-			t[#t+1] = {name = name, description = description}
+			t[#t+1] = {name = name, description = string.format("Type: %s, Desc: %s", type, description)}
 		else
 			ErrorNoHalt("Invalid param doc (" .. value .. ") in file: " .. curfile .. "\n")
 		end
 	end,
 	["return"] = function(parsing, value)
+		local type, description = string.match(value, "%s*([%w_%.%?]+)%s*(.*)")
 		local t = parsing.returns
 		if not t then t = {} parsing.returns = t end
-		t[#t+1] = value
+		t[#t+1] = string.format("Type: %s, Desc: %s", type, description)
 	end,
 	["field"] = function(parsing, value)
 		local name, description = string.match(value, "%s*([%w_]+)%s*(.*)")

@@ -67,8 +67,8 @@ end)
 -- ------------------------- Methods ------------------------- --
 
 --- Parents the entity to another entity
--- @param parent Entity to parent to. nil to unparent
--- @param attachment Optional string attachment name to parent to
+-- @param entity? parent Entity to parent to. nil to unparent
+-- @param string? attachment Optional string attachment name to parent to
 function ents_methods:setParent(parent, attachment)
 	local ent = getent(self)
 	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
@@ -103,7 +103,7 @@ function ents_methods:unparent()
 end
 
 --- Links starfall components to a starfall processor or vehicle. Screen can only connect to processor. HUD can connect to processor and vehicle.
--- @param e Entity to link the component to, a vehicle or starfall for huds, or a starfall for screens. nil to clear links.
+-- @param entity? e Entity to link the component to, a vehicle or starfall for huds, or a starfall for screens. nil to clear links.
 function ents_methods:linkComponent(e)
 	local ent = getent(self)
 	checkpermission(instance, ent, "entities.canTool")
@@ -132,7 +132,7 @@ function ents_methods:linkComponent(e)
 end
 
 --- Sets a component's ability to lock a player's controls
--- @param enable Whether the component will lock the player's controls when used
+-- @param boolean enable Whether the component will lock the player's controls when used
 function ents_methods:setComponentLocksControls(enable)
 	local ent = getent(self)
 	checkluatype(enable, TYPE_BOOL)
@@ -145,9 +145,9 @@ function ents_methods:setComponentLocksControls(enable)
 end
 
 --- Applies damage to an entity
--- @param amt damage amount
--- @param attacker damage attacker
--- @param inflictor damage inflictor
+-- @param number amt Damage amount
+-- @param entity attacker Damage attacker
+-- @param entity inflictor Damage inflictor
 function ents_methods:applyDamage(amt, attacker, inflictor)
 	local ent = getent(self)
 	checkluatype(amt, TYPE_NUMBER)
@@ -165,9 +165,9 @@ function ents_methods:applyDamage(amt, attacker, inflictor)
 end
 
 --- Sets a custom prop's physics simulation forces. Thrusters and balloons use this.
--- @param ang Angular Force (Torque)
--- @param lin Linear Force
--- @param mode The physics mode to use. 0 = Off, 1 = Local acceleration, 2 = Local force, 3 = Global Acceleration, 4 = Global force
+-- @param vector ang Angular Force (Torque)
+-- @param vector lin Linear Force
+-- @param number mode The physics mode to use. 0 = Off, 1 = Local acceleration, 2 = Local force, 3 = Global Acceleration, 4 = Global force
 function ents_methods:setCustomPropForces(ang, lin, mode)
 	local ent = getent(self)
 	if ent:GetClass()~="starfall_prop" then SF.Throw("The entity isn't a custom prop", 2) end
@@ -189,7 +189,7 @@ function ents_methods:setCustomPropForces(ang, lin, mode)
 end
 
 --- Set the angular velocity of an object
--- @param angvel The local angvel vector to set
+-- @param vector angvel The local angvel vector to set
 function ents_methods:setAngleVelocity(angvel)
 	local ent = getent(self)
 	angvel = vunwrap(angvel)
@@ -204,7 +204,7 @@ function ents_methods:setAngleVelocity(angvel)
 end
 
 --- Applys a angular velocity to an object
--- @param angvel The local angvel vector to apply
+-- @param vector angvel The local angvel vector to apply
 function ents_methods:addAngleVelocity(angvel)
 	local ent = getent(self)
 	angvel = vunwrap(angvel)
@@ -239,9 +239,9 @@ function ents_methods:setElasticity(elasticity)
 	checkpermission(instance, ent, "entities.canTool")
 	ent:SetElasticity(elasticity)
 end
-	
+
 --- Applies linear force to the entity
--- @param vec The force vector
+-- @param vector vec The force vector
 function ents_methods:applyForceCenter(vec)
 	local ent = getent(self)
 	local vec = vunwrap(vec)
@@ -256,8 +256,8 @@ function ents_methods:applyForceCenter(vec)
 end
 
 --- Applies linear force to the entity with an offset
--- @param force The force vector in world coordinates
--- @param position The force position in world coordinates
+-- @param vector force The force vector in world coordinates
+-- @param vector position The force position in world coordinates
 function ents_methods:applyForceOffset(force, position)
 	local ent = getent(self)
 
@@ -276,7 +276,7 @@ function ents_methods:applyForceOffset(force, position)
 end
 
 --- Applies angular force to the entity (This function is garbage, use applyTorque instead)
--- @param ang The force angle
+-- @param angle ang The force angle
 function ents_methods:applyAngForce(ang)
 	local ent = getent(self)
 
@@ -316,7 +316,7 @@ function ents_methods:applyAngForce(ang)
 end
 
 --- Applies torque
--- @param torque The torque vector
+-- @param vector torque The torque vector
 function ents_methods:applyTorque(torque)
 	local ent = getent(self)
 
@@ -346,12 +346,12 @@ local function addCollisions(func)
 	end
 end
 --- Allows detecting collisions on an entity. You can only do this once for the entity's entire lifespan so use it wisely.
--- @param func The callback function with argument, table collsiondata, http://wiki.facepunch.com/gmod/Structures/CollisionData
+-- @param function func The callback function with argument, table collsiondata, http://wiki.facepunch.com/gmod/Structures/CollisionData
 function ents_methods:addCollisionListener(func)
 	local ent = getent(self)
 	checkluatype(func, TYPE_FUNCTION)
 	checkpermission(instance, ent, "entities.canTool")
-	
+
 	local callback = addCollisions(func)
 	if ent:GetClass() ~= "starfall_prop" then
 		if ent.SF_CollisionCallback then SF.Throw("The entity is already listening to collisions!", 2) end
@@ -379,7 +379,8 @@ function ents_methods:removeCollisionListener()
 end
 
 --- Sets whether an entity's shadow should be drawn
--- @param ply Optional player argument to set only for that player. Can also be table of players.
+-- @param boolean draw Whether the shadow should draw
+-- @param player? ply Optional player argument to set only for that player. Can also be table of players.
 function ents_methods:setDrawShadow(draw, ply)
 	local ent = getent(self)
 	checkpermission(instance, ent, "entities.setRenderProperty")
@@ -392,7 +393,7 @@ function ents_methods:setDrawShadow(draw, ply)
 end
 
 --- Sets the entitiy's position. No interpolation will occur clientside, use physobj.setPos to have interpolation.
--- @param vec New position
+-- @param vector vec New position
 function ents_methods:setPos(vec)
 	local ent = getent(self)
 
@@ -403,7 +404,7 @@ function ents_methods:setPos(vec)
 end
 
 --- Sets the entity's angles
--- @param ang New angles
+-- @param angle ang New angles
 function ents_methods:setAngles(ang)
 	local ent = getent(self)
 
@@ -414,7 +415,7 @@ function ents_methods:setAngles(ang)
 end
 
 --- Sets the entity's linear velocity
--- @param vel New velocity
+-- @param vector vel New velocity
 function ents_methods:setVelocity(vel)
 	local ent = getent(self)
 
@@ -446,8 +447,8 @@ function ents_methods:breakEnt()
 end
 
 --- Ignites an entity
--- @param length How long the fire lasts
--- @param radius (optional) How large the fire hitbox is (entity obb is the max)
+-- @param number length How long the fire lasts
+-- @param number? radius (optional) How large the fire hitbox is (entity obb is the max)
 function ents_methods:ignite(length, radius)
 	local ent = getent(self)
 	checkluatype(length, TYPE_NUMBER)
@@ -472,8 +473,8 @@ function ents_methods:extinguish()
 end
 
 --- Simulate a Use action on the entity by the chip owner
--- @param usetype The USE_ enum use type. (Default: USE_ON)
--- @param value The use value (Default: 0)
+-- @param number? usetype The USE_ enum use type. (Default: USE_ON)
+-- @param number? value The use value (Default: 0)
 function ents_methods:use(usetype, value)
     local ent = getent(self)
     checkpermission(instance, ent, "entities.use")
@@ -483,7 +484,7 @@ function ents_methods:use(usetype, value)
 end
 
 --- Sets the entity frozen state
--- @param freeze Should the entity be frozen?
+-- @param boolean freeze Should the entity be frozen?
 function ents_methods:setFrozen(freeze)
 	local ent = getent(self)
 	local phys = ent:GetPhysicsObject()
@@ -496,16 +497,16 @@ function ents_methods:setFrozen(freeze)
 end
 
 --- Checks the entities frozen state
--- @return True if entity is frozen
+-- @return boolean True if entity is frozen
 function ents_methods:isFrozen()
 	local ent = getent(self)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
-	if phys:IsMoveable() then return false else return true end
+	return not phys:IsMoveable()
 end
 
 --- Sets the entity to be Solid or not.
--- @param solid Boolean, Should the entity be solid?
+-- @param boolean solid Should the entity be solid?
 function ents_methods:setSolid(solid)
 	local ent = getent(self)
 	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
@@ -515,7 +516,7 @@ function ents_methods:setSolid(solid)
 end
 
 --- Sets the entity's collision group
--- @param group The COLLISION_GROUP value to set it to
+-- @param number group The COLLISION_GROUP value to set it to
 function ents_methods:setCollisionGroup(group)
 	checkluatype(group, TYPE_NUMBER)
 	if group < 0 or group >= LAST_SHARED_COLLISION_GROUP then SF.Throw("Invalid collision group value", 2) end
@@ -527,7 +528,7 @@ function ents_methods:setCollisionGroup(group)
 end
 
 --- Set's the entity to collide with nothing but the world. Alias to entity:setCollisionGroup(COLLISION_GROUP_WORLD)
--- @param nocollide Whether to collide with nothing except world or not.
+-- @param boolean nocollide Whether to collide with nothing except world or not.
 function ents_methods:setNocollideAll(nocollide)
 	local ent = getent(self)
 	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
@@ -537,7 +538,7 @@ function ents_methods:setNocollideAll(nocollide)
 end
 
 --- Sets the entity's mass
--- @param mass number mass
+-- @param number mass Mass to set to
 function ents_methods:setMass(mass)
 	local ent = getent(self)
 	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
@@ -553,7 +554,7 @@ function ents_methods:setMass(mass)
 end
 
 --- Sets the entity's inertia
--- @param vec Inertia tensor
+-- @param vector vec Inertia tensor
 function ents_methods:setInertia(vec)
 	local ent = getent(self)
 	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
@@ -571,7 +572,7 @@ function ents_methods:setInertia(vec)
 end
 
 --- Sets the physical material of the entity
--- @param mat Material to use
+-- @param string materialName Material to use
 function ents_methods:setPhysMaterial(mat)
 	local ent = getent(self)
 	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
@@ -585,7 +586,7 @@ function ents_methods:setPhysMaterial(mat)
 end
 
 --- Get the physical material of the entity
--- @return the physical material
+-- @return string The physical material
 function ents_methods:getPhysMaterial()
 	local ent = getent(self)
 	local phys = ent:GetPhysicsObject()
@@ -595,7 +596,7 @@ function ents_methods:getPhysMaterial()
 end
 
 --- Checks whether entity has physics
--- @return True if entity has physics
+-- @return boolean If entity has physics
 function ents_methods:isValidPhys()
 	local ent = getent(self)
 	local phys = ent:GetPhysicsObject()
@@ -604,7 +605,7 @@ end
 
 --- Returns true if the entity is being held by a player. Either by Physics gun, Gravity gun or Use-key.
 -- @server
--- @return Boolean if the entity is being held or not
+-- @return boolean If the entity is being held or not
 function ents_methods:isPlayerHolding()
 	local ent = getent(self)
 	return ent:IsPlayerHolding()
@@ -612,13 +613,13 @@ end
 
 ---Returns if the entity is a constraint.
 -- @server
--- @return Boolean if the entity is a constraint
+-- @return boolean If the entity is a constraint
 function ents_methods:isConstraint()
 	return getent(self):IsConstraint()
 end
 
 --- Sets entity gravity
--- @param grav Bool should the entity respect gravity?
+-- @param boolean grav Should the entity respect gravity?
 function ents_methods:enableGravity(grav)
 	local ent = getent(self)
 	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
@@ -632,7 +633,7 @@ function ents_methods:enableGravity(grav)
 end
 
 --- Sets the entity drag state
--- @param drag Bool should the entity have air resistence?
+-- @param boolean drag Should the entity have air resistence?
 function ents_methods:enableDrag(drag)
 	local ent = getent(self)
 	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
@@ -645,7 +646,7 @@ function ents_methods:enableDrag(drag)
 end
 
 --- Sets the entity movement state
--- @param move Bool should the entity move?
+-- @param boolean move Should the entity move?
 function ents_methods:enableMotion(move)
 	local ent = getent(self)
 	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
@@ -660,7 +661,7 @@ end
 
 
 --- Sets the physics of an entity to be a sphere
--- @param enabled Bool should the entity be spherical?
+-- @param boolean enabled Should the entity be spherical?
 function ents_methods:enableSphere(enabled)
 	local ent = getent(self)
 	if ent:GetClass() ~= "prop_physics" then SF.Throw("This function only works for prop_physics", 2) end
@@ -694,7 +695,7 @@ function ents_methods:enableSphere(enabled)
 end
 
 --- Gets what the entity is welded to. If the entity is parented, returns the parent.
---@return The first welded/parent entity
+-- @return entity The first welded/parent entity
 function ents_methods:isWeldedTo()
 	local ent = getent(self)
 	local constr = constraint.FindConstraint(ent, "Weld")
@@ -710,7 +711,7 @@ function ents_methods:isWeldedTo()
 end
 
 --- Gets a table of all constrained entities to each other
---@param filter Optional constraint type filter table where keys are the type name and values are 'true'. "Wire" and "Parent" are used for wires and parents.
+-- @param table? filter Optional constraint type filter table where keys are the type name and values are 'true'. "Wire" and "Parent" are used for wires and parents.
 function ents_methods:getAllConstrained(filter)
 	local ent = getent(self)
 	if filter ~= nil then checkluatype(filter, TYPE_TABLE) end
@@ -764,13 +765,13 @@ function ents_methods:getAllConstrained(filter)
 end
 
 --- Adds a trail to the entity with the specified attributes.
--- @param startSize The start size of the trail
--- @param endSize The end size of the trail
--- @param length The length size of the trail
--- @param material The material of the trail
--- @param color The color of the trail
--- @param attachmentID Optional attachmentid the trail should attach to
--- @param additive If the trail's rendering is additive
+-- @param number startSize The start size of the trail (0-128)
+-- @param number endSize The end size of the trail (0-128)
+-- @param number length The length size of the trail
+-- @param string material The material of the trail
+-- @param color color The color of the trail
+-- @param number? attachmentID Optional attachmentid the trail should attach to
+-- @param boolean? additive If the trail's rendering is additive
 function ents_methods:setTrails(startSize, endSize, length, material, color, attachmentID, additive)
 	local ent = getent(self)
 	checkluatype(material, TYPE_STRING)
@@ -803,7 +804,7 @@ function ents_methods:removeTrails()
 end
 
 --- Sets a prop_physics to be unbreakable
--- @param on Whether to make the prop unbreakable
+-- @param boolean on Whether to make the prop unbreakable
 function ents_methods:setUnbreakable(on)
 	local ent = getent(self)
 	checkluatype(on, TYPE_BOOL)
@@ -825,8 +826,8 @@ function ents_methods:setUnbreakable(on)
 end
 
 --- Check if the given Entity or Vector is within this entity's PVS (Potentially Visible Set). See: https://developer.valvesoftware.com/wiki/PVS
--- @param other Entity or Vector to test
--- @return bool True/False
+-- @param any other Entity or Vector to test
+-- @return boolean If the Entity/Vector is within the PVS
 function ents_methods:testPVS(other)
 	local ent = getent(self)
 
@@ -843,7 +844,7 @@ function ents_methods:testPVS(other)
 end
 
 --- Returns entity's creation ID (similar to entIndex, but increments monotonically)
--- @return The creation ID
+-- @return number The creation ID
 function ents_methods:getCreationID()
 	local ent = getent(self)
 	return ent:GetCreationID()

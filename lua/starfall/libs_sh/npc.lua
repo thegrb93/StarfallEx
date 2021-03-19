@@ -37,6 +37,8 @@ local function getnpc(self)
 	end
 end
 
+--- tostring metamethod
+-- @return string String representation of the npc
 function npc_meta:__tostring()
 	local ent = unwrap(self)
 	if not ent then return "(null entity)"
@@ -47,7 +49,7 @@ end
 if SERVER then
 	--- Adds a relationship to the npc
 	-- @server
-	-- @param str The relationship string. http://wiki.facepunch.com/gmod/NPC:AddRelationship
+	-- @param string str The relationship string. http://wiki.facepunch.com/gmod/NPC:AddRelationship
 	function npc_methods:addRelationship(str)
 		local npc = getnpc(self)
 		checkpermission(instance, npc, "npcs.modify")
@@ -68,9 +70,9 @@ if SERVER then
 	}
 	--- Adds a relationship to the npc with an entity
 	-- @server
-	-- @param ent The target entity
-	-- @param disp String of the relationship. (hate fear like neutral)
-	-- @param priority number how strong the relationship is. Higher number is stronger
+	-- @param entity ent The target entity
+	-- @param string disp String of the relationship. ("hate", "fear", "like", "neutral")
+	-- @param number priority How strong the relationship is. Higher number is stronger
 	function npc_methods:addEntityRelationship(ent, disp, priority)
 		local npc = getnpc(self)
 		local target = getent(ent)
@@ -82,15 +84,15 @@ if SERVER then
 
 	--- Gets the npc's relationship to the target
 	-- @server
-	-- @param ent Target entity
-	-- @return string relationship of the npc with the target
+	-- @param entity ent Target entity
+	-- @return string Relationship of the npc with the target
 	function npc_methods:getRelationship(ent)
 		return dispositions[getnpc(self):Disposition(getent(ent))]
 	end
 
 	--- Gives the npc a weapon
 	-- @server
-	-- @param wep The classname of the weapon
+	-- @param weapon wep The classname of the weapon
 	function npc_methods:giveWeapon(wep)
 		checkluatype(wep, TYPE_STRING)
 
@@ -108,7 +110,7 @@ if SERVER then
 
 	--- Tell the npc to fight this
 	-- @server
-	-- @param ent Target entity
+	-- @param entity ent Target entity
 	function npc_methods:setEnemy(ent)
 		local npc = getnpc(self)
 		checkpermission(instance, npc, "npcs.modify")
@@ -117,7 +119,7 @@ if SERVER then
 
 	--- Gets what the npc is fighting
 	-- @server
-	-- @return Entity the npc is fighting
+	-- @return entity Entity the npc is fighting
 	function npc_methods:getEnemy()
 		return owrap(getnpc(self):GetEnemy())
 	end
@@ -148,7 +150,7 @@ if SERVER then
 
 	--- Makes the npc walk to a destination
 	-- @server
-	-- @param vec The position of the destination
+	-- @param vector vec The position of the destination
 	function npc_methods:goWalk(vec)
 		local npc = getnpc(self)
 		checkpermission(instance, npc, "npcs.modify")
@@ -158,7 +160,7 @@ if SERVER then
 
 	--- Makes the npc run to a destination
 	-- @server
-	-- @param vec The position of the destination
+	-- @param vector vec The position of the destination
 	function npc_methods:goRun(vec)
 		local npc = getnpc(self)
 		checkpermission(instance, npc, "npcs.modify")

@@ -645,6 +645,7 @@ if CLIENT then
 	--- Mesh type
 	-- @name Mesh
 	-- @class type
+	-- @client
 	-- @libtbl mesh_methods
 	SF.RegisterType("Mesh", true, false)
 end
@@ -665,11 +666,11 @@ instance:AddHook("initialize", function()
 end)
 
 --- Parses obj data into a table of vertices, normals, texture coordinates, colors, and tangents
--- @param obj The obj data
--- @param threaded Optional bool, use threading object that can be used to load the mesh over time to prevent hitting quota limit
--- @param triangulate Whether to triangulate the faces
--- @return Table of Mesh tables. The keys correspond to the objs object names, and the values are tables of vertices that can be passed to mesh.createFromTable
--- @return Table of Mesh data. {positions = positionData, normals = normalData, texturecoords = texturecoordData, faces = faceData}
+-- @param string obj The obj data
+-- @param boolean? threaded Optional bool, use threading object that can be used to load the mesh over time to prevent hitting quota limit
+-- @param boolean? triangulate Whether to triangulate the faces
+-- @return table Table of Mesh tables. The keys correspond to the objs object names, and the values are tables of vertices that can be passed to mesh.createFromTable
+-- @return table Table of Mesh data. {positions = positionData, normals = normalData, texturecoords = texturecoordData, faces = faceData}
 function mesh_library.parseObj(obj, threaded, triangulate)
 	checkluatype (obj, TYPE_STRING)
 	if threaded ~= nil then checkluatype(threaded, TYPE_BOOL) if threaded and not coroutine.running() then SF.Throw("Tried to use threading while not in a thread!", 2) end end
@@ -679,38 +680,38 @@ function mesh_library.parseObj(obj, threaded, triangulate)
 end
 
 --- Generates normal vectors for the provided vertices table
--- @param vertices The table of vertices
--- @param inverted Optional bool, invert the normal
--- @param smooth_limit Optional number, smooths the normal based on the limit in radians
+-- @param table vertices The table of vertices
+-- @param boolean? inverted Optional bool, invert the normal
+-- @param number? smooth_limit Optional number, smooths the normal based on the limit in radians
 function mesh_library.generateNormals(vertices, inverted, smooth_limit)
 	checkluatype(vertices, TYPE_TABLE)
 	if inverted ~= nil then checkluatype(inverted, TYPE_BOOL) else inverted = false end
 	if smooth_limit ~= nil then checkluatype(smooth_limit, TYPE_NUMBER) else smooth_limit = 0 end
 	local nvertices = #vertices
 	if nvertices<3 or nvertices%3~=0 then SF.Throw("Expected a multiple of 3 vertices.", 2) end
-	
+
 	SF.GenerateNormals(vertices, inverted, smooth_limit, vector)
 end
 
 --- Generates the uv for the provided vertices table
--- @param vertices The table of vertices
--- @param scale The scale of the uvs
+-- @param table vertices The table of vertices
+-- @param number scale The scale of the uvs
 function mesh_library.generateUV(vertices, scale)
 	checkluatype(vertices, TYPE_TABLE)
 	checkluatype(scale, TYPE_NUMBER)
 	local nvertices = #vertices
 	if nvertices<3 or nvertices%3~=0 then SF.Throw("Expected a multiple of 3 vertices.", 2) end
-	
+
 	SF.GenerateUV(vertices, scale, vector, angle, worldtolocal)
 end
 
 --- Generates the tangents for the provided vertices table
--- @param vertices The table of vertices
+-- @param table vertices The table of vertices
 function mesh_library.generateTangents(vertices)
 	checkluatype(vertices, TYPE_TABLE)
 	local nvertices = #vertices
 	if nvertices<3 or nvertices%3~=0 then SF.Throw("Expected a multiple of 3 vertices.", 2) end
-	
+
 	SF.GenerateTangents(vertices, nil, vector)
 end
 
@@ -758,9 +759,9 @@ if CLIENT then
 	}
 
 	--- Creates a mesh from vertex data.
-	-- @param verteces Table containing vertex data. http://wiki.facepunch.com/gmod/Structures/MeshVertex
-	-- @param threaded Optional bool, use threading object that can be used to load the mesh over time to prevent hitting quota limit. The thread will yield with number of vertices remaining to be processed. After 0 is yielded, the final expensive phase starts.
-	-- @return Mesh object
+	-- @param table verteces Table containing vertex data. http://wiki.facepunch.com/gmod/Structures/MeshVertex
+	-- @param boolean? threaded Optional bool, use threading object that can be used to load the mesh over time to prevent hitting quota limit. The thread will yield with number of vertices remaining to be processed. After 0 is yielded, the final expensive phase starts.
+	-- @return mesh Mesh object
 	-- @client
 	function mesh_library.createFromTable(verteces, threaded)
 		checkpermission (instance, nil, "mesh")
@@ -799,10 +800,10 @@ if CLIENT then
 	end
 
 	--- Creates a mesh from an obj file. Only supports triangular meshes with normals and texture coordinates.
-	-- @param obj The obj file data
-	-- @param threaded Optional bool, use threading object that can be used to load the mesh over time to prevent hitting quota limit
-	-- @param triangulate Whether to triangulate faces. (Consumes more CPU)
-	-- @return Table of Mesh objects. The keys correspond to the objs object names
+	-- @param string obj The obj file data
+	-- @param boolean? threaded Optional bool, use threading object that can be used to load the mesh over time to prevent hitting quota limit
+	-- @param boolean? triangulate Whether to triangulate faces. (Consumes more CPU)
+	-- @return table Table of Mesh objects. The keys correspond to the objs object names
 	-- @client
 	function mesh_library.createFromObj(obj, threaded, triangulate)
 		checkluatype (obj, TYPE_STRING)
@@ -828,7 +829,7 @@ if CLIENT then
 	end
 
 	--- Creates a mesh without any vertex data.
-	-- @return Mesh object
+	-- @return mesh Mesh object
 	-- @client
 	function mesh_library.createEmpty()
 		checkpermission(instance, nil, "mesh")
@@ -854,10 +855,10 @@ if CLIENT then
 		return tri
 	end
 	--- Returns a table of visual meshes of given model or nil if the model is invalid
-	-- @param model The full path to a model to get the visual meshes of.
-	-- @param lod The lod of the model to use.
-	-- @param bodygroupMask The bodygroupMask of the model to use.
-	-- @return A table of tables with the following format:  string material - The material of the specific mesh table triangles - A table of MeshVertex structures ready to be fed into IMesh:BuildFromTriangles table verticies - A table of MeshVertex structures representing all the vertexes of the mesh. This table is used internally to generate the "triangles" table. Each MeshVertex structure returned also has an extra table of tables field called "weights" with the following data:  number boneID - The bone this vertex is attached to number weight - How "strong" this vertex is attached to the bone. A vertex can be attached to multiple bones at once.
+	-- @param string model The full path to a model to get the visual meshes of.
+	-- @param number? lod The lod of the model to use. Default 0.
+	-- @param number? bodygroupMask The bodygroupMask of the model to use. Default 0.
+	-- @return table A table of tables with the following format:  string material - The material of the specific mesh table triangles - A table of MeshVertex structures ready to be fed into IMesh:BuildFromTriangles table verticies - A table of MeshVertex structures representing all the vertexes of the mesh. This table is used internally to generate the "triangles" table. Each MeshVertex structure returned also has an extra table of tables field called "weights" with the following data:  number boneID - The bone this vertex is attached to number weight - How "strong" this vertex is attached to the bone. A vertex can be attached to multiple bones at once.
 	-- @client
 	function mesh_library.getModelMeshes(model, lod, bodygroupMask)
 		checkluatype(model, TYPE_STRING)
@@ -882,14 +883,14 @@ if CLIENT then
 	end
 
 	--- Returns how many triangles can be created
-	-- @return Number of triangles that can be created
+	-- @return number Number of triangles that can be created
 	-- @client
 	function mesh_library.trianglesLeft()
 		return plyTriangleCount:check(instance.player)
 	end
 
 	--- Returns how many triangles can be rendered
-	-- @return Number of triangles that can be rendered
+	-- @return number Number of triangles that can be rendered
 	-- @client
 	function mesh_library.trianglesLeftRender()
 		return plyTriangleRenderBurst:check(instance.player)
@@ -908,10 +909,10 @@ if CLIENT then
 		[MATERIAL_TRIANGLE_STRIP] = function(count) return count end
 	}
 	--- Generates mesh data. If an Mesh object is passed, it will populate that mesh with the data. Otherwise, it will render directly to renderer.
-	-- @param mesh_obj Optional Mesh object, mesh to build. (default: nil)
-	-- @param prim_type Int, primitive type, see MATERIAL
-	-- @param prim_count Int, the amount of primitives
-	-- @param func The function provided that will generate the mesh vertices
+	-- @param mesh? mesh_obj Optional Mesh object, mesh to build. (default: nil)
+	-- @param number prim_type Int, primitive type, see MATERIAL
+	-- @param number prim_count Int, the amount of primitives
+	-- @param function func The function provided that will generate the mesh vertices
 	-- @client
 	function mesh_library.generate(mesh_obj, prim_type, prim_count, func)
 		if meshgenerating then SF.Throw("Dynamic mesh was already started.", 2) end
@@ -954,63 +955,63 @@ if CLIENT then
 	end
 	
 	--- Sets the vertex color by RGBA values
-	-- @param r Number, red value
-	-- @param g Number, green value
-	-- @param b Number, blue value
-	-- @param a Number, alpha value
+	-- @param number r Number, red value
+	-- @param number g Number, green value
+	-- @param number b Number, blue value
+	-- @param number a Number, alpha value
 	-- @client
 	function mesh_library.writeColor(r, g, b, a)
 		mesh.Color(r, g, b, a)
 	end
 	
 	--- Sets the vertex normal
-	-- @param normal Vector
+	-- @param vector normal Normal
 	-- @client
 	function mesh_library.writeNormal(normal)
 		mesh.Normal(vunwrap(normal))
 	end
 	
 	--- Sets the vertex position
-	-- @param position Vector
+	-- @param vector position Position
 	-- @client
 	function mesh_library.writePosition(pos)
 		mesh.Position(vunwrap(pos))
 	end
 	
 	--- Sets the vertex texture coordinates
-	-- @param stage Number, stage of the texture coordinate
-	-- @param u Number, u coordinate
-	-- @param v Number, v coordinate
+	-- @param number stage Stage of the texture coordinate
+	-- @param number u U coordinate
+	-- @param number v V coordinate
 	-- @client
 	function mesh_library.writeUV(stage, u, v)
 		mesh.TexCoord(stage, u, v)
 	end
 	
 	--- Sets the vertex tangent user data
-	-- @param x Number
-	-- @param y Number
-	-- @param z Number
-	-- @param handedness Number
+	-- @param number x x
+	-- @param number y y
+	-- @param number z z
+	-- @param number handedness
 	-- @client
 	function mesh_library.writeUserData(x, y, z, handedness)
 		mesh.UserData(x, y, z, handedness)
 	end
 	
 	--- Draws a quad using 4 vertices
-	-- @param v1 Vector, vertex1 position
-	-- @param v2 Vector, vertex2 position
-	-- @param v3 Vector, vertex3 position
-	-- @param v4 Vector, vertex4 position
+	-- @param vector v1 Vertex1 position
+	-- @param vector v2 Vertex2 position
+	-- @param vector v3 Vertex3 position
+	-- @param vector v4 Vertex4 position
 	-- @client
 	function mesh_library.writeQuad(v1, v2, v3, v4)
 		mesh.Quad(vunwrap(v1), vunwrap(v2), vunwrap(v3), vunwrap(v4))
 	end
 	
 	--- Draws a quad using a position, normal and size
-	-- @param position Vector
-	-- @param normal Vector
-	-- @param w Number
-	-- @param h Number
+	-- @param vector position
+	-- @param vector normal
+	-- @param number w
+	-- @param number h
 	-- @client
 	function mesh_library.writeQuadEasy(position, normal, w, h)
 		mesh.QuadEasy(vunwrap(position), vunwrap(normal), w, h)

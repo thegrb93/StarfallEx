@@ -53,13 +53,13 @@ local function convertFilter(filter)
 end
 
 --- Does a line trace
--- @param start Start position
--- @param endpos End position
--- @param filter Entity/array of entities to filter, or a function callback with an entity arguement that returns whether the trace should hit
--- @param mask Trace mask
--- @param colgroup The collision group of the trace
--- @param ignworld Whether the trace should ignore world
--- @return Result of the trace https://wiki.facepunch.com/gmod/Structures/TraceResult
+-- @param vector start Start position
+-- @param vector endpos End position
+-- @param any? filter Entity/array of entities to filter, or a function callback with an entity arguement that returns whether the trace should hit
+-- @param number? mask Trace mask
+-- @param number? colgroup The collision group of the trace
+-- @param boolean? ignworld Whether the trace should ignore world
+-- @return table Result of the trace https://wiki.facepunch.com/gmod/Structures/TraceResult
 function trace_library.trace(start, endpos, filter, mask, colgroup, ignworld)
 	checkpermission(instance, nil, "trace")
 	checkvector(start)
@@ -85,15 +85,15 @@ function trace_library.trace(start, endpos, filter, mask, colgroup, ignworld)
 end
 
 --- Does a swept-AABB trace
--- @param start Start position
--- @param endpos End position
--- @param minbox Lower box corner
--- @param maxbox Upper box corner
--- @param filter Entity/array of entities to filter, or a function callback with an entity arguement that returns whether the trace should hit
--- @param mask Trace mask
--- @param colgroup The collision group of the trace
--- @param ignworld Whether the trace should ignore world
--- @return Result of the trace https://wiki.facepunch.com/gmod/Structures/TraceResult
+-- @param vector start Start position
+-- @param vector endpos End position
+-- @param vector minbox Lower box corner
+-- @param vector maxbox Upper box corner
+-- @param any? filter Entity/array of entities to filter, or a function callback with an entity arguement that returns whether the trace should hit
+-- @param number? mask Trace mask
+-- @param number? colgroup The collision group of the trace
+-- @param boolean? ignworld Whether the trace should ignore world
+-- @return table Result of the trace https://wiki.facepunch.com/gmod/Structures/TraceResult
 function trace_library.traceHull(start, endpos, minbox, maxbox, filter, mask, colgroup, ignworld)
 	checkpermission(instance, nil, "trace")
 	checkvector(start)
@@ -123,36 +123,36 @@ function trace_library.traceHull(start, endpos, minbox, maxbox, filter, mask, co
 end
 
 --- Does a ray box intersection returning the position hit, normal, and trace fraction, or nil if not hit.
---@param rayStart The origin of the ray
---@param rayDelta The direction and length of the ray
---@param boxOrigin The origin of the box
---@param boxAngles The box's angles
---@param boxMins The box min bounding vector
---@param boxMaxs The box max bounding vector
---@return Hit position or nil if not hit
---@return Hit normal or nil if not hit
---@return Hit fraction or nil if not hit
+--@param vector rayStart The origin of the ray
+--@param vector rayDelta The direction and length of the ray
+--@param vector boxOrigin The origin of the box
+--@param angle boxAngles The box's angles
+--@param vector boxMins The box min bounding vector
+--@param vector boxMaxs The box max bounding vector
+--@return vector? Hit position or nil if not hit
+--@return vector? Hit normal or nil if not hit
+--@return number? Hit fraction or nil if not hit
 function trace_library.intersectRayWithOBB(rayStart, rayDelta, boxOrigin, boxAngles, boxMins, boxMaxs)
 	local pos, normal, fraction = util.IntersectRayWithOBB(vunwrap(rayStart), vunwrap(rayDelta), vunwrap(boxOrigin), aunwrap(boxAngles), vunwrap(boxMins), vunwrap(boxMaxs))
 	if pos then return vwrap(pos), vwrap(normal), fraction end
 end
 
 --- Does a ray plane intersection returning the position hit or nil if not hit
---@param rayStart The origin of the ray
---@param rayDelta The direction and length of the ray
---@param planeOrigin The origin of the plane
---@param planeNormal The normal of the plane
---@return Hit position or nil if not hit
+--@param vector rayStart The origin of the ray
+--@param vector rayDelta The direction and length of the ray
+--@param vector planeOrigin The origin of the plane
+--@param vector planeNormal The normal of the plane
+--@return vector? Hit position or nil if not hit
 function trace_library.intersectRayWithPlane(rayStart, rayDelta, planeOrigin, planeNormal)
 	local pos = util.IntersectRayWithPlane(vunwrap(rayStart), vunwrap(rayDelta), vunwrap(planeOrigin), vunwrap(planeNormal))
 	if pos then return vwrap(pos) end
 end
 
 --- Does a line trace and applies a decal to wherever is hit
--- @param name The decal name, see https://wiki.facepunch.com/gmod/util.Decal
--- @param start Start position
--- @param endpos End position
--- @param filter (Optional) Entity/array of entities to filter
+-- @param string name The decal name, see https://wiki.facepunch.com/gmod/util.Decal
+-- @param vector start Start position
+-- @param vector endpos End position
+-- @param any? filter (Optional) Entity/array of entities to filter
 function trace_library.decal(name, start, endpos, filter)
 	checkpermission(instance, nil, "trace.decal")
 	checkluatype(name, TYPE_STRING)
@@ -168,8 +168,8 @@ function trace_library.decal(name, start, endpos, filter)
 end
 
 --- Returns the contents of the position specified.
--- @param position The position to get the CONTENTS of
--- @return Contents bitflag, see the CONTENTS enums
+-- @param vector position The position to get the CONTENTS of
+-- @return number Contents bitflag, see the CONTENTS enums
 function trace_library.pointContents(position)
 	return util.PointContents(vunwrap(position))
 end

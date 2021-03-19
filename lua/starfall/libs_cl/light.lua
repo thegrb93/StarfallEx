@@ -100,11 +100,11 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 
 
 --- Creates a dynamic light (make sure to draw it)
--- @param pos The position of the light
--- @param size The size of the light. Must be lower than sf_light_maxsize
--- @param brightness The brightness of the light
--- @param color The color of the light
--- @return Dynamic light
+-- @param vector pos The position of the light
+-- @param number size The size of the light. Must be lower than sf_light_maxsize
+-- @param number brightness The brightness of the light
+-- @param color color The color of the light
+-- @return light Dynamic light
 function light_library.create(pos, size, brightness, color)
 	if table.Count(lights) >= 256 then SF.Throw("Too many lights have already been allocated (max 256)", 2) end
 	if maxSize:GetFloat() == 0 then SF.Throw("sf_light_maxsize is set to 0", 2) end
@@ -148,89 +148,89 @@ function light_methods:draw()
 end
 
 --- Sets the light brightness
--- @param brightness The light's brightness
+-- @param number brightness The light's brightness
 function light_methods:setBrightness(brightness)
 	checkluatype(brightness, TYPE_NUMBER)
 	unwrap(self).data.brightness = brightness
 end
 
 --- Sets the light decay speed in thousandths per second. 1000 lasts for 1 second, 2000 lasts for 0.5 seconds
--- @param decay The light's decay speed
+-- @param number decay The light's decay speed
 function light_methods:setDecay(decay)
 	checkluatype(decay, TYPE_NUMBER)
 	unwrap(self).data.decay = decay
 end
 
 --- Sets the light lifespan (Required for fade effect i.e. decay)
--- @param dietime The how long the light will stay alive after turning it off.
+-- @param number dietime The how long the light will stay alive after turning it off.
 function light_methods:setDieTime(dietime)
 	checkluatype(dietime, TYPE_NUMBER)
 	unwrap(self).dietime = math.max(dietime, 0)
 end
 
 --- Sets the light direction (used with setInnerAngle and setOuterAngle)
--- @param dir Direction of the light
+-- @param vector dir Direction of the light
 function light_methods:setDirection(dir)
-	unwrap(self).data.dir = vunwrap(dir) 
+	unwrap(self).data.dir = vunwrap(dir)
 end
 
 --- Sets the light inner angle (used with setDirection and setOuterAngle)
--- @param ang Number inner angle of the light
+-- @param number ang Inner angle of the light
 function light_methods:setInnerAngle(ang)
 	checkluatype(ang, TYPE_NUMBER)
 	unwrap(self).data.innerangle = ang
 end
 
 --- Sets the light outer angle (used with setDirection and setInnerAngle)
--- @param ang Number outer angle of the light
+-- @param number ang Outer angle of the light
 function light_methods:setOuterAngle(ang)
 	checkluatype(ang, TYPE_NUMBER)
 	unwrap(self).data.outerangle = ang
 end
 
 --- Sets the minimum light amount
--- @param min The minimum light
+-- @param number min The minimum light
 function light_methods:setMinLight(min)
 	checkluatype(min, TYPE_NUMBER)
 	unwrap(self).data.minlight = min
 end
 
 --- Sets whether the light should cast onto the world or not
--- @param on Whether the light shouldn't cast onto the world
+-- @param boolean on Whether the light shouldn't cast onto the world
 function light_methods:setNoWorld(on)
 	checkluatype(on, TYPE_BOOL)
 	unwrap(self).data.noworld = on
 end
 
 --- Sets whether the light should cast onto models or not
--- @param on Whether the light shouldn't cast onto the models
+-- @param boolean on Whether the light shouldn't cast onto the models
 function light_methods:setNoModel(on)
 	checkluatype(on, TYPE_BOOL)
 	unwrap(self).data.nomodel = on
 end
 
 --- Sets the light position
--- @param pos The position of the light
+-- @param vector pos The position of the light
 function light_methods:setPos(pos)
-	unwrap(self).data.pos = vunwrap(pos) 
+	unwrap(self).data.pos = vunwrap(pos)
 end
 
 --- Sets the size of the light (max is sf_light_maxsize)
--- @param size The size of the light
+-- @param number size The size of the light
 function light_methods:setSize(size)
 	checkluatype(size, TYPE_NUMBER)
 	unwrap(self).data.size = math.Clamp(size, 0, maxSize:GetFloat())
 end
 
 --- Sets the flicker style of the light https://developer.valvesoftware.com/wiki/Light_dynamic#Appearances
--- @param style The number of the flicker style
+-- @param number style The number of the flicker style
 function light_methods:setStyle(style)
 	checkluatype(style, TYPE_NUMBER)
 	unwrap(self).data.style = style
 end
 
 --- Sets the color of the light
--- @param color The color of the light
+-- @param color col The color of the light
 function light_methods:setColor(color)
 	local col = cunwrap(color)
 	local data = unwrap(self).data

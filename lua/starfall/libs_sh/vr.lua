@@ -2,7 +2,7 @@
 local checkluatype = SF.CheckLuaType
 local haspermission = SF.Permissions.hasAccess
 
---- VRMod Library 
+--- VRMod Library
 -- Addon and module: https://steamcommunity.com/sharedfiles/filedetails/?id=1678408548
 -- Follow install instructions on the addon's page.
 -- @name vr
@@ -65,40 +65,40 @@ instance:AddHook("initialize", function()
 	getply = instance.Types.Player.GetPlayer
 end)
 
---- Checks wether the player is in VR
--- @param target player to check
--- @return boolean true if player is in VR
+--- Checks whether the player is in VR
+-- @param player target Player to check
+-- @return boolean True if player is in VR
 function vr_library.isPlayerInVR(ply)
 	return vrmod.IsPlayerInVR(getply(ply))
 end
 
 --- Checks wether the player is using empty hands
--- @param target player to check
--- @return boolean true if player is using empty hands
+-- @param player target Player to check
+-- @return boolean True if player is using empty hands
 function vr_library.usingEmptyHands(ply)
 	return vrmod.UsingEmptyHands(getply(ply))
 end
 
 --HMD
 
---- returns the HMD position
--- @param target player to get the HMD position from
--- @return vector position
+--- Returns the Head Mounted Device position
+-- @param player target Player to get the HMD position from
+-- @return vector HMD Position
 function vr_library.getHMDPos(ply)
 	return vwrap(vrmod.GetHMDPos(getply(ply)))
 end
 
---- returns the HMD angles
--- @param target player to get the HMD angles from
--- @return angle angles
+--- Returns the Head Mounted Device angles
+-- @param player target Player to get the HMD angles from
+-- @return angle HMD Angles
 function vr_library.getHMDAng(ply)
 	return awrap(vrmod.GetHMDAng(getply(ply)))
 end
 
---- returns the HMD pose
--- @param target player to get the HMD pose from
--- @return vector position 
--- @return angle angles
+--- Returns the HMD pose
+-- @param player target Player to get the HMD pose from
+-- @return vector HMD Position
+-- @return angle HMD Angles
 function vr_library.getHMDPose(ply)
 	local pos, ang = vrmod.GetHMDPose(getply(ply))
 	return vwrap(pos), awrap(ang)
@@ -106,24 +106,24 @@ end
 
 --Left Hand
 
---- returns the left hand position
--- @param target player to get the left hand position from
--- @return vector position
+--- Returns the left hand position
+-- @param player target Player to get the left hand position from
+-- @return vector Position
 function vr_library.getLeftHandPos(ply)
 	return vwrap(vrmod.GetLeftHandPos(getply(ply)))
 end
 
---- returns the left hand angles
--- @param target player to get the left hand angles from
--- @return angle angles
+--- Returns the left hand angles
+-- @param player target Player to get the left hand angles from
+-- @return angle Angles
 function vr_library.getLeftHandAng(ply)
 	return awrap(vrmod.GetLeftHandAng(getply(ply)))
 end
 
---- returns the left hand pose
--- @param target player to get the left hand pose from
--- @return vector position 
--- @return angle angles
+--- Returns the left hand pose
+-- @param player target Player to get the left hand pose from
+-- @return vector Position
+-- @return angle Angles
 function vr_library.getLeftHandPose(ply)
 	local pos, ang = vrmod.GetLeftHandPose(getply(ply))
 	return vwrap(pos), awrap(ang)
@@ -131,24 +131,24 @@ end
 
 --Right Hand
 
---- returns the right hand position
--- @param target player to get the right hand position from
--- @return vector position
+--- Returns the right hand position
+-- @param player target Player to get the right hand position from
+-- @return vector Position
 function vr_library.getRightHandPos(ply)
 	return vwrap(vrmod.GetRightHandPos(getply(ply)))
 end
 
---- returns the left hand angles
--- @param target player to get the right hand angles from
--- @return angle angles
+--- Returns the left hand angles
+-- @param player target Player to get the right hand angles from
+-- @return angle Angles
 function vr_library.getRightHandAng(ply)
 	return awrap(vrmod.GetRightHandAng(getply(ply)))
 end
 
---- returns the left hand pose
--- @param target player to get the right hand pose from
--- @return vector position 
--- @return angle angles
+--- Returns the left hand pose
+-- @param player target Player to get the right hand pose from
+-- @return vector Position
+-- @return angle Angles
 function vr_library.getRightHandPose(ply)
 	local pos, ang = vrmod.GetRightHandPose(getply(ply))
 	return vwrap(pos), awrap(ang)
@@ -156,12 +156,12 @@ end
 
 if CLIENT then
 
-	--- returns the a controller's input state, may return boolean, number or vector.
-	-- @param actionname to check control of, check VR enums
-	-- @return boolean, vector or number of input
+	--- Returns the a controller's input state, may return boolean, number or vector.
+	-- @param string actionname ActionName to check control of, see the VR enums
+	-- @return any Boolean, Vector or Number of input
 	-- @client
 	function vr_library.getInput(actionname)
-		checkluatype(actionname, TYPE_STRING) 
+		checkluatype(actionname, TYPE_STRING)
 		local var = vrmod.GetInput(actionname)
 		local typeid = TypeID(var)
 		if typeid == TYPE_BOOL or typeid == TYPE_NUMBER then
@@ -175,23 +175,23 @@ if CLIENT then
 
 	-- HMD
 
-	--- returns the HMD velocity
-	-- @return vector velocity
+	--- Returns the HMD velocity
+	-- @return vector HMD Velocity
 	-- @client
 	function vr_library.getHMDVelocity()
 		return vwrap(vrmod.GetHMDVelocity())
 	end
 
-	--- returns the HMD angular velocity
-	-- @return vector angular velocity
+	--- Returns the HMD angular velocity
+	-- @return vector Angular velocity
 	-- @client
 	function vr_library.getHMDAngularVelocity()
 		return vwrap(vrmod.GetHMDVelocity())
 	end
 
-	--- returns the HMD velocities, position and angular
-	-- @return vector velocity
-	-- @return vector angular velocity
+	--- Returns the HMD velocities, position and angular
+	-- @return vector Velocity
+	-- @return vector Angular velocity
 	-- @client
 	function vr_library.getHMDVelocities()
 		local v1, v2 = vrmod.GetHMDVelocities()
@@ -200,23 +200,23 @@ if CLIENT then
 
 	--Left hand
 
-	--- returns the left hand velocity
-	-- @return vector velocity
+	--- Returns the left hand velocity
+	-- @return vector Velocity
 	-- @client
 	function vr_library.getLeftHandVelocity()
 		return vwrap(vrmod.GetLeftHandVelocity())
 	end
 
-	--- returns the left hand angular velocity
-	-- @return vector angular velocity
+	--- Returns the left hand angular velocity
+	-- @return vector Angular velocity
 	-- @client
 	function vr_library.getLeftHandAngularVelocity()
 		return vwrap(vrmod.GetLeftHandAngularVelocity())
 	end
 
-	--- returns the left hand velocities, position and angular
-	-- @return vector velocity
-	-- @return vector angular velocity
+	--- Returns the left hand velocities, position and angular
+	-- @return vector Velocity
+	-- @return vector Angular velocity
 	-- @client
 	function vr_library.getLeftHandVelocities()
 		local v1, v2 = vrmod.GetLeftHandVelocities()
@@ -225,23 +225,23 @@ if CLIENT then
 
 	--Right hand
 
-	--- returns the right hand velocity
-	-- @return vector velocity
+	--- Returns the right hand velocity
+	-- @return vector Velocity
 	-- @client
 	function vr_library.getRightHandVelocity()
 		return vwrap(vrmod.GetRightHandVelocity())
 	end
 
-	--- returns the right hand angular velocity
-	-- @return vector angular velocity
+	--- Returns the right hand angular velocity
+	-- @return vector Angular velocity
 	-- @client
 	function vr_library.getRightHandAngularVelocity()
 		return vwrap(vrmod.GetRightHandAngularVelocity())
 	end
 
-	--- returns the right hand velocities, position and angular
-	-- @return vector velocity
-	-- @return vector angular velocity
+	--- Returns the right hand velocities, position and angular
+	-- @return vector Velocity
+	-- @return vector Angular velocity
 	-- @client
 	function vr_library.getRightHandVelocities()
 		local v1, v2 = vrmod.GetRightHandVelocities()
@@ -257,23 +257,23 @@ if CLIENT then
 
 	--Playspace
 
-	--- returns the playspace position
-	-- @return vector position
+	--- Returns the playspace position
+	-- @return vector Position
 	-- @client
 	function vr_library.getOriginPos()
 		return vwrap(vrmod.GetOriginPos())
 	end
 
-	--- returns the playspace angles
-	-- @return angle angles
+	--- Returns the playspace angles
+	-- @return angle Angles
 	-- @client
 	function vr_library.getOriginAng()
 		return awrap(vrmod.GetOriginAng())
 	end
 
-	--- returns the playspace position and angles
-	-- @return vector position
-	-- @return angle angles
+	--- Returns the playspace position and angles
+	-- @return vector Position
+	-- @return angle Angles
 	-- @client
 	function vr_library.getOrigin()
 		local pos, ang = vrmod.GetOrigin()
@@ -282,22 +282,22 @@ if CLIENT then
 
 	--eyes GetEyePos
 
-	--- returns position of the eye that is currently being used for rendering.
-	-- @return vector position
+	--- Returns position of the eye that is currently being used for rendering.
+	-- @return vector Position
 	-- @client
 	function vr_library.getEyePos()
 		return vwrap(vrmod.GetEyePos())
 	end
 
-	--- returns position of the left eye
-	-- @return vector position
+	--- Returns position of the left eye
+	-- @return vector Position
 	-- @client
 	function vr_library.getLeftEyePos()
 		return vwrap(vrmod.GetLeftEyePos())
 	end
 
-	--- returns position of the right eye
-	-- @return vector position
+	--- Returns position of the right eye
+	-- @return vector Position
 	-- @client
 	function vr_library.getRightEyePos()
 		return vwrap(vrmod.GetRightEyePos())

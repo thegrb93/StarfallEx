@@ -60,10 +60,10 @@ local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wr
 
 
 --- Creates a sound and attaches it to an entity
--- @param ent Entity to attach sound to.
--- @param path Filepath to the sound file.
--- @param nofilter (Optional) Boolean Make the sound play for everyone regardless of range or location. Only affects Server-side sounds.
--- @return Sound Object
+-- @param entity ent Entity to attach sound to.
+-- @param string path Filepath to the sound file.
+-- @param boolean? nofilter (Optional) Boolean Make the sound play for everyone regardless of range or location. Only affects Server-side sounds.
+-- @return sound Sound Object
 function sounds_library.create(ent, path, nofilter)
 	checkluatype(path, TYPE_STRING)
 	if nofilter~=nil then checkluatype(nofilter, TYPE_BOOL) end
@@ -95,20 +95,20 @@ end
 
 
 --- Returns if a sound is able to be created
--- @return If it is possible to make a sound
+-- @return boolean If it is possible to make a sound
 function sounds_library.canCreate()
 	return plyCount:check(instance.player) > 0 and plySoundBurst:check(instance.player) >= 1
 end
 
 --- Returns the number of sounds left that can be created
--- @return The number of sounds left
+-- @return number The number of sounds left
 function sounds_library.soundsLeft()
 	return math.min(plyCount:check(instance.player), plySoundBurst:check(instance.player))
 end
 
 --- Returns the sound duration in seconds. May not work for all file-types on linux/macos
--- @param path String path to the sound file
--- @return Number duration in seconds
+-- @param string path String path to the sound file
+-- @return number Number duration in seconds
 function sounds_library.duration(path)
     checkluatype(path, TYPE_STRING)
     return SoundDuration(path)
@@ -123,7 +123,7 @@ function sound_methods:play()
 end
 
 --- Stops the sound from being played.
--- @param fade Time in seconds to fade out, if nil or 0 the sound stops instantly.
+-- @param number? fade Time in seconds to fade out, if nil or 0 the sound stops instantly.
 function sound_methods:stop(fade)
 	checkpermission(instance, nil, "sound.modify")
 	if fade~=nil then
@@ -150,8 +150,8 @@ function sound_methods:destroy()
 end
 
 --- Sets the volume of the sound. Won't work unless the sound is playing.
--- @param vol Volume to set to, between 0 and 1.
--- @param fade Time in seconds to transition to this new volume.
+-- @param number vol Volume to set to, between 0 and 1.
+-- @param number? fade Time in seconds to transition to this new volume. Default 0
 function sound_methods:setVolume(vol, fade)
 	checkpermission(instance, nil, "sound.modify")
 	checkluatype(vol, TYPE_NUMBER)
@@ -168,8 +168,8 @@ function sound_methods:setVolume(vol, fade)
 end
 
 --- Sets the pitch of the sound. Won't work unless the sound is playing.
--- @param pitch Pitch to set to, between 0 and 255.
--- @param fade Time in seconds to transition to this new pitch.
+-- @param number pitch Pitch to set to, between 0 and 255.
+-- @param number? fade Time in seconds to transition to this new pitch. Default 0
 function sound_methods:setPitch(pitch, fade)
 	checkpermission(instance, nil, "sound.modify")
 	checkluatype(pitch, TYPE_NUMBER)
@@ -191,7 +191,7 @@ function sound_methods:isPlaying()
 end
 
 --- Sets the sound level in dB. Won't work unless the sound is playing.
--- @param level dB level, see <a href='https://developer.valvesoftware.com/wiki/Soundscripts#SoundLevel'> Vale Dev Wiki</a>, for information on the value to use.
+-- @param number level dB level, see <a href='https://developer.valvesoftware.com/wiki/Soundscripts#SoundLevel'> Vale Dev Wiki</a>, for information on the value to use.
 function sound_methods:setSoundLevel(level)
 	checkpermission(instance, nil, "sound.modify")
 	checkluatype(level, TYPE_NUMBER)

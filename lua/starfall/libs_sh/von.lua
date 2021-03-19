@@ -810,16 +810,16 @@ return function(instance)
 local von_library = instance.Libraries.von
 
 --- Deserialize a string
--- @param str String to deserialize
--- @return Table
+-- @param string str String to deserialize
+-- @return table Table
 function von_library.deserialize(str)
 	g_instance = instance
 	return deserialize(str)
 end
 
 --- Serialize a table
--- @param tbl Table to serialize
--- @return String
+-- @param table tbl Table to serialize
+-- @return string String encoded from the table
 function von_library.serialize(tbl)
 	g_instance = instance
 	return serialize(tbl)
