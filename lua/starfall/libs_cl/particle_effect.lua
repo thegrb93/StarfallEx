@@ -60,11 +60,11 @@ end
 
 
 --- Attaches a particleEffect to an entity.
--- @param entity Entity to attach to
--- @param name Name of the particle effect
--- @param pattach PATTACH enum
--- @param options Table of options
--- @return ParticleEffect type.
+-- @param entity entity Entity to attach to
+-- @param string name Name of the particle effect
+-- @param number pattach PATTACH enum
+-- @param table options Table of options
+-- @return particleeffect ParticleEffect type.
 function particleef_library.attach(entity, name, pattach, options)
 	checkpermission(instance, entity, "particleEffect.attach")
 
@@ -94,12 +94,11 @@ end
 
 
 --- Gets if the particle effect is valid or not.
--- @return Is valid or not
+-- @return boolean Is valid or not
 function particleef_methods:isValid()
 	local uw = unwrap(self)
 
 	return uw and uw:IsValid()
-
 end
 
 --- Starts emission of the particle effect.
@@ -109,8 +108,6 @@ function particleef_methods:startEmission()
 	checkValid(uw)
 
 	uw:StartEmission()
-
-
 end
 
 
@@ -121,8 +118,6 @@ function particleef_methods:stopEmission()
 	checkValid(uw)
 
 	uw:StopEmission()
-
-
 end
 
 --- Stops emission of the particle effect and destroys the object.
@@ -133,7 +128,6 @@ function particleef_methods:destroy()
 		uw:StopEmissionAndDestroyImmediately()
 		plyCount:free(instance.player, 1)
 	end
-
 end
 
 --- Restarts emission of the particle effect.
@@ -143,13 +137,11 @@ function particleef_methods:restart()
 	checkValid(uw)
 
 	uw:Restart()
-
-
 end
 
 
---- Restarts emission of the particle effect.
--- @return bool finished
+--- Returns if the particle effect is finished
+-- @return boolean If the particle effect is finished
 function particleef_methods:isFinished()
 	local uw = unwrap(self)
 
@@ -158,26 +150,23 @@ function particleef_methods:isFinished()
 	end
 
 	return true
-
 end
 
 
 --- Sets the sort origin for given particle effect system. This is used as a helper to determine which particles are in front of which.
--- @param vector Sort Origin
+-- @param vector origin Sort Origin
 function particleef_methods:setSortOrigin(origin)
 	local uw = unwrap(self)
 
 	checkValid(uw)
 
 	uw:SetSortOrgin(vunwrap(origin))
-
-
 end
 
 
 --- Sets a value for given control point.
--- @param number Control Point ID (0-63)
--- @param vector Value
+-- @param number id Control Point ID (0-63)
+-- @param vector value Value
 function particleef_methods:setControlPoint(id,value)
 	local uw = unwrap(self)
 
@@ -186,14 +175,12 @@ function particleef_methods:setControlPoint(id,value)
 	checkValid(uw)
 
 	uw:SetControlPoint(id,vunwrap(value))
-
-
 end
 
 
 --- Essentially makes child control point follow the parent entity.
--- @param number Child Control Point ID (0-63)
--- @param entity Entity parent
+-- @param number id Child Control Point ID (0-63)
+-- @param entity entity Entity parent
 function particleef_methods:setControlPointEntity(id,entity)
 	local uw = unwrap(self)
 	local entity = getent(entity)
@@ -203,14 +190,12 @@ function particleef_methods:setControlPointEntity(id,entity)
 	checkValid(uw)
 
 	uw:SetControlPointEntity(id,entity)
-
-
 end
 
 
 --- Sets the forward direction for given control point.
--- @param number Control Point ID (0-63)
--- @param vector Forward
+-- @param number id Control Point ID (0-63)
+-- @param vector fwd Forward vector
 function particleef_methods:setForwardVector(id,value)
 	local uw = unwrap(self)
 
@@ -219,13 +204,11 @@ function particleef_methods:setForwardVector(id,value)
 	checkValid(uw)
 
 	uw:SetControlPointForwardVector(id,vunwrap(value))
-
-
 end
 
 --- Sets the right direction for given control point.
--- @param number Control Point ID (0-63)
--- @param vector Right
+-- @param number id Control Point ID (0-63)
+-- @param vector right Right vector
 function particleef_methods:setRightVector(id,value)
 	local uw = unwrap(self)
 
@@ -234,14 +217,12 @@ function particleef_methods:setRightVector(id,value)
 	checkValid(uw)
 
 	uw:SetControlPointRightVector(id,vunwrap(value))
-
-
 end
 
 
---- Sets the right direction for given control point.
--- @param number Control Point ID (0-63)
--- @param vector Right
+--- Sets the up direction for given control point.
+-- @param number id Control Point ID (0-63)
+-- @param vector up Up vector
 function particleef_methods:setUpVector(id,value)
 	local uw = unwrap(self)
 
@@ -254,9 +235,9 @@ function particleef_methods:setUpVector(id,value)
 end
 
 
---- Sets the forward direction for given control point.
--- @param number Child Control Point ID (0-63)
--- @param number Parent
+--- Sets the parent for given control point.
+-- @param number id Child Control Point ID (0-63)
+-- @param number parentid Parent
 function particleef_methods:setControlPointParent(id,value)
 	local uw = unwrap(self)
 
