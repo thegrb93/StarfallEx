@@ -148,7 +148,7 @@ local parseAttributes = {
 		local type, name, description = string.match(value, "%s*([%w_%.%?]+)%s*([%w_%.]+)%s*(.*)")
 		if type then
 			if not valid_sftype(type) then
-				-- No type found, revert to old typeless documentation
+				-- No type found, revert to old untyped documentation
 				type = "any?"
 				name, description = string.match(value, "%s*([%w_%.]+)%s*(.*)")
 				if name==nil then
@@ -161,7 +161,7 @@ local parseAttributes = {
 			t[#t+1] = {
 				name = name,
 				description = description,
-				type = _type
+				type = type
  			}
 		else
 			ErrorNoHalt("Invalid param doc (" .. value .. ") in file: " .. curfile .. "\n")
@@ -171,7 +171,7 @@ local parseAttributes = {
 		local type, description = string.match(value, "%s*([%w_%.%?]+)%s*(.*)")
 		if type then
 			if not valid_sftype(type) then
-				-- No type found, revert to old typeless documentation
+				-- No type found, revert to old untyped documentation
 				type = "any?"
 				description = value
 			end
