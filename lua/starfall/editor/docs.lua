@@ -145,7 +145,7 @@ local parseAttributes = {
 		t[#t+1] = value
 	end,
 	["param"] = function(parsing, value)
-		local type, name, desc = string.match(value, "%s*([%w_%.%?]+)%s*([%w_%.]+)%s*(.*)")
+		local type, name, description = string.match(value, "%s*([%w_%.%?]+)%s*([%w_%.]+)%s*(.*)")
 		if type then
 			if not valid_sftype(type) then
 				-- No type found, revert to old typeless documentation
