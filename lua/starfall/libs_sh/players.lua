@@ -182,14 +182,14 @@ end
 
 --- Returns the name of the player's active weapon
 -- @shared
--- @return weapon The weapon
+-- @return Weapon The weapon
 function player_methods:getActiveWeapon()
 	return wwrap(getply(self):GetActiveWeapon())
 end
 
 --- Returns the player's aim vector
 -- @shared
--- @return vector Aim vector
+-- @return Vector Aim vector
 function player_methods:getAimVector()
 	return vwrap(getply(self):GetAimVector())
 end
@@ -238,14 +238,14 @@ end
 
 --- Returns the entity the player is currently using, like func_tank mounted turrets or +use prop pickups.
 -- @shared
--- @return entity Entity
+-- @return Entity Entity
 function player_methods:getEntityInUse()
 	return owrap(getply(self):GetEntityInUse())
 end
 
 --- Returns the player's shoot position
 -- @shared
--- @return vector Shoot position
+-- @return Vector Shoot position
 function player_methods:getShootPos()
 	return vwrap(getply(self):GetShootPos())
 end
@@ -259,7 +259,7 @@ end
 
 --- Returns the vehicle the player is driving
 -- @shared
--- @return vehicle Vehicle if player in vehicle or nil
+-- @return Vehicle Vehicle if player in vehicle or nil
 function player_methods:getVehicle()
 	return vhwrap(getply(self):GetVehicle())
 end
@@ -373,7 +373,7 @@ end
 
 --- Returns the player's current view entity
 -- @shared
--- @return entity Player's current view entity
+-- @return Entity Player's current view entity
 function player_methods:getViewEntity()
 	return owrap(getply(self):GetViewEntity())
 end
@@ -381,13 +381,13 @@ end
 --- Returns the player's view model
 -- In the Client realm, other players' viewmodels are not available unless they are being spectated
 -- @shared
--- @return entity Player's view model
+-- @return Entity Player's view model
 function player_methods:getViewModel()
 	return owrap(getply(self):GetViewModel(0))
 end
 
 --- Returns the camera punch offset angle
--- @return angle The angle of the view offset
+-- @return Angle The angle of the view offset
 function player_methods:getViewPunchAngles()
 	return awrap(getply(self):GetViewPunchAngles())
 end
@@ -402,7 +402,7 @@ end
 --- Returns the specified weapon or nil if the player doesn't have it
 -- @shared
 -- @param string wep Weapon class name
--- @return weapon Weapon
+-- @return Weapon Weapon
 function player_methods:getWeapon(wep)
 	checkluatype(wep, TYPE_STRING)
 	return wwrap(getply(self):GetWeapon(wep))
@@ -410,7 +410,7 @@ end
 
 --- Returns the entity that the player is standing on
 -- @shared
--- @return entity Ground entity
+-- @return Entity Ground entity
 function player_methods:getGroundEntity()
 	return owrap(getply(self):GetGroundEntity())
 end
@@ -452,7 +452,7 @@ if SERVER then
 
 	--- Sets the view entity of the player. Only works if they are linked to a hud.
 	-- @server
-	-- @param entity ent Entity to set the player's view entity to, or nothing to reset it
+	-- @param Entity ent Entity to set the player's view entity to, or nothing to reset it
 	function player_methods:setViewEntity(ent)
 		local ply = getply(self)
 		if ent~=nil then ent = getent(ent) end
@@ -472,8 +472,8 @@ if SERVER then
 	--- Drops the players' weapon
 	-- @server
 	-- @param any weapon The weapon instance or class name of the weapon to drop
-	-- @param vector? target If set, launches the weapon at the given position
-	-- @param vector? velocity If set and target is unset, launches the weapon with the given velocity
+	-- @param Vector? target If set, launches the weapon at the given position
+	-- @param Vector? velocity If set and target is unset, launches the weapon with the given velocity
 	function player_methods:dropWeapon(weapon, target, velocity)
 		local ply = getply(self)
 		checkpermission(instance, ply, "player.dropweapon")
@@ -498,7 +498,7 @@ if SERVER then
 
 	--- Sets a player's eye angles
 	-- @server
-	-- @param angle ang New angles
+	-- @param Angle ang New angles
 	function player_methods:setEyeAngles(ang)
 		local ent = getent(self)
 		local ang = aunwrap(ang)

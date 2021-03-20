@@ -367,20 +367,20 @@ end
 --- Calculates point between first and second vector using given fraction and linear interpolation.
 -- @class function
 -- @param number ratio Ratio of progress through values
--- @param vector from Vector to begin from
--- @param vector Vector to end at
--- @return vector The interpolated vector
+-- @param Vector from Vector to begin from
+-- @param Vector Vector to end at
+-- @return Vector The interpolated vector
 function math_library.lerpVector(ratio, from, to)
 	checkluatype(ratio, TYPE_NUMBER)
 	return vwrap(LerpVector(ratio, vunwrap(from), vunwrap(to)))
 end
 
 --- Gets the distance between a line and a point in 3d space
--- @param vector lineStart Start of the line
--- @param vector lineEnd End of the line
--- @param vector pointPos Position of the point
+-- @param Vector lineStart Start of the line
+-- @param Vector lineEnd End of the line
+-- @param Vector pointPos Position of the point
 -- @return number Distance from line
--- @return vector Nearest point on line
+-- @return Vector Nearest point on line
 -- @return number Distance along line from start
 function math_library.distanceToLine(lineStart, lineEnd, pointPos)
 	local nearDist, nearPoint, startDist = util.DistanceToLine(vunwrap(lineStart), vunwrap(lineEnd), vunwrap(pointPos))

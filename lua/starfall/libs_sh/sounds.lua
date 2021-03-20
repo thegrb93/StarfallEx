@@ -60,10 +60,10 @@ local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wr
 
 
 --- Creates a sound and attaches it to an entity
--- @param entity ent Entity to attach sound to.
+-- @param Entity ent Entity to attach sound to.
 -- @param string path Filepath to the sound file.
 -- @param boolean? nofilter (Optional) Boolean Make the sound play for everyone regardless of range or location. Only affects Server-side sounds.
--- @return sound Sound Object
+-- @return Sound Sound Object
 function sounds_library.create(ent, path, nofilter)
 	checkluatype(path, TYPE_STRING)
 	if nofilter~=nil then checkluatype(nofilter, TYPE_BOOL) end

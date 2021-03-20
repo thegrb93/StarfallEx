@@ -159,8 +159,8 @@ end
 -- @name remote
 -- @class hook
 -- @shared
--- @param entity sender The entity that caused the hook to run
--- @param player owner The owner of the sender
+-- @param Entity sender The entity that caused the hook to run
+-- @param Player owner The owner of the sender
 -- @param ... payload The payload that was supplied when calling the hook
 
 local hookrun = hook_library.run
@@ -168,7 +168,7 @@ local hookrun = hook_library.run
 --- Run a hook remotely.
 -- This will call the hook "remote" on either a specified entity or all instances on the server/client
 -- @shared
--- @param entity? recipient Starfall entity to call the hook on. Nil to run on every starfall entity
+-- @param Entity? recipient Starfall entity to call the hook on. Nil to run on every starfall entity
 -- @param ... payload Payload. These parameters will be used to call the hook functions
 -- @return table A list of the resultset of each called hook
 function hook_library.runRemote(recipient, ...)
@@ -227,93 +227,93 @@ end
 -- @name GravGunOnPickedUp
 -- @class hook
 -- @server
--- @param player ply Player picking up an object
--- @param entity ent Entity being picked up
+-- @param Player ply Player picking up an object
+-- @param Entity ent Entity being picked up
 
 --- Called when an entity is being dropped by a gravity gun
 -- @name GravGunOnDropped
 -- @class hook
 -- @server
--- @param player ply Player dropping the object
--- @param entity ent Entity being dropped
+-- @param Player ply Player dropping the object
+-- @param Entity ent Entity being dropped
 
 --- Called when an entity is being picked up by +use
 -- @name OnPlayerPhysicsPickup
 -- @class hook
 -- @server
--- @param player ply Player picking up an object
--- @param entity ent Entity being picked up
+-- @param Player ply Player picking up an object
+-- @param Entity ent Entity being picked up
 
 --- Called when an entity is being dropped or thrown by +use
 -- @name OnPlayerPhysicsDrop
 -- @class hook
 -- @server
--- @param player ply Player dropping the object
--- @param entity ent Entity being dropped
+-- @param Player ply Player dropping the object
+-- @param Entity ent Entity being dropped
 -- @param boolean thrown Whether the entity was thrown or dropped
 
 --- Called when an entity is being frozen
 -- @name OnPhysgunFreeze
 -- @class hook
 -- @server
--- @param entity physgun Entity of the physgun
+-- @param Entity physgun Entity of the physgun
 -- @param physobj physobj PhysObj of the entity
--- @param entity ent Entity being frozen
--- @param player ply Player freezing the entity
+-- @param Entity ent Entity being frozen
+-- @param Player ply Player freezing the entity
 
 --- Called when a player reloads his physgun
 -- @name OnPhysgunReload
 -- @class hook
 -- @server
--- @param entity physgun Entity of the physgun
--- @param player ply Player reloading the physgun
+-- @param Entity physgun Entity of the physgun
+-- @param Player ply Player reloading the physgun
 
 --- Called when a player dies
 -- @name PlayerDeath
 -- @class hook
 -- @server
--- @param player ply Player who died
--- @param entity inflictor Entity used to kill the player
--- @param entity attacker Entity that killed the player
+-- @param Player ply Player who died
+-- @param Entity inflictor Entity used to kill the player
+-- @param Entity attacker Entity that killed the player
 
 --- Called when a player disconnects
 -- @name PlayerDisconnected
 -- @class hook
 -- @server
--- @param player ply Player that disconnected
+-- @param Player ply Player that disconnected
 
 --- Called when a player spawns for the first time
 -- @name PlayerInitialSpawn
 -- @class hook
 -- @server
--- @param player ply Player who spawned
+-- @param Player ply Player who spawned
 
 --- Called when a player spawns
 -- @name PlayerSpawn
 -- @class hook
 -- @server
--- @param player ply Player who spawned
+-- @param Player ply Player who spawned
 
 --- Called when a players enters a vehicle
 -- @name PlayerEnteredVehicle
 -- @class hook
 -- @server
--- @param player ply Player who entered a vehicle
--- @param vehicle vehicle Vehicle that was entered
+-- @param Player ply Player who entered a vehicle
+-- @param Vehicle vehicle Vehicle that was entered
 -- @param number num Role. The seat number
 
 --- Called when a players leaves a vehicle
 -- @name PlayerLeaveVehicle
 -- @class hook
 -- @server
--- @param player ply Player who left a vehicle
--- @param vehicle vehicle Vehicle that was left
+-- @param Player ply Player who left a vehicle
+-- @param Vehicle vehicle Vehicle that was left
 
 --- Called when a player sends a chat message
 -- @name PlayerSay
 -- @class hook
 -- @server
--- @param player ply Player that sent the message
+-- @param Player ply Player that sent the message
 -- @param string text Content of the message
 -- @param boolean teamChat True if team chat
 -- @return string? New text. "" to stop from displaying. Nil to keep original.
@@ -322,36 +322,36 @@ end
 -- @name PlayerSpray
 -- @class hook
 -- @server
--- @param player ply Player that sprayed
+-- @param Player ply Player that sprayed
 
 --- Called when a player holds their use key and looks at an entity.
 -- Will continuously run.
 -- @name PlayerUse
 -- @server
 -- @class hook
--- @param player ply Player using the entity
--- @param entity ent Entity being used
+-- @param Player ply Player using the entity
+-- @param Entity ent Entity being used
 
 --- Called when a players turns their flashlight on or off
 -- @name PlayerSwitchFlashlight
 -- @class hook
 -- @server
--- @param player ply Player switching flashlight
+-- @param Player ply Player switching flashlight
 -- @param boolean state New flashlight state. True if on.
 
 --- Called when a wants to pick up a weapon
 -- @name PlayerCanPickupWeapon
 -- @class hook
 -- @server
--- @param player ply Player
--- @param weapon wep Weapon
+-- @param Player ply Player
+-- @param Weapon wep Weapon
 
 --- Called when a player gets hurt
 -- @name PlayerHurt
 -- @class hook
 -- @shared
--- @param player ply Player being hurt
--- @param entity attacker Entity causing damage to the player
+-- @param Player ply Player being hurt
+-- @param Entity attacker Entity causing damage to the player
 -- @param number newHealth New health of the player
 -- @param number damageTaken Amount of damage the player has taken
 
@@ -359,63 +359,63 @@ end
 -- @name PlayerNoClip
 -- @class hook
 -- @shared
--- @param player ply Player toggling noclip
+-- @param Player ply Player toggling noclip
 -- @param boolean newState New noclip state. True if on.
 
 --- Called when a player presses a key
 -- @name KeyPress
 -- @class hook
 -- @shared
--- @param player ply Player pressing the key
+-- @param Player ply Player pressing the key
 -- @param number key The key being pressed
 
 --- Called when a player releases a key
 -- @name KeyRelease
 -- @class hook
 -- @shared
--- @param player ply Player releasing the key
+-- @param Player ply Player releasing the key
 -- @param number key The key being released
 
 --- Called when a player punts with the gravity gun
 -- @name GravGunPunt
 -- @class hook
 -- @shared
--- @param player ply Player punting the gravgun
--- @param entity ent Entity being punted
+-- @param Player ply Player punting the gravgun
+-- @param Entity ent Entity being punted
 
 --- Called when an entity gets picked up by a physgun
 -- @name PhysgunPickup
 -- @class hook
 -- @shared
--- @param player ply Player picking up the entity
--- @param entity ent Entity being picked up
+-- @param Player ply Player picking up the entity
+-- @param Entity ent Entity being picked up
 
 --- Called when an entity being held by a physgun gets dropped
 -- @name PhysgunDrop
 -- @class hook
 -- @shared
--- @param player ply Player dropping the entity
--- @param entity ent Entity being dropped
+-- @param Player ply Player dropping the entity
+-- @param Entity ent Entity being dropped
 
 --- Called when a player switches their weapon
 -- @name PlayerSwitchWeapon
 -- @class hook
 -- @shared
--- @param player ply Player changing weapon
--- @param weapon oldwep Old weapon
--- @param weapon newweapon New weapon
+-- @param Player ply Player changing weapon
+-- @param Weapon oldwep Old weapon
+-- @param Weapon newweapon New weapon
 
 --- Called when an entity gets created
 -- @name OnEntityCreated
 -- @class hook
 -- @shared
--- @param entity ent New entity
+-- @param Entity ent New entity
 
 --- Called when a clientside entity gets created or re-created via lag/PVS
 -- @name NetworkEntityCreated
 -- @class hook
 -- @client
--- @param entity ent New entity
+-- @param Entity ent New entity
 
 --- Called when a clientside entity transmit state is changed. Usually when changing PVS
 -- If you want clientside render changes to persist on an entity you have to re-apply them
@@ -423,54 +423,54 @@ end
 -- @name NotifyShouldTransmit
 -- @class hook
 -- @client
--- @param entity ent The entity
+-- @param Entity ent The entity
 -- @param boolean shouldtransmit Whether it is now transmitting or not
 
 --- Called when an entity is removed
 -- @name EntityRemoved
 -- @class hook
 -- @shared
--- @param entity ent Entity being removed
+-- @param Entity ent Entity being removed
 
 --- Called when an entity is broken
 -- @name PropBreak
 -- @class hook
 -- @shared
--- @param player ply Player who broke it
--- @param entity ent Entity broken
+-- @param Player ply Player who broke it
+-- @param Entity ent Entity broken
 
 --- Called every time a bullet is fired from an entity
 -- @name EntityFireBullets
 -- @class hook
 -- @shared
--- @param entity ent The entity that fired the bullet
+-- @param Entity ent The entity that fired the bullet
 -- @param table data The bullet data. See http://wiki.facepunch.com/gmod/Structures/Bullet
 
 --- Called when an entity is damaged
 -- @name EntityTakeDamage
 -- @class hook
 -- @server
--- @param entity target Entity that is hurt
--- @param entity attacker Entity that attacked
--- @param entity inflictor Entity that inflicted the damage
+-- @param Entity target Entity that is hurt
+-- @param Entity attacker Entity that attacked
+-- @param Entity inflictor Entity that inflicted the damage
 -- @param number amount How much damage
 -- @param number type Type of the damage
--- @param vector position Position of the damage
--- @param vector force Force of the damage
+-- @param Vector position Position of the damage
+-- @param Vector force Force of the damage
 
 --- Called when a player stops driving an entity
 -- @name EndEntityDriving
 -- @class hook
 -- @shared
--- @param entity ent Entity that had been driven
--- @param player ply Player that drove the entity
+-- @param Entity ent Entity that had been driven
+-- @param Player ply Player that drove the entity
 
 --- Called when a player starts driving an entity
 -- @name StartEntityDriving
 -- @class hook
 -- @shared
--- @param entity ent Entity being driven
--- @param player ply Player that is driving the entity
+-- @param Entity ent Entity being driven
+-- @param Player ply Player that is driving the entity
 
 --- Think hook. Called each frame on the client and each game tick on the server.
 -- @name think
@@ -497,7 +497,7 @@ end
 -- @name ClientInitialized
 -- @class hook
 -- @server
--- @param player ply The player that initialized
+-- @param Player ply The player that initialized
 
 --- Called when the local player opens their chat window.
 -- @name StartChat
@@ -513,7 +513,7 @@ end
 -- @name PlayerChat
 -- @class hook
 -- @client
--- @param player ply Player that said the message
+-- @param Player ply Player that said the message
 -- @param string text The message
 -- @param boolean team Whether the message was team only
 -- @param boolean isdead Whether the message was send from a dead player
@@ -522,18 +522,18 @@ end
 -- @name StarfallError
 -- @class hook
 -- @shared
--- @param entity ent Starfall chip that errored
--- @param player ply Owner of the chip on server or player that script errored for on client
+-- @param Entity ent Starfall chip that errored
+-- @param Player ply Owner of the chip on server or player that script errored for on client
 -- @param string err Error message
 
 --- Called when a component is linked to the starfall
 -- @name ComponentLinked
 -- @class hook
 -- @shared
--- @param entity ent The component entity
+-- @param Entity ent The component entity
 
 --- Called when a component is unlinked to the starfall
 -- @name ComponentUnlinked
 -- @class hook
 -- @shared
--- @param entity ent The component entity
+-- @param Entity ent The component entity

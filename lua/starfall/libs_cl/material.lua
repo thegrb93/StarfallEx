@@ -333,7 +333,7 @@ end)
 --- Existing created materials can be loaded with ! prepended to the name
 --- Can't be modified
 -- @param string path The path of the material (don't include .vmt in the path)
--- @return material The material object. Can't be modified.
+-- @return Material The material object. Can't be modified.
 function material_library.load(path)
 	checkluatype(path, TYPE_STRING)
 	if string.GetExtensionFromFilename(path) then SF.Throw("The path cannot have an extension", 2) end
@@ -398,7 +398,7 @@ end
 -- @param string path The path of the material (don't include .vmt in the path)
 -- @param number x The x coordinate of the pixel
 -- @param number y The y coordinate of the pixel
--- @return color The color value
+-- @return Color The color value
 function material_library.getColor(path, x, y)
 	checkluatype(path, TYPE_STRING)
 	checkluatype(x, TYPE_NUMBER)
@@ -429,7 +429,7 @@ end
 --- Returns a matrix keyvalue of a material
 -- @param string path The path of the material (don't include .vmt in the path)
 -- @param string key The key to get the matrix from
--- @return vmatrix? The matrix value or nil if it doesn't exist
+-- @return VMatrix? The matrix value or nil if it doesn't exist
 function material_library.getMatrix(path, key)
 	checkluatype(path, TYPE_STRING)
 	checkluatype(key, TYPE_STRING)
@@ -449,7 +449,7 @@ end
 --- Returns a vector keyvalue of a material
 -- @param string path The path of the material (don't include .vmt in the path)
 -- @param string key The key to get the vector from
--- @return vector? The vector value or nil if it doesn't exist
+-- @return Vector? The vector value or nil if it doesn't exist
 function material_library.getVector(path, key)
 	checkluatype(path, TYPE_STRING)
 	checkluatype(key, TYPE_STRING)
@@ -459,7 +459,7 @@ end
 --- Returns a linear color-corrected vector keyvalue of a material
 -- @param string path The path of the material (don't include .vmt in the path)
 -- @param string key The key to get the vector from
--- @return vector? The vector value or nil if it doesn't exist
+-- @return Vector? The vector value or nil if it doesn't exist
 function material_library.getVectorLinear(path, key)
 	checkluatype(path, TYPE_STRING)
 	checkluatype(key, TYPE_STRING)
@@ -568,7 +568,7 @@ end
 -- @name material_methods.getColor
 -- @param number x The x coordinate of the pixel
 -- @param number y The y coordinate of the pixel
--- @return color The color value
+-- @return Color The color value
 function lmaterial_methods:getColor(x, y)
 	checkluatype(x, TYPE_NUMBER)
 	checkluatype(y, TYPE_NUMBER)
@@ -603,7 +603,7 @@ end
 --- Returns a matrix keyvalue
 -- @name material_methods.getMatrix
 -- @param string key The key to get the matrix from
--- @return vmatrix? The matrix value or nil if it doesn't exist
+-- @return VMatrix? The matrix value or nil if it doesn't exist
 function lmaterial_methods:getMatrix(key)
 	checkluatype(key, TYPE_STRING)
 	return mwrap(lunwrap(self):GetMatrix(key))
@@ -640,7 +640,7 @@ end
 --- Returns a linear color-corrected vector keyvalue
 -- @name material_methods.getVectorLinear
 -- @param string key The key to get the vector from
--- @return vector? The vector value or nil if it doesn't exist
+-- @return Vector? The vector value or nil if it doesn't exist
 function lmaterial_methods:getVectorLinear(key)
 	checkluatype(key, TYPE_STRING)
 	return vwrap(lunwrap(self):GetVectorLinear(key))
@@ -671,7 +671,7 @@ end
 
 --- Sets a matrix keyvalue
 -- @param string key The key name to set
--- @param vmatrix v The value to set it to
+-- @param VMatrix v The value to set it to
 function material_methods:setMatrix(key, v)
 	checkkey(key)
 	unwrap(self):SetMatrix(key, munwrap(v))
@@ -781,7 +781,7 @@ end
 
 --- Sets a vector keyvalue
 -- @param string key The key name to set
--- @param vector v The value to set it to
+-- @param Vector v The value to set it to
 function material_methods:setVector(key, v)
 	checkkey(key)
 	unwrap(self):SetVector(key, vunwrap(v))

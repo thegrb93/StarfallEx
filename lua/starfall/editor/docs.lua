@@ -99,6 +99,30 @@ local function process(data, nextline)
 	end
 end
 
+local generic_lua_types = {
+	["boolean"] = true,
+	["number"] = true,
+	["string"] = true,
+	["table"] = true,
+	["..."] = true,
+	["any"] = true,
+	["function"] = true,
+}
+
+local function valid_sftype(type1)
+	if SF.Types[type1] or generic_lua_types[type1] then return true end
+
+	local type2 = type1:match("%.%.%.(%w+)%??") -- ...(number)?
+
+	if SF.Types[type2] or generic_lua_types[type2] then return true end
+
+	local type3 = type1:match("(%w+)%??") -- (vector)?
+
+	if SF.Types[type3] or generic_lua_types[type3] then return true end
+
+	return false
+end
+
 local parseAttributes = {
 	["client"] = function(parsing)
 		parsing.realm = "client"
@@ -121,20 +145,42 @@ local parseAttributes = {
 		t[#t+1] = value
 	end,
 	["param"] = function(parsing, value)
-		local type, name, description = string.match(value, "%s*([%w_%.%?]+)%s*([%w_%.]+)%s*(.*)")
+		local type, name, desc = string.match(value, "%s*([%w_%.%?]+)%s*([%w_%.]+)%s*(.*)")
 		if type then
+			if not valid_sftype(type) then
+				-- No type found, revert to old typeless documentation
+				type = "any?"
+				name, description = string.match(value, "%s*([%w_%.]+)%s*(.*)")
+				if name==nil then
+					ErrorNoHalt("Invalid param doc (" .. value .. ") in file: " .. curfile .. "\n")
+				end
+			end
+
 			local t = parsing.params
 			if not t then t = {} parsing.params = t end
-			t[#t+1] = {name = name, description = string.format("Type: %s, Desc: %s", type, description)}
+			t[#t+1] = {
+				name = name,
+				description = description,
+				type = _type
+ 			}
 		else
 			ErrorNoHalt("Invalid param doc (" .. value .. ") in file: " .. curfile .. "\n")
 		end
 	end,
 	["return"] = function(parsing, value)
 		local type, description = string.match(value, "%s*([%w_%.%?]+)%s*(.*)")
-		local t = parsing.returns
-		if not t then t = {} parsing.returns = t end
-		t[#t+1] = string.format("Type: %s, Desc: %s", type, description)
+		if type then
+			if not valid_sftype(type) then
+				-- No type found, revert to old typeless documentation
+				type = "any?"
+				description = value
+			end
+			local t = parsing.returns
+			if not t then t = {} parsing.returns = t end
+			t[#t+1] = { type = type, description = description }
+		else
+			ErrorNoHalt("Invalid return doc (" .. value .. ") in file: " .. curfile .. "\n")
+		end
 	end,
 	["field"] = function(parsing, value)
 		local name, description = string.match(value, "%s*([%w_]+)%s*(.*)")
@@ -212,4 +258,5 @@ for name, mod in pairs(SF.Modules) do
 		data.source = nil
 	end
 end
+
 processMembers()

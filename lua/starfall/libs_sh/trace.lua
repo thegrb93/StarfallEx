@@ -53,8 +53,8 @@ local function convertFilter(filter)
 end
 
 --- Does a line trace
--- @param vector start Start position
--- @param vector endpos End position
+-- @param Vector start Start position
+-- @param Vector endpos End position
 -- @param any? filter Entity/array of entities to filter, or a function callback with an entity arguement that returns whether the trace should hit
 -- @param number? mask Trace mask
 -- @param number? colgroup The collision group of the trace
@@ -85,10 +85,10 @@ function trace_library.trace(start, endpos, filter, mask, colgroup, ignworld)
 end
 
 --- Does a swept-AABB trace
--- @param vector start Start position
--- @param vector endpos End position
--- @param vector minbox Lower box corner
--- @param vector maxbox Upper box corner
+-- @param Vector start Start position
+-- @param Vector endpos End position
+-- @param Vector minbox Lower box corner
+-- @param Vector maxbox Upper box corner
 -- @param any? filter Entity/array of entities to filter, or a function callback with an entity arguement that returns whether the trace should hit
 -- @param number? mask Trace mask
 -- @param number? colgroup The collision group of the trace
@@ -150,8 +150,8 @@ end
 
 --- Does a line trace and applies a decal to wherever is hit
 -- @param string name The decal name, see https://wiki.facepunch.com/gmod/util.Decal
--- @param vector start Start position
--- @param vector endpos End position
+-- @param Vector start Start position
+-- @param Vector endpos End position
 -- @param any? filter (Optional) Entity/array of entities to filter
 function trace_library.decal(name, start, endpos, filter)
 	checkpermission(instance, nil, "trace.decal")
@@ -168,7 +168,7 @@ function trace_library.decal(name, start, endpos, filter)
 end
 
 --- Returns the contents of the position specified.
--- @param vector position The position to get the CONTENTS of
+-- @param Vector position The position to get the CONTENTS of
 -- @return number Contents bitflag, see the CONTENTS enums
 function trace_library.pointContents(position)
 	return util.PointContents(vunwrap(position))

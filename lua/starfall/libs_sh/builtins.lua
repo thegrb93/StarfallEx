@@ -41,20 +41,20 @@ end)
 -- @libtbl builtins_library
 
 --- Returns the entity representing a processor that this script is running on.
--- @return entity Starfall chip entity
+-- @return Entity Starfall chip entity
 function builtins_library.chip()
 	return ewrap(instance.entity)
 end
 
 --- Returns whoever created the chip
--- @return entity Owner entity
+-- @return Entity Owner entity
 function builtins_library.owner()
 	return instance.Types.Player.Wrap(instance.player)
 end
 
 --- Same as owner() on the server. On the client, returns the local player
 -- @param number? num UserID to get the player with.
--- @return player Returns player with given UserID or if none specified then returns either the owner (server) or the local player (client)
+-- @return Player Returns player with given UserID or if none specified then returns either the owner (server) or the local player (client)
 function builtins_library.player(num)
 	if num~=nil then
 		checkluatype(num, TYPE_NUMBER)
@@ -67,7 +67,7 @@ end
 
 --- Returns the entity with index 'num'
 -- @param number num Entity index
--- @return entity Entity at the index
+-- @return Entity Entity at the index
 function builtins_library.entity(num)
 	checkluatype(num, TYPE_NUMBER)
 	return owrap(Entity(num))
@@ -476,7 +476,7 @@ if SERVER then
 
 	--- Prints a message to a target player's chat as long as they're connected to a hud.
 	-- @shared
-	-- @param player ply The target player. If in CLIENT, then ply is the client player and this param is omitted
+	-- @param Player ply The target player. If in CLIENT, then ply is the client player and this param is omitted
 	-- @param ... printArgs Values to print. Colors before text will set the text color
 	function builtins_library.printHud(ply, ...)
 		ply = getply(ply)
@@ -593,21 +593,21 @@ else
 
 	--- Returns the local player's camera angles
 	-- @client
-	-- @return angle The local player's camera angles
+	-- @return Angle The local player's camera angles
 	function builtins_library.eyeAngles()
 		return awrap(LocalPlayer():EyeAngles())
 	end
 
 	--- Returns the local player's camera position
 	-- @client
-	-- @return vector The local player's camera position
+	-- @return Vector The local player's camera position
 	function builtins_library.eyePos()
 		return vwrap(LocalPlayer():EyePos())
 	end
 
 	--- Returns the local player's camera forward vector
 	-- @client
-	-- @return vector The local player's camera forward vector
+	-- @return Vector The local player's camera forward vector
 	function builtins_library.eyeVector()
 		return vwrap(LocalPlayer():GetAimVector())
 	end
@@ -986,12 +986,12 @@ function builtins_library.isValid(object)
 end
 
 --- Translates the specified position and angle into the specified coordinate system
--- @param vector pos The position that should be translated from the current to the new system
--- @param angle ang The angles that should be translated from the current to the new system
--- @param vector newSystemOrigin The origin of the system to translate to
--- @param angle newSystemAngles The angles of the system to translate to
--- @return vector localPos
--- @return angle localAngles
+-- @param Vector pos The position that should be translated from the current to the new system
+-- @param Angle ang The angles that should be translated from the current to the new system
+-- @param Vector newSystemOrigin The origin of the system to translate to
+-- @param Angle newSystemAngles The angles of the system to translate to
+-- @return Vector localPos
+-- @return Angle localAngles
 function builtins_library.worldToLocal(pos, ang, newSystemOrigin, newSystemAngles)
 
 	local localPos, localAngles = WorldToLocal(
@@ -1005,12 +1005,12 @@ function builtins_library.worldToLocal(pos, ang, newSystemOrigin, newSystemAngle
 end
 
 --- Translates the specified position and angle from the specified local coordinate system
--- @param vector localPos The position vector that should be translated to world coordinates
--- @param angle localAng The angle that should be converted to a world angle
--- @param vector originPos The origin point of the source coordinate system, in world coordinates
--- @param angle originAngle The angles of the source coordinate system, as a world angle
--- @return vector worldPos
--- @return angle worldAngles
+-- @param Vector localPos The position vector that should be translated to world coordinates
+-- @param Angle localAng The angle that should be converted to a world angle
+-- @param Vector originPos The origin point of the source coordinate system, in world coordinates
+-- @param Angle originAngle The angles of the source coordinate system, as a world angle
+-- @return Vector worldPos
+-- @return Angle worldAngles
 function builtins_library.localToWorld(localPos, localAng, originPos, originAngle)
 
 	local worldPos, worldAngles = LocalToWorld(
@@ -1025,7 +1025,7 @@ end
 
 --- Sets the current instance to allow HUD drawing. Only works if player is in your vehicle or
 -- if it's ran on yourself or if the player is connected to your hud and you want to disconnect them
--- @param player ply The player to enable the hud on. If CLIENT, will be forced to player()
+-- @param Player ply The player to enable the hud on. If CLIENT, will be forced to player()
 -- @param boolean active Whether hud hooks should be active. true to force on, false to force off.
 function builtins_library.enableHud(ply, active)
 	ply = SERVER and getply(ply) or LocalPlayer()

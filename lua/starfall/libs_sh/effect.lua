@@ -43,7 +43,7 @@ instance:AddHook("initialize", function()
 end)
 
 --- Creates an effect data structure
--- @return effect Effect Object
+-- @return Effect Effect Object
 function effect_library.create()
 	return wrap(EffectData())
 end
@@ -61,7 +61,7 @@ function effect_library.canCreate()
 end
 
 --- Plays the effect
--- @param effect eff The effect type to play
+-- @param Effect eff The effect type to play
 function effect_methods:play(eff)
 	checkluatype(eff, TYPE_STRING)
 
@@ -74,7 +74,7 @@ function effect_methods:play(eff)
 end
 
 --- Returns the effect's angle
--- @return angle The effect's angle
+-- @return Angle The effect's angle
 function effect_methods:getAngles()
 	return awrap(unwrap(self):GetAngles())
 end
@@ -104,7 +104,7 @@ function effect_methods:getEntIndex()
 end
 
 --- Returns the effect's entity
--- @return entity The effect's entity
+-- @return Entity The effect's entity
 function effect_methods:getEntity()
 	return ewrap(unwrap(self):GetEntity())
 end
@@ -134,13 +134,13 @@ function effect_methods:getMaterialIndex()
 end
 
 --- Returns the effect's normal
--- @return vector The effect's normal
+-- @return Vector The effect's normal
 function effect_methods:getNormal()
 	return vwrap(unwrap(self):GetNormal())
 end
 
 --- Returns the effect's origin
--- @return vector The effect's origin
+-- @return Vector The effect's origin
 function effect_methods:getOrigin()
 	return vwrap(unwrap(self):GetOrigin())
 end
@@ -158,7 +158,7 @@ function effect_methods:getScale()
 end
 
 --- Returns the effect's start position
--- @return vector The effect's start position
+-- @return Vector The effect's start position
 function effect_methods:getStart()
 	return vwrap(unwrap(self):GetStart())
 end
@@ -170,7 +170,7 @@ function effect_methods:getSurfaceProp()
 end
 
 --- Sets the effect's angles
--- @param angle ang The angles
+-- @param Angle ang The angles
 function effect_methods:setAngles(ang)
 	unwrap(self):SetAngles(aunwrap(ang))
 end
@@ -205,7 +205,7 @@ function effect_methods:setEntIndex(index)
 end
 
 --- Sets the effect's entity
--- @param entity ent The entity
+-- @param Entity ent The entity
 function effect_methods:setEntity(ent)
 	unwrap(self):SetEntity(getent(ent))
 end
@@ -239,13 +239,13 @@ function effect_methods:setMaterialIndex(mat)
 end
 
 --- Sets the effect's normal
--- @param vector normal The vector normal
+-- @param Vector normal The vector normal
 function effect_methods:setNormal(normal)
 	unwrap(self):SetNormal(vunwrap(normal))
 end
 
 --- Sets the effect's origin
--- @param vector origin The vector origin
+-- @param Vector origin The vector origin
 function effect_methods:setOrigin(origin)
 	unwrap(self):SetOrigin(vunwrap(origin))
 end
@@ -266,7 +266,7 @@ end
 
 --- Sets the effect's start pos
 -- Limited to world bounds (+-16386 on every axis) and has horrible networking precision. (17 bit float per component)
--- @param vector start The vector start
+-- @param Vector start The vector start
 function effect_methods:setStart(start)
 	unwrap(self):SetStart(vunwrap(start))
 end

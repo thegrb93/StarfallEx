@@ -49,7 +49,7 @@ instance:AddHook("deinitialize", function()
 end)
 
 --- Creates a ParticleEmitter data structure
--- @param vector position The particle emitter's position
+-- @param Vector position The particle emitter's position
 -- @param boolean use3D Create the emitter in 3D mode
 -- @return particleemitter ParticleEmitter Object
 function particle_library.create(position, use3D)
@@ -68,8 +68,8 @@ function particle_library.particleEmittersLeft()
 end
 
 --- Creates a new Particle with the given material and position.
--- @param material material The material object to set the particle
--- @param vector position The position to create the particle
+-- @param Material material The material object to set the particle
+-- @param Vector position The position to create the particle
 -- @param number startSize Sets the initial size value of the particle.
 -- @param number endSize Sets the size of the particle that it will reach when it dies.
 -- @param number startLength Sets the initial length value of the particle.
@@ -134,7 +134,7 @@ function particleem_methods:getParticlesLeft()
 end
 
 --- Returns the position of this emitter. This is set when creating the emitter with ParticleEmitter.
--- @return vector Position of the Emitter
+-- @return Vector Position of the Emitter
 function particleem_methods:getPos()
 	return vwrap(unwrap(self):GetPos())
 end
@@ -152,8 +152,8 @@ function particleem_methods:isValid()
 end
 
 --- Sets the bounding box for this emitter. Usually the bounding box is automatically determined by the particles, but this function overrides it.
--- @param vector mins Min vector
--- @param vector maxs Max vector
+-- @param Vector mins Min vector
+-- @param Vector maxs Max vector
 function particleem_methods:setBBox(mins, maxs)
 	peunwrap(self):SetBBox(vunwrap(mins), vunwrap(maxs))
 end
@@ -182,7 +182,7 @@ function particleem_methods:setParticleCullRadius(radius)
 end
 
 --- Sets the position of the particle emitter.
--- @param vector position The position
+-- @param Vector position The position
 function particleem_methods:setPos( position )
 	 peunwrap(self):SetPos(vunwrap(position))
 end
@@ -191,25 +191,25 @@ end
 
 
 --- Returns the current orientation of the particle.
--- @return angle Angles of the particle
+-- @return Angle Angles of the particle
 function particle_methods:getAngles()
 	return awrap(punwrap(self):GetAngles())
 end
 
 --- Returns the angular velocity of the particle
--- @return angle Angular velocity of the particle
+-- @return Angle Angular velocity of the particle
 function particle_methods:getAngleVelocity()
 	return awrap(punwrap(self):GetAngleVelocity())
 end
 
 --- Returns the color of the particle.
--- @return color Color of the particle
+-- @return Color Color of the particle
 function particle_methods:getColor()
 	return cwrap(Color(punwrap(self):GetColor()))
 end
 
 --- Returns the absolute position of the particle.
--- @return vector Position of the particle
+-- @return Vector Position of the particle
 function particle_methods:getPos()
 	return vwrap(punwrap(self):GetPos())
 end
@@ -221,19 +221,19 @@ function particle_methods:getRoll()
 end
 
 --- Returns the current velocity of the particle.
--- @return vector Velocity
+-- @return Vector Velocity
 function particle_methods:getVelocity()
 	return vwrap(punwrap(self):GetVelocity())
 end
 
 --- Sets the angles of the particle.
--- @param angle ang Angles to set the particle's angles to
+-- @param Angle ang Angles to set the particle's angles to
 function particle_methods:setAngles(ang)
 	punwrap(self):SetAngles(aunwrap(ang))
 end
 
 --- Sets the angular velocity of the the particle.
--- @param angle angVel Angular velocity to set the particle's to
+-- @param Angle angVel Angular velocity to set the particle's to
 function particle_methods:setAngleVelocity(angVel)
 	punwrap(self):SetAngleVelocity(aunwrap(angVel))
 end
@@ -253,7 +253,7 @@ function particle_methods:setCollide(shouldCollide)
 end
 
 --- Sets the color of the particle.
--- @param color col Color to set to
+-- @param Color col Color to set to
 function particle_methods:setColor(col)
 	col = cunwrap(col)
 	punwrap(self):SetColor(col[1], col[2], col[3])
@@ -267,13 +267,13 @@ function particle_methods:setLighting(useLighting)
 end
 
 --- Sets the material of the particle.
--- @param material mat Material to set
+-- @param Material mat Material to set
 function particle_methods:setMaterial(mat)
 	punwrap(self):SetMaterial(munwrap(mat))
 end
 
 --- Sets the absolute position of the particle.
--- @param vector pos Vector position to set to
+-- @param Vector pos Vector position to set to
 function particle_methods:setPos(pos)
 	punwrap(self):SetPos(vunwrap(pos))
 end
@@ -293,7 +293,7 @@ function particle_methods:setRollDelta(rollDelta)
 end
 
 --- Sets the velocity of the particle.
--- @param vector vel Velocity to set to
+-- @param Vector vel Velocity to set to
 function particle_methods:setVelocity(vel)
 	punwrap(self):SetVelocity(vunwrap(vel))
 end
@@ -306,7 +306,7 @@ function particle_methods:setAirResistance(airResistance)
 end
 
 --- Sets the directional gravity aka. acceleration of the particle.
--- @param vector gravity Directional gravity
+-- @param Vector gravity Directional gravity
 function particle_methods:setGravity(gravity)
 	punwrap(self):SetGravity(vunwrap(gravity))
 end

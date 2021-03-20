@@ -70,7 +70,7 @@ if SERVER then
 	}
 	--- Adds a relationship to the npc with an entity
 	-- @server
-	-- @param entity ent The target entity
+	-- @param Entity ent The target entity
 	-- @param string disp String of the relationship. ("hate", "fear", "like", "neutral")
 	-- @param number priority How strong the relationship is. Higher number is stronger
 	function npc_methods:addEntityRelationship(ent, disp, priority)
@@ -84,7 +84,7 @@ if SERVER then
 
 	--- Gets the npc's relationship to the target
 	-- @server
-	-- @param entity ent Target entity
+	-- @param Entity ent Target entity
 	-- @return string Relationship of the npc with the target
 	function npc_methods:getRelationship(ent)
 		return dispositions[getnpc(self):Disposition(getent(ent))]
@@ -92,7 +92,7 @@ if SERVER then
 
 	--- Gives the npc a weapon
 	-- @server
-	-- @param weapon wep The classname of the weapon
+	-- @param Weapon wep The classname of the weapon
 	function npc_methods:giveWeapon(wep)
 		checkluatype(wep, TYPE_STRING)
 
@@ -110,7 +110,7 @@ if SERVER then
 
 	--- Tell the npc to fight this
 	-- @server
-	-- @param entity ent Target entity
+	-- @param Entity ent Target entity
 	function npc_methods:setEnemy(ent)
 		local npc = getnpc(self)
 		checkpermission(instance, npc, "npcs.modify")
@@ -119,7 +119,7 @@ if SERVER then
 
 	--- Gets what the npc is fighting
 	-- @server
-	-- @return entity Entity the npc is fighting
+	-- @return Entity Entity the npc is fighting
 	function npc_methods:getEnemy()
 		return owrap(getnpc(self):GetEnemy())
 	end
@@ -150,7 +150,7 @@ if SERVER then
 
 	--- Makes the npc walk to a destination
 	-- @server
-	-- @param vector vec The position of the destination
+	-- @param Vector vec The position of the destination
 	function npc_methods:goWalk(vec)
 		local npc = getnpc(self)
 		checkpermission(instance, npc, "npcs.modify")
@@ -160,7 +160,7 @@ if SERVER then
 
 	--- Makes the npc run to a destination
 	-- @server
-	-- @param vector vec The position of the destination
+	-- @param Vector vec The position of the destination
 	function npc_methods:goRun(vec)
 		local npc = getnpc(self)
 		checkpermission(instance, npc, "npcs.modify")

@@ -61,11 +61,11 @@ end
 
 --- Creates a prop
 -- @server
--- @param vector pos Initial entity position
--- @param angle ang Initial entity angles
+-- @param Vector pos Initial entity position
+-- @param Angle ang Initial entity angles
 -- @param string model Model path
 -- @param boolean? frozen True to spawn the entity in a frozen state. Default = False
--- @return entity The prop object
+-- @return Entity The prop object
 function props_library.create(pos, ang, model, frozen)
 
 	checkpermission(instance, nil, "prop.create")
@@ -119,7 +119,7 @@ end
 -- @server
 -- @param string model Model path
 -- @param boolean? frozen True to spawn the entity in a frozen state. Default = False
--- @return entity The ragdoll entity
+-- @return Entity The ragdoll entity
 function props_library.createRagdoll(model, frozen)
     checkpermission(instance, nil, "prop.createRagdoll")
     checkluatype(model, TYPE_STRING)
@@ -166,11 +166,11 @@ end
 
 --- Creates a custom prop.
 -- @server
--- @param vector pos The position to spawn the prop
--- @param angle ang The angles to spawn the prop
+-- @param Vector pos The position to spawn the prop
+-- @param Angle ang The angles to spawn the prop
 -- @param table vertices The table of tables of vectices that make up the physics mesh {{v1,v2,...},{v1,v2,...},...}
 -- @param boolean frozen Whether the prop starts frozen
--- @return entity The prop object
+-- @return Entity The prop object
 function props_library.createCustom(pos, ang, vertices, frozen)
 	local pos = SF.clampPos(vunwrap(pos))
 	local ang = aunwrap(ang)
@@ -265,13 +265,13 @@ local allowed_components = {
 -- Allowed components:
 -- starfall_hud
 -- starfall_screen
--- @param vector pos Position of created component
--- @param angle ang Angle of created component
+-- @param Vector pos Position of created component
+-- @param Angle ang Angle of created component
 -- @param string class Class of created component
 -- @param string model Model of created component
 -- @param boolean frozen True to spawn frozen
 -- @server
--- @return entity Component entity
+-- @return Entity Component entity
 function props_library.createComponent(pos, ang, class, model, frozen)
 	checkpermission(instance,  nil, "prop.create")
 	checkluatype(class, TYPE_STRING)
@@ -359,13 +359,13 @@ function props_library.getSpawnableSents(categorized)
 end
 
 --- Creates a sent.
--- @param vector pos Position of created sent
--- @param angle ang Angle of created sent
+-- @param Vector pos Position of created sent
+-- @param Angle ang Angle of created sent
 -- @param string class Class of created sent
 -- @param boolean frozen True to spawn frozen
 -- @param table? data Optional table, additional entity data to be supplied to certain SENTs. See prop.SENT_Data_Structures table in Docs for list of SENTs
 -- @server
--- @return entity The sent object
+-- @return Entity The sent object
 function props_library.createSent(pos, ang, class, frozen, data)
 	checkpermission(instance,  nil, "prop.create")
 

@@ -121,7 +121,7 @@ end
 
 --- Casts a hologram entity into the hologram type
 -- @shared
--- @return hologram Hologram instance
+-- @return Hologram Hologram instance
 function ents_methods:toHologram()
 	local ent = getent(self)
 	if not ent.IsSFHologram then SF.Throw("The entity isn't a hologram", 2) end
@@ -130,11 +130,11 @@ end
 
 
 --- Creates a hologram.
--- @param vector pos The position to create the hologram
--- @param angle ang The angle to create the hologram
+-- @param Vector pos The position to create the hologram
+-- @param Angle ang The angle to create the hologram
 -- @param string model The model to give the hologram
--- @param vector? scale (Optional) The scale to give the hologram
--- @return hologram The hologram object
+-- @param Vector? scale (Optional) The scale to give the hologram
+-- @return Hologram The hologram object
 function holograms_library.create(pos, ang, model, scale)
 	checkpermission(instance, nil, "hologram.create")
 	checkluatype(model, TYPE_STRING)
@@ -214,7 +214,7 @@ end
 if SERVER then
 	--- Sets the hologram linear velocity
 	-- @server
-	-- @param vector vel New velocity
+	-- @param Vector vel New velocity
 	function hologram_methods:setVel(vel)
 		local vel = vunwrap(vel)
 
@@ -226,7 +226,7 @@ if SERVER then
 
 	--- Sets the hologram's angular velocity.
 	-- @server
-	-- @param angle angvel *Vector* angular velocity.
+	-- @param Angle angvel *Vector* angular velocity.
 	function hologram_methods:setAngVel(angvel)
 
 		local holo = getholo(self)
@@ -240,7 +240,7 @@ if SERVER then
 else
 	--- Sets the hologram's position.
 	-- @shared
-	-- @param vector vec New position
+	-- @param Vector vec New position
 	function hologram_methods:setPos(vec)
 		local holo = getholo(self)
 		local vec = vunwrap(vec)
@@ -252,7 +252,7 @@ else
 
 	--- Sets the hologram's angles.
 	-- @shared
-	-- @param angle ang New angles
+	-- @param Angle ang New angles
 	function hologram_methods:setAngles(ang)
 		local holo = getholo(self)
 		local ang = aunwrap(ang)
@@ -296,7 +296,7 @@ else
 
 	--- Sets a hologram entity's rendermatrix
 	-- @client
-	-- @param vmatrix mat Starfall matrix to use
+	-- @param VMatrix mat Starfall matrix to use
 	function hologram_methods:setRenderMatrix(mat)
 		local holo = getholo(self)
 
@@ -318,7 +318,7 @@ else
 	end
 
 	--- Parents a hologram
-	-- @param entity? ent Entity parent (nil to unparent)
+	-- @param Entity? ent Entity parent (nil to unparent)
 	-- @param number? attachment Optional attachment ID
 	function hologram_methods:setParent(ent, attachment)
 
@@ -373,9 +373,9 @@ end
 -- @shared
 -- @param number index Whatever number you want the clip to be
 -- @param boolean enabled Whether the clip is enabled
--- @param vector origin The center of the clip plane in world coordinates, or local to entity if it is specified
--- @param vector normal The the direction of the clip plane in world coordinates, or local to entity if it is specified
--- @param entity? entity (Optional) The entity to make coordinates local to, otherwise the world is used
+-- @param Vector origin The center of the clip plane in world coordinates, or local to entity if it is specified
+-- @param Vector normal The the direction of the clip plane in world coordinates, or local to entity if it is specified
+-- @param Entity? entity (Optional) The entity to make coordinates local to, otherwise the world is used
 function hologram_methods:setClip(index, enabled, origin, normal, entity)
 	local holo = getholo(self)
 
@@ -408,7 +408,7 @@ end
 
 --- Sets the hologram scale. Basically the same as setRenderMatrix() with a scaled matrix
 -- @shared
--- @param vector scale Vector new scale
+-- @param Vector scale Vector new scale
 function hologram_methods:setScale(scale)
 	local holo = getholo(self)
 	local scale = vunwrap(scale)
@@ -420,7 +420,7 @@ end
 
 --- Sets the hologram size in game units
 -- @shared
--- @param vector size Vector new size in game units
+-- @param Vector size Vector new size in game units
 function hologram_methods:setSize(size)
 	local holo = getholo(self)
 	local size = vunwrap(size)
@@ -434,7 +434,7 @@ end
 
 --- Gets the hologram scale.
 -- @shared
--- @return vector Vector scale
+-- @return Vector Vector scale
 function hologram_methods:getScale()
 	return vwrap(getholo(self):GetScale())
 end

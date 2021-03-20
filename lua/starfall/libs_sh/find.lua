@@ -41,8 +41,8 @@ local function convert(results, func)
 end
 
 --- Finds entities in a box
--- @param vector min Bottom corner
--- @param vector max Top corner
+-- @param Vector min Bottom corner
+-- @param Vector max Top corner
 -- @param function? filter Optional function to filter results
 -- @return table An array of found entities
 function find_library.inBox(min, max, filter)
@@ -54,7 +54,7 @@ function find_library.inBox(min, max, filter)
 end
 
 --- Finds entities in a sphere
--- @param vector center Center of the sphere
+-- @param Vector center Center of the sphere
 -- @param number radius Sphere radius
 -- @param function? filter Optional function to filter results
 -- @return table An array of found entities
@@ -68,8 +68,8 @@ function find_library.inSphere(center, radius, filter)
 end
 
 --- Finds entities in a cone
--- @param vector pos The cone vertex position
--- @param vector dir The direction to project the cone
+-- @param Vector pos The cone vertex position
+-- @param Vector dir The direction to project the cone
 -- @param number distance The length to project the cone
 -- @param number radius The cosine of angle of the cone. 1 makes a 0° cone, 0.707 makes approximately 90°, 0 makes 180°, and so on.
 -- @param function? filter Optional function to filter results
@@ -85,10 +85,10 @@ function find_library.inCone(pos, dir, distance, radius, filter)
 end
 
 --- Finds entities in a ray
--- @param vector startpos The ray start
--- @param vector endpos The ray end
--- @param vector? mins If not nil, will define a lower bound of the ray's hull
--- @param vector? maxs If not nil, will define a upper bound of the ray's hull
+-- @param Vector startpos The ray start
+-- @param Vector endpos The ray end
+-- @param Vector? mins If not nil, will define a lower bound of the ray's hull
+-- @param Vector? maxs If not nil, will define a upper bound of the ray's hull
 -- @param function? filter Optional function to filter results
 -- @return table An array of found entities
 function find_library.inRay(startpos, endpos, mins, maxs, filter)
@@ -141,7 +141,7 @@ end
 if SERVER then
 	--- Finds entities that are in the PVS (Potentially Visible Set). See: https://developer.valvesoftware.com/wiki/PVS
 	-- @server
-	-- @param vector pos Vector view point
+	-- @param Vector pos Vector view point
 	-- @param function? filter Optional function to filter results
 	-- @return table An array of found entities
 	function find_library.inPVS(pos, filter)
@@ -171,8 +171,8 @@ end
 
 --- Finds the closest entity to a point
 -- @param table ents The array of entities
--- @param vector pos The position
--- @return entity The closest entity
+-- @param Vector pos The position
+-- @return Entity The closest entity
 function find_library.closest(ents, pos)
 	local closest = math.huge
 	local closestent
@@ -190,7 +190,7 @@ end
 
 --- Returns a sorted array of entities by how close they are to a point
 -- @param table ents The array of entities
--- @param vector pos The position
+-- @param Vector pos The position
 -- @param boolean furthest Whether to have the further entities first
 -- @return table A table of the closest entities
 function find_library.sortByClosest(ents, pos, furthest)

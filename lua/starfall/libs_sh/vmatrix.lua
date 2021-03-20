@@ -26,7 +26,7 @@ end
 -- @name builtins_library.Matrix
 -- @class function
 -- @param table Optional data to initialize the Matrix with.
--- @return vmatrix New VMatrix
+-- @return VMatrix New VMatrix
 function instance.env.Matrix(t)
 	return wrap(Matrix(t))
 end
@@ -38,19 +38,19 @@ function vmatrix_meta:__tostring()
 end
 
 --- Returns angles
--- @return angle Angles
+-- @return Angle Angles
 function vmatrix_methods:getAngles()
 	return awrap(unwrap(self):GetAngles())
 end
 
 --- Returns scale
--- @return vector Scale
+-- @return Vector Scale
 function vmatrix_methods:getScale()
 	return vwrap(unwrap(self):GetScale())
 end
 
 --- Returns translation
--- @return vector Translation
+-- @return Vector Translation
 function vmatrix_methods:getTranslation()
 	return vwrap(unwrap(self):GetTranslation())
 end
@@ -65,51 +65,51 @@ end
 
 --- Rotate the matrix
 -- Self-Modifies. Does not return anything
--- @param angle ang Angle to rotate by
+-- @param Angle ang Angle to rotate by
 function vmatrix_methods:rotate(ang)
 	unwrap(self):Rotate(aunwrap(ang))
 end
 
 --- Returns an inverted matrix. Inverting the matrix will fail if its determinant is 0 or close to 0
--- @return vmatrix Inverted matrix
+-- @return VMatrix Inverted matrix
 function vmatrix_methods:getInverse()
 	return wrap(unwrap(self):GetInverse())
 end
 
 --- Returns an inverted matrix. Efficiently for translations and rotations
--- @return vmatrix Inverted matrix
+-- @return VMatrix Inverted matrix
 function vmatrix_methods:getInverseTR()
 	return wrap(unwrap(self):GetInverseTR())
 end
 
 --- Returns forward vector of matrix. First matrix column
--- @return vector Translation
+-- @return Vector Translation
 function vmatrix_methods:getForward()
 	return vwrap(unwrap(self):GetForward())
 end
 
 --- Returns right vector of matrix. Negated second matrix column
--- @return vector Translation
+-- @return Vector Translation
 function vmatrix_methods:getRight()
 	return vwrap(unwrap(self):GetRight())
 end
 
 --- Returns up vector of matrix. Third matrix column
--- @return vector Translation
+-- @return Vector Translation
 function vmatrix_methods:getUp()
 	return vwrap(unwrap(self):GetUp())
 end
 
 --- Sets the scale
 -- Self-Modifies. Does not return anything
--- @param vector vec New scale
+-- @param Vector vec New scale
 function vmatrix_methods:setScale(vec)
 	unwrap(self):SetScale(vunwrap(vec))
 end
 
 --- Scale the matrix
 -- Self-Modifies. Does not return anything
--- @param vector vec Vector to scale by
+-- @param Vector vec Vector to scale by
 function vmatrix_methods:scale(vec)
 	unwrap(self):Scale(vunwrap(vec))
 end
@@ -124,35 +124,35 @@ end
 
 --- Sets the angles
 -- Self-Modifies. Does not return anything
--- @param angle ang New angles
+-- @param Angle ang New angles
 function vmatrix_methods:setAngles(ang)
 	unwrap(self):SetAngles(aunwrap(ang))
 end
 
 --- Sets the translation
 -- Self-Modifies. Does not return anything
--- @param vector vec New translation
+-- @param Vector vec New translation
 function vmatrix_methods:setTranslation(vec)
 	unwrap(self):SetTranslation(vunwrap(vec))
 end
 
 --- Sets the forward direction of the matrix. First column
 -- Self-Modifies. Does not return anything
--- @param vector forward The forward vector
+-- @param Vector forward The forward vector
 function vmatrix_methods:setForward(forward)
 	unwrap(self):SetForward(vunwrap(forward))
 end
 
 --- Sets the right direction of the matrix. Negated second column
 -- Self-Modifies. Does not return anything
--- @param vector right The right vector
+-- @param Vector right The right vector
 function vmatrix_methods:setRight(right)
 	unwrap(self):SetRight(vunwrap(right))
 end
 
 --- Sets the up direction of the matrix. Third column
 -- Self-Modifies. Does not return anything
--- @param vector up The up vector
+-- @param Vector up The up vector
 function vmatrix_methods:setUp(up)
 	unwrap(self):SetUp(vunwrap(up))
 end
@@ -167,7 +167,7 @@ function vmatrix_methods:setField(row, column, value)
 end
 
 --- Copies The matrix and returns a new matrix
--- @return vmatrix The copy of the matrix
+-- @return VMatrix The copy of the matrix
 function vmatrix_methods:clone()
 	return wrap(Matrix(unwrap(self)))
 end
@@ -202,7 +202,7 @@ end
 
 --- Copies the values from the second matrix to the first matrix.
 -- Self-Modifies. Does not return anything
--- @param vmatrix src Second matrix
+-- @param VMatrix src Second matrix
 function vmatrix_methods:set(src)
 	unwrap(self):Set(unwrap(src))
 end
@@ -239,7 +239,7 @@ function vmatrix_methods:invertTR()
 end
 
 --- Translate the matrix
--- @param vector vec Vector to translate by
+-- @param Vector vec Vector to translate by
 function vmatrix_methods:translate(vec)
 	unwrap(self):Translate(vunwrap(vec))
 end
@@ -252,7 +252,7 @@ end
 
 --- Sets the rotation or the matrix to the rotation by an axis and angle
 -- Self-Modifies. Does not return anything
--- @param vector axis The normalized axis of rotation
+-- @param Vector axis The normalized axis of rotation
 -- @param number angle The angle of rotation in radians
 function vmatrix_methods:setAxisAngle(axis, ang)
 	local x, y, z = axis[1], axis[2], axis[3]
@@ -276,7 +276,7 @@ function vmatrix_methods:setAxisAngle(axis, ang)
 end
 
 --- Gets the rotation axis and angle of rotation of the rotation matrix
--- @return vector The axis of rotation
+-- @return Vector The axis of rotation
 -- @return number The angle of rotation
 function vmatrix_methods:getAxisAngle()
 	local epsilon = 0.00001
@@ -331,19 +331,19 @@ function vmatrix_methods:getAxisAngle()
 end
 
 --- Adds two matrices (why would you do this?)
--- @return vmatrix Added matrix
+-- @return VMatrix Added matrix
 function vmatrix_meta.__add(lhs, rhs)
 	return wrap(unwrap(lhs) + unwrap(rhs))
 end
 
 --- Subtracts two matrices (why would you do this?)
--- @return vmatrix Subtracted matrix
+-- @return VMatrix Subtracted matrix
 function vmatrix_meta.__sub(lhs, rhs)
 	return wrap(unwrap(lhs) - unwrap(rhs))
 end
 
 --- Multiplies two matrices
--- @return vmatrix Result matrix
+-- @return VMatrix Result matrix
 function vmatrix_meta.__mul(lhs, rhs)
 	local rhsmeta = dgetmeta(rhs)
 	if rhsmeta == vmatrix_meta then

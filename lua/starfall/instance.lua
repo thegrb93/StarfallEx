@@ -32,7 +32,7 @@ SF.playerInstances = {}
 --- Preprocesses and Compiles code and returns an Instance
 -- @param code Either a string of code, or a {path=source} table
 -- @param mainfile If code is a table, this specifies the first file to parse.
--- @param player The "owner" of the instance
+-- @param Player The "owner" of the instance
 -- @param data The table to set instance.data to. Default is a new table.
 -- @return True if no errors, false if errors occured.
 -- @return The compiled instance, or the error message.

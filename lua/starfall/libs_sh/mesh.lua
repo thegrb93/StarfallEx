@@ -965,14 +965,14 @@ if CLIENT then
 	end
 	
 	--- Sets the vertex normal
-	-- @param vector normal Normal
+	-- @param Vector normal Normal
 	-- @client
 	function mesh_library.writeNormal(normal)
 		mesh.Normal(vunwrap(normal))
 	end
 	
 	--- Sets the vertex position
-	-- @param vector position Position
+	-- @param Vector position Position
 	-- @client
 	function mesh_library.writePosition(pos)
 		mesh.Position(vunwrap(pos))
@@ -998,18 +998,18 @@ if CLIENT then
 	end
 	
 	--- Draws a quad using 4 vertices
-	-- @param vector v1 Vertex1 position
-	-- @param vector v2 Vertex2 position
-	-- @param vector v3 Vertex3 position
-	-- @param vector v4 Vertex4 position
+	-- @param Vector v1 Vertex1 position
+	-- @param Vector v2 Vertex2 position
+	-- @param Vector v3 Vertex3 position
+	-- @param Vector v4 Vertex4 position
 	-- @client
 	function mesh_library.writeQuad(v1, v2, v3, v4)
 		mesh.Quad(vunwrap(v1), vunwrap(v2), vunwrap(v3), vunwrap(v4))
 	end
 	
 	--- Draws a quad using a position, normal and size
-	-- @param vector position
-	-- @param vector normal
+	-- @param Vector position
+	-- @param Vector normal
 	-- @param number w
 	-- @param number h
 	-- @client

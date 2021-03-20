@@ -67,7 +67,7 @@ end)
 -- ------------------------- Methods ------------------------- --
 
 --- Parents the entity to another entity
--- @param entity? parent Entity to parent to. nil to unparent
+-- @param Entity? parent Entity to parent to. nil to unparent
 -- @param string? attachment Optional string attachment name to parent to
 function ents_methods:setParent(parent, attachment)
 	local ent = getent(self)
@@ -103,7 +103,7 @@ function ents_methods:unparent()
 end
 
 --- Links starfall components to a starfall processor or vehicle. Screen can only connect to processor. HUD can connect to processor and vehicle.
--- @param entity? e Entity to link the component to, a vehicle or starfall for huds, or a starfall for screens. nil to clear links.
+-- @param Entity? e Entity to link the component to, a vehicle or starfall for huds, or a starfall for screens. nil to clear links.
 function ents_methods:linkComponent(e)
 	local ent = getent(self)
 	checkpermission(instance, ent, "entities.canTool")
@@ -146,8 +146,8 @@ end
 
 --- Applies damage to an entity
 -- @param number amt Damage amount
--- @param entity attacker Damage attacker
--- @param entity inflictor Damage inflictor
+-- @param Entity attacker Damage attacker
+-- @param Entity inflictor Damage inflictor
 function ents_methods:applyDamage(amt, attacker, inflictor)
 	local ent = getent(self)
 	checkluatype(amt, TYPE_NUMBER)
@@ -165,8 +165,8 @@ function ents_methods:applyDamage(amt, attacker, inflictor)
 end
 
 --- Sets a custom prop's physics simulation forces. Thrusters and balloons use this.
--- @param vector ang Angular Force (Torque)
--- @param vector lin Linear Force
+-- @param Vector ang Angular Force (Torque)
+-- @param Vector lin Linear Force
 -- @param number mode The physics mode to use. 0 = Off, 1 = Local acceleration, 2 = Local force, 3 = Global Acceleration, 4 = Global force
 function ents_methods:setCustomPropForces(ang, lin, mode)
 	local ent = getent(self)
@@ -189,7 +189,7 @@ function ents_methods:setCustomPropForces(ang, lin, mode)
 end
 
 --- Set the angular velocity of an object
--- @param vector angvel The local angvel vector to set
+-- @param Vector angvel The local angvel vector to set
 function ents_methods:setAngleVelocity(angvel)
 	local ent = getent(self)
 	angvel = vunwrap(angvel)
@@ -204,7 +204,7 @@ function ents_methods:setAngleVelocity(angvel)
 end
 
 --- Applys a angular velocity to an object
--- @param vector angvel The local angvel vector to apply
+-- @param Vector angvel The local angvel vector to apply
 function ents_methods:addAngleVelocity(angvel)
 	local ent = getent(self)
 	angvel = vunwrap(angvel)
@@ -241,7 +241,7 @@ function ents_methods:setElasticity(elasticity)
 end
 
 --- Applies linear force to the entity
--- @param vector vec The force vector
+-- @param Vector vec The force vector
 function ents_methods:applyForceCenter(vec)
 	local ent = getent(self)
 	local vec = vunwrap(vec)
@@ -256,8 +256,8 @@ function ents_methods:applyForceCenter(vec)
 end
 
 --- Applies linear force to the entity with an offset
--- @param vector force The force vector in world coordinates
--- @param vector position The force position in world coordinates
+-- @param Vector force The force vector in world coordinates
+-- @param Vector position The force position in world coordinates
 function ents_methods:applyForceOffset(force, position)
 	local ent = getent(self)
 
@@ -276,7 +276,7 @@ function ents_methods:applyForceOffset(force, position)
 end
 
 --- Applies angular force to the entity (This function is garbage, use applyTorque instead)
--- @param angle ang The force angle
+-- @param Angle ang The force angle
 function ents_methods:applyAngForce(ang)
 	local ent = getent(self)
 
@@ -316,7 +316,7 @@ function ents_methods:applyAngForce(ang)
 end
 
 --- Applies torque
--- @param vector torque The torque vector
+-- @param Vector torque The torque vector
 function ents_methods:applyTorque(torque)
 	local ent = getent(self)
 
@@ -380,7 +380,7 @@ end
 
 --- Sets whether an entity's shadow should be drawn
 -- @param boolean draw Whether the shadow should draw
--- @param player? ply Optional player argument to set only for that player. Can also be table of players.
+-- @param Player? ply Optional player argument to set only for that player. Can also be table of players.
 function ents_methods:setDrawShadow(draw, ply)
 	local ent = getent(self)
 	checkpermission(instance, ent, "entities.setRenderProperty")
@@ -393,7 +393,7 @@ function ents_methods:setDrawShadow(draw, ply)
 end
 
 --- Sets the entitiy's position. No interpolation will occur clientside, use physobj.setPos to have interpolation.
--- @param vector vec New position
+-- @param Vector vec New position
 function ents_methods:setPos(vec)
 	local ent = getent(self)
 
@@ -404,7 +404,7 @@ function ents_methods:setPos(vec)
 end
 
 --- Sets the entity's angles
--- @param angle ang New angles
+-- @param Angle ang New angles
 function ents_methods:setAngles(ang)
 	local ent = getent(self)
 
@@ -415,7 +415,7 @@ function ents_methods:setAngles(ang)
 end
 
 --- Sets the entity's linear velocity
--- @param vector vel New velocity
+-- @param Vector vel New velocity
 function ents_methods:setVelocity(vel)
 	local ent = getent(self)
 
@@ -554,7 +554,7 @@ function ents_methods:setMass(mass)
 end
 
 --- Sets the entity's inertia
--- @param vector vec Inertia tensor
+-- @param Vector vec Inertia tensor
 function ents_methods:setInertia(vec)
 	local ent = getent(self)
 	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
@@ -695,7 +695,7 @@ function ents_methods:enableSphere(enabled)
 end
 
 --- Gets what the entity is welded to. If the entity is parented, returns the parent.
--- @return entity The first welded/parent entity
+-- @return Entity The first welded/parent entity
 function ents_methods:isWeldedTo()
 	local ent = getent(self)
 	local constr = constraint.FindConstraint(ent, "Weld")
@@ -769,7 +769,7 @@ end
 -- @param number endSize The end size of the trail (0-128)
 -- @param number length The length size of the trail
 -- @param string material The material of the trail
--- @param color color The color of the trail
+-- @param Color color The color of the trail
 -- @param number? attachmentID Optional attachmentid the trail should attach to
 -- @param boolean? additive If the trail's rendering is additive
 function ents_methods:setTrails(startSize, endSize, length, material, color, attachmentID, additive)

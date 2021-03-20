@@ -355,7 +355,7 @@ function wire_library.adjustPorts(inputs, outputs)
 end
 
 --- Returns the wirelink representing this entity.
--- @return wirelink Wirelink representing this entity
+-- @return Wirelink Wirelink representing this entity
 function wire_library.self()
 	local ent = instance.entity
 	if not ent then SF.Throw("No entity", 2) end
@@ -370,12 +370,12 @@ end
 
 local ValidWireMat = { 	["cable/rope"] = true, ["cable/cable2"] = true, ["cable/xbeam"] = true, ["cable/redlaser"] = true, ["cable/blue_elec"] = true, ["cable/physbeam"] = true, ["cable/hydra"] = true, ["arrowire/arrowire"] = true, ["arrowire/arrowire2"] = true }
 --- Wires two entities together
--- @param entity entI Entity with input
--- @param entity entO Entity with output
+-- @param Entity entI Entity with input
+-- @param Entity entO Entity with output
 -- @param string inputname Input to be wired
 -- @param string outputname Output to be wired
 -- @param number? width Width of the wire(optional)
--- @param color? color Color of the wire(optional)
+-- @param Color? color Color of the wire(optional)
 -- @param string? materialName Material of the wire(optional), Valid materials are cable/rope, cable/cable2, cable/xbeam, cable/redlaser, cable/blue_elec, cable/physbeam, cable/hydra, arrowire/arrowire, arrowire/arrowire2
 function wire_library.create(entI, entO, inputname, outputname, width, color, material)
 	checkluatype(inputname, TYPE_STRING)
@@ -422,7 +422,7 @@ function wire_library.create(entI, entO, inputname, outputname, width, color, ma
 end
 
 --- Unwires an entity's input
--- @param entity entI Entity with input
+-- @param Entity entI Entity with input
 -- @param string inputname Input to be un-wired
 function wire_library.delete(entI, inputname)
 	checkluatype(inputname, TYPE_STRING)
@@ -460,7 +460,7 @@ local function parseEntity(ent, io)
 end
 
 --- Returns a table of entity's inputs
--- @param entity entI Entity with input(s)
+-- @param Entity entI Entity with input(s)
 -- @return table Table of entity's input names
 -- @return table Table of entity's input types
 function wire_library.getInputs(entI)
@@ -468,7 +468,7 @@ function wire_library.getInputs(entI)
 end
 
 --- Returns a table of entity's outputs
--- @param entity entO Entity with output(s)
+-- @param Entity entO Entity with output(s)
 -- @return table Table of entity's output names
 -- @return table Table of entity's output types
 function wire_library.getOutputs(entO)
@@ -476,8 +476,8 @@ function wire_library.getOutputs(entO)
 end
 
 --- Returns a wirelink to a wire entity
--- @param entity ent Wire entity
--- @return wirelink Wirelink of the entity
+-- @param Entity ent Wire entity
+-- @return Wirelink Wirelink of the entity
 function wire_library.getWirelink(ent)
 	ent = eunwrap(ent)
 	if not ent:IsValid() then return end
@@ -492,7 +492,7 @@ end
 
 --- Returns an entities wirelink
 -- @class function
--- @return wirelink Wirelink of the entity
+-- @return Wirelink Wirelink of the entity
 ents_methods.getWirelink = wire_library.getWirelink
 
 -- ------------------------- Wirelink ------------------------- --
@@ -563,7 +563,7 @@ function wirelink_methods:outputType(name)
 end
 
 --- Returns the entity that the wirelink represents
--- @return entity Entity the wirelink represents
+-- @return Entity Entity the wirelink represents
 function wirelink_methods:entity()
 	return owrap(wlunwrap(self))
 end
@@ -624,7 +624,7 @@ end
 
 --- Returns what an input of the wirelink is wired to.
 -- @param string name Name of the input
--- @return entity The entity the wirelink is wired to
+-- @return Entity The entity the wirelink is wired to
 function wirelink_methods:getWiredTo(name)
 	checkluatype(name, TYPE_STRING)
 	local wl = wlunwrap(self)

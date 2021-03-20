@@ -267,7 +267,7 @@ end
 --- Multiplication metamethod
 -- @param any lhs Left side of equation. Quaternion or number
 -- @param any rhs Right side of equation. Quaternion or number
--- @return quaternion Product
+-- @return Quaternion Product
 function quat_meta.__mul(lhs, rhs)
 	if isnumber(rhs) then -- Q * N
 		lhs = clone(lhs)
@@ -306,7 +306,7 @@ end
 --- Division metamethod
 -- @param any lhs Left side of equation. Quaternion or number
 -- @param any rhs Right side of equation. Quaternion or number
--- @return quaternion Quotient
+-- @return Quaternion Quotient
 function quat_meta.__div(lhs, rhs)
 	if isnumber(rhs) then -- Q / N
 		return wrap({ lhs[1] / rhs, lhs[2] / rhs, lhs[3] / rhs, lhs[4] / rhs })
@@ -341,7 +341,7 @@ end
 --- Involution metamethod
 -- @param any lhs Left side of equation. Quaternion or number
 -- @param any rhs Right side of equation. Quaternion or number
--- @return quaternion Power
+-- @return Quaternion Power
 function quat_meta.__pow(lhs, rhs)
 	if isnumber(rhs) then -- Q ^ N
 		local out = clone(lhs)
@@ -372,7 +372,7 @@ end
 --- Addition metamethod
 -- @param any lhs Left side of equation. Quaternion or number
 -- @param any rhs Right side of equation. Quaternion or number
--- @return quaternion Sum
+-- @return Quaternion Sum
 function quat_meta.__add(lhs, rhs)
 	if isnumber(rhs) then -- Q + N
 		local out = clone(lhs)
@@ -399,7 +399,7 @@ end
 --- Subtraction metamethod
 -- @param any lhs Left side of equation. Quaternion or number
 -- @param any rhs Right side of equation. Quaternion or number
--- @return quaternion Difference
+-- @return Quaternion Difference
 function quat_meta.__sub(lhs, rhs)
 	if isnumber(rhs) then -- Q - N
 		return wrap({ lhs[1] - rhs, lhs[2], lhs[3], lhs[4] })
@@ -418,20 +418,20 @@ function quat_meta.__sub(lhs, rhs)
 end
 
 --- Unary minus metamethod
--- @return quaternion Negated quaternion
+-- @return Quaternion Negated quaternion
 function quat_meta.__unm(q)
 	return wrap({ -q[1], -q[2], -q[3], -q[4] })
 end
 
 --- Equivalence metamethod
--- @param quaternion rhs Quaternion to compare to
+-- @param Quaternion rhs Quaternion to compare to
 -- @return boolean True if both sides are equal
 function quat_meta.__eq(lhs, rhs)
 	return lhs[1] == rhs[1] and lhs[2] == rhs[2] and lhs[3] == rhs[3] and lhs[4] == rhs[4]
 end
 
 --- Tostring metamethod
--- @param quaternion q Quaternion
+-- @param Quaternion q Quaternion
 -- @return string Quaternion represented as a string
 function quat_meta.__tostring(q)
 	return table.concat(q, " ", 1, 4)
@@ -459,21 +459,21 @@ function quat_methods:unpack()
 end
 
 --- Creates a copy of the quaternion
--- @return quaternion Duplicate quaternion
+-- @return Quaternion Duplicate quaternion
 function quat_methods:clone()
 	return clone(self)
 end
 
 --- Copies components of the second quaternion to the first quaternion.
 -- Self-Modifies. Does not return anything
--- @param quaternion quat Quaternion to copy from
+-- @param Quaternion quat Quaternion to copy from
 function quat_methods:set(quat)
 	quatPack(self, quatUnpack(quat))
 end
 
 --- Sets R (real) component of the quaternion and returns self after modification
 -- @param number r Value of the R component
--- @return quaternion self
+-- @return Quaternion self
 function quat_methods:setR(r)
 	self[1] = r
 	return self
@@ -481,7 +481,7 @@ end
 
 --- Sets I component of the quaternion and returns self after modification
 -- @param number i Value of the I component
--- @return quaternion self
+-- @return Quaternion self
 function quat_methods:setI(i)
 	self[2] = i
 	return self
@@ -489,7 +489,7 @@ end
 
 --- Sets J component of the quaternion and returns self after modification
 -- @param number j Value of the J component
--- @return quaternion self
+-- @return Quaternion self
 function quat_methods:setJ(j)
 	self[3] = j
 	return self
@@ -497,7 +497,7 @@ end
 
 --- Sets K component of the quaternion and returns self after modification
 -- @param number k Value of the K component
--- @return quaternion self
+-- @return Quaternion self
 function quat_methods:setK(k)
 	self[4] = k
 	return self
@@ -506,7 +506,7 @@ end
 -------------------------------------
 
 --- Raises Euler's constant e to the quaternion's power
--- @return quaternion Constant e raised to the quaternion
+-- @return Quaternion Constant e raised to the quaternion
 function quat_methods:getExp()
 	local ret = clone(self)
 	quatExp(ret)
@@ -520,7 +520,7 @@ function quat_methods:exp()
 end
 
 --- Calculates natural logarithm of the quaternion
--- @return quaternion Logarithmic quaternion
+-- @return Quaternion Logarithmic quaternion
 function quat_methods:getLog()
 	local ret = clone(self)
 	quatLog(ret)
@@ -536,7 +536,7 @@ end
 -------------------------------------
 
 --- Calculates upward direction of the quaternion
--- @return vector Vector pointing up
+-- @return Vector Vector pointing up
 function quat_methods:getUp()
 	local q1, q2, q3, q4 = quatUnpack(self)
 	local t2, t3, t4 = q2 * 2, q3 * 2, q4 * 2
@@ -548,7 +548,7 @@ function quat_methods:getUp()
 end
 
 --- Calculates right direction of the quaternion
--- @return vector Vector pointing right
+-- @return Vector Vector pointing right
 function quat_methods:getRight()
 	local q1, q2, q3, q4 = quatUnpack(self)
 	local t2, t3, t4 = q2 * 2, q3 * 2, q4 * 2
@@ -560,7 +560,7 @@ function quat_methods:getRight()
 end
 
 --- Calculates forward direction of the quaternion
--- @return vector Vector pointing forward
+-- @return Vector Vector pointing forward
 function quat_methods:getForward()
 	local q1, q2, q3, q4 = quatUnpack(self)
 	local t2, t3, t4 = q2 * 2, q3 * 2, q4 * 2
@@ -574,13 +574,13 @@ end
 -------------------------------------
 
 --- Returns absolute value of the quaternion
--- @return vector Absolute value
+-- @return Vector Absolute value
 function quat_methods:getAbsolute()
 	return getQuatLenSqr(self)
 end
 
 --- Returns conjugate of the quaternion
--- @return quaternion Quaternion's conjugate
+-- @return Quaternion Quaternion's conjugate
 function quat_methods:getConjugate()
 	local ret = clone(self)
 	quatConj(ret)
@@ -594,7 +594,7 @@ function quat_methods:conjugate()
 end
 
 --- Calculates inverse of the quaternion
--- @return quaternion Inverse of the quaternion
+-- @return Quaternion Inverse of the quaternion
 function quat_methods:getInverse()
 	local ret = clone(self)
 	quatInv(ret)
@@ -608,7 +608,7 @@ function quat_methods:inverse()
 end
 
 --- Gets the quaternion representing rotation contained within an angle between 0 and 180 degrees
--- @return quaternion Quaternion with contained rotation
+-- @return Quaternion Quaternion with contained rotation
 function quat_methods:getMod()
 	local ret = clone(self)
 	quatMod(ret)
@@ -622,7 +622,7 @@ function quat_methods:mod()
 end
 
 --- Returns new normalized quaternion
--- @return quaternion Normalized quaternion
+-- @return Quaternion Normalized quaternion
 function quat_methods:getNormalized()
 	local ret = clone(self)
 	quatNorm(ret)
@@ -636,7 +636,7 @@ function quat_methods:normalize()
 end
 
 --- Returns dot product of two quaternions
--- @param quaternion quat Second quaternion
+-- @param Quaternion quat Second quaternion
 -- @return number The dot product
 function quat_methods:dot(quat)
 	return getQuatDot(self, quat)
@@ -645,7 +645,7 @@ end
 -------------------------------------
 
 --- Converts quaternion to a vector by dropping the R (real) component
--- @return vector Vector from the quaternion
+-- @return Vector Vector from the quaternion
 function quat_methods:getVector()
 	return vwrap(Vector(self[2], self[3], self[4]))
 end
@@ -653,7 +653,7 @@ end
 -- credits: Malte Clasen (https://stackoverflow.com/a/1556470)
 --- Converts quaternion to a matrix
 -- @param boolean? Optional bool, normalizes the quaternion
--- @return vmatrix Transformation matrix
+-- @return VMatrix Transformation matrix
 function quat_methods:getMatrix(normalize)
 	local quat
 	if normalize then
@@ -676,7 +676,7 @@ function quat_methods:getMatrix(normalize)
 end
 
 --- Returns the euler angle of rotation in degrees
--- @return angle Angle object
+-- @return Angle Angle object
 function quat_methods:getEulerAngle()
 	local len_sqrt = getQuatLen(self)
 	if len_sqrt == 0 then
@@ -730,7 +730,7 @@ end
 
 -- credits: https://github.com/cder0xff
 --- Returns the axis of rotation
--- @return vector Vector axis
+-- @return Vector Vector axis
 function quat_methods:getRotationAxis()
 	local ilen = getQuatImaginaryLenSqr(self)
 	if ilen == 0 then
@@ -743,7 +743,7 @@ end
 
 -- credits: https://github.com/cder0xff
 --- Returns the rotation vector - rotation axis where magnitude is the angle of rotation in degrees
--- @return vector Rotation vector
+-- @return Vector Rotation vector
 function quat_methods:getRotationVector()
 	local len = getQuatLenSqr(self)
 	local ilen_max = math_max(getQuatImaginaryLenSqr(self), 0)
@@ -764,8 +764,8 @@ end
 -------------------------------------
 
 --- Converts vector to quaternion
--- @param vector up Upward direction. If specified, the original vector will act like a forward pointing one
--- @return quaternion Quaternion from the given vector
+-- @param Vector up Upward direction. If specified, the original vector will act like a forward pointing one
+-- @return Quaternion Quaternion from the given vector
 function vec_methods:getQuaternion(up)
 	if up then
 		local x = vunwrap(self)
@@ -792,7 +792,7 @@ end
 
 --- Returns quaternion for rotation about axis represented by the vector by an angle
 -- @param number ang Number rotation angle
--- @return quaternion Rotated quaternion
+-- @return Quaternion Rotated quaternion
 function vec_methods:getQuaternionFromAxis(ang)
 	local axis = vunwrap(self):GetNormalized()
 	local rang = math_rad(ang) * 0.5
@@ -802,7 +802,7 @@ end
 
 -- credits: https://github.com/cder0xff
 --- Constructs a quaternion from the rotation vector. Vector direction is axis of rotation, it's magnitude is angle in degrees
--- @return quaternion Rotated quaternion
+-- @return Quaternion Rotated quaternion
 function vec_methods:getQuaternionFromRotation()
 	local vec_len = self:getLengthSqr()
 	if vec_len == 0 then
@@ -818,23 +818,23 @@ function vec_methods:getQuaternionFromRotation()
 end
 
 --- Converts angle to a quaternion
--- @return quaternion Constructed quaternion
+-- @return Quaternion Constructed quaternion
 function ang_methods:getQuaternion()
 	return wrap(quatFromAngle(aunwrap(self)))
 end
 
 --- Converts entity angles to a quaternion
--- @return quaternion Constructed quaternion
+-- @return Quaternion Constructed quaternion
 function ents_methods:getQuaternion()
 	local ang = getent(self):GetAngles()
 	return wrap(quatFromAngle(ang))
 end
 
 --- Performs spherical linear interpolation between two quaternions
--- @param quaternion quat1 Quaternion to start with
--- @param quaternion quat2 Quaternion to end with
+-- @param Quaternion quat1 Quaternion to start with
+-- @param Quaternion quat2 Quaternion to end with
 -- @param number t Ratio, 0 = quat1; 1 = quat2
--- @return quaternion Interpolated quaternion
+-- @return Quaternion Interpolated quaternion
 function math_library.slerpQuaternion(quat1, quat2, t)
 	checkluatype(t, TYPE_NUMBER)
 
@@ -859,10 +859,10 @@ function math_library.slerpQuaternion(quat1, quat2, t)
 end
 
 --- Performs normalized linear interpolation between two quaternions
--- @param quaternion quat1 Quaternion to start with
--- @param quaternion quat2 Quaternion to end with
+-- @param Quaternion quat1 Quaternion to start with
+-- @param Quaternion quat2 Quaternion to end with
 -- @param number t Ratio, 0 = quat1; 1 = quat2
--- @return quaternion Interpolated quaternion
+-- @return Quaternion Interpolated quaternion
 function math_library.nlerpQuaternion(quat1, quat2, t)
 	checkluatype(t, TYPE_NUMBER)
 

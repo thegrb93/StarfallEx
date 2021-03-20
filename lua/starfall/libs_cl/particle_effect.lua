@@ -60,7 +60,7 @@ end
 
 
 --- Attaches a particleEffect to an entity.
--- @param entity entity Entity to attach to
+-- @param Entity entity Entity to attach to
 -- @param string name Name of the particle effect
 -- @param number pattach PATTACH enum
 -- @param table options Table of options
@@ -154,7 +154,7 @@ end
 
 
 --- Sets the sort origin for given particle effect system. This is used as a helper to determine which particles are in front of which.
--- @param vector origin Sort Origin
+-- @param Vector origin Sort Origin
 function particleef_methods:setSortOrigin(origin)
 	local uw = unwrap(self)
 
@@ -166,7 +166,7 @@ end
 
 --- Sets a value for given control point.
 -- @param number id Control Point ID (0-63)
--- @param vector value Value
+-- @param Vector value Value
 function particleef_methods:setControlPoint(id,value)
 	local uw = unwrap(self)
 
@@ -180,7 +180,7 @@ end
 
 --- Essentially makes child control point follow the parent entity.
 -- @param number id Child Control Point ID (0-63)
--- @param entity entity Entity parent
+-- @param Entity entity Entity parent
 function particleef_methods:setControlPointEntity(id,entity)
 	local uw = unwrap(self)
 	local entity = getent(entity)
@@ -195,7 +195,7 @@ end
 
 --- Sets the forward direction for given control point.
 -- @param number id Control Point ID (0-63)
--- @param vector fwd Forward vector
+-- @param Vector fwd Forward vector
 function particleef_methods:setForwardVector(id,value)
 	local uw = unwrap(self)
 
@@ -208,7 +208,7 @@ end
 
 --- Sets the right direction for given control point.
 -- @param number id Control Point ID (0-63)
--- @param vector right Right vector
+-- @param Vector right Right vector
 function particleef_methods:setRightVector(id,value)
 	local uw = unwrap(self)
 
@@ -222,7 +222,7 @@ end
 
 --- Sets the up direction for given control point.
 -- @param number id Control Point ID (0-63)
--- @param vector up Up vector
+-- @param Vector up Up vector
 function particleef_methods:setUpVector(id,value)
 	local uw = unwrap(self)
 

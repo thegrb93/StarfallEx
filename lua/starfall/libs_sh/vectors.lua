@@ -43,7 +43,7 @@ end)
 -- @param number x X value
 -- @param number y Y value
 -- @param number z Z value
--- @return vector Vector
+-- @return Vector Vector
 function instance.env.Vector(x, y, z)
 	if x~=nil then checkluatype(x, TYPE_NUMBER) else x = 0 end
 	if z~=nil then checkluatype(z, TYPE_NUMBER) else z = (y and 0 or x) end
@@ -58,7 +58,7 @@ end
 local xyz = { x = 1, y = 2, z = 3 }
 
 --- Sets a value at a key in the vector
--- @param vector Vec
+-- @param Vector Vec
 -- @param any Key
 -- @param number Value
 function vec_meta.__newindex(t, k, v)
@@ -86,14 +86,14 @@ local math_min = math.min
 --- Gets a value at a key in the vector
 -- Can be indexed with: 1, 2, 3, x, y, z, xx, xy, xz, xxx, xyz, zyx, etc.. 1,2,3 is most efficient.
 -- @param any Key to get the value at
--- @return any Value at the index
+-- @return any The value at the index
 function vec_meta.__index(t, k)
 	local method = vec_methods[k]
 	if method ~= nil then
 		return method
 	elseif xyz[k] then
 		return rawget(t, xyz[k])
-	else 
+	else
 		-- Swizzle support
 		local v = {0,0,0}
 		for i = 1, math_min(#k,3)do
@@ -119,7 +119,7 @@ end
 --- Multiplication metamethod
 -- @param any a Number or Vector multiplicand.
 -- @param any b Number or Vector multiplier.
--- @return vector Multiplied vector.
+-- @return Vector Multiplied vector.
 function vec_meta.__mul(a, b)
 	if isnumber(b) then
 		return wrap({ a[1] * b, a[2] * b, a[3] * b })
@@ -141,7 +141,7 @@ end
 --- Division metamethod
 -- @param any v1 Number or Vector dividend.
 -- @param any v2 Number or Vector divisor.
--- @return vector Scaled vector.
+-- @return Vector Scaled vector.
 function vec_meta.__div(a, b)
 	if isnumber(b) then
 		return wrap({ a[1] / b, a[2] / b, a[3] / b })
@@ -157,51 +157,51 @@ function vec_meta.__div(a, b)
 end
 
 --- Addition metamethod
--- @param vector v1 Initial vector.
--- @param vector v2 Vector to add to the first.
--- @return vector Resultant vector after addition operation.
+-- @param Vector v1 Initial vector.
+-- @param Vector v2 Vector to add to the first.
+-- @return Vector Resultant vector after addition operation.
 function vec_meta.__add(a, b)
 	return wrap({ a[1] + b[1], a[2] + b[2], a[3] + b[3] })
 end
 
 --- Subtraction metamethod
--- @param vector v1 Initial Vector
--- @param vector v2 Vector to subtract
--- @return vector Resultant vector after subtraction operation.
+-- @param Vector v1 Initial Vector
+-- @param Vector v2 Vector to subtract
+-- @return Vector Resultant vector after subtraction operation.
 function vec_meta.__sub(a, b)
 	return wrap({ a[1]-b[1], a[2]-b[2], a[3]-b[3] })
 end
 
 --- Unary Minus metamethod (Negative)
--- @return vector Negative vector.
+-- @return Vector Negative vector.
 function vec_meta.__unm(a)
 	return wrap({ -a[1], -a[2], -a[3] })
 end
 
 --- Equivalence metamethod
--- @param vector v1 Initial vector.
--- @param vector v2 Vector to check against.
+-- @param Vector v1 Initial vector.
+-- @param Vector v2 Vector to check against.
 -- @return bool Whether both sides are equal.
 function vec_meta.__eq(a, b)
 	return a[1]==b[1] and a[2]==b[2] and a[3]==b[3]
 end
 
 --- Get the vector's angle.
--- @return angle Angle representing the vector
+-- @return Angle Angle representing the vector
 function vec_methods:getAngle()
 	return awrap(unwrap(self):Angle())
 end
 
 --- Returns the vector's euler angle with respect to the other vector as if it were the new vertical axis.
--- @param vector v Second Vector
--- @return angle Angle
+-- @param Vector v Second Vector
+-- @return Angle Angle
 function vec_methods:getAngleEx(v)
 	return awrap(unwrap(self):AngleEx(unwrap(v)))
 end
 
 --- Calculates the cross product of the 2 vectors, creates a unique perpendicular vector to both input vectors.
--- @param vector v Second Vector
--- @return vector Vector from cross product
+-- @param Vector v Second Vector
+-- @return Vector Vector from cross product
 function vec_methods:cross(v)
 	return wrap({ self[2] * v[3] - self[3] * v[2], self[3] * v[1] - self[1] * v[3], self[1] * v[2] - self[2] * v[1] })
 end
@@ -209,28 +209,28 @@ end
 local math_sqrt = math.sqrt
 
 --- Returns the pythagorean distance between the vector and the other vector.
--- @param vector v Second Vector
+-- @param Vector v Second Vector
 -- @return number Vector distance from v
 function vec_methods:getDistance(v)
 	return math_sqrt((v[1]-self[1])^2 + (v[2]-self[2])^2 + (v[3]-self[3])^2)
 end
 
 --- Returns the squared distance of 2 vectors, this is faster Vector:getDistance as calculating the square root is an expensive process.
--- @param vector v Second Vector
+-- @param Vector v Second Vector
 -- @return number Vector distance from v
 function vec_methods:getDistanceSqr(v)
 	return ((v[1]-self[1])^2 + (v[2]-self[2])^2 + (v[3]-self[3])^2)
 end
 
 --- Dot product is the cosine of the angle between both vectors multiplied by their lengths. A.B = ||A||||B||cosA.
--- @param vector v Second Vector
+-- @param Vector v Second Vector
 -- @return number Dot product result between the two vectors
 function vec_methods:dot(v)
 	return (self[1] * v[1] + self[2] * v[2] + self[3] * v[3])
 end
 
 --- Returns a new vector with the same direction by length of 1.
--- @return vector Normalized vector
+-- @return Vector Normalized vector
 function vec_methods:getNormalized()
 	local len = math_sqrt(self[1]^2 + self[2]^2 + self[3]^2)
 
@@ -238,7 +238,7 @@ function vec_methods:getNormalized()
 end
 
 --- Is this vector and v equal within tolerance t.
--- @param vector v Second Vector
+-- @param Vector v Second Vector
 -- @param number t Tolerance number.
 -- @return boolean Whether the vector is equal to v within the tolerance.
 function vec_methods:isEqualTol(v, t)
@@ -279,7 +279,7 @@ end
 
 --- Add v to this vector
 -- Self-Modifies. Does not return anything
--- @param vector v Vector to add
+-- @param Vector v Vector to add
 function vec_methods:add(v)
 	self[1] = self[1] + v[1]
 	self[2] = self[2] + v[2]
@@ -288,7 +288,7 @@ end
 
 --- Subtract v from this Vector.
 -- Self-Modifies. Does not return anything
--- @param vector v Vector to subtract.
+-- @param Vector v Vector to subtract.
 function vec_methods:sub(v)
 	self[1] = self[1] - v[1]
 	self[2] = self[2] - v[2]
@@ -319,7 +319,7 @@ end
 
 --- Multiply self with a Vector.
 -- Self-Modifies. Does not return anything
--- @param vector v Vector to multiply with
+-- @param Vector v Vector to multiply with
 function vec_methods:vmul(v)
 	self[1] = self[1] * v[1]
 	self[2] = self[2] * v[2]
@@ -328,7 +328,7 @@ end
 
 --- Divide self by a Vector.
 -- Self-Modifies. Does not return anything
--- @param vector v Vector to divide by
+-- @param Vector v Vector to divide by
 function vec_methods:vdiv(v)
 	self[1] = self[1] / v[1]
 	self[2] = self[2] / v[2]
@@ -345,7 +345,7 @@ end
 
 --- Set's the vector's x coordinate and returns the vector after modifying.
 -- @param number x The x coordinate
--- @return vector Modified vector after setting X.
+-- @return Vector Modified vector after setting X.
 function vec_methods:setX(x)
 	self[1] = x
 	return self
@@ -353,7 +353,7 @@ end
 
 --- Set's the vector's y coordinate and returns the vector after modifying.
 -- @param number y The y coordinate
--- @return vector Modified vector after setting Y.
+-- @return Vector Modified vector after setting Y.
 function vec_methods:setY(y)
 	self[2] = y
 	return self
@@ -361,7 +361,7 @@ end
 
 --- Set's the vector's z coordinate and returns the vector after modifying.
 -- @param number z The z coordinate
--- @return vector Modified vector after setting Z.
+-- @return Vector Modified vector after setting Z.
 function vec_methods:setZ(z)
 	self[3] = z
 	return self
@@ -379,7 +379,7 @@ end
 
 --- Rotate the vector by Angle b.
 -- Self-Modifies. Does not return anything
--- @param angle b Angle to rotate by.
+-- @param Angle b Angle to rotate by.
 function vec_methods:rotate(b)
 	local vec = unwrap(self)
 	vec:Rotate(aunwrap(b))
@@ -390,8 +390,8 @@ function vec_methods:rotate(b)
 end
 
 --- Returns Rotated vector by Angle b
--- @param angle b Angle to rotate by.
--- @return vector Rotated Vector
+-- @param Angle b Angle to rotate by.
+-- @return Vector Rotated Vector
 function vec_methods:getRotated(b)
 	local vec = unwrap(self)
 	vec:Rotate(aunwrap(b))
@@ -413,10 +413,10 @@ function vec_methods:getBasis()
 end
 
 --- Return rotated vector by an axis
--- @param vector axis Axis the rotate around
+-- @param Vector axis Axis the rotate around
 -- @param number? degrees Angle to rotate by in degrees or nil if radians.
 -- @param number? radians Angle to rotate by in radians or nil if degrees.
--- @return vector Rotated vector
+-- @return Vector Rotated vector
 function vec_methods:rotateAroundAxis(axis, degrees, radians)
 	if degrees then
 		checkluatype(degrees, TYPE_NUMBER)
@@ -445,14 +445,14 @@ function vec_methods:round(idp)
 end
 
 --- Copies x,y,z from a vector and returns a new vector
--- @return vector The copy of the vector
+-- @return Vector The copy of the vector
 function vec_methods:clone()
 	return wrap({ self[1], self[2], self[3] })
 end
 
 --- Copies the values from the second vector to the first vector.
 -- Self-Modifies. Does not return anything
--- @param vector v Second Vector
+-- @param Vector v Second Vector
 function vec_methods:set(v)
 	self[1] = v[1]
 	self[2] = v[2]
@@ -466,14 +466,14 @@ function vec_methods:toScreen()
 end
 
 --- Converts vector to color
--- @return color New color object
+-- @return Color New color object
 function vec_methods:getColor()
 	return cwrap(unwrap(self):ToColor())
 end
 
 --- Returns whenever the given vector is in a box created by the 2 other vectors.
--- @param vector v1 Vector used to define AABox
--- @param vector v2 Second Vector to define AABox
+-- @param Vector v1 Vector used to define AABox
+-- @param Vector v2 Second Vector to define AABox
 -- @return bool True/False.
 function vec_methods:withinAABox(v1, v2)
 	if self[1] < math.min(v1[1], v2[1]) or self[1] > math.max(v1[1], v2[1]) then return false end

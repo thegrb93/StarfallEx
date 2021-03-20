@@ -125,25 +125,25 @@ function color_meta.__concat(a, b)
 end
 
 --- Equivalence metamethod
--- @param color c1 Initial color.
--- @param color c2 Color to check against.
+-- @param Color c1 Initial color.
+-- @param Color c2 Color to check against.
 -- @return boolean Whether their fields are equal
 function color_meta.__eq(a, b)
 	return a[1]==b[1] and a[2]==b[2] and a[3]==b[3] and a[4]==b[4]
 end
 
 --- Addition metamethod
--- @param color c1 Initial color.
--- @param color c2 Color to add to the first.
--- @return color Resultant color.
+-- @param Color c1 Initial color.
+-- @param Color c2 Color to add to the first.
+-- @return Color Resultant color.
 function color_meta.__add(a, b)
 	return wrap({ a[1] + b[1], a[2] + b[2], a[3] + b[3], a[4] + b[4] })
 end
 
 --- Subtraction metamethod
--- @param color c1 Initial color.
--- @param color c2 Color to subtract.
--- @return color Resultant color.
+-- @param Color c1 Initial color.
+-- @param Color c2 Color to subtract.
+-- @return Color Resultant color.
 function color_meta.__sub(a, b)
 	return wrap({ a[1]-b[1], a[2]-b[2], a[3]-b[3], a[4]-b[4] })
 end
@@ -151,7 +151,7 @@ end
 --- Multiplication metamethod
 -- @param any a Number or Color multiplicant
 -- @param any b Number or Color multiplier
--- @return color Multiplied color.
+-- @return Color Multiplied color.
 function color_meta.__mul(a, b)
 	if isnumber(b) then
 		return wrap({ a[1] * b, a[2] * b, a[3] * b, a[4] * b })
@@ -186,7 +186,7 @@ end
 
 --- Converts the color from RGB to HSV.
 -- @shared
--- @return color A triplet of numbers representing HSV.
+-- @return Color A triplet of numbers representing HSV.
 function color_methods:rgbToHSV()
 	local h, s, v = ColorToHSV(self)
 	return wrap({ h, s, v, 255 })
@@ -194,7 +194,7 @@ end
 
 --- Converts the color from HSV to RGB.
 -- @shared
--- @return color A triplet of numbers representing HSV.
+-- @return Color A triplet of numbers representing HSV.
 function color_methods:hsvToRGB()
 	local rgb = HSVToColor(math.Clamp(self[1] % 360, 0, 360), math.Clamp(self[2], 0, 1), math.Clamp(self[3], 0, 1))
 	return wrap({ rgb.r, rgb.g, rgb.b, (rgb.a or 255) })
@@ -223,14 +223,14 @@ function color_methods:round(idp)
 end
 
 --- Copies r,g,b,a from color and returns a new color
--- @return color The copy of the color
+-- @return Color The copy of the color
 function color_methods:clone()
 	return wrap({ self[1], self[2], self[3], self[4] })
 end
 
 --- Copies r,g,b,a from color to another.
 -- Self-Modifies. Does not return anything
--- @param color b The color to copy from.
+-- @param Color b The color to copy from.
 function color_methods:set(b)
 	self[1] = b[1]
 	self[2] = b[2]
@@ -240,7 +240,7 @@ end
 
 --- Set's the color's red channel and returns self.
 -- @param number r The red
--- @return color Color after modification
+-- @return Color Color after modification
 function color_methods:setR(r)
 	self[1] = r
 	return self
@@ -248,7 +248,7 @@ end
 
 --- Set's the color's green and returns self.
 -- @param number g The green
--- @return color Color after modification
+-- @return Color Color after modification
 function color_methods:setG(g)
 	self[2] = g
 	return self
@@ -256,7 +256,7 @@ end
 
 --- Set's the color's blue and returns self.
 -- @param number b The blue
--- @return color Color after modification
+-- @return Color Color after modification
 function color_methods:setB(b)
 	self[3] = b
 	return self
@@ -264,7 +264,7 @@ end
 
 --- Set's the color's alpha and returns it.
 -- @param number a The alpha
--- @return color Color after modification
+-- @return Color Color after modification
 function color_methods:setA(a)
 	self[4] = a
 	return self

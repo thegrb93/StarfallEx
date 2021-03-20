@@ -20,7 +20,7 @@ end
 
 --- Returns the color of a team
 -- @param number ind Index of the team
--- @return color Color of the team
+-- @return Color Color of the team
 function team_library.getColor(ind)
 	return cwrap(team.GetColor(ind))
 end

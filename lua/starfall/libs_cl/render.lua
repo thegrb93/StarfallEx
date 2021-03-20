@@ -472,7 +472,7 @@ end
 -- ------------------------------------------------------------------ --
 
 --- Pushes a matrix onto the matrix stack.
--- @param vmatrix m The matrix
+-- @param VMatrix m The matrix
 -- @param boolean? world Should the transformation be relative to the screen or world?
 function render_library.pushMatrix(m, world)
 	if world == nil then
@@ -590,8 +590,8 @@ function render_library.popViewMatrix()
 end
 
 --- Sets background color of screen
--- @param color col Color of background
--- @param entity? screen (Optional) entity of screen
+-- @param Color col Color of background
+-- @param Entity? screen (Optional) entity of screen
 function render_library.setBackgroundColor(col, screen)
 	if screen then
 		screen = getent(screen)
@@ -622,7 +622,7 @@ function render_library.setLightingMode(mode)
 end
 
 --- Sets the draw color
--- @param color clr Color type
+-- @param Color clr Color type
 function render_library.setColor(clr)
 	currentcolor = clr
 	surface.SetDrawColor(clr)
@@ -648,7 +648,7 @@ end
 -- @param string tx Texture file path, a http url, or image data: https://en.wikipedia.org/wiki/Data_URI_scheme
 -- @param function? cb An optional callback called when loading is done. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture.
 -- @param function? done An optional callback called when the image is done loading. Passes the material, url
--- @return material The material. Use with render.setMaterial to draw with it.
+-- @return Material The material. Use with render.setMaterial to draw with it.
 function render_library.createMaterial(tx, cb, done)
 	checkluatype (tx, TYPE_STRING)
 
@@ -663,13 +663,13 @@ function render_library.createMaterial(tx, cb, done)
 end
 
 --- Releases the texture. Required if you reach the maximum url textures.
--- @param material mat The material object
+-- @param Material mat The material object
 function render_library.destroyTexture(mat)
 	mat:destroy()
 end
 
 --- Sets the current render material
--- @param material mat The material object
+-- @param Material mat The material object
 function render_library.setMaterial(mat)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if mat then
@@ -694,7 +694,7 @@ local function gettexture(mat)
 end
 
 --- Sets the current render material to the given material or the rendertarget, applying an additive shader when drawn.
--- @param material mat The material object to use the texture of, or the name of a rendertarget to use instead.
+-- @param Material mat The material object to use the texture of, or the name of a rendertarget to use instead.
 function render_library.setMaterialEffectAdd(mat)
 
 	checkpermission(instance, nil, "render.effects")
@@ -708,7 +708,7 @@ function render_library.setMaterialEffectAdd(mat)
 end
 
 --- Sets the current render material to the given material or the rendertarget, applying a subtractive shader when drawn.
--- @param material mat The material object to use the texture of, or the name of a rendertarget to use instead.
+-- @param Material mat The material object to use the texture of, or the name of a rendertarget to use instead.
 function render_library.setMaterialEffectSub(mat)
 
 	checkpermission(instance, nil, "render.effects")
@@ -722,7 +722,7 @@ function render_library.setMaterialEffectSub(mat)
 end
 
 --- Sets the current render material to the given material or the rendertarget, applying a bloom shader to the texture.
--- @param material mat The material object to use the texture of, or the name of a rendertarget to use instead.
+-- @param Material mat The material object to use the texture of, or the name of a rendertarget to use instead.
 -- @param number levelr Multiplier for all red pixels. 1 = unchanged
 -- @param number levelg Multiplier for all green pixels. 1 = unchanged
 -- @param number levelb Multiplier for all blue pixels. 1 = unchanged
@@ -752,7 +752,7 @@ function render_library.setMaterialEffectBloom(mat, levelr, levelg, levelb, colo
 end
 
 --- Sets the current render material to the given material or the rendertarget, darkening the texture, and scaling up color values.
--- @param material mat The material object to use the texture of, or the name of a rendertarget to use instead.
+-- @param Material mat The material object to use the texture of, or the name of a rendertarget to use instead.
 -- @param number darken The amount to darken the texture by. -1 to 1 inclusive.
 -- @param number multiply The amount to multiply the pixel colors by. (0-1024)
 function render_library.setMaterialEffectDownsample(mat, darken, multiply)
@@ -787,7 +787,7 @@ local defaultCM = {
 }
 
 --- Sets the current render material to the given material or the rendertarget, applying a color modification shader to the texture. Alias: render.setMaterialEffectColourModify
--- @param material mat The material object to use the texture of, or the name of a rendertarget to use instead.
+-- @param Material mat The material object to use the texture of, or the name of a rendertarget to use instead.
 -- @param table cmStructure A table where each key must be of "addr", "addg", "addb", "brightness", "color" or "colour", "contrast", "mulr", "mulg", and "mulb". All keys are optional.
 function render_library.setMaterialEffectColorModify(mat, cmStructure)
 
@@ -952,7 +952,7 @@ function render_library.setRenderTargetTexture(name)
 end
 
 --- Sets the texture of a screen entity
--- @param entity ent Screen entity
+-- @param Entity ent Screen entity
 function render_library.setTextureFromScreen(ent)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
@@ -999,7 +999,7 @@ function render_library.setCullMode(mode)
 end
 
 --- Clears the active render target
--- @param color? clr Color type to clear with
+-- @param Color? clr Color type to clear with
 -- @param boolean? depth Boolean if should clear depth. Default false
 function render_library.clear(clr, depth)
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
@@ -1545,7 +1545,7 @@ function render_library.clearDepth()
 end
 
 --- Draws a sprite in 3d space.
--- @param vector pos Position of the sprite.
+-- @param Vector pos Position of the sprite.
 -- @param number width Width of the sprite.
 -- @param number height Height of the sprite.
 function render_library.draw3DSprite(pos, width, height)
@@ -1554,7 +1554,7 @@ function render_library.draw3DSprite(pos, width, height)
 end
 
 --- Draws a sphere
--- @param vector pos Position of the sphere
+-- @param Vector pos Position of the sphere
 -- @param number radius Radius of the sphere
 -- @param number longitudeSteps The amount of longitude steps. The larger this number is, the smoother the sphere is
 -- @param number latitudeSteps The amount of latitude steps. The larger this number is, the smoother the sphere is
@@ -1570,7 +1570,7 @@ function render_library.draw3DSphere(pos, radius, longitudeSteps, latitudeSteps)
 end
 
 --- Draws a wireframe sphere
--- @param vector pos Position of the sphere
+-- @param Vector pos Position of the sphere
 -- @param number radius Radius of the sphere
 -- @param number longitudeSteps The amount of longitude steps. The larger this number is, the smoother the sphere is
 -- @param number latitudeSteps The amount of latitude steps. The larger this number is, the smoother the sphere is
@@ -1586,8 +1586,8 @@ function render_library.draw3DWireframeSphere(pos, radius, longitudeSteps, latit
 end
 
 --- Draws a 3D Line
--- @param vector startPos Starting position
--- @param vector endPos Ending position
+-- @param Vector startPos Starting position
+-- @param Vector endPos Ending position
 function render_library.draw3DLine(startPos, endPos)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	startPos = vunwrap(startPos)
@@ -1597,10 +1597,10 @@ function render_library.draw3DLine(startPos, endPos)
 end
 
 --- Draws a box in 3D space
--- @param vector origin Origin of the box.
--- @param angle angle Orientation of the box
--- @param vector mins Start position of the box, relative to origin.
--- @param vector maxs End position of the box, relative to origin.
+-- @param Vector origin Origin of the box.
+-- @param Angle angle Orientation of the box
+-- @param Vector mins Start position of the box, relative to origin.
+-- @param Vector maxs End position of the box, relative to origin.
 function render_library.draw3DBox(origin, angle, mins, maxs)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	origin = vunwrap(origin)
@@ -1612,10 +1612,10 @@ function render_library.draw3DBox(origin, angle, mins, maxs)
 end
 
 --- Draws a wireframe box in 3D space
--- @param vector origin Origin of the box.
--- @param angle angle Orientation of the box
--- @param vector mins Start position of the box, relative to origin.
--- @param vector maxs End position of the box, relative to origin.
+-- @param Vector origin Origin of the box.
+-- @param Angle angle Orientation of the box
+-- @param Vector mins Start position of the box, relative to origin.
+-- @param Vector maxs End position of the box, relative to origin.
 function render_library.draw3DWireframeBox(origin, angle, mins, maxs)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	origin = vunwrap(origin)
@@ -1627,8 +1627,8 @@ function render_library.draw3DWireframeBox(origin, angle, mins, maxs)
 end
 
 --- Draws textured beam.
--- @param vector startPos Beam start position.
--- @param vector endPos Beam end position.
+-- @param Vector startPos Beam start position.
+-- @param Vector endPos Beam end position.
 -- @param number width The width of the beam.
 -- @param number textureStart The start coordinate of the texture used.
 -- @param number textureEnd The end coordinate of the texture used.
@@ -1645,10 +1645,10 @@ function render_library.draw3DBeam(startPos, endPos, width, textureStart, textur
 end
 
 --- Draws 2 connected triangles.
--- @param vector vert1 First vertex.
--- @param vector vert2 The second vertex.
--- @param vector vert3 The third vertex.
--- @param vector vert4 The fourth vertex.
+-- @param Vector vert1 First vertex.
+-- @param Vector vert2 The second vertex.
+-- @param Vector vert3 The third vertex.
+-- @param Vector vert4 The fourth vertex.
 function render_library.draw3DQuad(vert1, vert2, vert3, vert4)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
@@ -1661,10 +1661,10 @@ function render_library.draw3DQuad(vert1, vert2, vert3, vert4)
 end
 
 --- Draws 2 connected triangles with custom UVs.
--- @param vector vert1 First vertex. {x, y, z, u, v}
--- @param vector vert2 The second vertex.
--- @param vector vert3 The third vertex.
--- @param vector vert4 The fourth vertex.
+-- @param Vector vert1 First vertex. {x, y, z, u, v}
+-- @param Vector vert2 The second vertex.
+-- @param Vector vert3 The third vertex.
+-- @param Vector vert4 The fourth vertex.
 function render_library.draw3DQuadUV(vert1, vert2, vert3, vert4)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	mesh.Begin(MATERIAL_QUADS, 1)
@@ -1691,8 +1691,8 @@ function render_library.draw3DQuadUV(vert1, vert2, vert3, vert4)
 end
 
 --- Gets a 2D cursor position where ply is aiming at the current rendered screen or nil if they aren't aiming at it.
--- @param player? ply player to get cursor position from. Default player()
--- @param entity? screen An explicit screen to get the cursor pos of (default: The current rendering screen using 'render' hook)
+-- @param Player? ply player to get cursor position from. Default player()
+-- @param Entity? screen An explicit screen to get the cursor pos of (default: The current rendering screen using 'render' hook)
 -- @return number X position
 -- @return number Y position
 function render_library.cursorPos(ply, screen)
@@ -1736,7 +1736,7 @@ end
 
 --- Returns information about the screen, such as world offsets, dimentions, and rotation.
 -- Note: this does a table copy so move it out of your draw hook
--- @param entity e The screen to get info from.
+-- @param Entity e The screen to get info from.
 -- @return table A table describing the screen.
 function render_library.getScreenInfo(e)
 	local screen = getent(e)
@@ -1745,7 +1745,7 @@ function render_library.getScreenInfo(e)
 end
 
 --- Returns the entity currently being rendered to
--- @return entity Entity of the screen or hud being rendered
+-- @return Entity Entity of the screen or hud being rendered
 function render_library.getScreenEntity()
 	return ewrap(renderdata.renderEnt)
 end
@@ -1763,7 +1763,7 @@ end
 --- Reads the color of the specified pixel.
 -- @param number x Pixel x-coordinate.
 -- @param number y Pixel y-coordinate.
--- @return color Color object with ( r, g, b, 255 ) from the specified pixel.
+-- @return Color Color object with ( r, g, b, 255 ) from the specified pixel.
 function render_library.readPixel(x, y)
 	if not renderdata.isRendering then
 		SF.Throw("Not in rendering hook.", 2)
@@ -1793,9 +1793,9 @@ function render_library.getGameResolution()
 end
 
 --- Does a trace and returns the color of the textel the trace hits.
--- @param vector vec1 The starting vector
--- @param vector vec2 The ending vector
--- @return color The color
+-- @param Vector vec1 The starting vector
+-- @param Vector vec2 The ending vector
+-- @return Color The color
 function render_library.traceSurfaceColor(vec1, vec2)
 	return cwrap(render.GetSurfaceColor(vunwrap(vec1), vunwrap(vec2)):ToColor())
 end
@@ -1971,7 +1971,7 @@ function render_library.enableClipping(state)
 end
 
 --- Pushes a new clipping plane of the clip plane stack.
--- @param vector normal The normal of the clipping plane.
+-- @param Vector normal The normal of the clipping plane.
 -- @param number distance The normal of the clipping plane.
 function render_library.pushCustomClipPlane(normal, distance)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
@@ -1998,30 +1998,30 @@ function render_library.popCustomClipPlane()
 end
 
 --- Calculates the light color of a certain surface
--- @param vector pos Vector position to sample from
--- @param vector normal Normal vector of the surface
--- @return vector Vector representing color of the light
+-- @param Vector pos Vector position to sample from
+-- @param Vector normal Normal vector of the surface
+-- @return Vector Vector representing color of the light
 function render_library.computeLighting(pos, normal)
 	return vwrap(render.ComputeLighting(vunwrap(pos), vunwrap(normal)))
 end
 
 --- Calculates the lighting caused by dynamic lights for the specified surface
--- @param vector pos Vector position to sample from
--- @param vector normal Normal vector of the surface
--- @return vector Vector representing color of the light
+-- @param Vector pos Vector position to sample from
+-- @param Vector normal Normal vector of the surface
+-- @return Vector Vector representing color of the light
 function render_library.computeDynamicLighting(pos, normal)
 	return vwrap(render.ComputeDynamicLighting(vunwrap(pos), vunwrap(normal)))
 end
 
 --- Gets the light exposure on the specified position
--- @param vector pos Vector position to sample from
--- @return vector Vector representing color of the light
+-- @param Vector pos Vector position to sample from
+-- @return Vector Vector representing color of the light
 function render_library.getLightColor(pos)
 	return vwrap(render.GetLightColor(vunwrap(pos)))
 end
 
 --- Returns the ambient color of the map
--- @return vector Vector representing color of the light
+-- @return Vector Vector representing color of the light
 function render_library.getAmbientLightColor()
 	return vwrap(render.GetAmbientLightColor())
 end
@@ -2037,7 +2037,7 @@ function render_library.setFogMode(mode)
 end
 
 --- Changes color of the fog
--- @param color col Color (alpha won't have any effect)
+-- @param Color col Color (alpha won't have any effect)
 function render_library.setFogColor(color)
 	checkpermission(instance, nil, "render.fog")
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
@@ -2107,7 +2107,7 @@ function render_library.setChipOverlay(name)
 end
 
 --- Using the custom screen model, sets the screen offset and size as long as its within bounds of -1024 to 1024 units
--- @param entity screen The custom screen to be resized
+-- @param Entity screen The custom screen to be resized
 -- @param number x The x offset of the screen
 -- @param number y The y offset of the screen
 -- @param number w The width of the screen
@@ -2182,8 +2182,8 @@ end
 -- @name renderscene
 -- @class hook
 -- @client
--- @param vector origin View origin
--- @param angle angles View angles
+-- @param Vector origin View origin
+-- @param Angle angles View angles
 -- @param number fov View FOV
 
 --- Called when the player connects to a HUD component linked to the Starfall Chip
@@ -2233,8 +2233,8 @@ end
 -- @name calcview
 -- @class hook
 -- @client
--- @param vector pos Current position of the camera
--- @param angle ang Current angles of the camera
+-- @param Vector pos Current position of the camera
+-- @param Angle ang Current angles of the camera
 -- @param number fov Current fov of the camera
 -- @param number znear Current near plane of the camera
 -- @param number zfar Current far plane of the camera
@@ -2254,8 +2254,8 @@ end
 --- Called when a player uses the screen
 -- @name starfallUsed
 -- @class hook
--- @param player activator Player who used the screen or chip
--- @param entity used The screen or chip entity that was used
+-- @param Player activator Player who used the screen or chip
+-- @param Entity used The screen or chip entity that was used
 
 ---
 -- @name render_library.Screen information table

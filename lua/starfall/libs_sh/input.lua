@@ -245,7 +245,7 @@ end
 -- @client
 -- @param number x X coordinate on the screen
 -- @param number y Y coordinate on the screen
--- @return vector Aim vector
+-- @return Vector Aim vector
 function input_library.screenToVector(x, y)
 	checkpermission(instance, nil, "input")
 	checkluatype(x, TYPE_NUMBER)
@@ -270,7 +270,7 @@ end
 
 --- Makes the local player select a weapon
 -- @client
--- @param weapon weapon The weapon entity to select
+-- @param Weapon weapon The weapon entity to select
 function input_library.selectWeapon(weapon)
 	local ent = getent(weapon)
 	if not (ent:IsWeapon() and ent:IsCarriedByLocalPlayer()) then SF.Throw("This weapon is not your own!", 2) end

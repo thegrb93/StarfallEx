@@ -43,7 +43,7 @@ end
 if SERVER then
 	--- Returns the driver of the vehicle
 	-- @server
-	-- @return player Driver of vehicle
+	-- @return Player Driver of vehicle
 	function vehicle_methods:getDriver()
 		return pwrap(getveh(self):GetDriver())
 	end
@@ -60,7 +60,7 @@ if SERVER then
 	--- Returns a passenger of a vehicle
 	-- @server
 	-- @param number n The index of the passenger to get
-	-- @return player The passenger or NULL if empty
+	-- @return Player The passenger or NULL if empty
 	function vehicle_methods:getPassenger(n)
 		checkluatype(n, TYPE_NUMBER)
 		return pwrap(getveh(self):GetPassenger(n))

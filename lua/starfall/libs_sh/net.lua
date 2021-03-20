@@ -394,7 +394,7 @@ end
 
 --- Writes an angle to the net message
 -- @shared
--- @param angle t The angle to be written
+-- @param Angle t The angle to be written
 function net_library.writeAngle(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
 	write(net.WriteFloat, 4*8, t[1])
@@ -405,14 +405,14 @@ end
 
 --- Reads an angle from the net message
 -- @shared
--- @return angle The angle that was read
+-- @return Angle The angle that was read
 function net_library.readAngle()
 	return awrap(Angle(net.ReadFloat(), net.ReadFloat(), net.ReadFloat()))
 end
 
 --- Writes an vector to the net message. Has significantly lower precision than writeFloat
 -- @shared
--- @param vector t The vector to be written
+-- @param Vector t The vector to be written
 function net_library.writeVector(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
 	write(net.WriteFloat, 4*8, t[1])
@@ -423,14 +423,14 @@ end
 
 --- Reads a vector from the net message
 -- @shared
--- @return vector The vector that was read
+-- @return Vector The vector that was read
 function net_library.readVector()
 	return vwrap(Vector(net.ReadFloat(), net.ReadFloat(), net.ReadFloat()))
 end
 
 --- Writes an matrix to the net message
 -- @shared
--- @param vmatrix t The matrix to be written
+-- @param VMatrix t The matrix to be written
 function net_library.writeMatrix(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
 	local vals = {munwrap(t):Unpack()}
@@ -442,7 +442,7 @@ end
 
 --- Reads a matrix from the net message
 -- @shared
--- @return vmatrix The matrix that was read
+-- @return VMatrix The matrix that was read
 function net_library.readMatrix()
 	local m = Matrix()
 	m:SetUnpacked(net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat())
@@ -451,7 +451,7 @@ end
 
 --- Writes an color to the net message
 -- @shared
--- @param color t The color to be written
+-- @param Color t The color to be written
 function net_library.writeColor(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
 	write(net.WriteColor, 4*8, cunwrap(t))
@@ -460,14 +460,14 @@ end
 
 --- Reads a color from the net message
 -- @shared
--- @return color The color that was read
+-- @return Color The color that was read
 function net_library.readColor()
 	return cwrap(net.ReadColor())
 end
 
 --- Writes an entity to the net message
 -- @shared
--- @param entity t The entity to be written
+-- @param Entity t The entity to be written
 function net_library.writeEntity(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
 	write(net.WriteUInt, 16, getent(t):EntIndex(), 16)
@@ -477,7 +477,7 @@ end
 --- Reads a entity from the net message
 -- @shared
 -- @param function? callback (Client only) optional callback to be ran whenever the entity becomes valid; returns nothing if this is used. The callback passes the entity if it succeeds or nil if it fails.
--- @return entity The entity that was read
+-- @return Entity The entity that was read
 function net_library.readEntity(callback)
 	local index = net.ReadUInt(16)
 	if callback ~= nil and CLIENT then
@@ -526,4 +526,4 @@ end
 -- @class hook
 -- @param string name Name of the arriving net message
 -- @param number len Length of the arriving net message in bits
--- @param entity ply On server, the player that sent the message. Nil on client.
+-- @param Entity ply On server, the player that sent the message. Nil on client.

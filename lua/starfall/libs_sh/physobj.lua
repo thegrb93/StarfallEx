@@ -39,43 +39,43 @@ end
 
 --- Gets the entity attached to the physics object
 -- @shared
--- @return entity The entity attached to the physics object
+-- @return Entity The entity attached to the physics object
 function physobj_methods:getEntity()
 	return ewrap(unwrap(self):GetEntity())
 end
 
 --- Gets the position of the physics object
 -- @shared
--- @return vector Vector position of the physics object
+-- @return Vector Vector position of the physics object
 function physobj_methods:getPos()
 	return vwrap(unwrap(self):GetPos())
 end
 
 --- Returns the world transform matrix of the physobj
 -- @shared
--- @return vmatrix The matrix
+-- @return VMatrix The matrix
 function physobj_methods:getMatrix()
 	return mwrap(unwrap(self):GetPositionMatrix())
 end
 
 --- Gets the angles of the physics object
 -- @shared
--- @return angle Angle angles of the physics object
+-- @return Angle Angle angles of the physics object
 function physobj_methods:getAngles()
 	return awrap(unwrap(self):GetAngles())
 end
 
 --- Gets the velocity of the physics object
 -- @shared
--- @return vector Vector velocity of the physics object
+-- @return Vector Vector velocity of the physics object
 function physobj_methods:getVelocity()
 	return vwrap(unwrap(self):GetVelocity())
 end
 
 --- Gets the axis aligned bounding box of the physics object
 -- @shared
--- @return vector The mins of the AABB
--- @return vector The maxs of the AABB
+-- @return Vector The mins of the AABB
+-- @return Vector The maxs of the AABB
 function physobj_methods:getAABB()
 	local a, b = unwrap(self):GetAABB()
 	return vwrap(a), vwrap(b)
@@ -84,15 +84,15 @@ end
 --- Gets the velocity of the physics object at an arbitrary point in its local reference frame
 --- This includes velocity at the point induced by rotational velocity
 -- @shared
--- @param vector vec The point to get velocity of in local reference frame
--- @return vector Vector Local velocity of the physics object at the point
+-- @param Vector vec The point to get velocity of in local reference frame
+-- @return Vector Vector Local velocity of the physics object at the point
 function physobj_methods:getVelocityAtPoint(vec)
 	return vwrap(unwrap(self):GetVelocityAtPoint(vunwrap(vec)))
 end
 
 --- Gets the angular velocity of the physics object
 -- @shared
--- @return vector Vector angular velocity of the physics object
+-- @return Vector Vector angular velocity of the physics object
 function physobj_methods:getAngleVelocity()
 	return vwrap(unwrap(self):GetAngleVelocity())
 end
@@ -106,14 +106,14 @@ end
 
 --- Gets the center of mass of the physics object in the local reference frame.
 -- @shared
--- @return vector Center of mass vector in the physobject's local reference frame.
+-- @return Vector Center of mass vector in the physobject's local reference frame.
 function physobj_methods:getMassCenter()
 	return vwrap(unwrap(self):GetMassCenter())
 end
 
 --- Gets the inertia of the physics object
 -- @shared
--- @return vector Vector Inertia of the physics object
+-- @return Vector Vector Inertia of the physics object
 function physobj_methods:getInertia()
 	return vwrap(unwrap(self):GetInertia())
 end
@@ -126,29 +126,29 @@ function physobj_methods:getMaterial()
 end
 
 --- Returns a vector in the local reference frame of the physicsobject from the world frame
--- @param vector vec The vector to transform
--- @return vector The transformed vector
+-- @param Vector vec The vector to transform
+-- @return Vector The transformed vector
 function physobj_methods:worldToLocal(vec)
 	return vwrap(unwrap(self):WorldToLocal(vunwrap(vec)))
 end
 
 --- Returns a vector in the reference frame of the world from the local frame of the physicsobject
--- @param vector vec The vector to transform
--- @return vector The transformed vector
+-- @param Vector vec The vector to transform
+-- @return Vector The transformed vector
 function physobj_methods:localToWorld(vec)
 	return vwrap(unwrap(self):LocalToWorld(vunwrap(vec)))
 end
 
 --- Returns a normal vector in the local reference frame of the physicsobject from the world frame
--- @param vector vec The normal vector to transform
--- @return vector The transformed vector
+-- @param Vector vec The normal vector to transform
+-- @return Vector The transformed vector
 function physobj_methods:worldToLocalVector(vec)
 	return vwrap(unwrap(self):WorldToLocalVector(vunwrap(vec)))
 end
 
 --- Returns a normal vector in the reference frame of the world from the local frame of the physicsobject
--- @param vector vec The normal vector to transform
--- @return vector The transformed vector
+-- @param Vector vec The normal vector to transform
+-- @return Vector The transformed vector
 function physobj_methods:localToWorldVector(vec)
 	return vwrap(unwrap(self):LocalToWorldVector(vunwrap(vec)))
 end
@@ -183,7 +183,7 @@ end
 if SERVER then
 	--- Sets the position of the physics object. Will cause interpolation of the entity in clientside, use entity.setPos to avoid this.
 	-- @server
-	-- @param vector pos The position vector to set it to
+	-- @param Vector pos The position vector to set it to
 	function physobj_methods:setPos(pos)
 
 		pos = vunwrap(pos)
@@ -196,7 +196,7 @@ if SERVER then
 
 	--- Sets the angles of the physics object. Will cause interpolation of the entity in clientside, use entity.setAngles to avoid this.
 	-- @server
-	-- @param angle ang The angle to set it to
+	-- @param Angle ang The angle to set it to
 	function physobj_methods:setAngles(ang)
 
 		ang = aunwrap(ang)
@@ -209,7 +209,7 @@ if SERVER then
 
 	--- Sets the velocity of the physics object
 	-- @server
-	-- @param vector vel The velocity vector to set it to
+	-- @param Vector vel The velocity vector to set it to
 	function physobj_methods:setVelocity(vel)
 
 		vel = vunwrap(vel)
@@ -237,7 +237,7 @@ if SERVER then
 
 	--- Applys a force to the center of the physics object
 	-- @server
-	-- @param vector force The force vector to apply
+	-- @param Vector force The force vector to apply
 	function physobj_methods:applyForceCenter(force)
 
 		force = vunwrap(force)
@@ -250,8 +250,8 @@ if SERVER then
 
 	--- Applys an offset force to a physics object
 	-- @server
-	-- @param vector force The force vector in world coordinates
-	-- @param vector position The force position in world coordinates
+	-- @param Vector force The force vector in world coordinates
+	-- @param Vector position The force position in world coordinates
 	function physobj_methods:applyForceOffset(force, position)
 
 		force = vunwrap(force)
@@ -266,7 +266,7 @@ if SERVER then
 
 	--- Sets the angular velocity of an object
 	-- @server
-	-- @param vector angvel The local angvel vector to set
+	-- @param Vector angvel The local angvel vector to set
 	function physobj_methods:setAngleVelocity(angvel)
 		angvel = vunwrap(angvel)
 		checkvector(angvel)
@@ -279,7 +279,7 @@ if SERVER then
 
 	--- Applys a angular velocity to an object
 	-- @server
-	-- @param vector angvel The local angvel vector to apply
+	-- @param Vector angvel The local angvel vector to apply
 	function physobj_methods:addAngleVelocity(angvel)
 		angvel = vunwrap(angvel)
 		checkvector(angvel)
@@ -292,7 +292,7 @@ if SERVER then
 
 	--- Applys a torque to a physics object
 	-- @server
-	-- @param vector torque The world torque vector to apply
+	-- @param Vector torque The world torque vector to apply
 	function physobj_methods:applyTorque(torque)
 		torque = vunwrap(torque)
 		checkvector(torque)
@@ -318,7 +318,7 @@ if SERVER then
 
 	--- Sets the inertia of a physics object
 	-- @server
-	-- @param vector inertia The inertia vector to set it to
+	-- @param Vector inertia The inertia vector to set it to
 	function physobj_methods:setInertia(inertia)
 		local phys = unwrap(self)
 		checkpermission(instance, phys:GetEntity(), "entities.setInertia")

@@ -19,7 +19,7 @@ function physenv_lib.getAirDensity()
 end
 
 --- Gets the gravity vector
--- @return vector Vector Gravity Vector ( eg Vector(0,0,-600) )
+-- @return Vector Vector Gravity Vector ( eg Vector(0,0,-600) )
 function physenv_lib.getGravity()
 	return vwrap(physenv.GetGravity())
 end

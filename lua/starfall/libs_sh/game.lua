@@ -79,7 +79,7 @@ function game_library.getAmmoData(id)
 end
 
 --- Returns the worldspawn entity
--- @return entity Worldspawn
+-- @return Entity Worldspawn
 function game_library.getWorld()
 	return ewrap(game.GetWorld())
 end
@@ -102,7 +102,7 @@ if SERVER then
 
 	--- Applies explosion damage to all entities in the specified radius
 	-- @server
-	-- @param vector damageOrigin The center of the explosion
+	-- @param Vector damageOrigin The center of the explosion
 	-- @param number damageRadius The radius in which entities will be damaged (0 - 1500)
 	-- @param number damage The amount of damage to be applied
 	function game_library.blastDamage(damageOrigin, damageRadius, damage)
@@ -121,7 +121,7 @@ else
 
 	--- Returns the direction and how obstructed the map's sun is or nil if it doesn't exist
 	-- @client
-	-- @return vector The direction of the sun
+	-- @return Vector The direction of the sun
 	-- @return number How obstructed the sun is 0 to 1.
 	function game_library.getSunInfo()
 		local info = util.GetSunInfo()
@@ -130,7 +130,7 @@ else
 
 	--- Check whether the skybox is visible from the point specified
 	-- @client
-	-- @param vector position The position to check the skybox visibility from
+	-- @param Vector position The position to check the skybox visibility from
 	-- @return boolean Whether the skybox is visible from the position
 	function game_library.isSkyboxVisibleFromPoint(position)
 		return util.IsSkyboxVisibleFromPoint(vunwrap(position))

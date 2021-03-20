@@ -100,10 +100,10 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 
 
 --- Creates a dynamic light (make sure to draw it)
--- @param vector pos The position of the light
+-- @param Vector pos The position of the light
 -- @param number size The size of the light. Must be lower than sf_light_maxsize
 -- @param number brightness The brightness of the light
--- @param color color The color of the light
+-- @param Color color The color of the light
 -- @return light Dynamic light
 function light_library.create(pos, size, brightness, color)
 	if table.Count(lights) >= 256 then SF.Throw("Too many lights have already been allocated (max 256)", 2) end
@@ -169,7 +169,7 @@ function light_methods:setDieTime(dietime)
 end
 
 --- Sets the light direction (used with setInnerAngle and setOuterAngle)
--- @param vector dir Direction of the light
+-- @param Vector dir Direction of the light
 function light_methods:setDirection(dir)
 	unwrap(self).data.dir = vunwrap(dir)
 end
@@ -210,7 +210,7 @@ function light_methods:setNoModel(on)
 end
 
 --- Sets the light position
--- @param vector pos The position of the light
+-- @param Vector pos The position of the light
 function light_methods:setPos(pos)
 	unwrap(self).data.pos = vunwrap(pos)
 end
@@ -230,7 +230,7 @@ function light_methods:setStyle(style)
 end
 
 --- Sets the color of the light
--- @param color col The color of the light
+-- @param Color col The color of the light
 function light_methods:setColor(color)
 	local col = cunwrap(color)
 	local data = unwrap(self).data

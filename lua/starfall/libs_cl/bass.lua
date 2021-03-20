@@ -181,7 +181,7 @@ function bass_methods:setPitch(pitch)
 end
 
 --- Sets the position of the sound in 3D space. Must have `3d` flag to get this work on.
--- @param vector pos Where to position the sound.
+-- @param Vector pos Where to position the sound.
 function bass_methods:setPos(pos)
 	getsnd(self):SetPos(vunwrap(pos))
 end
