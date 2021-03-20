@@ -59,7 +59,7 @@ local xyz = { x = 1, y = 2, z = 3 }
 
 --- Sets a value at a key in the vector
 -- @param Vector Vec
--- @param any Key
+-- @param number|string Key
 -- @param number Value
 function vec_meta.__newindex(t, k, v)
 	if xyz[k] then
@@ -85,8 +85,8 @@ local math_min = math.min
 
 --- Gets a value at a key in the vector
 -- Can be indexed with: 1, 2, 3, x, y, z, xx, xy, xz, xxx, xyz, zyx, etc.. 1,2,3 is most efficient.
--- @param any Key to get the value at
--- @return any The value at the index
+-- @param number|string Key to get the value at
+-- @return number The value at the index
 function vec_meta.__index(t, k)
 	local method = vec_methods[k]
 	if method ~= nil then
@@ -117,8 +117,8 @@ function vec_meta.__tostring(a)
 end
 
 --- Multiplication metamethod
--- @param any a Number or Vector multiplicand.
--- @param any b Number or Vector multiplier.
+-- @param number|Vector a Number or Vector multiplicand.
+-- @param number|Vector b Number or Vector multiplier.
 -- @return Vector Multiplied vector.
 function vec_meta.__mul(a, b)
 	if isnumber(b) then
@@ -139,8 +139,8 @@ function vec_meta.__mul(a, b)
 end
 
 --- Division metamethod
--- @param any v1 Number or Vector dividend.
--- @param any v2 Number or Vector divisor.
+-- @param number|Vector v1 Number or Vector dividend.
+-- @param number|Vector v2 Number or Vector divisor.
 -- @return Vector Scaled vector.
 function vec_meta.__div(a, b)
 	if isnumber(b) then

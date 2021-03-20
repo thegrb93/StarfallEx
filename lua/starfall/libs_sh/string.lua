@@ -95,7 +95,7 @@ string_library.format = sfstring.format
 -- @class function
 -- @param number time The time in seconds to format
 -- @param string? format An optional formatting to use. If no format it specified, a table will be returned instead
--- @return any Formatted string or a table
+-- @return string|table Formatted string or a table
 string_library.formattedTime = sfstring.FormattedTime
 
 --- Returns char value from the specified index in the supplied string. (DEPRECATED! You should use string.sub instead)
@@ -141,7 +141,7 @@ string_library.gmatch = sfstring.gmatch
 -- @class function
 -- @param string str String which should be modified.
 -- @param string pattern The pattern that defines what should be matched and eventually be replaced.
--- @param any replacement If string: matched sequence will be replaced with it; If table: matched sequence will be used as key; If function: matches will be passed as parameters to the function (return to replace)
+-- @param string|table|function replacement If string: matched sequence will be replaced with it; If table: matched sequence will be used as key; If function: matches will be passed as parameters to the function (return to replace)
 -- @param number? max Optional maximum number of replacements to be made
 -- @return string String with replaced parts
 -- @return number Replacements count
@@ -361,7 +361,7 @@ string_library.utf8force = utf8.force
 -- @param string str The string to calculate the length of
 -- @param number? startPos The starting position to get the length from
 -- @param number? endPos The ending position to get the length from
--- @return any The number of UTF-8 characters in the string. If there are invalid bytes, this will be false
+-- @return number|boolean The number of UTF-8 characters in the string. If there are invalid bytes, this will be false
 -- @return number? The position of the first invalid byte. If there were no invalid bytes, this will be nil
 string_library.utf8len = utf8.len
 

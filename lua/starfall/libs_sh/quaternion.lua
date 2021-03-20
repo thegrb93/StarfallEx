@@ -265,8 +265,8 @@ end
 -------------------------------------
 
 --- Multiplication metamethod
--- @param any lhs Left side of equation. Quaternion or number
--- @param any rhs Right side of equation. Quaternion or number
+-- @param Quaternion|number lhs Left side of equation. Quaternion or number
+-- @param Quaternion|number rhs Right side of equation. Quaternion or number
 -- @return Quaternion Product
 function quat_meta.__mul(lhs, rhs)
 	if isnumber(rhs) then -- Q * N
@@ -304,8 +304,8 @@ function quat_meta.__mul(lhs, rhs)
 end
 
 --- Division metamethod
--- @param any lhs Left side of equation. Quaternion or number
--- @param any rhs Right side of equation. Quaternion or number
+-- @param Quaternion|number lhs Left side of equation. Quaternion or number
+-- @param Quaternion|number rhs Right side of equation. Quaternion or number
 -- @return Quaternion Quotient
 function quat_meta.__div(lhs, rhs)
 	if isnumber(rhs) then -- Q / N
@@ -339,8 +339,8 @@ function quat_meta.__div(lhs, rhs)
 end
 
 --- Involution metamethod
--- @param any lhs Left side of equation. Quaternion or number
--- @param any rhs Right side of equation. Quaternion or number
+-- @param Quaternion|number lhs Left side of equation. Quaternion or number
+-- @param Quaternion|number rhs Right side of equation. Quaternion or number
 -- @return Quaternion Power
 function quat_meta.__pow(lhs, rhs)
 	if isnumber(rhs) then -- Q ^ N
@@ -370,8 +370,8 @@ function quat_meta.__pow(lhs, rhs)
 end
 
 --- Addition metamethod
--- @param any lhs Left side of equation. Quaternion or number
--- @param any rhs Right side of equation. Quaternion or number
+-- @param Quaternion|number lhs Left side of equation. Quaternion or number
+-- @param Quaternion|number rhs Right side of equation. Quaternion or number
 -- @return Quaternion Sum
 function quat_meta.__add(lhs, rhs)
 	if isnumber(rhs) then -- Q + N
@@ -397,8 +397,8 @@ function quat_meta.__add(lhs, rhs)
 end
 
 --- Subtraction metamethod
--- @param any lhs Left side of equation. Quaternion or number
--- @param any rhs Right side of equation. Quaternion or number
+-- @param Quaternion|number lhs Left side of equation. Quaternion or number
+-- @param Quaternion|number rhs Right side of equation. Quaternion or number
 -- @return Quaternion Difference
 function quat_meta.__sub(lhs, rhs)
 	if isnumber(rhs) then -- Q - N

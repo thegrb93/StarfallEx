@@ -60,11 +60,11 @@ end
 --- Creates a table struct that resembles a Color
 -- @name builtins_library.Color
 -- @class function
--- @param r - Red or string hexadecimal color
--- @param g - Green
--- @param b - Blue
--- @param a - Alpha
--- @return New color
+-- @param number r Red or string hexadecimal color
+-- @param number g Green
+-- @param number b Blue
+-- @param number a Alpha
+-- @return Color New color
 function instance.env.Color(r, g, b, a)
 	if isstring(r) then
 		local hex = string.match(r, "^#?(%x+)$") or SF.Throw("Invalid hexadecimal color", 2)
@@ -90,8 +90,8 @@ end
 local rgb = { r = 1, g = 2, b = 3, a = 4, h = 1, s = 2, v = 3, l = 3 }
 
 --- Sets a value at a key in the color
--- @param any k Key. Number or string
--- @param any v Value.
+-- @param number|string k Key. Number or string
+-- @param number v Value.
 function color_meta.__newindex(t, k, v)
 	if rgb[k] then
 		rawset(t, rgb[k], v)
@@ -101,7 +101,7 @@ function color_meta.__newindex(t, k, v)
 end
 
 --- Gets a value at a key in the color
--- @param any k Key. Number or string
+-- @param number|string k Key. Number or string
 -- @return number Value at the index
 function color_meta.__index(t, k)
 	local method = color_methods[k]
@@ -149,8 +149,8 @@ function color_meta.__sub(a, b)
 end
 
 --- Multiplication metamethod
--- @param any a Number or Color multiplicant
--- @param any b Number or Color multiplier
+-- @param number|Color a Number or Color multiplicant
+-- @param number|Color b Number or Color multiplier
 -- @return Color Multiplied color.
 function color_meta.__mul(a, b)
 	if isnumber(b) then
@@ -167,8 +167,8 @@ function color_meta.__mul(a, b)
 end
 
 --- Division metamethod
--- @param any b Number or Color dividend
--- @param any b Number or Color divisor
+-- @param number|Color b Number or Color dividend
+-- @param number|Color b Number or Color divisor
 -- @return Scaled color.
 function color_meta.__div(a, b)
 	if isnumber(b) then
@@ -214,7 +214,7 @@ end
 
 --- Round the color values.
 -- Self-Modifies. Does not return anything
--- @param number idp (Default 0) The integer decimal place to round to.
+-- @param number? idp (Default 0) The integer decimal place to round to.
 function color_methods:round(idp)
 	self[1] = math.Round(self[1], idp)
 	self[2] = math.Round(self[2], idp)

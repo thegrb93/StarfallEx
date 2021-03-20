@@ -11,10 +11,12 @@ local curfile
 local methodstolib = {}
 local members = {}
 
+local string_match, string_find = string.match, string.find
+
 
 local function processMembers()
 	for k, data in ipairs(members) do
-		local _1, _2, libtblname, funcname = string.find(data.name, "([%w_]+)%s*[%.%:]%s*([%w_]+)")
+		local _1, _2, libtblname, funcname = string_find(data.name, "([%w_]+)%s*[%.%:]%s*([%w_]+)")
 		if libtblname then
 			data.name = funcname
 			local lib = methodstolib[libtblname]
@@ -76,7 +78,7 @@ local processTypes = {
 }
 local function process(data, nextline)
 	if not data.class then
-		if string.find(nextline, "function", 1, true) then
+		if string_find(nextline, "function", 1, true) then
 			data.class = "function"
 		else
 			return
@@ -109,18 +111,26 @@ local generic_lua_types = {
 	["function"] = true,
 }
 
+local sf_types = SF.Types
+
 local function valid_sftype(type1)
-	if SF.Types[type1] or generic_lua_types[type1] then return true end
+	if sf_types[type1] or generic_lua_types[type1] then return true end
+
+	if string_find(type1, "|", 1, true) then
+		for _, match in next, type1:Split("|") do
+			if not (sf_types[match] or generic_lua_types[match]) then
+				return false
+			end
+		end
+	end
 
 	local type2 = type1:match("%.%.%.(%w+)%??") -- ...(number)?
 
-	if SF.Types[type2] or generic_lua_types[type2] then return true end
+	if sf_types[type2] or generic_lua_types[type2] then return true end
 
 	local type3 = type1:match("(%w+)%??") -- (vector)?
 
-	if SF.Types[type3] or generic_lua_types[type3] then return true end
-
-	return false
+	return sf_types[type3] or generic_lua_types[type3]
 end
 
 local parseAttributes = {
@@ -145,12 +155,12 @@ local parseAttributes = {
 		t[#t+1] = value
 	end,
 	["param"] = function(parsing, value)
-		local type, name, description = string.match(value, "%s*([%w_%.%?]+)%s*([%w_%.]+)%s*(.*)")
+		local type, name, description = string_match(value, "%s*([%w_%.%?|]+)%s*([%w_%.]+)%s*(.*)")
 		if type then
 			if not valid_sftype(type) then
 				-- No type found, revert to old untyped documentation
 				type = "any?"
-				name, description = string.match(value, "%s*([%w_%.]+)%s*(.*)")
+				name, description = string_match(value, "%s*([%w_%.]+)%s*(.*)")
 				if name==nil then
 					ErrorNoHalt("Invalid param doc (" .. value .. ") in file: " .. curfile .. "\n")
 				end
@@ -168,7 +178,7 @@ local parseAttributes = {
 		end
 	end,
 	["return"] = function(parsing, value)
-		local type, description = string.match(value, "%s*([%w_%.%?]+)%s*(.*)")
+		local type, description = string_match(value, "%s*([%w_%.%?|]+)%s*(.*)")
 		if type then
 			if not valid_sftype(type) then
 				-- No type found, revert to old untyped documentation
@@ -183,7 +193,7 @@ local parseAttributes = {
 		end
 	end,
 	["field"] = function(parsing, value)
-		local name, description = string.match(value, "%s*([%w_]+)%s*(.*)")
+		local name, description = string_match(value, "%s*([%w_]+)%s*(.*)")
 		if name then
 			local t = parsing.fields
 			if not t then t = {} parsing.fields = t end
@@ -194,7 +204,7 @@ local parseAttributes = {
 	end
 }
 local function parse(parsing, data)
-	local attribute, value = string.match(data, "^%s*@(%w+)%s*(.*)")
+	local attribute, value = string_match(data, "^%s*@(%w+)%s*(.*)")
 	if attribute then
 		local parser = parseAttributes[attribute]
 		if parser then
@@ -215,11 +225,11 @@ local function scan(src, realm)
 	local parsing
 	for line in lines do
 		if parsing then
-			local data = string.match(line, "^%s*%-%-%-*(.*)")
+			local data = string_match(line, "^%s*%-%-%-*(.*)")
 			if data then
 				parse(parsing, data)
 			else
-				while line and not string.find(line, "%S") do -- Find next non-empty line
+				while line and not string_find(line, "%S") do -- Find next non-empty line
 					line = lines()
 				end
 				process(parsing, line or "")
@@ -228,7 +238,7 @@ local function scan(src, realm)
 			end
 		end
 		if not parsing then
-			local desc = string.match(line, "^%s*%-%-%-(.*)")
+			local desc = string_match(line, "^%s*%-%-%-(.*)")
 			if desc then
 				parsing = {
 					description = {desc},
@@ -240,11 +250,11 @@ local function scan(src, realm)
 end
 
 local function realm(filename)
-	if string.match(filename, ".*_sv/[^/]+$") then
+	if string_match(filename, ".*_sv/[^/]+$") then
 		return "server"
-	elseif string.match(filename, ".*_sh/[^/]+$") then
+	elseif string_match(filename, ".*_sh/[^/]+$") then
 		return "shared"
-	elseif string.match(filename, ".*_cl/[^/]+$") then
+	elseif string_match(filename, ".*_cl/[^/]+$") then
 		return "client"
 	else
 		error("Couldn't figure out the realm! " .. filename)

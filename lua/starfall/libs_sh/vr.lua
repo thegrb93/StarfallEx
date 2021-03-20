@@ -158,7 +158,7 @@ if CLIENT then
 
 	--- Returns the a controller's input state, may return boolean, number or vector.
 	-- @param string actionname ActionName to check control of, see the VR enums
-	-- @return any Boolean, Vector or Number of input
+	-- @return boolean|Vector|number Boolean, Vector or Number of input
 	-- @client
 	function vr_library.getInput(actionname)
 		checkluatype(actionname, TYPE_STRING)

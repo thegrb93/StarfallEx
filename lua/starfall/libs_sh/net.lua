@@ -161,7 +161,7 @@ end
 function net_library.writeTable(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
 	checkluatype(t, TYPE_TABLE)
-	
+
 	local str = util.Compress(SF.TableToString(t, instance))
 	write(net.WriteUInt, 32, #str, 32)
 	write(net.WriteData, #str*8, str, #str)

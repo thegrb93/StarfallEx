@@ -339,7 +339,7 @@ os_library.clock = os.clock
 -- @class function
 -- @param string format The format string. If starts with an '!', it will use UTC timezone rather than the local timezone
 -- @param number? time Time to use for the format. Default os.time()
--- @return any If format is equal to '*t' or '!*t' then it will return a table with DateData structure, otherwise a string
+-- @return string|table If format is equal to '*t' or '!*t' then it will return a table with DateData structure, otherwise a string
 os_library.date = function(format, time)
 	if format~=nil then
 		for v in string.gmatch(format, "%%(.?)") do if not string.match(v, "[%%aAbBcCdDSHeUmMjIpwxXzZyY]") then SF.Throw("Bad date format", 2) end end
@@ -787,7 +787,7 @@ instance.whitelistedEnvs = whitelistedEnvs
 --- Lua's setfenv
 -- Sets the environment of either the stack level or the function specified.
 -- Note that this function will throw an error if you try to use it on anything outside of your sandbox.
--- @param any funcOrStackLevel Function or stack level to set the environment of
+-- @param function|number funcOrStackLevel Function or stack level to set the environment of
 -- @param table tbl New environment
 -- @return function Function with environment set to tbl
 function builtins_library.setfenv(location, environment)
@@ -808,7 +808,7 @@ end
 --- Lua's getfenv
 -- Returns the environment of either the stack level or the function specified.
 -- Note that this function will return nil if the return value would be anything other than builtins_library or an environment you have passed to setfenv.
--- @param any funcOrStackLevel Function or stack level to get the environment of
+-- @param function|number funcOrStackLevel Function or stack level to get the environment of
 -- @return table? Environment table (or nil, if restricted)
 function builtins_library.getfenv(location)
 	if location == nil then
@@ -837,7 +837,7 @@ end
 
 --- GLua's debug.getinfo()
 -- Returns a DebugInfo structure containing the passed function's info https://wiki.facepunch.com/gmod/Structures/DebugInfo
--- @param any funcOrStackLevel Function or stack level to get info about. Defaults to stack level 0.
+-- @param function|number funcOrStackLevel Function or stack level to get info about. Defaults to stack level 0.
 -- @param string? fields A string that specifies the information to be retrieved. Defaults to all (flnSu).
 -- @return table DebugInfo table
 function builtins_library.debugGetInfo(funcOrStackLevel, fields)
@@ -853,7 +853,7 @@ end
 
 --- GLua's debug.getlocal()
 -- Returns the name of a function or stack's locals
--- @param any funcOrStackLevel Function or stack level to get info about. Defaults to stack level 0.
+-- @param function|number funcOrStackLevel Function or stack level to get info about. Defaults to stack level 0.
 -- @param number index The index of the local to get
 -- @return string The name of the local
 function builtins_library.debugGetLocal(funcOrStackLevel, index)

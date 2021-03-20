@@ -475,7 +475,7 @@ end
 
 --- Animates a hologram
 -- @shared
--- @param any animation number or string name. Does nothing if nil
+-- @param number|string animation Animation number or string name. Does nothing if nil
 -- @param number? frame Optional int (Default 0) The starting frame number. Does nothing if nil
 -- @param number? rate Optional float (Default 1) Frame speed. Does nothing if nil
 function hologram_methods:setAnimation(animation, frame, rate)

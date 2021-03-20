@@ -72,7 +72,8 @@ xinput_library.getStick = xinput.getStick
 -- @name xinput_library.getBatteryLevel
 -- @class function
 -- @param number id Controller number. Starts at 0
--- @return any If successful: a number between 0.0-1.0 inclusive. If unsuccessful: false, and a string error message
+-- @return number|boolean If successful: a number between 0.0-1.0 inclusive.
+-- @return string? If last return was a false boolean (errored), this will be the error message.
 xinput_library.getBatteryLevel = xinput.getBatteryLevel
 
 --- Gets all of the connected controllers.

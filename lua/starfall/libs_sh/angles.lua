@@ -48,7 +48,7 @@ local pyr = { p = 1, y = 2, r = 3, pitch = 1, yaw = 2, roll = 3 }
 
 --- Sets a value at a key in the angle
 -- @param Angle Ang
--- @param any Key
+-- @param number|string Key
 -- @param number Value
 function ang_meta.__newindex(t, k, v)
 	if pyr[k] then
@@ -61,7 +61,7 @@ end
 --- Gets a value at a key in the color
 -- Can be indexed with: 1, 2, 3, p, y, r, pitch, yaw, roll. 1,2,3 is most efficient.
 -- @param Angle Ang
--- @param any Key
+-- @param number|string Key
 -- @return number Value
 function ang_meta.__index(t, k)
 	local method = ang_methods[k]
@@ -81,8 +81,8 @@ function ang_meta.__tostring(a)
 end
 
 --- Multiplication metamethod
--- @param any a1 Number or Angle multiplicand.
--- @param any a2 Number or Angle multiplier.
+-- @param number|Angle a1 Number or Angle multiplicand.
+-- @param number|Angle a2 Number or Angle multiplier.
 -- @return Angle Resultant angle.
 function ang_meta.__mul(a, b)
 	if isnumber(b) then
@@ -99,8 +99,8 @@ function ang_meta.__mul(a, b)
 end
 
 --- Division metamethod
--- @param any a1 Number or Angle dividend.
--- @param any a2 Number or Angle divisor.
+-- @param number|Angle a1 Number or Angle dividend.
+-- @param number|Angle a2 Number or Angle divisor.
 -- @return Angle Resultant angle.
 function ang_meta.__div(a, b)
 	if isnumber(b) then

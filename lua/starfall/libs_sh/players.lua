@@ -417,7 +417,7 @@ end
 
 --- Gets the amount of ammo the player has.
 -- @shared
--- @param any idOrName The string ammo name or number id of the ammo
+-- @param string|number idOrName The string ammo name or number id of the ammo
 -- @return number The amount of ammo player has in reserve.
 function player_methods:getAmmoCount(id)
 	if not isnumber(id) and not isstring(id) then SF.ThrowTypeError("number or string", SF.GetType(id), 2) end
@@ -471,16 +471,16 @@ if SERVER then
 
 	--- Drops the players' weapon
 	-- @server
-	-- @param any weapon The weapon instance or class name of the weapon to drop
+	-- @param Weapon|string weapon The weapon instance or class name of the weapon to drop
 	-- @param Vector? target If set, launches the weapon at the given position
 	-- @param Vector? velocity If set and target is unset, launches the weapon with the given velocity
 	function player_methods:dropWeapon(weapon, target, velocity)
 		local ply = getply(self)
 		checkpermission(instance, ply, "player.dropweapon")
-		
+
 		if target~=nil then target = vunwrap(target) end
 		if velocity~=nil then velocity = vunwrap(velocity) end
-		
+
 		if isstring(weapon) then
 			ply:DropNamedWeapon(weapon, target, velocity)
 		else
@@ -488,7 +488,7 @@ if SERVER then
 			ply:DropWeapon(weapon, target, velocity)
 		end
 	end
-	
+
 	--- Returns the hitgroup where the player was last hit.
 	-- @server
 	-- @return number Hitgroup, see https://wiki.facepunch.com/gmod/Enums/HITGROUP
@@ -649,7 +649,7 @@ if CLIENT then
 	-- @param number? rate Optional float (Default 1), the playback rate of the animation
 	-- @param boolean? loop Optional boolean (Default false), should the animation loop
 	-- @param boolean? auto_advance Optional boolean (Default true), should the animation handle advancing itself
-	-- @param any? act Optional number or string name (Default sequence value), the activity the player should use
+	-- @param string?|number? act Optional number or string name (Default sequence value), the activity the player should use
 	function player_methods:setAnimation(seq, progress, rate, loop, auto_advance, act)
 		local ply = getply(self)
 		checkpermission(instance, ply, "entities.setPlayerRenderProperty")

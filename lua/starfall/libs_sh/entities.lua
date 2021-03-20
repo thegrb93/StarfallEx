@@ -1469,7 +1469,7 @@ end
 --- Gets a networked variable of an entity
 -- @shared
 -- @param string key The string key to get
--- @return any The object associated with that key or nil if it's not set
+-- @return any? The object associated with that key or nil if it's not set
 function ents_methods:getNWVar(key)
 	checkluatype(key, TYPE_STRING)
 	-- GetNW* returns whatever the key is tied to regardless of the function name
