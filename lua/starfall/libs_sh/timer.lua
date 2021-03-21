@@ -109,8 +109,8 @@ function timer_library.create(name, delay, reps, func)
 end
 
 --- Creates a simple timer, has no name, can't be stopped, paused, or destroyed.
--- @param number delay the time, in second, to set the timer to
--- @param function func the function to call when the timer is fired
+-- @param number delay The time, in second, to set the timer to
+-- @param function func The function to call when the timer is fired
 function timer_library.simple(delay, func)
 	checkluatype(delay, TYPE_NUMBER)
 	checkluatype(func, TYPE_FUNCTION)

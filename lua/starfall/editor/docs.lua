@@ -109,15 +109,16 @@ local generic_lua_types = {
 	["..."] = true,
 	["any"] = true,
 	["function"] = true,
+	["thread"] = true
 }
 
-local sf_types = SF.Types
+local sf_types = Docs.Types -- Get the types from documentation rather than the lua state
 
 local function valid_sftype(type1)
 	if sf_types[type1] or generic_lua_types[type1] then return true end
 
 	if string_find(type1, "|", 1, true) then
-		for _, match in next, type1:Split("|") do
+		for match in type1:gmatch("[^|]+") do
 			if not (sf_types[match] or generic_lua_types[match]) then
 				return false
 			end
@@ -219,11 +220,8 @@ local function parse(parsing, data)
 end
 
 local function scan(src, realm)
-	local linetbl = string.Explode("\r?\n", src, true)
-	local i = 0
-	local function lines() i=i+1 return linetbl[i] end
 	local parsing
-	for line in lines do
+	for line in src:gmatch("[^\n\r]+") do
 		if parsing then
 			local data = string_match(line, "^%s*%-%-%-*(.*)")
 			if data then

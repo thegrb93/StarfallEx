@@ -6,6 +6,7 @@ local checkluatype = SF.CheckLuaType
 -- @name Weapon
 -- @class type
 -- @libtbl weapon_methods
+-- @libtbl weapon_meta
 SF.RegisterType("Weapon", false, true, debug.getregistry().Weapon, "Entity")
 
 
@@ -15,8 +16,8 @@ local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check
 local weapon_methods, weapon_meta, wrap, unwrap = instance.Types.Weapon.Methods, instance.Types.Weapon, instance.Types.Weapon.Wrap, instance.Types.Weapon.Unwrap
 
 
---- Tostring metamethod
--- @return string String representation of the weapon
+--- Turns a weapon into a string.
+-- @return string String representing the weapon.
 function weapon_meta:__tostring()
 	local ent = unwrap(self)
 	if not ent then return "(null entity)"

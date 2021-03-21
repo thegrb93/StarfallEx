@@ -13,6 +13,7 @@ end
 -- @name Npc
 -- @class type
 -- @libtbl npc_methods
+-- @libtbl npc_meta
 SF.RegisterType("Npc", false, true, debug.getregistry().NPC, "Entity")
 
 return function(instance)
@@ -37,8 +38,8 @@ local function getnpc(self)
 	end
 end
 
---- tostring metamethod
--- @return string String representation of the npc
+--- Turns a NPC object into a string.
+-- @return string String representing the NPC.
 function npc_meta:__tostring()
 	local ent = unwrap(self)
 	if not ent then return "(null entity)"

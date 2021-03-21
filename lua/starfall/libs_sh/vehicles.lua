@@ -15,6 +15,7 @@ end
 -- @name Vehicle
 -- @class type
 -- @libtbl vehicle_methods
+-- @libtbl vehicle_meta
 SF.RegisterType("Vehicle", false, true, debug.getregistry().Vehicle, "Entity")
 
 return function(instance)
@@ -32,8 +33,8 @@ local function getveh(self)
 	end
 end
 
---- tostring metamethod
--- @return string String representation of the entity.
+--- Turns a vehicle into a string.
+-- @return string String representing the vehicle.
 function vehicle_meta:__tostring()
 	local ent = unwrap(self)
 	if not ent then return "(null entity)"

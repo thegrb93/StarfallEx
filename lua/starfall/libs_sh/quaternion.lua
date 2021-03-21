@@ -189,11 +189,11 @@ instance.Types.Quaternion.QuaternionMultiply = getQuatMul
 --- Creates a Quaternion
 -- @name builtins_library.Quaternion
 -- @class function
--- @param r R (real) component
--- @param i I component
--- @param j J component
--- @param k K component
--- @return Quaternion object
+-- @param number r R (real) component
+-- @param number i I component
+-- @param number j J component
+-- @param number k K component
+-- @return Quaternion Quaternion object
 function instance.env.Quaternion(r, i, j, k)
 	if r ~= nil then checkluatype(r, TYPE_NUMBER) else r = 0 end
 	if i ~= nil then checkluatype(i, TYPE_NUMBER) else i = 0 end
@@ -206,7 +206,9 @@ end
 
 local rijk = { r = 1, i = 2, j = 3, k = 4 }
 
---- newindex metamethod
+--- Newindex metamethod
+-- @param number|string Key
+-- @param number Value to set
 function quat_meta.__newindex(t, k, v)
 	if rijk[k] then
 		rawset(t, rijk[k], v)
@@ -237,9 +239,9 @@ function quat_meta.__newindex(t, k, v)
 	end
 end
 
---- index metamethod
+--- Index metamethod
 -- Can be indexed with: 1, 2, 3, 4, r, i, j, k, rr, ri, rj, rk, rrr, rijk, kjir, etc. Numerical lookup is the most efficient
--- @param number Key
+-- @param number|string Key
 -- @return number Found value
 function quat_meta.__index(t, k)
 	local method = quat_methods[k]
@@ -273,19 +275,19 @@ function quat_meta.__mul(lhs, rhs)
 		lhs = clone(lhs)
 		quatMulNum(lhs, rhs)
 		return lhs
-		
+
 	elseif isnumber(lhs) then -- N * Q
 		rhs = clone(rhs)
 		quatMulNum(rhs, lhs)
 		return rhs
 	end
-	
+
 	local lhs_meta = dgetmeta(lhs)
 	local rhs_meta = dgetmeta(rhs)
-	
+
 	if lhs_meta == quat_meta and rhs_meta == quat_meta then -- Q * Q
 		return wrap(getQuatMul(lhs, rhs))
-		
+
 	elseif lhs_meta == quat_meta and rhs_meta == vec_meta then -- Q * V
 		local lhs1, lhs2, lhs3, lhs4 = quatUnpack(lhs)
 		local rhs2, rhs3, rhs4 = rhs[1], rhs[2], rhs[3]
@@ -295,7 +297,7 @@ function quat_meta.__mul(lhs, rhs)
 			lhs1 * rhs3 + lhs4 * rhs2 - lhs2 * rhs4,
 			lhs1 * rhs4 + lhs2 * rhs3 - lhs3 * rhs2
 		})
-		
+
 	elseif lhs_meta == quat_meta then
 		checkluatype(rhs, TYPE_NUMBER)
 	else
