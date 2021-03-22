@@ -51,7 +51,7 @@ end)
 --- Creates a ParticleEmitter data structure
 -- @param Vector position The particle emitter's position
 -- @param boolean use3D Create the emitter in 3D mode
--- @return particleemitter ParticleEmitter Object
+-- @return ParticleEmitter ParticleEmitter Object
 function particle_library.create(position, use3D)
 	checkluatype(use3D, TYPE_BOOL)
 	checkpermission(instance, nil, "particle.create")

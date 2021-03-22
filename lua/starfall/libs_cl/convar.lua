@@ -27,7 +27,7 @@ end
 
 
 --- Check if the given ConVar exists
--- @param name Name of the ConVar
+-- @param string name Name of the ConVar
 -- @return boolean True if exists
 function convar_library.exists(name)
 	checkpermission(instance, nil, "convar")
@@ -73,8 +73,8 @@ function convar_library.getInt(name)
 end
 
 --- Returns value of the ConVar as a floating-point number.
--- @param name Name of the ConVar
--- @return The float value or 0 if converting fails
+-- @param string name Name of the ConVar
+-- @return number? The float value or 0 if converting fails
 function convar_library.getFloat(name)
 	return getValidConVar(name):GetFloat()
 end

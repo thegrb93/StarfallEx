@@ -761,7 +761,7 @@ if CLIENT then
 	--- Creates a mesh from vertex data.
 	-- @param table verteces Table containing vertex data. http://wiki.facepunch.com/gmod/Structures/MeshVertex
 	-- @param boolean? threaded Optional bool, use threading object that can be used to load the mesh over time to prevent hitting quota limit. The thread will yield with number of vertices remaining to be processed. After 0 is yielded, the final expensive phase starts.
-	-- @return mesh Mesh object
+	-- @return Mesh Mesh object
 	-- @client
 	function mesh_library.createFromTable(verteces, threaded)
 		checkpermission (instance, nil, "mesh")
@@ -829,13 +829,13 @@ if CLIENT then
 	end
 
 	--- Creates a mesh without any vertex data.
-	-- @return mesh Mesh object
+	-- @return Mesh Mesh object
 	-- @client
 	function mesh_library.createEmpty()
 		checkpermission(instance, nil, "mesh")
-		
+
 		plyMeshCount:use(instance.player, 1)
-		
+
 		local mesh = Mesh()
 		meshData[mesh] = { ntriangles = 0 }
 		return wrap(mesh)
@@ -909,27 +909,27 @@ if CLIENT then
 		[MATERIAL_TRIANGLE_STRIP] = function(count) return count end
 	}
 	--- Generates mesh data. If an Mesh object is passed, it will populate that mesh with the data. Otherwise, it will render directly to renderer.
-	-- @param mesh? mesh_obj Optional Mesh object, mesh to build. (default: nil)
+	-- @param Mesh? mesh_obj Optional Mesh object, mesh to build. (default: nil)
 	-- @param number prim_type Int, primitive type, see MATERIAL
 	-- @param number prim_count Int, the amount of primitives
 	-- @param function func The function provided that will generate the mesh vertices
 	-- @client
 	function mesh_library.generate(mesh_obj, prim_type, prim_count, func)
 		if meshgenerating then SF.Throw("Dynamic mesh was already started.", 2) end
-		
+
 		checkpermission(instance, nil, "mesh")
-		
+
 		checkluatype(prim_type, TYPE_NUMBER)
 		checkluatype(prim_count, TYPE_NUMBER)
 		checkluatype(func, TYPE_FUNCTION)
-		
+
 		local prim_trifunc = prim_triangles[prim_type]
 		if not prim_trifunc then SF.Throw("Invalid Primitive.", 2) end
-		
+
 		if prim_count<1 then SF.Throw("Can't generate with less than 1 primitive", 2) end
 		if prim_count>8192 then SF.Throw("Can't generate more than 8192 primitives", 2) end
 		prim_count = math.floor(prim_count)
-		
+
 		local tri_count = math.max(1, math.ceil(prim_trifunc(prim_count)))
 		if mesh_obj == nil then
 			if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end 
@@ -947,13 +947,13 @@ if CLIENT then
 			meshgenerating = mesh_obj
 			mesh.Begin(mesh_obj, prim_type, prim_count)
 		end
-		
+
 		local ok, err = pcall(func)
 		mesh.End()
 		meshgenerating = false
 		if not ok then SF.Throw(err, 2) end
 	end
-	
+
 	--- Sets the vertex color by RGBA values
 	-- @param number r Number, red value
 	-- @param number g Number, green value
@@ -963,21 +963,21 @@ if CLIENT then
 	function mesh_library.writeColor(r, g, b, a)
 		mesh.Color(r, g, b, a)
 	end
-	
+
 	--- Sets the vertex normal
 	-- @param Vector normal Normal
 	-- @client
 	function mesh_library.writeNormal(normal)
 		mesh.Normal(vunwrap(normal))
 	end
-	
+
 	--- Sets the vertex position
 	-- @param Vector position Position
 	-- @client
 	function mesh_library.writePosition(pos)
 		mesh.Position(vunwrap(pos))
 	end
-	
+
 	--- Sets the vertex texture coordinates
 	-- @param number stage Stage of the texture coordinate
 	-- @param number u U coordinate
@@ -986,7 +986,7 @@ if CLIENT then
 	function mesh_library.writeUV(stage, u, v)
 		mesh.TexCoord(stage, u, v)
 	end
-	
+
 	--- Sets the vertex tangent user data
 	-- @param number x x
 	-- @param number y y
@@ -996,7 +996,7 @@ if CLIENT then
 	function mesh_library.writeUserData(x, y, z, handedness)
 		mesh.UserData(x, y, z, handedness)
 	end
-	
+
 	--- Draws a quad using 4 vertices
 	-- @param Vector v1 Vertex1 position
 	-- @param Vector v2 Vertex2 position
@@ -1006,7 +1006,7 @@ if CLIENT then
 	function mesh_library.writeQuad(v1, v2, v3, v4)
 		mesh.Quad(vunwrap(v1), vunwrap(v2), vunwrap(v3), vunwrap(v4))
 	end
-	
+
 	--- Draws a quad using a position, normal and size
 	-- @param Vector position
 	-- @param Vector normal
@@ -1016,13 +1016,13 @@ if CLIENT then
 	function mesh_library.writeQuadEasy(position, normal, w, h)
 		mesh.QuadEasy(vunwrap(position), vunwrap(normal), w, h)
 	end
-	
+
 	--- Pushes the vertex data onto the render stack
 	-- @client
 	function mesh_library.advanceVertex()
 		mesh.AdvanceVertex()
 	end
-	
+
 	--- Draws the mesh. Must be in a 3D rendering context.
 	-- @client
 	function mesh_methods:draw()

@@ -13,20 +13,20 @@ SF.RegisterLibrary("vr")
 --- Called when a player enters VR
 -- @name VRStart
 -- @class hook
--- @param ply Player entering VR
+-- @param Player ply Player entering VR
 SF.hookAdd("VRMod_Start", "vrstart")
 
 --- Called when a player exits VR
 -- @name VRExit
 -- @class hook
--- @param ply Player exiting VR
+-- @param Player ply Player exiting VR
 SF.hookAdd("VRMod_Exit", "vrexit")
 
 if CLIENT then
 	--- This gets called every time a boolean controller input action changes state
 	-- @name VRInput
 	-- @class hook
-	-- @param actionname Name of the input
+	-- @param string actionname Name of the input
 	-- @param boolean State of the input
 	-- @client
 	SF.hookAdd("VRMod_Input", "vrinput")

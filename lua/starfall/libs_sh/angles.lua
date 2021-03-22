@@ -202,14 +202,14 @@ function ang_methods:round(idp)
 end
 
 --- Copies p,y,r from angle and returns a new angle
--- @return The copy of the angle
+-- @return Angle The copy of the angle
 function ang_methods:clone()
 	return wrap({ self[1], self[2], self[3] })
 end
 
 --- Copies p,y,r from angle to another.
 -- Self-Modifies. Does not return anything
--- @param b The angle to copy from.
+-- @param Angle b The angle to copy from.
 function ang_methods:set(b)
 	self[1] = b[1]
 	self[2] = b[2]

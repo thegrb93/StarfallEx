@@ -234,7 +234,7 @@ end
 
 --- Gets whether the cursor is visible on the screen
 -- @client
--- @return The cursor's visibility
+-- @return boolean The cursor's visibility
 function input_library.getCursorVisible()
 	checkpermission(instance, nil, "input")
 

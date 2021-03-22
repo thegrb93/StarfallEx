@@ -242,18 +242,18 @@ function constraint_library.ballsocketadv(e1, e2, bone1, bone2, v1, v2, force_li
 end
 
 --- Elastic constraint between two entities
--- @param index Index of the elastic constraint
--- @param e1 The first entity
--- @param e2 The second entity
--- @param bone1 Number bone of the first entity
--- @param bone2 Number bone of the second entity
--- @param v1 Position on the first entity, in its local space coordinates
--- @param v2 Position on the second entity, in its local space coordinates
--- @param const Constant of the constraint. Default = 1000
--- @param damp Damping of the constraint. Default = 100
--- @param rdamp Rotational damping of the constraint. Default = 0
--- @param width Width of the created constraint
--- @param strech True to mark as strech-only
+-- @param number index Index of the elastic constraint
+-- @param Entity e1 The first entity
+-- @param Entity e2 The second entity
+-- @param number? bone1 Number bone of the first entity. Default 0
+-- @param number? bone2 Number bone of the second entity. Default 0
+-- @param Vector v1 Position on the first entity, in its local space coordinates
+-- @param Vector v2 Position on the second entity, in its local space coordinates
+-- @param number? const Constant of the constraint. Default 1000
+-- @param number? damp Damping of the constraint. Default 100
+-- @param number? rdamp Rotational damping of the constraint. Default 0
+-- @param number? width Width of the created constraint. Default 0
+-- @param boolean? strech True to mark as strech-only. Default false
 -- @server
 function constraint_library.elastic(index, e1, e2, bone1, bone2, v1, v2, const, damp, rdamp, width, strech)
 	plyCount:checkuse(instance.player, 1)

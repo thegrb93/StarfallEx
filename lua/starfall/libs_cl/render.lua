@@ -1465,7 +1465,7 @@ end
 --- Constructs a markup object for quick styled text drawing.
 -- @param string str The markup string to parse
 -- @param number? maxsize The max width of the markup. Default nil
--- @return markup The markup object. See https://wiki.facepunch.com/gmod/markup.Parse
+-- @return Markup The markup object. See https://wiki.facepunch.com/gmod/markup.Parse
 function render_library.parseMarkup(str, maxsize)
 	checkluatype (str, TYPE_STRING)
 	if maxsize~=nil then checkluatype (maxsize, TYPE_NUMBER) end

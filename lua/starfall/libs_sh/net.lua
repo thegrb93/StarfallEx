@@ -84,7 +84,7 @@ end
 
 --- Send a net message from client->server, or server->client.
 -- @shared
--- @param any? target Optional target location to send the net message. Entity or table of targets
+-- @param entity?|table? target Optional target location to send the net message. Entity or table of targets. If nil, sends to server on client
 -- @param boolean? unreliable Optional choose whether it's more important for the message to actually reach its destination (false) or reach it as fast as possible (true).
 function net_library.send(target, unreliable)
 	if target~=nil then checkluatype(target, TYPE_TABLE) end

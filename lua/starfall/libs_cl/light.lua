@@ -104,7 +104,7 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 -- @param number size The size of the light. Must be lower than sf_light_maxsize
 -- @param number brightness The brightness of the light
 -- @param Color color The color of the light
--- @return light Dynamic light
+-- @return Light Dynamic light
 function light_library.create(pos, size, brightness, color)
 	if table.Count(lights) >= 256 then SF.Throw("Too many lights have already been allocated (max 256)", 2) end
 	if maxSize:GetFloat() == 0 then SF.Throw("sf_light_maxsize is set to 0", 2) end

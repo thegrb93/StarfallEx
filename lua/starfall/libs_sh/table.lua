@@ -42,8 +42,8 @@ table_library.concat = table.concat
 
 --- Empties the target table, and merges all values from the source table into it.
 -- @class function
--- @param target source The table to copy from
--- @param target target The table to write to
+-- @param table source The table to copy from
+-- @param table target The table to write to
 table_library.copyFromTo = table.CopyFromTo
 
 --- Counts the amount of keys in a table. This should only be used when a table is not numerically and sequentially indexed, for those table consider # operator

@@ -257,7 +257,7 @@ end
 -- @class hook
 -- @server
 -- @param Entity physgun Entity of the physgun
--- @param physobj physobj PhysObj of the entity
+-- @param PhysObj physobj PhysObj of the entity
 -- @param Entity ent Entity being frozen
 -- @param Player ply Player freezing the entity
 

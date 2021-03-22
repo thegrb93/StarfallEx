@@ -153,8 +153,8 @@ math_library.easeInOut = math.EaseInOut
 
 --- Returns the x power of the Euler constant.
 -- @class function
--- @param x The exponent of the function
--- @return e to the specific power
+-- @param number x The exponent of the function
+-- @return number e to the specific power
 math_library.exp = math.exp
 
 --- Rounds a number down.

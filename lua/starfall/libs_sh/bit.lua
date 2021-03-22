@@ -604,7 +604,7 @@ bit_library.tohex = bit.tohex
 -- @param string stream String to set the initial buffer to (default "")
 -- @param number i The initial buffer pointer (default 1)
 -- @param string endian The endianness of number types. "big" or "little" (default "little")
--- @return stringstream StringStream object
+-- @return StringStream StringStream object
 bit_library.stringstream = SF.StringStream
 
 --- Converts a table to string serializing data types as best as it can
