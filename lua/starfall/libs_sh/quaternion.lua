@@ -765,6 +765,7 @@ end
 
 -------------------------------------
 
+
 --- Converts vector to quaternion
 -- @param Vector up Upward direction. If specified, the original vector will act like a forward pointing one
 -- @return Quaternion Quaternion from the given vector

@@ -55,7 +55,7 @@ end
 --- Does a line trace
 -- @param Vector start Start position
 -- @param Vector endpos End position
--- @param entity?|table?|function? filter Entity/array of entities to filter, or a function callback with an entity arguement that returns whether the trace should hit
+-- @param Entity?|table?|function? filter Entity/array of entities to filter, or a function callback with an entity arguement that returns whether the trace should hit
 -- @param number? mask Trace mask
 -- @param number? colgroup The collision group of the trace
 -- @param boolean? ignworld Whether the trace should ignore world
@@ -89,7 +89,7 @@ end
 -- @param Vector endpos End position
 -- @param Vector minbox Lower box corner
 -- @param Vector maxbox Upper box corner
--- @param entity?|table?|function? filter Entity/array of entities to filter, or a function callback with an entity arguement that returns whether the trace should hit
+-- @param Entity?|table?|function? filter Entity/array of entities to filter, or a function callback with an entity arguement that returns whether the trace should hit
 -- @param number? mask Trace mask
 -- @param number? colgroup The collision group of the trace
 -- @param boolean? ignworld Whether the trace should ignore world
@@ -123,26 +123,26 @@ function trace_library.traceHull(start, endpos, minbox, maxbox, filter, mask, co
 end
 
 --- Does a ray box intersection returning the position hit, normal, and trace fraction, or nil if not hit.
---@param vector rayStart The origin of the ray
---@param vector rayDelta The direction and length of the ray
---@param vector boxOrigin The origin of the box
---@param angle boxAngles The box's angles
---@param vector boxMins The box min bounding vector
---@param vector boxMaxs The box max bounding vector
---@return vector? Hit position or nil if not hit
---@return vector? Hit normal or nil if not hit
---@return number? Hit fraction or nil if not hit
+-- @param Vector rayStart The origin of the ray
+-- @param Vector rayDelta The direction and length of the ray
+-- @param Vector boxOrigin The origin of the box
+-- @param Angle boxAngles The box's angles
+-- @param Vector boxMins The box min bounding vector
+-- @param Vector boxMaxs The box max bounding vector
+-- @return Vector? Hit position or nil if not hit
+-- @return Vector? Hit normal or nil if not hit
+-- @return number? Hit fraction or nil if not hit
 function trace_library.intersectRayWithOBB(rayStart, rayDelta, boxOrigin, boxAngles, boxMins, boxMaxs)
 	local pos, normal, fraction = util.IntersectRayWithOBB(vunwrap(rayStart), vunwrap(rayDelta), vunwrap(boxOrigin), aunwrap(boxAngles), vunwrap(boxMins), vunwrap(boxMaxs))
 	if pos then return vwrap(pos), vwrap(normal), fraction end
 end
 
 --- Does a ray plane intersection returning the position hit or nil if not hit
---@param vector rayStart The origin of the ray
---@param vector rayDelta The direction and length of the ray
---@param vector planeOrigin The origin of the plane
---@param vector planeNormal The normal of the plane
---@return vector? Hit position or nil if not hit
+-- @param Vector rayStart The origin of the ray
+-- @param Vector rayDelta The direction and length of the ray
+-- @param Vector planeOrigin The origin of the plane
+-- @param Vector planeNormal The normal of the plane
+-- @return Vector? Hit position or nil if not hit
 function trace_library.intersectRayWithPlane(rayStart, rayDelta, planeOrigin, planeNormal)
 	local pos = util.IntersectRayWithPlane(vunwrap(rayStart), vunwrap(rayDelta), vunwrap(planeOrigin), vunwrap(planeNormal))
 	if pos then return vwrap(pos) end
@@ -152,7 +152,7 @@ end
 -- @param string name The decal name, see https://wiki.facepunch.com/gmod/util.Decal
 -- @param Vector start Start position
 -- @param Vector endpos End position
--- @param entity?|table? filter (Optional) Entity/array of entities to filter
+-- @param Entity?|table? filter (Optional) Entity/array of entities to filter
 function trace_library.decal(name, start, endpos, filter)
 	checkpermission(instance, nil, "trace.decal")
 	checkluatype(name, TYPE_STRING)

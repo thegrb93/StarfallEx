@@ -64,7 +64,7 @@ end
 -- @param string name Name of the particle effect
 -- @param number pattach PATTACH enum
 -- @param table options Table of options
--- @return particleeffect ParticleEffect type.
+-- @return ParticleEffect ParticleEffect type.
 function particleef_library.attach(entity, name, pattach, options)
 	checkpermission(instance, entity, "particleEffect.attach")
 

@@ -826,7 +826,7 @@ function ents_methods:setUnbreakable(on)
 end
 
 --- Check if the given Entity or Vector is within this entity's PVS (Potentially Visible Set). See: https://developer.valvesoftware.com/wiki/PVS
--- @param entity|Vector other Entity or Vector to test
+-- @param Entity|Vector other Entity or Vector to test
 -- @return boolean If the Entity/Vector is within the PVS
 function ents_methods:testPVS(other)
 	local ent = getent(self)

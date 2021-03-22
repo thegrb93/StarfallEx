@@ -11,8 +11,18 @@ local curfile
 local methodstolib = {}
 local members = {}
 
-local string_match, string_find = string.match, string.find
+local string_match, string_find, string_sub = string.match, string.find, string.sub
 
+local typedAttributes = {
+	["class"] = true,
+	["name"] = true,
+	["libtbl"] = true
+}
+
+-- @class <x>
+local typedTypes = {
+	["type"] = true
+}
 
 local function processMembers()
 	for k, data in ipairs(members) do
@@ -76,7 +86,10 @@ local processTypes = {
 		members[#members+1] = data
 	end
 }
-local function process(data, nextline)
+
+local function process(data, nextline, type_only, line_n)
+	if type_only and not typedTypes[data.class] then return end
+
 	if not data.class then
 		if string_find(nextline, "function", 1, true) then
 			data.class = "function"
@@ -95,7 +108,7 @@ local function process(data, nextline)
 	local processFunc = processTypes[data.class]
 	if processFunc then
 		data.description = table.concat(data.description, "\n")
-		processFunc(data, nextline)
+		processFunc(data, nextline, line_n)
 	else
 		ErrorNoHalt("Invalid doc class (" .. data.class .. ") in file: " .. curfile .. "\n")
 	end
@@ -118,8 +131,10 @@ local function valid_sftype(type1)
 	if sf_types[type1] or generic_lua_types[type1] then return true end
 
 	if string_find(type1, "|", 1, true) then
-		for match in type1:gmatch("[^|]+") do
-			if not (sf_types[match] or generic_lua_types[match]) then
+		for str in type1:gmatch("[^|]+") do
+			str = (str:match("(.-)%?") or str) -- In case there's nullable stuff in there.
+			-- We shouldn't use variadics in an or statement (instead just use the variadics or an any type)
+			if not (sf_types[str] or generic_lua_types[str]) then
 				return false
 			end
 		end
@@ -204,12 +219,15 @@ local parseAttributes = {
 		end
 	end
 }
-local function parse(parsing, data)
+
+local function parse(parsing, data, type_only, line_n)
 	local attribute, value = string_match(data, "^%s*@(%w+)%s*(.*)")
+
 	if attribute then
+		if type_only and not typedAttributes[attribute] then return end
 		local parser = parseAttributes[attribute]
 		if parser then
-			parser(parsing, value)
+			parser(parsing, value, line_n)
 		else
 			ErrorNoHalt("Invalid attribute (" .. attribute .. ") in file: " .. curfile .. "\n")
 		end
@@ -219,18 +237,36 @@ local function parse(parsing, data)
 	end
 end
 
-local function scan(src, realm)
+local function get_lines(self)
+    local result = {}
+    local from, line_n = 1, 0
+    local delim_from, delim_to = string_find( self, "\r?\n", from  )
+    while delim_from do
+      local str = string_sub( self, from , delim_from-1 )
+      from = delim_to + 1
+      line_n = line_n + 1
+      result[line_n] = str
+      delim_from, delim_to = string_find( self, "\r?\n", from  )
+    end
+    result[line_n+1] = string_sub( self, from  )
+    return result
+end
+--- Scan function
+-- @param string src Source code
+-- @param string file_name Source file name.
+-- @param boolean type_only Whether to only parse types / classes.
+local function scan(src, realm, type_only)
+	-- https://github.com/thegrb93/StarfallEx/blob/master/lua/starfall/...
+	local file_path = string_match(curfile, "%.%./lua/starfall/(libs_.+/.*)") -- libs_sh/... path that will be used for links with [src] on the sfhelper to the github.
 	local parsing
-	for line in src:gmatch("[^\n\r]+") do
+
+	for line_n, line in next, get_lines(src) do
 		if parsing then
 			local data = string_match(line, "^%s*%-%-%-*(.*)")
 			if data then
-				parse(parsing, data)
+				parse(parsing, data, type_only, line_n)
 			else
-				while line and not string_find(line, "%S") do -- Find next non-empty line
-					line = lines()
-				end
-				process(parsing, line or "")
+				process(parsing, line or "", type_only, line_n)
 				parsing = nil
 				if line == nil then break end
 			end
@@ -240,7 +276,8 @@ local function scan(src, realm)
 			if desc then
 				parsing = {
 					description = {desc},
-					realm = realm
+					realm = realm,
+					path = file_path.."#L"..line_n
 				}
 			end
 		end
@@ -259,10 +296,20 @@ local function realm(filename)
 	end
 end
 
+
+-- First, go over all of the types so we have them in Docs.Types ready for typed docs.
 for name, mod in pairs(SF.Modules) do
 	for filename, data in pairs(mod) do
 		curfile = filename
-		scan(data.source, realm(filename))
+		scan(data.source, realm(filename), true)
+	end
+end
+
+-- Then, make the rest of the docs.
+for name, mod in pairs(SF.Modules) do
+	for filename, data in pairs(mod) do
+		curfile = filename
+		scan(data.source, realm(filename), false)
 		data.source = nil
 	end
 end
