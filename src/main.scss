@@ -257,6 +257,21 @@ code {
 {
   white-space: pre-line;
 }
+.sf-src {
+  color: #ffffff;
+  font-weight: bold;
+  float: right;
+  text-align: right;
+  font-size: 15px;
+}
+.sf-reference {
+  color: #059de3;
+  font-weight: bold;
+  text-decoration: none;
+}
+.sf-paramname {
+  font-weight: bold;
+}
 .card-contributors
 {
   padding-left: 60px;

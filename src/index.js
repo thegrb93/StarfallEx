@@ -16,7 +16,7 @@ if (!Object.entries) {
         resArray = new Array(i); // preallocate the Array
     while (i--)
       resArray[i] = [ownProps[i], obj[ownProps[i]]];
-    
+
     return resArray;
   };
 }
@@ -27,7 +27,7 @@ if (!String.prototype.includes) {
 
     if (search instanceof RegExp) {
       throw TypeError('first argument must not be a RegExp');
-    } 
+    }
     if (start === undefined) { start = 0; }
     return this.indexOf(search, start) !== -1;
   };
@@ -41,7 +41,7 @@ const SF_DOC = {
         {
             path = parent + "." + name;
         }
-        
+
         data._path = path;
         data._children = [];
         data._class = type;
@@ -64,7 +64,7 @@ const SF_DOC = {
             class: type
         }
         pages[path.toLowerCase()] = page;
-        
+
         if(parent !== "")
         {
             pages[parent.toLowerCase()].data._children.push(data);
@@ -90,8 +90,9 @@ const SF_DOC = {
                 name: lib.name,
                 realm: lib.realm,
                 description: lib.description,
+                ghpath: lib.path,
             };
-            
+
             SF_DOC.AddPage(lib.name, "library", "realm", lib.realm, libData, "Libraries");
 
             const path = "Libraries."+lib.name
@@ -104,6 +105,7 @@ const SF_DOC = {
                     parameters: method.params ?? [],
                     returns: method.returns ?? [],
                     parent: lib.name,
+                    ghpath: method.path,
                     type: "library",
                 }
                 SF_DOC.AddPage(method.name, "method", "method-realm", method.realm, methodData, path);
@@ -117,6 +119,7 @@ const SF_DOC = {
                     description: table.description,
                     fields: table.fields ?? [],
                     parent: lib.name,
+                    ghpath: table.path,
                     type: "table",
                 }
                 SF_DOC.AddPage(table.name, "table", "table-realm", table.realm, tableData, path);
@@ -130,7 +133,8 @@ const SF_DOC = {
                 realm: hook.realm,
                 description: hook.description,
                 parameters: hook.params ?? [],
-                returns: hook.returns ?? []
+                returns: hook.returns ?? [],
+                ghpath: hook.path,
             }
             SF_DOC.AddPage(hook.name, "hook", "realm", hook.realm, hookData, "Hooks");
         }
@@ -146,8 +150,9 @@ const SF_DOC = {
                 name: t.name,
                 realm: t.realm,
                 description: t.description,
+                ghpath: t.path,
             }
-            
+
             SF_DOC.AddPage(t.name, "type", "realm", t.realm, typeData, "Types");
 
             const path = "Types."+t.name
@@ -161,6 +166,7 @@ const SF_DOC = {
                     returns: method.returns ?? [],
                     parent: t.name,
                     type: "type",
+                    ghpath: method.path,
                 }
                 SF_DOC.AddPage(method.name, "method", "realm", method.realm, methodData, path);
             }
