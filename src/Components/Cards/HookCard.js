@@ -6,10 +6,10 @@ import getGitSourceLink from '../../Modules/Links';
 export default function HookCard(props)
 {
     let callParams = props.parameters.map((x, index) =>
-        <pre>
+        <div>
             {getElementsFromType(x.type)} {x.name}
             {index === props.parameters.length - 1 ? "" : ",\xa0"}
-        </pre>
+        </div>
     )
 
     const titlePart = (
@@ -20,14 +20,12 @@ export default function HookCard(props)
     );
     let paramPart = null;
     const paramList = props.parameters.map(x =>
-        (
-            <li key={x.name}>
-                {getElementsFromType(x.type)} <span className="sf-paramname">{x.name}</span>
-                <ul>
-                    <span className="accept-newlines">{x.description}</span>
-                </ul>
-            </li>
-        )
+        <li key={x.name}>
+            {getElementsFromType(x.type)} <span className="sf-paramname">{x.name}</span>
+            <ul>
+                <span className="accept-newlines">{x.description}</span>
+            </ul>
+        </li>
     );
     if(paramList.length > 0)
     {

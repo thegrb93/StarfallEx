@@ -10,7 +10,7 @@ export default function LibraryCard(props)
                 <Icon type="realm" value={props.realm} />
                 {props.name}
             </h1>
-            <a className="sf-src" href={getGitSourceLink(props.ghpath)}>[src]</a>
+            <a className="sf-src" href={getGitSourceLink(props)}>[src]</a>
 
             <p className="accept-newlines">
                 {props.description}

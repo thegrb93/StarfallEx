@@ -6,10 +6,10 @@ import getGitSourceLink from '../../Modules/Links';
 export default function MethodCard(props)
 {
     let callParams = props.parameters.map((x, index) =>
-        <pre>
+        <div>
             {getElementsFromType(x.type)} {x.name}
             {index === props.parameters.length - 1 ? "" : ",\xa0"}
-        </pre>
+        </div>
     )
     let is_library = props.type==="library";
     let parentName = props.parent;
