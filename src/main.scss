@@ -39,11 +39,10 @@ code {
   {
     margin-left: 20px;
   }
-  .card-title
+  .card-title *
   {
-    display: flex;
-    align-items: center;
-  } 
+    display: inline-block;
+  }
 }
 
 .sidebar
