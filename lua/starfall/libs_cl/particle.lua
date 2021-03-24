@@ -76,8 +76,8 @@ end
 -- @param number endLength Sets the length of the particle that it will reach when it dies.
 -- @param number startAlpha Sets the initial alpha value of the particle.
 -- @param number endAlpha Sets the alpha value of the particle that it will reach when it dies.
--- @param number dieTime Sets the time where the particle will be removed.
--- @return particle A Particle object
+-- @param number dieTime Sets the time where the particle will be removed. (0-60)
+-- @return Particle A Particle object
 function particleem_methods:add(material, position, startSize, endSize, startLength, endLength, startAlpha, endAlpha, dieTime)
 	self = peunwrap(self)
 	if not emitters[self] then SF.Throw("Tried to use invalid emitter!", 2) end
@@ -174,11 +174,13 @@ function particleem_methods:setNoDraw(noDraw)
 	peunwrap(self):SetNoDraw(noDraw)
 end
 
---- The function name has not much in common with its actual function, it applies a radius to every particles that affects the building of the bounding box, as it, usually is constructed by the particle that has the lowest x, y and z and the highest x, y and z, this function just adds/subtracts the radius and inflates the bounding box.
--- @param number radius
+--- The function name has not much in common with its actual function.
+-- It applies a radius to every particles that affects the building of the bounding box, as it usually is constructed by the particle that has the lowest x, y and z and the highest x, y and z.
+-- This function just adds/subtracts the radius and inflates the bounding box.
+-- @param number radius Particle radius
 function particleem_methods:setParticleCullRadius(radius)
 	checkluatype(radius, TYPE_NUMBER)
-	peunwrap(self):SetPos(vunwrap(position))
+	peunwrap(self):SetParticleCullRadius(radius)
 end
 
 --- Sets the position of the particle emitter.
@@ -186,8 +188,6 @@ end
 function particleem_methods:setPos( position )
 	 peunwrap(self):SetPos(vunwrap(position))
 end
-
-
 
 
 --- Returns the current orientation of the particle.

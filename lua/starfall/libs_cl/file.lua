@@ -176,7 +176,7 @@ local file_methods, file_meta, wrap, unwrap = instance.Types.File.Methods, insta
 --- Opens and returns a file
 -- @param string path Filepath relative to data/sf_filedata/.
 -- @param string mode The file mode to use. See lua manual for explaination
--- @return File File object or nil if it failed
+-- @return File? File object or nil if it failed
 function file_library.open(path, mode)
 	checkpermission (instance, path, "file.open")
 	checkluatype (path, TYPE_STRING)

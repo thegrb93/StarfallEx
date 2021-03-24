@@ -79,7 +79,7 @@ if SERVER then
 	end
 
 	--- Strips weapons of the driver
-	-- @param string class Optional weapon class to strip. Otherwise all are stripped.
+	-- @param string? class Optional weapon class to strip. Otherwise all are stripped.
 	-- @server
 	function vehicle_methods:stripDriver(class)
 		if class ~= nil then checkluatype(class, TYPE_STRING) end

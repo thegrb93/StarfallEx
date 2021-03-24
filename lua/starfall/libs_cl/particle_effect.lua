@@ -237,16 +237,16 @@ end
 
 --- Sets the parent for given control point.
 -- @param number id Child Control Point ID (0-63)
--- @param number parentid Parent
-function particleef_methods:setControlPointParent(id,value)
+-- @param number parentid Parent control point ID (0-63)
+function particleef_methods:setControlPointParent(id,parentid)
 	local uw = unwrap(self)
 
 	checkluatype (id, TYPE_NUMBER)
-	checkluatype (value, TYPE_NUMBER)
+	checkluatype (parentid, TYPE_NUMBER)
 
 	checkValid(uw)
 
-	uw:SetControlPointParent(id,value)
+	uw:SetControlPointParent(id,parentid)
 
 end
 

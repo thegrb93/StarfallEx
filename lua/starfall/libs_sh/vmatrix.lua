@@ -25,7 +25,7 @@ end
 --- Returns a new VMatrix
 -- @name builtins_library.Matrix
 -- @class function
--- @param table Optional data to initialize the Matrix with.
+-- @param table? Optional data to initialize the Matrix with.
 -- @return VMatrix New VMatrix
 function instance.env.Matrix(t)
 	return wrap(Matrix(t))
@@ -173,22 +173,7 @@ function vmatrix_methods:clone()
 end
 
 --- Returns all 16 fields of the matrix in row-major order
--- @return number [1, 1]
--- @return number [1, 2]
--- @return number [1, 3]
--- @return number [1, 4]
--- @return number [2, 1]
--- @return number [2, 2]
--- @return number [2, 3]
--- @return number [2, 4]
--- @return number [3, 1]
--- @return number [3, 2]
--- @return number [3, 3]
--- @return number [3, 4]
--- @return number [4, 1]
--- @return number [4, 2]
--- @return number [4, 3]
--- @return number [4, 4]
+-- @return ...number The 16 fields
 function vmatrix_methods:unpack()
 	return unwrap(self):Unpack()
 end
@@ -331,18 +316,24 @@ function vmatrix_methods:getAxisAngle()
 end
 
 --- Adds two matrices (why would you do this?)
+-- @param VMatrix lhs Initial Matrix
+-- @param VMatrix rhs Matrix to add to the first
 -- @return VMatrix Added matrix
 function vmatrix_meta.__add(lhs, rhs)
 	return wrap(unwrap(lhs) + unwrap(rhs))
 end
 
 --- Subtracts two matrices (why would you do this?)
+-- @param VMatrix lhs Initial Matrix
+-- @param VMatrix rhs Matrix to subtract from the first
 -- @return VMatrix Subtracted matrix
 function vmatrix_meta.__sub(lhs, rhs)
 	return wrap(unwrap(lhs) - unwrap(rhs))
 end
 
---- Multiplies two matrices
+--- Multiplies two matrices (Left must be a VMatrix)
+-- @param VMatrix lhs Matrix multiplicand
+-- @param VMatrix|Vector rhs Matrix or Vector multiplier
 -- @return VMatrix Result matrix
 function vmatrix_meta.__mul(lhs, rhs)
 	local rhsmeta = dgetmeta(rhs)

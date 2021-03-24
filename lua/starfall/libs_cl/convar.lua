@@ -19,7 +19,7 @@ local convar_library = instance.Libraries.convar
 local function getValidConVar(name)
 	checkpermission(instance, nil, "convar")
 	checkluatype(name, TYPE_STRING)
-	
+
 	local cvar = GetConVar(name)
 	if not cvar then SF.Throw("Trying to access non-existent ConVar", 3) end
 	return cvar
@@ -74,7 +74,7 @@ end
 
 --- Returns value of the ConVar as a floating-point number.
 -- @param string name Name of the ConVar
--- @return number? The float value or 0 if converting fails
+-- @return number The float value or 0 if converting fails
 function convar_library.getFloat(name)
 	return getValidConVar(name):GetFloat()
 end

@@ -371,7 +371,7 @@ function builtins_library.getLibraries()
 end
 
 --- Set the value of a table index without invoking a metamethod
--- @param table The table to modify
+-- @param table tbl The table to modify
 -- @param any key The index of the table
 -- @param any value The value to set the index equal to
 function builtins_library.rawset(table, key, value)

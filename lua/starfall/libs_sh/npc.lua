@@ -93,7 +93,7 @@ if SERVER then
 
 	--- Gives the npc a weapon
 	-- @server
-	-- @param Weapon wep The classname of the weapon
+	-- @param string wep The classname of the weapon
 	function npc_methods:giveWeapon(wep)
 		checkluatype(wep, TYPE_STRING)
 
