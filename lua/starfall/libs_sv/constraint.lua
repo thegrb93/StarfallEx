@@ -253,9 +253,9 @@ end
 -- @param number? damp Damping of the constraint. Default 100
 -- @param number? rdamp Rotational damping of the constraint. Default 0
 -- @param number? width Width of the created constraint. Default 0
--- @param boolean? strech True to mark as strech-only. Default false
+-- @param boolean? stretch True to mark as stretch-only. Default false
 -- @server
-function constraint_library.elastic(index, e1, e2, bone1, bone2, v1, v2, const, damp, rdamp, width, strech)
+function constraint_library.elastic(index, e1, e2, bone1, bone2, v1, v2, const, damp, rdamp, width, stretch)
 	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
@@ -284,7 +284,7 @@ function constraint_library.elastic(index, e1, e2, bone1, bone2, v1, v2, const, 
 	e1.Elastics = e1.Elastics or {}
 	e2.Elastics = e2.Elastics or {}
 
-	local ent = constraint.Elastic(ent1, ent2, bone1, bone2, vec1, vec2, const, damp, rdamp, "cable/cable2", math.Clamp(width, 0, 50), strech)
+	local ent = constraint.Elastic(ent1, ent2, bone1, bone2, vec1, vec2, const, damp, rdamp, "cable/cable2", math.Clamp(width, 0, 50), stretch)
 	if ent then
 		register(ent, instance)
 

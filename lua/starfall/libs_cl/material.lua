@@ -475,6 +475,7 @@ end
 --- Sky_DX9
 --- gmodscreenspace
 --- Modulate_DX9
+-- @return Material The Material created.
 function material_library.create(shader)
 	checkluatype(shader, TYPE_STRING)
 	checkpermission(instance, nil, "material.create")
@@ -488,8 +489,9 @@ end
 local image_params = {["nocull"] = true,["alphatest"] = true,["mips"] = true,["noclamp"] = true,["smooth"] = true}
 --- Creates a .jpg or .png material from file
 --- Can't be modified
--- @param string path The path to the image file
+-- @param string path The path to the image file, must be a jpg or png image
 -- @param string params The shader parameters to apply to the material. See https://wiki.facepunch.com/gmod/Material_Parameters
+-- @return Material The Material created.
 function material_library.createFromImage(path, params)
 	checkluatype(path, TYPE_STRING)
 	checkluatype(params, TYPE_STRING)
@@ -513,7 +515,7 @@ function material_library.createFromImage(path, params)
 	return lwrap(m)
 end
 
---- Free's a user created material allowing you to create others
+--- Frees a user created material allowing you to create others
 function material_methods:destroy()
 
 	local m = unwrap(self)
@@ -524,7 +526,7 @@ function material_methods:destroy()
 	if rt then
 		instance.env.render.destroyRenderTarget(name)
 	end
-	
+
 	local sensitive2sf, sf2sensitive = material_meta.sensitive2sf, material_meta.sf2sensitive
 	sensitive2sf[m] = nil
 	sf2sensitive[self] = nil
