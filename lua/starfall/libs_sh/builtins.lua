@@ -374,10 +374,9 @@ end
 -- @param table tbl The table to modify
 -- @param any key The index of the table
 -- @param any value The value to set the index equal to
-function builtins_library.rawset(table, key, value)
-    checkluatype(table, TYPE_TABLE)
-
-    rawset(table, key, value)
+function builtins_library.rawset(tbl, key, value)
+    checkluatype(tbl, TYPE_TABLE)
+    rawset(tbl, key, value)
 end
 
 --- Gets the value of a table index without invoking a metamethod
