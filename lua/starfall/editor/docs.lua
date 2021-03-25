@@ -228,12 +228,14 @@ end
 
 local function getLines(str)
 	local current_pos = 1
+	local lineN = 0
 	return function()
 		local start_pos, end_pos = string_find( str, "\r?\n", current_pos )
 		if start_pos then
 			local ret = string_sub( str, current_pos, start_pos - 1 )
 			current_pos = end_pos + 1
-			return ret
+			lineN = lineN + 1
+			return lineN, ret
 		else
 			return nil
 		end
@@ -246,17 +248,15 @@ local function scan(src, realm)
 	-- https://github.com/thegrb93/StarfallEx/blob/master/lua/starfall/...
 	local filePath = string_match(curfile, "%.%./lua/starfall/(libs_.+/.*)") -- libs_sh/... path that will be used for links with [src] on the sfhelper to the github.
 	local parsing
-	local lineN = 0
 	local lines = getLines(src)
-	for line in lines do
-		lineN = lineN + 1
+	for lineN, line in lines do
 		if parsing then
 			local data = string_match(line, "^%s*%-%-%-*(.*)")
 			if data then
 				parse(parsing, data, lineN)
 			else
 				while line and not string.find(line, "%S") do -- Find next non-empty line
-					line = lines()
+					lineN, line = lines()
 				end
 				process(parsing, line or "", lineN)
 				parsing = nil
