@@ -13,20 +13,43 @@ local members = {}
 
 local string_match, string_find, string_sub = string.match, string.find, string.sub
 
-local typedAttributes = {
-	["class"] = true,
-	["name"] = true,
-	["libtbl"] = true
+local generic_lua_types = {
+	["boolean"] = true,
+	["number"] = true,
+	["string"] = true,
+	["table"] = true,
+	["..."] = true,
+	["any"] = true,
+	["function"] = true,
+	["thread"] = true
 }
 
--- @class <x>
-local typedTypes = {
-	["type"] = true
-}
+local sf_types = Docs.Types -- Get the types from documentation rather than the lua state
+local function valid_sftype(type1)
+	if sf_types[type1] or generic_lua_types[type1] then return true end
+
+	if string_find(type1, "|", 1, true) then
+		for str in type1:gmatch("[^|]+") do
+			str = (str:match("(.-)%?") or str) -- In case there's nullable stuff in there.
+			-- We shouldn't use variadics in an or statement (instead just use the variadics or an any type)
+			if not (sf_types[str] or generic_lua_types[str]) then
+				return false
+			end
+		end
+	end
+
+	local type2 = type1:match("%.%.%.(%w+)%??") -- ...(number)?
+
+	if sf_types[type2] or generic_lua_types[type2] then return true end
+
+	local type3 = type1:match("(%w+)%??") -- (vector)?
+
+	return sf_types[type3] or generic_lua_types[type3]
+end
 
 local function processMembers()
 	for k, data in ipairs(members) do
-		local _1, _2, libtblname, funcname = string_find(data.name, "([%w_]+)%s*[%.%:]%s*([%w_]+)")
+		local libtblname, funcname = string_match(data.name, "([%w_]+)%s*[%.%:]%s*([%w_]+)")
 		if libtblname then
 			data.name = funcname
 			local lib = methodstolib[libtblname]
@@ -34,7 +57,26 @@ local function processMembers()
 				local tblindex
 				if data.class == "table" then tblindex = "tables"
 				elseif data.class == "field" then tblindex = "fields"
-				elseif data.class == "function" then tblindex = "methods"
+				elseif data.class == "function" then
+					tblindex = "methods"
+
+					for _, param in ipairs(data.params) do
+						if not valid_sftype(param.type) then
+							-- No type found, revert to old untyped documentation
+							param.type = "any?"
+							name, description = string_match(param.value, "%s*([%w_%.]+)%s*(.*)")
+							if name==nil then
+								ErrorNoHalt("Invalid param doc (" .. value .. ") in file: " .. curfile .. "\n")
+							end
+						end
+					end
+					for _, ret in ipairs(data.returns) do
+						if not valid_sftype(ret.type) then
+							-- No type found, revert to old untyped documentation
+							ret.type = "any?"
+							description = value
+						end
+					end
 				end
 				if Docs.Types[lib] then
 					Docs.Types[lib][tblindex][funcname] = data
@@ -51,7 +93,6 @@ local function processMembers()
 		end
 	end
 end
-
 
 local processTypes = {
 	["type"] = function(data)
@@ -87,9 +128,7 @@ local processTypes = {
 	end
 }
 
-local function process(data, nextline, type_only, line_n)
-	if type_only and not typedTypes[data.class] then return end
-
+local function process(data, nextline, lineN)
 	if not data.class then
 		if string_find(nextline, "function", 1, true) then
 			data.class = "function"
@@ -108,45 +147,10 @@ local function process(data, nextline, type_only, line_n)
 	local processFunc = processTypes[data.class]
 	if processFunc then
 		data.description = table.concat(data.description, "\n")
-		processFunc(data, nextline, line_n)
+		processFunc(data, nextline, lineN)
 	else
 		ErrorNoHalt("Invalid doc class (" .. data.class .. ") in file: " .. curfile .. "\n")
 	end
-end
-
-local generic_lua_types = {
-	["boolean"] = true,
-	["number"] = true,
-	["string"] = true,
-	["table"] = true,
-	["..."] = true,
-	["any"] = true,
-	["function"] = true,
-	["thread"] = true
-}
-
-local sf_types = Docs.Types -- Get the types from documentation rather than the lua state
-
-local function valid_sftype(type1)
-	if sf_types[type1] or generic_lua_types[type1] then return true end
-
-	if string_find(type1, "|", 1, true) then
-		for str in type1:gmatch("[^|]+") do
-			str = (str:match("(.-)%?") or str) -- In case there's nullable stuff in there.
-			-- We shouldn't use variadics in an or statement (instead just use the variadics or an any type)
-			if not (sf_types[str] or generic_lua_types[str]) then
-				return false
-			end
-		end
-	end
-
-	local type2 = type1:match("%.%.%.(%w+)%??") -- ...(number)?
-
-	if sf_types[type2] or generic_lua_types[type2] then return true end
-
-	local type3 = type1:match("(%w+)%??") -- (vector)?
-
-	return sf_types[type3] or generic_lua_types[type3]
 end
 
 local parseAttributes = {
@@ -173,15 +177,6 @@ local parseAttributes = {
 	["param"] = function(parsing, value)
 		local type, name, description = string_match(value, "%s*([%w_%.%?|]+)%s*([%w_%.]+)%s*(.*)")
 		if type then
-			if not valid_sftype(type) then
-				-- No type found, revert to old untyped documentation
-				type = "any?"
-				name, description = string_match(value, "%s*([%w_%.]+)%s*(.*)")
-				if name==nil then
-					ErrorNoHalt("Invalid param doc (" .. value .. ") in file: " .. curfile .. "\n")
-				end
-			end
-
 			local t = parsing.params
 			if not t then t = {} parsing.params = t end
 			t[#t+1] = {
@@ -196,11 +191,6 @@ local parseAttributes = {
 	["return"] = function(parsing, value)
 		local type, description = string_match(value, "%s*([%w_%.%?|]+)%s*(.*)")
 		if type then
-			if not valid_sftype(type) then
-				-- No type found, revert to old untyped documentation
-				type = "any?"
-				description = value
-			end
 			local t = parsing.returns
 			if not t then t = {} parsing.returns = t end
 			t[#t+1] = { type = type, description = description }
@@ -220,14 +210,13 @@ local parseAttributes = {
 	end
 }
 
-local function parse(parsing, data, type_only, line_n)
+local function parse(parsing, data, lineN)
 	local attribute, value = string_match(data, "^%s*@(%w+)%s*(.*)")
 
 	if attribute then
-		if type_only and not typedAttributes[attribute] then return end
 		local parser = parseAttributes[attribute]
 		if parser then
-			parser(parsing, value, line_n)
+			parser(parsing, value, lineN)
 		else
 			ErrorNoHalt("Invalid attribute (" .. attribute .. ") in file: " .. curfile .. "\n")
 		end
@@ -237,36 +226,39 @@ local function parse(parsing, data, type_only, line_n)
 	end
 end
 
-local function get_lines(self)
-    local result = {}
-    local from, line_n = 1, 0
-    local delim_from, delim_to = string_find( self, "\r?\n", from  )
-    while delim_from do
-      local str = string_sub( self, from , delim_from-1 )
-      from = delim_to + 1
-      line_n = line_n + 1
-      result[line_n] = str
-      delim_from, delim_to = string_find( self, "\r?\n", from  )
-    end
-    result[line_n+1] = string_sub( self, from  )
-    return result
+local function getLines(str)
+	local current_pos = 1
+	return function()
+		local start_pos, end_pos = string_find( str, "\r?\n", current_pos )
+		if start_pos then
+			local ret = string_sub( str, current_pos, start_pos - 1 )
+			current_pos = end_pos + 1
+			return ret
+		else
+			return nil
+		end
+	end
 end
 --- Scan function
 -- @param string src Source code
 -- @param string file_name Source file name.
--- @param boolean type_only Whether to only parse types / classes.
-local function scan(src, realm, type_only)
+local function scan(src, realm)
 	-- https://github.com/thegrb93/StarfallEx/blob/master/lua/starfall/...
-	local file_path = string_match(curfile, "%.%./lua/starfall/(libs_.+/.*)") -- libs_sh/... path that will be used for links with [src] on the sfhelper to the github.
+	local filePath = string_match(curfile, "%.%./lua/starfall/(libs_.+/.*)") -- libs_sh/... path that will be used for links with [src] on the sfhelper to the github.
 	local parsing
-
-	for line_n, line in next, get_lines(src) do
+	local lineN = 0
+	local lines = getLines(src)
+	for line in lines do
+		lineN = lineN + 1
 		if parsing then
 			local data = string_match(line, "^%s*%-%-%-*(.*)")
 			if data then
-				parse(parsing, data, type_only, line_n)
+				parse(parsing, data, lineN)
 			else
-				process(parsing, line or "", type_only, line_n)
+				while line and not string.find(line, "%S") do -- Find next non-empty line
+					line = lines()
+				end
+				process(parsing, line or "", lineN)
 				parsing = nil
 				if line == nil then break end
 			end
@@ -277,7 +269,7 @@ local function scan(src, realm, type_only)
 				parsing = {
 					description = {desc},
 					realm = realm,
-					path = file_path.."#L"..line_n
+					path = filePath.."#L"..lineN
 				}
 			end
 		end
@@ -301,17 +293,9 @@ end
 for name, mod in pairs(SF.Modules) do
 	for filename, data in pairs(mod) do
 		curfile = filename
-		scan(data.source, realm(filename), true)
+		scan(data.source, realm(filename))
 	end
 end
 
--- Then, make the rest of the docs.
-for name, mod in pairs(SF.Modules) do
-	for filename, data in pairs(mod) do
-		curfile = filename
-		scan(data.source, realm(filename), false)
-		data.source = nil
-	end
-end
 
 processMembers()
