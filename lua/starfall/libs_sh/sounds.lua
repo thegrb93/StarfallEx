@@ -181,6 +181,7 @@ function sound_methods:setPitch(pitch, fade)
 end
 
 --- Returns whether the sound is being played.
+-- @return boolean Whether the sound is playing or not
 function sound_methods:isPlaying()
 	return unwrap(self):IsPlaying()
 end

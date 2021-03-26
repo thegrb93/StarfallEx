@@ -967,7 +967,7 @@ end
 --- If the result of the first argument is false or nil, an error is thrown with the second argument as the message.
 -- @name builtins_library.assert
 -- @class function
--- @param any expression
+-- @param any expression Anything that will be evaluated to be true or false
 -- @param string? msg Error message. Default "assertion failed!"
 -- @param ... args Any arguments to return if the assertion is successful
 builtins_library.assert = assert

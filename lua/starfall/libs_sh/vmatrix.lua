@@ -180,7 +180,7 @@ end
 
 --- Allows you to set all 16 fields in row-major order
 -- Self-Modifies. Does not return anything
--- @param ...number The 16 fields
+-- @param ...number fields The 16 fields
 function vmatrix_methods:setUnpacked(...)
 	unwrap(self):SetUnpacked(...)
 end

@@ -526,7 +526,7 @@ bit_library.arshift = bit.arshift
 --- Performs the bitwise "and" for all values specified.
 -- @class function
 -- @param number value The value to be manipulated.
--- @param number otherValues Values bit to perform bitwise "and" with. Optional.
+-- @param ...number otherValues Values bit to perform bitwise "and" with. Optional.
 -- @return number Result of bitwise "and" operation.
 bit_library.band = bit.band
 
@@ -593,7 +593,7 @@ bit_library.tobit = bit.tobit
 --- Returns the hexadecimal representation of the number with the specified digits.
 -- @class function
 -- @param number value The value to be normalized.
--- @param number digits The number of digits. Optional. (default 8)
+-- @param number? digits The number of digits. Optional. (default 8)
 -- @return string Hex string.
 bit_library.tohex = bit.tohex
 
