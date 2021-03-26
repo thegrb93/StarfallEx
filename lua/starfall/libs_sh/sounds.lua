@@ -198,4 +198,17 @@ function sound_methods:setSoundLevel(level)
 	unwrap(self):SetSoundLevel(math.Clamp(level, 0, 511))
 end
 
+--- Sets the sound dsp
+-- @param number dsp (0 - 133) DSP values. List can be found here https://developer.valvesoftware.com/wiki/Dsp_presets
+function sound_methods:setDSP(dsp)
+	checkluatype(dsp, TYPE_NUMBER)
+	unwrap(self):SetDSP(math.Clamp(dsp, 0, 133))
+end
+
+--- Gets the sound dsp
+-- @return number dsp (0 - 133) DSP value.
+function sound_methods:getDSP()
+	return unwrap(self):GetDSP()
+end
+
 end
