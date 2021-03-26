@@ -38,10 +38,10 @@ function http_library.canRequest()
 end
 
 --- Runs a new http GET request
--- @param url http target url
--- @param callbackSuccess the function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)
--- @param callbackFail the function to be called on request fail, taking the failing reason as an argument
--- @param headers GET headers to be sent
+-- @param string url Http target url
+-- @param function callbackSuccess The function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)
+-- @param function? callbackFail The function to be called on request fail, taking the failing reason as an argument
+-- @param table? headers GET headers to be sent
 function http_library.get(url, callbackSuccess, callbackFail, headers)
 	checkpermission(instance, url, "http.get")
 
@@ -66,11 +66,11 @@ function http_library.get(url, callbackSuccess, callbackFail, headers)
 end
 
 --- Runs a new http POST request
--- @param url http target url
--- @param payload optional POST payload to be sent, can be both table and string. When table is used, the request body is encoded as application/x-www-form-urlencoded
--- @param callbackSuccess optional function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)
--- @param callbackFail optional function to be called on request fail, taking the failing reason as an argument
--- @param headers optional POST headers to be sent
+-- @param string url Http target url
+-- @param table? payload Optional POST payload to be sent, can be both table and string. When table is used, the request body is encoded as application/x-www-form-urlencoded
+-- @param function? callbackSuccess Optional function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)
+-- @param function? callbackFail Optional function to be called on request fail, taking the failing reason as an argument
+-- @param table? headers Optional POST headers to be sent
 function http_library.post(url, payload, callbackSuccess, callbackFail, headers)
 	checkluatype(url, TYPE_STRING)
 	checkpermission(instance, url, "http.post")
@@ -131,25 +131,25 @@ function http_library.post(url, payload, callbackSuccess, callbackFail, headers)
 end
 
 --- Converts data into base64 format or nil if the string is 0 length
---@name http_library.base64Encode
---@class function
---@param data The data to convert
---@return The converted data
+-- @name http_library.base64Encode
+-- @class function
+-- @param string data The data to convert
+-- @return string The converted data
 function http_library.base64Encode(data)
 	checkluatype(data, TYPE_STRING)
 	return string.gsub(util.Base64Encode(data),"\n","")
 end
 
 --- Converts data from base64 format
---@name http_library.base64Decode
---@class function
---@param data The data to convert
---@return The converted data
+-- @name http_library.base64Decode
+-- @class function
+-- @param string data The data to convert
+-- @return string The converted data
 http_library.base64Decode = util.Base64Decode
 
 --- Encodes illegal url characters to be legal
---@param data The data to convert
---@return The converted data
+-- @param string data The data to convert
+-- @return string The converted data
 function http_library.urlEncode(data)
 	checkluatype(data, TYPE_STRING)
 	data = string.gsub(data, "[^%w_~%.%-%(%)!%*]", function(char)

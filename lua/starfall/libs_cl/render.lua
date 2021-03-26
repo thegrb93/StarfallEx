@@ -337,7 +337,7 @@ end)
 -- ------------------------------------------------------------------ --
 
 --- Sets whether stencil tests are carried out for each rendered pixel. Only pixels passing the stencil test are written to the render target.
--- @param enable true to enable, false to disable
+-- @param boolean enable true to enable, false to disable
 function render_library.setStencilEnable(enable)
 	enable = (enable == true) -- Make sure it's a boolean
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
@@ -352,10 +352,10 @@ function render_library.clearStencil()
 end
 
 --- Clears the current rendertarget for obeying the current stencil buffer conditions.
--- @param r Value of the red channel to clear the current rt with.
--- @param g Value of the green channel to clear the current rt with.
--- @param b Value of the blue channel to clear the current rt with.
--- @param depth Clear the depth buffer.
+-- @param number r Value of the red channel to clear the current rt with.
+-- @param number g Value of the green channel to clear the current rt with.
+-- @param number b Value of the blue channel to clear the current rt with.
+-- @param boolean Clear the depth buffer.
 function render_library.clearBuffersObeyStencil(r, g, b, a, depth)
 	checkluatype (r, TYPE_NUMBER)
 	checkluatype (g, TYPE_NUMBER)
@@ -368,11 +368,11 @@ function render_library.clearBuffersObeyStencil(r, g, b, a, depth)
 end
 
 --- Sets the stencil value in a specified rect.
--- @param originX X origin of the rectangle.
--- @param originY Y origin of the rectangle.
--- @param endX The end X coordinate of the rectangle.
--- @param endY The end Y coordinate of the rectangle.
--- @param stencilValue Value to set cleared stencil buffer to.
+-- @param number originX X origin of the rectangle.
+-- @param number originY Y origin of the rectangle.
+-- @param number endX The end X coordinate of the rectangle.
+-- @param number endY The end Y coordinate of the rectangle.
+-- @param number stencilValue Value to set cleared stencil buffer to.
 function render_library.clearStencilBufferRectangle(originX, originY, endX, endY, stencilValue)
 	checkluatype (originX, TYPE_NUMBER)
 	checkluatype (originY, TYPE_NUMBER)
@@ -386,7 +386,7 @@ function render_library.clearStencilBufferRectangle(originX, originY, endX, endY
 end
 
 --- Sets the compare function of the stencil. More: https://wiki.facepunch.com/gmod/render.SetStencilCompareFunction
--- @param compareFunction
+-- @param number compareFunction
 function render_library.setStencilCompareFunction(compareFunction)
 	checkluatype (compareFunction, TYPE_NUMBER)
 
@@ -396,7 +396,7 @@ function render_library.setStencilCompareFunction(compareFunction)
 end
 
 --- Sets the operation to be performed on the stencil buffer values if the compare function was not successful. More: http://wiki.facepunch.com/gmod/render.SetStencilFailOperation
--- @param operation
+-- @param number operation
 function render_library.setStencilFailOperation(operation)
 	checkluatype (operation, TYPE_NUMBER)
 
@@ -406,7 +406,7 @@ function render_library.setStencilFailOperation(operation)
 end
 
 --- Sets the operation to be performed on the stencil buffer values if the compare function was successful. More: http://wiki.facepunch.com/gmod/render.SetStencilPassOperation
--- @param operation
+-- @param number operation
 function render_library.setStencilPassOperation(operation)
 	checkluatype (operation, TYPE_NUMBER)
 
@@ -416,7 +416,7 @@ function render_library.setStencilPassOperation(operation)
 end
 
 --- Sets the operation to be performed on the stencil buffer values if the stencil test is passed but the depth buffer test fails. More: http://wiki.facepunch.com/gmod/render.SetStencilZFailOperation
--- @param operation
+-- @param number operation
 function render_library.setStencilZFailOperation(operation)
 	checkluatype (operation, TYPE_NUMBER)
 
@@ -426,7 +426,7 @@ function render_library.setStencilZFailOperation(operation)
 end
 
 --- Sets the reference value which will be used for all stencil operations. This is an unsigned integer.
--- @param referenceValue Reference value.
+-- @param number referenceValue Reference value.
 function render_library.setStencilReferenceValue(referenceValue)
 	checkluatype (referenceValue, TYPE_NUMBER)
 
@@ -436,7 +436,7 @@ function render_library.setStencilReferenceValue(referenceValue)
 end
 
 --- Sets the unsigned 8-bit test bitflag mask to be used for any stencil testing.
--- @param mask The mask bitflag.
+-- @param number mask The mask bitflag.
 function render_library.setStencilTestMask(mask)
 	checkluatype (mask, TYPE_NUMBER)
 
@@ -446,7 +446,7 @@ function render_library.setStencilTestMask(mask)
 end
 
 --- Sets the unsigned 8-bit write bitflag mask to be used for any writes to the stencil buffer.
--- @param mask The mask bitflag.
+-- @param number mask The mask bitflag.
 function render_library.setStencilWriteMask(mask)
 	checkluatype (mask, TYPE_NUMBER)
 
@@ -458,7 +458,7 @@ end
 --- Resets stencil operations to their default behavior
 function render_library.resetStencil()
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
-	
+
 	render.SetStencilWriteMask(0xFF)
 	render.SetStencilTestMask(0xFF)
 	render.SetStencilReferenceValue(0)
@@ -472,8 +472,8 @@ end
 -- ------------------------------------------------------------------ --
 
 --- Pushes a matrix onto the matrix stack.
--- @param m The matrix
--- @param world Should the transformation be relative to the screen or world?
+-- @param VMatrix m The matrix
+-- @param boolean? world Should the transformation be relative to the screen or world?
 function render_library.pushMatrix(m, world)
 	if world == nil then
 		world = renderdata.usingRT
@@ -497,10 +497,10 @@ function render_library.pushMatrix(m, world)
 end
 
 --- Enables a scissoring rect which limits the drawing area. Only works 2D contexts such as HUD or render targets.
--- @param startX X start coordinate of the scissor rect.
--- @param startY Y start coordinate of the scissor rect.
--- @param endX X end coordinate of the scissor rect.
--- @param endX Y end coordinate of the scissor rect.
+-- @param number startX X start coordinate of the scissor rect.
+-- @param number startY Y start coordinate of the scissor rect.
+-- @param number endX X end coordinate of the scissor rect.
+-- @param number endX Y end coordinate of the scissor rect.
 function render_library.enableScissorRect(startX, startY, endX, endY)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype (startX, TYPE_NUMBER)
@@ -514,7 +514,6 @@ end
 function render_library.disableScissorRect()
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	render.SetScissorRect(0 , 0 , 0 , 0, false)
-
 end
 
 --- Pops a matrix from the matrix stack.
@@ -535,7 +534,7 @@ local viewmatrix_checktypes =
 local viewmatrix_checktypes_ignore = {origin = true, angles = true}
 
 --- Pushes a perspective matrix onto the view matrix stack.
--- @param tbl The view matrix data. See http://wiki.facepunch.com/gmod/Structures/RenderCamData
+-- @param table tbl The view matrix data. See http://wiki.facepunch.com/gmod/Structures/RenderCamData
 function render_library.pushViewMatrix(tbl)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if #view_matrix_stack == MATRIX_STACK_LIMIT then SF.Throw("Pushed too many matrices", 2) end
@@ -591,8 +590,8 @@ function render_library.popViewMatrix()
 end
 
 --- Sets background color of screen
--- @param col Color of background
--- @param screen (Optional) entity of screen
+-- @param Color col Color of background
+-- @param Entity? screen (Optional) entity of screen
 function render_library.setBackgroundColor(col, screen)
 	if screen then
 		screen = getent(screen)
@@ -615,15 +614,15 @@ function render_library.setBackgroundColor(col, screen)
 end
 
 --- Sets the lighting mode
--- @param mode The lighting mode. 0 - Default, 1 - Fullbright, 2 - Increased Fullbright
+-- @param number mode The lighting mode. 0 - Default, 1 - Fullbright, 2 - Increased Fullbright
 function render_library.setLightingMode(mode)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if mode ~= 0 and mode ~= 1 and mode ~= 2 then SF.Throw("Invalid mode.", 2) end
-	render.SetLightingMode(mode) 
+	render.SetLightingMode(mode)
 end
 
 --- Sets the draw color
--- @param clr Color type
+-- @param Color clr Color type
 function render_library.setColor(clr)
 	currentcolor = clr
 	surface.SetDrawColor(clr)
@@ -631,10 +630,10 @@ function render_library.setColor(clr)
 end
 
 --- Sets the draw color by RGBA values
--- @param r Number, red value
--- @param g Number, green value
--- @param b Number, blue value
--- @param a Number, alpha value
+-- @param number r Number, red value
+-- @param number g Number, green value
+-- @param number b Number, blue value
+-- @param number a Number, alpha value
 function render_library.setRGBA(r, g, b, a)
 	checkluatype (r, TYPE_NUMBER) checkluatype (g, TYPE_NUMBER) checkluatype (b, TYPE_NUMBER) checkluatype (a, TYPE_NUMBER)
 	currentcolor = Color(r, g, b, a)
@@ -646,10 +645,10 @@ end
 --- Also supports image URLs or image data (These will create a rendertarget for the $basetexture): https://en.wikipedia.org/wiki/Data_URI_scheme
 --- Make sure to store the material to use it rather than calling this slow function repeatedly.
 --- NOTE: This no longer supports material names. Use texture names instead (Textures are .vtf, material are .vmt)
--- @param tx Texture file path, a http url, or image data: https://en.wikipedia.org/wiki/Data_URI_scheme
--- @param cb An optional callback called when loading is done. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture.
--- @param done An optional callback called when the image is done loading. Passes the material, url
--- @return The material. Use with render.setMaterial to draw with it.
+-- @param string tx Texture file path, a http url, or image data: https://en.wikipedia.org/wiki/Data_URI_scheme
+-- @param function? cb An optional callback called when loading is done. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture.
+-- @param function? done An optional callback called when the image is done loading. Passes the material, url
+-- @return Material The material. Use with render.setMaterial to draw with it.
 function render_library.createMaterial(tx, cb, done)
 	checkluatype (tx, TYPE_STRING)
 
@@ -664,13 +663,13 @@ function render_library.createMaterial(tx, cb, done)
 end
 
 --- Releases the texture. Required if you reach the maximum url textures.
--- @param mat The material object
+-- @param Material mat The material object
 function render_library.destroyTexture(mat)
 	mat:destroy()
 end
 
 --- Sets the current render material
--- @param mat The material object
+-- @param Material mat The material object
 function render_library.setMaterial(mat)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if mat then
@@ -695,7 +694,7 @@ local function gettexture(mat)
 end
 
 --- Sets the current render material to the given material or the rendertarget, applying an additive shader when drawn.
--- @param mat The material object to use the texture of, or the name of a rendertarget to use instead.
+-- @param Material mat The material object to use the texture of, or the name of a rendertarget to use instead.
 function render_library.setMaterialEffectAdd(mat)
 
 	checkpermission(instance, nil, "render.effects")
@@ -709,7 +708,7 @@ function render_library.setMaterialEffectAdd(mat)
 end
 
 --- Sets the current render material to the given material or the rendertarget, applying a subtractive shader when drawn.
--- @param mat The material object to use the texture of, or the name of a rendertarget to use instead.
+-- @param Material mat The material object to use the texture of, or the name of a rendertarget to use instead.
 function render_library.setMaterialEffectSub(mat)
 
 	checkpermission(instance, nil, "render.effects")
@@ -723,11 +722,11 @@ function render_library.setMaterialEffectSub(mat)
 end
 
 --- Sets the current render material to the given material or the rendertarget, applying a bloom shader to the texture.
--- @param mat The material object to use the texture of, or the name of a rendertarget to use instead.
--- @param levelr Multiplier for all red pixels. 1 = unchanged
--- @param levelg Multiplier for all green pixels. 1 = unchanged
--- @param levelb Multiplier for all blue pixels. 1 = unchanged
--- @param colormul Multiplier for all three colors. 1 = unchanged
+-- @param Material mat The material object to use the texture of, or the name of a rendertarget to use instead.
+-- @param number levelr Multiplier for all red pixels. 1 = unchanged
+-- @param number levelg Multiplier for all green pixels. 1 = unchanged
+-- @param number levelb Multiplier for all blue pixels. 1 = unchanged
+-- @param number colormul Multiplier for all three colors. 1 = unchanged
 function render_library.setMaterialEffectBloom(mat, levelr, levelg, levelb, colormul)
 
 	checkpermission(instance, nil, "render.effects")
@@ -753,9 +752,9 @@ function render_library.setMaterialEffectBloom(mat, levelr, levelg, levelb, colo
 end
 
 --- Sets the current render material to the given material or the rendertarget, darkening the texture, and scaling up color values.
--- @param mat The material object to use the texture of, or the name of a rendertarget to use instead.
--- @param darken The amount to darken the texture by. -1 to 1 inclusive.
--- @param multiply The amount to multiply the pixel colors by.
+-- @param Material mat The material object to use the texture of, or the name of a rendertarget to use instead.
+-- @param number darken The amount to darken the texture by. -1 to 1 inclusive.
+-- @param number multiply The amount to multiply the pixel colors by. (0-1024)
 function render_library.setMaterialEffectDownsample(mat, darken, multiply)
 
 	checkpermission(instance, nil, "render.effects")
@@ -788,8 +787,8 @@ local defaultCM = {
 }
 
 --- Sets the current render material to the given material or the rendertarget, applying a color modification shader to the texture. Alias: render.setMaterialEffectColourModify
--- @param mat The material object to use the texture of, or the name of a rendertarget to use instead.
--- @param cmStructure A table where each key must be of "addr", "addg", "addb", "brightness", "color" or "colour", "contrast", "mulr", "mulg", and "mulb". All keys are optional.
+-- @param Material mat The material object to use the texture of, or the name of a rendertarget to use instead.
+-- @param table cmStructure A table where each key must be of "addr", "addg", "addb", "brightness", "color" or "colour", "contrast", "mulr", "mulg", and "mulb". All keys are optional.
 function render_library.setMaterialEffectColorModify(mat, cmStructure)
 
 	checkpermission(instance, nil, "render.effects")
@@ -821,9 +820,9 @@ render_library.setMaterialEffectColourModify = render_library.setMaterialEffectC
 
 
 --- Applies a blur effect to the active rendertarget. This must be used with a rendertarget created beforehand.
--- @param blurx The amount of horizontal blur to apply.
--- @param blury The amount of vertical blur to apply.
--- @param passes The number of times the blur effect is applied.
+-- @param number blurx The amount of horizontal blur to apply.
+-- @param number blury The amount of vertical blur to apply.
+-- @param number passes The number of times the blur effect is applied.
 function render_library.drawBlurEffect(blurx, blury, passes)
 
 	checkpermission(instance, nil, "render.effects")
@@ -846,7 +845,7 @@ function render_library.drawBlurEffect(blurx, blury, passes)
 end
 
 --- Check if the specified render target exists.
--- @param name The name of the render target
+-- @param string name The name of the render target
 function render_library.renderTargetExists(name)
 	checkluatype (name, TYPE_STRING)
 	return renderdata.rendertargets[name] ~= nil
@@ -854,7 +853,7 @@ end
 
 --- Creates a new render target to draw onto.
 -- The dimensions will always be 1024x1024
--- @param name The name of the render target
+-- @param string name The name of the render target
 function render_library.createRenderTarget(name)
 	checkluatype (name, TYPE_STRING)
 
@@ -869,7 +868,7 @@ function render_library.createRenderTarget(name)
 end
 
 --- Releases the rendertarget. Required if you reach the maximum rendertargets.
--- @param name Rendertarget name
+-- @param string name Rendertarget name
 function render_library.destroyRenderTarget(name)
 	local rt = renderdata.rendertargets[name]
 	if rt then
@@ -883,7 +882,7 @@ end
 
 --- Selects the render target to draw on.
 -- Nil for the visible RT.
--- @param name Name of the render target to use
+-- @param string? name Name of the render target to use
 function render_library.selectRenderTarget(name)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if name then
@@ -931,7 +930,7 @@ end
 
 --- Sets the active texture to the render target with the specified name.
 -- Nil to reset.
--- @param name Name of the render target to use
+-- @param string? name Name of the render target to use
 function render_library.setRenderTargetTexture(name)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if name == nil then
@@ -953,7 +952,7 @@ function render_library.setRenderTargetTexture(name)
 end
 
 --- Sets the texture of a screen entity
--- @param ent Screen entity
+-- @param Entity ent Screen entity
 function render_library.setTextureFromScreen(ent)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
@@ -970,7 +969,7 @@ function render_library.setTextureFromScreen(ent)
 end
 
 --- Sets the texture filtering function when viewing a close texture
--- @param val The filter function to use http://wiki.facepunch.com/gmod/Enums/TEXFILTER
+-- @param number val The filter function to use http://wiki.facepunch.com/gmod/Enums/TEXFILTER
 function render_library.setFilterMag(val)
 	checkluatype (val, TYPE_NUMBER)
 	if renderdata.changedFilterMag then
@@ -981,7 +980,7 @@ function render_library.setFilterMag(val)
 end
 
 --- Sets the texture filtering function when viewing a far texture
--- @param val The filter function to use http://wiki.facepunch.com/gmod/Enums/TEXFILTER
+-- @param number val The filter function to use http://wiki.facepunch.com/gmod/Enums/TEXFILTER
 function render_library.setFilterMin(val)
 	checkluatype (val, TYPE_NUMBER)
 	if renderdata.changedFilterMin then
@@ -992,7 +991,7 @@ function render_library.setFilterMin(val)
 end
 
 --- Changes the cull mode
--- @param mode Cull mode. 0 for counter clock wise, 1 for clock wise
+-- @param number mode Cull mode. 0 for counter clock wise, 1 for clock wise
 function render_library.setCullMode(mode)
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 
@@ -1000,8 +999,8 @@ function render_library.setCullMode(mode)
 end
 
 --- Clears the active render target
--- @param clr Color type to clear with
--- @param depth Boolean if should clear depth
+-- @param Color? clr Color type to clear with
+-- @param boolean? depth Boolean if should clear depth. Default false
 function render_library.clear(clr, depth)
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 	if renderdata.usingRT then
@@ -1014,26 +1013,26 @@ function render_library.clear(clr, depth)
 end
 
 --- Draws a rounded rectangle using the current color
--- @param r The corner radius
--- @param x Top left corner x coordinate
--- @param y Top left corner y coordinate
--- @param w Width
--- @param h Height
+-- @param number r The corner radius
+-- @param number x Top left corner x coordinate
+-- @param number y Top left corner y coordinate
+-- @param number w Width
+-- @param number h Height
 function render_library.drawRoundedBox(r, x, y, w, h)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	draw.RoundedBox(r, x, y, w, h, currentcolor)
 end
 
 --- Draws a rounded rectangle using the current color
--- @param r The corner radius
--- @param x Top left corner x coordinate
--- @param y Top left corner y coordinate
--- @param w Width
--- @param h Height
--- @param tl Boolean Top left corner
--- @param tr Boolean Top right corner
--- @param bl Boolean Bottom left corner
--- @param br Boolean Bottom right corner
+-- @param number r The corner radius
+-- @param number x Top left corner x coordinate
+-- @param number y Top left corner y coordinate
+-- @param number w Width
+-- @param number h Height
+-- @param boolean? tl Top left corner. Default false
+-- @param boolean? tr Top right corner. Default false
+-- @param boolean? bl Bottom left corner. Default false
+-- @param boolean? br Bottom right corner. Default false
 function render_library.drawRoundedBoxEx(r, x, y, w, h, tl, tr, bl, br)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	draw.RoundedBoxEx(r, x, y, w, h, currentcolor, tl, tr, bl, br)
@@ -1053,20 +1052,20 @@ local function makeQuad(x, y, w, h)
 end
 --- Draws a rectangle using the current color
 --- Faster, but uses integer coordinates and will get clipped by user's screen resolution
--- @param x Top left corner x
--- @param y Top left corner y
--- @param w Width
--- @param h Height
+-- @param number x Top left corner x
+-- @param number y Top left corner y
+-- @param number w Width
+-- @param number h Height
 function render_library.drawRectFast(x, y, w, h)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	surface.DrawRect(x, y, w, h)
 end
 
 --- Draws a rectangle using the current color
--- @param x Top left corner x
--- @param y Top left corner y
--- @param w Width
--- @param h Height
+-- @param number x Top left corner x
+-- @param number y Top left corner y
+-- @param number w Width
+-- @param number h Height
 function render_library.drawRect(x, y, w, h)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	makeQuad(x, y, w, h)
@@ -1075,20 +1074,20 @@ function render_library.drawRect(x, y, w, h)
 end
 
 --- Draws a rectangle outline using the current color.
--- @param x Top left corner x integer coordinate
--- @param y Top left corner y integer coordinate
--- @param w Width
--- @param h Height
--- @param thickness Optional inset border width
+-- @param number x Top left corner x integer coordinate
+-- @param number y Top left corner y integer coordinate
+-- @param number w Width
+-- @param number h Height
+-- @param number? thickness Optional inset border width
 function render_library.drawRectOutline(x, y, w, h, thickness)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	surface.DrawOutlinedRect(x, y, w, h, thickness)
 end
 
 --- Draws a circle outline
--- @param x Center x coordinate
--- @param y Center y coordinate
--- @param r Radius
+-- @param number x Center x coordinate
+-- @param number y Center y coordinate
+-- @param number r Radius
 function render_library.drawCircle(x, y, r)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	surface.DrawCircle(x, y, r, currentcolor)
@@ -1096,20 +1095,20 @@ end
 
 --- Draws a textured rectangle
 --- Faster, but uses integer coordinates and will get clipped by user's screen resolution
--- @param x Top left corner x
--- @param y Top left corner y
--- @param w Width
--- @param h Height
+-- @param number x Top left corner x
+-- @param number y Top left corner y
+-- @param number w Width
+-- @param number h Height
 function render_library.drawTexturedRectFast(x, y, w, h)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	surface.DrawTexturedRect(x, y, w, h)
 end
 
 --- Draws a textured rectangle
--- @param x Top left corner x
--- @param y Top left corner y
--- @param w Width
--- @param h Height
+-- @param number x Top left corner x
+-- @param number y Top left corner y
+-- @param number w Width
+-- @param number h Height
 function render_library.drawTexturedRect(x, y, w, h)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	makeQuad(x, y, w, h)
@@ -1118,15 +1117,15 @@ end
 
 --- Draws a textured rectangle with UV coordinates
 --- Faster, but uses integer coordinates and will get clipped by user's screen resolution
--- @param x Top left corner x
--- @param y Top left corner y
--- @param w Width
--- @param h Height
--- @param startU Texture mapping at rectangle's origin U
--- @param startV Texture mapping at rectangle's origin V
--- @param endU Texture mapping at rectangle's end U
--- @param endV Texture mapping at rectangle's end V
--- @param UVHack If enabled, will scale the UVs to compensate for internal bug. Should be true for user created materials.
+-- @param number x Top left corner x
+-- @param number y Top left corner y
+-- @param number w Width
+-- @param number h Height
+-- @param number startU Texture mapping at rectangle's origin U
+-- @param number startV Texture mapping at rectangle's origin V
+-- @param number endU Texture mapping at rectangle's end U
+-- @param number endV Texture mapping at rectangle's end V
+-- @param boolean? UVHack If enabled, will scale the UVs to compensate for internal bug. Should be true for user created materials.
 function render_library.drawTexturedRectUVFast(x, y, w, h, startU, startV, endU, endV, UVHack)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
@@ -1141,14 +1140,14 @@ function render_library.drawTexturedRectUVFast(x, y, w, h, startU, startV, endU,
 end
 
 --- Draws a textured rectangle with UV coordinates
--- @param x Top left corner x
--- @param y Top left corner y
--- @param w Width
--- @param h Height
--- @param startU Texture mapping at rectangle origin
--- @param startV Texture mapping at rectangle origin
--- @param endU Texture mapping at rectangle end
--- @param endV Texture mapping at rectangle end
+-- @param number x Top left corner x
+-- @param number y Top left corner y
+-- @param number w Width
+-- @param number h Height
+-- @param number startU Texture mapping at rectangle origin
+-- @param number startV Texture mapping at rectangle origin
+-- @param number endU Texture mapping at rectangle end
+-- @param number endV Texture mapping at rectangle end
 function render_library.drawTexturedRectUV(x, y, w, h, startU, startV, endU, endV)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype (x, TYPE_NUMBER)
@@ -1185,11 +1184,11 @@ end
 
 --- Draws a rotated, textured rectangle.
 --- Faster, but uses integer coordinates and will get clipped by user's screen resolution
--- @param x X coordinate of center of rect
--- @param y Y coordinate of center of rect
--- @param w Width
--- @param h Height
--- @param rot Rotation in degrees
+-- @param number x X coordinate of center of rect
+-- @param number y Y coordinate of center of rect
+-- @param number w Width
+-- @param number h Height
+-- @param number rot Rotation in degrees
 function render_library.drawTexturedRectRotatedFast(x, y, w, h, rot)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
@@ -1197,11 +1196,11 @@ function render_library.drawTexturedRectRotatedFast(x, y, w, h, rot)
 end
 
 --- Draws a rotated, textured rectangle.
--- @param x X coordinate of center of rect
--- @param y Y coordinate of center of rect
--- @param w Width
--- @param h Height
--- @param rot Rotation in degrees
+-- @param number x X coordinate of center of rect
+-- @param number y Y coordinate of center of rect
+-- @param number w Width
+-- @param number h Height
+-- @param number rot Rotation in degrees
 function render_library.drawTexturedRectRotated(x, y, w, h, rot)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
@@ -1225,11 +1224,11 @@ function render_library.drawTexturedRectRotated(x, y, w, h, rot)
 end
 
 --- Draws RGB color channel tables to current render target.
--- @param w Width of image to be drawn.
--- @param h Height of image to be drawn.
--- @param dataR Red channel data.
--- @param dataG Green channel data.
--- @param dataB Blue channel data.
+-- @param number w Width of image to be drawn.
+-- @param number h Height of image to be drawn.
+-- @param table dataR Red channel data.
+-- @param table dataG Green channel data.
+-- @param table dataB Blue channel data.
 function render_library.drawPixelsRGB(w, h, dataR, dataG, dataB) 
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if not renderdata.usingRT then SF.Throw("Cannot use this function outside of a rendertarget.", 2) end
@@ -1241,13 +1240,13 @@ function render_library.drawPixelsRGB(w, h, dataR, dataG, dataB)
 end
 
 --- Draws RGBA color channel tables to current render target.
--- @param w Width of image to be drawn.
--- @param h Height of image to be drawn.
--- @param dataR Red channel data.
--- @param dataG Green channel data.
--- @param dataB Blue channel data.
--- @param dataA Alpha channel data.
-function render_library.drawPixelsRGBA(w, h, dataR, dataG, dataB, dataA) 
+-- @param number w Width of image to be drawn.
+-- @param number h Height of image to be drawn.
+-- @param table dataR Red channel data.
+-- @param table dataG Green channel data.
+-- @param table dataB Blue channel data.
+-- @param table dataA Alpha channel data.
+function render_library.drawPixelsRGBA(w, h, dataR, dataG, dataB, dataA)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if not renderdata.usingRT then SF.Throw("Cannot use this function outside of a rendertarget.", 2) end
 	for i = 1, w*h do
@@ -1257,18 +1256,18 @@ function render_library.drawPixelsRGBA(w, h, dataR, dataG, dataB, dataA)
 	render.SetViewPort(0, 0, 1024, 1024)
 end
 --- Draws region of RGB color channel tables to current render target.
--- @param dstX Destination x coordinate
--- @param dstY Destination y coordinate
--- @param srcX Source x coordinate
--- @param srcY Source y coordinate
--- @param srcW Source original width
--- @param srcH Source original height
--- @param subrectW Width of subrect
--- @param subrectH Height of subrect
--- @param dataR Red channel data.
--- @param dataG Green channel data.
--- @param dataB Blue channel data.
-function render_library.drawPixelsSubrectRGB(dstX, dstY, srcX, srcY, srcW, srcH, subrectW, subrectH, dataR, dataG, dataB) 
+-- @param number dstX Destination x coordinate
+-- @param number dstY Destination y coordinate
+-- @param number srcX Source x coordinate
+-- @param number srcY Source y coordinate
+-- @param number srcW Source original width
+-- @param number srcH Source original height
+-- @param number subrectW Width of subrect
+-- @param number subrectH Height of subrect
+-- @param table dataR Red channel data.
+-- @param table dataG Green channel data.
+-- @param table dataB Blue channel data.
+function render_library.drawPixelsSubrectRGB(dstX, dstY, srcX, srcY, srcW, srcH, subrectW, subrectH, dataR, dataG, dataB)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if not renderdata.usingRT then SF.Throw("Cannot use this function outside of a rendertarget.", 2) end
 	for i = 0, subrectW*subrectH-1 do
@@ -1280,18 +1279,18 @@ function render_library.drawPixelsSubrectRGB(dstX, dstY, srcX, srcY, srcW, srcH,
 	render.SetViewPort(0, 0, 1024, 1024)
 end
 --- Draws region of RGBA color channel tables to current render target.
--- @param dstX Destination x coordinate
--- @param dstY Destination y coordinate
--- @param srcX Source x coordinate
--- @param srcY Source y coordinate
--- @param srcW Source original width
--- @param srcH Source original height
--- @param subrectW Width of subrect
--- @param subrectH Height of subrect
--- @param dataR Red channel data.
--- @param dataG Green channel data.
--- @param dataB Blue channel data.
--- @param dataA Alpha channel data.
+-- @param number dstX Destination x coordinate
+-- @param number dstY Destination y coordinate
+-- @param number srcX Source x coordinate
+-- @param number srcY Source y coordinate
+-- @param number srcW Source original width
+-- @param number srcH Source original height
+-- @param number subrectW Width of subrect
+-- @param number subrectH Height of subrect
+-- @param table dataR Red channel data.
+-- @param table dataG Green channel data.
+-- @param table dataB Blue channel data.
+-- @param table dataA Alpha channel data.
 function render_library.drawPixelsSubrectRGBA(dstX, dstY, srcX, srcY, srcW, srcH, subrectW, subrectH, dataR, dataG, dataB, dataA) 
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if not renderdata.usingRT then SF.Throw("Cannot use this function outside of a rendertarget.", 2) end
@@ -1305,25 +1304,25 @@ function render_library.drawPixelsSubrectRGBA(dstX, dstY, srcX, srcY, srcW, srcH
 end
 
 --- Draws a line. Use 3D functions for float coordinates
--- @param x1 X start integer coordinate
--- @param y1 Y start integer coordinate
--- @param x2 X end interger coordinate
--- @param y2 Y end integer coordinate
+-- @param number x1 X start integer coordinate
+-- @param number y1 Y start integer coordinate
+-- @param number x2 X end interger coordinate
+-- @param number y2 Y end integer coordinate
 function render_library.drawLine(x1, y1, x2, y2)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	surface.DrawLine(x1, y1, x2, y2)
 end
 
 --- Creates a font. Does not require rendering hook
--- @param font Base font to use
--- @param size Font size
--- @param weight Font weight (default: 400)
--- @param antialias Antialias font?
--- @param additive If true, adds brightness to pixels behind it rather than drawing over them.
--- @param shadow Enable drop shadow?
--- @param outline Enable outline?
--- @param blur Enable blur?
--- @param extended Allows the font to display glyphs outside of Latin-1 range. Unicode code points above 0xFFFF are not supported. Required to use FontAwesome
+-- @param string font Base font to use
+-- @param number? size Font size. Default 16
+-- @param number? weight Font weight. Default 400
+-- @param boolean? antialias Antialias font? Default false
+-- @param boolean? additive If true, adds brightness to pixels behind it rather than drawing over them. Default false
+-- @param boolean? shadow Enable drop shadow? Default false
+-- @param boolean? outline Enable outline? Default false
+-- @param boolean? blur Enable blur? Default false
+-- @param boolean? extended Allows the font to display glyphs outside of Latin-1 range. Unicode code points above 0xFFFF are not supported. Required to use FontAwesome
 -- Base font can be one of (keep in mind that these may not exist on all clients if they are not shipped with starfall):
 -- \- Akbar
 -- \- Coolvetica
@@ -1378,9 +1377,9 @@ end
 defaultFont = render_library.createFont("Default", 16, 400, false, false, false, false, 0)
 
 --- Gets the size of the specified text. Don't forget to use setFont before calling this function
--- @param text Text to get the size of
--- @return width of the text
--- @return height of the text
+-- @param string text Text to get the size of
+-- @return number width of the text
+-- @return number height of the text
 function render_library.getTextSize(text)
 	checkluatype (text, TYPE_STRING)
 
@@ -1389,7 +1388,7 @@ function render_library.getTextSize(text)
 end
 
 --- Sets the font
--- @param font The font to use
+-- @param string font The font to use
 -- Use a font created by render.createFont or use one of these already defined fonts:
 -- \- DebugFixed
 -- \- DebugFixedSmall
@@ -1420,16 +1419,16 @@ function render_library.setFont(font)
 end
 
 --- Gets the default font
--- @return Default font
+-- @return string Default font
 function render_library.getDefaultFont()
 	return defaultFont
 end
 
 --- Draws text with newlines and tabs
--- @param x X coordinate
--- @param y Y coordinate
--- @param text Text to draw
--- @param alignment Text alignment
+-- @param number x X coordinate
+-- @param number y Y coordinate
+-- @param string text Text to draw
+-- @param number alignment Text alignment
 function render_library.drawText(x, y, text, alignment)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype (x, TYPE_NUMBER)
@@ -1445,11 +1444,11 @@ function render_library.drawText(x, y, text, alignment)
 end
 
 --- Draws text more easily and quickly but no new lines or tabs.
--- @param x X coordinate
--- @param y Y coordinate
--- @param text Text to draw
--- @param xalign Text x alignment
--- @param yalign Text y alignment
+-- @param number x X coordinate
+-- @param number y Y coordinate
+-- @param string text Text to draw
+-- @param number? xalign Text x alignment
+-- @param number? yalign Text y alignment
 function render_library.drawSimpleText(x, y, text, xalign, yalign)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype (x, TYPE_NUMBER)
@@ -1464,9 +1463,9 @@ function render_library.drawSimpleText(x, y, text, xalign, yalign)
 end
 
 --- Constructs a markup object for quick styled text drawing.
--- @param str The markup string to parse
--- @param maxsize The max width of the markup (default nil)
--- @return The markup object. See https://wiki.facepunch.com/gmod/markup.Parse
+-- @param string str The markup string to parse
+-- @param number? maxsize The max width of the markup. Default nil
+-- @return Markup The markup object. See https://wiki.facepunch.com/gmod/markup.Parse
 function render_library.parseMarkup(str, maxsize)
 	checkluatype (str, TYPE_STRING)
 	if maxsize~=nil then checkluatype (maxsize, TYPE_NUMBER) end
@@ -1475,11 +1474,11 @@ function render_library.parseMarkup(str, maxsize)
 end
 
 --- Draw the markup object
--- @param x number The x offset
--- @param y number The x offset
--- @param xalign number The x TEXT_ALIGN (default TEXT_ALIGN.LEFT)
--- @param yalign number The y TEXT_ALIGN (default TEXT_ALIGN.TOP)
--- @param a number The alpha to draw it with. (default 255)
+-- @param number x number The x offset
+-- @param number y number The x offset
+-- @param number? xalign number The x TEXT_ALIGN. Default TEXT_ALIGN.LEFT
+-- @param number? yalign number The y TEXT_ALIGN. Default TEXT_ALIGN.TOP
+-- @param number? alpha The alpha to draw it with. Default 255
 function markup_methods:draw(x, y, xalign, yalign, a)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype(x, TYPE_NUMBER)
@@ -1510,14 +1509,14 @@ function markup_methods:getSize()
 end
 
 --- Draws a polygon.
--- @param poly Table of polygon vertices. Texture coordinates are optional. {{x=x1, y=y1, u=u1, v=v1}, ... }
+-- @param table poly Table of polygon vertices. Texture coordinates are optional. {{x=x1, y=y1, u=u1, v=v1}, ... }
 function render_library.drawPoly(poly)
 	checkluatype (poly, TYPE_TABLE)
 	surface.DrawPoly(poly)
 end
 
 --- Enables or disables Depth Buffer
--- @param enable true to enable
+-- @param boolean enable True to enable
 function render_library.enableDepth(enable)
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 	checkluatype (enable, TYPE_BOOL)
@@ -1525,13 +1524,13 @@ function render_library.enableDepth(enable)
 end
 
 --- Enables blend mode control. Read OpenGL or DirectX docs for more info
--- @param on Whether to control the blend mode of upcoming rendering
--- @param srcBlend Number http://wiki.facepunch.com/gmod/Enums/BLEND
--- @param destBlend Number
--- @param blendFunc Number http://wiki.facepunch.com/gmod/Enums/BLENDFUNC
--- @param srcBlendAlpha Optional Number http://wiki.facepunch.com/gmod/Enums/BLEND
--- @param destBlendAlpha Optional Number
--- @param blendFuncAlpha Optional Number http://wiki.facepunch.com/gmod/Enums/BLENDFUNC
+-- @param boolean on Whether to control the blend mode of upcoming rendering
+-- @param number srcBlend http://wiki.facepunch.com/gmod/Enums/BLEND
+-- @param number destBlend
+-- @param number blendFunc http://wiki.facepunch.com/gmod/Enums/BLENDFUNC
+-- @param number? srcBlendAlpha http://wiki.facepunch.com/gmod/Enums/BLEND
+-- @param number? destBlendAlpha
+-- @param number? blendFuncAlpha http://wiki.facepunch.com/gmod/Enums/BLENDFUNC
 function render_library.overrideBlend(on, srcBlend, destBlend, blendFunc, srcBlendAlpha, destBlendAlpha, blendFuncAlpha)
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 	render.OverrideBlend(on, srcBlend, destBlend, blendFunc, srcBlendAlpha, destBlendAlpha, blendFuncAlpha)
@@ -1546,19 +1545,19 @@ function render_library.clearDepth()
 end
 
 --- Draws a sprite in 3d space.
--- @param pos Position of the sprite.
--- @param width Width of the sprite.
--- @param height Height of the sprite.
+-- @param Vector pos Position of the sprite.
+-- @param number width Width of the sprite.
+-- @param number height Height of the sprite.
 function render_library.draw3DSprite(pos, width, height)
 	pos = vunwrap(pos)
 	render.DrawSprite(pos, width, height)
 end
 
 --- Draws a sphere
--- @param pos Position of the sphere
--- @param radius Radius of the sphere
--- @param longitudeSteps The amount of longitude steps. The larger this number is, the smoother the sphere is
--- @param latitudeSteps The amount of latitude steps. The larger this number is, the smoother the sphere is
+-- @param Vector pos Position of the sphere
+-- @param number radius Radius of the sphere
+-- @param number longitudeSteps The amount of longitude steps. The larger this number is, the smoother the sphere is
+-- @param number latitudeSteps The amount of latitude steps. The larger this number is, the smoother the sphere is
 function render_library.draw3DSphere(pos, radius, longitudeSteps, latitudeSteps)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype (radius, TYPE_NUMBER)
@@ -1571,10 +1570,10 @@ function render_library.draw3DSphere(pos, radius, longitudeSteps, latitudeSteps)
 end
 
 --- Draws a wireframe sphere
--- @param pos Position of the sphere
--- @param radius Radius of the sphere
--- @param longitudeSteps The amount of longitude steps. The larger this number is, the smoother the sphere is
--- @param latitudeSteps The amount of latitude steps. The larger this number is, the smoother the sphere is
+-- @param Vector pos Position of the sphere
+-- @param number radius Radius of the sphere
+-- @param number longitudeSteps The amount of longitude steps. The larger this number is, the smoother the sphere is
+-- @param number latitudeSteps The amount of latitude steps. The larger this number is, the smoother the sphere is
 function render_library.draw3DWireframeSphere(pos, radius, longitudeSteps, latitudeSteps)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype (radius, TYPE_NUMBER)
@@ -1587,8 +1586,8 @@ function render_library.draw3DWireframeSphere(pos, radius, longitudeSteps, latit
 end
 
 --- Draws a 3D Line
--- @param startPos Starting position
--- @param endPos Ending position
+-- @param Vector startPos Starting position
+-- @param Vector endPos Ending position
 function render_library.draw3DLine(startPos, endPos)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	startPos = vunwrap(startPos)
@@ -1598,10 +1597,10 @@ function render_library.draw3DLine(startPos, endPos)
 end
 
 --- Draws a box in 3D space
--- @param origin Origin of the box.
--- @param angle Orientation of the box
--- @param mins Start position of the box, relative to origin.
--- @param maxs End position of the box, relative to origin.
+-- @param Vector origin Origin of the box.
+-- @param Angle angle Orientation of the box
+-- @param Vector mins Start position of the box, relative to origin.
+-- @param Vector maxs End position of the box, relative to origin.
 function render_library.draw3DBox(origin, angle, mins, maxs)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	origin = vunwrap(origin)
@@ -1613,10 +1612,10 @@ function render_library.draw3DBox(origin, angle, mins, maxs)
 end
 
 --- Draws a wireframe box in 3D space
--- @param origin Origin of the box.
--- @param angle Orientation of the box
--- @param mins Start position of the box, relative to origin.
--- @param maxs End position of the box, relative to origin.
+-- @param Vector origin Origin of the box.
+-- @param Angle angle Orientation of the box
+-- @param Vector mins Start position of the box, relative to origin.
+-- @param Vector maxs End position of the box, relative to origin.
 function render_library.draw3DWireframeBox(origin, angle, mins, maxs)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	origin = vunwrap(origin)
@@ -1628,11 +1627,11 @@ function render_library.draw3DWireframeBox(origin, angle, mins, maxs)
 end
 
 --- Draws textured beam.
--- @param startPos Beam start position.
--- @param endPos Beam end position.
--- @param width The width of the beam.
--- @param textureStart The start coordinate of the texture used.
--- @param textureEnd The end coordinate of the texture used.
+-- @param Vector startPos Beam start position.
+-- @param Vector endPos Beam end position.
+-- @param number width The width of the beam.
+-- @param number textureStart The start coordinate of the texture used.
+-- @param number textureEnd The end coordinate of the texture used.
 function render_library.draw3DBeam(startPos, endPos, width, textureStart, textureEnd)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype (width, TYPE_NUMBER)
@@ -1646,10 +1645,10 @@ function render_library.draw3DBeam(startPos, endPos, width, textureStart, textur
 end
 
 --- Draws 2 connected triangles.
--- @param vert1 First vertex.
--- @param vert2 The second vertex.
--- @param vert3 The third vertex.
--- @param vert4 The fourth vertex.
+-- @param Vector vert1 First vertex.
+-- @param Vector vert2 The second vertex.
+-- @param Vector vert3 The third vertex.
+-- @param Vector vert4 The fourth vertex.
 function render_library.draw3DQuad(vert1, vert2, vert3, vert4)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
@@ -1662,10 +1661,10 @@ function render_library.draw3DQuad(vert1, vert2, vert3, vert4)
 end
 
 --- Draws 2 connected triangles with custom UVs.
--- @param vert1 First vertex. {x, y, z, u, v}
--- @param vert2 The second vertex.
--- @param vert3 The third vertex.
--- @param vert4 The fourth vertex.
+-- @param Vector vert1 First vertex. {x, y, z, u, v}
+-- @param Vector vert2 The second vertex.
+-- @param Vector vert3 The third vertex.
+-- @param Vector vert4 The fourth vertex.
 function render_library.draw3DQuadUV(vert1, vert2, vert3, vert4)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	mesh.Begin(MATERIAL_QUADS, 1)
@@ -1692,10 +1691,10 @@ function render_library.draw3DQuadUV(vert1, vert2, vert3, vert4)
 end
 
 --- Gets a 2D cursor position where ply is aiming at the current rendered screen or nil if they aren't aiming at it.
--- @param ply player to get cursor position from (default: player())
--- @param screen An explicit screen to get the cursor pos of (default: The current rendering screen using 'render' hook)
--- @return x position
--- @return y position
+-- @param Player? ply player to get cursor position from. Default player()
+-- @param Entity? screen An explicit screen to get the cursor pos of (default: The current rendering screen using 'render' hook)
+-- @return number X position
+-- @return number Y position
 function render_library.cursorPos(ply, screen)
 	if ply~=nil then
 		ply = getent(ply)
@@ -1737,8 +1736,8 @@ end
 
 --- Returns information about the screen, such as world offsets, dimentions, and rotation.
 -- Note: this does a table copy so move it out of your draw hook
--- @param e The screen to get info from.
--- @return A table describing the screen.
+-- @param Entity e The screen to get info from.
+-- @return table A table describing the screen.
 function render_library.getScreenInfo(e)
 	local screen = getent(e)
 	if not screen.ScreenInfo then SF.Throw("Invalid screen", 2) end
@@ -1746,7 +1745,7 @@ function render_library.getScreenInfo(e)
 end
 
 --- Returns the entity currently being rendered to
--- @return Entity of the screen or hud being rendered
+-- @return Entity Entity of the screen or hud being rendered
 function render_library.getScreenEntity()
 	return ewrap(renderdata.renderEnt)
 end
@@ -1762,9 +1761,9 @@ function render_library.capturePixels()
 end
 
 --- Reads the color of the specified pixel.
--- @param x Pixel x-coordinate.
--- @param y Pixel y-coordinate.
--- @return Color object with ( r, g, b, a ) from the specified pixel.
+-- @param number x Pixel x-coordinate.
+-- @param number y Pixel y-coordinate.
+-- @return Color Color object with ( r, g, b, a ) from the specified pixel.
 function render_library.readPixel(x, y)
 	if not renderdata.isRendering then
 		SF.Throw("Not in rendering hook.", 2)
@@ -1774,8 +1773,8 @@ end
 
 --- Returns the render context's width and height. If a rendertarget is selected, will return 1024, 1024
 -- @class function
--- @return the X size of the current render context
--- @return the Y size of the current render context
+-- @return number the X size of the current render context
+-- @return number the Y size of the current render context
 function render_library.getResolution()
 	if renderdata.renderEnt and renderdata.renderEnt.GetResolution then
 		return renderdata.renderEnt:GetResolution()
@@ -1785,28 +1784,28 @@ end
 
 --- Returns width and height of the game window
 -- @class function
--- @return the X size of the game window
--- @return the Y size of the game window
+-- @return number the X size of the game window
+-- @return number the Y size of the game window
 function render_library.getGameResolution()
 	return renderdata.oldW, renderdata.oldH
 end
 
 --- Does a trace and returns the color of the textel the trace hits.
--- @param vec1 The starting vector
--- @param vec2 The ending vector
--- @return The color
+-- @param Vector vec1 The starting vector
+-- @param Vector vec2 The ending vector
+-- @return Color The color
 function render_library.traceSurfaceColor(vec1, vec2)
-
 	return cwrap(render.GetSurfaceColor(vunwrap(vec1), vunwrap(vec2)):ToColor())
 end
 
 --- Checks if a hud component is connected to the Starfall Chip
+-- @return boolean Whether a hud component is connected to the SF Chip and active
 function render_library.isHUDActive()
 	return SF.IsHUDActive(instance.entity)
 end
 
 --- Renders the scene with the specified viewData to the current active render target.
--- @param tbl view The view data to be used in the rendering. See http://wiki.facepunch.com/gmod/Structures/ViewData. There's an additional key drawviewer used to tell the engine whether the local player model should be rendered.
+-- @param table tbl view The view data to be used in the rendering. See http://wiki.facepunch.com/gmod/Structures/ViewData. There's an additional key drawviewer used to tell the engine whether the local player model should be rendered.
 function render_library.renderView(tbl)
 	checkluatype(tbl, TYPE_TABLE)
 
@@ -1942,18 +1941,20 @@ function render_library.renderView(tbl)
 end
 
 --- Returns whether render.renderView is being executed.
+-- @return boolean Whether render.renderView is being executed
 function render_library.isInRenderView()
 	return renderingView
 end
 
 --- Returns how many render.renderView calls can be done in the current frame.
+-- @return number How many render.renderView calls are left
 function render_library.renderViewsLeft()
 	return cv_max_maxrenderviewsperframe:GetInt() - renderdata.renderedViews
 end
 
 --- Sets the status of the clip renderer, returning previous state.
--- @param state New clipping state.
--- @return Previous clipping state.
+-- @param boolean state New clipping state.
+-- @return boolean Previous clipping state.
 function render_library.enableClipping(state)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype(state, TYPE_BOOL)
@@ -1968,8 +1969,8 @@ function render_library.enableClipping(state)
 end
 
 --- Pushes a new clipping plane of the clip plane stack.
--- @param normal The normal of the clipping plane.
--- @param distance The normal of the clipping plane.
+-- @param Vector normal The normal of the clipping plane.
+-- @param number distance The normal of the clipping plane.
 function render_library.pushCustomClipPlane(normal, distance)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
@@ -1978,7 +1979,7 @@ function render_library.pushCustomClipPlane(normal, distance)
 	end
 
 	checkluatype(distance, TYPE_NUMBER)
-	
+
 	render.PushCustomClipPlane(vunwrap(normal), distance)
 
 	pushedClippingPlanes = pushedClippingPlanes + 1
@@ -1988,88 +1989,88 @@ end
 function render_library.popCustomClipPlane()
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if pushedClippingPlanes == 0 then SF.Throw("Popped too many clipping planes.", 2) end
-	
+
 	render.PopCustomClipPlane()
 
 	pushedClippingPlanes = pushedClippingPlanes - 1
 end
 
 --- Calculates the light color of a certain surface
--- @param pos Vector position to sample from
--- @param normal Normal vector of the surface
--- @return Vector representing color of the light
-function render_library.computeLighting(pos, normal) 
+-- @param Vector pos Vector position to sample from
+-- @param Vector normal Normal vector of the surface
+-- @return Vector Vector representing color of the light
+function render_library.computeLighting(pos, normal)
 	return vwrap(render.ComputeLighting(vunwrap(pos), vunwrap(normal)))
 end
 
 --- Calculates the lighting caused by dynamic lights for the specified surface
--- @param pos Vector position to sample from
--- @param normal Normal vector of the surface
--- @return Vector representing color of the light
+-- @param Vector pos Vector position to sample from
+-- @param Vector normal Normal vector of the surface
+-- @return Vector Vector representing color of the light
 function render_library.computeDynamicLighting(pos, normal)
 	return vwrap(render.ComputeDynamicLighting(vunwrap(pos), vunwrap(normal)))
 end
 
 --- Gets the light exposure on the specified position
--- @param pos Vector position to sample from
--- @return Vector representing color of the light
+-- @param Vector pos Vector position to sample from
+-- @return Vector Vector representing color of the light
 function render_library.getLightColor(pos)
 	return vwrap(render.GetLightColor(vunwrap(pos)))
 end
 
 --- Returns the ambient color of the map
--- @return Vector representing color of the light
+-- @return Vector Vector representing color of the light
 function render_library.getAmbientLightColor()
 	return vwrap(render.GetAmbientLightColor())
 end
 
 --- Sets the fog mode. See: https://wiki.facepunch.com/gmod/Enums/MATERIAL_FOG
--- @param mode Fog mode
+-- @param number mode Fog mode
 function render_library.setFogMode(mode)
 	checkpermission(instance, nil, "render.fog")
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype(mode, TYPE_NUMBER)
-	
+
 	render.FogMode(mode)
 end
 
 --- Changes color of the fog
--- @param color Color (alpha won't have any effect)
+-- @param Color col Color (alpha won't have any effect)
 function render_library.setFogColor(color)
 	checkpermission(instance, nil, "render.fog")
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	
+
 	local col = cunwrap(color)
 	render.FogColor(col.r, col.g, col.b)
 end
 
 --- Changes density of the fog
--- @param density Number density between 0 and 1
+-- @param number density Density between 0 and 1
 function render_library.setFogDensity(density)
 	checkpermission(instance, nil, "render.fog")
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype(density, TYPE_NUMBER)
-	
+
 	render.FogMaxDensity(density)
 end
 
 --- Sets distance at which the fog will start appearing
--- @param distance Start distance
+-- @param number distance Start distance
 function render_library.setFogStart(distance)
 	checkpermission(instance, nil, "render.fog")
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype(distance, TYPE_NUMBER)
-	
+
 	render.FogStart(distance)
 end
 
 --- Sets distance at which the fog will reach it's target density
--- @param distance End distance
+-- @param number distance End distance
 function render_library.setFogEnd(distance)
 	checkpermission(instance, nil, "render.fog")
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype(distance, TYPE_NUMBER)
-	
+
 	render.FogEnd(distance)
 end
 
@@ -2084,15 +2085,15 @@ end
 
 
 --- Checks whether the hardware supports HDR
--- @return True if supported
+-- @return boolean True if supported
 render_library.supportsHDR = render.SupportsHDR
 
 --- Checks whether HDR is enabled. Hardware support, map and client settings are all taken into account
--- @return True if available
+-- @return boolean True if available
 render_library.getHDREnabled = render.GetHDREnabled
 
 --- Sets the overlay of the chip to a user's rendertarget
--- @param name The name of the RT to use or nil to set it back to normal
+-- @param string? name The name of the RT to use or nil to set it back to normal
 function render_library.setChipOverlay(name)
 	local rt
 	if name~=nil then
@@ -2104,11 +2105,11 @@ function render_library.setChipOverlay(name)
 end
 
 --- Using the custom screen model, sets the screen offset and size as long as its within bounds of -1024 to 1024 units
--- @param screen The custom screen to be resized
--- @param x The x offset of the screen
--- @param y The y offset of the screen
--- @param w The width of the screen
--- @param h The height of the screen
+-- @param Entity screen The custom screen to be resized
+-- @param number x The x offset of the screen
+-- @param number y The y offset of the screen
+-- @param number w The width of the screen
+-- @param number h The height of the screen
 function render_library.setScreenDimensions(screen, x, y, w, h)
 	checkluatype(x, TYPE_NUMBER)
 	checkluatype(y, TYPE_NUMBER)
@@ -2130,9 +2131,9 @@ function render_library.setScreenDimensions(screen, x, y, w, h)
 end
 
 --- Makes the screen shake, client must be connected to a HUD.
--- @param amplitude The strength of the effect
--- @param frequency The frequency of the effect in hertz
--- @param duration The duration of the effect in seconds, max 10.
+-- @param number amplitude The strength of the effect
+-- @param number frequency The frequency of the effect in hertz
+-- @param number duration The duration of the effect in seconds, max 10.
 function render_library.screenShake(amplitude, frequency, duration)
 	checkluatype (amplitude, TYPE_NUMBER)
 	checkluatype (frequency, TYPE_NUMBER)
@@ -2157,8 +2158,8 @@ end
 -- @name hudshoulddraw
 -- @class hook
 -- @client
--- @param string The name of the hud element trying to be drawn
--- @return Return false to not draw the element
+-- @param string str The name of the hud element trying to be drawn
+-- @return boolean Return false to not draw the element
 
 ---Called before drawing HUD (2D Context)
 -- @name predrawhud
@@ -2179,9 +2180,9 @@ end
 -- @name renderscene
 -- @class hook
 -- @client
--- @param origin View origin
--- @param angles View angles
--- @param fov View FOV
+-- @param Vector origin View origin
+-- @param Angle angles View angles
+-- @param number fov View FOV
 
 --- Called when the player connects to a HUD component linked to the Starfall Chip
 -- @name hudconnected
@@ -2202,39 +2203,39 @@ end
 -- @name predrawopaquerenderables
 -- @class hook
 -- @client
--- @param depth Boolean whether the current draw is writing depth
--- @param skybox Boolean whether the current draw is drawing the skybox
+-- @param boolean depth Whether the current draw is writing depth
+-- @param boolean skybox Whether the current draw is drawing the skybox
 
 --- Called after opaque entities are drawn. (Only works with HUD) (3D context)
 -- @name postdrawopaquerenderables
 -- @class hook
 -- @client
--- @param depth Boolean whether the current draw is writing depth
--- @param skybox Boolean whether the current draw is drawing the skybox
+-- @param boolean depth Whether the current draw is writing depth
+-- @param boolean skybox Whether the current draw is drawing the skybox
 
 --- Called before translucent entities are drawn. (Only works with HUD) (3D context)
 -- @name predrawtranslucentrenderables
 -- @class hook
 -- @client
--- @param depth Boolean whether the current draw is writing depth
--- @param skybox Boolean whether the current draw is drawing the skybox
+-- @param boolean depth Whether the current draw is writing depth
+-- @param boolean skybox Whether the current draw is drawing the skybox
 
 --- Called after translucent entities are drawn. (Only works with HUD) (3D context)
 -- @name postdrawtranslucentrenderables
 -- @class hook
 -- @client
--- @param depth Boolean whether the current draw is writing depth
--- @param skybox Boolean whether the current draw is drawing the skybox
+-- @param boolean depth Whether the current draw is writing depth
+-- @param boolean skybox Whether the current draw is drawing the skybox
 
 --- Called when the engine wants to calculate the player's view. Only works if connected to Starfall HUD
 -- @name calcview
 -- @class hook
 -- @client
--- @param pos Current position of the camera
--- @param ang Current angles of the camera
--- @param fov Current fov of the camera
--- @param znear Current near plane of the camera
--- @param zfar Current far plane of the camera
+-- @param Vector pos Current position of the camera
+-- @param Angle ang Current angles of the camera
+-- @param number fov Current fov of the camera
+-- @param number znear Current near plane of the camera
+-- @param number zfar Current far plane of the camera
 -- @return table Table containing information for the camera. {origin=camera origin, angles=camera angles, fov=camera fov, znear=znear, zfar=zfar, drawviewer=drawviewer, ortho=ortho table}
 
 --- Called when world fog is drawn.
@@ -2246,13 +2247,13 @@ end
 -- @name setupskyboxfog
 -- @class hook
 -- @client
--- @param scale Skybox scale
+-- @param number scale Skybox scale
 
 --- Called when a player uses the screen
 -- @name starfallUsed
 -- @class hook
--- @param activator Player who used the screen or chip
--- @param used The screen or chip entity that was used
+-- @param Player activator Player who used the screen or chip
+-- @param Entity used The screen or chip entity that was used
 
 ---
 -- @name render_library.Screen information table

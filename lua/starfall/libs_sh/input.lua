@@ -151,9 +151,9 @@ local vwrap = instance.Types.Vector.Wrap
 
 --- Gets the first key that is bound to the command passed
 -- @client
--- @param binding The name of the bind
--- @return The id of the first key bound
--- @return The name of the first key bound
+-- @param string binding The name of the bind
+-- @return number The id of the first key bound
+-- @return string The name of the first key bound
 
 function input_library.lookupBinding(binding)
 	checkluatype(binding, TYPE_STRING)
@@ -170,8 +170,8 @@ end
 
 --- Gets whether a key is down
 -- @client
--- @param key The key id, see input
--- @return True if the key is down
+-- @param number key The key id, see input
+-- @return boolean True if the key is down
 function input_library.isKeyDown(key)
 	checkluatype(key, TYPE_NUMBER)
 
@@ -182,8 +182,8 @@ end
 
 --- Gets whether a mouse button is down
 -- @client
--- @param key The mouse button id, see input
--- @return True if the key is down
+-- @param number key The mouse button id, see input
+-- @return boolean True if the key is down
 function input_library.isMouseDown(key)
 	checkluatype(key, TYPE_NUMBER)
 
@@ -194,8 +194,8 @@ end
 
 --- Gets the name of a key from the id
 -- @client
--- @param key The key id, see input
--- @return The name of the key
+-- @param number key The key id, see input
+-- @return string The name of the key
 function input_library.getKeyName(key)
 	checkluatype(key, TYPE_NUMBER)
 
@@ -206,7 +206,7 @@ end
 
 --- Gets whether the shift key is down
 -- @client
--- @return True if the shift key is down
+-- @return boolean True if the shift key is down
 function input_library.isShiftDown()
 	checkpermission(instance, nil, "input")
 
@@ -215,7 +215,7 @@ end
 
 --- Gets whether the control key is down
 -- @client
--- @return True if the control key is down
+-- @return boolean True if the control key is down
 function input_library.isControlDown()
 	checkpermission(instance, nil, "input")
 
@@ -224,8 +224,8 @@ end
 
 --- Gets the position of the mouse
 -- @client
--- @return The x position of the mouse
--- @return The y position of the mouse
+-- @return number The x position of the mouse
+-- @return number The y position of the mouse
 function input_library.getCursorPos()
 	checkpermission(instance, nil, "input")
 
@@ -234,7 +234,7 @@ end
 
 --- Gets whether the cursor is visible on the screen
 -- @client
--- @return The cursor's visibility
+-- @return boolean The cursor's visibility
 function input_library.getCursorVisible()
 	checkpermission(instance, nil, "input")
 
@@ -243,9 +243,9 @@ end
 
 ---Translates position on player's screen to aim vector
 -- @client
--- @param x X coordinate on the screen
--- @param y Y coordinate on the screen
--- @return Aim vector
+-- @param number x X coordinate on the screen
+-- @param number y Y coordinate on the screen
+-- @return Vector Aim vector
 function input_library.screenToVector(x, y)
 	checkpermission(instance, nil, "input")
 	checkluatype(x, TYPE_NUMBER)
@@ -255,7 +255,7 @@ end
 
 --- Sets the state of the mouse cursor
 -- @client
--- @param enabled Whether or not the cursor should be enabled
+-- @param boolean enabled Whether or not the cursor should be enabled
 function input_library.enableCursor(enabled)
 	checkluatype(enabled, TYPE_BOOL)
 	checkpermission(instance, nil, "input")
@@ -270,17 +270,17 @@ end
 
 --- Makes the local player select a weapon
 -- @client
--- @param weapon The weapon entity to select
+-- @param Weapon weapon The weapon entity to select
 function input_library.selectWeapon(weapon)
 	local ent = getent(weapon)
 	if not (ent:IsWeapon() and ent:IsCarriedByLocalPlayer()) then SF.Throw("This weapon is not your own!", 2) end
 	checkpermission(instance, nil, "input.emulate")
-	input.SelectWeapon( ent ) 
+	input.SelectWeapon( ent )
 end
 
 --- Locks game controls for typing purposes. Alt will unlock the controls. Has a 10 second cooldown.
 -- @client
--- @param enabled Whether to lock or unlock the controls
+-- @param boolean enabled Whether to lock or unlock the controls
 function input_library.lockControls(enabled)
 	checkluatype(enabled, TYPE_BOOL)
 	checkpermission(instance, nil, "input")
@@ -302,14 +302,14 @@ end
 
 --- Gets whether the player's control is currenty locked
 -- @client
--- @return Whether the player's control is locked
+-- @return boolean Whether the player's control is locked
 function input_library.isControlLocked()
 	return controlsLocked
 end
 
 --- Gets whether the player's control can be locked
 -- @client
--- @return Whether the player's control can be locked
+-- @return boolean Whether the player's control can be locked
 function input_library.canLockControls()
 	return SF.IsHUDActive(instance.entity) and lockedControlCooldown <= CurTime()
 end
@@ -322,24 +322,24 @@ end
 -- @client
 -- @name inputPressed
 -- @class hook
--- @param button Number of the button
+-- @param number button Number of the button
 
 --- Called when a button is released
 -- @client
 -- @name inputReleased
 -- @class hook
--- @param button Number of the button
+-- @param number button Number of the button
 
 --- Called when the mouse is moved
 -- @client
 -- @name mousemoved
 -- @class hook
--- @param x X coordinate moved
--- @param y Y coordinate moved
+-- @param number x X coordinate moved
+-- @param number y Y coordinate moved
 
 --- Called when the mouse wheel is rotated
 -- @client
 -- @name mouseWheeled
 -- @class hook
--- @param delta Rotate delta
+-- @param number delta Rotate delta
 

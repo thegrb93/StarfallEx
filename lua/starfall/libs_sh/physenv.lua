@@ -24,7 +24,7 @@ function physenv_lib.getGravity()
 	return vwrap(physenv.GetGravity())
 end
 
---- Gets the performance settings.</br>
+--- Gets the performance settings.
 -- See http://wiki.facepunch.com/gmod/Structures/PhysEnvPerformanceSettings for table structure.
 -- @return table Performance Settings Table.
 function physenv_lib.getPerformanceSettings()

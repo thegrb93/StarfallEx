@@ -95,10 +95,10 @@ local function createTimer(name, delay, reps, func, simple)
 end
 
 --- Creates (and starts) a timer
--- @param name The timer name
--- @param delay The time, in seconds, to set the timer to.
--- @param reps The repititions of the timer. 0 = infinte
--- @param func The function to call when the timer is fired
+-- @param string name The timer name
+-- @param number delay The time, in seconds, to set the timer to.
+-- @param number reps The repititions of the timer. 0 = infinte
+-- @param function func The function to call when the timer is fired
 function timer_library.create(name, delay, reps, func)
 	checkluatype(name, TYPE_STRING)
 	checkluatype(delay, TYPE_NUMBER)
@@ -109,8 +109,8 @@ function timer_library.create(name, delay, reps, func)
 end
 
 --- Creates a simple timer, has no name, can't be stopped, paused, or destroyed.
--- @param delay the time, in second, to set the timer to
--- @param func the function to call when the timer is fired
+-- @param number delay The time, in second, to set the timer to
+-- @param function func The function to call when the timer is fired
 function timer_library.simple(delay, func)
 	checkluatype(delay, TYPE_NUMBER)
 	checkluatype(func, TYPE_FUNCTION)
@@ -118,7 +118,7 @@ function timer_library.simple(delay, func)
 end
 
 --- Stops and removes the timer.
--- @param name The timer name
+-- @param string name The timer name
 function timer_library.remove(name)
 	checkluatype(name, TYPE_STRING)
 
@@ -131,24 +131,24 @@ function timer_library.remove(name)
 end
 
 --- Checks if a timer exists
--- @param name The timer name
--- @return bool if the timer exists
+-- @param string name The timer name
+-- @return boolean if the timer exists
 function timer_library.exists(name)
 	checkluatype(name, TYPE_STRING)
 	return timer.Exists(mangle_timer_name(name))
 end
 
 --- Stops a timer
--- @param name The timer name
--- @return false if the timer didn't exist or was already stopped, true otherwise.
+-- @param string name The timer name
+-- @return boolean False if the timer didn't exist or was already stopped, true otherwise.
 function timer_library.stop(name)
 	checkluatype(name, TYPE_STRING)
 	return timer.Stop(mangle_timer_name(name))
 end
 
 --- Starts a timer
--- @param name The timer name
--- @return true if the timer exists, false if it doesn't.
+-- @param string name The timer name
+-- @return boolean True if the timer exists, false if it doesn't.
 function timer_library.start(name)
 	checkluatype(name, TYPE_STRING)
 
@@ -156,11 +156,11 @@ function timer_library.start(name)
 end
 
 --- Adjusts a timer
--- @param name The timer name
--- @param delay The time, in seconds, to set the timer to.
--- @param reps (Optional) The repititions of the timer. 0 = infinte, nil = 1
--- @param func (Optional) The function to call when the timer is fired
--- @return true if succeeded
+-- @param string name The timer name
+-- @param number delay The time, in seconds, to set the timer to.
+-- @param number? reps (Optional) The repetitions of the timer. 0 = infinite, nil = 1
+-- @param function? func (Optional) The function to call when the timer is fired
+-- @return boolean True if succeeded
 function timer_library.adjust(name, delay, reps, func)
 	checkluatype(name, TYPE_STRING)
 	checkluatype(delay, TYPE_NUMBER)
@@ -178,8 +178,8 @@ function timer_library.adjust(name, delay, reps, func)
 end
 
 --- Pauses a timer
--- @param name The timer name
--- @return false if the timer didn't exist or was already paused, true otherwise.
+-- @param string name The timer name
+-- @return boolean false if the timer didn't exist or was already paused, true otherwise.
 function timer_library.pause(name)
 	checkluatype(name, TYPE_STRING)
 
@@ -187,8 +187,8 @@ function timer_library.pause(name)
 end
 
 --- Unpauses a timer
--- @param name The timer name
--- @return false if the timer didn't exist or was already running, true otherwise.
+-- @param string name The timer name
+-- @return boolean false if the timer didn't exist or was already running, true otherwise.
 function timer_library.unpause(name)
 	checkluatype(name, TYPE_STRING)
 
@@ -196,8 +196,8 @@ function timer_library.unpause(name)
 end
 
 --- Runs either timer.pause or timer.unpause based on the timer's current status.
--- @param name The timer name
--- @return status of the timer.
+-- @param string name The timer name
+-- @return boolean Status of the timer.
 function timer_library.toggle(name)
 	checkluatype(name, TYPE_STRING)
 
@@ -205,8 +205,8 @@ function timer_library.toggle(name)
 end
 
 --- Returns amount of time left (in seconds) before the timer executes its function.
--- @param name The timer name
--- @return The amount of time left (in seconds). If the timer is paused, the amount will be negative. Nil if timer doesnt exist
+-- @param string name The timer name
+-- @return number The amount of time left (in seconds). If the timer is paused, the amount will be negative. Nil if timer doesnt exist
 function timer_library.timeleft(name)
 	checkluatype(name, TYPE_STRING)
 
@@ -214,8 +214,8 @@ function timer_library.timeleft(name)
 end
 
 --- Returns amount of repetitions/executions left before the timer destroys itself.
--- @param name The timer name
--- @return The amount of executions left. Nil if timer doesnt exist
+-- @param string name The timer name
+-- @return number The amount of executions left. Nil if timer doesnt exist
 function timer_library.repsleft(name)
 	checkluatype(name, TYPE_STRING)
 
@@ -223,7 +223,7 @@ function timer_library.repsleft(name)
 end
 
 --- Returns number of available timers
--- @return Number of available timers
+-- @return number Number of available timers
 function timer_library.getTimersLeft()
 	return max_timers:GetInt() - timer_count
 end

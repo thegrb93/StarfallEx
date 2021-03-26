@@ -30,10 +30,10 @@ end
 --- Creates an Angle struct.
 -- @name builtins_library.Angle
 -- @class function
--- @param p - Pitch
--- @param y - Yaw
--- @param r - Roll
--- @return Angle
+-- @param number p Pitch
+-- @param number y Yaw
+-- @param number r Roll
+-- @return Angle Angle struct
 instance.env.Angle = function (p, y, r)
 	if p~=nil then checkluatype(p, TYPE_NUMBER) else p = 0 end
 	if y~=nil then checkluatype(y, TYPE_NUMBER) else y = p end
@@ -46,7 +46,10 @@ end
 -- String based indexing returns string, just a pass through.
 local pyr = { p = 1, y = 2, r = 3, pitch = 1, yaw = 2, roll = 3 }
 
---- __newindex metamethod
+--- Sets a value at a key in the angle
+-- @param Angle Ang
+-- @param number|string Key
+-- @param number Value
 function ang_meta.__newindex(t, k, v)
 	if pyr[k] then
 		rawset(t, pyr[k], v)
@@ -55,8 +58,11 @@ function ang_meta.__newindex(t, k, v)
 	end
 end
 
---- __index metamethod
+--- Gets a value at a key in the color
 -- Can be indexed with: 1, 2, 3, p, y, r, pitch, yaw, roll. 1,2,3 is most efficient.
+-- @param Angle Ang
+-- @param number|string Key
+-- @return number Value
 function ang_meta.__index(t, k)
 	local method = ang_methods[k]
 	if method then
@@ -68,15 +74,16 @@ end
 
 local table_concat = table.concat
 
---- tostring metamethod
--- @return string representing the angle.
+--- Turns an angle into a string.
+-- @return string String representing the angle.
 function ang_meta.__tostring(a)
 	return table_concat(a, ' ', 1, 3)
 end
 
---- __mul metamethod ang1 * b or ang1 * ang2.
--- @param b Number or Angle to multiply by.
--- @return resultant angle.
+--- Multiplication metamethod
+-- @param number|Angle a1 Number or Angle multiplicand.
+-- @param number|Angle a2 Number or Angle multiplier.
+-- @return Angle Resultant angle.
 function ang_meta.__mul(a, b)
 	if isnumber(b) then
 		return wrap({ a[1] * b, a[2] * b, a[3] * b })
@@ -91,9 +98,10 @@ function ang_meta.__mul(a, b)
 	end
 end
 
---- __div metamethod ang1 / b or ang1 / ang2.
--- @param b Number or Angle to divided by.
--- @return resultant angle.
+--- Division metamethod
+-- @param number|Angle a1 Number or Angle dividend.
+-- @param number|Angle a2 Number or Angle divisor.
+-- @return Angle Resultant angle.
 function ang_meta.__div(a, b)
 	if isnumber(b) then
 		return wrap({ a[1] / b, a[2] / b, a[3] / b })
@@ -108,64 +116,65 @@ function ang_meta.__div(a, b)
 	end
 end
 
---- __unm metamethod -ang.
--- @return resultant angle.
+--- Unary Minus metamethod (Negative)
+-- @return Angle Negative angle.
 function ang_meta.__unm(a)
 	return wrap({ -a[1], -a[2], -a[3] })
 end
 
---- __eq metamethod ang1 == ang2.
--- @param a Angle to check against.
--- @return bool
+--- Equivalence metamethod
+-- @param Angle a1 Initial angle.
+-- @param Angle a2 Angle to check against.
+-- @return boolean Whether their fields are equal
 function ang_meta.__eq(a, b)
 	return a[1]==b[1] and a[2]==b[2] and a[3]==b[3]
 end
 
---- __add metamethod ang1 + ang2.
--- @param a Angle to add.
--- @return resultant angle.
+--- Addition metamethod
+-- @param Angle a1 Initial angle.
+-- @param Angle a2 Angle to add to the first.
+-- @return Angle Resultant angle.
 function ang_meta.__add(a, b)
-
 	return wrap({ a[1] + b[1], a[2] + b[2], a[3] + b[3] })
 end
 
---- __sub metamethod ang1 - ang2.
--- @param a Angle to subtract.
--- @return resultant angle.
+--- Subtraction metamethod
+-- @param Angle a1 Initial angle.
+-- @param Angle a2 Angle to subtract.
+-- @return Angle Resultant angle.
 function ang_meta.__sub(a, b)
-
 	return wrap({ a[1]-b[1], a[2]-b[2], a[3]-b[3] })
 end
 
 --- Returns if p,y,r are all 0.
--- @return boolean
+-- @return boolean If they are all zero
 function ang_methods:isZero()
 	return self[1]==0 and self[2]==0 and self[3]==0
 end
 
 --- Return the Forward Vector ( direction the angle points ).
--- @return vector normalised.
+-- @return Vector Forward direction.
 function ang_methods:getForward()
 	return vwrap(unwrap(self):Forward())
 end
 
 --- Return the Right Vector relative to the angle dir.
--- @return vector normalised.
+-- @return Vector Right direction.
 function ang_methods:getRight()
 	return vwrap(unwrap(self):Right())
 end
 
 --- Return the Up Vector relative to the angle dir.
--- @return vector normalised.
+-- @return Vector Up direction.
 function ang_methods:getUp()
 	return vwrap(unwrap(self):Up())
 end
 
 --- Return Rotated angle around the specified axis.
--- @param v Vector axis
--- @param deg Number of degrees or nil if radians.
--- @param rad Number of radians or nil if degrees.
--- @return The modified angle
+-- @param Vector v Vector axis
+-- @param number? deg Number of degrees or nil if radians.
+-- @param number? rad Number of radians or nil if degrees.
+-- @return Angle The modified angle
 function ang_methods:rotateAroundAxis(v, deg, rad)
 
 	if rad then
@@ -183,9 +192,9 @@ function ang_methods:rotateAroundAxis(v, deg, rad)
 	return awrap(ret)
 end
 
---- Round the angle values. Self-Modifies.
--- @param idp (Default 0) The integer decimal place to round to. 
--- @return nil
+--- Round the angle values.
+-- Self-Modifies. Does not return anything
+-- @param number? idp (Default 0) The integer decimal place to round to.
 function ang_methods:round(idp)
 	self[1] = math.Round(self[1], idp)
 	self[2] = math.Round(self[2], idp)
@@ -193,14 +202,14 @@ function ang_methods:round(idp)
 end
 
 --- Copies p,y,r from angle and returns a new angle
--- @return The copy of the angle
+-- @return Angle The copy of the angle
 function ang_methods:clone()
 	return wrap({ self[1], self[2], self[3] })
 end
 
 --- Copies p,y,r from angle to another.
--- @param b The angle to copy from.
--- @return nil
+-- Self-Modifies. Does not return anything
+-- @param Angle b The angle to copy from.
 function ang_methods:set(b)
 	self[1] = b[1]
 	self[2] = b[2]
@@ -208,32 +217,32 @@ function ang_methods:set(b)
 end
 
 --- Sets p,y,r to 0. This is faster than doing it manually.
--- @return nil
+-- Self-Modifies. Does not return anything
 function ang_methods:setZero()
 	self[1] = 0
 	self[2] = 0
 	self[3] = 0
 end
 
---- Set's the angle's pitch and returns it.
--- @param p The pitch
--- @return The modified angle
+--- Set's the angle's pitch and returns self.
+-- @param number p The pitch
+-- @return Angle Angle after modification
 function ang_methods:setP(p)
 	self[1] = p
 	return self
 end
 
---- Set's the angle's yaw and returns it.
--- @param y The yaw
--- @return The modified angle
+--- Set's the angle's yaw and returns self.
+-- @param number y The yaw
+-- @return Angle Angle after modification
 function ang_methods:setY(y)
 	self[2] = y
 	return self
 end
 
---- Set's the angle's roll and returns it.
--- @param r The roll
--- @return The modified angle
+--- Set's the angle's roll and returns self.
+-- @param number r The roll
+-- @return Angle Angle after modification
 function ang_methods:setR(r)
 	self[3] = r
 	return self
