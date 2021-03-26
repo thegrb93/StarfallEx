@@ -5,11 +5,24 @@ const GENERIC_LUA_TYPES = {
     ["number"] : true,
     ["string"] : true,
     ["table"] : true,
-    ["..."] : true,
-    ["any"] : true,
     ["function"] : true,
-    ["thread"] : true
+    ["thread"] : true,
+
+    ["..."] : true,
+
+    ["any"] : true,
+
+    ["nil"] : true
 }
+
+// If no type is defined, insert this html. Just "any or nil".
+const ANY_TYPE = <a className="sf-reference">any</a>;
+
+// To replace the '?' in <type>? with <type> or nil
+const NULLABLE = [
+    " or ",
+    <a className="sf-reference">nil</a>
+]
 
 // Gets each arg from a multi-type. number|Angle|Vector -> ["number", "Angle", "Vector"]
 function getTypes(s) {
@@ -34,7 +47,7 @@ function getTypeHTML(type) {
 }
 
 // Turns something like ...number? -> ["...", <a>number</a>, "?"]
-function getElementsFromSingleType(single_type) {
+function getElementsFromSingleType(single_type, disallow_nullable) {
     if(GENERIC_LUA_TYPES[single_type] != null) return getTypeHTML(single_type);
     let out = [];
     let _, vararg, type, nullable;
@@ -42,19 +55,22 @@ function getElementsFromSingleType(single_type) {
 
     if (vararg != null) out.push(vararg);
     out.push( getTypeHTML(type) );
-    if (nullable != null) out.push(nullable);
+    if (!disallow_nullable && nullable != null) out.push(NULLABLE);
     return out;
 }
 
 // Like getElementsFromSingleType, but takes a full type. Full types might have types inside of them
 // number|Vector|Angle.
 export default function getElementsFromType(full_type) {
+    if(full_type == null) // Incorrect documentation / Old docs.
+        return ANY_TYPE;
     let types = getTypes(full_type);
     let multi_type = types.length>1;
     if (multi_type) {
         let out = [];
         types.forEach( (type, ind) => {
-            out.push( getElementsFromSingleType(type) );
+            // Don't allow the '?' for nullable types inside of multi-types. (Assume they did '<type>|<type2>|nil')
+            out.push( getElementsFromSingleType(type, true) );
             if (ind != types.length-1) out.push(' or ');
         });
         return out;
