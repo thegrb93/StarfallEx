@@ -335,7 +335,7 @@ function net_library.readBit()
 	return net.ReadBit()
 end
 
---- Writes a bool to the net message
+--- Writes a boolean to the net message
 -- @shared
 -- @param number t The bit to be written. (boolean)
 function net_library.writeBool(t)
