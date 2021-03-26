@@ -181,7 +181,7 @@ end
 --- Equivalence metamethod
 -- @param Vector v1 Initial vector.
 -- @param Vector v2 Vector to check against.
--- @return bool Whether both sides are equal.
+-- @return boolean Whether both sides are equal.
 function vec_meta.__eq(a, b)
 	return a[1]==b[1] and a[2]==b[2] and a[3]==b[3]
 end
@@ -474,7 +474,7 @@ end
 --- Returns whenever the given vector is in a box created by the 2 other vectors.
 -- @param Vector v1 Vector used to define AABox
 -- @param Vector v2 Second Vector to define AABox
--- @return bool True/False.
+-- @return boolean True/False.
 function vec_methods:withinAABox(v1, v2)
 	if self[1] < math.min(v1[1], v2[1]) or self[1] > math.max(v1[1], v2[1]) then return false end
 	if self[2] < math.min(v1[2], v2[2]) or self[2] > math.max(v1[2], v2[2]) then return false end
@@ -486,7 +486,7 @@ end
 if SERVER then
 	--- Returns whether the vector is in world
 	-- @server
-	-- @return bool True/False.
+	-- @return boolean True/False.
 	function vec_methods:isInWorld()
 		return util.IsInWorld(unwrap(self))
 	end

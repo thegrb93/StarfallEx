@@ -107,7 +107,7 @@ if CLIENT then
 
 	--- Sets a hologram or custom_prop model to a custom Mesh
 	-- @client
-	-- @param mesh? mesh The mesh to set it to or nil to set back to normal
+	-- @param Mesh? mesh The mesh to set it to or nil to set back to normal
 	function ents_methods:setMesh(mesh)
 		local ent = getent(self)
 		if not ent.IsSFHologram and not ent.IsSFProp then SF.Throw("The entity isn't a hologram or custom-prop", 2) end

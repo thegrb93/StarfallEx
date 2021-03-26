@@ -169,7 +169,7 @@ end
 --- Division metamethod
 -- @param number|Color b Number or Color dividend
 -- @param number|Color b Number or Color divisor
--- @return Scaled color.
+-- @return Color Scaled color.
 function color_meta.__div(a, b)
 	if isnumber(b) then
 		return wrap({ a[1] / b, a[2] / b, a[3] / b, a[4] / b })
