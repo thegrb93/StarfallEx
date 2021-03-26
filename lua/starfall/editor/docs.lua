@@ -15,13 +15,16 @@ local string_match, string_find, string_sub = string.match, string.find, string.
 
 local generic_lua_types = {
 	["boolean"] = true,
-	["number"] = true,
-	["string"] = true,
+	["number"]  = true,
+	["string"]  = true,
 	["table"] = true,
-	["..."] = true,
-	["any"] = true,
 	["function"] = true,
-	["thread"] = true
+	["thread"] = true,
+	["..."] = true, -- Any type of multiple values or no values potentially.
+
+	["any"] = true, -- Can be any type, only one value
+
+	["nil"] = true -- For nullable / optional values
 }
 
 local sf_types = Docs.Types -- Get the types from documentation rather than the lua state
@@ -30,19 +33,20 @@ local function valid_sftype(type1)
 
 	if string_find(type1, "|", 1, true) then
 		for str in type1:gmatch("[^|]+") do
-			str = (str:match("(.-)%?") or str) -- In case there's nullable stuff in there.
-			-- We shouldn't use variadics in an or statement (instead just use the variadics or an any type)
+			-- Note that we shouldn't use nullables / variadics in a multi-type <type>|<type2> so we don't support it here.
+			-- Just use the variadic since it can equal nil or add |nil to it.
+
 			if not (sf_types[str] or generic_lua_types[str]) then
 				return false
 			end
 		end
 	end
 
-	local type2 = type1:match("%.%.%.(%w+)%??") -- ...(number)?
+	local type2 = type1:match("%.%.%.(%w+)%??") -- ...<number>(?)
 
 	if sf_types[type2] or generic_lua_types[type2] then return true end
 
-	local type3 = type1:match("(%w+)%??") -- (vector)?
+	local type3 = type1:match("(%w+)%??") -- <Vector>?
 
 	return sf_types[type3] or generic_lua_types[type3]
 end
@@ -60,21 +64,26 @@ local function processMembers()
 				elseif data.class == "function" then
 					tblindex = "methods"
 
-					for _, param in ipairs(data.params) do
-						if not valid_sftype(param.type) then
-							-- No type found, revert to old untyped documentation
-							param.type = "any?"
-							name, description = string_match(param.value, "%s*([%w_%.]+)%s*(.*)")
-							if name==nil then
-								ErrorNoHalt("Invalid param doc (" .. value .. ") in file: " .. curfile .. "\n")
+					if data.params then
+						for _, param in ipairs(data.params) do
+							if not valid_sftype(param.type) then
+								-- No valid type found, revert to old untyped documentation
+								param.type = nil -- SFHelper will turn this into "any". (Any type, including nil)
+								param.name, param.description = string_match(param.value, "%s*([%w_%.]+)%s*(.*)")
+								if param.name==nil then
+									ErrorNoHalt("Invalid param doc (" .. param.value .. ") in file: " .. curfile .. "\n")
+								end
+								param.value = nil
 							end
 						end
 					end
-					for _, ret in ipairs(data.returns) do
-						if not valid_sftype(ret.type) then
-							-- No type found, revert to old untyped documentation
-							ret.type = "any?"
-							description = value
+					if data.returns then
+						for _, ret in ipairs(data.returns) do
+							if not valid_sftype(ret.type) then
+								ret.type = nil
+								ret.description = ret.value
+								ret.value = nil
+							end
 						end
 					end
 				end
@@ -175,14 +184,15 @@ local parseAttributes = {
 		t[#t+1] = value
 	end,
 	["param"] = function(parsing, value)
-		local type, name, description = string_match(value, "%s*([%w_%.%?|]+)%s*([%w_%.]+)%s*(.*)")
+		local type, name, description = string_match(value, "%s*([%w%.%?|]+)%s*([%w_%.]+)%s*(.*)")
 		if type then
 			local t = parsing.params
 			if not t then t = {} parsing.params = t end
 			t[#t+1] = {
 				name = name,
 				description = description,
-				type = type
+				type = type,
+				value = value -- We need this in case the type isn't valid. Will be deleted after.
  			}
 		else
 			ErrorNoHalt("Invalid param doc (" .. value .. ") in file: " .. curfile .. "\n")
@@ -193,7 +203,11 @@ local parseAttributes = {
 		if type then
 			local t = parsing.returns
 			if not t then t = {} parsing.returns = t end
-			t[#t+1] = { type = type, description = description }
+			t[#t+1] = {
+				type = type,
+				description = description,
+				value = value
+			}
 		else
 			ErrorNoHalt("Invalid return doc (" .. value .. ") in file: " .. curfile .. "\n")
 		end

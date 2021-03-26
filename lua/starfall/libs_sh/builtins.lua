@@ -127,9 +127,9 @@ end
 -- @name builtins_library.next
 -- @class function
 -- @param table tbl Table to get the next key-value pair of
--- @param any? k Previous key (can be nil)
--- @return any? Key or nil
--- @return any? Value or nil
+-- @param any k Previous key (can be nil)
+-- @return any Key or nil
+-- @return any Value or nil
 builtins_library.next = next
 
 --- This function takes a numeric indexed table and return all the members as a vararg.
@@ -256,7 +256,7 @@ end
 
 --- Checks if the chip is capable of performing an action.
 -- @param string perm The permission id to check
--- @param any? obj Optional object to pass to the permission system.
+-- @param any obj Optional object to pass to the permission system.
 function builtins_library.hasPermission(perm, obj)
 	checkluatype(perm, TYPE_STRING)
 	if not SF.Permissions.permissionchecks[perm] then SF.Throw("Permission doesn't exist", 2) end

@@ -55,7 +55,7 @@ end
 --- Does a line trace
 -- @param Vector start Start position
 -- @param Vector endpos End position
--- @param Entity?|table?|function? filter Entity/array of entities to filter, or a function callback with an entity arguement that returns whether the trace should hit
+-- @param Entity|table|function|nil filter Entity/array of entities to filter, or a function callback with an entity arguement that returns whether the trace should hit
 -- @param number? mask Trace mask
 -- @param number? colgroup The collision group of the trace
 -- @param boolean? ignworld Whether the trace should ignore world
@@ -89,7 +89,7 @@ end
 -- @param Vector endpos End position
 -- @param Vector minbox Lower box corner
 -- @param Vector maxbox Upper box corner
--- @param Entity?|table?|function? filter Entity/array of entities to filter, or a function callback with an entity arguement that returns whether the trace should hit
+-- @param Entity|table|function|nil filter Entity/array of entities to filter, or a function callback with an entity arguement that returns whether the trace should hit
 -- @param number? mask Trace mask
 -- @param number? colgroup The collision group of the trace
 -- @param boolean? ignworld Whether the trace should ignore world
@@ -152,7 +152,7 @@ end
 -- @param string name The decal name, see https://wiki.facepunch.com/gmod/util.Decal
 -- @param Vector start Start position
 -- @param Vector endpos End position
--- @param Entity?|table? filter (Optional) Entity/array of entities to filter
+-- @param Entity|table|nil filter (Optional) Entity/array of entities to filter
 function trace_library.decal(name, start, endpos, filter)
 	checkpermission(instance, nil, "trace.decal")
 	checkluatype(name, TYPE_STRING)

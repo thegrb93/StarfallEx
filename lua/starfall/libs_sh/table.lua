@@ -157,7 +157,7 @@ table_library.inherit = table.Inherit
 -- @class function
 -- @param table tbl The table to insert the variable into
 -- @param any pos The position in the table to insert the variable. If the third argument is not provided, this argument becomes the value to insert at the end of given table
--- @param any? val The variable to insert into the table
+-- @param any val The variable to insert into the table
 table_library.insert = function(a,b,c) if c~=nil then b = math.Clamp(b, 1, 2^31-1) return table.insert(a,b,c) else return table.insert(a,b) end end
 
 --- Returns whether or not the table's keys are sequential.

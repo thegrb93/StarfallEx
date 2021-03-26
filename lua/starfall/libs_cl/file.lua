@@ -315,7 +315,7 @@ end
 
 --- Enumerates a directory
 -- @param string path The folder to enumerate, relative to data/sf_filedata/.
--- @param string? sorting Optional sorting arguement. Either nameasc, namedesc, dateasc, datedesc
+-- @param string? sorting Optional sorting argument. Either nameasc, namedesc, dateasc, datedesc
 -- @return table Table of file names
 -- @return table Table of directory names
 function file_library.find(path, sorting)

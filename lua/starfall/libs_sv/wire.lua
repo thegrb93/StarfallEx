@@ -499,7 +499,7 @@ ents_methods.getWirelink = wire_library.getWirelink
 
 --- Retrieves an output. Returns nil if the output doesn't exist.
 -- @param any Key to get the value at
--- @return any? Value at the index
+-- @return any Value at the index
 wirelink_meta.__index = function(self, k)
 	checkpermission(instance, nil, "wire.wirelink.read")
 	if wirelink_methods[k] then
