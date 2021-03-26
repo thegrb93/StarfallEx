@@ -39,11 +39,10 @@ code {
   {
     margin-left: 20px;
   }
-  .card-title
+  .card-title *
   {
-    display: flex;
-    align-items: center;
-  } 
+    display: inline-block;
+  }
 }
 
 .sidebar
@@ -256,6 +255,21 @@ code {
 .accept-newlines
 {
   white-space: pre-line;
+}
+.sf-src {
+  color: #ffffff;
+  font-weight: bold;
+  float: right;
+  text-align: right;
+  font-size: 15px;
+}
+.sf-reference {
+  color: #059de3;
+  font-weight: bold;
+  text-decoration: none;
+}
+.sf-paramname {
+  font-weight: bold;
 }
 .card-contributors
 {

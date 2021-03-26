@@ -1,24 +1,44 @@
 import React from 'react';
 import Icon from '../Icon';
+import getElementsFromType from '../../Modules/SFTypes';
+import getGitSourceLink from '../../Modules/Links';
 
 export default function MethodCard(props)
 {
-    let callParams = props.parameters.map(x => x.name).join(",\xa0");
-    let callSplitter = props.type==="library" ? "." : ":";
+    let callParams = props.parameters.map((x, index) =>
+        <div>
+            {getElementsFromType(x.type)} {x.name}
+            {index === props.parameters.length - 1 ? "" : ",\xa0"}
+        </div>
+    )
+    let is_library = props.type==="library";
     let parentName = props.parent;
-    
+    let parentLink = "#" + (is_library ? "Libraries" : "Types") + "." + parentName
+    let callSplitter = is_library ? "." : ":";
+
     if(parentName === "builtins")
     {
         parentName = "";
         callSplitter = "";
     }
 
-
-    const titlePart = (<h1 className="card-title"><Icon type="realm" value={props.realm} />{parentName}{callSplitter}{props.name}({callParams})</h1>);
+    const titlePart = (
+        <h1 className="card-title">
+            <Icon type="realm" value={props.realm} />
+            <a className="sf-reference" href={parentLink}>{parentName}</a>{callSplitter}{props.name}({callParams})
+        </h1>
+    );
 
     let paramPart = null;
-    const paramList = props.parameters.map(x => 
-        (<li key={x.name}><span>{x.name}</span> - <span className="accept-newlines">{x.description}</span></li>)
+    const paramList = props.parameters.map(x =>
+        (
+            <li key={x.name}>
+                {getElementsFromType(x.type)} <span className="sf-paramname">{x.name}</span>
+                <ul>
+                    <span className="accept-newlines">{x.description}</span>
+                </ul>
+            </li>
+        )
     );
     if(paramList.length > 0)
     {
@@ -32,7 +52,14 @@ export default function MethodCard(props)
         );
     }
 
-    const returnsList = props.returns.map((x, index)=> <li key={index}>{x}</li>);
+    const returnsList = props.returns.map((x, index)=>
+        <li key={index}>
+            {getElementsFromType(x.type)}
+            <ul>
+                <span className="accept-newlines">{x.description}</span>
+            </ul>
+        </li>
+    );
     let returnsPart = null;
     if(returnsList.length > 0)
     {
@@ -49,6 +76,8 @@ export default function MethodCard(props)
     return (
         <React.Fragment>
             {titlePart}
+            <a className="sf-src" href={getGitSourceLink(props)}>[src]</a>
+
             <p className="description accept-newlines">{props.description}</p>
             {paramPart}
             {returnsPart}
