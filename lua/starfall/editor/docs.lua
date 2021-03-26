@@ -260,7 +260,7 @@ end
 -- @param string file_name Source file name.
 local function scan(src, realm)
 	-- https://github.com/thegrb93/StarfallEx/blob/master/lua/starfall/...
-	local filePath = string_match(curfile, "%.%./lua/starfall/(libs_.+/.*)") -- libs_sh/... path that will be used for links with [src] on the sfhelper to the github.
+	local filePath = string_match(curfile, "starfall/(libs_.+/.*)") -- libs_sh/... path that will be used for links with [src] on the sfhelper to the github.
 	local parsing
 	local lines = getLines(src)
 	for lineN, line in lines do
