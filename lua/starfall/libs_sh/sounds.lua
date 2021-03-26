@@ -4,7 +4,6 @@ local registerprivilege = SF.Permissions.registerPrivilege
 
 -- Register Privileges
 registerprivilege("sound.create", "Sound", "Allows the user to create sounds", { client = {} })
-registerprivilege("sound.modify", "Sound", "Allows the user to modify created sounds", { client = {} })
 
 local plyCount = SF.LimitObject("sounds", "sounds", 20, "The number of sounds allowed to be playing via Starfall client at once")
 local plySoundBurst = SF.BurstObject("sounds", "sounds", 10, 5, "The rate at which the burst regenerates per second.", "The number of sounds allowed to be made in a short interval of time via Starfall scripts for a single instance ( burst )")
@@ -118,14 +117,12 @@ end
 
 --- Starts to play the sound.
 function sound_methods:play()
-	checkpermission(instance, nil, "sound.modify")
 	unwrap(self):Play()
 end
 
 --- Stops the sound from being played.
 -- @param number? fade Time in seconds to fade out, if nil or 0 the sound stops instantly.
 function sound_methods:stop(fade)
-	checkpermission(instance, nil, "sound.modify")
 	if fade~=nil then
 		checkluatype(fade, TYPE_NUMBER)
 		unwrap(self):FadeOut(math.max(fade, 0))
@@ -153,7 +150,6 @@ end
 -- @param number vol Volume to set to, between 0 and 1.
 -- @param number? fade Time in seconds to transition to this new volume. Default 0
 function sound_methods:setVolume(vol, fade)
-	checkpermission(instance, nil, "sound.modify")
 	checkluatype(vol, TYPE_NUMBER)
 
 	if fade~=nil then
@@ -171,7 +167,6 @@ end
 -- @param number pitch Pitch to set to, between 0 and 255.
 -- @param number? fade Time in seconds to transition to this new pitch. Default 0
 function sound_methods:setPitch(pitch, fade)
-	checkpermission(instance, nil, "sound.modify")
 	checkluatype(pitch, TYPE_NUMBER)
 
 	if fade~=nil then
@@ -193,9 +188,21 @@ end
 --- Sets the sound level in dB. Won't work unless the sound is playing.
 -- @param number level dB level, see <a href='https://developer.valvesoftware.com/wiki/Soundscripts#SoundLevel'> Vale Dev Wiki</a>, for information on the value to use.
 function sound_methods:setSoundLevel(level)
-	checkpermission(instance, nil, "sound.modify")
 	checkluatype(level, TYPE_NUMBER)
 	unwrap(self):SetSoundLevel(math.Clamp(level, 0, 511))
+end
+
+--- Sets the sound dsp
+-- @param number dsp (0 - 133) DSP values. List can be found here https://developer.valvesoftware.com/wiki/Dsp_presets
+function sound_methods:setDSP(dsp)
+	checkluatype(dsp, TYPE_NUMBER)
+	unwrap(self):SetDSP(math.Clamp(dsp, 0, 133))
+end
+
+--- Gets the sound dsp
+-- @return number dsp (0 - 133) DSP value.
+function sound_methods:getDSP()
+	return unwrap(self):GetDSP()
 end
 
 end

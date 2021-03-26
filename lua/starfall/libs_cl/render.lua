@@ -1763,14 +1763,12 @@ end
 --- Reads the color of the specified pixel.
 -- @param number x Pixel x-coordinate.
 -- @param number y Pixel y-coordinate.
--- @return Color Color object with ( r, g, b, 255 ) from the specified pixel.
+-- @return Color Color object with ( r, g, b, a ) from the specified pixel.
 function render_library.readPixel(x, y)
 	if not renderdata.isRendering then
 		SF.Throw("Not in rendering hook.", 2)
 	end
-
-	local r, g, b = render.ReadPixel(x, y)
-	return cwrap(Color(r, g, b, 255))
+	return cwrap(Color(render.ReadPixel(x, y)))
 end
 
 --- Returns the render context's width and height. If a rendertarget is selected, will return 1024, 1024
