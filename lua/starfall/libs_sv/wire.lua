@@ -660,7 +660,7 @@ wire_library.ports = setmetatable({}, {
 			if type(input.Value) == "table" then
 				ret = inputConverters[input.Type](input.Value)
 			else
-				if wirecache[name]==input.Value then 
+				if wirecache[name]==input.Value then
 					ret = wirecachevals[name]
 				else
 					ret = inputConverters[input.Type](input.Value)
