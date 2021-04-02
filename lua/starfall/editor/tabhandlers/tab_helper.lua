@@ -58,6 +58,29 @@ end
 -----------------------
 function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate for each tab
 	local html = vgui.Create("DHTML", self)
+
+	local backButton = vgui.Create("StarfallButton", html)
+	backButton:SetText("")
+	backButton:SetImage("icon16/control_rewind_blue.png")
+	backButton:SetTooltip("Back")
+	backButton:SetSize(16, 16)
+	backButton:SetPos(0, 0)
+
+	local forwButton = vgui.Create("StarfallButton", html)
+	forwButton:SetText("")
+	forwButton:SetImage("icon16/control_fastforward_blue.png")
+	forwButton:SetTooltip("Forward")
+	forwButton:SetSize(16, 16)
+	forwButton:SetPos(16, 0)
+
+	-- HTML panel
+	backButton.DoClick = function()
+		html:GoBack()
+	end
+	forwButton.DoClick = function()
+		html:GoForward()
+	end
+
 	html:Dock(FILL)
 	html:DockMargin(0, 0, 0, 0)
 	html:DockPadding(0, 0, 0, 0)
