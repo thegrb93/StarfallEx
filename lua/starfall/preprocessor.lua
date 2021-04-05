@@ -88,6 +88,10 @@ end
 -- @param source The source code to parse.
 -- @param data The data table passed to the directives.
 function SF.Preprocessor.ParseDirectives(filename, source, data)
+	local includesdata = data.includesdata
+	if includesdata and includesdata[filename] then
+		return
+	end
 	local ending = nil
 	local endingLevel = nil
 	local lines = string.Explode("\r?\n", source, true)
@@ -141,6 +145,13 @@ local function directive_includedir(args, filename, data)
 	incl[#incl + 1] = string.Trim(args)
 end
 SF.Preprocessor.SetGlobalDirective("includedir", directive_includedir)
+
+SF.Preprocessor.SetGlobalDirective("includedata", function(args, filename, data)
+	if not data.includesdata then data.includesdata = {} end
+	data.includesdata[string.Trim(args)] = true
+
+	directive_include(args, filename, data)
+end)
 
 local function directive_name(args, filename, data)
 	if not data.scriptnames then data.scriptnames = {} end
