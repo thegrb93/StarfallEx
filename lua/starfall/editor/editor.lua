@@ -288,7 +288,6 @@ if CLIENT then
 					assert(tbl.includes[codepath] == inc)
 				end
 
-				local includesdata = ppdata.includesdata or {}
 				for i = 1, #inc do
 					recursiveLoad(inc[i], codedir)
 				end
