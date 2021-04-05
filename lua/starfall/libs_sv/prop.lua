@@ -61,11 +61,11 @@ end
 
 --- Creates a prop
 -- @server
--- @param pos Initial entity position
--- @param ang Initial entity angles
--- @param model Model path
--- @param frozen True to spawn the entity in a frozen state. Default = False
--- @return The prop object
+-- @param Vector pos Initial entity position
+-- @param Angle ang Initial entity angles
+-- @param string model Model path
+-- @param boolean? frozen True to spawn the entity in a frozen state. Default = False
+-- @return Entity The prop object
 function props_library.create(pos, ang, model, frozen)
 
 	checkpermission(instance, nil, "prop.create")
@@ -117,9 +117,9 @@ end
 
 --- Creates a ragdoll
 -- @server
--- @param model Model path
--- @param frozen True to spawn the entity in a frozen state. Default = False
--- @return The ragdoll entity
+-- @param string model Model path
+-- @param boolean? frozen True to spawn the entity in a frozen state. Default = False
+-- @return Entity The ragdoll entity
 function props_library.createRagdoll(model, frozen)
     checkpermission(instance, nil, "prop.createRagdoll")
     checkluatype(model, TYPE_STRING)
@@ -166,11 +166,11 @@ end
 
 --- Creates a custom prop.
 -- @server
--- @param pos The position to spawn the prop
--- @param ang The angles to spawn the prop
--- @param vertices The table of tables of vectices that make up the physics mesh {{v1,v2,...},{v1,v2,...},...}
--- @param frozen Whether the prop starts frozen
--- @return The prop object
+-- @param Vector pos The position to spawn the prop
+-- @param Angle ang The angles to spawn the prop
+-- @param table vertices The table of tables of vectices that make up the physics mesh {{v1,v2,...},{v1,v2,...},...}
+-- @param boolean frozen Whether the prop starts frozen
+-- @return Entity The prop object
 function props_library.createCustom(pos, ang, vertices, frozen)
 	local pos = SF.clampPos(vunwrap(pos))
 	local ang = aunwrap(ang)
@@ -265,13 +265,13 @@ local allowed_components = {
 -- Allowed components:
 -- starfall_hud
 -- starfall_screen
--- @param pos Position of created component
--- @param ang Angle of created component
--- @param class Class of created component
--- @param model Model of created component
--- @param frozen True to spawn frozen
+-- @param Vector pos Position of created component
+-- @param Angle ang Angle of created component
+-- @param string class Class of created component
+-- @param string model Model of created component
+-- @param boolean frozen True to spawn frozen
 -- @server
--- @return Component entity
+-- @return Entity Component entity
 function props_library.createComponent(pos, ang, class, model, frozen)
 	checkpermission(instance,  nil, "prop.create")
 	checkluatype(class, TYPE_STRING)
@@ -328,8 +328,8 @@ function props_library.createComponent(pos, ang, class, model, frozen)
 end
 
 --- Get a list of all spawnable sents.
--- @param categorized True to get an categorized list
--- @return The table
+-- @param boolean? categorized True to get an categorized list
+-- @return table The table
 function props_library.getSpawnableSents(categorized)
 	local tbl = {}
 
@@ -359,13 +359,13 @@ function props_library.getSpawnableSents(categorized)
 end
 
 --- Creates a sent.
--- @param pos Position of created sent
--- @param ang Angle of created sent
--- @param class Class of created sent
--- @param frozen True to spawn frozen
--- @param data Optional table, additional entity data to be supplied to certain SENTs. See prop.SENT_Data_Structures table in Docs for list of SENTs
+-- @param Vector pos Position of created sent
+-- @param Angle ang Angle of created sent
+-- @param string class Class of created sent
+-- @param boolean frozen True to spawn frozen
+-- @param table? data Optional table, additional entity data to be supplied to certain SENTs. See prop.SENT_Data_Structures table in Docs for list of SENTs
 -- @server
--- @return The sent object
+-- @return Entity The sent object
 function props_library.createSent(pos, ang, class, frozen, data)
 	checkpermission(instance,  nil, "prop.create")
 
@@ -601,7 +601,7 @@ end
 
 --- Checks if a user can spawn anymore props.
 -- @server
--- @return True if user can spawn props, False if not.
+-- @return boolean True if user can spawn props, False if not.
 function props_library.canSpawn()
 	if not SF.Permissions.hasAccess(instance, nil, "prop.create") then return false end
 	return plyCount:check(instance.player) > 0 and plyPropBurst:check(instance.player) >= 1
@@ -609,7 +609,7 @@ end
 
 --- Checks how many props can be spawned
 -- @server
--- @return number of props able to be spawned
+-- @return number Number of props able to be spawned
 function props_library.propsLeft()
 	if not SF.Permissions.hasAccess(instance,  nil, "prop.create") then return 0 end
 	return math.min(plyCount:check(instance.player), plyPropBurst:check(instance.player))
@@ -617,21 +617,19 @@ end
 
 --- Returns how many props per second the user can spawn
 -- @server
--- @return Number of props per second the user can spawn
+-- @return number Number of props per second the user can spawn
 function props_library.spawnRate()
-
 	return plyPropBurst.rate
-
 end
 
 --- Sets whether the chip should remove created props when the chip is removed
--- @param on Boolean whether the props should be cleaned or not
+-- @param boolean on Whether the props should be cleaned or not
 function props_library.setPropClean(on)
 	propClean = on
 end
 
 --- Sets whether the props should be undo-able
--- @param on Boolean whether the props should be undo-able
+-- @param boolean on Whether the props should be undo-able
 function props_library.setPropUndo(on)
 	propUndo = on
 end

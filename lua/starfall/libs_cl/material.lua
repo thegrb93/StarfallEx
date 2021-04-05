@@ -332,8 +332,8 @@ end)
 --- Loads a .vmt material or existing material. Throws an error if the material fails to load
 --- Existing created materials can be loaded with ! prepended to the name
 --- Can't be modified
--- @param path The path of the material (don't include .vmt in the path)
--- @return The material object. Can't be modified.
+-- @param string path The path of the material (don't include .vmt in the path)
+-- @return Material The material object. Can't be modified.
 function material_library.load(path)
 	checkluatype(path, TYPE_STRING)
 	if string.GetExtensionFromFilename(path) then SF.Throw("The path cannot have an extension", 2) end
@@ -344,9 +344,9 @@ function material_library.load(path)
 end
 
 --- Gets a texture from a material
--- @param path The path of the material (don't include .vmt in the path)
--- @param texture The texture key to get
--- @return The texture's name or nil if texture key isn't found
+-- @param string path The path of the material (don't include .vmt in the path)
+-- @param string texture The texture key to get
+-- @return string? The texture's name or nil if texture key isn't found
 function material_library.getTexture(path, texture)
 	checkluatype(path, TYPE_STRING)
 	checkluatype(texture, TYPE_STRING)
@@ -355,50 +355,50 @@ function material_library.getTexture(path, texture)
 end
 
 --- Returns a table of keyvalues from a material
--- @param path The path of the material (don't include .vmt in the path)
--- @return The table of keyvalues
+-- @param string path The path of the material (don't include .vmt in the path)
+-- @return table The table of keyvalues
 function material_library.getKeyValues(path)
 	checkluatype(path, TYPE_STRING)
 	return instance.Sanitize(Material(path):GetKeyValues())
 end
 
 --- Returns a material's engine name
--- @param path The path of the material (don't include .vmt in the path)
--- @return The name of a material. If this material is user created, add ! to the beginning of this to use it with entity.setMaterial
+-- @param string path The path of the material (don't include .vmt in the path)
+-- @return string The name of a material. If this material is user created, add ! to the beginning of this to use it with entity.setMaterial
 function material_library.getName(path)
 	checkluatype(path, TYPE_STRING)
 	return Material(path):GetName()
 end
 
 --- Returns the shader name of a material
--- @param path The path of the material (don't include .vmt in the path)
--- @return The shader name of the material
+-- @param string path The path of the material (don't include .vmt in the path)
+-- @return string The shader name of the material
 function material_library.getShader(path)
 	checkluatype(path, TYPE_STRING)
 	return Material(path):GetShader()
 end
 
 --- Returns the width of the member texture set for $basetexture of a material
--- @param path The path of the material (don't include .vmt in the path)
--- @return The basetexture's width
+-- @param string path The path of the material (don't include .vmt in the path)
+-- @return number The basetexture's width
 function material_library.getWidth(path)
 	checkluatype(path, TYPE_STRING)
 	return Material(path):Width()
 end
 
 --- Returns the height of the member texture set for $basetexture of a material
--- @param path The path of the material (don't include .vmt in the path)
--- @return The basetexture's height
+-- @param string path The path of the material (don't include .vmt in the path)
+-- @return number The basetexture's height
 function material_library.getHeight(path)
 	checkluatype(path, TYPE_STRING)
 	return Material(path):Height()
 end
 
 --- Returns a color pixel value of the $basetexture of a .png or .jpg material.
--- @param path The path of the material (don't include .vmt in the path)
--- @param x The x coordinate of the pixel
--- @param y The y coordinate of the pixel
--- @return The color value
+-- @param string path The path of the material (don't include .vmt in the path)
+-- @param number x The x coordinate of the pixel
+-- @param number y The y coordinate of the pixel
+-- @return Color The color value
 function material_library.getColor(path, x, y)
 	checkluatype(path, TYPE_STRING)
 	checkluatype(x, TYPE_NUMBER)
@@ -407,9 +407,9 @@ function material_library.getColor(path, x, y)
 end
 
 --- Returns a float keyvalue of a material
--- @param path The path of the material (don't include .vmt in the path)
--- @param key The key to get the float from
--- @return The float value or nil if it doesn't exist
+-- @param string path The path of the material (don't include .vmt in the path)
+-- @param string key The key to get the float from
+-- @return number? The float value or nil if it doesn't exist
 function material_library.getFloat(path, key)
 	checkluatype(path, TYPE_STRING)
 	checkluatype(key, TYPE_STRING)
@@ -417,9 +417,9 @@ function material_library.getFloat(path, key)
 end
 
 --- Returns an int keyvalue of a material
--- @param path The path of the material (don't include .vmt in the path)
--- @param key The key to get the int from
--- @return The int value or nil if it doesn't exist
+-- @param string path The path of the material (don't include .vmt in the path)
+-- @param string key The key to get the int from
+-- @return number? The int value or nil if it doesn't exist
 function material_library.getInt(path, key)
 	checkluatype(path, TYPE_STRING)
 	checkluatype(key, TYPE_STRING)
@@ -427,9 +427,9 @@ function material_library.getInt(path, key)
 end
 
 --- Returns a matrix keyvalue of a material
--- @param path The path of the material (don't include .vmt in the path)
--- @param key The key to get the matrix from
--- @return The matrix value or nil if it doesn't exist
+-- @param string path The path of the material (don't include .vmt in the path)
+-- @param string key The key to get the matrix from
+-- @return VMatrix? The matrix value or nil if it doesn't exist
 function material_library.getMatrix(path, key)
 	checkluatype(path, TYPE_STRING)
 	checkluatype(key, TYPE_STRING)
@@ -437,9 +437,9 @@ function material_library.getMatrix(path, key)
 end
 
 --- Returns a string keyvalue
--- @param path The path of the material (don't include .vmt in the path)
--- @param key The key to get the string from
--- @return The string value or nil if it doesn't exist
+-- @param string path The path of the material (don't include .vmt in the path)
+-- @param string key The key to get the string from
+-- @return string? The string value or nil if it doesn't exist
 function material_library.getString(path, key)
 	checkluatype(path, TYPE_STRING)
 	checkluatype(key, TYPE_STRING)
@@ -447,9 +447,9 @@ function material_library.getString(path, key)
 end
 
 --- Returns a vector keyvalue of a material
--- @param path The path of the material (don't include .vmt in the path)
--- @param key The key to get the vector from
--- @return The string id of the texture
+-- @param string path The path of the material (don't include .vmt in the path)
+-- @param string key The key to get the vector from
+-- @return Vector? The vector value or nil if it doesn't exist
 function material_library.getVector(path, key)
 	checkluatype(path, TYPE_STRING)
 	checkluatype(key, TYPE_STRING)
@@ -457,9 +457,9 @@ function material_library.getVector(path, key)
 end
 
 --- Returns a linear color-corrected vector keyvalue of a material
--- @param path The path of the material (don't include .vmt in the path)
--- @param key The key to get the vector from
--- @return The vector value or nil if it doesn't exist
+-- @param string path The path of the material (don't include .vmt in the path)
+-- @param string key The key to get the vector from
+-- @return Vector? The vector value or nil if it doesn't exist
 function material_library.getVectorLinear(path, key)
 	checkluatype(path, TYPE_STRING)
 	checkluatype(key, TYPE_STRING)
@@ -467,7 +467,7 @@ function material_library.getVectorLinear(path, key)
 end
 
 --- Creates a new blank material
--- @param shader The shader of the material. Must be one of
+-- @param string shader The shader of the material. Must be one of
 --- UnlitGeneric
 --- VertexLitGeneric
 --- Refract_DX90
@@ -475,6 +475,7 @@ end
 --- Sky_DX9
 --- gmodscreenspace
 --- Modulate_DX9
+-- @return Material The Material created.
 function material_library.create(shader)
 	checkluatype(shader, TYPE_STRING)
 	checkpermission(instance, nil, "material.create")
@@ -488,8 +489,9 @@ end
 local image_params = {["nocull"] = true,["alphatest"] = true,["mips"] = true,["noclamp"] = true,["smooth"] = true}
 --- Creates a .jpg or .png material from file
 --- Can't be modified
--- @param path The path to the image file
--- @param params The shader parameters to apply to the material. See https://wiki.facepunch.com/gmod/Material_Parameters
+-- @param string path The path to the image file, must be a jpg or png image
+-- @param string params The shader parameters to apply to the material. See https://wiki.facepunch.com/gmod/Material_Parameters
+-- @return Material The Material created.
 function material_library.createFromImage(path, params)
 	checkluatype(path, TYPE_STRING)
 	checkluatype(params, TYPE_STRING)
@@ -513,7 +515,7 @@ function material_library.createFromImage(path, params)
 	return lwrap(m)
 end
 
---- Free's a user created material allowing you to create others
+--- Frees a user created material allowing you to create others
 function material_methods:destroy()
 
 	local m = unwrap(self)
@@ -524,7 +526,7 @@ function material_methods:destroy()
 	if rt then
 		instance.env.render.destroyRenderTarget(name)
 	end
-	
+
 	local sensitive2sf, sf2sensitive = material_meta.sensitive2sf, material_meta.sf2sensitive
 	sensitive2sf[m] = nil
 	sf2sensitive[self] = nil
@@ -538,37 +540,37 @@ end
 
 --- Returns the material's engine name
 -- @name material_methods.getName
--- @return The name of the material. If this material is user created, add ! to the beginning of this to use it with entity.setMaterial
+-- @return string The name of the material. If this material is user created, add ! to the beginning of this to use it with entity.setMaterial
 function lmaterial_methods:getName()
 	return lunwrap(self):GetName()
 end
 
 --- Returns the shader name of the material
 -- @name material_methods.getShader
--- @return The shader name of the material
+-- @return string The shader name of the material
 function lmaterial_methods:getShader()
 	return lunwrap(self):GetShader()
 end
 
 --- Gets the base texture set to the material's width
 -- @name material_methods.getWidth
--- @return The basetexture's width
+-- @return number The basetexture's width
 function lmaterial_methods:getWidth()
 	return lunwrap(self):Width()
 end
 
 --- Gets the base texture set to the material's height
 -- @name material_methods.getHeight
--- @return The basetexture's height
+-- @return number The basetexture's height
 function lmaterial_methods:getHeight()
 	return lunwrap(self):Height()
 end
 
 --- Returns a color pixel value of the $basetexture of a .png or .jpg material.
 -- @name material_methods.getColor
--- @param x The x coordinate of the pixel
--- @param y The y coordinate of the pixel
--- @return The color value
+-- @param number x The x coordinate of the pixel
+-- @param number y The y coordinate of the pixel
+-- @return Color The color value
 function lmaterial_methods:getColor(x, y)
 	checkluatype(x, TYPE_NUMBER)
 	checkluatype(y, TYPE_NUMBER)
@@ -577,8 +579,8 @@ end
 
 --- Returns a float keyvalue
 -- @name material_methods.getFloat
--- @param key The key to get the float from
--- @return The float value or nil if it doesn't exist
+-- @param string key The key to get the float from
+-- @return number? The float value or nil if it doesn't exist
 function lmaterial_methods:getFloat(key)
 	checkluatype(key, TYPE_STRING)
 	return lunwrap(self):GetFloat(key)
@@ -586,8 +588,8 @@ end
 
 --- Returns an int keyvalue
 -- @name material_methods.getInt
--- @param key The key to get the int from
--- @return The int value or nil if it doesn't exist
+-- @param string key The key to get the int from
+-- @return number? The int value or nil if it doesn't exist
 function lmaterial_methods:getInt(key)
 	checkluatype(key, TYPE_STRING)
 	return lunwrap(self):GetInt(key)
@@ -595,15 +597,15 @@ end
 
 --- Returns a table of material keyvalues
 -- @name material_methods.getKeyValues
--- @return The table of keyvalues
+-- @return table The table of keyvalues
 function lmaterial_methods:getKeyValues()
 	return instance.Sanitize(lunwrap(self):GetKeyValues())
 end
 
 --- Returns a matrix keyvalue
 -- @name material_methods.getMatrix
--- @param key The key to get the matrix from
--- @return The matrix value or nil if it doesn't exist
+-- @param string key The key to get the matrix from
+-- @return VMatrix? The matrix value or nil if it doesn't exist
 function lmaterial_methods:getMatrix(key)
 	checkluatype(key, TYPE_STRING)
 	return mwrap(lunwrap(self):GetMatrix(key))
@@ -611,8 +613,8 @@ end
 
 --- Returns a string keyvalue
 -- @name material_methods.getString
--- @param key The key to get the string from
--- @return The string value or nil if it doesn't exist
+-- @param string key The key to get the string from
+-- @return string? The string value or nil if it doesn't exist
 function lmaterial_methods:getString(key)
 	checkluatype(key, TYPE_STRING)
 	return lunwrap(self):GetString(key)
@@ -620,8 +622,8 @@ end
 
 --- Returns a texture id keyvalue
 -- @name material_methods.getTexture
--- @param key The key to get the texture from
--- @return The string id of the texture or nil if it doesn't exist
+-- @param string key The key to get the texture from
+-- @return string? The string id of the texture or nil if it doesn't exist
 function lmaterial_methods:getTexture(key)
 	checkluatype(key, TYPE_STRING)
 	local tex = lunwrap(self):GetTexture(key)
@@ -630,8 +632,8 @@ end
 
 --- Returns a vector keyvalue
 -- @name material_methods.getVector
--- @param key The key to get the vector from
--- @return The string id of the texture
+-- @param string key The key to get the vector from
+-- @return string? The string id of the texture or nil if it doesn't exist
 function lmaterial_methods:getVector(key)
 	checkluatype(key, TYPE_STRING)
 	return vwrap(lunwrap(self):GetVector(key))
@@ -639,8 +641,8 @@ end
 
 --- Returns a linear color-corrected vector keyvalue
 -- @name material_methods.getVectorLinear
--- @param key The key to get the vector from
--- @return The vector value or nil if it doesn't exist
+-- @param string key The key to get the vector from
+-- @return Vector? The vector value or nil if it doesn't exist
 function lmaterial_methods:getVectorLinear(key)
 	checkluatype(key, TYPE_STRING)
 	return vwrap(lunwrap(self):GetVectorLinear(key))
@@ -652,8 +654,8 @@ function material_methods:recompute()
 end
 
 --- Sets a float keyvalue
--- @param key The key name to set
--- @param v The value to set it to
+-- @param string key The key name to set
+-- @param number v The value to set it to
 function material_methods:setFloat(key, v)
 	checkkey(key)
 	checkluatype(v, TYPE_NUMBER)
@@ -661,8 +663,8 @@ function material_methods:setFloat(key, v)
 end
 
 --- Sets an int keyvalue
--- @param key The key name to set
--- @param v The value to set it to
+-- @param string key The key name to set
+-- @param number v The value to set it to
 function material_methods:setInt(key, v)
 	checkkey(key)
 	checkluatype(v, TYPE_NUMBER)
@@ -670,16 +672,16 @@ function material_methods:setInt(key, v)
 end
 
 --- Sets a matrix keyvalue
--- @param key The key name to set
--- @param v The value to set it to
+-- @param string key The key name to set
+-- @param VMatrix v The value to set it to
 function material_methods:setMatrix(key, v)
 	checkkey(key)
 	unwrap(self):SetMatrix(key, munwrap(v))
 end
 
 --- Sets a string keyvalue
--- @param key The key name to set
--- @param v The value to set it to
+-- @param string key The key name to set
+-- @param string v The value to set it to
 function material_methods:setString(key, v)
 	checkkey(key)
 	checkluatype(v, TYPE_STRING)
@@ -687,8 +689,8 @@ function material_methods:setString(key, v)
 end
 
 --- Sets a texture keyvalue
--- @param key The key name to set. $basetexture is the key name for most purposes.
--- @param v The texture name to set it to.
+-- @param string key The key name to set. $basetexture is the key name for most purposes.
+-- @param string v The texture name to set it to.
 function material_methods:setTexture(key, v)
 	checkkey(key)
 	checkluatype(v, TYPE_STRING)
@@ -697,11 +699,11 @@ function material_methods:setTexture(key, v)
 end
 
 --- Loads an online image or base64 data to the specified texture key
--- @param key The key name to set. $basetexture is the key name for most purposes.
 -- If the texture in key is not set to a rendertarget, a rendertarget will be created and used.
--- @param url The url or base64 data
--- @param cb An optional callback called when image is loaded. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture
--- @param done An optional callback called when the image is done loading. Passes the material, url
+-- @param string key The key name to set. $basetexture is the key name for most purposes.
+-- @param string url The url or base64 data
+-- @param function? cb An optional callback called when image is loaded. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture
+-- @param function? done An optional callback called when the image is done loading. Passes the material, url
 function material_methods:setTextureURL(key, url, cb, done)
 	checkkey(key)
 	checkluatype(url, TYPE_STRING)
@@ -759,8 +761,8 @@ function material_methods:setTextureURL(key, url, cb, done)
 end
 
 --- Sets a rendertarget texture to the specified texture key
--- @param key The key name to set. $basetexture is the key name for most purposes.
--- @param name The name of the rendertarget
+-- @param string key The key name to set. $basetexture is the key name for most purposes.
+-- @param string name The name of the rendertarget
 function material_methods:setTextureRenderTarget(key, name)
 	checkkey(key)
 	checkluatype(name, TYPE_STRING)
@@ -773,15 +775,15 @@ function material_methods:setTextureRenderTarget(key, name)
 end
 
 --- Sets a keyvalue to be undefined
--- @param key The key name to set
+-- @param string key The key name to set
 function material_methods:setUndefined(key)
 	checkkey(key)
 	unwrap(self):SetUndefined(key)
 end
 
 --- Sets a vector keyvalue
--- @param key The key name to set
--- @param v The value to set it to
+-- @param string key The key name to set
+-- @param Vector v The value to set it to
 function material_methods:setVector(key, v)
 	checkkey(key)
 	unwrap(self):SetVector(key, vunwrap(v))

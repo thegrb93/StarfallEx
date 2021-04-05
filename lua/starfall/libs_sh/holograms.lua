@@ -121,7 +121,7 @@ end
 
 --- Casts a hologram entity into the hologram type
 -- @shared
--- @return Hologram type
+-- @return Hologram Hologram instance
 function ents_methods:toHologram()
 	local ent = getent(self)
 	if not ent.IsSFHologram then SF.Throw("The entity isn't a hologram", 2) end
@@ -130,11 +130,11 @@ end
 
 
 --- Creates a hologram.
--- @param pos The position to create the hologram
--- @param ang The angle to create the hologram
--- @param model The model to give the hologram
--- @param scale (Optional) The scale to give the hologram
--- @return The hologram object
+-- @param Vector pos The position to create the hologram
+-- @param Angle ang The angle to create the hologram
+-- @param string model The model to give the hologram
+-- @param Vector? scale (Optional) The scale to give the hologram
+-- @return Hologram The hologram object
 function holograms_library.create(pos, ang, model, scale)
 	checkpermission(instance, nil, "hologram.create")
 	checkluatype(model, TYPE_STRING)
@@ -198,14 +198,14 @@ function holograms_library.create(pos, ang, model, scale)
 end
 
 --- Checks if a user can spawn anymore holograms.
--- @return True if user can spawn holograms, False if not.
+-- @return boolean True if user can spawn holograms, False if not.
 function holograms_library.canSpawn()
 	if not SF.Permissions.hasAccess(instance,  nil, "hologram.create") then return false end
 	return plyCount:check(instance.player) > 0
 end
 
 --- Checks how many holograms can be spawned
--- @return number of holograms able to be spawned
+-- @return number Number of holograms able to be spawned
 function holograms_library.hologramsLeft()
 	if not SF.Permissions.hasAccess(instance,  nil, "hologram.create") then return 0 end
 	return plyCount:check(instance.player)
@@ -214,7 +214,7 @@ end
 if SERVER then
 	--- Sets the hologram linear velocity
 	-- @server
-	-- @param vel New velocity
+	-- @param Vector vel New velocity
 	function hologram_methods:setVel(vel)
 		local vel = vunwrap(vel)
 
@@ -226,7 +226,7 @@ if SERVER then
 
 	--- Sets the hologram's angular velocity.
 	-- @server
-	-- @param angvel *Vector* angular velocity.
+	-- @param Angle angvel *Vector* angular velocity.
 	function hologram_methods:setAngVel(angvel)
 
 		local holo = getholo(self)
@@ -235,12 +235,12 @@ if SERVER then
 		holo:SetLocalAngularVelocity(aunwrap(angvel))
 	end
 
-	
+
 
 else
 	--- Sets the hologram's position.
 	-- @shared
-	-- @param vec New position
+	-- @param Vector vec New position
 	function hologram_methods:setPos(vec)
 		local holo = getholo(self)
 		local vec = vunwrap(vec)
@@ -252,7 +252,7 @@ else
 
 	--- Sets the hologram's angles.
 	-- @shared
-	-- @param ang New angles
+	-- @param Angle ang New angles
 	function hologram_methods:setAngles(ang)
 		local holo = getholo(self)
 		local ang = aunwrap(ang)
@@ -264,7 +264,7 @@ else
 
 	--- Sets the texture filtering function when viewing a close texture
 	-- @client
-	-- @param val The filter function to use http://wiki.facepunch.com/gmod/Enums/TEXFILTER
+	-- @param number val The filter function to use http://wiki.facepunch.com/gmod/Enums/TEXFILTER
 	function hologram_methods:setFilterMag(val)
 		local holo = getholo(self)
 
@@ -280,7 +280,7 @@ else
 
 	--- Sets the texture filtering function when viewing a far texture
 	-- @client
-	-- @param val The filter function to use http://wiki.facepunch.com/gmod/Enums/TEXFILTER
+	-- @param number val The filter function to use http://wiki.facepunch.com/gmod/Enums/TEXFILTER
 	function hologram_methods:setFilterMin(val)
 		local holo = getholo(self)
 
@@ -296,7 +296,7 @@ else
 
 	--- Sets a hologram entity's rendermatrix
 	-- @client
-	-- @param mat Starfall matrix to use
+	-- @param VMatrix mat Starfall matrix to use
 	function hologram_methods:setRenderMatrix(mat)
 		local holo = getholo(self)
 
@@ -316,53 +316,53 @@ else
 			holo:DisableMatrix("RenderMultiply")
 		end
 	end
-	
+
 	--- Parents a hologram
-	-- @param ent Entity parent (nil to unparent)
-	-- @param attachment Optional attachment ID
+	-- @param Entity? ent Entity parent (nil to unparent)
+	-- @param number? attachment Optional attachment ID
 	function hologram_methods:setParent(ent, attachment)
-		
+
 		local holo = getholo(self)
-		
+
 		checkpermission(instance, holo, "hologram.setParent")
-		
+
 		if ent ~= nil then
 			local parent = getent(ent)
-			
+
 			if attachment == nil then attachment = -1 end
 			checkluatype(attachment, TYPE_NUMBER)
-			
+
 			if not parent.sf_children then
 				parent.sf_children = {}
 			end
-			
+
 			if holo.sf_parent then
 				holo.sf_parent.sf_children[holo] = nil
 			end
-			
+
 			parent.sf_children[holo] = attachment
 			holo.sf_parent = parent
-			
+
 			holo:SetParent(parent, attachment)
-			
+
 		else
-			
+
 			if holo.sf_parent then
 				holo.sf_parent.sf_children[holo] = nil
 			end
-			
+
 			holo.sf_parent = nil
 			holo:SetParent()
-			
+
 		end
-		
+
 	end
-	
+
 	--- Manually draws a hologram, requires a 3d render context
 	-- @client
 	function hologram_methods:draw()
 		if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
-		
+
 		local holo = getholo(self)
 		holo:SetupBones()
 		holo:DrawModel()
@@ -371,11 +371,11 @@ end
 
 --- Updates a clip plane
 -- @shared
--- @param index Whatever number you want the clip to be
--- @param enabled Whether the clip is enabled
--- @param origin The center of the clip plane in world coordinates, or local to entity if it is specified
--- @param normal The the direction of the clip plane in world coordinates, or local to entity if it is specified
--- @param entity (Optional) The entity to make coordinates local to, otherwise the world is used
+-- @param number index Whatever number you want the clip to be
+-- @param boolean enabled Whether the clip is enabled
+-- @param Vector origin The center of the clip plane in world coordinates, or local to entity if it is specified
+-- @param Vector normal The the direction of the clip plane in world coordinates, or local to entity if it is specified
+-- @param Entity? entity (Optional) The entity to make coordinates local to, otherwise the world is used
 function hologram_methods:setClip(index, enabled, origin, normal, entity)
 	local holo = getholo(self)
 
@@ -408,7 +408,7 @@ end
 
 --- Sets the hologram scale. Basically the same as setRenderMatrix() with a scaled matrix
 -- @shared
--- @param scale Vector new scale
+-- @param Vector scale Vector new scale
 function hologram_methods:setScale(scale)
 	local holo = getholo(self)
 	local scale = vunwrap(scale)
@@ -420,13 +420,13 @@ end
 
 --- Sets the hologram size in game units
 -- @shared
--- @param size Vector new size in game units
+-- @param Vector size Vector new size in game units
 function hologram_methods:setSize(size)
 	local holo = getholo(self)
 	local size = vunwrap(size)
-	
+
 	checkpermission(instance, holo, "hologram.setRenderProperty")
-	
+
 	local bounds = holo:OBBMaxs() - holo:OBBMins()
 	local scale = Vector(size[1] / bounds[1], size[2] / bounds[2], size[3] / bounds[3])
 	holo:SetScale(scale)
@@ -434,14 +434,14 @@ end
 
 --- Gets the hologram scale.
 -- @shared
--- @return Vector scale
+-- @return Vector Vector scale
 function hologram_methods:getScale()
 	return vwrap(getholo(self):GetScale())
 end
 
 --- Suppress Engine Lighting of a hologram. Disabled by default.
 -- @shared
--- @param suppress Boolean to represent if shading should be set or not.
+-- @param boolean suppress Boolean to represent if shading should be set or not.
 function hologram_methods:suppressEngineLighting(suppress)
 	local holo = getholo(self)
 
@@ -454,13 +454,13 @@ end
 
 --- Suppress Engine Lighting of a hologram. Disabled by default.
 -- @shared
--- @param suppress Boolean to represent if shading should be set or not.
+-- @return boolean Whether engine lighting is suppressed
 function hologram_methods:getSuppressEngineLighting()
 	return getholo(self):GetSuppressEngineLighting()
 end
 
 --- Sets the model of a hologram
--- @param model string model path
+-- @param string model string model path
 function hologram_methods:setModel(model)
 	local holo = getholo(self)
 	checkluatype(model, TYPE_STRING)
@@ -475,9 +475,9 @@ end
 
 --- Animates a hologram
 -- @shared
--- @param animation number or string name. Does nothing if nil
--- @param frame Optional int (Default 0) The starting frame number. Does nothing if nil
--- @param rate Optional float (Default 1) Frame speed. Does nothing if nil
+-- @param number|string animation Animation number or string name.
+-- @param number? frame Optional int (Default 0) The starting frame number. Does nothing if nil
+-- @param number? rate Optional float (Default 1) Frame speed. Does nothing if nil
 function hologram_methods:setAnimation(animation, frame, rate)
 	local holo = getholo(self)
 	checkpermission(instance, holo, "hologram.setRenderProperty")
@@ -504,25 +504,25 @@ end
 
 --- Applies engine effects to the hologram
 -- @shared
--- @param effect The effects to add. EF table values
+-- @param number effect The effects to add. See EF Enums
 function hologram_methods:addEffects(effect)
 	checkluatype(effect, TYPE_NUMBER)
-	
+
 	local holo = getholo(self)
 	checkpermission(instance, holo, "entities.setRenderProperty")
-	
+
 	holo:AddEffects(effect)
 end
 
 --- Removes engine effects from the hologram
 -- @shared
--- @param effect The effects to remove. EF table values
+-- @param number effect The effects to remove. See EF Enums
 function hologram_methods:removeEffects(effect)
 	checkluatype(effect, TYPE_NUMBER)
-	
+
 	local holo = getholo(self)
 	checkpermission(instance, holo, "entities.setRenderProperty")
-	
+
 	holo:RemoveEffects(effect)
 end
 

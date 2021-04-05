@@ -32,50 +32,50 @@ local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.
 
 --- Checks if the physics object is valid
 -- @shared
--- @return boolean if the physics object is valid
+-- @return boolean If the physics object is valid
 function physobj_methods:isValid()
 	return unwrap(self):IsValid()
 end
 
 --- Gets the entity attached to the physics object
 -- @shared
--- @return The entity attached to the physics object
+-- @return Entity The entity attached to the physics object
 function physobj_methods:getEntity()
 	return ewrap(unwrap(self):GetEntity())
 end
 
 --- Gets the position of the physics object
 -- @shared
--- @return Vector position of the physics object
+-- @return Vector Vector position of the physics object
 function physobj_methods:getPos()
 	return vwrap(unwrap(self):GetPos())
 end
 
 --- Returns the world transform matrix of the physobj
 -- @shared
--- @return The matrix
+-- @return VMatrix The matrix
 function physobj_methods:getMatrix()
 	return mwrap(unwrap(self):GetPositionMatrix())
 end
 
 --- Gets the angles of the physics object
 -- @shared
--- @return Angle angles of the physics object
+-- @return Angle Angle angles of the physics object
 function physobj_methods:getAngles()
 	return awrap(unwrap(self):GetAngles())
 end
 
 --- Gets the velocity of the physics object
 -- @shared
--- @return Vector velocity of the physics object
+-- @return Vector Vector velocity of the physics object
 function physobj_methods:getVelocity()
 	return vwrap(unwrap(self):GetVelocity())
 end
 
 --- Gets the axis aligned bounding box of the physics object
 -- @shared
--- @return The mins of the AABB
--- @return The maxs of the AABB
+-- @return Vector The mins of the AABB
+-- @return Vector The maxs of the AABB
 function physobj_methods:getAABB()
 	local a, b = unwrap(self):GetAABB()
 	return vwrap(a), vwrap(b)
@@ -84,91 +84,91 @@ end
 --- Gets the velocity of the physics object at an arbitrary point in its local reference frame
 --- This includes velocity at the point induced by rotational velocity
 -- @shared
--- @param vec The point to get velocity of in local reference frame
--- @return Vector Local velocity of the physics object at the point
+-- @param Vector vec The point to get velocity of in local reference frame
+-- @return Vector Vector Local velocity of the physics object at the point
 function physobj_methods:getVelocityAtPoint(vec)
 	return vwrap(unwrap(self):GetVelocityAtPoint(vunwrap(vec)))
 end
 
 --- Gets the angular velocity of the physics object
 -- @shared
--- @return Vector angular velocity of the physics object
+-- @return Vector Vector angular velocity of the physics object
 function physobj_methods:getAngleVelocity()
 	return vwrap(unwrap(self):GetAngleVelocity())
 end
 
 --- Gets the mass of the physics object
 -- @shared
--- @return mass of the physics object
+-- @return number Mass of the physics object
 function physobj_methods:getMass()
 	return unwrap(self):GetMass()
 end
 
 --- Gets the center of mass of the physics object in the local reference frame.
 -- @shared
--- @return Center of mass vector in the physobject's local reference frame.
+-- @return Vector Center of mass vector in the physobject's local reference frame.
 function physobj_methods:getMassCenter()
 	return vwrap(unwrap(self):GetMassCenter())
 end
 
 --- Gets the inertia of the physics object
 -- @shared
--- @return Vector Inertia of the physics object
+-- @return Vector Vector Inertia of the physics object
 function physobj_methods:getInertia()
 	return vwrap(unwrap(self):GetInertia())
 end
 
 --- Gets the material of the physics object
 -- @shared
--- @return The physics material of the physics object
+-- @return string The physics material of the physics object
 function physobj_methods:getMaterial()
 	return unwrap(self):GetMaterial()
 end
 
 --- Returns a vector in the local reference frame of the physicsobject from the world frame
--- @param vec The vector to transform
--- @return The transformed vector
+-- @param Vector vec The vector to transform
+-- @return Vector The transformed vector
 function physobj_methods:worldToLocal(vec)
 	return vwrap(unwrap(self):WorldToLocal(vunwrap(vec)))
 end
 
 --- Returns a vector in the reference frame of the world from the local frame of the physicsobject
--- @param vec The vector to transform
--- @return The transformed vector
+-- @param Vector vec The vector to transform
+-- @return Vector The transformed vector
 function physobj_methods:localToWorld(vec)
 	return vwrap(unwrap(self):LocalToWorld(vunwrap(vec)))
 end
 
 --- Returns a normal vector in the local reference frame of the physicsobject from the world frame
--- @param vec The normal vector to transform
--- @return The transformed vector
+-- @param Vector vec The normal vector to transform
+-- @return Vector The transformed vector
 function physobj_methods:worldToLocalVector(vec)
 	return vwrap(unwrap(self):WorldToLocalVector(vunwrap(vec)))
 end
 
 --- Returns a normal vector in the reference frame of the world from the local frame of the physicsobject
--- @param vec The normal vector to transform
--- @return The transformed vector
+-- @param Vector vec The normal vector to transform
+-- @return Vector The transformed vector
 function physobj_methods:localToWorldVector(vec)
 	return vwrap(unwrap(self):LocalToWorldVector(vunwrap(vec)))
 end
 
 --- Returns a table of MeshVertex structures where each 3 vertices represent a triangle. See: http://wiki.facepunch.com/gmod/Structures/MeshVertex
--- @return table of MeshVertex structures
+-- @return table Table of MeshVertex structures
 function physobj_methods:getMesh()
 	local mesh = unwrap(self):GetMesh()
 	return instance.Sanitize(mesh)
 end
 
 --- Returns a structured table, the physics mesh of the physics object. See: http://wiki.facepunch.com/gmod/Structures/MeshVertex
--- @return table of MeshVertex structures
+-- @return table Table of MeshVertex structures
 function physobj_methods:getMeshConvexes()
 	local mesh = unwrap(self):GetMeshConvexes()
 	return instance.Sanitize(mesh)
 end
 
 --- Sets the physical material of a physics object
--- @param material The physical material to set it to
+-- @param string materialName The physical material to set it to
 function physobj_methods:setMaterial(material)
 	checkluatype (material, TYPE_STRING)
 	local phys = unwrap(self)
@@ -183,7 +183,7 @@ end
 if SERVER then
 	--- Sets the position of the physics object. Will cause interpolation of the entity in clientside, use entity.setPos to avoid this.
 	-- @server
-	-- @param pos The position vector to set it to
+	-- @param Vector pos The position vector to set it to
 	function physobj_methods:setPos(pos)
 
 		pos = vunwrap(pos)
@@ -196,7 +196,7 @@ if SERVER then
 
 	--- Sets the angles of the physics object. Will cause interpolation of the entity in clientside, use entity.setAngles to avoid this.
 	-- @server
-	-- @param ang The angle to set it to
+	-- @param Angle ang The angle to set it to
 	function physobj_methods:setAngles(ang)
 
 		ang = aunwrap(ang)
@@ -209,7 +209,7 @@ if SERVER then
 
 	--- Sets the velocity of the physics object
 	-- @server
-	-- @param vel The velocity vector to set it to
+	-- @param Vector vel The velocity vector to set it to
 	function physobj_methods:setVelocity(vel)
 
 		vel = vunwrap(vel)
@@ -222,7 +222,7 @@ if SERVER then
 
 	--- Sets the buoyancy ratio of a physobject
 	-- @server
-	-- @param ratio The buoyancy ratio to use
+	-- @param number ratio The buoyancy ratio to use
 	function physobj_methods:setBuoyancyRatio(ratio)
 		checkluatype(ratio, TYPE_NUMBER)
 
@@ -237,7 +237,7 @@ if SERVER then
 
 	--- Applys a force to the center of the physics object
 	-- @server
-	-- @param force The force vector to apply
+	-- @param Vector force The force vector to apply
 	function physobj_methods:applyForceCenter(force)
 
 		force = vunwrap(force)
@@ -250,8 +250,8 @@ if SERVER then
 
 	--- Applys an offset force to a physics object
 	-- @server
-	-- @param force The force vector in world coordinates
-	-- @param position The force position in world coordinates
+	-- @param Vector force The force vector in world coordinates
+	-- @param Vector position The force position in world coordinates
 	function physobj_methods:applyForceOffset(force, position)
 
 		force = vunwrap(force)
@@ -266,7 +266,7 @@ if SERVER then
 
 	--- Sets the angular velocity of an object
 	-- @server
-	-- @param angvel The local angvel vector to set
+	-- @param Vector angvel The local angvel vector to set
 	function physobj_methods:setAngleVelocity(angvel)
 		angvel = vunwrap(angvel)
 		checkvector(angvel)
@@ -279,7 +279,7 @@ if SERVER then
 
 	--- Applys a angular velocity to an object
 	-- @server
-	-- @param angvel The local angvel vector to apply
+	-- @param Vector angvel The local angvel vector to apply
 	function physobj_methods:addAngleVelocity(angvel)
 		angvel = vunwrap(angvel)
 		checkvector(angvel)
@@ -292,7 +292,7 @@ if SERVER then
 
 	--- Applys a torque to a physics object
 	-- @server
-	-- @param torque The world torque vector to apply
+	-- @param Vector torque The world torque vector to apply
 	function physobj_methods:applyTorque(torque)
 		torque = vunwrap(torque)
 		checkvector(torque)
@@ -305,7 +305,7 @@ if SERVER then
 
 	--- Sets the mass of a physics object
 	-- @server
-	-- @param mass The mass to set it to
+	-- @param number mass The mass to set it to
 	function physobj_methods:setMass(mass)
 		checkluatype(mass, TYPE_NUMBER)
 		local phys = unwrap(self)
@@ -318,7 +318,7 @@ if SERVER then
 
 	--- Sets the inertia of a physics object
 	-- @server
-	-- @param inertia The inertia vector to set it to
+	-- @param Vector inertia The inertia vector to set it to
 	function physobj_methods:setInertia(inertia)
 		local phys = unwrap(self)
 		checkpermission(instance, phys:GetEntity(), "entities.setInertia")
@@ -342,7 +342,7 @@ if SERVER then
 	-- FVPHYSICS.NO_IMPACT_DMG
 	-- FVPHYSICS.NO_NPC_IMPACT_DMG
 	-- FVPHYSICS.NO_PLAYER_PICKUP
-	-- @param flags The flags to add. FVPHYSICS enum.
+	-- @param number flags The flags to add. FVPHYSICS enum.
 	function physobj_methods:addGameFlags(flags)
 		checkluatype(flags, TYPE_NUMBER)
 		local phys = unwrap(self)
@@ -362,7 +362,7 @@ if SERVER then
 	-- FVPHYSICS.NO_IMPACT_DMG
 	-- FVPHYSICS.NO_NPC_IMPACT_DMG
 	-- FVPHYSICS.NO_PLAYER_PICKUP
-	-- @param flags The flags to add. FVPHYSICS enum.
+	-- @param number flags The flags to clear. FVPHYSICS enum.
 	function physobj_methods:clearGameFlags(flags)
 		checkluatype(flags, TYPE_NUMBER)
 		local phys = unwrap(self)
@@ -376,7 +376,7 @@ if SERVER then
 	end
 	
 	--- Returns whether the game flags of the physics object are set.
-	-- @param flags The flags to test. FVPHYSICS enum.
+	-- @param number flags The flags to test. FVPHYSICS enum.
 	-- @return boolean If the flags are set
 	function physobj_methods:hasGameFlags(flags)
 		checkluatype(flags, TYPE_NUMBER)
@@ -385,7 +385,7 @@ if SERVER then
 	end
 	
 	--- Sets bone gravity
-	-- @param grav Bool should the bone respect gravity?
+	-- @param boolean grav Should the bone respect gravity?
 	function physobj_methods:enableGravity(grav)
 		local phys = unwrap(self)
 		checkpermission(instance, phys:GetEntity(), "entities.enableGravity")
@@ -394,7 +394,7 @@ if SERVER then
 	end
 
 	--- Sets the bone drag state
-	-- @param drag Bool should the bone have air resistence?
+	-- @param boolean drag Should the bone have air resistence?
 	function physobj_methods:enableDrag(drag)
 		local phys = unwrap(self)
 		checkpermission(instance, phys:GetEntity(), "entities.enableDrag")
@@ -409,7 +409,7 @@ if SERVER then
 	end
 
 	--- Sets coefficient of air resistance affecting the bone. Air resistance depends on the cross-section of the object.
-	-- @param coeff Number how much drag affects the bone
+	-- @param number coeff How much drag affects the bone
 	function physobj_methods:setDragCoefficient(coeff)
 		checkluatype(coeff, TYPE_NUMBER)
 		local phys = unwrap(self)
@@ -418,7 +418,7 @@ if SERVER then
 	end
 
 	--- Sets coefficient of air resistance affecting the bone when rotating. Air resistance depends on the cross-section of the object.
-	-- @param coeff Number how much drag affects the bone when rotating
+	-- @param number coeff How much drag affects the bone when rotating
 	function physobj_methods:setAngleDragCoefficient(coeff)
 		checkluatype(coeff, TYPE_NUMBER)
 		local phys = unwrap(self)
@@ -427,26 +427,26 @@ if SERVER then
 	end
 
 	--- Returns Movement damping of the bone.
-	-- @return Linear damping
-	-- @return Angular damping
+	-- @return number Linear damping
+	-- @return number Angular damping
 	function physobj_methods:getDamping()
 		local phys = unwrap(self)
 		return phys:GetDamping()
 	end
 	
 	--- Sets the movement damping of the bone. Unlike air drag, it doesn't take into account the cross-section of the object.
-	-- @param linear Number of the linear damping
-	-- @param angular Number of the angular damping
+	-- @param number linear Number of the linear damping
+	-- @param number angular Number of the angular damping
 	function physobj_methods:setDamping(linear, angular)
 		checkluatype(linear, TYPE_NUMBER)
 		checkluatype(angular, TYPE_NUMBER)
 		local phys = unwrap(self)
 		checkpermission(instance, phys:GetEntity(), "entities.setDamping")
-		return phys:SetDamping(linear, angular)
+		phys:SetDamping(linear, angular)
 	end
 	
 	--- Sets the bone movement state
-	-- @param move Bool should the bone move?
+	-- @param boolean move Should the bone move?
 	function physobj_methods:enableMotion(move)
 		local phys = unwrap(self)
 		checkpermission(instance, phys:GetEntity(), "entities.enableMotion")
@@ -456,7 +456,7 @@ if SERVER then
 
 	--- Returns whether the physobj is asleep
 	-- @server
-	-- @return boolean if the physobj is asleep
+	-- @return boolean If the physobj is asleep
 	function physobj_methods:isAsleep()
 		local phys = unwrap(self)
 		return phys:IsAsleep()
@@ -480,7 +480,7 @@ if SERVER then
 	
 	--- Returns table of tables of friction data of a contact against the physobj
 	-- @server
-	-- @return Table of tables of data. Each table will contain:
+	-- @return table Table of tables of data. Each table will contain:
 	-- PhysObj Other - The other physics object we came in contact with
 	-- number EnergyAbsorbed -
 	-- number FrictionCoefficient -

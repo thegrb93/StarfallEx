@@ -243,8 +243,8 @@ local sfTypeToWireTypeTable = {
 
 --- Creates/Modifies wire inputs. All wire ports must begin with an uppercase
 -- letter and contain only alphabetical characters or numbers but may not begin with a number.
--- @param names An array of input names. May be modified by the function.
--- @param types An array of input types. Can be shortcuts. May be modified by the function.
+-- @param table names An array of input names. May be modified by the function.
+-- @param table types An array of input types. Can be shortcuts. May be modified by the function.
 function wire_library.adjustInputs(names, types)
 	checkpermission(instance, nil, "wire.setInputs")
 	checkluatype(names, TYPE_TABLE)
@@ -271,8 +271,8 @@ end
 
 --- Creates/Modifies wire outputs. All wire ports must begin with an uppercase
 -- letter and contain only alphabetical characters or numbers but may not begin with a number.
--- @param names An array of output names. May be modified by the function.
--- @param types An array of output types. Can be shortcuts. May be modified by the function.
+-- @param table names An array of output names. May be modified by the function.
+-- @param table types An array of output types. Can be shortcuts. May be modified by the function.
 function wire_library.adjustOutputs(names, types)
 	checkpermission(instance, nil, "wire.setOutputs")
 	checkluatype(names, TYPE_TABLE)
@@ -310,8 +310,8 @@ end
 
 --- Creates/Modifies wire inputs/outputs. All wire ports must begin with an uppercase
 -- letter and contain only alphabetical characters or numbers but may not begin with a number.
--- @param inputs (Optional) A key-value table with input port names as keys and types as values. e.g. {MyInput="number"} or {MyInput={type="number"}}. If nil, input ports won't be changed.
--- @param outputs (Optional) A key-value table with output port names as keys and types as values. e.g. {MyOutput="number"} or {MyOutput={type="number"}}. If nil, output ports won't be changed.
+-- @param table? inputs (Optional) A key-value table with input port names as keys and types as values. e.g. {MyInput="number"} or {MyInput={type="number"}}. If nil, input ports won't be changed.
+-- @param table? outputs (Optional) A key-value table with output port names as keys and types as values. e.g. {MyOutput="number"} or {MyOutput={type="number"}}. If nil, output ports won't be changed.
 function wire_library.adjustPorts(inputs, outputs)
 	if inputs ~= nil then
 		checkluatype(inputs, TYPE_TABLE)
@@ -355,6 +355,7 @@ function wire_library.adjustPorts(inputs, outputs)
 end
 
 --- Returns the wirelink representing this entity.
+-- @return Wirelink Wirelink representing this entity
 function wire_library.self()
 	local ent = instance.entity
 	if not ent then SF.Throw("No entity", 2) end
@@ -362,20 +363,20 @@ function wire_library.self()
 end
 
 --- Returns the server's UUID.
--- @return UUID as string
+-- @return string Server UUID
 function wire_library.serverUUID()
 	return WireLib.GetServerUUID()
 end
 
 local ValidWireMat = { 	["cable/rope"] = true, ["cable/cable2"] = true, ["cable/xbeam"] = true, ["cable/redlaser"] = true, ["cable/blue_elec"] = true, ["cable/physbeam"] = true, ["cable/hydra"] = true, ["arrowire/arrowire"] = true, ["arrowire/arrowire2"] = true }
 --- Wires two entities together
--- @param entI Entity with input
--- @param entO Entity with output
--- @param inputname Input to be wired
--- @param outputname Output to be wired
--- @param width Width of the wire(optional)
--- @param color Color of the wire(optional)
--- @param material Material of the wire(optional), Valid materials are cable/rope, cable/cable2, cable/xbeam, cable/redlaser, cable/blue_elec, cable/physbeam, cable/hydra, arrowire/arrowire, arrowire/arrowire2
+-- @param Entity entI Entity with input
+-- @param Entity entO Entity with output
+-- @param string inputname Input to be wired
+-- @param string outputname Output to be wired
+-- @param number? width Width of the wire(optional)
+-- @param Color? color Color of the wire(optional)
+-- @param string? materialName Material of the wire(optional), Valid materials are cable/rope, cable/cable2, cable/xbeam, cable/redlaser, cable/blue_elec, cable/physbeam, cable/hydra, arrowire/arrowire, arrowire/arrowire2
 function wire_library.create(entI, entO, inputname, outputname, width, color, material)
 	checkluatype(inputname, TYPE_STRING)
 	checkluatype(outputname, TYPE_STRING)
@@ -421,8 +422,8 @@ function wire_library.create(entI, entO, inputname, outputname, width, color, ma
 end
 
 --- Unwires an entity's input
--- @param entI Entity with input
--- @param inputname Input to be un-wired
+-- @param Entity entI Entity with input
+-- @param string inputname Input to be un-wired
 function wire_library.delete(entI, inputname)
 	checkluatype(inputname, TYPE_STRING)
 
@@ -459,24 +460,24 @@ local function parseEntity(ent, io)
 end
 
 --- Returns a table of entity's inputs
--- @param entI Entity with input(s)
--- @return Table of entity's input names
--- @return Table of entity's input types
+-- @param Entity entI Entity with input(s)
+-- @return table Table of entity's input names
+-- @return table Table of entity's input types
 function wire_library.getInputs(entI)
 	return parseEntity(entI, "Inputs")
 end
 
 --- Returns a table of entity's outputs
--- @param entO Entity with output(s)
--- @return Table of entity's output names
--- @return Table of entity's output types
+-- @param Entity entO Entity with output(s)
+-- @return table Table of entity's output names
+-- @return table Table of entity's output types
 function wire_library.getOutputs(entO)
 	return parseEntity(entO, "Outputs")
 end
 
 --- Returns a wirelink to a wire entity
--- @param ent Wire entity
--- @return Wirelink of the entity
+-- @param Entity ent Wire entity
+-- @return Wirelink Wirelink of the entity
 function wire_library.getWirelink(ent)
 	ent = eunwrap(ent)
 	if not ent:IsValid() then return end
@@ -491,12 +492,14 @@ end
 
 --- Returns an entities wirelink
 -- @class function
--- @return Wirelink of the entity
+-- @return Wirelink Wirelink of the entity
 ents_methods.getWirelink = wire_library.getWirelink
 
 -- ------------------------- Wirelink ------------------------- --
 
 --- Retrieves an output. Returns nil if the output doesn't exist.
+-- @param any Key to get the value at
+-- @return any Value at the index
 wirelink_meta.__index = function(self, k)
 	checkpermission(instance, nil, "wire.wirelink.read")
 	if wirelink_methods[k] then
@@ -516,6 +519,8 @@ wirelink_meta.__index = function(self, k)
 end
 
 --- Writes to an input.
+-- @param any key Key to set the value at
+-- @param any val Value to set at the index
 wirelink_meta.__newindex = function(self, k, v)
 	checkpermission(instance, nil, "wire.wirelink.write")
 	local wl = wlunwrap(self)
@@ -532,11 +537,14 @@ wirelink_meta.__newindex = function(self, k, v)
 end
 
 --- Checks if a wirelink is valid. (ie. doesn't point to an invalid entity)
+-- @return boolean Whether the wirelink is valid
 function wirelink_methods:isValid()
 	return wlunwrap(self) and true or false
 end
 
 --- Returns the type of input name, or nil if it doesn't exist
+-- @param string name Input name to search for
+-- @return string Type of input
 function wirelink_methods:inputType(name)
 	local wl = wlunwrap(self)
 	if not wl then return end
@@ -545,6 +553,8 @@ function wirelink_methods:inputType(name)
 end
 
 --- Returns the type of output name, or nil if it doesn't exist
+-- @param string name Output name to search for
+-- @return string Type of output
 function wirelink_methods:outputType(name)
 	local wl = wlunwrap(self)
 	if not wl then return end
@@ -553,11 +563,13 @@ function wirelink_methods:outputType(name)
 end
 
 --- Returns the entity that the wirelink represents
+-- @return Entity Entity the wirelink represents
 function wirelink_methods:entity()
 	return owrap(wlunwrap(self))
 end
 
 --- Returns a table of all of the wirelink's inputs
+-- @return table All of the wirelink's inputs
 function wirelink_methods:inputs()
 	local wl = wlunwrap(self)
 	if not wl then return nil end
@@ -578,6 +590,7 @@ function wirelink_methods:inputs()
 end
 
 --- Returns a table of all of the wirelink's outputs
+-- @return table All of the wirelink's outputs
 function wirelink_methods:outputs()
 	local wl = wlunwrap(self)
 	if not wl then return nil end
@@ -598,7 +611,8 @@ function wirelink_methods:outputs()
 end
 
 --- Checks if an input is wired.
--- @param name Name of the input to check
+-- @param string name Name of the input to check
+-- @return boolean Whether it is wired
 function wirelink_methods:isWired(name)
 	checkluatype(name, TYPE_STRING)
 	local wl = wlunwrap(self)
@@ -609,8 +623,8 @@ function wirelink_methods:isWired(name)
 end
 
 --- Returns what an input of the wirelink is wired to.
--- @param name Name of the input
--- @return The entity the wirelink is wired to
+-- @param string name Name of the input
+-- @return Entity The entity the wirelink is wired to
 function wirelink_methods:getWiredTo(name)
 	checkluatype(name, TYPE_STRING)
 	local wl = wlunwrap(self)
@@ -622,8 +636,8 @@ function wirelink_methods:getWiredTo(name)
 end
 
 --- Returns the name of the output an input of the wirelink is wired to.
--- @param name Name of the input of the wirelink.
--- @return String name of the output that the input is wired to.
+-- @param string name Name of the input of the wirelink.
+-- @return string String name of the output that the input is wired to.
 function wirelink_methods:getWiredToName(name)
 	checkluatype(name, TYPE_STRING)
 	local wl = wlunwrap(self)
@@ -642,10 +656,18 @@ wire_library.ports = setmetatable({}, {
 	__index = function(self, name)
 		local input = instance.entity.Inputs[name]
 		if input then
-			if wirecache[name]==input.Value then return wirecachevals[name] end
-			local ret = inputConverters[input.Type](input.Value)
-			wirecache[name] = input.Value
-			wirecachevals[name] = ret
+			local ret
+			if type(input.Value) == "table" then
+				ret = inputConverters[input.Type](input.Value)
+			else
+				if wirecache[name]==input.Value then
+					ret = wirecachevals[name]
+				else
+					ret = inputConverters[input.Type](input.Value)
+					wirecache[name] = input.Value
+					wirecachevals[name] = ret
+				end
+			end
 			return ret
 		end
 	end,
@@ -666,20 +688,20 @@ wire_library.ports = setmetatable({}, {
 --- Called when an input on a wired SF chip is written to
 -- @name input
 -- @class hook
--- @param input The input name
--- @param value The value of the input
+-- @param string input The input name
+-- @param any value The value of the input
 
 --- Called when a high speed device reads from a wired SF chip
 -- @name readcell
 -- @class hook
 -- @server
--- @param address The address requested
--- @return The value read
+-- @param any address The address requested
+-- @return any The value read
 
 --- Called when a high speed device writes to a wired SF chip
 -- @name writecell
 -- @class hook
--- @param address The address written to
--- @param data The data being written
+-- @param any address The address written to
+-- @param table data The data being written
 
 end

@@ -41,19 +41,20 @@ end)
 -- @libtbl builtins_library
 
 --- Returns the entity representing a processor that this script is running on.
--- @return Starfall entity
+-- @return Entity Starfall chip entity
 function builtins_library.chip()
 	return ewrap(instance.entity)
 end
 
 --- Returns whoever created the chip
--- @return Owner entity
+-- @return Entity Owner entity
 function builtins_library.owner()
 	return instance.Types.Player.Wrap(instance.player)
 end
 
 --- Same as owner() on the server. On the client, returns the local player
--- @return Returns player with given UserID or if none specified then returns either the owner (server) or the local player (client)
+-- @param number? num UserID to get the player with.
+-- @return Player Returns player with given UserID or if none specified then returns either the owner (server) or the local player (client)
 function builtins_library.player(num)
 	if num~=nil then
 		checkluatype(num, TYPE_NUMBER)
@@ -65,8 +66,8 @@ end
 
 
 --- Returns the entity with index 'num'
--- @param num Entity index
--- @return entity
+-- @param number num Entity index
+-- @return Entity Entity at the index
 function builtins_library.entity(num)
 	checkluatype(num, TYPE_NUMBER)
 	return owrap(Entity(num))
@@ -76,47 +77,47 @@ end
 --- Used to select single values from a vararg or get the count of values in it.
 -- @name builtins_library.select
 -- @class function
--- @param parameter
--- @param vararg
--- @return Returns a number or vararg, depending on the select method.
+-- @param any parameter
+-- @param ... vararg Args to select from
+-- @return any Returns a number or vararg, depending on the select method.
 builtins_library.select = select
 
 --- Attempts to convert the value to a string.
 -- @name builtins_library.tostring
 -- @class function
--- @param obj
--- @return obj as string
+-- @param any obj Object to turn into a string
+-- @return string Object as a string
 builtins_library.tostring = tostring
 
 --- Attempts to convert the value to a number.
 -- @name builtins_library.tonumber
 -- @class function
--- @param obj
--- @return obj as number
+-- @param any obj Object to turn into a number
+-- @return number? The object as a number or nil if it couldn't be converted
 builtins_library.tonumber = tonumber
 
 --- Returns an iterator function for a for loop, to return ordered key-value pairs from a table.
 -- @name builtins_library.ipairs
 -- @class function
--- @param tbl Table to iterate over
--- @return Iterator function
--- @return Table tbl
--- @return 0 as current index
+-- @param table tbl Table to iterate over
+-- @return function Iterator function
+-- @return table Table being iterated over
+-- @return number Origin index. Equals 0.
 builtins_library.ipairs = ipairs
 
 --- Returns an iterator function for a for loop that will return the values of the specified table in an arbitrary order.
 -- @name builtins_library.pairs
 -- @class function
--- @param tbl Table to iterate over
--- @return Iterator function
--- @return Table tbl
--- @return nil as current index
+-- @param table tbl Table to iterate over
+-- @return function Iterator function
+-- @return table Table being iterated over
+-- @return any Nil as current index (for the constructor)
 builtins_library.pairs = pairs
 
 --- Returns a string representing the name of the type of the passed object.
 -- @name builtins_library.type
--- @param obj Object to get type of
--- @return The name of the object's type.
+-- @param any obj Object to get type of
+-- @return string The name of the object's type.
 function builtins_library.type(obj)
 	local tp = getmetatable(obj)
 	return isstring(tp) and tp or type(obj)
@@ -125,30 +126,30 @@ end
 --- Returns the next key and value pair in a table.
 -- @name builtins_library.next
 -- @class function
--- @param tbl Table to get the next key-value pair of
--- @param k Previous key (can be nil)
--- @return Key or nil
--- @return Value or nil
+-- @param table tbl Table to get the next key-value pair of
+-- @param any k Previous key (can be nil)
+-- @return any Key or nil
+-- @return any Value or nil
 builtins_library.next = next
 
 --- This function takes a numeric indexed table and return all the members as a vararg.
 -- @name builtins_library.unpack
 -- @class function
--- @param tbl
--- @return Elements of tbl
+-- @param table tbl To get elements out of
+-- @return ... elements Elements of tbl
 builtins_library.unpack = unpack
 
 --- Sets, changes or removes a table's metatable. Doesn't work on most internal metatables
 -- @name builtins_library.setmetatable
 -- @class function
--- @param tbl The table to set the metatable of
--- @param meta The metatable to use
--- @return tbl with metatable set to meta
+-- @param table tbl The table to set the metatable of
+-- @param table meta The metatable to use
+-- @return table tbl with metatable set to meta
 builtins_library.setmetatable = setmetatable
 
 --- Returns the metatable of an object. Doesn't work on most internal metatables
--- @param tbl Table to get metatable of
--- @return The metatable of tbl
+-- @param table tbl Table to get metatable of
+-- @return table The metatable of tbl
 builtins_library.getmetatable = function(tbl)
 	checkluatype(tbl, TYPE_TABLE)
 	return getmetatable(tbl)
@@ -157,8 +158,8 @@ end
 --- Generates the CRC checksum of the specified string. (https://en.wikipedia.org/wiki/Cyclic_redundancy_check)
 -- @name builtins_library.crc
 -- @class function
--- @param stringToHash The string to calculate the checksum of
--- @return The unsigned 32 bit checksum as a string
+-- @param string stringToHash The string to calculate the checksum of
+-- @return string The unsigned 32 bit checksum as a string
 builtins_library.crc = util.CRC
 
 --- Constant that denotes whether the code is executed on the client
@@ -174,43 +175,43 @@ builtins_library.SERVER = SERVER
 --- Returns if this is the first time this hook was predicted.
 -- @name builtins_library.isFirstTimePredicted
 -- @class function
--- @return Boolean
+-- @return boolean Whether this is the first time this hook was predicted
 builtins_library.isFirstTimePredicted = IsFirstTimePredicted
 
 --- Returns the current count for this Think's CPU Time.
 -- This value increases as more executions are done, may not be exactly as you want.
 -- If used on screens, will show 0 if only rendering is done. Operations must be done in the Think loop for them to be counted.
--- @return Current quota used this Think
+-- @return number Current quota used this Think
 function builtins_library.quotaUsed()
 	return instance.cpu_total
 end
 
 --- Gets the Average CPU Time in the buffer
--- @return Average CPU Time of the buffer.
+-- @return number Average CPU Time of the buffer.
 function builtins_library.quotaAverage()
 	return instance:movingCPUAverage()
 end
 
 --- Gets the current ram usage of the gmod lua environment
--- @return The ram used in kilobytes
+-- @return number The ram used in kilobytes
 function builtins_library.ramUsed()
 	return SF.Instance.Ram
 end
 
 --- Gets the moving average of ram usage of the gmod lua environment
--- @return The ram used in kilobytes
+-- @return number The ram used in kilobytes
 function builtins_library.ramAverage()
 	return SF.Instance.RamAvg
 end
 
 --- Gets the max allowed ram usage of the gmod lua environment
--- @return The max ram usage in kilobytes
+-- @return number The max ram usage in kilobytes
 function builtins_library.ramMax()
 	return SF.RamCap:GetInt()
 end
 
 --- Gets the starfall version
--- @return Starfall version
+-- @return string Starfall version
 function builtins_library.version()
 	if SERVER then
 		return SF.Version
@@ -220,7 +221,7 @@ function builtins_library.version()
 end
 
 --- Returns the total used time for all chips by the player.
--- @return Total used CPU time of all your chips.
+-- @return number Total used CPU time of all your chips.
 function builtins_library.quotaTotalUsed()
 	local total = 0
 	for instance, _ in pairs(SF.playerInstances[instance.player]) do
@@ -230,7 +231,7 @@ function builtins_library.quotaTotalUsed()
 end
 
 --- Returns the total average time for all chips by the player.
--- @return Total average CPU Time of all your chips.
+-- @return number Total average CPU Time of all your chips.
 function builtins_library.quotaTotalAverage()
 	local total = 0
 	for instance, _ in pairs(SF.playerInstances[instance.player]) do
@@ -241,21 +242,21 @@ end
 
 --- Gets the CPU Time max.
 -- CPU Time is stored in a buffer of N elements, if the average of this exceeds quotaMax, the chip will error.
--- @return Max SysTime allowed to take for execution of the chip in a Think.
+-- @return number Max SysTime allowed to take for execution of the chip in a Think.
 function builtins_library.quotaMax()
 	return instance.cpuQuota
 end
 
 --- Sets a CPU soft quota which will trigger a catchable error if the cpu goes over a certain amount.
--- @param quota The threshold where the soft error will be thrown. Ratio of current cpu to the max cpu usage. 0.5 is 50%
+-- @param number quota The threshold where the soft error will be thrown. Ratio of current cpu to the max cpu usage. 0.5 is 50%
 function builtins_library.setSoftQuota(quota)
 	checkluatype(quota, TYPE_NUMBER)
 	instance.cpu_softquota = quota
 end
 
 --- Checks if the chip is capable of performing an action.
---@param perm The permission id to check
---@param obj Optional object to pass to the permission system.
+-- @param string perm The permission id to check
+-- @param any obj Optional object to pass to the permission system.
 function builtins_library.hasPermission(perm, obj)
 	checkluatype(perm, TYPE_STRING)
 	if not SF.Permissions.permissionchecks[perm] then SF.Throw("Permission doesn't exist", 2) end
@@ -270,10 +271,10 @@ if CLIENT then
 	-- @client
 
 	--- Setups request for overriding permissions.
-	--@param perms Table of overridable permissions' names.
-	--@param desc Description attached to request.
-	--@param showOnUse Whether request will popup when player uses chip or linked screen.
-	--@client
+	-- @param table perms Table of overridable permissions' names.
+	-- @param string desc Description attached to request.
+	-- @param boolean showOnUse Whether request will popup when player uses chip or linked screen.
+	-- @client
 	function builtins_library.setupPermissionRequest( perms, desc, showOnUse )
 		checkluatype( desc, TYPE_STRING )
 		checkluatype( perms, TYPE_TABLE )
@@ -303,15 +304,15 @@ if CLIENT then
 	end
 
 	--- Is permission request fully satisfied.
-	--@return Boolean of whether the client gave all permissions specified in last request or not.
-	--@client
+	-- @return boolean Whether the client gave all permissions specified in last request or not.
+	-- @client
 	function builtins_library.permissionRequestSatisfied()
 		return SF.Permissions.permissionRequestSatisfied( instance )
 	end
 
 	local sentPermRequest = false
 	--- Opens the permission request dialogue if the player is connected to HUD. setupPermissionRequest must be called first
-	--@client
+	-- @client
 	function builtins_library.sendPermissionRequest()
 		if not SF.IsHUDActive(instance.entity) then SF.Throw("Player isn't connected to HUD!", 2) end
 		if sentPermRequest then SF.Throw("Can only send the permission request once!", 2) end
@@ -330,15 +331,15 @@ local os_library = instance.Libraries.os
 --- Returns the approximate cpu time the application ran.
 -- This function has different precision on Linux (1/100).
 -- @class function
--- @return The runtime
+-- @return number The runtime
 os_library.clock = os.clock
 
 --- Returns the date/time as a formatted string or in a table.
 -- See https://wiki.facepunch.com/gmod/Structures/DateData for the table structure
 -- @class function
--- @param format The format string. If starts with an '!', it will use UTC timezone rather than the local timezone
--- @param time Time to use for the format
--- @return If format is equal to '*t' or '!*t' then it will return a table with DateData structure, otherwise a string
+-- @param string format The format string. If starts with an '!', it will use UTC timezone rather than the local timezone
+-- @param number? time Time to use for the format. Default os.time()
+-- @return string|table If format is equal to '*t' or '!*t' then it will return a table with DateData structure, otherwise a string
 os_library.date = function(format, time)
 	if format~=nil then
 		for v in string.gmatch(format, "%%(.?)") do if not string.match(v, "[%%aAbBcCdDSHeUmMjIpwxXzZyY]") then SF.Throw("Bad date format", 2) end end
@@ -348,41 +349,40 @@ end
 
 --- Subtracts the second of the first value and rounds the result
 -- @class function
--- @param timeA The first value
--- @param timeB The value to subtract
--- @return Time difference
+-- @param number timeA The first value
+-- @param number timeB The value to subtract
+-- @return number Time difference
 os_library.difftime = os.difftime
 
 --- Returns the system time in seconds past the unix epoch.
 -- If a table is supplied, the function attempts to build a system time with the specified table members
 -- @class function
--- @param dateData Optional table to generate the time from. This table's data is interpreted as being in the local timezone
--- @return Seconds passed since Unix epoch
+-- @param table? dateData Optional table to generate the time from. This table's data is interpreted as being in the local timezone
+-- @return number Seconds passed since Unix epoch
 os_library.time = os.time
 
 
 -- ------------------------- Functions ------------------------- --
 
 --- Gets all libraries
--- @return Table where each key is the library name and value is table of the library
+-- @return table Table where each key is the library name and value is table of the library
 function builtins_library.getLibraries()
 	return instance.Libraries
 end
 
 --- Set the value of a table index without invoking a metamethod
---@param table The table to modify
---@param key The index of the table
---@param value The value to set the index equal to
-function builtins_library.rawset(table, key, value)
-    checkluatype(table, TYPE_TABLE)
-
-    rawset(table, key, value)
+-- @param table tbl The table to modify
+-- @param any key The index of the table
+-- @param any value The value to set the index equal to
+function builtins_library.rawset(tbl, key, value)
+    checkluatype(tbl, TYPE_TABLE)
+    rawset(tbl, key, value)
 end
 
 --- Gets the value of a table index without invoking a metamethod
---@param table The table to get the value from
---@param key The index of the table
---@return The value of the index
+-- @param table table The table to get the value from
+-- @param any key The index of the table
+-- @return any The value of the index
 function builtins_library.rawget(table, key, value)
     checkluatype(table, TYPE_TABLE)
 
@@ -466,7 +466,7 @@ if SERVER then
 
 	--- Prints a message to the player's chat.
 	-- @shared
-	-- @param ... Values to print. Colors before text will set the text color
+	-- @param ... printArgs Values to print. Colors before text will set the text color
 	function builtins_library.print(...)
 		local data, strlen, size = argsToChat(...)
 		printBurst:use(instance.player, size)
@@ -475,8 +475,8 @@ if SERVER then
 
 	--- Prints a message to a target player's chat as long as they're connected to a hud.
 	-- @shared
-	-- @param ply The target player. If in CLIENT, then ply is the client player and this param is omitted
-	-- @param ... Values to print. Colors before text will set the text color
+	-- @param Player ply The target player. If in CLIENT, then ply is the client player and this param is omitted
+	-- @param ... printArgs Values to print. Colors before text will set the text color
 	function builtins_library.printHud(ply, ...)
 		ply = getply(ply)
 		if not ply:IsPlayer() then SF.Throw("Expected a target player!", 2) end
@@ -494,7 +494,7 @@ if SERVER then
 	end
 
 	--- Prints a table to player's chat
-	-- @param tbl Table to print
+	-- @param table tbl Table to print
 	function builtins_library.printTable(tbl)
 		checkluatype(tbl, TYPE_TABLE)
 		printTableX(tbl, 0, { tbl = true })
@@ -502,7 +502,7 @@ if SERVER then
 
 	--- Execute a console command
 	-- @shared
-	-- @param cmd Command to execute
+	-- @param string cmd Command to execute
 	function builtins_library.concmd(cmd)
 		checkluatype(cmd, TYPE_STRING)
 		if #cmd > 512 then SF.Throw("Console command is too long!", 2) end
@@ -512,7 +512,7 @@ if SERVER then
 
 	--- Sets the chip's userdata that the duplicator tool saves. max 1MiB; can be changed with convar sf_userdata_max
 	-- @server
-	-- @param str String data
+	-- @param string str String data
 	function builtins_library.setUserdata(str)
 		checkluatype(str, TYPE_STRING)
 		local max = userdataLimit:GetInt()
@@ -524,14 +524,14 @@ if SERVER then
 
 	--- Gets the chip's userdata that the duplicator tool loads
 	-- @server
-	-- @return String data
+	-- @return string String data
 	function builtins_library.getUserdata()
 		return instance.entity.starfalluserdata or ""
 	end
 else
 	--- Sets the chip's display name
 	-- @client
-	-- @param name Name
+	-- @param string name Name to set the chip's name to
 	function builtins_library.setName(name)
 		checkluatype(name, TYPE_STRING)
 		local e = instance.entity
@@ -542,7 +542,7 @@ else
 
 	--- Sets clipboard text. Only works on the owner of the chip.
 	-- @client
-	-- @param txt Text to set to the clipboard
+	-- @param string txt Text to set to the clipboard
 	function builtins_library.setClipboardText(txt)
 		if instance.player ~= LocalPlayer() then return end
 		checkluatype(txt, TYPE_STRING)
@@ -551,8 +551,8 @@ else
 
 	--- Prints a message to your chat, console, or the center of your screen.
 	-- @client
-	-- @param mtype How the message should be displayed. See http://wiki.facepunch.com/gmod/Enums/HUD
-	-- @param text The message text.
+	-- @param number mtype How the message should be displayed. See http://wiki.facepunch.com/gmod/Enums/HUD
+	-- @param string text The message text.
 	function builtins_library.printMessage(mtype, text)
 		if instance.player ~= LocalPlayer() then return end
 		checkluatype(text, TYPE_STRING)
@@ -592,36 +592,36 @@ else
 
 	--- Returns the local player's camera angles
 	-- @client
-	-- @return The local player's camera angles
+	-- @return Angle The local player's camera angles
 	function builtins_library.eyeAngles()
 		return awrap(LocalPlayer():EyeAngles())
 	end
 
 	--- Returns the local player's camera position
 	-- @client
-	-- @return The local player's camera position
+	-- @return Vector The local player's camera position
 	function builtins_library.eyePos()
 		return vwrap(LocalPlayer():EyePos())
 	end
 
 	--- Returns the local player's camera forward vector
 	-- @client
-	-- @return The local player's camera forward vector
+	-- @return Vector The local player's camera forward vector
 	function builtins_library.eyeVector()
 		return vwrap(LocalPlayer():GetAimVector())
 	end
 end
 
 --- Returns the table of scripts used by the chip
--- @return Table of scripts used by the chip
+-- @return table Table of scripts used by the chip
 function builtins_library.getScripts()
 	return instance.Sanitize(instance.source)
 end
 
 --- Runs an included script and caches the result.
 -- Works pretty much like standard Lua require()
--- @param file The file to include. Make sure to --@include it
--- @return Return value of the script
+-- @param string file The file to include. Make sure to --@include it
+-- @return ... Return value(s) of the script
 function builtins_library.require(file)
 	checkluatype(file, TYPE_STRING)
 	local loaded = instance.requires
@@ -662,9 +662,9 @@ end
 
 --- Runs an included script and caches the result.
 -- Works pretty much like standard Lua require()
--- @param dir The directory to include. Make sure to --@includedir it
--- @param loadpriority Table of files that should be loaded before any others in the directory
--- @return Table of return values of the scripts
+-- @param string dir The directory to include. Make sure to --@includedir it
+-- @param table loadpriority Table of files that should be loaded before any others in the directory
+-- @return table Table of return values of the scripts
 function builtins_library.requiredir(dir, loadpriority)
 	checkluatype(dir, TYPE_STRING)
 	if loadpriority~=nil then checkluatype(loadpriority, TYPE_TABLE) end
@@ -712,8 +712,8 @@ end
 
 --- Runs an included script, but does not cache the result.
 -- Pretty much like standard Lua dofile()
--- @param file The file to include. Make sure to --@include it
--- @return Return value of the script
+-- @param string file The file to include. Make sure to --@include it
+-- @return ... Return value(s) of the script
 function builtins_library.dofile(file)
 	checkluatype(file, TYPE_STRING)
 	local path
@@ -731,9 +731,9 @@ function builtins_library.dofile(file)
 end
 
 --- Runs an included directory, but does not cache the result.
--- @param dir The directory to include. Make sure to --@includedir it
--- @param loadpriority Table of files that should be loaded before any others in the directory
--- @return Table of return values of the scripts
+-- @param string dir The directory to include. Make sure to --@includedir it
+-- @param table loadpriority Table of files that should be loaded before any others in the directory
+-- @return table Table of return values of the scripts
 function builtins_library.dodir(dir, loadpriority)
 	checkluatype(dir, TYPE_STRING)
 	if loadpriority~=nil then checkluatype(loadpriority, TYPE_TABLE) end
@@ -763,8 +763,8 @@ end
 
 --- GLua's loadstring
 -- Works like loadstring, except that it executes by default in the main builtins_library
--- @param str String to execute
--- @return Function of str
+-- @param string str String to execute
+-- @return function Function of str
 function builtins_library.loadstring(str, name)
 	name = "SF:" .. (name or tostring(instance.env))
 	local func = SF.CompileString(str, name, false)
@@ -786,9 +786,9 @@ instance.whitelistedEnvs = whitelistedEnvs
 --- Lua's setfenv
 -- Sets the environment of either the stack level or the function specified.
 -- Note that this function will throw an error if you try to use it on anything outside of your sandbox.
--- @param funcOrStackLevel Function or stack level to set the environment of
--- @param tbl New environment
--- @return Function with environment set to tbl
+-- @param function|number funcOrStackLevel Function or stack level to set the environment of
+-- @param table tbl New environment
+-- @return function Function with environment set to tbl
 function builtins_library.setfenv(location, environment)
 	if location == nil then
 		location = 2
@@ -807,8 +807,8 @@ end
 --- Lua's getfenv
 -- Returns the environment of either the stack level or the function specified.
 -- Note that this function will return nil if the return value would be anything other than builtins_library or an environment you have passed to setfenv.
--- @param funcOrStackLevel Function or stack level to get the environment of
--- @return Environment table (or nil, if restricted)
+-- @param function|number funcOrStackLevel Function or stack level to get the environment of
+-- @return table? Environment table (or nil, if restricted)
 function builtins_library.getfenv(location)
 	if location == nil then
 		location = 2
@@ -824,8 +824,8 @@ function builtins_library.getfenv(location)
 end
 
 --- Gets an SF type's methods table
--- @param sfType Name of SF type
--- @return Table of the type's methods which can be edited or iterated
+-- @param string sfType Name of SF type
+-- @return table Table of the type's methods which can be edited or iterated
 function builtins_library.getMethods(sfType)
 	checkluatype(sfType, TYPE_STRING)
 	local typemeta = instance.Types[sfType]
@@ -836,9 +836,9 @@ end
 
 --- GLua's debug.getinfo()
 -- Returns a DebugInfo structure containing the passed function's info https://wiki.facepunch.com/gmod/Structures/DebugInfo
--- @param funcOrStackLevel Function or stack level to get info about. Defaults to stack level 0.
--- @param fields A string that specifies the information to be retrieved. Defaults to all (flnSu).
--- @return DebugInfo table
+-- @param function|number funcOrStackLevel Function or stack level to get info about. Defaults to stack level 0.
+-- @param string? fields A string that specifies the information to be retrieved. Defaults to all (flnSu).
+-- @return table DebugInfo table
 function builtins_library.debugGetInfo(funcOrStackLevel, fields)
 	if not isfunction(funcOrStackLevel) and not isnumber(funcOrStackLevel) then SF.ThrowTypeError("function or number", SF.GetType(TfuncOrStackLevel), 2) end
 	if fields~=nil then checkluatype(fields, TYPE_STRING) end
@@ -852,9 +852,9 @@ end
 
 --- GLua's debug.getlocal()
 -- Returns the name of a function or stack's locals
--- @param funcOrStackLevel Function or stack level to get info about. Defaults to stack level 0.
--- @param index The index of the local to get
--- @return The name of the local
+-- @param function|number funcOrStackLevel Function or stack level to get info about. Defaults to stack level 0.
+-- @param number index The index of the local to get
+-- @return string The name of the local
 function builtins_library.debugGetLocal(funcOrStackLevel, index)
 	if not isfunction(funcOrStackLevel) and not isnumber(funcOrStackLevel) then SF.ThrowTypeError("function or number", SF.GetType(TfuncOrStackLevel), 2) end
 	checkluatype(index, TYPE_NUMBER)
@@ -871,10 +871,10 @@ local uncatchable = {
 
 --- Lua's pcall with SF throw implementation
 -- Calls a function and catches an error that can be thrown while the execution of the call.
--- @param func Function to be executed and of which the errors should be caught of
--- @param arguments Arguments to call the function with.
--- @return If the function had no errors occur within it.
--- @return If an error occurred, this will be a string containing the error message. Otherwise, this will be the return values of the function passed in.
+-- @param function func Function to be executed and of which the errors should be caught of
+-- @param ... arguments Arguments to call the function with.
+-- @return boolean If the function had no errors occur within it.
+-- @return ... If an error occurred, this will be a string containing the error message. Otherwise, this will be the return values of the function passed in.
 function builtins_library.pcall(func, ...)
 	local vret = { pcall(func, ...) }
 	local ok, err = vret[1], vret[2]
@@ -901,11 +901,11 @@ end
 --- Lua's xpcall with SF throw implementation, and a traceback for debugging.
 -- Attempts to call the first function. If the execution succeeds, this returns true followed by the returns of the function.
 -- If execution fails, this returns false and the second function is called with the error message, and the stack trace.
--- @param func The function to call initially.
--- @param callback The function to be called if execution of the first fails; the error message and stack trace are passed.
--- @param ... Varargs to pass to the initial function.
--- @return Status of the execution; true for success, false for failure.
--- @return The returns of the first function if execution succeeded, otherwise the return values of the error callback.
+-- @param function func The function to call initially.
+-- @param function callback The function to be called if execution of the first fails; the error message and stack trace are passed.
+-- @param ... passArgs Varargs to pass to the initial function.
+-- @return boolean Status of the execution; true for success, false for failure.
+-- @return ... The returns of the first function if execution succeeded, otherwise the return values of the error callback.
 function builtins_library.xpcall(func, callback, ...)
 	local vret = { xpcall(func, xpcall_Callback, ...) }
 	local ok, errData = vret[1], vret[2]
@@ -928,8 +928,8 @@ end
 
 --- Try to execute a function and catch possible exceptions
 -- Similar to xpcall, but a bit more in-depth
--- @param func Function to execute
--- @param catch Optional function to execute in case func fails
+-- @param function func Function to execute
+-- @param function? catch Optional function to execute in case func fails
 function builtins_library.try(func, catch)
 	local ok, err = pcall(func)
 	if ok then return end
@@ -948,9 +948,9 @@ end
 
 
 --- Throws an exception
--- @param msg Message string
--- @param level Which level in the stacktrace to blame. Defaults to 1
--- @param uncatchable Makes this exception uncatchable
+-- @param string msg Message string
+-- @param number? level Which level in the stacktrace to blame. Defaults to 1
+-- @param boolean uncatchable Makes this exception uncatchable
 function builtins_library.throw(msg, level, uncatchable)
 	SF.Throw(msg, 1 + (level or 1), uncatchable)
 end
@@ -958,8 +958,8 @@ end
 --- Throws an error. Similar to 'throw' but throws whatever you want instead of an SF Error.
 -- @name builtins_library.error
 -- @class function
--- @param msg Message string
--- @param level Which level in the stacktrace to blame. Defaults to 1. 0 for no stacktrace.
+-- @param string msg Message string
+-- @param number? level Which level in the stacktrace to blame. Defaults to 1. 0 for no stacktrace.
 function builtins_library.error(msg, level)
 	SF.Throw(msg, 1 + (level or 1), false, msg)
 end
@@ -967,13 +967,14 @@ end
 --- If the result of the first argument is false or nil, an error is thrown with the second argument as the message.
 -- @name builtins_library.assert
 -- @class function
--- @param condition
--- @param msg
+-- @param any expression Anything that will be evaluated to be true or false
+-- @param string? msg Error message. Default "assertion failed!"
+-- @param ... args Any arguments to return if the assertion is successful
 builtins_library.assert = assert
 
 --- Returns if the table has an isValid function and isValid returns true.
---@param object Table to check
---@return If it is valid
+-- @param any object Table to check
+-- @return boolean If it is valid
 function builtins_library.isValid(object)
 
 	if (not object) then return false end
@@ -984,12 +985,12 @@ function builtins_library.isValid(object)
 end
 
 --- Translates the specified position and angle into the specified coordinate system
--- @param pos The position that should be translated from the current to the new system
--- @param ang The angles that should be translated from the current to the new system
--- @param newSystemOrigin The origin of the system to translate to
--- @param newSystemAngles The angles of the system to translate to
--- @return localPos
--- @return localAngles
+-- @param Vector pos The position that should be translated from the current to the new system
+-- @param Angle ang The angles that should be translated from the current to the new system
+-- @param Vector newSystemOrigin The origin of the system to translate to
+-- @param Angle newSystemAngles The angles of the system to translate to
+-- @return Vector localPos
+-- @return Angle localAngles
 function builtins_library.worldToLocal(pos, ang, newSystemOrigin, newSystemAngles)
 
 	local localPos, localAngles = WorldToLocal(
@@ -1003,12 +1004,12 @@ function builtins_library.worldToLocal(pos, ang, newSystemOrigin, newSystemAngle
 end
 
 --- Translates the specified position and angle from the specified local coordinate system
--- @param localPos The position vector that should be translated to world coordinates
--- @param localAng The angle that should be converted to a world angle
--- @param originPos The origin point of the source coordinate system, in world coordinates
--- @param originAngle The angles of the source coordinate system, as a world angle
--- @return worldPos
--- @return worldAngles
+-- @param Vector localPos The position vector that should be translated to world coordinates
+-- @param Angle localAng The angle that should be converted to a world angle
+-- @param Vector originPos The origin point of the source coordinate system, in world coordinates
+-- @param Angle originAngle The angles of the source coordinate system, as a world angle
+-- @return Vector worldPos
+-- @return Angle worldAngles
 function builtins_library.localToWorld(localPos, localAng, originPos, originAngle)
 
 	local worldPos, worldAngles = LocalToWorld(
@@ -1023,8 +1024,8 @@ end
 
 --- Sets the current instance to allow HUD drawing. Only works if player is in your vehicle or
 -- if it's ran on yourself or if the player is connected to your hud and you want to disconnect them
---@param ply The player to enable the hud on. If CLIENT, will be forced to player()
---@param active Whether hud hooks should be active. true to force on, false to force off.
+-- @param Player ply The player to enable the hud on. If CLIENT, will be forced to player()
+-- @param boolean active Whether hud hooks should be active. true to force on, false to force off.
 function builtins_library.enableHud(ply, active)
 	ply = SERVER and getply(ply) or LocalPlayer()
 	checkluatype(active, TYPE_BOOL)
@@ -1044,8 +1045,8 @@ end
 --- Creates a 'middleclass' class object that can be used similarly to Java/C++ classes. See https://github.com/kikito/middleclass for examples.
 -- @name builtins_library.class
 -- @class function
--- @param name The string name of the class
--- @param super The (optional) parent class to inherit from
+-- @param string name The string name of the class
+-- @param table? super The (optional) parent class to inherit from
 builtins_library.class = SF.Class
 
 end
@@ -1085,6 +1086,10 @@ end
 
 --- Set the current file to only run on the client. Shared is default. --@client
 -- @name client
+-- @class directive
+
+--- Set the current file to run on both the server and client. This is enabled by default. --@shared
+-- @name shared
 -- @class directive
 
 --- Set the client file to run as main. Can only be used in the main file. The client file must be --@include'ed. The main file will not be sent to the client if you use this directive.

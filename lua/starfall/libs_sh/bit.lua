@@ -177,19 +177,19 @@ local function UnpackIEEE754Double(b8, b7, b6, b5, b4, b3, b2, b1)
 end
 
 --- Sets the endianness of the string stream
---@param endian The endianness of number types. "big" or "little" (default "little")
+-- @param string endian The endianness of number types. "big" or "little" (default "little")
 function ss_methods:setEndian(endian)
 	if endian == "little" then
-		setmetatable(self, ss_meta)
+		debug.setmetatable(self, ss_meta)
 	elseif endian == "big" then
-		setmetatable(self, ss_meta_big)
+		debug.setmetatable(self, ss_meta_big)
 	else
 		error("Invalid endian specified", 2)
 	end
 end
 
 --- Writes the given string and advances the buffer pointer.
---@param data A string of data to write
+-- @param string data A string of data to write
 function ss_methods:write(data)
 	if self.index > #self then -- Most often case
 		self[self.index] = data
@@ -222,8 +222,8 @@ function ss_methods:write(data)
 end
 
 --- Reads the specified number of bytes from the buffer and advances the buffer pointer.
---@param length How many bytes to read
---@return A string containing the bytes
+-- @param number length How many bytes to read
+-- @return string A string containing the bytes
 function ss_methods:read(length)
 	local ret = {}
 	while length > 0 do
@@ -251,8 +251,8 @@ function ss_methods:read(length)
 	return table.concat(ret)
 end
 
---- Sets internal pointer to i. The position will be clamped to [1, buffersize+1]
---@param i The position
+--- Sets internal pointer to pos. The position will be clamped to [1, buffersize+1]
+-- @param number pos Position to seek to
 function ss_methods:seek(pos)
 	if pos < 1 then error("Index must be 1 or greater", 2) end
 	self.index = #self+1
@@ -270,7 +270,7 @@ function ss_methods:seek(pos)
 end
 
 --- Move the internal pointer by amount i
---@param length The offset
+-- @param number length The offset
 function ss_methods:skip(length)
 	while length>0 do
 		local cur = self[self.index]
@@ -307,7 +307,7 @@ function ss_methods:skip(length)
 end
 
 --- Returns the internal position of the byte reader.
---@return The buffer position
+-- @return number The buffer position
 function ss_methods:tell()
 	local length = 0
 	for i=1, self.index-1 do
@@ -317,7 +317,7 @@ function ss_methods:tell()
 end
 
 --- Tells the size of the byte stream.
---@return The buffer size
+-- @return number The buffer size
 function ss_methods:size()
 	local length = 0
 	for i, v in ipairs(self) do
@@ -327,7 +327,7 @@ function ss_methods:size()
 end
 
 --- Reads an unsigned 8-bit (one byte) integer from the byte stream and advances the buffer pointer.
---@return The uint8 at this position
+-- @return number UInt8 at this position
 function ss_methods:readUInt8()
 	return string.byte(self:read(1))
 end
@@ -336,7 +336,7 @@ function ss_methods_big:readUInt8()
 end
 
 --- Reads an unsigned 16 bit (two byte) integer from the byte stream and advances the buffer pointer.
---@return The uint16 at this position
+-- @return number UInt16 at this position
 function ss_methods:readUInt16()
 	local a,b = string.byte(self:read(2), 1, 2)
 	return b * 0x100 + a
@@ -347,7 +347,7 @@ function ss_methods_big:readUInt16()
 end
 
 --- Reads an unsigned 32 bit (four byte) integer from the byte stream and advances the buffer pointer.
---@return The uint32 at this position
+-- @return number UInt32 at this position
 function ss_methods:readUInt32()
 	local a,b,c,d = string.byte(self:read(4), 1, 4)
 	return d * 0x1000000 + c * 0x10000 + b * 0x100 + a
@@ -358,7 +358,7 @@ function ss_methods_big:readUInt32()
 end
 
 --- Reads a signed 8-bit (one byte) integer from the byte stream and advances the buffer pointer.
---@return The int8 at this position
+-- @return number Int8 at this position
 function ss_methods:readInt8()
 	local x = self:readUInt8()
 	if x>=0x80 then x = x - 0x100 end
@@ -366,7 +366,7 @@ function ss_methods:readInt8()
 end
 
 --- Reads a signed 16-bit (two byte) integer from the byte stream and advances the buffer pointer.
---@return The int16 at this position
+-- @return number Int16 at this position
 function ss_methods:readInt16()
 	local x = self:readUInt16()
 	if x>=0x8000 then x = x - 0x10000 end
@@ -374,7 +374,7 @@ function ss_methods:readInt16()
 end
 
 --- Reads a signed 32-bit (four byte) integer from the byte stream and advances the buffer pointer.
---@return The int32 at this position
+-- @return number Int32 at this position
 function ss_methods:readInt32()
 	local x = self:readUInt32()
 	if x>=0x80000000 then x = x - 0x100000000 end
@@ -382,7 +382,7 @@ function ss_methods:readInt32()
 end
 
 --- Reads a 4 byte IEEE754 float from the byte stream and advances the buffer pointer.
---@return The float32 at this position
+-- @return number Float32 at this position
 function ss_methods:readFloat()
 	return UnpackIEEE754Float(string.byte(self:read(4), 1, 4))
 end
@@ -392,7 +392,7 @@ function ss_methods_big:readFloat()
 end
 
 --- Reads a 8 byte IEEE754 double from the byte stream and advances the buffer pointer.
---@return The double at this position
+-- @return number Double at this position
 function ss_methods:readDouble()
 	return UnpackIEEE754Double(string.byte(self:read(8), 1, 8))
 end
@@ -402,8 +402,8 @@ function ss_methods_big:readDouble()
 end
 
 --- Reads until the given byte and advances the buffer pointer.
---@param byte The byte to read until (in number form)
---@return The string of bytes read
+-- @param number byte The byte to read until (in number form)
+-- @return string The string of bytes read
 function ss_methods:readUntil(byte)
 	byte = string.char(byte)
 	local ret = {}
@@ -431,15 +431,15 @@ function ss_methods:readUntil(byte)
 	return table.concat(ret)
 end
 
---- returns a null terminated string, reads until "\x00" and advances the buffer pointer.
---@return The string of bytes read
+--- Returns a null terminated string, reads until "\x00" and advances the buffer pointer.
+-- @return string The string of bytes read
 function ss_methods:readString()
 	local s = self:readUntil(0)
 	return string.sub(s, 1, #s-1)
 end
 
 --- Writes a byte to the buffer and advances the buffer pointer.
---@param x An int8 to write
+-- @param number x Int8 to write
 function ss_methods:writeInt8(x)
 	if x==math_huge or x==-math_huge or x~=x then error("Can't convert error float to integer!", 2) end
 	if x < 0 then x = x + 0x100 end
@@ -447,7 +447,7 @@ function ss_methods:writeInt8(x)
 end
 
 --- Writes a short to the buffer and advances the buffer pointer.
---@param x An int16 to write
+-- @param number x Int16 to write
 function ss_methods:writeInt16(x)
 	if x==math_huge or x==-math_huge or x~=x then error("Can't convert error float to integer!", 2) end
 	if x < 0 then x = x + 0x10000 end
@@ -456,11 +456,11 @@ end
 function ss_methods_big:writeInt16(x)
 	if x==math_huge or x==-math_huge or x~=x then error("Can't convert error float to integer!", 2) end
 	if x < 0 then x = x + 0x10000 end
-	self:write(bit_rshift(x, 8)%0x100, string.char(x%0x100))
+	self:write(string.char(bit_rshift(x, 8)%0x100, x%0x100))
 end
 
 --- Writes an int to the buffer and advances the buffer pointer.
---@param x An int32 to write
+-- @param number x Int32 to write
 function ss_methods:writeInt32(x)
 	if x==math_huge or x==-math_huge or x~=x then error("Can't convert error float to integer!", 2) end
 	if x < 0 then x = x + 0x100000000 end
@@ -469,11 +469,11 @@ end
 function ss_methods_big:writeInt32(x)
 	if x==math_huge or x==-math_huge or x~=x then error("Can't convert error float to integer!", 2) end
 	if x < 0 then x = x + 0x100000000 end
-	self:write(string.char(bit_rshift(x, 24)%0x100, bit_rshift(x, 16)%0x100, bit_rshift(x, 8)%0x100), x%0x100)
+	self:write(string.char(bit_rshift(x, 24)%0x100, bit_rshift(x, 16)%0x100, bit_rshift(x, 8)%0x100, x%0x100))
 end
 
 --- Writes a 4 byte IEEE754 float to the byte stream and advances the buffer pointer.
---@param x The float to write
+-- @param number x The float to write
 function ss_methods:writeFloat(x)
 	self:write(string.char(PackIEEE754Float(x)))
 end
@@ -483,7 +483,7 @@ function ss_methods_big:writeFloat(x)
 end
 
 --- Writes a 8 byte IEEE754 double to the byte stream and advances the buffer pointer.
---@param x The double to write
+-- @param number x The double to write
 function ss_methods:writeDouble(x)
 	self:write(string.char(PackIEEE754Double(x)))
 end
@@ -493,14 +493,14 @@ function ss_methods_big:writeDouble(x)
 end
 
 --- Writes a string to the buffer putting a null at the end and advances the buffer pointer.
---@param string The string of bytes to write
-function ss_methods:writeString(string)
-	self:write(string)
+-- @param string str The string of bytes to write
+function ss_methods:writeString(str)
+	self:write(str)
 	self:write("\0")
 end
 
 --- Returns the buffer as a string
---@return The buffer as a string
+-- @return string The buffer as a string
 function ss_methods:getString()
 	return table.concat(self)
 end
@@ -516,79 +516,124 @@ SF.RegisterLibrary("bit")
 return function(instance)
 
 local bit_library = instance.Libraries.bit
----
+--- Returns the arithmetically shifted value.
 -- @class function
+-- @param number value The value to be manipulated.
+-- @param number shiftCount Amount of bits to shift
+-- @return number shiftedValue
 bit_library.arshift = bit.arshift
----
+
+--- Performs the bitwise "and" for all values specified.
 -- @class function
+-- @param number value The value to be manipulated.
+-- @param ...number otherValues Values bit to perform bitwise "and" with. Optional.
+-- @return number Result of bitwise "and" operation.
 bit_library.band = bit.band
----
+
+--- Returns the bitwise not of the value.
 -- @class function
+-- @param number value The value to be inverted.
+-- @return number Return value of bitwise not operation
 bit_library.bnot = bit.bnot
----
+
+--- Returns the bitwise OR of all values specified.
 -- @class function
+-- @param number value1 The first value.
+-- @param ...number Extra values to be evaluated. (must all be numbers)
+-- @return number The bitwise OR result between all numbers.
 bit_library.bor = bit.bor
----
+
+--- Swaps the byte order.
 -- @class function
+-- @param number value The value to be byte swapped.
+-- @return number Bit swapped value
 bit_library.bswap = bit.bswap
----
+
+--- Returns the bitwise xor of all values specified.
 -- @class function
+-- @param number value The value to be manipulated.
+-- @param ...number otherValues Values to bit xor with. Optional.
+-- @return number Return value of bitwiseXOr operation
 bit_library.bxor = bit.bxor
----
+
+--- Returns the left shifted value.
 -- @class function
+-- @param number value The value to be manipulated.
+-- @param number shiftCount Amounts of bits to shift left by.
+-- @return number Return of bitwise lshift operation
 bit_library.lshift = bit.lshift
----
+
+--- Returns the left rotated value.
 -- @class function
+-- @param number value The value to be manipulated.
+-- @param number shiftCount Amounts of bits to rotate left by.
+-- @return number Left rotated value
 bit_library.rol = bit.rol
----
+
+--- Returns the right rotated value.
 -- @class function
+-- @param number value The value to be manipulated.
+-- @param number shiftCount Amounts of bits to rotate right by.
+-- @return number Right rotated value
 bit_library.ror = bit.ror
----
+
+--- Returns the right shifted value.
 -- @class function
+-- @param number value The value to be manipulated.
+-- @param number shiftCount Amounts of bits to shift right by.
+-- @return number Right shifted value
 bit_library.rshift = bit_rshift
----
+
+--- Normalizes the specified value and clamps it in the range of a signed 32bit integer.
 -- @class function
+-- @param number value The value to be normalized.
+-- @return number Bit swapped value
 bit_library.tobit = bit.tobit
----
+
+--- Returns the hexadecimal representation of the number with the specified digits.
 -- @class function
+-- @param number value The value to be normalized.
+-- @param number? digits The number of digits. Optional. (default 8)
+-- @return string Hex string.
 bit_library.tohex = bit.tohex
 
 
 --- Creates a StringStream object
---@name bit_library.stringstream
---@class function
---@param stream A string to set the initial buffer to (default "")
---@param i The initial buffer pointer (default 1)
---@param endian The endianness of number types. "big" or "little" (default "little")
+-- @name bit_library.stringstream
+-- @class function
+-- @param string stream String to set the initial buffer to (default "")
+-- @param number i The initial buffer pointer (default 1)
+-- @param string endian The endianness of number types. "big" or "little" (default "little")
+-- @return StringStream StringStream object
 bit_library.stringstream = SF.StringStream
 
 --- Converts a table to string serializing data types as best as it can
--- @param t The table to serialize
--- @return The serialized data
+-- @param table t The table to serialize
+-- @return string Serialized data
 function bit_library.tableToString(t)
 	checkluatype(t, TYPE_TABLE)
 	return SF.TableToString(t, instance)
 end
 
 --- Converts serialized string data to table
--- @param s The serialized string data
--- @return The deserialized table
+-- @param string s The serialized string data
+-- @return table The deserialized table
 function bit_library.stringToTable(s)
 	checkluatype(s, TYPE_STRING)
 	return SF.StringToTable(s, instance)
 end
 
 --- Compresses a string
---@param s String to compress
---@return Compressed string
+-- @param string s String to compress
+-- @return string Compressed string
 function bit_library.compress(s)
 	checkluatype(s, TYPE_STRING)
 	return util.Compress(s)
 end
 
 --- Decompresses a string
--- @param s Compressed string to decode
--- @return Decompressed string or nil if the input was invalid
+-- @param string s Compressed string to decode
+-- @return string Decompressed string or nil if the input was invalid
 function bit_library.decompress(s)
 	checkluatype(s, TYPE_STRING)
 	return util.Decompress(s)

@@ -986,7 +986,7 @@ local materialBlacklist = {
 	["effects/ar2_altfire1"] = true,
 }
 --- Checks that the material isn't malicious
--- @param material The path to the material
+-- @param Material The path to the material
 -- @return The material object or false if it's invalid
 function SF.CheckMaterial(material)
 	if material == "" then return end

@@ -58,8 +58,8 @@ local function createCoroutine(func)
 end
 
 --- Creates a new coroutine.
--- @param func Function of the coroutine
--- @return coroutine
+-- @param function func Function of the coroutine
+-- @return thread Created coroutine
 function coroutine_library.create(func)
 	checkluatype (func, TYPE_FUNCTION)
 	local wrappedFunc, wrappedThread = createCoroutine(func)
@@ -67,8 +67,8 @@ function coroutine_library.create(func)
 end
 
 --- Creates a new coroutine.
--- @param func Function of the coroutine
--- @return A function that, when called, resumes the created coroutine. Any parameters to that function will be passed to the coroutine.
+-- @param function func Function of the coroutine
+-- @return function A function that, when called, resumes the created coroutine. Any parameters to that function will be passed to the coroutine.
 function coroutine_library.wrap(func)
 	checkluatype (func, TYPE_FUNCTION)
 	local wrappedFunc, wrappedThread = createCoroutine(func)
@@ -77,16 +77,16 @@ end
 
 --- Resumes a suspended coroutine. Note that, in contrast to Lua's native coroutine.resume function, it will not run in protected mode and can throw an error.
 -- @param thread coroutine to resume
--- @param ... optional parameters that will be passed to the coroutine
--- @return Any values the coroutine is returning to the main thread
+-- @param ... args Optional parameters that will be passed to the coroutine
+-- @return ... Any values the coroutine is returning to the main thread
 function coroutine_library.resume(thread, ...)
 	local func = unwrap(thread).func
 	return func(...)
 end
 
 --- Suspends the currently running coroutine. May not be called outside a coroutine.
--- @param ... optional parameters that will be returned to the main thread
--- @return Any values passed to the coroutine
+-- @param ... Optional parameters that will be returned to the main thread
+-- @return ... Any values passed to the coroutine
 function coroutine_library.yield(...)
 	local curthread = coroutine.running()
 	if curthread and coroutines[curthread] then
@@ -97,22 +97,22 @@ function coroutine_library.yield(...)
 end
 
 --- Returns the status of the coroutine.
--- @param thread The coroutine
--- @return Either "suspended", "running", "normal" or "dead"
+-- @param thread coroutine The coroutine
+-- @return string Either "suspended", "running", "normal" or "dead"
 function coroutine_library.status(thread)
 	local thread = unwrap(thread).thread
 	return coroutine.status(thread)
 end
 
 --- Returns the coroutine that is currently running.
--- @return Currently running coroutine
+-- @return thread Currently running coroutine
 function coroutine_library.running()
 	local thread = coroutine.running()
 	return coroutines[thread]
 end
 
 --- Suspends the coroutine for a number of seconds. Note that the coroutine will not resume automatically, but any attempts to resume the coroutine while it is waiting will not resume the coroutine and act as if the coroutine suspended itself immediately.
--- @param time Time in seconds to suspend the coroutine
+-- @param number time Time in seconds to suspend the coroutine
 function coroutine_library.wait(time)
 	local curthread = coroutine.running()
 	if curthread and coroutines[curthread] then

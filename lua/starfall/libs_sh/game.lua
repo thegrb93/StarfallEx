@@ -55,44 +55,44 @@ game_library.getMaxPlayers = game.MaxPlayers
 --- Checks whether the specified game is mounted
 -- @name game_library.isMounted
 -- @class function
--- @param str String identifier of the game, eg. 'cstrike'
--- @return True if the game is mounted
+-- @param string str String identifier of the game, eg. 'cstrike'
+-- @return boolean True if the game is mounted
 game_library.isMounted = IsMounted
 
 --- Returns the game time scale
 -- @name game_library.getTimeScale
 -- @class function
--- @return number time scale
+-- @return number Time scale
 game_library.getTimeScale = game.GetTimeScale
 
 --- Returns the number of seconds between each gametick
 -- @name game_library.getTickInterval
 -- @class function
--- @return number interval
+-- @return number Interval
 game_library.getTickInterval = engine.TickInterval
 
 --- Returns AmmoData for given id
--- @param number id, see https://wiki.facepunch.com/gmod/Default_Ammo_Types
+-- @param number id See https://wiki.facepunch.com/gmod/Default_Ammo_Types
 -- @return table AmmoData, see https://wiki.facepunch.com/gmod/Structures/AmmoData
 function game_library.getAmmoData(id)
 	return game.GetAmmoData(id)
 end
 
 --- Returns the worldspawn entity
--- @return entity world
+-- @return Entity Worldspawn
 function game_library.getWorld()
 	return ewrap(game.GetWorld())
 end
 
 --- Given a 64bit SteamID will return a STEAM_0: style Steam ID
--- @param id The 64 bit Steam ID
+-- @param string id The 64 bit Steam ID
 -- @return string STEAM_0 style Steam ID
 function game_library.steamIDFrom64(id)
 	return util.SteamIDFrom64(id)
 end
 
 --- Given a STEAM_0 style Steam ID will return a 64bit Steam ID
--- @param id The STEAM_0 style id
+-- @param string id The STEAM_0 style id
 -- @return string 64bit Steam ID
 function game_library.steamIDTo64(id)
 	return util.SteamIDTo64(id)
@@ -102,9 +102,9 @@ if SERVER then
 
 	--- Applies explosion damage to all entities in the specified radius
 	-- @server
-	-- @param damageOrigin The center of the explosion
-	-- @param damageRadius The radius in which entities will be damaged (0 - 1500)
-	-- @param damage The amount of damage to be applied
+	-- @param Vector damageOrigin The center of the explosion
+	-- @param number damageRadius The radius in which entities will be damaged (0 - 1500)
+	-- @param number damage The amount of damage to be applied
 	function game_library.blastDamage(damageOrigin, damageRadius, damage)
 		checkpermission(instance, nil, "blast.create")
 		util.BlastDamage(instance.entity, instance.player, vunwrap(damageOrigin), math.Clamp(damageRadius, 0, 1500), damage)
@@ -121,7 +121,7 @@ else
 
 	--- Returns the direction and how obstructed the map's sun is or nil if it doesn't exist
 	-- @client
-	-- @return vector The direction of the sun
+	-- @return Vector The direction of the sun
 	-- @return number How obstructed the sun is 0 to 1.
 	function game_library.getSunInfo()
 		local info = util.GetSunInfo()
@@ -130,8 +130,8 @@ else
 
 	--- Check whether the skybox is visible from the point specified
 	-- @client
-	-- @param position The position to check the skybox visibility from
-	-- @return bool Whether the skybox is visible from the position
+	-- @param Vector position The position to check the skybox visibility from
+	-- @return boolean Whether the skybox is visible from the position
 	function game_library.isSkyboxVisibleFromPoint(position)
 		return util.IsSkyboxVisibleFromPoint(vunwrap(position))
 	end

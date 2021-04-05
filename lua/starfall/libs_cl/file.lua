@@ -174,9 +174,9 @@ local file_methods, file_meta, wrap, unwrap = instance.Types.File.Methods, insta
 
 
 --- Opens and returns a file
--- @param path Filepath relative to data/sf_filedata/.
--- @param mode The file mode to use. See lua manual for explaination
--- @return File object or nil if it failed
+-- @param string path Filepath relative to data/sf_filedata/.
+-- @param string mode The file mode to use. See lua manual for explaination
+-- @return File? File object or nil if it failed
 function file_library.open(path, mode)
 	checkpermission (instance, path, "file.open")
 	checkluatype (path, TYPE_STRING)
@@ -189,8 +189,8 @@ function file_library.open(path, mode)
 end
 
 --- Reads a file from path
--- @param path Filepath relative to data/sf_filedata/.
--- @return Contents, or nil if error
+-- @param string path Filepath relative to data/sf_filedata/.
+-- @return string? Contents, or nil if error
 function file_library.read(path)
 	checkpermission (instance, path, "file.read")
 	checkluatype (path, TYPE_STRING)
@@ -204,9 +204,9 @@ local function checkExtension(filename)
 end
 
 --- Writes to a file
--- @param path Filepath relative to data/sf_filedata/.
--- @param data The data to write
--- @return True if OK, nil if error
+-- @param string path Filepath relative to data/sf_filedata/.
+-- @param string data The data to write
+-- @return boolean? True if OK, nil if error
 function file_library.write(path, data)
 	checkpermission (instance, path, "file.write")
 	checkluatype (path, TYPE_STRING)
@@ -221,8 +221,8 @@ function file_library.write(path, data)
 end
 
 --- Reads a temp file's data if it exists. Otherwise returns nil
--- @param filename The temp file name. Must be only a file and not a path
--- @return The data of the temp file or nil if it doesn't exist
+-- @param string filename The temp file name. Must be only a file and not a path
+-- @return string? The data of the temp file or nil if it doesn't exist
 function file_library.readTemp(filename)
 	checkluatype(filename, TYPE_STRING)
 
@@ -234,9 +234,9 @@ function file_library.readTemp(filename)
 end
 
 --- Writes a temporary file. Throws an error if it is unable to.
--- @param filename The name to give the file. Must be only a file and not a path
--- @param data The data to write
--- @return The generated path for your temp file
+-- @param string filename The name to give the file. Must be only a file and not a path
+-- @param string data The data to write
+-- @return string The generated path for your temp file
 function file_library.writeTemp(filename, data)
 	checkluatype(filename, TYPE_STRING)
 	checkluatype(data, TYPE_STRING)
@@ -254,8 +254,8 @@ function file_library.writeTemp(filename, data)
 end
 
 --- Returns the path of a temp file if it exists. Otherwise returns nil
--- @param filename The temp file name. Must be only a file and not a path
--- @return The path to the temp file or nil if it doesn't exist
+-- @param string filename The temp file name. Must be only a file and not a path
+-- @return string? The path to the temp file or nil if it doesn't exist
 function file_library.existsTemp(filename)
 	checkluatype(filename, TYPE_STRING)
 
@@ -270,8 +270,8 @@ function file_library.existsTemp(filename)
 end
 
 --- Appends a string to the end of a file
--- @param path Filepath relative to data/sf_filedata/.
--- @param data String that will be appended to the file.
+-- @param string path Filepath relative to data/sf_filedata/.
+-- @param string data String that will be appended to the file.
 function file_library.append(path, data)
 	checkpermission (instance, path, "file.write")
 	checkluatype (path, TYPE_STRING)
@@ -284,8 +284,8 @@ function file_library.append(path, data)
 end
 
 --- Checks if a file exists
--- @param path Filepath relative to data/sf_filedata/.
--- @return True if exists, false if not, nil if error
+-- @param string path Filepath relative to data/sf_filedata/.
+-- @return boolean? True if exists, false if not, nil if error
 function file_library.exists(path)
 	checkpermission (instance, path, "file.exists")
 	checkluatype (path, TYPE_STRING)
@@ -293,8 +293,8 @@ function file_library.exists(path)
 end
 
 --- Deletes a file
--- @param path Filepath relative to data/sf_filedata/.
--- @return True if successful, nil if it wasn't found
+-- @param string path Filepath relative to data/sf_filedata/.
+-- @return boolean? True if successful, nil if it wasn't found
 function file_library.delete(path)
 	checkpermission (instance, path, "file.write")
 	checkluatype (path, TYPE_STRING)
@@ -306,7 +306,7 @@ function file_library.delete(path)
 end
 
 --- Creates a directory
--- @param path Filepath relative to data/sf_filedata/.
+-- @param string path Filepath relative to data/sf_filedata/.
 function file_library.createDir(path)
 	checkpermission (instance, path, "file.write")
 	checkluatype (path, TYPE_STRING)
@@ -314,10 +314,10 @@ function file_library.createDir(path)
 end
 
 --- Enumerates a directory
--- @param path The folder to enumerate, relative to data/sf_filedata/.
--- @param sorting Optional sorting arguement. Either nameasc, namedesc, dateasc, datedesc
--- @return Table of file names
--- @return Table of directory names
+-- @param string path The folder to enumerate, relative to data/sf_filedata/.
+-- @param string? sorting Optional sorting argument. Either nameasc, namedesc, dateasc, datedesc
+-- @return table Table of file names
+-- @return table Table of directory names
 function file_library.find(path, sorting)
 	checkpermission (instance, path, "file.find")
 	checkluatype (path, TYPE_STRING)
@@ -326,10 +326,10 @@ function file_library.find(path, sorting)
 end
 
 --- Enumerates a directory relative to gmod
--- @param path The folder to enumerate, relative to garrysmod.
--- @param sorting Optional sorting arguement. Either nameasc, namedesc, dateasc, datedesc
--- @return Table of file names
--- @return Table of directory names
+-- @param string path The folder to enumerate, relative to garrysmod.
+-- @param string? sorting Optional sorting arguement. Either nameasc, namedesc, dateasc, datedesc
+-- @return table Table of file names
+-- @return table Table of directory names
 function file_library.findInGame(path, sorting)
 	checkpermission (instance, path, "file.findInGame")
 	checkluatype (path, TYPE_STRING)
@@ -350,125 +350,125 @@ function file_methods:close()
 end
 
 --- Sets the file position
--- @param n The position to set it to
+-- @param number n The position to set it to
 function file_methods:seek(n)
 	checkluatype (n, TYPE_NUMBER)
 	unwrap(self):Seek(n)
 end
 
 --- Moves the file position relative to its current position
--- @param n How much to move the position
--- @return The resulting position
+-- @param number n How much to move the position
+-- @return number The resulting position
 function file_methods:skip(n)
 	checkluatype (n, TYPE_NUMBER)
 	return unwrap(self):Skip(n)
 end
 
 --- Returns the current file position
--- @return The current file position
+-- @return number The current file position
 function file_methods:tell()
 	return unwrap(self):Tell()
 end
 
 --- Returns the file's size in bytes
--- @return The file's size
+-- @return number The file's size
 function file_methods:size()
 	return unwrap(self):Size()
 end
 
 --- Reads a certain length of the file's bytes
--- @param n The length to read
--- @return The data
+-- @param number n The length to read
+-- @return string The data
 function file_methods:read(n)
 	return unwrap(self):Read(n)
 end
 
 --- Reads a boolean and advances the file position
--- @return The data
+-- @return boolean Boolean
 function file_methods:readBool()
 	return unwrap(self):ReadBool()
 end
 
 --- Reads a byte and advances the file position
--- @return The data
+-- @return number UInt8 number
 function file_methods:readByte()
 	return unwrap(self):ReadByte()
 end
 
 --- Reads a double and advances the file position
--- @return The data
+-- @return number Float64 number
 function file_methods:readDouble()
 	return unwrap(self):ReadDouble()
 end
 
 --- Reads a float and advances the file position
--- @return The data
+-- @return number Float32 number
 function file_methods:readFloat()
 	return unwrap(self):ReadFloat()
 end
 
 --- Reads a line and advances the file position
--- @return The data
+-- @return string Line contents
 function file_methods:readLine()
 	return unwrap(self):ReadLine()
 end
 
 --- Reads a long and advances the file position
--- @return The data
+-- @return number Int32 number
 function file_methods:readLong()
 	return unwrap(self):ReadLong()
 end
 
 --- Reads a short and advances the file position
--- @return The data
+-- @return number Int16 number
 function file_methods:readShort()
 	return unwrap(self):ReadShort()
 end
 
 --- Writes a string to the file and advances the file position
--- @param str The data to write
+-- @param string str The data to write
 function file_methods:write(str)
 	checkluatype (str, TYPE_STRING)
 	unwrap(self):Write(str)
 end
 
 --- Writes a boolean and advances the file position
--- @param x The boolean to write
+-- @param boolean x The boolean to write
 function file_methods:writeBool(x)
 	checkluatype (x, TYPE_BOOL)
 	unwrap(self):WriteBool(x)
 end
 
 --- Writes a byte and advances the file position
--- @param x The byte to write
+-- @param number x The byte to write
 function file_methods:writeByte(x)
 	checkluatype (x, TYPE_NUMBER)
 	unwrap(self):WriteByte(x)
 end
 
 --- Writes a double and advances the file position
--- @param x The double to write
+-- @param number x The double to write
 function file_methods:writeDouble(x)
 	checkluatype (x, TYPE_NUMBER)
 	unwrap(self):WriteDouble(x)
 end
 
 --- Writes a float and advances the file position
--- @param x The float to write
+-- @param number x The float to write
 function file_methods:writeFloat(x)
 	checkluatype (x, TYPE_NUMBER)
 	unwrap(self):WriteFloat(x)
 end
 
 --- Writes a long and advances the file position
--- @param x The long to write
+-- @param number x The long to write
 function file_methods:writeLong(x)
 	checkluatype (x, TYPE_NUMBER)
 	unwrap(self):WriteLong(x)
 end
 
 --- Writes a short and advances the file position
--- @param x The short to write
+-- @param number x The short to write
 function file_methods:writeShort(x)
 	checkluatype (x, TYPE_NUMBER)
 	unwrap(self):WriteShort(x)

@@ -15,6 +15,7 @@ end
 -- @name Vehicle
 -- @class type
 -- @libtbl vehicle_methods
+-- @libtbl vehicle_meta
 SF.RegisterType("Vehicle", false, true, debug.getregistry().Vehicle, "Entity")
 
 return function(instance)
@@ -32,6 +33,8 @@ local function getveh(self)
 	end
 end
 
+--- Turns a vehicle into a string.
+-- @return string String representing the vehicle.
 function vehicle_meta:__tostring()
 	local ent = unwrap(self)
 	if not ent then return "(null entity)"
@@ -41,7 +44,7 @@ end
 if SERVER then
 	--- Returns the driver of the vehicle
 	-- @server
-	-- @return Driver of vehicle
+	-- @return Player Driver of vehicle
 	function vehicle_methods:getDriver()
 		return pwrap(getveh(self):GetDriver())
 	end
@@ -57,8 +60,8 @@ if SERVER then
 
 	--- Returns a passenger of a vehicle
 	-- @server
-	-- @param n The index of the passenger to get
-	-- @return The passenger or NULL if empty
+	-- @param number n The index of the passenger to get
+	-- @return Player The passenger or NULL if empty
 	function vehicle_methods:getPassenger(n)
 		checkluatype(n, TYPE_NUMBER)
 		return pwrap(getveh(self):GetPassenger(n))
@@ -76,7 +79,7 @@ if SERVER then
 	end
 
 	--- Strips weapons of the driver
-	-- @param class Optional weapon class to strip. Otherwise all are stripped.
+	-- @param string? class Optional weapon class to strip. Otherwise all are stripped.
 	-- @server
 	function vehicle_methods:stripDriver(class)
 		if class ~= nil then checkluatype(class, TYPE_STRING) end
