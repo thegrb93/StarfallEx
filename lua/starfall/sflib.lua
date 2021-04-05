@@ -11,8 +11,8 @@ local dgetmeta = debug.getmetatable
 
 -- Make sure this is done after metatables have been set
 hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
-	local _G = _G
-	local getfenv = getfenv
+	-- If *anything* needs to be micro-optimized, it's this.
+	-- This doesn't just affect StarfallEx, it affects *everything*.
 	local rawget = rawget
 	local SF = SF
 	local function sanitizeTypeMeta(theType, myMeta)
@@ -23,7 +23,7 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 					local myMetaFunc = myMeta and myMeta[k]
 					if myMetaFunc then
 						meta[k] = function(...)
-							if SF.runningOps and getfenv(2) ~= _G then
+							if SF.runningOps then
 								return myMetaFunc(...)
 							else
 								return v(...)
@@ -31,7 +31,7 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 						end
 					else
 						meta[k] = function(...)
-							if not SF.runningOps or getfenv(2) == _G then
+							if not SF.runningOps then
 								return v(...)
 							end
 						end
@@ -40,7 +40,7 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 					local myMetaFunc = myMeta and myMeta[k]
 					if myMetaFunc then
 						meta[k] = function(t,k)
-							if SF.runningOps and getfenv(2) ~= _G then
+							if SF.runningOps then
 								return myMetaFunc(t,k)
 							else
 								return rawget(t,k)
@@ -48,7 +48,7 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 						end
 					else
 						meta[k] = function(t,k)
-							if not SF.runningOps or getfenv(2) == _G then
+							if not SF.runningOps then
 								return rawget(t,k)
 							end
 						end
@@ -65,8 +65,23 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 	sanitizeTypeMeta(function() end)
 	sanitizeTypeMeta(coroutine.create(function() end))
 
+	local _G = _G
+	local getfenv = getfenv
+	local isfunction = isfunction
+	local tonumber = tonumber
+	local tostring = tostring
+	local string_library = SF.SafeStringLib
 	sanitizeTypeMeta("", {
 		__index = function(self, key)
+			if getfenv(3) == _G then
+				local val = string_library[key]
+				if val then
+					return val
+				elseif tonumber(key) then
+					return string_library.sub(self, key, key)
+				end
+				SF.Throw("attempt to index a string value with bad key ('"..tostring(key).."' is not part of the string library)", 3)
+			end
 			local instance_string = SF.runningOps.Libraries.string
 			local value = rawget(instance_string, key)
 			if value then
