@@ -65,23 +65,24 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 	sanitizeTypeMeta(function() end)
 	sanitizeTypeMeta(coroutine.create(function() end))
 
-	local function sf_string_index(self, key)
-		local instance_string = SF.runningOps.Libraries.string
-		local value = rawget(instance_string, key)
-		if value then
-			return value
+	sanitizeTypeMeta("", {
+		__index = function(self, key)
+			local instance_string = SF.runningOps.Libraries.string
+			local value = rawget(instance_string, key)
+			if value then
+				return value
+			end
+			local meta = dgetmeta(instance_string)
+			if not meta then
+				return
+			end
+			local __index = rawget(meta, '__index') -- To avoid any metatable set on the metatable itself
+			if isfunction(__index) then
+				return __index(self, key) -- All of this just so that a metamethod gets self instead of meta...
+			end
+			return __index[key]
 		end
-		local meta = dgetmeta(instance_string)
-		if not meta then
-			return
-		end
-		local __index = rawget(meta, '__index') -- To avoid any metatable set on the metatable itself
-		if not __index then
-			return
-		end
-		return __index(self, key)
-	end
-	sanitizeTypeMeta("", {__index = sf_string_index})
+	})
 	
 	if not (WireLib and WireLib.PatchedDuplicator) then
 		if WireLib then WireLib.PatchedDuplicator = true end
