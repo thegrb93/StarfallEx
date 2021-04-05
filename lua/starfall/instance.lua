@@ -69,6 +69,8 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 	end
 	instance.player = player
 
+	instance.enhancedMethods = instance.ppdata.enhancedmethods or false
+
 	local quotaRun
 	if player == SF.Superuser then
 		quotaRun = SF.Instance.runWithoutOps

@@ -73,29 +73,30 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 	local string_library = SF.SafeStringLib
 	sanitizeTypeMeta("", {
 		__index = function(self, key)
-			if getfenv(3) == _G then
-				local val = string_library[key]
-				if val then
-					return val
-				elseif tonumber(key) then
-					return string_library.sub(self, key, key)
+			local instance = SF.runningOps
+			if instance.enhancedMethods and getfenv(2) ~= _G then
+				local instance_string = instance.Libraries.string
+				local value = rawget(instance_string, key)
+				if value then
+					return value
 				end
-				SF.Throw("attempt to index a string value with bad key ('"..tostring(key).."' is not part of the string library)", 3)
+				local meta = dgetmeta(instance_string)
+				if not meta then
+					return
+				end
+				local __index = rawget(meta, '__index') -- To avoid any metatable set on the metatable itself
+				if isfunction(__index) then
+					return __index(self, key) -- All of this just so that a metamethod gets self instead of meta...
+				end
+				return __index[key]
 			end
-			local instance_string = SF.runningOps.Libraries.string
-			local value = rawget(instance_string, key)
-			if value then
-				return value
+			local val = string_library[key]
+			if val then
+				return val
+			elseif tonumber(key) then
+				return string_library.sub(self, key, key)
 			end
-			local meta = dgetmeta(instance_string)
-			if not meta then
-				return
-			end
-			local __index = rawget(meta, '__index') -- To avoid any metatable set on the metatable itself
-			if isfunction(__index) then
-				return __index(self, key) -- All of this just so that a metamethod gets self instead of meta...
-			end
-			return __index[key]
+			SF.Throw("attempt to index a string value with bad key ('"..tostring(key).."' is not part of the string library)", 3)
 		end
 	})
 	

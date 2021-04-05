@@ -181,3 +181,7 @@ SF.Preprocessor.SetGlobalDirective("superuser", function(args, filename, data)
 	if not data.superuser then data.superuser = {} end
 	data.superuser[filename] = true
 end)
+
+SF.Preprocessor.SetGlobalDirective("enhancedmethods", function(args, filename, data)
+	data.enhancedmethods = true
+end)

@@ -1103,3 +1103,6 @@ end
 -- @name superuser
 -- @class directive
 
+--- String methods use your chip's string library instead of the immutable SF.SafeStringLib. This means you can use custom string methods, but it's also MUCH slower.
+-- @name enhancedmethods
+-- @class directive
