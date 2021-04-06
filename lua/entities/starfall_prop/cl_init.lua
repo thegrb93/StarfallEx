@@ -6,6 +6,7 @@ ENT.Material = ENT.DefaultMaterial
 
 function ENT:Initialize()
 	self.rendermesh = Mesh(self.Material)
+	self.rendermeshloaded = false
 	self:DrawShadow(false)
 	self:EnableCustomCollisions( true )
 end
@@ -60,7 +61,7 @@ net.Receive("starfall_custom_prop", function()
 	local self, data
 
 	local function applyData()
-		if not (self and self:IsValid() and data) then return end
+		if not (self and self:IsValid() and data and not self.rendermeshloaded) then return end
 		local stream = SF.StringStream(data)
 		local physmesh = {}
 		local mins, maxs = Vector(math.huge, math.huge, math.huge), Vector(-math.huge, -math.huge, -math.huge)
@@ -91,6 +92,7 @@ net.Receive("starfall_custom_prop", function()
 		self.rendermesh:BuildFromTriangles(rendermesh)
 		self:SetRenderBounds(mins, maxs)
 		self:SetCollisionBounds(mins, maxs)
+		self.rendermeshloaded = true
 	end
 
 	SF.WaitForEntity(index, function(e)
