@@ -1063,6 +1063,13 @@ end
 -- @class directive
 -- @param path Path to the directory
 
+--- Mark a file to be included in the upload.
+-- Different from include in that the file does not have to have valid syntax.
+-- Cannot be used with require() or dofile(), can only be used with getScripts().
+-- @name includedata
+-- @class directive
+-- @param path Path to the file
+
 --- Set the name of the script.
 -- This will become the name of the tab and will show on the overlay of the processor. --@name Awesome script
 -- @name name
