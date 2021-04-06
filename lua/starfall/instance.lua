@@ -111,25 +111,22 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 	if not ok then
 		return false, { message = "", traceback = err }
 	end
-	local includesdata = instance.ppdata.includesdata or {}
-	for filename, source in pairs(code) do
-		local serverorclient
-		if instance.ppdata.serverorclient then
-			serverorclient = instance.ppdata.serverorclient[filename]
-		end
 
-		if includesdata[filename] then
-			-- Don't do anything.
-		elseif string.match(source, "^[%s\n]*$") or (serverorclient == "server" and CLIENT) or (serverorclient == "client" and SERVER) then
-			-- Lua doesn't have empty statements, so an empty file gives a syntax error
-			instance.scripts[filename] = function() end
-		else
-			local func = SF.CompileString(source, "SF:"..filename, false)
-			if isstring(func) then
-				return false, { message = func, traceback = "" }
+	local includesdatapp = instance.ppdata.includesdata or {}
+	local serverorclientpp = instance.ppdata.serverorclient or {}
+	for filename, source in pairs(code) do
+		if not includesdatapp[filename] then -- Don't compile data files
+			local serverorclient = serverorclientpp[filename]
+			if (serverorclient == "server" and CLIENT) or (serverorclient == "client" and SERVER) then
+				instance.scripts[filename] = function() end
+			else
+				local func = SF.CompileString(source, "SF:"..filename, false)
+				if isstring(func) then
+					return false, { message = func, traceback = "" }
+				end
+				debug.setfenv(func, instance.env)
+				instance.scripts[filename] = func
 			end
-			debug.setfenv(func, instance.env)
-			instance.scripts[filename] = func
 		end
 	end
 
