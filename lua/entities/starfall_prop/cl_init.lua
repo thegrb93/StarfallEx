@@ -89,7 +89,10 @@ net.Receive("starfall_custom_prop", function()
 			end
 		end
 
-		self.rendermesh:BuildFromTriangles(rendermesh)
+		-- less than 3 can crash
+		if #rendermesh >= 3 then
+			self.rendermesh:BuildFromTriangles(rendermesh)
+		end
 		self:SetRenderBounds(mins, maxs)
 		self:SetCollisionBounds(mins, maxs)
 		self.rendermeshloaded = true
