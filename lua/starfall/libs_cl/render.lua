@@ -181,8 +181,12 @@ SF.hookAdd("PreDrawOpaqueRenderables", "hologrammatrix", function(instance, draw
 	return not drawskybox, {}
 end)
 
-local function canRenderHudSafeArgs(instance, ...)
+local function canRenderHud(instance, ...)
 	return SF.IsHUDActive(instance.entity) and (instance.player == SF.Superuser or haspermission(instance, nil, "render.hud")), {...}
+end
+
+local function canRenderHudSecurely(instance, ...)
+	return SF.IsHUDActive(instance.entity) and (instance.player == SF.Superuser or haspermission(instance, nil, "render.hud")) and not SF.showingPermissionPrompt, {...}
 end
 
 local function canCalcview(instance, ply, pos, ang, fov, znear, zfar)
@@ -204,19 +208,19 @@ local function returnCalcview(instance, tbl)
 	end
 end
 
-SF.hookAdd("HUDPaint", "drawhud", canRenderHudSafeArgs)
-SF.hookAdd("HUDShouldDraw", nil, canRenderHudSafeArgs, function(instance, args)
+SF.hookAdd("HUDPaint", "drawhud", canRenderHud)
+SF.hookAdd("HUDShouldDraw", nil, canRenderHud, function(instance, args)
 	if args[2]==false then return false end
 end)
-SF.hookAdd("PreDrawOpaqueRenderables", nil, canRenderHudSafeArgs)
-SF.hookAdd("PostDrawOpaqueRenderables", nil, canRenderHudSafeArgs)
-SF.hookAdd("PreDrawTranslucentRenderables", nil, canRenderHudSafeArgs)
-SF.hookAdd("PostDrawTranslucentRenderables", nil, canRenderHudSafeArgs)
-SF.hookAdd("PreDrawHUD", nil, canRenderHudSafeArgs)
-SF.hookAdd("PostDrawHUD", nil, canRenderHudSafeArgs)
+SF.hookAdd("PreDrawOpaqueRenderables", nil, canRenderHud)
+SF.hookAdd("PostDrawOpaqueRenderables", nil, canRenderHud)
+SF.hookAdd("PreDrawTranslucentRenderables", nil, canRenderHud)
+SF.hookAdd("PostDrawTranslucentRenderables", nil, canRenderHud)
+SF.hookAdd("PreDrawHUD", nil, canRenderHud)
+SF.hookAdd("PostDrawHUD", nil, canRenderHudSecurely)
 SF.hookAdd("CalcView", nil, canCalcview, returnCalcview)
-SF.hookAdd("SetupWorldFog", nil, canRenderHudSafeArgs, function() return true end)
-SF.hookAdd("SetupSkyboxFog", nil, canRenderHudSafeArgs, function() return true end)
+SF.hookAdd("SetupWorldFog", nil, canRenderHud, function() return true end)
+SF.hookAdd("SetupSkyboxFog", nil, canRenderHud, function() return true end)
 
 hook.Add("ShouldDrawLocalPlayer", "SF_DrawLocalPlayerInRenderView", function()
 	if renderingView and drawViewerInView then
