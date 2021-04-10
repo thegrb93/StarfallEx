@@ -185,6 +185,11 @@ local function canRenderHudSafeArgs(instance, ...)
 	return SF.IsHUDActive(instance.entity) and (instance.player == SF.Superuser or haspermission(instance, nil, "render.hud")), {...}
 end
 
+local function canRenderHudSafeArgsParanoid(instance, ...)
+	local allowed, args = canRenderHudSafeArgs(instance, ...)
+	return allowed and not IsValid(SF.permPanel), args
+end
+
 local function canCalcview(instance, ply, pos, ang, fov, znear, zfar)
 	return SF.IsHUDActive(instance.entity) and (instance.player == SF.Superuser or haspermission(instance, nil, "render.calcview")), {instance.Types.Vector.Wrap(pos), instance.Types.Angle.Wrap(ang), fov, znear, zfar}
 end
@@ -213,7 +218,7 @@ SF.hookAdd("PostDrawOpaqueRenderables", nil, canRenderHudSafeArgs)
 SF.hookAdd("PreDrawTranslucentRenderables", nil, canRenderHudSafeArgs)
 SF.hookAdd("PostDrawTranslucentRenderables", nil, canRenderHudSafeArgs)
 SF.hookAdd("PreDrawHUD", nil, canRenderHudSafeArgs)
-SF.hookAdd("PostDrawHUD", nil, canRenderHudSafeArgs)
+SF.hookAdd("PostDrawHUD", nil, canRenderHudSafeArgsParanoid)
 SF.hookAdd("CalcView", nil, canCalcview, returnCalcview)
 SF.hookAdd("SetupWorldFog", nil, canRenderHudSafeArgs, function() return true end)
 SF.hookAdd("SetupSkyboxFog", nil, canRenderHudSafeArgs, function() return true end)
