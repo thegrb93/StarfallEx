@@ -46,6 +46,7 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 	instance.entity = entity
 	instance.data = {}
 	instance.stackn = 0
+	instance.sfhooks = {}
 	instance.hooks = {}
 	instance.scripts = {}
 	instance.source = code
@@ -139,11 +140,11 @@ end
 -- @param name The hook name
 -- @param func The hook function
 function SF.Instance:AddHook(name, func)
-	local hook = self.Hooks[name]
+	local hook = self.sfhooks[name]
 	if hook then
 		hook[#hook + 1] = func
 	else
-		self.Hooks[name] = {func}
+		self.sfhooks[name] = {func}
 	end
 end
 
@@ -151,7 +152,7 @@ end
 -- @param name Hook to run.
 -- @param ... Additional arguments.
 function SF.Instance:RunHook(name, ...)
-	local hook = self.Hooks[name]
+	local hook = self.sfhooks[name]
 	if hook then
 		for i = 1, #hook do
 			hook[i](...)
@@ -251,7 +252,6 @@ end
 --- Builds an environment table
 -- @return The environment
 function SF.Instance:BuildEnvironment()
-	self.Hooks = {}
 	self.Libraries = {}
 	self.Types = {}
 	self.env = {}
