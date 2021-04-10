@@ -619,13 +619,7 @@ function PANEL:OpenForChip( chip, showOverrides )
 	end
 end
 
-function PANEL:OnClose()
-	SF.showingPermissionPrompt = false
-end
-
 function PANEL:Init()
-	SF.showingPermissionPrompt = true
-
 	self:ShowCloseButton( false )
 	self:DockPadding( 5, 5, 5, 5 )
 	self:SetSize( 640, 400 )

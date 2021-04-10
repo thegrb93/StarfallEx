@@ -186,7 +186,8 @@ local function canRenderHudSafeArgs(instance, ...)
 end
 
 local function canRenderHudSafeArgsParanoid(instance, ...)
-	return SF.IsHUDActive(instance.entity) and (instance.player == SF.Superuser or haspermission(instance, nil, "render.hud")) and not SF.showingPermissionPrompt, {...}
+	local allowed, args = canRenderHudSafeArgs(instance, ...)
+	return allowed and not IsValid(SF.permPanel), args
 end
 
 local function canCalcview(instance, ply, pos, ang, fov, znear, zfar)
