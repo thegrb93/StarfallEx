@@ -27,7 +27,7 @@ if CLIENT then
 	-- @name VRInput
 	-- @class hook
 	-- @param string actionname Name of the input
-	-- @param boolean State of the input
+	-- @param boolean state State of the input
 	-- @client
 	SF.hookAdd("VRMod_Input", "vrinput")
 
