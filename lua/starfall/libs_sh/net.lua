@@ -514,10 +514,3 @@ function net_library.isStreaming()
 end
 
 end
-
---- Called when a net message arrives
--- @name net
--- @class hook
--- @param string name Name of the arriving net message
--- @param number len Length of the arriving net message in bits
--- @param Player? ply On server, the player that sent the message. Nil on client.

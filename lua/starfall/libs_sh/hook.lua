@@ -568,7 +568,7 @@ end
 --- Called when the starfall chip is removed
 -- @name Removed
 -- @class hook
--- @server
+-- @shared
 
 --- Called after the starfall chip is duplicated and the duplication is finished.
 -- @name DupeFinished
@@ -601,3 +601,31 @@ end
 -- @class hook
 -- @shared
 -- @param Entity ent The component entity
+
+--- Called when a net message arrives
+-- @name net
+-- @class hook
+-- @param string name Name of the arriving net message
+-- @param number len Length of the arriving net message in bits
+-- @param Player? ply On server, the player that sent the message. Nil on client.
+
+--- Called when the player disconnects from a HUD component linked to the Starfall Chip
+-- @name huddisconnected
+-- @class hook
+-- @client
+
+--- Called when the player connects to a HUD component linked to the Starfall Chip
+-- @name hudconnected
+-- @class hook
+-- @client
+
+--- Called when a player uses the screen
+-- @name starfallUsed
+-- @class hook
+-- @param Player activator Player who used the screen or chip
+-- @param Entity used The screen or chip entity that was used
+
+--- Called when a frame is requested to be drawn on screen. (2D/3D Context)
+-- @name render
+-- @class hook
+-- @client
