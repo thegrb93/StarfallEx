@@ -602,13 +602,6 @@ end
 -- @shared
 -- @param Entity ent The component entity
 
---- Called when a net message arrives
--- @name net
--- @class hook
--- @param string name Name of the arriving net message
--- @param number len Length of the arriving net message in bits
--- @param Player? ply On server, the player that sent the message. Nil on client.
-
 --- Called when the player disconnects from a HUD component linked to the Starfall Chip
 -- @name huddisconnected
 -- @class hook
