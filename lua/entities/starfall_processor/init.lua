@@ -85,8 +85,7 @@ function ENT:PreEntityCopy()
 	duplicator.ClearEntityModifier(self, "SFDupeInfo")
 	if self.sfdata then
 		local info = WireLib and WireLib.BuildDupeInfo(self) or {}
-		info.starfall = SF.SerializeCode(self.sfdata.files, self.sfdata.mainfile)
-		info.starfalluserdata = self.starfalluserdata
+		info.starfall = {mainfile = self.sfdata.mainfile, files = SF.CompressFiles(self.sfdata.files), udata = self.starfalluserdata, ver = 4.3}
 		duplicator.StoreEntityModifier(self, "SFDupeInfo", info)
 	end
 end
@@ -109,9 +108,15 @@ function ENT:PostEntityPaste(ply, ent, CreatedEntities)
 		end
 
 		if info.starfall then
-			local files, mainfile = SF.DeserializeCode(info.starfall)
-			self.starfalluserdata = info.starfalluserdata
-			self.sfdata = {owner = ply, files = files, mainfile = mainfile}
+			if info.starfall.ver then
+				self.starfalluserdata = info.starfall.udata
+				self.sfdata = {owner = ply, files = SF.DecompressFiles(info.starfall.files), mainfile = info.starfall.mainfile}
+			else
+				-- Legacy duplications
+				local files, mainfile = SF.LegacyDeserializeCode(info.starfall)
+				self.starfalluserdata = info.starfalluserdata
+				self.sfdata = {owner = ply, files = files, mainfile = mainfile}
+			end
 		end
 	end
 end

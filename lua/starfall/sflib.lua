@@ -1073,31 +1073,13 @@ function SF.IsHUDActive(ent, ply)
 end
 
 -- ------------------------------------------------------------------------- --
-
-local serialize_replace_regex = "[\"\n]"
-local serialize_replace_tbl = { ["\n"] = string.char(5), ['"'] = string.char(4) }
-
---- Serializes an instance's code in a format compatible with the duplicator library
--- @param sources The table of filename = source entries. Ususally instance.source
--- @param mainfile The main filename. Usually instance.mainfile
-function SF.SerializeCode(sources, mainfile)
-	local rt = { source = {} }
-	for filename, source in pairs(sources) do
-		rt.source[filename] = string.gsub(source, serialize_replace_regex, serialize_replace_tbl)
-	end
-	rt.mainfile = mainfile
-	return rt
-end
-
-local deserialize_replace_regex = "[" .. string.char(5) .. string.char(4) .. "]"
-local deserialize_replace_tbl = { [string.char(5)[1]] = "\n", [string.char(4)[1]] = '"' }
---- Deserializes an instance's code.
+--- Legacy deserializes an instance's code.
 -- @return The table of filename = source entries
 -- @return The main filename
-function SF.DeserializeCode(tbl)
+function SF.LegacyDeserializeCode(tbl)
 	local sources = {}
 	for filename, source in pairs(tbl.source) do
-		sources[filename] = string.gsub(source, deserialize_replace_regex, deserialize_replace_tbl)
+		sources[filename] = string.gsub(source, "[" .. string.char(5) .. string.char(4) .. "]", { [string.char(5)[1]] = "\n", [string.char(4)[1]] = '"' })
 	end
 	return sources, tbl.mainfile
 end
