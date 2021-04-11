@@ -88,6 +88,16 @@ function ENT:PreEntityCopy()
 		info.starfall = {mainfile = self.sfdata.mainfile, files = SF.CompressFiles(self.sfdata.files), udata = self.starfalluserdata, ver = 4.3}
 		duplicator.StoreEntityModifier(self, "SFDupeInfo", info)
 	end
+
+	-- Stupid hack to prevent garry dupe from copying everything
+	SF.Copying = {self.sfdata, self.instance}
+	self.sfdata = nil
+	self.instance = nil
+end
+function ENT:PostEntityCopy()
+	self.sfdata = SF.Copying[1]
+	self.instance = SF.Copying[2]
+	SF.Copying = nil
 end
 
 local function EntityLookup(CreatedEntities)
