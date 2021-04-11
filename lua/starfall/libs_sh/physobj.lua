@@ -499,7 +499,7 @@ if SERVER then
 	
 	--- Returns the volume in source units cubed. Or nil if the PhysObj is a generated sphere or box.
 	-- @shared
-	-- @return number The volume or nil if the PhysObj is a generated sphere or box.
+	-- @return number? The volume or nil if the PhysObj is a generated sphere or box.
 	function physobj_methods:getVolume()
 		return unwrap(self):GetVolume()
 	end
