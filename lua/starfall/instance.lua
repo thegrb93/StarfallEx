@@ -46,6 +46,7 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 	instance.entity = entity
 	instance.data = {}
 	instance.stackn = 0
+	instance.sfhooks = {}
 	instance.hooks = {}
 	instance.scripts = {}
 	instance.source = code
@@ -113,22 +114,22 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 	if not ok then
 		return false, { message = "", traceback = err }
 	end
-	for filename, source in pairs(code) do
-		local serverorclient
-		if instance.ppdata.serverorclient then
-			serverorclient = instance.ppdata.serverorclient[filename]
-		end
 
-		if string.match(source, "^[%s\n]*$") or (serverorclient == "server" and CLIENT) or (serverorclient == "client" and SERVER) then
-			-- Lua doesn't have empty statements, so an empty file gives a syntax error
-			instance.scripts[filename] = function() end
-		else
-			local func = SF.CompileString(source, "SF:"..filename, false)
-			if isstring(func) then
-				return false, { message = func, traceback = "" }
+	local includesdatapp = instance.ppdata.includesdata or {}
+	local serverorclientpp = instance.ppdata.serverorclient or {}
+	for filename, source in pairs(code) do
+		if not includesdatapp[filename] then -- Don't compile data files
+			local serverorclient = serverorclientpp[filename]
+			if (serverorclient == "server" and CLIENT) or (serverorclient == "client" and SERVER) then
+				instance.scripts[filename] = function() end
+			else
+				local func = SF.CompileString(source, "SF:"..filename, false)
+				if isstring(func) then
+					return false, { message = func, traceback = "" }
+				end
+				debug.setfenv(func, instance.env)
+				instance.scripts[filename] = func
 			end
-			debug.setfenv(func, instance.env)
-			instance.scripts[filename] = func
 		end
 	end
 
@@ -141,11 +142,11 @@ end
 -- @param name The hook name
 -- @param func The hook function
 function SF.Instance:AddHook(name, func)
-	local hook = self.Hooks[name]
+	local hook = self.sfhooks[name]
 	if hook then
 		hook[#hook + 1] = func
 	else
-		self.Hooks[name] = {func}
+		self.sfhooks[name] = {func}
 	end
 end
 
@@ -153,7 +154,7 @@ end
 -- @param name Hook to run.
 -- @param ... Additional arguments.
 function SF.Instance:RunHook(name, ...)
-	local hook = self.Hooks[name]
+	local hook = self.sfhooks[name]
 	if hook then
 		for i = 1, #hook do
 			hook[i](...)
@@ -253,7 +254,6 @@ end
 --- Builds an environment table
 -- @return The environment
 function SF.Instance:BuildEnvironment()
-	self.Hooks = {}
 	self.Libraries = {}
 	self.Types = {}
 	self.env = {}
@@ -541,16 +541,13 @@ function SF.Instance:initialize()
 
 	self:RunHook("initialize")
 
-	self:RunHook("prepare", "_initialize")
 	local func = self.scripts[self.mainfile]
 	local tbl = self:run(func)
 	if not tbl[1] then
-		self:RunHook("cleanup", "_initialize", true, tbl[2])
 		self:Error(tbl[2])
 		return false, tbl[2]
 	end
 
-	self:RunHook("cleanup", "_initialize", false)
 	return true
 end
 
@@ -563,18 +560,15 @@ function SF.Instance:runScriptHook(hook, ...)
 	if self.error then return {} end
 	local hooks = self.hooks[hook]
 	if not hooks then return {} end
-	self:RunHook("prepare", hook)
 	local tbl
 	for name, func in hooks:pairs() do
 		tbl = self:run(func, ...)
 		if not tbl[1] then
 			tbl[2].message = "Hook '" .. hook .. "' errored with: " .. tbl[2].message
-			self:RunHook("cleanup", hook, true, tbl[2])
 			self:Error(tbl[2])
 			return tbl
 		end
 	end
-	self:RunHook("cleanup", hook, false)
 	return tbl
 end
 
@@ -588,7 +582,6 @@ function SF.Instance:runScriptHookForResult(hook, ...)
 	if self.error then return {} end
 	local hooks = self.hooks[hook]
 	if not hooks then return {} end
-	self:RunHook("prepare", hook)
 	local tbl
 	for name, func in hooks:pairs() do
 		tbl = self:run(func, ...)
@@ -598,12 +591,10 @@ function SF.Instance:runScriptHookForResult(hook, ...)
 			end
 		else
 			tbl[2].message = "Hook '" .. hook .. "' errored with: " .. tbl[2].message
-			self:RunHook("cleanup", hook, true, tbl[2])
 			self:Error(tbl[2])
 			return tbl
 		end
 	end
-	self:RunHook("cleanup", hook, false)
 	return tbl
 end
 
@@ -614,14 +605,10 @@ end
 -- @param ... Arguments to pass to func
 function SF.Instance:runFunction(func, ...)
 	if self.error then return {} end
-	self:RunHook("prepare", "_runFunction")
 
 	local tbl = self:run(func, ...)
-	if tbl[1] then
-		self:RunHook("cleanup", "_runFunction", false)
-	else
+	if not tbl[1] then
 		tbl[2].message = "Callback errored with: " .. tbl[2].message
-		self:RunHook("cleanup", "_runFunction", true, tbl[2])
 		self:Error(tbl[2])
 	end
 

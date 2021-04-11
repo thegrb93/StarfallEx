@@ -88,9 +88,26 @@ local function CheckButtonPerms(instance, ply, button)
 	return false
 end
 
+--- Called when a button is pressed
+-- @client
+-- @name inputPressed
+-- @class hook
+-- @param number button Number of the button
 SF.hookAdd("PlayerButtonDown", "inputpressed", CheckButtonPerms)
+
+--- Called when a button is released
+-- @client
+-- @name inputReleased
+-- @class hook
+-- @param number button Number of the button
 SF.hookAdd("PlayerButtonUp", "inputreleased", CheckButtonPerms)
 
+--- Called when the mouse is moved
+-- @client
+-- @name mousemoved
+-- @class hook
+-- @param number x X coordinate moved
+-- @param number y Y coordinate moved
 SF.hookAdd("StartCommand", "mousemoved", function(instance, ply, cmd)
 	if haspermission(instance, nil, "input") then
 		local x, y = cmd:GetMouseX(), cmd:GetMouseY()
@@ -102,6 +119,11 @@ SF.hookAdd("StartCommand", "mousemoved", function(instance, ply, cmd)
 	return false
 end)
 
+--- Called when the mouse wheel is rotated
+-- @client
+-- @name mouseWheeled
+-- @class hook
+-- @param number delta Rotate delta
 SF.hookAdd("StartCommand", "mousewheeled", function(instance, ply, cmd)
 	if haspermission(instance, nil, "input") then
 		local delta = cmd:GetMouseWheel()
@@ -154,7 +176,6 @@ local vwrap = instance.Types.Vector.Wrap
 -- @param string binding The name of the bind
 -- @return number The id of the first key bound
 -- @return string The name of the first key bound
-
 function input_library.lookupBinding(binding)
 	checkluatype(binding, TYPE_STRING)
 
@@ -316,30 +337,3 @@ end
 
 
 end
-
-
---- Called when a button is pressed
--- @client
--- @name inputPressed
--- @class hook
--- @param number button Number of the button
-
---- Called when a button is released
--- @client
--- @name inputReleased
--- @class hook
--- @param number button Number of the button
-
---- Called when the mouse is moved
--- @client
--- @name mousemoved
--- @class hook
--- @param number x X coordinate moved
--- @param number y Y coordinate moved
-
---- Called when the mouse wheel is rotated
--- @client
--- @name mouseWheeled
--- @class hook
--- @param number delta Rotate delta
-

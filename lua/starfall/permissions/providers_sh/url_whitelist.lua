@@ -217,3 +217,8 @@ pattern [[(%w+)%.sndcdn%.com/(.+)]]
 --- Examples:
 --- http://yp.shoutcast.com/sbin/tunein-station.pls?id=567807
 simple [[yp.shoutcast.com]]
+
+-- Google Translate API
+--- Examples:
+--- http://translate.google.com/translate_tts?&q=Hello%20World&ie=utf-8&client=tw-ob&tl=en
+simple [[translate.google.com]]

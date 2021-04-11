@@ -268,6 +268,12 @@ if CLIENT then
 
 			codedir = string.GetPathFromFilename(codepath)
 			tbl.files[codepath] = code
+
+			local includesdata = ppdata.includesdata
+			if includesdata and includesdata[codepath] then
+				return
+			end
+
 			SF.Preprocessor.ParseDirectives(codepath, code, ppdata)
 
 			local clientmain = ppdata.clientmain and ppdata.clientmain[codepath]

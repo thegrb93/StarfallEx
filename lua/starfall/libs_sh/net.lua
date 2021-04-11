@@ -50,12 +50,6 @@ instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
 end)
 
-instance:AddHook("cleanup", function()
-	netStarted = false
-	netData = nil
-end)
-
-
 local net_library = instance.Libraries.net
 local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap

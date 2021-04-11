@@ -27,25 +27,32 @@ if CLIENT then
 	-- @name VRInput
 	-- @class hook
 	-- @param string actionname Name of the input
-	-- @param boolean State of the input
+	-- @param boolean state State of the input
 	-- @client
 	SF.hookAdd("VRMod_Input", "vrinput")
 
-	local function canRenderHudSafeArgs(instance, ...)
-		return SF.IsHUDActive(instance.entity) and (instance.player == SF.Superuser or haspermission(instance, nil, "render.hud")), {...}
+	local function hudPrepareSafeArgs(instance, ...)
+		if SF.IsHUDActive(instance.entity) and (haspermission(instance, nil, "render.hud") or instance.player == SF.Superuser) then
+			instance:prepareRender()
+			return true, {...}
+		end
+		return false
+	end
+	local function cleanupRender(instance)
+		instance:cleanupRender()
 	end
 
 	--- Called before rendering the game. Any code that you want to run once per frame should be put here. HUD is required.
 	-- @name VRPreRender
 	-- @class hook
 	-- @client
-	SF.hookAdd("VRMod_PreRender", "vrprerenderleft", canRenderHudSafeArgs)
+	SF.hookAdd("VRMod_PreRender", "vrprerenderleft", hudPrepareSafeArgs, cleanupRender)
 
 	--- Called before rendering the right eye. This along with the previous hook can be used to render different things in different eyes. HUD is required.
 	-- @name VRPreRenderRight
 	-- @class hook
 	-- @client
-	SF.hookAdd("VRMod_PreRenderRight", "vrprerenderright", canRenderHudSafeArgs)
+	SF.hookAdd("VRMod_PreRenderRight", "vrprerenderright", hudPrepareSafeArgs, cleanupRender)
 end
 
 return function(instance)

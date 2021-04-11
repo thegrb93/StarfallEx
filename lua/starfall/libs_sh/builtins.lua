@@ -316,10 +316,13 @@ if CLIENT then
 	function builtins_library.sendPermissionRequest()
 		if not SF.IsHUDActive(instance.entity) then SF.Throw("Player isn't connected to HUD!", 2) end
 		if sentPermRequest then SF.Throw("Can only send the permission request once!", 2) end
-		if instance.permissionRequest and not SF.Permissions.permissionRequestSatisfied( instance ) then
+		if instance.permissionRequest and not SF.Permissions.permissionRequestSatisfied( instance ) and not IsValid(SF.permPanel) then
 			sentPermRequest = true
 			local pnl = vgui.Create("SFChipPermissions")
-			if pnl then pnl:OpenForChip(instance.entity) end
+			if pnl then
+				pnl:OpenForChip(instance.entity)
+				SF.permPanel = pnl
+			end
 		end
 	end
 
@@ -1030,7 +1033,7 @@ function builtins_library.enableHud(ply, active)
 	ply = SERVER and getply(ply) or LocalPlayer()
 	checkluatype(active, TYPE_BOOL)
 
-	if ply==instance.player or instance.player==SF.SuperUser or (not active and SF.IsHUDActive(instance.entity, ply)) then
+	if ply==instance.player or (instance.player==SF.Superuser) or (not active and SF.IsHUDActive(instance.entity, ply)) then
 		SF.EnableHud(ply, instance.entity, nil, active)
 	else
 		local vehicle = ply:GetVehicle()
@@ -1062,6 +1065,13 @@ end
 -- @name includedir
 -- @class directive
 -- @param path Path to the directory
+
+--- Mark a file to be included in the upload.
+-- Different from include in that the file does not have to have valid syntax.
+-- Cannot be used with require() or dofile(), can only be used with getScripts().
+-- @name includedata
+-- @class directive
+-- @param path Path to the file
 
 --- Set the name of the script.
 -- This will become the name of the tab and will show on the overlay of the processor. --@name Awesome script
