@@ -534,16 +534,13 @@ function SF.Instance:initialize()
 
 	self:RunHook("initialize")
 
-	self:RunHook("prepare", "_initialize")
 	local func = self.scripts[self.mainfile]
 	local tbl = self:run(func)
 	if not tbl[1] then
-		self:RunHook("cleanup", "_initialize", true, tbl[2])
 		self:Error(tbl[2])
 		return false, tbl[2]
 	end
 
-	self:RunHook("cleanup", "_initialize", false)
 	return true
 end
 
@@ -556,18 +553,15 @@ function SF.Instance:runScriptHook(hook, ...)
 	if self.error then return {} end
 	local hooks = self.hooks[hook]
 	if not hooks then return {} end
-	self:RunHook("prepare", hook)
 	local tbl
 	for name, func in hooks:pairs() do
 		tbl = self:run(func, ...)
 		if not tbl[1] then
 			tbl[2].message = "Hook '" .. hook .. "' errored with: " .. tbl[2].message
-			self:RunHook("cleanup", hook, true, tbl[2])
 			self:Error(tbl[2])
 			return tbl
 		end
 	end
-	self:RunHook("cleanup", hook, false)
 	return tbl
 end
 
@@ -581,7 +575,6 @@ function SF.Instance:runScriptHookForResult(hook, ...)
 	if self.error then return {} end
 	local hooks = self.hooks[hook]
 	if not hooks then return {} end
-	self:RunHook("prepare", hook)
 	local tbl
 	for name, func in hooks:pairs() do
 		tbl = self:run(func, ...)
@@ -591,12 +584,10 @@ function SF.Instance:runScriptHookForResult(hook, ...)
 			end
 		else
 			tbl[2].message = "Hook '" .. hook .. "' errored with: " .. tbl[2].message
-			self:RunHook("cleanup", hook, true, tbl[2])
 			self:Error(tbl[2])
 			return tbl
 		end
 	end
-	self:RunHook("cleanup", hook, false)
 	return tbl
 end
 
@@ -607,14 +598,10 @@ end
 -- @param ... Arguments to pass to func
 function SF.Instance:runFunction(func, ...)
 	if self.error then return {} end
-	self:RunHook("prepare", "_runFunction")
 
 	local tbl = self:run(func, ...)
-	if tbl[1] then
-		self:RunHook("cleanup", "_runFunction", false)
-	else
+	if not tbl[1] then
 		tbl[2].message = "Callback errored with: " .. tbl[2].message
-		self:RunHook("cleanup", "_runFunction", true, tbl[2])
 		self:Error(tbl[2])
 	end
 
