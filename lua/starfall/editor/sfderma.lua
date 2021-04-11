@@ -617,7 +617,6 @@ function PANEL:OpenForChip( chip, showOverrides )
 			chip.instance:runScriptHook( 'permissionrequest' )
 		end
 	end
-
 end
 
 function PANEL:Init()

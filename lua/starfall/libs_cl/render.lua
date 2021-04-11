@@ -110,88 +110,95 @@ cvars.AddChangeCallback( "sf_render_maxrendertargets", function()
 	rt_bank.max = cv_max_rendertargets:GetInt()
 end )
 
-local function prepareRender(data)
-	currentcolor = COLOR_WHITE
-	render.SetColorMaterial()
-	draw.NoTexture()
-	surface.SetDrawColor(255, 255, 255, 255)
-	surface.DisableClipping( true ) 
-	data.isRendering = true
-	data.noStencil = false
-	data.isScenic = false
-	data.needRT = false
-	data.oldW = ScrW()
-	data.oldH = ScrH()
-end
 
 local dummyrt = GetRenderTarget("starfall_dummyrt", 32, 32)
-local function prepareRenderOffscreen(data)
-	prepareRender(data)
-	data.noStencil = false
-	data.needRT = true
-	render.PushRenderTarget(dummyrt, 0, 0, 1024, 1024)
-	cam.Start2D()
-	view_matrix_stack[#view_matrix_stack + 1] = "End2D"
-	render.SetStencilEnable(false)
-	data.usingRT = true
+
+local function cleanupRender(instance)
+	instance:cleanupRender()
 end
 
-local function prepareRenderScene(data)
-	prepareRenderOffscreen(data)
-	data.isScenic = true
+local function canRenderHud(instance)
+	return SF.IsHUDActive(instance.entity) and (haspermission(instance, nil, "render.hud") or instance.player == SF.Superuser)
 end
 
-local function prepareScreen(data)
-	prepareRender(data)
-	data.noStencil = true
+local function hudPrepareSafeArgs(instance, ...)
+	if SF.IsHUDActive(instance.entity) and (haspermission(instance, nil, "render.hud") or instance.player == SF.Superuser) then
+		instance:prepareRender()
+		return true, {...}
+	end
+	return false
 end
-
-local function prepareRenderFog(data)
-	prepareRender(data)
-	render.FogMode(MATERIAL_FOG_LINEAR)
-end
-
-local renderhooks = {
-	render = prepareScreen,
-	renderoffscreen = prepareRenderOffscreen,
-	renderscene = prepareRenderScene,
-	predrawopaquerenderables = prepareRender,
-	postdrawopaquerenderables = prepareRender,
-	predrawtranslucentrenderables = prepareRender,
-	postdrawtranslucentrenderables = prepareRender,
-	vrprerenderleft = prepareRender,
-	vrprerenderright = prepareRender,
-	predrawhud = prepareRender,
-	drawhud = prepareRender,
-	postdrawhud = prepareRender,
-	setupworldfog = prepareRenderFog,
-	setupskyboxfog = prepareRenderFog,
-}
-
 
 SF.hookAdd("PreRender", "renderoffscreen", function(instance)
-	return (instance.player == SF.Superuser or haspermission(instance, nil, "render.offscreen")), {}
-end)
+	if haspermission(instance, nil, "render.offscreen") or instance.player == SF.Superuser then
+		instance:prepareRenderOffscreen()
+		return true, {}
+	end
+	return false
+end, cleanupRender)
 
 SF.hookAdd("RenderScene", "renderscene", function(instance, origin, angles, fov)
-	return (instance.player == SF.Superuser or haspermission(instance, nil, "render.renderscene")), {instance.Types.Vector.Wrap(origin), instance.Types.Angle.Wrap(angles), fov}
+	if haspermission(instance, nil, "render.renderscene") or instance.player == SF.Superuser then
+		instance:prepareRender()
+		instance.data.render.isScenic = true
+		return true, {instance.Types.Vector.Wrap(origin), instance.Types.Angle.Wrap(angles), fov}
+	end
+	return false
+end,
+function(instance)
+	instance:cleanupRender()
+	instance.data.render.isScenic = false
 end)
 
 SF.hookAdd("PreDrawOpaqueRenderables", "hologrammatrix", function(instance, drawdepth, drawskybox)
 	return not drawskybox, {}
 end)
 
-local function canRenderHudSafeArgs(instance, ...)
-	return SF.IsHUDActive(instance.entity) and (instance.player == SF.Superuser or haspermission(instance, nil, "render.hud")), {...}
-end
+SF.hookAdd("HUDPaint", "drawhud", hudPrepareSafeArgs, cleanupRender)
+SF.hookAdd("HUDShouldDraw", nil, nil, function(instance, args)
+	if args[1] and args[2]==false then return false end
+end)
+SF.hookAdd("PreDrawOpaqueRenderables", nil, hudPrepareSafeArgs, cleanupRender)
+SF.hookAdd("PostDrawOpaqueRenderables", nil, hudPrepareSafeArgs, cleanupRender)
+SF.hookAdd("PreDrawTranslucentRenderables", nil, hudPrepareSafeArgs, cleanupRender)
+SF.hookAdd("PostDrawTranslucentRenderables", nil, hudPrepareSafeArgs, cleanupRender)
+SF.hookAdd("PreDrawHUD", nil, hudPrepareSafeArgs, cleanupRender)
+SF.hookAdd("PostDrawHUD", nil, function(instance)
+	if canRenderHud(instance) and not IsValid(SF.permPanel) then
+		instance:prepareRender()
+		return true, {}
+	end
+end, cleanupRender)
 
-local function canCalcview(instance, ply, pos, ang, fov, znear, zfar)
-	return SF.IsHUDActive(instance.entity) and (instance.player == SF.Superuser or haspermission(instance, nil, "render.calcview")), {instance.Types.Vector.Wrap(pos), instance.Types.Angle.Wrap(ang), fov, znear, zfar}
-end
+SF.hookAdd("SetupWorldFog", nil, function(instance)
+	if canRenderHud(instance) then
+		render.FogMode(MATERIAL_FOG_LINEAR)
+		instance:prepareRender()
+		return true, {}
+	end
+	return false
+end, function(instance)
+	instance:cleanupRender()
+	return true
+end)
+SF.hookAdd("SetupSkyboxFog", nil, function(instance, scale)
+	if canRenderHud(instance) then
+		render.FogMode(MATERIAL_FOG_LINEAR)
+		instance:prepareRender()
+		return true, {scale}
+	end
+	return false
+end, function(instance)
+	instance:cleanupRender()
+	return true
+end)
 
-local function returnCalcview(instance, tbl)
+SF.hookAdd("CalcView", nil, function(instance, ply, pos, ang, fov, znear, zfar)
+	return SF.IsHUDActive(instance.entity) and (haspermission(instance, nil, "render.calcview") or instance.player == SF.Superuser),
+		{instance.Types.Vector.Wrap(pos), instance.Types.Angle.Wrap(ang), fov, znear, zfar}
+end, function(instance, tbl)
 	local t = tbl[2]
-	if istable(t) then
+	if t[1] and istable(t) then
 		local ret = {}
 		if t.origin then pcall(function() ret.origin = instance.Types.Vector.Unwrap(t.origin) end) end
 		if t.angles then pcall(function() ret.angles = instance.Types.Angle.Unwrap(t.angles) end) end
@@ -202,21 +209,7 @@ local function returnCalcview(instance, tbl)
 		ret.ortho  = t.ortho
 		return ret
 	end
-end
-
-SF.hookAdd("HUDPaint", "drawhud", canRenderHudSafeArgs)
-SF.hookAdd("HUDShouldDraw", nil, canRenderHudSafeArgs, function(instance, args)
-	if args[2]==false then return false end
 end)
-SF.hookAdd("PreDrawOpaqueRenderables", nil, canRenderHudSafeArgs)
-SF.hookAdd("PostDrawOpaqueRenderables", nil, canRenderHudSafeArgs)
-SF.hookAdd("PreDrawTranslucentRenderables", nil, canRenderHudSafeArgs)
-SF.hookAdd("PostDrawTranslucentRenderables", nil, canRenderHudSafeArgs)
-SF.hookAdd("PreDrawHUD", nil, canRenderHudSafeArgs)
-SF.hookAdd("PostDrawHUD", nil, canRenderHudSafeArgs)
-SF.hookAdd("CalcView", nil, canCalcview, returnCalcview)
-SF.hookAdd("SetupWorldFog", nil, canRenderHudSafeArgs, function() return true end)
-SF.hookAdd("SetupSkyboxFog", nil, canRenderHudSafeArgs, function() return true end)
 
 hook.Add("ShouldDrawLocalPlayer", "SF_DrawLocalPlayerInRenderView", function()
 	if renderingView and drawViewerInView then
@@ -268,60 +261,6 @@ local markup_methods, markwrap, markunwrap = instance.Types.Markup.Methods, inst
 local mtlunwrap = instance.Types.LockedMaterial.Unwrap
 
 
-instance:AddHook("prepare", function(hook)
-	local renderPrepare = renderhooks[hook]
-	if renderPrepare then renderPrepare(renderdata) end
-end)
-
-instance:AddHook("cleanup", function(hook)
-	if renderhooks[hook] then
-		render.SetStencilEnable(false)
-		render.OverrideBlend(false)
-		render.OverrideDepthEnable(false, false)
-		render.SetScissorRect(0, 0, 0, 0, false)
-		render.CullMode(MATERIAL_CULLMODE_CCW)
-		render.SetLightingMode(0) 
-		pp.colour:SetTexture("$fbtexture", tex_screenEffect)
-		pp.downsample:SetTexture("$fbtexture", tex_screenEffect)
-		for i = #matrix_stack, 1, -1 do
-			cam.PopModelMatrix()
-			matrix_stack[i] = nil
-		end
-		if renderdata.usingRT then
-			if renderingView then
-				render.SetRenderTarget(renderingViewRt)
-			else
-				render.PopRenderTarget()
-			end
-			renderdata.usingRT = false
-		end
-		for i = #view_matrix_stack, 1, -1 do
-			cam[view_matrix_stack[i]]()
-			view_matrix_stack[i] = nil
-		end
-		if renderdata.changedFilterMag then
-			renderdata.changedFilterMag = false
-			render.PopFilterMag()
-		end
-		if renderdata.changedFilterMin then
-			renderdata.changedFilterMin = false
-			render.PopFilterMin()
-		end
-		renderdata.isRendering = false
-		renderdata.needRT = false
-
-		for i = 1, pushedClippingPlanes do
-			render.PopCustomClipPlane()
-		end
-		pushedClippingPlanes = 0
-
-		if renderdata.prevClippingState ~= nil then
-			render.EnableClipping(renderdata.prevClippingState)
-			renderdata.prevClippingState = nil
-		end
-	end
-end)
-local getent
 instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
 end)
@@ -333,6 +272,77 @@ instance:AddHook("deinitialize", function ()
 		renderdata.validrendertargets[v:GetName()] = nil
 	end
 end)
+
+
+function instance:prepareRender()
+	currentcolor = COLOR_WHITE
+	render.SetColorMaterial()
+	draw.NoTexture()
+	surface.SetDrawColor(255, 255, 255, 255)
+	surface.DisableClipping( true ) 
+	renderdata.isRendering = true
+	renderdata.needRT = false
+	renderdata.oldW = ScrW()
+	renderdata.oldH = ScrH()
+end
+
+function instance:prepareRenderOffscreen()
+	prepareRender()
+	renderdata.needRT = true
+	render.PushRenderTarget(dummyrt, 0, 0, 1024, 1024)
+	cam.Start2D()
+	view_matrix_stack[#view_matrix_stack + 1] = "End2D"
+	render.SetStencilEnable(false)
+	renderdata.usingRT = true
+end
+
+function instance:cleanupRender()
+	render.SetStencilEnable(false)
+	render.OverrideBlend(false)
+	render.OverrideDepthEnable(false, false)
+	render.SetScissorRect(0, 0, 0, 0, false)
+	render.CullMode(MATERIAL_CULLMODE_CCW)
+	render.SetLightingMode(0) 
+	pp.colour:SetTexture("$fbtexture", tex_screenEffect)
+	pp.downsample:SetTexture("$fbtexture", tex_screenEffect)
+	for i = #matrix_stack, 1, -1 do
+		cam.PopModelMatrix()
+		matrix_stack[i] = nil
+	end
+	if renderdata.usingRT then
+		if renderingView then
+			render.SetRenderTarget(renderingViewRt)
+		else
+			render.PopRenderTarget()
+		end
+		renderdata.usingRT = false
+	end
+	for i = #view_matrix_stack, 1, -1 do
+		cam[view_matrix_stack[i]]()
+		view_matrix_stack[i] = nil
+	end
+	if renderdata.changedFilterMag then
+		renderdata.changedFilterMag = false
+		render.PopFilterMag()
+	end
+	if renderdata.changedFilterMin then
+		renderdata.changedFilterMin = false
+		render.PopFilterMin()
+	end
+	renderdata.isRendering = false
+	renderdata.needRT = false
+
+	for i = 1, pushedClippingPlanes do
+		render.PopCustomClipPlane()
+	end
+	pushedClippingPlanes = 0
+
+	if renderdata.prevClippingState ~= nil then
+		render.EnableClipping(renderdata.prevClippingState)
+		renderdata.prevClippingState = nil
+	end
+end
+
 
 -- ------------------------------------------------------------------ --
 

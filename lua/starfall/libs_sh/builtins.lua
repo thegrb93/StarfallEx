@@ -316,10 +316,13 @@ if CLIENT then
 	function builtins_library.sendPermissionRequest()
 		if not SF.IsHUDActive(instance.entity) then SF.Throw("Player isn't connected to HUD!", 2) end
 		if sentPermRequest then SF.Throw("Can only send the permission request once!", 2) end
-		if instance.permissionRequest and not SF.Permissions.permissionRequestSatisfied( instance ) then
+		if instance.permissionRequest and not SF.Permissions.permissionRequestSatisfied( instance ) and not IsValid(SF.permPanel) then
 			sentPermRequest = true
 			local pnl = vgui.Create("SFChipPermissions")
-			if pnl then pnl:OpenForChip(instance.entity) end
+			if pnl then
+				pnl:OpenForChip(instance.entity)
+				SF.permPanel = pnl
+			end
 		end
 	end
 

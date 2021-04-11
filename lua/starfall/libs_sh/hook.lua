@@ -4,14 +4,12 @@ local haspermission = SF.Permissions.hasAccess
 
 --Can only return if you are the first argument
 local function returnOnlyOnYourself(instance, args, ply)
-	if instance.player ~= ply then return end
-	return args[2]
+	if args[1] and instance.player == ply then return args[2] end
 end
 
 --Can only return false on yourself
 local function returnOnlyOnYourselfFalse(instance, args, ply)
-	if instance.player ~= ply then return end
-	if args[2]==false then return false end
+	if args[1] and instance.player == ply and args[2]==false then return false end
 end
 
 local add = SF.hookAdd
