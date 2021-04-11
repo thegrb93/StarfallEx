@@ -371,7 +371,7 @@ function instance:prepareRender()
 end
 
 function instance:prepareRenderOffscreen()
-	prepareRender()
+	self:prepareRender()
 	renderdata.needRT = true
 	render.PushRenderTarget(dummyrt, 0, 0, 1024, 1024)
 	cam.Start2D()
