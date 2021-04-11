@@ -355,8 +355,8 @@ add("PlayerSwitchWeapon", nil, nil, returnOnlyOnYourselfFalse)
 --- Called when player's reserve ammo count changes.
 -- @name PlayerAmmoChanged
 -- @class hook
--- @server
--- @param Player The player whose ammo is being affected.
+-- @shared
+-- @param Player ply The player whose ammo is being affected.
 -- @param number ammoID The ammo type ID
 -- @param number oldcount Previous water level
 -- @param number newcount The new ammo count
