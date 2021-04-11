@@ -747,7 +747,7 @@ function render_library.createMaterial(tx, cb, done)
 	checkluatype (tx, TYPE_STRING)
 
 	local m = instance.env.material.create("UnlitGeneric")
-	local _1, _2, prefix = tx:find("^(%w-):")
+	local _1, _2, prefix = string.find(tx, "^(%w-):")
 	if prefix=="http" or prefix=="https" or prefix == "data" then
 		m:setTextureURL("$basetexture", tx, cb, done)
 	else

@@ -69,7 +69,7 @@ function sounds_library.create(ent, path, nofilter)
 
 	checkpermission(instance, { ent, path }, "sound.create")
 
-	if path:match('["?]') then
+	if string.match(path, '["?]') then
 		SF.Throw("Invalid sound path: " .. path, 2)
 	end
 

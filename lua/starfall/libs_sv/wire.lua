@@ -258,9 +258,9 @@ function wire_library.adjustInputs(names, types)
 		local newtype = types[i]
 		if not isstring(newname) then SF.Throw("Non-string input name: " .. newname, 2) end
 		if not isstring(newtype) then SF.Throw("Non-string input type: " .. newtype, 2) end
-		newtype = newtype:upper()
+		newtype = string.upper(newtype)
 		newtype = sfTypeToWireTypeTable[newtype] or newtype
-		if not newname:match("^[%u][%a%d_]*$") then SF.Throw("Invalid input name: " .. newname, 2) end
+		if not string.match(newname, "^[%u][%a%d_]*$") then SF.Throw("Invalid input name: " .. newname, 2) end
 		if not inputConverters[newtype] then SF.Throw("Invalid/unsupported input type: " .. newtype, 2) end
 		names[i] = newname
 		types[i] = newtype
@@ -286,9 +286,9 @@ function wire_library.adjustOutputs(names, types)
 		local newtype = types[i]
 		if not isstring(newname) then SF.Throw("Non-string output name: " .. newname, 2) end
 		if not isstring(newtype) then SF.Throw("Non-string output type: " .. newtype, 2) end
-		newtype = newtype:upper()
+		newtype = string.upper(newtype)
 		newtype = sfTypeToWireTypeTable[newtype] or newtype
-		if not newname:match("^[%u][%a%d_]*$") then SF.Throw("Invalid output name: " .. newname, 2) end
+		if not string.match(newname, "^[%u][%a%d_]*$") then SF.Throw("Invalid output name: " .. newname, 2) end
 		if not outputConverters[newtype] then SF.Throw("Invalid/unsupported output type: " .. newtype, 2) end
 		names[i] = newname
 		types[i] = newtype

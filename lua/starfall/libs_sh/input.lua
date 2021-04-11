@@ -183,7 +183,7 @@ function input_library.lookupBinding(binding)
 
 	local bind = input.LookupBinding(binding)
 	if bind then
-		bind = bind:upper()
+		bind = string.upper(bind)
 
 		return instance.env.KEY[bind] or instance.env.MOUSE[bind], bind
 	end

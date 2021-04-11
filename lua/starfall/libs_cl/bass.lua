@@ -67,7 +67,7 @@ function bass_library.loadFile(path, flags, callback)
 	checkluatype(flags, TYPE_STRING)
 	checkluatype(callback, TYPE_FUNCTION)
 
-	if path:match('["?]') then
+	if string.match(path, '["?]') then
 		SF.Throw("Invalid sound path: " .. path, 2)
 	end
 
