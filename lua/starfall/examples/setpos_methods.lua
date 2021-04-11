@@ -23,37 +23,45 @@ The greenbox has setPos on the physicsObject.
 
 ]]--
 
---ignore this bit, it's for creating the prop
-function create( c )
-    p = prop.create( Vector( 0), Angle( 0 ), "models/props_junk/wood_crate001a.mdl", 1 )
+-- Ignore this bit, it's for creating the prop
+local function create( c )
+    p = prop.create( Vector(0), Angle(0), "models/props_junk/wood_crate001a.mdl", 1 )
     p:setColor( c ) 
     return p
 end
 
---hook
-hook.add( "tick", "runtime", function() 
-    --movement code
-    Motion = chip():getPos() + Vector( math.sin( timer.systime() * 4 ) * 64, 0, 48 )
-    --spawns prop when it doesn't exist
-    normal = ( ( not normal or not normal:isValid() ) and prop.canSpawn() ) and create( Color( 255, 0, 0, 255 ) ) or normal        
-    --check
-    if normal and normal:isValid() and normal:isValidPhys() then
-        
-        --This is setpos WITHOUT getting the entities getPhysicsObject()
-        --There is NO interpolation!
-        normal:setPos( Motion )
-    end
-    --movement code
-    Motion = Motion + Vector( 0, 0, 48 ) 
-    --spawns prop when it doesn't exist
-    normalandphys = ( ( not normalandphys or not normalandphys:isValid() ) and prop.canSpawn() ) and create( Color( 0, 255, 0, 255 ) ) or normalandphys        
-    --check
-    if normalandphys and normalandphys:isValid() and normalandphys:isValidPhys() then
-        
-        --This is setpos With getting the entities getPhysicsObject()
-        --Interpolation will work!
-        normalandphys:getPhysicsObject():setPos( Motion )
-        --            __________________
+-- Localize our variables, makes code more efficient
+local smooth, normal
+
+-- Change prop positions every tick
+hook.add( "tick", "runtime", function()
+    -- Movement code
+    local motion = chip():getPos() + Vector( math.sin( timer.systime() * 4 ) * 64, 0, 48 )
+    
+    -- Spawns prop when it doesn't exist
+    
+    -- If the prop exists, setPos to the movement else try and respawn it
+    if normal and normal:isValid() then
+        -- This is setpos WITHOUT getting the entities getPhysicsObject()
+        -- There is NO interpolation!
+        normal:setPos( motion )
+    else
+        if prop.canSpawn() then
+            normal = create( Color( 255, 0, 0, 255) )
+        end
     end
     
-end )
+    -- Movement code
+    motion = motion + Vector( 0, 0, 48 ) 
+    
+    -- If the prop exists, set the physobj position to the movement else try and respawn it
+    if smooth and smooth:isValid() and smooth:isValidPhys() then
+        -- This is setpos With getting the entities getPhysicsObject()
+        -- Interpolation will work!
+        smooth:getPhysicsObject():setPos( motion )
+    else
+        if prop.canSpawn() then
+            smooth = create( Color( 0, 255, 0, 255) )
+        end
+    end
+end)
