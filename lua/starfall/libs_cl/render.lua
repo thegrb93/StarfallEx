@@ -181,7 +181,12 @@ SF.hookAdd("HUDPaint", "drawhud", hudPrepareSafeArgs, cleanupRender)
 -- @client
 -- @param string str The name of the hud element trying to be drawn
 -- @return boolean Return false to not draw the element
-SF.hookAdd("HUDShouldDraw", nil, nil, function(instance, args)
+SF.hookAdd("HUDShouldDraw", nil, function(instance, ...)
+	if canRenderHud(instance) then
+		return true, {...}
+	end
+	return false
+end, function(instance, args)
 	if args[1] and args[2]==false then return false end
 end)
 
