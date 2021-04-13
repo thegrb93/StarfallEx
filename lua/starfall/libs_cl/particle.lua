@@ -11,7 +11,7 @@ local cv_particle_count = CreateConVar("sf_particles_max", "100", { FCVAR_ARCHIV
 SF.ResourceCounters.ParticleEmitters = {icon = "icon16/asterisk_yellow.png", count = function(ply) return plyEmitterCount:get(ply).val end}
 
 --- Particles library.
--- @name effect
+-- @name particle
 -- @class library
 -- @libtbl particle_library
 SF.RegisterLibrary("particle")
