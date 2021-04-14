@@ -13,42 +13,55 @@ local surface_SetTextColor = surface.SetTextColor
 local surface_DrawText = surface.DrawText
 local EDITOR = {}
 
+local kwCanParenthesis = { [true] = true, [false] = true }
+local kwNoParenthesis = { [true] = true }
+
 -- keywords[name][nextchar!="("]
 local storageTypes = {
-	["function"] = { [true] = true, [false] = true },
-	["local"] = { [true] = true },
+	["function"] = kwCanParenthesis,
+	["local"] = kwNoParenthesis,
 }
+
 local keywords = {
 	-- keywords that can be followed by a "(":
-	["if"] = { [true] = true, [false] = true },
-	["elseif"] = { [true] = true, [false] = true },
-	["while"] = { [true] = true, [false] = true },
-	["for"] = { [true] = true, [false] = true },
+	["if"] = kwCanParenthesis,
+	["elseif"] = kwCanParenthesis,
+	["while"] = kwCanParenthesis,
+	["for"] = kwCanParenthesis,
 
-	["repeat"] = { [true] = true, [false] = true },
-	["until"] = { [true] = true, [false] = true },
-	["and"] = { [true] = true, [false] = true },
-	["or"] = { [true] = true, [false] = true },
-	["not"] = { [true] = true, [false] = true },
+	["repeat"] = kwCanParenthesis,
+	["until"] = kwCanParenthesis,
+	["and"] = kwCanParenthesis,
+	["or"] = kwCanParenthesis,
+	["not"] = kwCanParenthesis,
+	["do"] = kwCanParenthesis,
 
 	-- keywords that cannot be followed by a "(":
-	["goto"] = { [true] = true },
-	["true"] = { [true] = true },
-	["false"] = { [true] = true },
-	["do"] = { [true] = true, [false] = true },
-	["else"] = { [true] = true },
-	["break"] = { [true] = true },
-	["continue"] = { [true] = true },
-	["then"] = { [true] = true },
-	["end"] = { [true] = true },
-	["in"] = { [true] = true },
-	["return"] = { [true] = true },
-	["nil"] = { [true] = true },
+	["goto"] = kwNoParenthesis,
+	["else"] = kwNoParenthesis,
+	["break"] = kwNoParenthesis,
+	["continue"] = kwNoParenthesis,
+	["then"] = kwNoParenthesis,
+	["end"] = kwNoParenthesis,
+	["in"] = kwNoParenthesis,
+	["return"] = kwNoParenthesis,
+}
+
+-- Keywords that are constant values.
+local keyword_const = {
+	["nil"] = kwNoParenthesis,
+	["true"] = kwNoParenthesis,
+	["false"] = kwNoParenthesis,
+	["_G"] = kwCanParenthesis,
+	["self"] = kwCanParenthesis,
+	["..."] = kwNoParenthesis
 }
 
 -- fallback for nonexistant entries:
-setmetatable(keywords, { __index = function(tbl, index) return {} end })
-setmetatable(storageTypes, { __index = function(tbl, index) return {} end })
+local fallback_meta = { __index = function(tbl, index) return {} end }
+setmetatable(keywords, fallback_meta)
+setmetatable(keyword_const, fallback_meta)
+setmetatable(storageTypes, fallback_meta)
 
 -- Get directives from the preprocessor so we don't have to hard-code them here.
 -- Allows for addons to make their own directives that properly highlight.
@@ -394,9 +407,9 @@ function EDITOR:SyntaxColorLine(row)
 			if libmap["Methods"][self.tokendata] then
 				tokenname = "method"
 			else
-				tokenname = "notfound"
+				tokenname = "identifier"
 			end
-		elseif self:NextPattern("^[a-zA-Z][a-zA-Z0-9_]*") then
+		elseif self:NextPattern("^[a-zA-Z_][a-zA-Z0-9_]*") then
 			local sstr = self.tokendata
 
 			-- is this a keyword or a function?
@@ -407,6 +420,8 @@ function EDITOR:SyntaxColorLine(row)
 				tokenname = "storageType"
 			elseif keywords[sstr][keyword] then
 				tokenname = "keyword"
+			elseif keyword_const[sstr][keyword] then
+				tokenname = "constant"
 			elseif libmap["Environment"][sstr] then -- We Environment /constant
 				local val = libmap["Environment"][sstr]
 				if istable(val) then
@@ -484,18 +499,17 @@ function EDITOR:SyntaxColorLine(row)
 						if t then -- Valid function, woohoo
 							tokenname = t == "function" and "function" or "constant"
 						else
-							tokenname = "notfound"
+							tokenname = "identifier"
 						end
 					end
 				end
 			else
-				tokenname = "notfound"
+				tokenname = "identifier"
 			end
 			if self.tokendata ~= "" then
 				addToken(tokenname, self.tokendata)
 				self.tokendata = ""
 			end
-
 		elseif self:NextPattern("%[=*%[") then -- Multiline strings
 			local reps = #self.tokendata:match("%[(=*)%[")
 			self:NextCharacter()
@@ -597,6 +611,9 @@ function EDITOR:SyntaxColorLine(row)
 			end
 		elseif self:NextPattern("[%>%<%!%~]%=") then
 			tokenname = "operator"
+		elseif self:NextPattern("%.%.%.") then
+			-- Manual [...] constant
+			tokenname = "constant"
 		elseif self:NextPattern("[%+%-%/%*%^%%%#%=%.%>%<]") then
 			tokenname = "operator"
 		elseif self:NextPattern("%.%.") then -- .. string concat
