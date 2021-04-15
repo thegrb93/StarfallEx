@@ -184,7 +184,7 @@ local function parseTextMate(text)
 		["Constant"] = { "constant", "directive" },
 		["Constants"] = { "constant", "directive" },
 		["Function name"] = { "function", "userfunction", "method" },
-		["Funtion"] = { "function", "userfunction", "method" },
+		["Function"] = { "function", "userfunction", "method" },
 		["Library function"] = { "function", "userfunction", "method" },
 		["String"] = { "string" },
 		["Number"] = { "number" },
@@ -192,6 +192,7 @@ local function parseTextMate(text)
 		["Class name"] = { "library" },
 		["Operators"] = { "operator" },
 		["Storage type"] = { "storageType" },
+		["Variable"] = { "identifier" }
 	}
 
 	local newmap = {}
@@ -211,9 +212,10 @@ local function parseTextMate(text)
 		if not v.name then continue end
 		local names = string.Explode(",",v.name:gsub("%s",""):lower())
 		for _,name in pairs(names) do
-			if map [name] then
-				debugPrint("Parsing %q as %s", name, table.concat(map[name], ","))
-				for k, v in pairs(map[name]) do
+			local token = map[name] -- Potential token
+			if token then
+				debugPrint("Parsing %q as %s", name, table.concat(token, ","))
+				for k, v in pairs(token) do
 					tbl[v] = { foreground, background, fontStyle }
 				end
 			else
@@ -276,6 +278,7 @@ SF.Editor.Themes.AddTheme("default", {
 	["bracket"] = { Color(230, 230, 230), nil, 0 },
 	["userfunction"] = { Color(166, 226, 42), nil, 0 },
 	["constant"] = { Color(174, 129, 255), nil, 0 },
+	["identifier"] = { Color(230, 230, 230), nil, 0 }
 })
 
 SF.Editor.Themes.Load()

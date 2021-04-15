@@ -116,6 +116,9 @@ local function createWireLibraryMap()
 			libMap.Methods[methodname] = true
 		end
 	end
+	for methodname, val in pairs(SF.Docs.Libraries.string.methods) do
+		libMap.Methods[methodname] = true
+	end
 	for libname, lib in pairs(SF.Docs.Libraries) do
 		local tbl
 		if libname == "builtins" then
