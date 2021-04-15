@@ -34,9 +34,9 @@ local keywords = {
 	["and"] = kwCanParenthesis,
 	["or"] = kwCanParenthesis,
 	["not"] = kwCanParenthesis,
-	["do"] = kwCanParenthesis,
 
 	-- keywords that cannot be followed by a "(":
+	["do"] = kwNoParenthesis,
 	["goto"] = kwNoParenthesis,
 	["else"] = kwNoParenthesis,
 	["break"] = kwNoParenthesis,
