@@ -51,12 +51,13 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 	local string_library = SF.SafeStringLib
 	local function sf_string_index(self, key)
 		local val = string_library[key]
-		if (val) then
+		if val then
 			return val
-		elseif (tonumber(key)) then
-			return self:sub(key, key)
 		else
-			SF.Throw("attempt to index a string value with bad key ('" .. tostring(key) .. "' is not part of the string library)", 2)
+			local n = tonumber(key)
+			if n then
+				return string_library.sub(self, n, n)
+			end
 		end
 	end
 	sanitizeTypeMeta("", {__index = sf_string_index})
