@@ -203,7 +203,7 @@ function ents_methods:setAngleVelocity(angvel)
 	phys:AddAngleVelocity(angvel - phys:GetAngleVelocity())
 end
 
---- Applys a angular velocity to an object
+--- Applies a angular velocity to an object
 -- @param Vector angvel The local angvel vector to apply
 function ents_methods:addAngleVelocity(angvel)
 	local ent = getent(self)
@@ -425,6 +425,21 @@ function ents_methods:setVelocity(vel)
 	checkpermission(instance, ent, "entities.setVelocity")
 
 	ent:SetVelocity(vel)
+end
+
+--- Applies velocity to an object
+-- @param Vector vel The world velocity vector to apply
+function ents_methods:addVelocity(vel)
+	local ent = getent(self)
+	vel = vunwrap(vel)
+	checkvector(vel)
+
+	local phys = ent:GetPhysicsObject()
+	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
+
+	checkpermission(instance, ent, "entities.applyForce")
+
+	phys:AddVelocity(vel)
 end
 
 --- Removes an entity
