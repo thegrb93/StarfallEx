@@ -220,6 +220,18 @@ if SERVER then
 		phys:SetVelocity(vel)
 	end
 
+    --- Applies velocity to an object
+    -- @server
+    -- @param Vector vel The world velocity vector to apply
+    function physobj_methods:addVelocity(vel)
+        vel = vunwrap(vel)
+        checkvector(vel)
+
+        local phys = unwrap(self)
+        checkpermission(instance, phys:GetEntity(), "entities.applyForce")
+        phys:AddVelocity(vel)
+    end
+
 	--- Sets the buoyancy ratio of a physobject
 	-- @server
 	-- @param number ratio The buoyancy ratio to use
@@ -235,7 +247,7 @@ if SERVER then
 		phys:SetBuoyancyRatio(ratio)
 	end
 
-	--- Applys a force to the center of the physics object
+	--- Applies a force to the center of the physics object
 	-- @server
 	-- @param Vector force The force vector to apply
 	function physobj_methods:applyForceCenter(force)
@@ -248,7 +260,7 @@ if SERVER then
 		phys:ApplyForceCenter(force)
 	end
 
-	--- Applys an offset force to a physics object
+	--- Applies an offset force to a physics object
 	-- @server
 	-- @param Vector force The force vector in world coordinates
 	-- @param Vector position The force position in world coordinates
@@ -277,7 +289,7 @@ if SERVER then
 		phys:AddAngleVelocity(angvel - phys:GetAngleVelocity())
 	end
 
-	--- Applys a angular velocity to an object
+	--- Applies a angular velocity to an object
 	-- @server
 	-- @param Vector angvel The local angvel vector to apply
 	function physobj_methods:addAngleVelocity(angvel)
@@ -290,7 +302,7 @@ if SERVER then
 		phys:AddAngleVelocity(angvel)
 	end
 
-	--- Applys a torque to a physics object
+	--- Applies a torque to a physics object
 	-- @server
 	-- @param Vector torque The world torque vector to apply
 	function physobj_methods:applyTorque(torque)
