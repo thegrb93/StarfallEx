@@ -287,7 +287,7 @@ SF.hookAdd("CalcView", nil, function(instance, ply, pos, ang, fov, znear, zfar)
 		{instance.Types.Vector.Wrap(pos), instance.Types.Angle.Wrap(ang), fov, znear, zfar}
 end, function(instance, tbl)
 	local t = tbl[2]
-	if t[1] and istable(t) then
+	if tbl[1] and istable(t) then
 		local ret = {}
 		if t.origin then pcall(function() ret.origin = instance.Types.Vector.Unwrap(t.origin) end) end
 		if t.angles then pcall(function() ret.angles = instance.Types.Angle.Unwrap(t.angles) end) end
