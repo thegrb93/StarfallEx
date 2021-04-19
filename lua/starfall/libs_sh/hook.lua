@@ -358,7 +358,7 @@ add("PlayerSwitchWeapon", nil, nil, returnOnlyOnYourselfFalse)
 -- @shared
 -- @param Player ply The player whose ammo is being affected.
 -- @param number ammoID The ammo type ID
--- @param number oldcount Previous water level
+-- @param number oldcount Previous ammo count
 -- @param number newcount The new ammo count
 add("PlayerAmmoChanged")
 

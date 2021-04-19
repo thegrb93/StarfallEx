@@ -436,7 +436,7 @@ end
 -- ------------------------------------------------------------------ --
 
 --- Sets whether stencil tests are carried out for each rendered pixel. Only pixels passing the stencil test are written to the render target.
--- @param boolean enable true to enable, false to disable
+-- @param boolean enable True to enable, false to disable
 function render_library.setStencilEnable(enable)
 	enable = (enable == true) -- Make sure it's a boolean
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
@@ -454,6 +454,7 @@ end
 -- @param number r Value of the red channel to clear the current rt with.
 -- @param number g Value of the green channel to clear the current rt with.
 -- @param number b Value of the blue channel to clear the current rt with.
+-- @param number a Value of the alpha channel to clear the current rt with.
 -- @param boolean Clear the depth buffer.
 function render_library.clearBuffersObeyStencil(r, g, b, a, depth)
 	checkluatype (r, TYPE_NUMBER)
@@ -2173,7 +2174,8 @@ function render_library.setFogEnd(distance)
 	render.FogEnd(distance)
 end
 
---- Sets the height below which fog will be rendered. Only works with fog mode 2
+--- Sets the height below which fog will be rendered. Only works with fog mode 2, MATERIAL_FOG.LINEAR_BELOW_FOG_Z
+-- @param number height The fog height
 function render_library.setFogHeight(height)
 	checkpermission(instance, nil, "render.fog")
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end

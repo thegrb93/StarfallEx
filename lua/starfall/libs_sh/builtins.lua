@@ -47,7 +47,7 @@ function builtins_library.chip()
 end
 
 --- Returns whoever created the chip
--- @return Entity Owner entity
+-- @return Player Owner of the chip
 function builtins_library.owner()
 	return instance.Types.Player.Wrap(instance.player)
 end
@@ -136,7 +136,7 @@ builtins_library.next = next
 -- @name builtins_library.unpack
 -- @class function
 -- @param table tbl To get elements out of
--- @return ... elements Elements of tbl
+-- @return ... Elements of tbl
 builtins_library.unpack = unpack
 
 --- Sets, changes or removes a table's metatable. Doesn't work on most internal metatables
@@ -623,7 +623,7 @@ end
 
 --- Runs an included script and caches the result.
 -- Works pretty much like standard Lua require()
--- @param string file The file to include. Make sure to --@include it
+-- @param string file The file path to include. Make sure to --@include it
 -- @return ... Return value(s) of the script
 function builtins_library.require(file)
 	checkluatype(file, TYPE_STRING)
