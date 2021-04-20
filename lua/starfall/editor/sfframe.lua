@@ -1920,7 +1920,7 @@ end
 function PANEL:CheckPlayersChanged()
 	local players = {}
 	for k, v in pairs(player.GetAll()) do
-		if SF.playerInstances[v] or SF.BlockedUsers[v:SteamID()] then
+		if SF.playerInstances[SF.GetPlayerPtr(v)] or SF.BlockedUsers[v:SteamID()] then
 			players[v] = true
 		end
 	end

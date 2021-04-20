@@ -829,6 +829,42 @@ function SF.WaitForPlayerInit(func)
 	playerinithooks[#playerinithooks+1] = func
 end
 
+do -- Player pointers
+local playerPtrs = setmetatable({},{__mode="v"})
+
+function SF.GetPlayerPtr(ply)
+	local id = ply:SteamID()
+	local ptr = playerPtrs[id]
+	if not ptr then
+		ptr = {ply}
+		function ptr:get()
+			return self[1]:IsValid() and self[1] or SF.Throw("Player is invalid",3)
+		end
+		playerPtrs[id] = ptr
+	end
+	return ptr
+end
+
+if SERVER then
+hook.Add("PlayerInitialSpawn","SF_PlayerPtrs",function(ply)
+	local id = ply:SteamID()
+	if playerPtrs[id] then
+		playerPtrs[id][1] = ply
+	end
+end)
+else
+hook.Add("NetworkEntityCreated","SF_PlayerPtrs",function(ply)
+	local steamid = ply.SteamID
+	if steamid and ply:IsPlayer() then
+		local id = steamid(ply)
+		if playerPtrs[id] then
+			playerPtrs[id][1] = ply
+		end
+	end
+end)
+end
+end
+
 
 -- Table networking
 do
