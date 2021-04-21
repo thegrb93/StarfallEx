@@ -29,12 +29,19 @@ jobs:
           chmod -R +xrw .
           cd docgen
           . ./build_docs.sh
+          cd ..
+      
+      # Move Docs from ./docgen/sf_doc.json to ./out/sf_doc.json
+      - name: Move Docs
+        run: |
+          mkdir out
+          cp -f docgen/sf_doc.json out/
 
       - name: Deploy Docs
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
+          publish_dir: ./out
           publish_branch: test-deploy # Explicit
           user_name: 'github-actions[bot]'
           user_email: 'github-actions[bot]@users.noreply.github.com'
