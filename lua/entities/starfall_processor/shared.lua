@@ -85,17 +85,14 @@ function ENT:Destroy()
 end
 
 function ENT:SetupFiles(sfdata)
+	self.sfdata = sfdata
+	sfdata.proc = self
+
 	if self.owner and self.owner~=sfdata.owner then
 		sfdata.owner = self.owner
-		sfdata.proc = self
-		self.sfdata = sfdata
-
 		self:Error({ message = "The starfall code has been updated by another user", traceback = "" })
 	else
-		self.sfdata = sfdata
 		self.owner = sfdata.owner
-		sfdata.proc = self
-
 		self:Compile()
 	end
 
