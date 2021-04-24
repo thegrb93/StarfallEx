@@ -29,8 +29,10 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 
 local builtins_library = instance.env
 
+local getent
 local getply
 instance:AddHook("initialize", function()
+	getent = instance.Types.Entity.GetEntity
 	getply = instance.Types.Player.GetPlayer
 end)
 
