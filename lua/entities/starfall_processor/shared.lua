@@ -86,10 +86,15 @@ end
 
 function ENT:SetupFiles(sfdata)
 	self.sfdata = sfdata
-	self.owner = sfdata.owner
 	sfdata.proc = self
 
-	self:Compile()
+	if self.owner and self.owner~=sfdata.owner then
+		sfdata.owner = self.owner
+		self:Error({ message = "The starfall code has been updated by another user", traceback = "" })
+	else
+		self.owner = sfdata.owner
+		self:Compile()
+	end
 
 	if SERVER then
 		local sfsenddata = {
