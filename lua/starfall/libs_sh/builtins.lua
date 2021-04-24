@@ -621,11 +621,18 @@ end
 function builtins_library.getScripts(ent)
 	if ent~=nil then
 		ent = getent(ent)
-		if not (ent.Starfall and ent.instance and ent.owner == instance.owner) then SF.Throw("Invalid starfall chip", 2) end
-		return instance.Sanitize(ent.instance.source)
+		local oinstance = ent.instance
+		if not (ent.Starfall and oinstance and (oinstance.player == instance.player or oinstance.shareScripts)) then SF.Throw("Invalid starfall chip", 2) end
+		return instance.Sanitize(oinstance.source)
 	else
 		return instance.Sanitize(instance.source)
 	end
+end
+
+--- Sets the chip to allow other chips to view its sources
+-- @param boolean enable If true, allow sharing scripts
+function builtins_library.shareScripts(enable)
+	instance.shareScripts = (enable == true) or nil
 end
 
 --- Runs an included script and caches the result.
