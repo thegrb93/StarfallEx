@@ -1,0 +1,24 @@
+name: Build Documentation
+
+# On pull requests, just try and build docs
+
+on:
+  pull_request:
+      branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+
+        # Clone docgen branch, run build_docs.sh in order to build sf_doc.json
+        - name: Build Docs
+          run: |
+            git clone -b docgen --single-branch https://github.com/thegrb93/StarfallEx.git docgen
+            chmod -R +xrw .
+            cd docgen
+            . ./build_docs.sh
