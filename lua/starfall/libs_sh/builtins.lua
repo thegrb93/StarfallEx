@@ -531,14 +531,6 @@ if SERVER then
 	function builtins_library.getUserdata()
 		return instance.entity.starfalluserdata or ""
 	end
-		
-	--- Allows other chips to use getChipScripts() on this chip.
-	-- @server
-	-- @param boolean allow Whether or not to allow other chips to view this chip's code.
-	function builtins_library.setTransmitScripts(allow)
-		checkluatype(allow, TYPE_BOOL)
-		instance.transmit = allow
-	end
 else
 	--- Sets the chip's display name
 	-- @client
@@ -624,9 +616,16 @@ else
 end
 
 --- Returns the table of scripts used by the chip
+-- @param Entity? ent Optional target entity. Default: chip()
 -- @return table Table of scripts used by the chip
-function builtins_library.getScripts()
-	return instance.Sanitize(instance.source)
+function builtins_library.getScripts(ent)
+	if ent~=nil then
+		ent = getent(ent)
+		if not (ent.Starfall and ent.instance and ent.owner == instance.owner) then SF.Throw("Invalid starfall chip", 2) end
+		return instance.Sanitize(ent.instance.source)
+	else
+		return instance.Sanitize(instance.source)
+	end
 end
 
 --- Runs an included script and caches the result.

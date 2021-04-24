@@ -164,19 +164,6 @@ function ents_methods:applyDamage(amt, attacker, inflictor)
 	ent:TakeDamage(amt, attacker, inflictor)
 end
 
---- Gets the scripts of the specified starfall chip. Only works if setTransmitScripts() is enabled on the chip.
--- @return table? The scripts used in the starfall chip. Nil if chip can't transmit scripts.
-function ents_methods:getChipScripts()
-	local ent = getent(self)
-	if not ent.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
-	
-	if ent.instance.transmit then
-		return instance.Sanitize(ent.instance.source)
-	else
-		return nil
-	end
-end
-	
 --- Sets a custom prop's physics simulation forces. Thrusters and balloons use this.
 -- @param Vector ang Angular Force (Torque)
 -- @param Vector lin Linear Force
