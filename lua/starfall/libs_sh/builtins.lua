@@ -531,6 +531,14 @@ if SERVER then
 	function builtins_library.getUserdata()
 		return instance.entity.starfalluserdata or ""
 	end
+		
+	--- Allows other chips to use getChipScripts() on this chip.
+	-- @server
+	-- @param boolean allow Whether or not to allow other chips to view this chip's code.
+	function builtins_library.setTransmitScripts(allow)
+		checkluatype(allow, TYPE_BOOL)
+		instance.transmit = allow
+	end
 else
 	--- Sets the chip's display name
 	-- @client
