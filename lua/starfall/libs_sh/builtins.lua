@@ -29,8 +29,10 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 
 local builtins_library = instance.env
 
+local getent
 local getply
 instance:AddHook("initialize", function()
+	getent = instance.Types.Entity.GetEntity
 	getply = instance.Types.Player.GetPlayer
 end)
 
@@ -616,9 +618,23 @@ else
 end
 
 --- Returns the table of scripts used by the chip
+-- @param Entity? ent Optional target entity. Default: chip()
 -- @return table Table of scripts used by the chip
-function builtins_library.getScripts()
-	return instance.Sanitize(instance.source)
+function builtins_library.getScripts(ent)
+	if ent~=nil then
+		ent = getent(ent)
+		local oinstance = ent.instance
+		if not (ent.Starfall and oinstance and (oinstance.player == instance.player or oinstance.shareScripts)) then SF.Throw("Invalid starfall chip", 2) end
+		return instance.Sanitize(oinstance.source)
+	else
+		return instance.Sanitize(instance.source)
+	end
+end
+
+--- Sets the chip to allow other chips to view its sources
+-- @param boolean enable If true, allow sharing scripts
+function builtins_library.shareScripts(enable)
+	instance.shareScripts = (enable == true) or nil
 end
 
 --- Runs an included script and caches the result.
