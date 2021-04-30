@@ -1746,7 +1746,7 @@ PANEL  = {}
 function PANEL:Block(ply)
 	SF.BlockUser(ply)
 	for k, v in pairs(ents.FindByClass("starfall_processor")) do 
-		if v.owner == ply then
+		if v.owner == ply and v.instance then
 			v:Error({message = "Blocked by user", traceback = ""})
 		end
 	end
@@ -1811,7 +1811,7 @@ function PANEL:UpdatePlayers(players)
 		local counters = {}
 		for k, v in pairs(SF.ResourceCounters) do
 			local counter = vgui.Create("StarfallPanel", header)
-			counter:DockMargin(0, 0, 3, 0)
+			counter:DockMargin(3, 0, 0, 0)
 			counter:SetSize(16, 32)
 			counter:Dock(LEFT)
 			counter:SetBackgroundColor(Color(0,0,0,20))
@@ -1819,18 +1819,21 @@ function PANEL:UpdatePlayers(players)
 			
 			local icon = vgui.Create("DImage", counter)
 			icon:SetImage(v.icon)
-			icon:DockMargin(0, 0, 0, 0)
 			icon:SetSize(16, 16)
 			icon:Dock(TOP)
 			
 			local count = vgui.Create("DLabel", counter)
 			count:SetFont("DermaDefault")
 			count:SetColor(Color(255, 255, 255))
-			count:DockMargin(0, 0, 3, 0)
 			count:Dock(BOTTOM)
 			count:SizeToContents()
 			
-			counters[#counters+1] = function()
+			counter.nextThink = 0
+			function counter:Think()
+				local t = CurTime()
+				if t < self.nextThink then return end
+				self.nextThink = t + 0.1
+
 				if blocked then
 					count:SetText("0")
 				else
@@ -1839,7 +1842,76 @@ function PANEL:UpdatePlayers(players)
 				count:SizeToContents()
 			end
 		end
-		header.counters = counters
+		
+		local cpuManager = vgui.Create("StarfallPanel", header)
+		cpuManager:DockMargin(15, 0, 0, 0)
+		cpuManager:SetSize(210, 32)
+		cpuManager:Dock(LEFT)
+		cpuManager:SetBackgroundColor(Color(0,0,0,20))
+
+		local cpuServer = vgui.Create("StarfallPanel", cpuManager)
+		cpuServer:SetSize(200, 16)
+		cpuServer:Dock(TOP)
+		cpuServer:SetBackgroundColor(Color(0,0,0,20))
+
+		local cpuServerText = vgui.Create("DLabel", cpuServer)
+		cpuServerText:SetFont("DermaDefault")
+		cpuServerText:SetColor(Color(255, 255, 255))
+		cpuServerText:Dock(LEFT)
+		cpuServerText:SetText("SV CPU Usage: 0.0 us")
+		cpuServerText:SetSize(150,16)
+
+		if LocalPlayer():IsAdmin() then
+			local killserver = vgui.Create("StarfallButton", cpuServer)
+			killserver:SetText("Admin Kill")
+			killserver.DoClick = function()
+				if SF.playerInstances[ply] then
+					for instance, _ in pairs(SF.playerInstances[ply]) do
+						net.Start("starfall_processor_kill")
+						net.WriteEntity(instance.entity)
+						net.SendToServer()
+					end
+				end
+			end
+			killserver:Dock(LEFT)
+		end
+
+		local cpuClient = vgui.Create("StarfallPanel", cpuManager)
+		cpuClient:SetSize(200, 16)
+		cpuClient:Dock(TOP)
+		cpuClient:SetBackgroundColor(Color(0,0,0,20))
+
+		local cpuClientText = vgui.Create("DLabel", cpuClient)
+		cpuClientText:SetFont("DermaDefault")
+		cpuClientText:SetColor(Color(255, 255, 255))
+		cpuClientText:Dock(LEFT)
+		cpuClientText:SetText("CL CPU Usage: 0.0 us")
+		cpuClientText:SetSize(150,16)
+
+		local killclient = vgui.Create("StarfallButton", cpuClient)
+		killclient:SetText("Kill all")
+		killclient.DoClick = function()
+			for instance, _ in pairs(SF.playerInstances[ply]) do
+				instance:Error({message = "Killed by user", traceback = ""})
+			end
+		end
+		killclient:Dock(LEFT)
+
+		header.nextThink = 0
+		function header:Think()
+			local t = CurTime()
+			if t < self.nextThink then return end
+			self.nextThink = t + 0.1
+
+			local svtotal = 0
+			local cltotal = 0
+			for instance, _ in pairs(SF.playerInstances[ply]) do
+				svtotal = svtotal + instance.entity:GetNWInt("CPUus")
+				cltotal = cltotal + instance.cpu_average
+			end
+			cpuServerText:SetText(string.format("SV CPU Usaage: %3.1f us", svtotal))
+			cpuClientText:SetText(string.format("CL CPU Usaage: %3.1f us", cltotal*1e6))
+		end
 
 		self.scrollPanel:AddItem(header)
 	end
@@ -1870,12 +1942,6 @@ end
 
 function PANEL:Think()
 	self:CheckPlayersChanged()
-
-	for _, header in pairs(self.scrollPanel:GetCanvas():GetChildren()) do
-		for _, counter in pairs(header.counters) do
-			counter()
-		end
-	end
 end
 
 function PANEL:Init()
@@ -1892,7 +1958,7 @@ list.Set( "DesktopWindows", "StarfallUsers", {
 
 	title		= "Starfall List",
 	icon		= "radon/starfall2",
-	width		= 960,
+	width		= 520,
 	height		= 700,
 	onewindow	= true,
 	init		= function( icon, window )
@@ -1906,7 +1972,7 @@ concommand.Add("sf_userlist", function()
 
 	userPanel = vgui.Create("StarfallUsers")
 	userPanel:SetTitle( "Starfall List" )
-	userPanel:SetSize( 400, ScrH()*0.5 )
+	userPanel:SetSize( 520, ScrH()*0.5 )
 	userPanel:SetSizable(true)
 	userPanel:Center()
 	userPanel:SetDeleteOnClose(true)

@@ -129,6 +129,13 @@ net.Receive("starfall_processor_link", function()
 	end, 10)
 end)
 
+net.Receive("starfall_processor_kill", function()
+	local target = net.ReadEntity()
+	if target:IsValid() and target:GetClass()=="starfall_processor" then
+		target:Error({message = "Killed by admin", traceback = ""})
+	end
+end)
+
 net.Receive("starfall_processor_used", function(len)
 	local chip = net.ReadEntity()
 	local used = net.ReadEntity()
