@@ -831,15 +831,23 @@ end
 
 do -- Player pointers
 local playerPtrs = setmetatable({},{__mode="v"})
+local ptrMethods = {}
+function ptrMethods:IsValid()
+	return self[1]:IsValid()
+end
+function ptrMethods:Get()
+	return self[1]
+end
+function ptrMethods:Reset(ply)
+	self[1] = ply
+end
+ptrMethods.__index = ptrMethods
 
 function SF.GetPlayerPtr(ply)
 	local id = ply:SteamID()
 	local ptr = playerPtrs[id]
 	if not ptr then
-		ptr = {ply}
-		function ptr:get()
-			return self[1]:IsValid() and self[1] or SF.Throw("Player is invalid",3)
-		end
+		ptr = setmetatable({ply}, ptrMethods)
 		playerPtrs[id] = ptr
 	end
 	return ptr
@@ -849,7 +857,7 @@ if SERVER then
 hook.Add("PlayerInitialSpawn","SF_PlayerPtrs",function(ply)
 	local id = ply:SteamID()
 	if playerPtrs[id] then
-		playerPtrs[id][1] = ply
+		playerPtrs[id]:Reset(ply)
 	end
 end)
 else
@@ -858,7 +866,7 @@ hook.Add("NetworkEntityCreated","SF_PlayerPtrs",function(ply)
 	if steamid and ply:IsPlayer() then
 		local id = steamid(ply)
 		if playerPtrs[id] then
-			playerPtrs[id][1] = ply
+			playerPtrs[id]:Reset(ply)
 		end
 	end
 end)
