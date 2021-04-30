@@ -202,17 +202,16 @@ function TOOL:Think()
 	if not (self.GhostEntity and self.GhostEntity:IsValid()) or self.GhostEntity:GetModel() ~= model then
 		self:MakeGhostEntity(model, Vector(0, 0, 0), Angle(0, 0, 0))
 	end
+	local ghost = self.GhostEntity
 
 	local ply = self:GetOwner()
 	local trace = ply:GetEyeTrace()
-	if (not trace.Hit) then return end
-	local ghost = self.GhostEntity
 	local ent = trace.Entity
 
 	if ghost and ghost:IsValid() then
 		if (ent:IsValid() and ent:GetClass() == "starfall_processor" or ent:IsPlayer()) then
 			ghost:SetNoDraw(true)
-		else
+		elseif trace.Hit then
 			local Ang = trace.HitNormal:Angle()
 			Ang.pitch = Ang.pitch + 90
 
