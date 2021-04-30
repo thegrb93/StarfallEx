@@ -150,25 +150,6 @@ function TOOL:LeftClick(trace)
 end
 
 function TOOL:RightClick(trace)
-	if SERVER then
-
-		local ply = self:GetOwner()
-		local ent = trace.Entity
-
-		if ent and ent:IsValid() and ent:GetClass() == "starfall_processor" then
-			if ent.sfdata then
-				net.Start("starfall_openeditor")
-				net.WriteBool(true)
-				net.WriteStarfall(ent.sfdata)
-				net.Send(ply)
-			end
-		else
-			net.Start("starfall_openeditor")
-			net.WriteBool(false)
-			net.Send(ply)
-		end
-
-	end
 	return false
 end
 
@@ -196,7 +177,23 @@ end
 function TOOL:DrawHUD()
 end
 
+function TOOL:OpenEditor(ply, ent)
+	if ent then
+		if ent.sfdata then
+			net.Start("starfall_openeditor")
+			net.WriteBool(true)
+			net.WriteStarfall(ent.sfdata)
+			net.Send(ply)
+		end
+	else
+		net.Start("starfall_openeditor")
+		net.WriteBool(false)
+		net.Send(ply)
+	end
+end
+
 function TOOL:Think()
+	if CLIENT then return end
 
 	local model = self:GetClientInfo("ScriptModel")
 	if model=="" then
@@ -206,26 +203,40 @@ function TOOL:Think()
 		self:MakeGhostEntity(model, Vector(0, 0, 0), Angle(0, 0, 0))
 	end
 
-	local trace = util.TraceLine(util.GetPlayerTrace(self:GetOwner()))
+	local ply = self:GetOwner()
+	local trace = ply:GetEyeTrace()
 	if (not trace.Hit) then return end
-	local ent = self.GhostEntity
+	local ghost = self.GhostEntity
+	local ent = trace.Entity
 
-	if not (ent and ent:IsValid()) then return end
-	if (trace.Entity and trace.Entity:GetClass() == "starfall_processor" or trace.Entity:IsPlayer()) then
+	if ghost and ghost:IsValid() then
+		if (ent:IsValid() and ent:GetClass() == "starfall_processor" or ent:IsPlayer()) then
+			ghost:SetNoDraw(true)
+		else
+			local Ang = trace.HitNormal:Angle()
+			Ang.pitch = Ang.pitch + 90
 
-		ent:SetNoDraw(true)
-		return
-
+			local min = ghost:OBBMins()
+			ghost:SetPos(trace.HitPos - trace.HitNormal * min.z)
+			ghost:SetAngles(Ang)
+			ghost:SetNoDraw(false)
+		end
 	end
 
-	local Ang = trace.HitNormal:Angle()
-	Ang.pitch = Ang.pitch + 90
-
-	local min = ent:OBBMins()
-	ent:SetPos(trace.HitPos - trace.HitNormal * min.z)
-	ent:SetAngles(Ang)
-
-	ent:SetNoDraw(false)
+	if ply:KeyPressed(IN_ATTACK2) then
+		if not self.OpenedEditor then
+			if ent:IsValid() and ent:GetClass() == "starfall_processor" then
+				if gamemode.Call("CanTool", ply, trace, self.Mode, self, 2)~=false then
+					self:OpenEditor(ply, ent)
+				end
+			else
+				self:OpenEditor(ply)
+			end
+			self.OpenedEditor = true
+		end
+	else
+		self.OpenedEditor = nil
+	end
 
 end
 
