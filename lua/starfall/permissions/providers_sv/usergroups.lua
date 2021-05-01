@@ -8,7 +8,8 @@ P.defaultsetting = 2
 
 P.checks = {
 	function(instance, target, key)
-		return instance.player:IsAdmin(), "This function is admin only"
+		local ply = instance.player:Get()
+		return ply:IsValid() and ply:IsAdmin(), "This function is admin only"
 	end,
 	"allow",
 	"block"
