@@ -11,14 +11,16 @@ if SERVER then
 	SF.cpuQuota = CreateConVar("sf_timebuffer", 0.005, FCVAR_ARCHIVE, "The max average the CPU time can reach.")
 	SF.cpuBufferN = CreateConVar("sf_timebuffersize", 100, FCVAR_ARCHIVE, "The window width of the CPU time quota moving average.")
 	SF.softLockProtection = CreateConVar("sf_timebuffersoftlock", 1, FCVAR_ARCHIVE, "Consumes more cpu, but protects from freezing the game. Only turn this off if you want to use a profiler on your scripts.")
-	SF.RamCap = CreateConVar("sf_ram_max", 1500000, "If ram exceeds this limit (in kB), starfalls will be terminated")
+	SF.RamCap = CreateConVar("sf_ram_max", 1500000, FCVAR_ARCHIVE, "If ram exceeds this limit (in kB), starfalls will be terminated")
+	SF.AllowSuperUser = CreateConVar("sf_superuserallowed", 0, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Whether the starfall useruser feature is allowed")
 else
 	SF.cpuQuota = CreateConVar("sf_timebuffer_cl", 0.006, FCVAR_ARCHIVE, "The max average the CPU time can reach.")
 	SF.cpuOwnerQuota = CreateConVar("sf_timebuffer_cl_owner", 0.015, FCVAR_ARCHIVE, "The max average the CPU time can reach for your own chips.")
 	SF.cpuBufferN = CreateConVar("sf_timebuffersize_cl", 100, FCVAR_ARCHIVE, "The window width of the CPU time quota moving average.")
 	SF.softLockProtection = CreateConVar("sf_timebuffersoftlock_cl", 1, FCVAR_ARCHIVE, "Consumes more cpu, but protects from freezing the game. Only turn this off if you want to use a profiler on your scripts.")
 	SF.softLockProtectionOwner = CreateConVar("sf_timebuffersoftlock_cl_owner", 1, FCVAR_ARCHIVE, "If sf_timebuffersoftlock_cl is 0, this enabled will make it only your own chips will be affected.")
-	SF.RamCap = CreateConVar("sf_ram_max_cl", 1500000, "If ram exceeds this limit (in kB), starfalls will be terminated")
+	SF.RamCap = CreateConVar("sf_ram_max_cl", 1500000, FCVAR_ARCHIVE, "If ram exceeds this limit (in kB), starfalls will be terminated")
+	SF.AllowSuperUser = CreateConVar("sf_superuserallowed", 0, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Whether the starfall useruser feature is allowed")
 end
 
 SF.Instance = {}
@@ -62,11 +64,9 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 	if player:IsWorld() then
 		player = SF.Superuser
 	elseif instance.ppdata.superuser and instance.ppdata.superuser[mainfile] then
-		if player:IsSuperAdmin() then
-			player = SF.Superuser
-		else
-			return false, { message = "Can't use --@superuser unless you are superadmin!", traceback = "" }
-		end
+		if not SF.AllowSuperUser:GetBool() then return false, { message = "Can't use --@superuser unless sf_superuserallowed is enabled!", traceback = "" } end
+		if not player:IsSuperAdmin() then return false, { message = "Can't use --@superuser unless you are superadmin!", traceback = "" } end
+		player = SF.Superuser
 	end
 	instance.player = player
 
