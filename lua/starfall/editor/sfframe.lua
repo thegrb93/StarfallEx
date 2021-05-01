@@ -1743,19 +1743,19 @@ vgui.Register("StarfallEditorFrame", Editor, "DFrame")
 -- Starfall Users
 PANEL  = {}
 
-function PANEL:Block(ply)
-	SF.BlockUser(ply)
+function PANEL:Block(plyptr)
+	SF.BlockUser(plyptr:Get())
 	for k, v in pairs(ents.FindByClass("starfall_processor")) do 
-		if v.owner == ply and v.instance then
+		if v.owner == plyptr and v.instance then
 			v:Error({message = "Blocked by user", traceback = ""})
 		end
 	end
 end
 
-function PANEL:Unblock(ply)
-	SF.UnblockUser(ply)
+function PANEL:Unblock(plyptr)
+	SF.UnblockUser(plyptr:Get())
 	for k, v in pairs(ents.FindByClass("starfall_processor")) do 
-		if v.owner == ply then
+		if v.owner == plyptr then
 			v:Compile()
 		end
 	end
@@ -1763,15 +1763,16 @@ end
 
 function PANEL:UpdatePlayers(players)
 	local sortedplayers = {}
-	for ply in pairs(self.players) do
-		local plyname = ply:GetName()
-		sortedplayers[#sortedplayers+1] = {ply = ply, name = plyname, namel = string.lower(plyname)}
+	for plyptr in pairs(self.players) do
+		local plyname = plyptr:Get():GetName()
+		sortedplayers[#sortedplayers+1] = {plyptr = plyptr, name = plyname, namel = string.lower(plyname)}
 	end
 	table.sort(sortedplayers, function(a,b) return a.namel<b.namel end)
 
 	self.scrollPanel:Clear()
 	for _, tbl in ipairs(sortedplayers) do
-		local ply = tbl.ply
+		local plyptr = tbl.plyptr
+		local ply = plyptr:Get()
 
 		local header = vgui.Create("StarfallPanel")
 		header:DockMargin(0, 5, 0, 0)
@@ -1787,7 +1788,7 @@ function PANEL:UpdatePlayers(players)
 		button:Dock(LEFT)
 
 		button.DoClick = function()
-			if blocked then self:Unblock(ply) else self:Block(ply) end
+			if blocked then self:Unblock(plyptr) else self:Block(plyptr) end
 			blocked = not blocked
 			button:SetText(blocked and "Unblock" or "Block")
 		end
@@ -1837,7 +1838,7 @@ function PANEL:UpdatePlayers(players)
 				if blocked then
 					count:SetText("0")
 				else
-					count:SetText(tostring(v.count(ply)))
+					count:SetText(tostring(v.count(plyptr)))
 				end
 				count:SizeToContents()
 			end
@@ -1865,8 +1866,8 @@ function PANEL:UpdatePlayers(players)
 			local killserver = vgui.Create("StarfallButton", cpuServer)
 			killserver:SetText("Admin Kill")
 			killserver.DoClick = function()
-				if SF.playerInstances[ply] then
-					for instance, _ in pairs(SF.playerInstances[ply]) do
+				if SF.playerInstances[plyptr] then
+					for instance, _ in pairs(SF.playerInstances[plyptr]) do
 						net.Start("starfall_processor_kill")
 						net.WriteEntity(instance.entity)
 						net.SendToServer()
@@ -1891,7 +1892,7 @@ function PANEL:UpdatePlayers(players)
 		local killclient = vgui.Create("StarfallButton", cpuClient)
 		killclient:SetText("Kill all")
 		killclient.DoClick = function()
-			for instance, _ in pairs(SF.playerInstances[ply]) do
+			for instance, _ in pairs(SF.playerInstances[plyptr]) do
 				instance:Error({message = "Killed by user", traceback = ""})
 			end
 		end
@@ -1905,7 +1906,7 @@ function PANEL:UpdatePlayers(players)
 
 			local svtotal = 0
 			local cltotal = 0
-			for instance, _ in pairs(SF.playerInstances[ply]) do
+			for instance in pairs(SF.playerInstances[plyptr]) do
 				svtotal = svtotal + instance.entity:GetNWInt("CPUus")
 				cltotal = cltotal + instance.cpu_average
 			end
@@ -1920,8 +1921,9 @@ end
 function PANEL:CheckPlayersChanged()
 	local players = {}
 	for k, v in pairs(player.GetAll()) do
-		if SF.playerInstances[SF.GetPlayerPtr(v)] or SF.BlockedUsers[v:SteamID()] then
-			players[v] = true
+		local ptr = SF.GetPlayerPtr(v)
+		if SF.playerInstances[ptr] or SF.BlockedUsers[v:SteamID()] then
+			players[ptr] = true
 		end
 	end
 	for v in pairs(self.players) do
