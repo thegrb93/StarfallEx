@@ -28,7 +28,7 @@ P.checks = {
 if CLIENT then
 	P.settingsoptions[3] = "Disabled for owner"
 	P.checks[3] = function(instance, target, player)
-		if instance.player == LocalPlayer() then return true end
+		if instance.player:Get() == LocalPlayer() then return true end
 		return checkWhitelist(instance, target, player)
 	end
 end

@@ -62,16 +62,17 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 	end
 
 	if player:IsWorld() then
-		player = SF.Superuser
+		instance.player = SF.Superuser
 	elseif instance.ppdata.superuser and instance.ppdata.superuser[mainfile] then
 		if not SF.AllowSuperUser:GetBool() then return false, { message = "Can't use --@superuser unless sf_superuserallowed is enabled!", traceback = "" } end
 		if not player:IsSuperAdmin() then return false, { message = "Can't use --@superuser unless you are superadmin!", traceback = "" } end
-		player = SF.Superuser
+		instance.player = SF.Superuser
+	else
+		instance.player = SF.GetPlayerPtr(player)
 	end
-	instance.player = player
 
 	local quotaRun
-	if player == SF.Superuser then
+	if instance.player == SF.Superuser then
 		quotaRun = SF.Instance.runWithoutOps
 	else
 		if SERVER then
@@ -645,7 +646,7 @@ hook.Add("Think", "SF_Think", function()
 		ErrorNoHalt("[Starfall] ERROR: This should not happen, bad addons?\n")
 	end
 
-	for pl, insts in pairs(SF.playerInstances) do
+	for plptr, insts in pairs(SF.playerInstances) do
 		local plquota
 		local cputotal = 0
 		for instance, _ in pairs(insts) do
