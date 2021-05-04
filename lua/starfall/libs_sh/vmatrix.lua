@@ -70,6 +70,16 @@ function vmatrix_methods:rotate(ang)
 	unwrap(self):Rotate(aunwrap(ang))
 end
 
+--- Returns the input matrix rotated by an axis
+-- @param Vector axis Axis to rotate around
+-- @param number ang Angle to rotate by in radians
+-- @return VMatrix The rotated matrix
+function vmatrix_methods:getRotatedAroundAxis(axis, ang)
+	local r = wrap(Matrix())
+	r:setAxisAngle(axis, ang)
+	return r*self
+end
+
 --- Returns an inverted matrix. Inverting the matrix will fail if its determinant is 0 or close to 0
 -- @return VMatrix Inverted matrix
 function vmatrix_methods:getInverse()
