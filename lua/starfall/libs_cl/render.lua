@@ -1549,6 +1549,8 @@ end
 -- @param string text Text to draw
 -- @param number? xalign Text x alignment
 -- @param number? yalign Text y alignment
+-- @return number Width of the drawn text. Same as calling render.getTextSize
+-- @return number Height of the drawn text. Same as calling render.getTextSize
 function render_library.drawSimpleText(x, y, text, xalign, yalign)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype (x, TYPE_NUMBER)
@@ -1559,7 +1561,7 @@ function render_library.drawSimpleText(x, y, text, xalign, yalign)
 
 	local font = renderdata.font or defaultFont
 
-	draw.SimpleText(text, font, x, y, currentcolor, xalign, yalign)
+	return draw.SimpleText(text, font, x, y, currentcolor, xalign, yalign)
 end
 
 --- Constructs a markup object for quick styled text drawing.

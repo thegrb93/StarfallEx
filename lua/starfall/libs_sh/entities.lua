@@ -159,6 +159,7 @@ if CLIENT then
 	-- Checks Entity against a predefined class whitelist
 	-- Entities that have RenderOverride defined or are parented cannot be drawn
 	-- @client
+	-- @return boolean Whether the entity can be drawn
 	function ents_methods:canDraw()
 		return canDrawEntity(getent(self))
 	end
