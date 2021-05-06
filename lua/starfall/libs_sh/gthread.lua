@@ -149,6 +149,7 @@ STL()
 SF.RegisterLibrary("gthread")
 
 return function(instance)
+if not instance.player:IsSuperAdmin() then return end
 
 local gthread_library = instance.Libraries.gthread
 
