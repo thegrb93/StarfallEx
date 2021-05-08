@@ -61,7 +61,7 @@ function effect_library.canCreate()
 end
 
 --- Plays the effect
--- @param Effect eff The effect type to play
+-- @param string eff The effect type name to play
 function effect_methods:play(eff)
 	checkluatype(eff, TYPE_STRING)
 
