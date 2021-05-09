@@ -166,7 +166,7 @@ end)
 -- @class hook
 -- @client
 SF.hookAdd("PreDrawOpaqueRenderables", "hologrammatrix", function(instance, drawdepth, drawskybox)
-	return not drawskybox, {}
+	return drawskybox, {}
 end)
 
 --- Called when a frame is requested to be drawn on hud. (2D Context)
