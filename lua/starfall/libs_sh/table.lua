@@ -18,6 +18,14 @@ local table_library = instance.Libraries.table
 -- @return table The target table
 table_library.add = table.Add
 
+--- Returns the string address of the table
+-- @class function
+-- @param table target The target to get the address of
+-- @return string The table's string address
+function table_library.address(target)
+	return string.format("%p",target)
+end
+
 --- Changes all keys to sequential integers. This creates a new table object and does not affect the original.
 -- @class function
 -- @param table tbl The original table to modify
