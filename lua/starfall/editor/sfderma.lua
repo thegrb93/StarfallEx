@@ -247,6 +247,8 @@ end
 local function addFiles(search, dir, node)
 	local found = false
 	local allFiles, allFolders = file.Find(dir .. "/*", "DATA")
+	allFiles = allFiles or {}
+	allFolders = allFolders or {}
 	sort(allFiles)
 	sort(allFolders)
 	if search=="" then
