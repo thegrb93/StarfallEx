@@ -7,6 +7,44 @@ registerprivilege("entities.setPlayerRenderProperty", "PlayerRenderProperty", "A
 registerprivilege("entities.setPersistent", "SetPersistent", "Allows the user to change entity's persistent state", { entities = {} })
 registerprivilege("entities.emitSound", "Emitsound", "Allows the user to play sounds on entities", { client = (CLIENT and {} or nil), entities = {} })
 
+local manipulations = SF.EntityTable("boneManipulations")
+
+hook.Add("PAC3ResetBones","SF_BoneManipulations",function(ent)
+	local manips = manipulations[ent]
+	if manips then
+		for bone, v in pairs(manips.Position) do
+			ent:ManipulateBonePosition(bone, v)
+		end
+		for bone, v in pairs(manips.Scale) do
+			ent:ManipulateBoneScale(bone, v)
+		end
+		for bone, v in pairs(manips.Angle) do
+			ent:ManipulateBoneAngles(bone, v)
+		end
+		for bone, v in pairs(manips.Jiggle) do
+			ent:ManipulateBoneJiggle(bone, v)
+		end
+	end
+end)
+local function setManipulation(ent, type, bone, val)
+	if val then
+		local manips = manipulations[ent]
+		if not manips then
+			manips = {Position = {}, Scale = {}, Angle = {}, Jiggle = {}}
+			manipulations[ent] = manips
+		end
+		manips[type][bone] = val
+	else
+		local manips = manipulations[ent]
+		if manips then
+			manips[type][bone] = nil
+			if next(manips.Position)==nil and next(manips.Scale)==nil and next(manips.Angle)==nil and next(manips.Jiggle)==nil then
+				manipulations[ent] = nil
+			end
+		end
+	end
+end
+
 
 --- Entity type
 -- @name Entity
@@ -14,7 +52,6 @@ registerprivilege("entities.emitSound", "Emitsound", "Allows the user to play so
 -- @libtbl ents_methods
 -- @libtbl ent_meta
 SF.RegisterType("Entity", false, true, debug.getregistry().Entity)
-
 
 
 return function(instance)
@@ -66,10 +103,15 @@ if CLIENT then
 	-- @param number bone The bone ID
 	-- @param Vector vec The position it should be manipulated to
 	function ents_methods:manipulateBonePosition(bone, vec)
-		checkluatype(bone, TYPE_NUMBER)
 		local ent = getent(self)
+		checkluatype(bone, TYPE_NUMBER)
+		bone = math.floor(bone)
+		if bone<0 or bone>=ent:GetBoneCount() then SF.Throw("Invalid bone "..bone, 2) end
+
+		vec = vunwrap(vec)
 		checkpermission(instance, ent, "entities.setRenderProperty")
-		ent:ManipulateBonePosition(bone, vunwrap(vec))
+		setManipulation(ent, "Position", bone, (vec[1]~=0 or vec[2]~=0 or vec[3]~=0) and vec)
+		ent:ManipulateBonePosition(bone, vec)
 	end
 
 	--- Allows manipulation of an entity's bones' scale
@@ -77,10 +119,15 @@ if CLIENT then
 	-- @param number bone The bone ID
 	-- @param Vector vec The scale it should be manipulated to
 	function ents_methods:manipulateBoneScale(bone, vec)
-		checkluatype(bone, TYPE_NUMBER)
 		local ent = getent(self)
+		checkluatype(bone, TYPE_NUMBER)
+		bone = math.floor(bone)
+		if bone<0 or bone>=ent:GetBoneCount() then SF.Throw("Invalid bone "..bone, 2) end
+
+		vec = vunwrap(vec)
 		checkpermission(instance, ent, "entities.setRenderProperty")
-		ent:ManipulateBoneScale(bone, vunwrap(vec))
+		setManipulation(ent, "Scale", bone, (vec[1]~=0 or vec[2]~=0 or vec[3]~=0) and vec)
+		ent:ManipulateBoneScale(bone, vec)
 	end
 
 	--- Allows manipulation of an entity's bones' angles
@@ -88,10 +135,15 @@ if CLIENT then
 	-- @param number bone The bone ID
 	-- @param Angle ang The angle it should be manipulated to
 	function ents_methods:manipulateBoneAngles(bone, ang)
-		checkluatype(bone, TYPE_NUMBER)
 		local ent = getent(self)
+		checkluatype(bone, TYPE_NUMBER)
+		bone = math.floor(bone)
+		if bone<0 or bone>=ent:GetBoneCount() then SF.Throw("Invalid bone "..bone, 2) end
+
+		ang = aunwrap(ang)
 		checkpermission(instance, ent, "entities.setRenderProperty")
-		ent:ManipulateBoneAngles(bone, aunwrap(ang))
+		setManipulation(ent, "Angle", bone, (ang[1]~=0 or ang[2]~=0 or ang[3]~=0) and ang)
+		ent:ManipulateBoneAngles(bone, ang)
 	end
 
 	--- Allows manipulation of an entity's bones' jiggle status
@@ -99,9 +151,14 @@ if CLIENT then
 	-- @param number bone The bone ID
 	-- @param boolean enabled Whether to make the bone jiggly or not
 	function ents_methods:manipulateBoneJiggle(bone, state)
-		checkluatype(bone, TYPE_NUMBER)
 		local ent = getent(self)
+		checkluatype(bone, TYPE_NUMBER)
+		bone = math.floor(bone)
+		if bone<0 or bone>=ent:GetBoneCount() then SF.Throw("Invalid bone "..bone, 2) end
+
+		checkluatype(state, TYPE_BOOL)
 		checkpermission(instance, ent, "entities.setRenderProperty")
+		setManipulation(ent, "Jiggle", bone, state and 1)
 		ent:ManipulateBoneJiggle(bone, state and 1 or 0)
 	end
 
