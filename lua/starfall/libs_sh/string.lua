@@ -283,6 +283,24 @@ string_library.toMinutesSeconds = sfstring.ToMinutesSeconds
 -- @return string Returns given time in "MM:SS:MS" format
 string_library.toMinutesSecondsMilliseconds = sfstring.ToMinutesSecondsMilliseconds
 
+--- Converts time to hours, minutes and seconds string.
+-- @class function
+-- @param number time Time in seconds
+-- @return string Given time in "HH:MM:SS" format
+function string_library.toHoursMinutesSeconds( seconds )
+	local formattedTime = sfstring.FormattedTime( seconds )
+	return sfstring.format("%02i:%02i:%02i", formattedTime.h, formattedTime.m, formattedTime.s)
+end
+
+--- Converts time to hours, minutes, seconds and miliseconds string.
+-- @class function
+-- @param number time Time in seconds
+-- @return string Returns given time in "HH:MM:SS.MS" format
+function string_library.toHoursMinutesSecondsMilliseconds( seconds )
+	local formattedTime = sfstring.FormattedTime( seconds )
+	return sfstring.format("%02i:%02i:%02i.%03i", formattedTime.h, formattedTime.m, formattedTime.s, formattedTime.ms)
+end
+
 --- Splits the string into characters and creates a sequential table of characters.
 -- As a result of the encoding, non-ASCII characters will be split into more than one character in the output table.
 -- Each character value in the output table will always be 1 byte.
