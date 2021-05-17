@@ -634,13 +634,8 @@ function SF.Require(moduleName)
 	return false
 end
 
-
-function SF.CompileString(str, name, handle)
-	if string.find(str, "repeat.*continue.*until") then
-		return "Due to a glua bug. Use of the string 'continue' in repeat-until loops has been banned"
-	end
-	return CompileString(str, name, handle)
-end
+-- Alias in case we need to patch a compilation bug or something.
+SF.CompileString = CompileString
 
 --- The safest write file function
 function SF.FileWrite(path, data)
