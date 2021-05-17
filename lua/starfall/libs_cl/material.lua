@@ -22,7 +22,6 @@ local allowed_shaders = {
 	Sky_DX9 = true,
 	gmodscreenspace = true,
 	Modulate_DX9 = true,
-	-- MonitorScreen_DX9 = true,
 }
 
 local default_values = {
