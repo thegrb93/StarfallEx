@@ -5,7 +5,7 @@ export default function ContributorsCard(props)
 
     async function fetchData() 
     {
-        const res = await fetch("https://api.github.com/repos/thegrb93/StarfallEx/contributors");
+        const res = await fetch("https://api.github.com/repos/thegrb93/StarfallEx/contributors?per_page=50");
         res
             .json()
             .then(res => setContributorsData(res))
