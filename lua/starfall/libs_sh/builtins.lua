@@ -18,7 +18,7 @@ end
 -- @libtbl os_library
 SF.RegisterLibrary("os")
 
---- Lua os library https://wiki.garrysmod.com/page/Category:debug
+--- Lua debug library https://wiki.garrysmod.com/page/Category:debug
 -- @name debug
 -- @class library
 -- @libtbl debug_library
