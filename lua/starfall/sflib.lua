@@ -634,8 +634,13 @@ function SF.Require(moduleName)
 	return false
 end
 
--- Alias in case we need to patch a compilation bug or something.
-SF.CompileString = CompileString
+--- Compile String but fix a compile error.
+function SF.CompileString(script, identifier, handle_error)
+	if script:match("repeat%s.*continue[;%s].*[%);%s\"']until[(%s\"']") then
+		return "Using 'continue' in a repeat-until loop has been banned due to a glua bug."
+	end
+	return CompileString(script, identifier, handle_error)
+end
 
 --- The safest write file function
 function SF.FileWrite(path, data)
