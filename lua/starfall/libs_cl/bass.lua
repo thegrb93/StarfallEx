@@ -136,30 +136,23 @@ end
 
 --------------------------------------------------
 
---- Removes the sound from the game so new one can be created if limit is reached
-function bass_methods:destroy()
-	local snd = getsnd(self)
-	if sounds[snd] then
-		deleteSound(instance.player, snd)
-		sounds[snd] = nil
-		local sensitive2sf, sf2sensitive = bass_meta.sensitive2sf, bass_meta.sf2sensitive
-		sensitive2sf[snd] = nil
-		sf2sensitive[self] = nil
-		debug.setmetatable(self, nil)
-	else
-		SF.Throw("Tried to destroy invalid sound", 2)
-	end
-end
-
 --- Starts to play the sound.
 function bass_methods:play()
 	getsnd(self):Play()
 end
 
---- Stops playing the sound.
+--- Stops playing the sound and destroys it. Use pause instead if you don't want it destroyed
 function bass_methods:stop()
-	getsnd(self):Stop()
+	local snd = getsnd(self)
+	deleteSound(instance.player, snd)
+	sounds[snd] = nil
+
+	-- This makes the sound no longer unwrap
+	local sensitive2sf, sf2sensitive = bass_meta.sensitive2sf, bass_meta.sf2sensitive
+	sensitive2sf[snd] = nil
+	sf2sensitive[self] = nil
 end
+bass_methods.destroy = bass_methods.stop
 
 --- Pauses the sound.
 function bass_methods:pause()
