@@ -637,8 +637,8 @@ end
 --- Compile String but fix a compile error.
 function SF.CompileString(script, identifier, handle_error)
 	if
-		script:match("[^%w%d_]repeat[^%w%d_].*[^%w%d_]continue[^%w%d_].*[^%w%d_]until[^%w%d_]")
-		or script:match("[^%w%d_]repeat[^%w%d_]+continue[^%w%d_]+until[^%w%d_]")
+		script:match("repeat[^%w%d_].*[^%w%d_]continue[^%w%d_].*[^%w%d_]until[^%w%d_]")
+		or script:match("repeat[^%w%d_]+continue[^%w%d_]+until[^%w%d_]")
 	then
 		return "Using 'continue' in a repeat-until loop has been banned due to a glua bug."
 	end
