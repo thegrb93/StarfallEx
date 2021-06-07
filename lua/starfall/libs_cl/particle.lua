@@ -256,7 +256,7 @@ end
 -- @param Color col Color to set to
 function particle_methods:setColor(col)
 	col = cunwrap(col)
-	punwrap(self):SetColor(col[1], col[2], col[3])
+	punwrap(self):SetColor(col.r, col.g, col.b)
 end
 
 --- Sets whether the particle should be affected by lighting.
