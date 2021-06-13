@@ -288,6 +288,10 @@ local function scan(src, realm)
 			end
 		end
 	end
+	if parsing then
+		local lineN = lines()
+		process(parsing, "", lineN)
+	end
 end
 
 local function realm(filename)
