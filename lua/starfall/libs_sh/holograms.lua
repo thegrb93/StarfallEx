@@ -30,10 +30,12 @@ if CLIENT then
 	registerprivilege("hologram.setParent", "Set Parent", "Allows the user to parent a hologram", { entities = {} })
 
 	local function parentChildren(ent)
-		for child, attachment in pairs(ent.sf_children) do
+		for child, data in pairs(ent.sf_children) do
 			if child and child:IsValid() then
-				child:SetParent(ent, attachment)
-				
+				child:SetParent(ent, data[1])
+				child:SetPos(ent:LocalToWorld(data[2]))
+				child:SetAngles(ent:LocalToWorldAngles(data[3]))
+
 				if child.sf_children then
 					return parentChildren(child)
 				end
@@ -340,7 +342,7 @@ else
 				holo.sf_parent.sf_children[holo] = nil
 			end
 
-			parent.sf_children[holo] = attachment
+			parent.sf_children[holo] = {attachment, parent:WorldToLocal(holo:GetPos()), parent:WorldToLocalAngles(holo:GetAngles())}
 			holo.sf_parent = parent
 
 			holo:SetParent(parent, attachment)
