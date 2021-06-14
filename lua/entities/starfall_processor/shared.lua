@@ -63,6 +63,10 @@ function ENT:Compile()
 				self:TriggerInput(k, v.Value)
 			end
 		end
+	else
+		net.Start("starfall_processor_clinit")
+		net.WriteEntity(self)
+		net.SendToServer()
 	end
 
 	for k, v in ipairs(ents.FindByClass("starfall_screen")) do
