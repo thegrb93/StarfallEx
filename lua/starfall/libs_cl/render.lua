@@ -1423,6 +1423,7 @@ end
 -- @param boolean? outline Enable outline? Default false
 -- @param boolean? blur Enable blur? Default false
 -- @param boolean? extended Allows the font to display glyphs outside of Latin-1 range. Unicode code points above 0xFFFF are not supported. Required to use FontAwesome
+-- @return string The font name that can be used with the rest of the font functions.
 -- Base font can be one of (keep in mind that these may not exist on all clients if they are not shipped with starfall):
 -- \- Akbar
 -- \- Coolvetica

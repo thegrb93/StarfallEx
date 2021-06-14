@@ -95,9 +95,9 @@ function convar_library.getFlags(name)
 end
 
 --- Returns true if a given FCVAR flag is set for this ConVar.
--- https://wiki.facepunch.com/gmod/Enums/FCVAR
 -- @param string name Name of the ConVar
--- @return boolean True if has the flag
+-- @param number flag Convar Flag, see https://wiki.facepunch.com/gmod/Enums/FCVAR
+-- @return boolean Whether the flag is set
 function convar_library.hasFlag(name, flag)
 	checkluatype(flag, TYPE_NUMBER)
 	return getValidConVar(name):IsFlagSet(flag)
