@@ -136,6 +136,14 @@ else
 		return util.IsSkyboxVisibleFromPoint(vunwrap(position))
 	end
 
+	--- Returns the server's frame time and standard deviation
+	-- @name game_library.serverFrameTime
+	-- @client
+	-- @class function
+	-- @return number Server frametime
+	-- @return number Server frametime standard deviation
+	game_library.serverFrameTime = engine.ServerFrameTime
+
 end
 
 end
