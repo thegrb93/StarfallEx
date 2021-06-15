@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import SideBar from './Components/Sidebar';
 import Page from './Components/Page';
-import { HashRouter, useParams, useRouteMatch } from 'react-router-dom';
+import { HashRouter, useRouteMatch } from 'react-router-dom';
 
 
 function AppBody(props)

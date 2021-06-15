@@ -1,18 +1,18 @@
 import React from 'react';
 
 const GENERIC_LUA_TYPES = {
-    ["boolean"] : true,
-    ["number"] : true,
-    ["string"] : true,
-    ["table"] : true,
-    ["function"] : true,
-    ["thread"] : true,
+    "boolean" : true,
+    "number" : true,
+    "string" : true,
+    "table" : true,
+    "function" : true,
+    "thread" : true,
 
-    ["..."] : true,
+    "..." : true,
 
-    ["any"] : true,
+    "any" : true,
 
-    ["nil"] : true
+    "nil" : true
 }
 
 // If no type is defined, insert this html. Just "any or nil".
@@ -50,8 +50,8 @@ function getTypeHTML(type) {
 function getElementsFromSingleType(single_type, disallow_nullable) {
     if(GENERIC_LUA_TYPES[single_type] != null) return getTypeHTML(single_type);
     let out = [];
-    let _, vararg, type, nullable;
-    [_, vararg, type, nullable] = single_type.match(/(\.{3})?(\w+)(\?)?/);
+    let vararg, type, nullable;
+    [, vararg, type, nullable] = single_type.match(/(\.{3})?(\w+)(\?)?/);
 
     if (vararg != null) out.push(vararg);
     out.push( getTypeHTML(type) );
@@ -71,7 +71,7 @@ export default function getElementsFromType(full_type) {
         types.forEach( (type, ind) => {
             // Don't allow the '?' for nullable types inside of multi-types. (Assume they did '<type>|<type2>|nil')
             out.push( getElementsFromSingleType(type, true) );
-            if (ind != types.length-1) out.push(' or ');
+            if (ind !== types.length-1) out.push(' or ');
         });
         return out;
     }else {

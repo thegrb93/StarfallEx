@@ -1,5 +1,3 @@
-import React from 'react';
-
 // Returns a link to the github's starfall source code so that the
 // local url given can be used.
 // You get 'properties' from the cards initial args/
