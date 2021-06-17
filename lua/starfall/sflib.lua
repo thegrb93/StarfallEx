@@ -1365,6 +1365,11 @@ end
 
 
 do
+	local function checkregex(data, pattern)
+		local n = 0 for i in string.gmatch(string.gsub(pattern, "%%.", ""), "[%+%-%*]") do n = n + 1 end
+		if n~=0 and not (n==1 and #data<15000) and not (n==2 and #data<900) then SF.Throw("Regex is too complex!", 3) end
+	end
+
 	local checkluatype = SF.CheckLuaType
 	local string_library = {}
 	string_library.byte = string.byte
@@ -1373,7 +1378,6 @@ do
 	string_library.dump = string.dump
 	string_library.endsWith = string.EndsWith string_library.EndsWith = string.EndsWith
 	string_library.explode = string.Explode string_library.Explode = string.Explode
-	string_library.find = string.find
 	function string_library.format(s, ...)
 		checkluatype(s, TYPE_STRING)
 		for i=1, select("#",...) do
@@ -1386,9 +1390,33 @@ do
 	string_library.getExtensionFromFilename = string.GetExtensionFromFilename string_library.GetExtensionFromFilename = string.GetExtensionFromFilename
 	string_library.getFileFromFilename = string.GetFileFromFilename string_library.GetFileFromFilename = string.GetFileFromFilename
 	string_library.getPathFromFilename = string.GetPathFromFilename string_library.GetPathFromFilename = string.GetPathFromFilename
-	string_library.gfind = string.gfind
-	string_library.gmatch = string.gmatch
-	string_library.gsub = string.gsub
+	function string_library.find(data, pattern, start, noPatterns)
+		if not noPatterns then
+			checkluatype(data, TYPE_STRING)
+			checkluatype(pattern, TYPE_STRING)
+			checkregex(data, pattern)
+		end
+		return string.find(data, pattern, start, noPatterns)
+	end
+	function string_library.match(data, pattern)
+		checkluatype(data, TYPE_STRING)
+		checkluatype(pattern, TYPE_STRING)
+		checkregex(data, pattern)
+		return string.match(data, pattern)
+	end
+	function string_library.gmatch(data, pattern)
+		checkluatype(data, TYPE_STRING)
+		checkluatype(pattern, TYPE_STRING)
+		checkregex(data, pattern)
+		return string.gmatch(data, pattern)
+	end
+	string_library.gfind = string_library.gmatch
+	function string_library.gsub(data, pattern, replacement, max)
+		checkluatype(data, TYPE_STRING)
+		checkluatype(pattern, TYPE_STRING)
+		checkregex(data, pattern)
+		return string.gsub(data, pattern, replacement, max)
+	end
 	string_library.implode = string.Implode string_library.Implode = string.Implode
 	local function javascriptSafe(str)
 		checkluatype(str, TYPE_STRING)
@@ -1398,7 +1426,6 @@ do
 	string_library.left = string.Left string_library.Left = string.Left
 	string_library.len = string.len
 	string_library.lower = string.lower
-	string_library.match = string.match
 	string_library.niceSize = string.NiceSize string_library.NiceSize = string.NiceSize
 	string_library.niceTime = string.NiceTime string_library.NiceTime = string.NiceTime
 	local function patternSafe(str)
