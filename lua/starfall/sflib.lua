@@ -1366,8 +1366,16 @@ end
 
 do
 	local function checkregex(data, pattern)
+		local limits = {15000, 500, 150, 70, 40} -- Worst case is about 200ms
 		local n = 0 for i in string.gmatch(string.gsub(pattern, "%%.", ""), "[%+%-%*]") do n = n + 1 end
-		if n~=0 and not (n==1 and #data<15000) and not (n==2 and #data<900) then SF.Throw("Regex is too complex!", 3) end
+		local msg
+		if n==0 then
+		elseif n<=#limits then
+			if #data>limits[n] then msg = n.." ext search length too long ("..limits[n].." max)" end
+		else
+			msg = "too many extenders"
+		end
+		if msg then SF.Throw("Regex is too complex! " .. msg, 3) end
 	end
 
 	local checkluatype = SF.CheckLuaType
