@@ -1377,7 +1377,6 @@ do
 	string_library.comma = string.Comma string_library.Comma = string.Comma
 	string_library.dump = string.dump
 	string_library.endsWith = string.EndsWith string_library.EndsWith = string.EndsWith
-	string_library.explode = string.Explode string_library.Explode = string.Explode
 	function string_library.format(s, ...)
 		checkluatype(s, TYPE_STRING)
 		for i=1, select("#",...) do
@@ -1390,6 +1389,15 @@ do
 	string_library.getExtensionFromFilename = string.GetExtensionFromFilename string_library.GetExtensionFromFilename = string.GetExtensionFromFilename
 	string_library.getFileFromFilename = string.GetFileFromFilename string_library.GetFileFromFilename = string.GetFileFromFilename
 	string_library.getPathFromFilename = string.GetPathFromFilename string_library.GetPathFromFilename = string.GetPathFromFilename
+	function string_library.explode(pattern, data, withpattern)
+		if withpattern then
+			checkluatype(data, TYPE_STRING)
+			checkluatype(pattern, TYPE_STRING)
+			checkregex(data, pattern)
+		end
+		return string.Explode(pattern, data, withpattern)
+	end
+	string_library.Explode = string_library.explode
 	function string_library.find(data, pattern, start, noPatterns)
 		if not noPatterns then
 			checkluatype(data, TYPE_STRING)
@@ -1422,6 +1430,7 @@ do
 		checkluatype(str, TYPE_STRING)
 		return string.JavascriptSafe(str)
 	end
+	string_library.replace = string.Replace string_library.Replace = string.Replace
 	string_library.javascriptSafe = javascriptSafe string_library.JavascriptSafe = javascriptSafe
 	string_library.left = string.Left string_library.Left = string.Left
 	string_library.len = string.len
@@ -1433,7 +1442,6 @@ do
 		return string.PatternSafe(str)
 	end
 	string_library.patternSafe = patternSafe string_library.PatternSafe = patternSafe
-	string_library.replace = string.Replace string_library.Replace = string.Replace
 	string_library.reverse = string.reverse
 	string_library.right = string.Right string_library.Right = string.Right
 	string_library.setChar = string.SetChar string_library.SetChar = string.SetChar
