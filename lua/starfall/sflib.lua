@@ -1369,13 +1369,13 @@ do
 		local limits = {15000, 500, 150, 70, 40} -- Worst case is about 200ms
 		local n = 0 for i in string.gmatch(string.gsub(pattern, "%%.", ""), "[%+%-%*]") do n = n + 1 end
 		local msg
-		if n==0 then
+		if n==0 then return
 		elseif n<=#limits then
-			if #data>limits[n] then msg = n.." ext search length too long ("..limits[n].." max)" end
+			if #data>limits[n] then msg = n.." ext search length too long ("..limits[n].." max)" else return end
 		else
 			msg = "too many extenders"
 		end
-		if msg then SF.Throw("Regex is too complex! " .. msg, 3) end
+		SF.Throw("Regex is too complex! " .. msg, 3)
 	end
 
 	local checkluatype = SF.CheckLuaType
