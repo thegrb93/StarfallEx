@@ -1371,7 +1371,7 @@ do
 		local n = 0 for i in string.gmatch(stripped, "[%+%-%*]") do n = n + 1 end
 		local msg
 		if n<=#limits then
-			if #data*(#pattern - nrepl)>limits[n] then msg = n.." ext search length too long ("..limits[n].." max)" else return end
+			if #data*(#pattern - nrepl - n)>limits[n] then msg = n.." ext search length too long ("..limits[n].." max)" else return end
 		else
 			msg = "too many extenders"
 		end
