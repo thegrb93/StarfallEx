@@ -1366,12 +1366,12 @@ end
 
 do
 	local function checkregex(data, pattern)
-		local limits = {15000, 500, 150, 70, 40} -- Worst case is about 200ms
-		local n = 0 for i in string.gmatch(string.gsub(pattern, "%%.", ""), "[%+%-%*]") do n = n + 1 end
+		local limits = {[0] = 50000000, 15000, 500, 150, 70, 40} -- Worst case is about 200ms
+		local stripped, nrepl = string.gsub(pattern, "%%.", "")
+		local n = 0 for i in string.gmatch(stripped, "[%+%-%*]") do n = n + 1 end
 		local msg
-		if n==0 then return
-		elseif n<=#limits then
-			if #data>limits[n] then msg = n.." ext search length too long ("..limits[n].." max)" else return end
+		if n<=#limits then
+			if #data*(#pattern - nrepl)>limits[n] then msg = n.." ext search length too long ("..limits[n].." max)" else return end
 		else
 			msg = "too many extenders"
 		end
