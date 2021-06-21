@@ -200,7 +200,7 @@ end
 
 --- Sets the current playback time of the sound channel. Requires the 'noblock' flag
 -- @param number time Sound channel playback time in seconds.
--- @param boolean dontDecode Skip decoding to set time, and instead just seek to it which is faster. Certain streams do not support seeking and have to decode to the given position.
+-- @param boolean? dontDecode Skip decoding to set time, and instead just seek to it which is faster. Certain streams do not support seeking and have to decode to the given position.
 function bass_methods:setTime(time, dontDecode)
 	checkluatype(time, TYPE_NUMBER)
 	getsnd(self):SetTime(time, dontDecode)
