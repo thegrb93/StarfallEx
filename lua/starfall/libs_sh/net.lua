@@ -214,7 +214,7 @@ function net_library.readData(n)
 	return net.ReadData(n)
 end
 
---- Streams a large 20MB string.
+--- Streams up to 64MB strings. Anything over 20MB with compression enabled will throw cpu quota
 -- @shared
 -- @param string str The string to be written
 -- @param boolean? compress Compress the data. True by default
