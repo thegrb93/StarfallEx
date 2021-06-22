@@ -222,7 +222,7 @@ function net_library.writeStream(str, compress)
 	if not netStarted then SF.Throw("net message not started", 2) end
 
 	checkluatype (str, TYPE_STRING)
-	write(net.WriteStream, 8*8, str, nil, Either(compress == nil, false, not compress))
+	write(net.WriteStream, 8*8, str, nil, compress == false)
 	return true
 end
 
