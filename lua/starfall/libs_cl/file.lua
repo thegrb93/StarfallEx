@@ -197,6 +197,20 @@ function file_library.read(path)
 	return file.Read("sf_filedata/" .. SF.NormalizePath(path), "DATA")
 end
 
+--- Reads a file asynchronously
+-- @param string path Filepath relative to data/sf_filedata/.
+-- @param function callback A callback function for when the read operation finishes. It has 3 arguments: `filename` string, `status` number and `data` string
+-- @param boolean? sync Read synchronously
+-- @return number FSASYNC status
+function file_library.asyncRead(path, callback, sync)
+	checkpermission (instance, path, "file.read")
+	checkluatype (path, TYPE_STRING)
+	checkluatype (callback, TYPE_FUNCTION)
+	return file.AsyncRead("sf_filedata/" .. SF.NormalizePath(path), "DATA", function(_, _, status, data)
+		instance:runFunction(callback, path, status, data)
+	end, sync or false --[[Doesn't accept nil]])
+end
+
 
 local allowedExtensions = {["txt"]=true,["dat"]=true,["json"]=true,["xml"]=true,["csv"]=true,["jpg"]=true,["jpeg"]=true,["png"]=true,["vtf"]=true,["vmt"]=true,["mp3"]=true,["wav"]=true,["ogg"]=true}
 local function checkExtension(filename)
@@ -231,6 +245,24 @@ function file_library.readTemp(filename)
 	filename = string.lower(string.GetFileFromFilename(filename))
 
 	return file.Read("sf_filedatatemp/"..instance.player:SteamID64().."/"..filename, "DATA")
+end
+
+--- Reads a temp file's data asynchronously
+-- @param string filename The temp file name. Must be only a file and not a path
+-- @param function callback A callback function for when the read operation finishes. Its 3 arguments are: `filename` string, `status` number and `data` string
+-- @param boolean? sync Read synchronously
+-- @return number FSASYNC status
+function file_library.asyncReadTemp(filename, callback, sync)
+	checkluatype (filename, TYPE_STRING)
+	checkluatype (callback, TYPE_FUNCTION)
+
+	if #filename > 128 then SF.Throw("Filename is too long!", 2) end
+	checkExtension(filename)
+	filename = string.lower(string.GetFileFromFilename(filename))
+
+	return file.AsyncRead("sf_filedatatemp/"..instance.player:SteamID64().."/"..filename, "DATA", function(_, _, status, data)
+		instance:runFunction(callback, filename, status, data)
+	end, sync or false --[[Doesn't accept nil]])
 end
 
 --- Writes a temporary file. Throws an error if it is unable to.
