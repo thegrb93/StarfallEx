@@ -601,7 +601,7 @@ end
 -- @param number startX X start coordinate of the scissor rect.
 -- @param number startY Y start coordinate of the scissor rect.
 -- @param number endX X end coordinate of the scissor rect.
--- @param number endX Y end coordinate of the scissor rect.
+-- @param number endY Y end coordinate of the scissor rect.
 function render_library.enableScissorRect(startX, startY, endX, endY)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype (startX, TYPE_NUMBER)
