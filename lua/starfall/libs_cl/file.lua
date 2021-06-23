@@ -250,26 +250,6 @@ function file_library.readTemp(filename)
 	return file.Read("sf_filedatatemp/"..instance.player:SteamID64().."/"..filename, "DATA")
 end
 
---- Reads a temp file's data asynchronously. Can only read 'sf_file_asyncmax' files at a time
--- @param string filename The temp file name. Must be only a file and not a path
--- @param function callback A callback function for when the read operation finishes. Its 3 arguments are: `filename` string, `status` number and `data` string
-function file_library.asyncReadTemp(filename, callback)
-	checkluatype (filename, TYPE_STRING)
-	checkluatype (callback, TYPE_FUNCTION)
-
-	if #filename > 128 then SF.Throw("Filename is too long!", 2) end
-	checkExtension(filename)
-	filename = string.lower(string.GetFileFromFilename(filename))
-
-	if concurrentreads == cv_max_concurrent_reads:GetInt() then SF.Throw("Reading too many files asynchronously!", 2) end
-	concurrentreads = concurrentreads + 1
-
-	file.AsyncRead("sf_filedatatemp/"..instance.player:SteamID64().."/"..filename, "DATA", function(_, _, status, data)
-		concurrentreads = concurrentreads - 1
-		instance:runFunction(callback, filename, status, data)
-	end)
-end
-
 --- Writes a temporary file. Throws an error if it is unable to.
 -- @param string filename The name to give the file. Must be only a file and not a path
 -- @param string data The data to write
