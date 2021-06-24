@@ -1016,23 +1016,17 @@ function SF.NormalizePath(path)
 	local null = string.find(path, "\x00", 1, true)
 	if null then path = string.sub(path, 1, null-1) end
 
-	local tbl = string.Explode("[/\\]+", path, true)
-	if #tbl == 1 then return path end
-	local i = 1
-	while i <= #tbl do
-		if tbl[i] == "." or tbl[i]=="" then
-			table.remove(tbl, i)
-		elseif tbl[i] == ".." then
-			table.remove(tbl, i)
-			if i>1 then
-				i = i - 1
-				table.remove(tbl, i)
+	local pathtbl = {}
+	for s in string.gmatch(path, "[^/\\]+") do
+		if s ~= "." and s~="" then
+			if s == ".." then
+				pathtbl[#pathtbl] = nil
+			else
+				pathtbl[#pathtbl + 1] = s
 			end
-		else
-			i = i + 1
 		end
 	end
-	return table.concat(tbl, "/")
+	return table.concat(pathtbl, "/")
 end
 
 -- This function clamps the position before moving the entity
