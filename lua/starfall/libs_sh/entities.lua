@@ -1101,6 +1101,14 @@ function ents_methods:getSequence()
 	return getent(self):GetSequence()
 end
 
+--- Gets the name of a sequence
+-- @param number id The id of the animation
+-- @return string The sequence name
+function ents_methods:getSequenceName(id)
+	checkluatype(id, TYPE_NUMBER)
+	return getent(self):GetSequenceName(id)
+end
+
 --- Get the length of an animation
 -- @param number? id (Optional) The id of the sequence, or will default to the currently playing sequence
 -- @return number Length of the animation in seconds
