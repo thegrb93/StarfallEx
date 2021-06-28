@@ -155,9 +155,9 @@ cvars.AddChangeCallback( "sf_render_maxusermaterials", function()
 end)
 
 local blacklisted_keys = {
-	["$flags2"] = true
-	["$frame"] = true
-	["$frame2"] = true
+	["$flags2"] = true,
+	["$frame"] = true,
+	["$frame2"] = true,
 }
 local function checkkey(key)
 	checkluatype(key, TYPE_STRING, 2)
