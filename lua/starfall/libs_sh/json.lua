@@ -9,9 +9,6 @@ SF.RegisterLibrary("json")
 
 
 return function(instance)
--- Currently owner only due to a crashing bug. https://github.com/Facepunch/garrysmod-issues/issues/4976
-if not (CLIENT and instance.player==LocalPlayer()) then return end
-
 local json_library = instance.Libraries.json
 
 --- Convert table to JSON string
