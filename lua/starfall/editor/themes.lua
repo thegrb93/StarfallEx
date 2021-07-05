@@ -1,5 +1,5 @@
 --[[
-    All code related to editor themes.
+	All code related to editor themes.
 ]]
 
 SF.Editor.Themes = { }
@@ -22,7 +22,7 @@ local function debugPrint(...)
 end
 
 function SF.Editor.Themes.Load()
-    if not file.Exists("sf_themes.txt", "DATA") then
+	if not file.Exists("sf_themes.txt", "DATA") then
 		SF.Editor.Themes.SwitchTheme("default")
 		return
 	end
@@ -61,7 +61,7 @@ end
 
 function SF.Editor.Themes.AddTheme(name, tbl)
 	tbl.Version = themeformat_version
-    SF.Editor.Themes.Themes[name] = tbl
+	SF.Editor.Themes.Themes[name] = tbl
 
 	if name ~= "default" then
 		SF.Editor.Themes.Save()
@@ -74,7 +74,7 @@ function SF.Editor.Themes.RemoveTheme(name)
 		return
 	end
 
-    if SF.Editor.Themes.ThemeConVar:GetString() == name then
+	if SF.Editor.Themes.ThemeConVar:GetString() == name then
 		SF.Editor.Themes.SwitchTheme("default")
 	end
 
@@ -85,12 +85,12 @@ end
 
 function SF.Editor.Themes.SwitchTheme(name)
 
-    local theme = SF.Editor.Themes.Themes[name]
+	local theme = SF.Editor.Themes.Themes[name]
 
-    if not theme then
-       print("No such theme " .. name)
-       return
-    end
+	if not theme then
+	   print("No such theme " .. name)
+	   return
+	end
 	if theme.Version ~= themeformat_version then
 		SF.Editor.Themes.SwitchTheme("default")
 		print("Theme "..name.." isnt compatibile with this starfall version, you have to reimport it!")
@@ -102,7 +102,7 @@ function SF.Editor.Themes.SwitchTheme(name)
 		end
 	end
 
-    SF.Editor.Themes.CurrentTheme = theme
+	SF.Editor.Themes.CurrentTheme = theme
 	SF.Editor.Themes.ThemeConVar:SetString(name)
 	if SF.Editor.editor then
 		SF.Editor.editor:OnThemeChange(theme)
@@ -111,63 +111,63 @@ end
 
 local function parseTextMate(text)
 	local xml = SF.Editor.Themes.CreateXMLParser()
-    xml:parse(text:Trim())
+	xml:parse(text:Trim())
 
 	if not xml._handler.root.children then
 		error("No XML tags found.")
 	end
 
-    local plist = xml._handler.root.children[1]
+	local plist = xml._handler.root.children[1]
 
-    -- Parse dict
+	-- Parse dict
 
-    local function parseDict(dict)
-        if not dict.children then return { } end
+	local function parseDict(dict)
+		if not dict.children then return { } end
 
-        local tbl = { }
+		local tbl = { }
 
-        for i = 1, #dict.children, 2 do
-            local value = dict.children[i + 1]
+		for i = 1, #dict.children, 2 do
+			local value = dict.children[i + 1]
 
-            if value.name == "string" then
-                tbl[dict.children[i].value] = value.value
-            elseif value.name == "dict" then
-                tbl[dict.children[i].value] = parseDict(value)
-            elseif value.name == "array" then
-                tbl[dict.children[i].value] = { }
+			if value.name == "string" then
+				tbl[dict.children[i].value] = value.value
+			elseif value.name == "dict" then
+				tbl[dict.children[i].value] = parseDict(value)
+			elseif value.name == "array" then
+				tbl[dict.children[i].value] = { }
 
-                for k, v in pairs(value.children) do
-                    tbl[dict.children[i].value][#tbl[dict.children[i].value] + 1] = parseDict(v)
-                end
-            end
-        end
+				for k, v in pairs(value.children) do
+					tbl[dict.children[i].value][#tbl[dict.children[i].value] + 1] = parseDict(v)
+				end
+			end
+		end
 
-        return tbl
-    end
+		return tbl
+	end
 
 
-    local parsed = parseDict(plist.children[1])
+	local parsed = parseDict(plist.children[1])
 
-    local tbl = { }
+	local tbl = { }
 
 	-- Editor values
 
-    tbl.Name = parsed.name or "No name"
+	tbl.Name = parsed.name or "No name"
 
-    local function parseColor(hex)
+	local function parseColor(hex)
 		if not hex then return end -- In case there is no color just return nil
-        return Color(tonumber("0x" .. hex:sub(2, 3)),
-            tonumber("0x" .. hex:sub(4, 5)),
-            tonumber("0x" .. hex:sub(6, 7)),
-            #hex >= 9 and tonumber("0x" .. hex:sub(8, 9)))
-    end
+		return Color(tonumber("0x" .. hex:sub(2, 3)),
+			tonumber("0x" .. hex:sub(4, 5)),
+			tonumber("0x" .. hex:sub(6, 7)),
+			#hex >= 9 and tonumber("0x" .. hex:sub(8, 9)))
+	end
 
-    tbl.background = parseColor(parsed.settings[1].settings.background)
-    tbl.line_highlight = parseColor(parsed.settings[1].settings.lineHighlight)
-    tbl.caret = parseColor(parsed.settings[1].settings.caret)
-    tbl.selection = parseColor(parsed.settings[1].settings.selection)
-    tbl.notfound = { parseColor(parsed.settings[1].settings.foreground), nil, 0 }
-    tbl.operator = { parseColor(parsed.settings[1].settings.foreground), nil, 0 }
+	tbl.background = parseColor(parsed.settings[1].settings.background)
+	tbl.line_highlight = parseColor(parsed.settings[1].settings.lineHighlight)
+	tbl.caret = parseColor(parsed.settings[1].settings.caret)
+	tbl.selection = parseColor(parsed.settings[1].settings.selection)
+	tbl.notfound = { parseColor(parsed.settings[1].settings.foreground), nil, 0 }
+	tbl.operator = { parseColor(parsed.settings[1].settings.foreground), nil, 0 }
 
 	-- Gutter settings
 
@@ -202,7 +202,8 @@ local function parseTextMate(text)
 	end
 	map = newmap
 
-    for k, v in pairs(parsed.settings) do
+	PrintTable(parsed.settings)
+	for k, v in pairs(parsed.settings) do
 		local foreground, background, fontStyle = parseColor(v.settings.foreground), parseColor(v.settings.background), v.settings.fontStyle
 		fontStyle = fontStyle or "normal"
 
@@ -222,7 +223,7 @@ local function parseTextMate(text)
 				debugPrint("[TextMate Import] Ignored setting:%q", name)
 			end
 		end
-    end
+	end
 
 	tbl.operator = tbl.operator or tbl.keyword
 
@@ -230,7 +231,7 @@ local function parseTextMate(text)
 
 	local strId = tbl.Name:Trim():Replace(" ", ""):lower()
 
-    return tbl, strId
+	return tbl, strId
 end
 
 --- Parses a TextMate XML theme file.
@@ -239,7 +240,7 @@ end
 -- @return Sanitized string identifier for the theme - a lowercase string without whitespace, nil if there was an error
 -- @return Parsing error string
 function SF.Editor.Themes.ParseTextMate(text)
-    local ok, themeTable, strId = pcall(parseTextMate, text)
+	local ok, themeTable, strId = pcall(parseTextMate, text)
 
 	if not ok then
 		return nil, nil, themeTable
@@ -249,22 +250,22 @@ function SF.Editor.Themes.ParseTextMate(text)
 end
 
 SF.Editor.Themes.AddTheme("default", {
-    Name = "Default Theme",
+	Name = "Default Theme",
 
 	["background"] = Color(39,40,34),
-    ["line_highlight"] = Color(39, 40, 34),
+	["line_highlight"] = Color(39, 40, 34),
 
 	["gutter_foreground"] = Color(143,144,138),
 	["gutter_background"] = Color(47,49,41),
 	["gutter_divider"] = Color(47,49,41),
 
-    ["caret"] = Color(240, 240, 240),
-    ["selection"] = Color(73, 72, 62),
+	["caret"] = Color(240, 240, 240),
+	["selection"] = Color(73, 72, 62),
 
 	["word_highlight"] = Color(30, 150, 30),
 
 	--{foreground color, background color, fontStyle}
-    ["keyword"] = { Color(249, 38, 114), nil, 0 },
+	["keyword"] = { Color(249, 38, 114), nil, 0 },
 	["storageType"] = { Color(249, 38, 114), nil, 0 },
 	["directive"] =	{ Color(230, 219, 116), nil, 0 },
 	["comment"] = { Color(117, 113, 94), nil, 1 },
