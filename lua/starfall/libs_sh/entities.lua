@@ -1062,6 +1062,14 @@ function ents_methods:localToWorld(data)
 	return vwrap(getent(self):LocalToWorld(vunwrap(data)))
 end
 
+--- Converts a direction vector in entity local space to world space
+-- @shared
+-- @param Vector data Local space vector direction
+-- @return Vector data as world space vector direction
+function ents_methods:localToWorldVector(data)
+	return vwrap(getent(self):GetPhysicsObject():LocalToWorldVector(vunwrap(data)))
+end
+
 --- Converts an angle in entity local space to world space
 -- @shared
 -- @param Angle data Local space angle
@@ -1076,6 +1084,14 @@ end
 -- @return Vector data as local space vector
 function ents_methods:worldToLocal(data)
 	return vwrap(getent(self):WorldToLocal(vunwrap(data)))
+end
+
+--- Converts a direction vector in world space to entity local space
+-- @shared
+-- @param Vector data World space direction vector
+-- @return Vector data as local space direction vector
+function ents_methods:worldToLocalVector(data)
+	return vwrap(getent(self):GetPhysicsObject():WorldToLocalVector(vunwrap(data)))
 end
 
 --- Converts an angle in world space to entity local space
