@@ -4,7 +4,7 @@ Starfall Scripting Environment
 
 #### Method 1
 
-`git -C "C:\path\to\Steam\steamapps\common\GarrysMod\garrysmod\addons" clone https://github.com/thegrb93/StarfallEx`
+`git clone https://github.com/thegrb93/StarfallEx "C:\path\to\Steam\steamapps\common\GarrysMod\garrysmod\addons\starfallex"`
 
 #### Method 2
 1. Download source code `Code > Download Zip`
