@@ -639,6 +639,27 @@ function bit_library.decompress(s)
 	return util.Decompress(s)
 end
 
+--- Generates the MD5 Checksum of the specified string.
+-- @name bit_library.md5
+-- @class function
+-- @param string s The string to calculate the checksum of.
+-- @return string The MD5 hex string of the checksum.
+bit_library.md5 = util.MD5
+
+--- Generates the SHA-256 Checksum of the specified string.
+-- @name bit_library.sha256
+-- @class function
+-- @param string s The string to calculate the checksum of.
+-- @return string The SHA-256 hex string of the checksum.
+bit_library.sha256 = util.SHA256
+
+--- Generates the SHA-1 Checksum of the specified string.
+-- @name bit_library.sha1
+-- @class function
+-- @param string s The string to calculate the checksum of.
+-- @return string The SHA-1 hex string of the checksum.
+bit_library.sha1 = util.SHA1
+
 instance.env.fastlz = {compress = bit_library.compress, decompress = bit_library.decompress}
 
 end
