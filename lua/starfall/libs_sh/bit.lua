@@ -8,6 +8,12 @@ local math_min = math.min
 local math_max = math.max
 local bit_rshift = bit.rshift
 
+local function checklength(s)
+	if #s > 1e7 then
+		SF.Throw("String is too long!")
+	end
+end
+
 --- StringStream type
 -- @name StringStream
 -- @class type
@@ -35,7 +41,7 @@ function SF.StringStream(stream, i, endian)
 		index = 1,
 		subindex = 1
 	}, ss_meta)
-	
+
 	if stream ~= nil then
 		checkluatype(stream, TYPE_STRING)
 		ret:write(stream)
@@ -45,7 +51,7 @@ function SF.StringStream(stream, i, endian)
 		checkluatype(endian, TYPE_STRING)
 		ret:setEndian(endian)
 	end
-	
+
 	return ret
 end
 
@@ -628,6 +634,7 @@ end
 -- @return string Compressed string
 function bit_library.compress(s)
 	checkluatype(s, TYPE_STRING)
+	checklength(s)
 	return util.Compress(s)
 end
 
@@ -636,29 +643,36 @@ end
 -- @return string Decompressed string or nil if the input was invalid
 function bit_library.decompress(s)
 	checkluatype(s, TYPE_STRING)
+	checklength(s)
 	return util.Decompress(s)
 end
 
 --- Generates the MD5 Checksum of the specified string.
--- @name bit_library.md5
--- @class function
 -- @param string s The string to calculate the checksum of.
 -- @return string The MD5 hex string of the checksum.
-bit_library.md5 = util.MD5
+function bit_library.md5(s)
+	checkluatype(s, TYPE_STRING)
+	checklength(s)
+	return util.MD5(s)
+end
 
 --- Generates the SHA-256 Checksum of the specified string.
--- @name bit_library.sha256
--- @class function
 -- @param string s The string to calculate the checksum of.
 -- @return string The SHA-256 hex string of the checksum.
-bit_library.sha256 = util.SHA256
+function bit_library.sha256(s)
+	checkluatype(s, TYPE_STRING)
+	checklength(s)
+	return util.SHA256(s)
+end
 
 --- Generates the SHA-1 Checksum of the specified string.
--- @name bit_library.sha1
--- @class function
 -- @param string s The string to calculate the checksum of.
 -- @return string The SHA-1 hex string of the checksum.
-bit_library.sha1 = util.SHA1
+function bit_library.sha1(s)
+	checkluatype(s, TYPE_STRING)
+	checklength(s)
+	return util.SHA1(s)
+end
 
 instance.env.fastlz = {compress = bit_library.compress, decompress = bit_library.decompress}
 
