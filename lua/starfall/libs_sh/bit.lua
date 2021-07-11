@@ -35,7 +35,7 @@ function SF.StringStream(stream, i, endian)
 		index = 1,
 		subindex = 1
 	}, ss_meta)
-	
+
 	if stream ~= nil then
 		checkluatype(stream, TYPE_STRING)
 		ret:write(stream)
@@ -45,7 +45,7 @@ function SF.StringStream(stream, i, endian)
 		checkluatype(endian, TYPE_STRING)
 		ret:setEndian(endian)
 	end
-	
+
 	return ret
 end
 
@@ -628,6 +628,7 @@ end
 -- @return string Compressed string
 function bit_library.compress(s)
 	checkluatype(s, TYPE_STRING)
+	if #s > 1e8 then SF.Throw("String is too long!") end
 	local ret = util.Compress(s)
 	instance:checkCpu()
 	return ret
@@ -638,11 +639,43 @@ end
 -- @return string Decompressed string or nil if the input was invalid
 function bit_library.decompress(s)
 	checkluatype(s, TYPE_STRING)
+	if #s > 1e8 then SF.Throw("String is too long!") end
 	local ret = util.Decompress(s)
 	instance:checkCpu()
 	return ret
 end
 
-instance.env.fastlz = {compress = bit_library.compress, decompress = bit_library.decompress}
+--- Generates the MD5 Checksum of the specified string.
+-- @param string s The string to calculate the checksum of.
+-- @return string The MD5 hex string of the checksum.
+function bit_library.md5(s)
+	checkluatype(s, TYPE_STRING)
+	if #s > 1e8 then SF.Throw("String is too long!") end
+	local ret = util.MD5(s)
+	instance:checkCpu()
+	return ret
+end
+
+--- Generates the SHA-256 Checksum of the specified string.
+-- @param string s The string to calculate the checksum of.
+-- @return string The SHA-256 hex string of the checksum.
+function bit_library.sha256(s)
+	checkluatype(s, TYPE_STRING)
+	if #s > 1e8 then SF.Throw("String is too long!") end
+	local ret = util.SHA256(s)
+	instance:checkCpu()
+	return ret
+end
+
+--- Generates the SHA-1 Checksum of the specified string.
+-- @param string s The string to calculate the checksum of.
+-- @return string The SHA-1 hex string of the checksum.
+function bit_library.sha1(s)
+	checkluatype(s, TYPE_STRING)
+	if #s > 1e8 then SF.Throw("String is too long!") end
+	local ret = util.SHA1(s)
+	instance:checkCpu()
+	return ret
+end
 
 end

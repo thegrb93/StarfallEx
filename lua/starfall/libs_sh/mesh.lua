@@ -735,6 +735,7 @@ if CLIENT then
 	local mesh_methods, mesh_meta, wrap, unwrap = instance.Types.Mesh.Methods, instance.Types.Mesh, instance.Types.Mesh.Wrap, instance.Types.Mesh.Unwrap
 	local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 	local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
+	local mwrap = instance.Types.VMatrix.Wrap
 
 	local vertexCheck = {
 		color = function(v) return dgetmeta(v) == col_meta end,
@@ -854,23 +855,26 @@ if CLIENT then
 		tri.weights = p.weights
 		return tri
 	end
+
 	--- Returns a table of visual meshes of given model or nil if the model is invalid
 	-- @param string model The full path to a model to get the visual meshes of.
 	-- @param number? lod The lod of the model to use. Default 0.
 	-- @param number? bodygroupMask The bodygroupMask of the model to use. Default 0.
 	-- @return table A table of tables with the following format:  string material - The material of the specific mesh table triangles - A table of MeshVertex structures ready to be fed into IMesh:BuildFromTriangles table verticies - A table of MeshVertex structures representing all the vertexes of the mesh. This table is used internally to generate the "triangles" table. Each MeshVertex structure returned also has an extra table of tables field called "weights" with the following data:  number boneID - The bone this vertex is attached to number weight - How "strong" this vertex is attached to the bone. A vertex can be attached to multiple bones at once.
+	-- @return table A table of tables with bone id keys with the following format:  number parent - The parent bone id Matrix matrix - pretransformed bone matrix
 	-- @client
 	function mesh_library.getModelMeshes(model, lod, bodygroupMask)
 		checkluatype(model, TYPE_STRING)
 		if lod~=nil then checkluatype(lod, TYPE_NUMBER) end
 		if bodygroupMask~=nil then checkluatype(bodygroupMask, TYPE_NUMBER) end
-		local mesh = util.GetModelMeshes( model, lod, bodygroupMask )
-		local output = {}
+
+		local mesh, bind_pose = util.GetModelMeshes( model, lod, bodygroupMask )
+		local out_mesh, out_bind = {}, {}
 		if mesh then
 			for k, v in ipairs(mesh) do
 				local triangles = {}
 				local verts = {}
-				output[k] = {triangles = triangles, material = v.material, verticies = verts}
+				out_mesh[k] = {triangles = triangles, material = v.material, verticies = verts}
 				for o, p in ipairs(v.triangles) do
 					triangles[o] = wrapVertex(p)
 				end
@@ -879,7 +883,13 @@ if CLIENT then
 				end
 			end
 		end
-		return output
+
+		if bind_pose then
+			for bone, v in pairs(bind_pose) do
+				out_bind[bone] = { parent = v.parent, matrix = mwrap(v.matrix) }
+			end
+		end
+		return out_mesh, out_bind
 	end
 
 	--- Returns how many triangles can be created
