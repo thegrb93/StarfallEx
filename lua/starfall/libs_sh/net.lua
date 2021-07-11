@@ -221,8 +221,8 @@ end
 -- @param boolean? compress Compress the data. True by default
 function net_library.writeStream(str, compress)
 	if not netStarted then SF.Throw("net message not started", 2) end
-
 	checkluatype (str, TYPE_STRING)
+	if #str > 64e6 then SF.Throw("String is too long!") end
 	write(net.WriteStream, 8*8, str, nil, compress == false)
 	return true
 end
