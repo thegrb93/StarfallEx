@@ -128,6 +128,7 @@ function net_library.send(target, unreliable)
 	netSize = 0
 	netData = {}
 	netStarted = false
+	instance:checkCpu()
 end
 
 --- Writes an object to a net message automatically typing it

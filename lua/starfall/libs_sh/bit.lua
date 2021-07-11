@@ -635,7 +635,9 @@ end
 function bit_library.compress(s)
 	checkluatype(s, TYPE_STRING)
 	checklength(s)
-	return util.Compress(s)
+	local ret = util.Compress(s)
+	instance:checkCpu()
+	return ret
 end
 
 --- Decompresses a string
@@ -644,7 +646,9 @@ end
 function bit_library.decompress(s)
 	checkluatype(s, TYPE_STRING)
 	checklength(s)
-	return util.Decompress(s)
+	local ret = util.Decompress(s)
+	instance:checkCpu()
+	return ret
 end
 
 --- Generates the MD5 Checksum of the specified string.

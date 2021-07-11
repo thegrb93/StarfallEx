@@ -12,7 +12,7 @@ if SERVER then
 	SF.cpuBufferN = CreateConVar("sf_timebuffersize", 100, FCVAR_ARCHIVE, "The window width of the CPU time quota moving average.")
 	SF.softLockProtection = CreateConVar("sf_timebuffersoftlock", 1, FCVAR_ARCHIVE, "Consumes more cpu, but protects from freezing the game. Only turn this off if you want to use a profiler on your scripts.")
 	SF.RamCap = CreateConVar("sf_ram_max", 1500000, FCVAR_ARCHIVE, "If ram exceeds this limit (in kB), starfalls will be terminated")
-	SF.AllowSuperUser = CreateConVar("sf_superuserallowed", 0, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Whether the starfall useruser feature is allowed")
+	SF.AllowSuperUser = CreateConVar("sf_superuserallowed", 0, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Whether the starfall superuser feature is allowed")
 else
 	SF.cpuQuota = CreateConVar("sf_timebuffer_cl", 0.006, FCVAR_ARCHIVE, "The max average the CPU time can reach.")
 	SF.cpuOwnerQuota = CreateConVar("sf_timebuffer_cl_owner", 0.015, FCVAR_ARCHIVE, "The max average the CPU time can reach for your own chips.")
@@ -20,7 +20,7 @@ else
 	SF.softLockProtection = CreateConVar("sf_timebuffersoftlock_cl", 1, FCVAR_ARCHIVE, "Consumes more cpu, but protects from freezing the game. Only turn this off if you want to use a profiler on your scripts.")
 	SF.softLockProtectionOwner = CreateConVar("sf_timebuffersoftlock_cl_owner", 1, FCVAR_ARCHIVE, "If sf_timebuffersoftlock_cl is 0, this enabled will make it only your own chips will be affected.")
 	SF.RamCap = CreateConVar("sf_ram_max_cl", 1500000, FCVAR_ARCHIVE, "If ram exceeds this limit (in kB), starfalls will be terminated")
-	SF.AllowSuperUser = CreateConVar("sf_superuserallowed", 0, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Whether the starfall useruser feature is allowed")
+	SF.AllowSuperUser = CreateConVar("sf_superuserallowed", 0, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Whether the starfall superuser feature is allowed")
 end
 
 SF.Instance = {}
@@ -447,6 +447,16 @@ local function safeThrow(self, msg, nocatch, force)
 	end
 end
 
+function SF.Instance:checkCpu()
+	self.cpu_total = SysTime() - self.start_time
+	local usedRatio = self:movingCPUAverage() / self.cpuQuota
+	if usedRatio>1 then
+		safeThrow(self, "CPU Quota exceeded.", true, true)
+	elseif usedRatio > self.cpu_softquota then
+		safeThrow(self, "CPU Quota warning.")
+	end
+end
+
 local function xpcall_callback(err)
 	if dgetmeta(err)~=SF.Errormeta then
 		return SF.MakeError(err, 1)
@@ -462,11 +472,14 @@ end
 -- @return True if ok
 -- @return A table of values that the hook returned
 function SF.Instance:runWithOps(func, ...)
-	if self.stackn == 128 then return {false, SF.MakeError("sf stack overflow", 1, true, true)} end
+	if self.stackn == 0 then
+		self.start_time = SysTime() - self.cpu_total
+	elseif self.stackn == 128 then
+		return {false, SF.MakeError("sf stack overflow", 1, true, true)}
+	end
 
-	local oldSysTime = SysTime() - self.cpu_total
-	local function cpuCheck()
-		self.cpu_total = SysTime() - oldSysTime
+	local function checkCpu()
+		self.cpu_total = SysTime() - self.start_time
 		local usedRatio = self:movingCPUAverage() / self.cpuQuota
 		if usedRatio>1 then
 			if usedRatio>1.5 then
@@ -483,7 +496,7 @@ function SF.Instance:runWithOps(func, ...)
 	local prev = SF.runningOps
 	SF.runningOps = true
 	SF.OnRunningOps(true)
-	dsethook(cpuCheck, "", 2000)
+	dsethook(checkCpu, "", 2000)
 	self.stackn = self.stackn + 1
 	local tbl = { xpcall(func, xpcall_callback, ...) }
 	self.stackn = self.stackn - 1
@@ -493,7 +506,7 @@ function SF.Instance:runWithOps(func, ...)
 
 	if tbl[1] then
 		--Do another cpu check in case the debug hook wasn't called
-		self.cpu_total = SysTime() - oldSysTime
+		self.cpu_total = SysTime() - self.start_time
 		local usedRatio = self:movingCPUAverage() / self.cpuQuota
 		if usedRatio>1 then
 			return {false, SF.MakeError("CPU Quota exceeded.", 1, true, true)}
