@@ -628,7 +628,9 @@ end
 -- @return string Compressed string
 function bit_library.compress(s)
 	checkluatype(s, TYPE_STRING)
-	return util.Compress(s)
+	local ret = util.Compress(s)
+	instance:checkCpu()
+	return ret
 end
 
 --- Decompresses a string
@@ -636,7 +638,9 @@ end
 -- @return string Decompressed string or nil if the input was invalid
 function bit_library.decompress(s)
 	checkluatype(s, TYPE_STRING)
-	return util.Decompress(s)
+	local ret = util.Decompress(s)
+	instance:checkCpu()
+	return ret
 end
 
 instance.env.fastlz = {compress = bit_library.compress, decompress = bit_library.decompress}
