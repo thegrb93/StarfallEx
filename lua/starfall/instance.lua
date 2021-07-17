@@ -115,11 +115,13 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 	local doNotRun = {}
 	local includesdata = instance.ppdata.includesdata
 	if includesdata then
-		for filename, datapath in pairs(includesdata) do
-			local codepath = SF.ChoosePath(datapath, string.GetPathFromFilename(filename), function(testpath)
-				return instance.source[testpath]
-			end)
-			if codepath then doNotRun[codepath] = true end
+		for filename, t in pairs(includesdata) do
+			for _, datapath in ipairs(t) do
+				local codepath = SF.ChoosePath(datapath, string.GetPathFromFilename(filename), function(testpath)
+					return instance.source[testpath]
+				end)
+				if codepath then doNotRun[codepath] = true end
+			end
 		end
 	end
 
