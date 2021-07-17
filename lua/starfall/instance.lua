@@ -633,7 +633,7 @@ local requireSentinel = {}
 function SF.Instance:require(path)
 	local loaded = self.requires
 	if loaded[path] == requireSentinel then
-		SF.Throw("Cyclic require loop detected!", 2)
+		SF.Throw("Cyclic require loop detected!", 3)
 	elseif loaded[path] then
 		return loaded[path]
 	else
