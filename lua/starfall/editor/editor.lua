@@ -219,7 +219,6 @@ if CLIENT then
 		permsPanel:Dock(FILL)
 	end
 
-
 	--- (Client) Builds a table for the compiler to use
 	-- @param mainfile Manual selection of which file should be main. Otherwise it's the open file
 	-- @return True if ok, false if a file was missing
@@ -237,61 +236,51 @@ if CLIENT then
 		local tbl = {}
 		tbl.mainfile = mainfile
 		tbl.files = {}
-		tbl.includes = {}
 
 		local ppdata = {}
 
-		local function findCodePath(path, curdir)
-			local codepath
-			if string.sub(path, 1, 1)~="/" then
-				codepath = SF.NormalizePath(curdir .. path)
-				if openfiles[codepath] or file.Exists("starfall/" .. codepath, "DATA") then return codepath end
-			end
-			codepath = SF.NormalizePath(path)
-			if openfiles[codepath] or file.Exists("starfall/" .. codepath, "DATA") then return codepath end
+		local function getInclude(path)
+			return openfiles[path] or file.Read("starfall/" .. path, "DATA") or error("Bad include: " .. path)
+		end
+		local function getIncludePath(path, curdir)
+			local path = SF.ChoosePath(path, curdir, function(testpath)
+				return openfiles[testpath] or file.Exists("starfall/" .. testpath, "DATA")
+			end) or error("Bad include: " .. path)
+			return path, string.GetPathFromFilename(path)
 		end
 
-		local function recursiveLoad(path, curdir)
-			local code, codedir, codepath
-
-			local codepath = findCodePath(path, curdir)
-			if not codepath then
-				error("Bad include: " .. path)
-			end
-
+		local function recursiveLoad(codepath, codedir, code, dontParse)
 			if tbl.files[codepath] then return end
-
-			code = openfiles[codepath] or file.Read("starfall/" .. codepath, "DATA")
-			if not code then
-				error("Bad include: " .. path)
-			end
-
-			codedir = string.GetPathFromFilename(codepath)
 			tbl.files[codepath] = code
 
-			local includesdata = ppdata.includesdata
-			if includesdata and includesdata[codepath] then
-				return
-			end
+			if dontParse then return end
 
 			SF.Preprocessor.ParseDirectives(codepath, code, ppdata)
 
 			local clientmain = ppdata.clientmain and ppdata.clientmain[codepath]
 			if clientmain then
-				ppdata.clientmain[codepath] = findCodePath(clientmain, curdir) or clientmain
+				clientmain = getIncludePath(clientmain, codedir)
+				if clientmain then ppdata.clientmain[codepath] = clientmain end
 			end
-			if ppdata.includes and ppdata.includes[codepath] then
-				local inc = ppdata.includes[codepath]
-				if not tbl.includes[codepath] then
-					tbl.includes[codepath] = inc
-				else
-					assert(tbl.includes[codepath] == inc)
-				end
 
-				for i = 1, #inc do
-					recursiveLoad(inc[i], codedir)
+			local dontParseTbl = {}
+			local dataincludes = ppdata.includesdata and ppdata.includesdata[codepath]
+			if dataincludes then
+				for k, v in ipairs(dataincludes) do
+					local datapath = getIncludePath(v, codedir)
+					if datapath then dontParseTbl[datapath] = true end
 				end
 			end
+
+			local includes = ppdata.includes and ppdata.includes[codepath]
+			if includes then
+				for k, v in ipairs(includes) do
+					local codepath, codedir = getIncludePath(v, codedir)
+					local code = getInclude(codepath)
+					recursiveLoad(codepath, codedir, code, dontParseTbl[codepath])
+				end
+			end
+
 			if ppdata.includedirs and ppdata.includedirs[codepath] then
 				local inc = ppdata.includedirs[codepath]
 
@@ -307,52 +296,22 @@ if CLIENT then
 						dir = SF.NormalizePath(origdir)
 						files = file.Find("starfall/" .. dir .. "/*", "DATA")
 					end
-					for j = 1, #files do
-						recursiveLoad(files[j], dir .. "/")
+					for k, v in ipairs(files) do
+						local codepath, codedir = getIncludePath(v, dir.."/")
+						local code = getInclude(codepath)
+						recursiveLoad(codepath, codedir, code, dontParseTbl[codepath])
 					end
 				end
 			end
 		end
-		local ok, msg = pcall(recursiveLoad, mainfile, string.GetPathFromFilename(mainfile))
+
+		local ok, msg = pcall(function()
+			local codepath, codedir = getIncludePath(mainfile, string.GetPathFromFilename(mainfile))
+			local code = getInclude(codepath)
+			recursiveLoad(codepath, codedir, code)
+		end)
 
 		if ok then
-			local function findCycle(file, visited, recStack)
-				if not visited[file] then
-					--Mark the current file as visited and part of recursion stack
-					visited[file] = true
-					recStack[file] = true
-
-					--Recurse for all the files included in this file
-					for k, v in pairs(ppdata.includes[file] or {}) do
-						if recStack[v] then
-							return true, file
-						elseif not visited[v] then
-							local cyclic, cyclicFile = findCycle(v, visited, recStack)
-							if cyclic then return true, cyclicFile end
-						end
-					end
-				end
-
-				--Remove this file from the recursion stack
-				recStack[file] = false
-				return false, nil
-			end
-
-			local isCyclic = false
-			local cyclicFile = nil
-			for k, v in pairs(ppdata.includes or {}) do
-				local cyclic, file = findCycle(k, {}, {})
-				if cyclic then
-					isCyclic = true
-					cyclicFile = file
-					break
-				end
-			end
-
-			if isCyclic then
-				err("Loop in includes from: " .. cyclicFile) return
-			end
-
 			local clientmain = ppdata.clientmain and ppdata.clientmain[tbl.mainfile]
 			if clientmain and not tbl.files[clientmain] then
 				err("Clientmain not found: " .. clientmain) return
@@ -360,7 +319,7 @@ if CLIENT then
 
 			success(tbl)
 		else
-			local _1, _2, file = string.find(msg, "(Bad include%: .*)")
+			local file = string.match(msg, "(Bad include%: .*)")
 			err(file or msg)
 		end
 	end

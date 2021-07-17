@@ -148,7 +148,10 @@ SF.Preprocessor.SetGlobalDirective("includedir", directive_includedir)
 
 SF.Preprocessor.SetGlobalDirective("includedata", function(args, filename, data)
 	if not data.includesdata then data.includesdata = {} end
-	data.includesdata[string.Trim(args)] = true
+	if not data.includesdata[filename] then data.includesdata[filename] = {} end
+
+	local incl = data.includesdata[filename]
+	incl[#incl + 1] = string.Trim(args)
 
 	directive_include(args, filename, data)
 end)

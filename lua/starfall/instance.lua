@@ -54,7 +54,6 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 	instance.source = code
 	instance.mainfile = mainfile
 	instance.requires = {}
-	instance.requirestack = {mainfile}
 
 	instance.ppdata = {}
 	for filename, source in pairs(code) do
@@ -113,21 +112,30 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 		return false, { message = "", traceback = err }
 	end
 
-	local includesdatapp = instance.ppdata.includesdata or {}
+	local doNotRun = {}
+	local includesdata = instance.ppdata.includesdata
+	if includesdata then
+		for filename, datapath in pairs(includesdata) do
+			local codepath = SF.ChoosePath(datapath, string.GetPathFromFilename(filename), function(testpath)
+				return instance.source[testpath]
+			end)
+			if codepath then doNotRun[codepath] = true end
+		end
+	end
+
 	local serverorclientpp = instance.ppdata.serverorclient or {}
 	for filename, source in pairs(code) do
-		if not includesdatapp[filename] then -- Don't compile data files
-			local serverorclient = serverorclientpp[filename]
-			if (serverorclient == "server" and CLIENT) or (serverorclient == "client" and SERVER) then
-				instance.scripts[filename] = function() end
-			else
-				local func = SF.CompileString(source, "SF:"..filename, false)
-				if isstring(func) then
-					return false, { message = func, traceback = "" }
-				end
-				debug.setfenv(func, instance.env)
-				instance.scripts[filename] = func
+		if doNotRun[filename] then continue end -- Don't compile data files
+		local serverorclient = serverorclientpp[filename]
+		if (serverorclient == "server" and CLIENT) or (serverorclient == "client" and SERVER) then
+			instance.scripts[filename] = function() end
+		else
+			local func = SF.CompileString(source, "SF:"..filename, false)
+			if isstring(func) then
+				return false, { message = func, traceback = "" }
 			end
+			debug.setfenv(func, instance.env)
+			instance.scripts[filename] = func
 		end
 	end
 
@@ -619,6 +627,23 @@ function SF.Instance:runFunction(func, ...)
 	end
 
 	return tbl
+end
+
+local requireSentinel = {}
+function SF.Instance:require(path)
+	local loaded = self.requires
+	if loaded[path] == requireSentinel then
+		SF.Throw("Cyclic require loop detected!", 2)
+	elseif loaded[path] then
+		return loaded[path]
+	else
+		local func = self.scripts[path]
+		if not func then SF.Throw("Can't find file '" .. path .. "' (did you forget to --@include it?)", 3) end
+		loaded[path] = requireSentinel
+		local ret = func()
+		loaded[path] = ret or true
+		return ret
+	end
 end
 
 --- Deinitializes the instance. After this, the instance should be discarded.
