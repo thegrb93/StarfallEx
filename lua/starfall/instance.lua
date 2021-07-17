@@ -637,8 +637,7 @@ function SF.Instance:require(path)
 	elseif loaded[path] then
 		return loaded[path]
 	else
-		local func = self.scripts[path]
-		if not func then SF.Throw("Can't find file '" .. path .. "' (did you forget to --@include it?)", 3) end
+		local func = self.scripts[path] or SF.Throw("Can't find file '" .. path .. "' (did you forget to --@include it?)", 3)
 		loaded[path] = requireSentinel
 		local ret = func()
 		loaded[path] = ret or true
