@@ -215,9 +215,6 @@ function PANEL:Setup(folder)
 	self.Root = self.RootNode:AddNode(folder)
 	self.Root:SetFolder(folder)
 
-	self.DataFiles = self.RootNode:AddNode("Data Files","icon16/folder_database.png")
-	self.DataFiles:SetFolder("Data Files")
-
 	local examples_url = "https://api.github.com/repos/thegrb93/StarfallEx/contents/lua/starfall/examples"
 	http.Fetch( examples_url,
 		function( body, len, headers, code )
@@ -288,12 +285,6 @@ function PANEL:AddFiles(filter)
 	if addFiles(filter, "starfall", self.Root) then
 		self.Root:SetExpanded(true)
 	end
-	
-	if self.DataFiles.ChildNodes then self.DataFiles.ChildNodes:Clear() end
-	if addFiles(filter, "sf_filedata", self.DataFiles) then
-		self.DataFiles:SetExpanded(true)
-	end
-
 	self.Root:SetExpanded(true)
 end
 
