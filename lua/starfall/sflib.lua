@@ -1010,6 +1010,21 @@ function SF.CanDrawEntity(ent)
 	return drawEntityClasses[ent:GetClass()] and not ent:GetParent():IsValid() and ent.RenderOverride==nil
 end
 
+--- Chooses whether to use absolute or relative path
+function SF.ChoosePath(path, curpath, testfunc)
+	if string.sub(path, 1, 1)=="/" then
+		path = SF.NormalizePath(path)
+		if testfunc(path) then return path end
+	else
+		local relativepath = SF.NormalizePath(curpath .. path)
+		if testfunc(relativepath) then
+			return relativepath
+		else
+			path = SF.NormalizePath(path)
+			if testfunc(path) then return path end
+		end
+	end
+end
 
 --- Returns a path with all .. accounted for
 function SF.NormalizePath(path)

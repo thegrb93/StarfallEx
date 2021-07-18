@@ -645,73 +645,37 @@ end
 
 --- Runs an included script and caches the result.
 -- Works pretty much like standard Lua require()
--- @param string file The file path to include. Make sure to --@include it
+-- @param string path The file path to include. Make sure to --@include it
 -- @return ... Return value(s) of the script
-function builtins_library.require(file)
-	checkluatype(file, TYPE_STRING)
-	local loaded = instance.requires
+function builtins_library.require(path)
+	checkluatype(path, TYPE_STRING)
 
-	local path
-	if string.sub(file, 1, 1)=="/" then
-		path = SF.NormalizePath(file)
-	else
-		path = SF.NormalizePath(string.GetPathFromFilename(instance.requirestack[#instance.requirestack]) .. file)
-		if not instance.scripts[path] then
-			path = SF.NormalizePath(file)
-		end
-	end
+	local curdir = string.match(debug.getinfo(2, "S").short_src, "SF:(.*[/\\])") or ""
+	path = SF.ChoosePath(path, curdir, function(testpath)
+		return instance.scripts[testpath]
+	end) or path
 
-	if loaded[path] then
-		return loaded[path]
-	else
-		local func = instance.scripts[path]
-		if not func then SF.Throw("Can't find file '" .. path .. "' (did you forget to --@include it?)", 2) end
-
-		if table.HasValue(instance.requirestack, path) then
-			SF.Throw("Cyclic require dependency", 2)
-		end
-
-		local stacklen = #instance.requirestack + 1
-		instance.requirestack[stacklen] = path
-		local ok, ret = pcall(func)
-		instance.requirestack[stacklen] = nil
-
-		if ok then
-			loaded[path] = ret or true
-			return loaded[path]
-		else
-			error(ret)
-		end
-	end
+	return instance:require(path)
 end
 
 --- Runs an included script and caches the result.
 -- Works pretty much like standard Lua require()
--- @param string dir The directory to include. Make sure to --@includedir it
+-- @param string path The directory to include. Make sure to --@includedir it
 -- @param table loadpriority Table of files that should be loaded before any others in the directory
 -- @return table Table of return values of the scripts
-function builtins_library.requiredir(dir, loadpriority)
-	checkluatype(dir, TYPE_STRING)
+function builtins_library.requiredir(path, loadpriority)
+	checkluatype(path, TYPE_STRING)
 	if loadpriority~=nil then checkluatype(loadpriority, TYPE_TABLE) end
 
-	local path
-	if string.sub(dir, 1, 1)=="/" then
-		path = SF.NormalizePath(dir)
-	else
-		path = SF.NormalizePath(string.GetPathFromFilename(instance.requirestack[#instance.requirestack]) .. dir)
-		
-		-- If no scripts found in relative dir, try the root dir.
-		local foundScript = false
-		for file, _ in pairs(instance.scripts) do
-			if string.match(file, "^"..path.."/[^/]+%.txt$") or string.match(file, "^"..path.."/[^/]+%.lua$") then
-				foundScript = true
-				break
+	local curdir = string.match(debug.getinfo(2, "S").short_src, "SF:(.*[/\\])") or ""
+	path = SF.ChoosePath(path, curdir, function(testpath)
+		for file in pairs(instance.scripts) do
+			if string.match(file, "^"..testpath.."/[^/]+%.txt$") or string.match(file, "^"..testpath.."/[^/]+%.lua$") then
+				return true
 			end
 		end
-		if not foundScript then
-			path = SF.NormalizePath(dir)
-		end
-	end
+		return false
+	end) or path
 
 	local returns = {}
 	local alreadyRequired = {}
@@ -719,16 +683,16 @@ function builtins_library.requiredir(dir, loadpriority)
 	if loadpriority then
 		for i = 1, #loadpriority do
 			local file = path .. "/" .. loadpriority[i]
-			if instance.scripts[file] and not table.HasValue(instance.requirestack, file) then
-				returns[file] = builtins_library.require("/"..file)
+			if instance.scripts[file] then
+				returns[file] = instance:require(file)
 				alreadyRequired[file] = true
 			end
 		end
 	end
 
-	for file, _ in pairs(instance.scripts) do
-		if not alreadyRequired[file] and (string.match(file, "^"..path.."/[^/]+%.txt$") or string.match(file, "^"..path.."/[^/]+%.lua$")) and not table.HasValue(instance.requirestack, file) then
-			returns[file] = builtins_library.require("/"..file)
+	for file in pairs(instance.scripts) do
+		if not alreadyRequired[file] and (string.match(file, "^"..path.."/[^/]+%.txt$") or string.match(file, "^"..path.."/[^/]+%.lua$")) then
+			returns[file] = instance:require(file)
 		end
 	end
 
@@ -737,49 +701,51 @@ end
 
 --- Runs an included script, but does not cache the result.
 -- Pretty much like standard Lua dofile()
--- @param string file The file to include. Make sure to --@include it
+-- @param string path The file path to include. Make sure to --@include it
 -- @return ... Return value(s) of the script
-function builtins_library.dofile(file)
-	checkluatype(file, TYPE_STRING)
-	local path
-	if string.sub(file, 1, 1)=="/" then
-		path = SF.NormalizePath(file)
-	else
-		path = SF.NormalizePath(string.GetPathFromFilename(string.sub(debug.getinfo(2, "S").source, 5)) .. file)
-		if not instance.scripts[path] then
-			path = SF.NormalizePath(file)
-		end
-	end
-	local func = instance.scripts[path]
-	if not func then SF.Throw("Can't find file '" .. path .. "' (did you forget to --@include it?)", 2) end
-	return func()
+function builtins_library.dofile(path)
+	checkluatype(path, TYPE_STRING)
+	local curdir = string.match(debug.getinfo(2, "S").short_src, "SF:(.*[/\\])") or ""
+	path = SF.ChoosePath(path, curdir, function(testpath)
+		return instance.scripts[testpath]
+	end) or path
+	return (instance.scripts[path] or SF.Throw("Can't find file '" .. path .. "' (did you forget to --@include it?)", 2))()
 end
 
 --- Runs an included directory, but does not cache the result.
--- @param string dir The directory to include. Make sure to --@includedir it
+-- @param string path The directory to include. Make sure to --@includedir it
 -- @param table loadpriority Table of files that should be loaded before any others in the directory
 -- @return table Table of return values of the scripts
-function builtins_library.dodir(dir, loadpriority)
-	checkluatype(dir, TYPE_STRING)
-	if loadpriority~=nil then checkluatype(loadpriority, TYPE_TABLE) end
+function builtins_library.dodir(path, loadpriority)
+	checkluatype(path, TYPE_STRING)
+	if loadpriority ~= nil then checkluatype(loadpriority, TYPE_TABLE) end
+
+	local curdir = string.match(debug.getinfo(2, "S").short_src, "SF:(.*[/\\])") or ""
+	path = SF.ChoosePath(path, curdir, function(testpath)
+		for file in pairs(instance.scripts) do
+			if string.match(file, "^"..testpath.."/[^/]+%.txt$") or string.match(file, "^"..testpath.."/[^/]+%.lua$") then
+				return true
+			end
+		end
+		return false
+	end) or path
 
 	local returns = {}
 	local alreadyRequired = {}
 
 	if loadpriority then
 		for i = 1, #loadpriority do
-			for file, _ in pairs(instance.scripts) do
-				if string.find(file, dir .. "/" .. loadpriority[i] , 1) == 1 then
-					returns[file] = builtins_library.dofile(file)
-					alreadyRequired[file] = true
-				end
+			local file = path .. "/" .. loadpriority[i]
+			if instance.scripts[file] then
+				returns[file] = instance.scripts[file]()
+				alreadyRequired[file] = true
 			end
 		end
 	end
 
-	for file, _ in pairs(instance.scripts) do
-		if not alreadyRequired[file] and string.find(file, dir, 1) == 1 then
-			returns[file] = builtins_library.dofile(file)
+	for file in pairs(instance.scripts) do
+		if not alreadyRequired[file] and (string.match(file, "^"..path.."/[^/]+%.txt$") or string.match(file, "^"..path.."/[^/]+%.lua$")) then
+			returns[file] = instance.scripts[file]()
 		end
 	end
 
