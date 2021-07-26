@@ -390,6 +390,7 @@ function props_library.createSeat(pos, ang, model, frozen)
     prop:SetPos(pos)
     prop:SetAngles(ang)
     prop:Spawn()
+    prop:SetKeyValue( "limitview", 0 )
     prop:Activate()
 
     register(prop, instance)
