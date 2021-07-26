@@ -358,6 +358,64 @@ function props_library.getSpawnableSents(categorized)
 	return tbl
 end
 
+--- Creates a seat.
+-- @param Vector pos Position of created seat
+-- @param Angle ang Angle of created seat
+-- @param string model Model of created seat
+-- @param boolean frozen True to spawn frozen
+-- @server
+-- @return Entity The seat object
+function props_library.createSeat(pos, ang, model, frozen)
+	checkpermission(instance, nil, "prop.create")
+	checkluatype(model, TYPE_STRING)
+	frozen = frozen and true or false
+
+	local pos = SF.clampPos(vunwrap(pos))
+	local ang = aunwrap(ang)
+
+	local ply = instance.player
+	model = SF.CheckModel(model, ply)
+	if not model then SF.Throw("Invalid model", 2) end
+
+	plyPropBurst:use(ply, 1)
+	plyCount:checkuse(ply, 1)
+
+    local class = "prop_vehicle_prisoner_pod"
+
+    local prop
+
+    prop = ents.Create(class)
+    prop:SetModel(model)
+
+    prop:SetPos(pos)
+    prop:SetAngles(ang)
+    prop:Spawn()
+    prop:Activate()
+
+    register(prop, instance)
+
+    prop:SetCreator( ply )
+
+    local phys = prop:GetPhysicsObject()
+    if phys:IsValid() then
+        phys:EnableMotion(not frozen)
+    end
+
+    if ply ~= SF.Superuser then
+        if propUndo then
+            undo.Create("SF")
+                undo.SetPlayer(ply)
+                undo.AddEntity(prop)
+            undo.Finish("SF (" .. class .. ")")
+        end
+
+        ply:AddCleanup("props", prop)
+        gamemode.Call("PlayerSpawnedVehicle", ply, prop)
+    end
+
+    return owrap(prop)
+end
+
 --- Creates a sent.
 -- @param Vector pos Position of created sent
 -- @param Angle ang Angle of created sent
