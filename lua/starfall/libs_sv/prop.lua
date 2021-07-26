@@ -366,19 +366,19 @@ end
 -- @server
 -- @return Entity The seat object
 function props_library.createSeat(pos, ang, model, frozen)
-	checkpermission(instance, nil, "prop.create")
-	checkluatype(model, TYPE_STRING)
-	frozen = frozen and true or false
+    checkpermission(instance, nil, "prop.create")
+    checkluatype(model, TYPE_STRING)
+    frozen = frozen and true or false
 
-	local pos = SF.clampPos(vunwrap(pos))
-	local ang = aunwrap(ang)
+    local pos = SF.clampPos(vunwrap(pos))
+    local ang = aunwrap(ang)
 
-	local ply = instance.player
-	model = SF.CheckModel(model, ply)
-	if not model then SF.Throw("Invalid model", 2) end
+    local ply = instance.player
+    model = SF.CheckModel(model, ply)
+    if not model then SF.Throw("Invalid model", 2) end
 
-	plyPropBurst:use(ply, 1)
-	plyCount:checkuse(ply, 1)
+    plyPropBurst:use(ply, 1)
+    plyCount:checkuse(ply, 1)
 
     local class = "prop_vehicle_prisoner_pod"
 
