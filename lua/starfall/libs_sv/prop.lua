@@ -121,47 +121,47 @@ end
 -- @param boolean? frozen True to spawn the entity in a frozen state. Default = False
 -- @return Entity The ragdoll entity
 function props_library.createRagdoll(model, frozen)
-    checkpermission(instance, nil, "prop.createRagdoll")
-    checkluatype(model, TYPE_STRING)
-    frozen = frozen and true or false
+	checkpermission(instance, nil, "prop.createRagdoll")
+	checkluatype(model, TYPE_STRING)
+	frozen = frozen and true or false
 
-    local ply = instance.player
-    model = SF.CheckRagdoll(model, ply)
-    if not model then SF.Throw("Invalid model", 2) end
+	local ply = instance.player
+	model = SF.CheckRagdoll(model, ply)
+	if not model then SF.Throw("Invalid model", 2) end
 
-    plyPropBurst:use(ply, 1)
-    plyCount:checkuse(ply, 1)
-    if ply ~= SF.Superuser and gamemode.Call("PlayerSpawnRagdoll", ply, model)==false then SF.Throw("Another hook prevented the ragdoll from spawning", 2) end
+	plyPropBurst:use(ply, 1)
+	plyCount:checkuse(ply, 1)
+	if ply ~= SF.Superuser and gamemode.Call("PlayerSpawnRagdoll", ply, model)==false then SF.Throw("Another hook prevented the ragdoll from spawning", 2) end
 
-    local ent = ents.Create("prop_ragdoll")
-    register(ent, instance)
-    ent:SetModel(model)
-    ent:Spawn()
+	local ent = ents.Create("prop_ragdoll")
+	register(ent, instance)
+	ent:SetModel(model)
+	ent:Spawn()
 
-    if not ent:GetModel() then ent:Remove() SF.Throw("Invalid model", 2) end
+	if not ent:GetModel() then ent:Remove() SF.Throw("Invalid model", 2) end
 
-    if frozen then
-        for I = 0, ent:GetPhysicsObjectCount() - 1 do
-            local obj = ent:GetPhysicsObjectNum(I)
-            if obj:IsValid() then
-                obj:EnableMotion(false)
-            end
-        end
-    end
+	if frozen then
+		for I = 0, ent:GetPhysicsObjectCount() - 1 do
+			local obj = ent:GetPhysicsObjectNum(I)
+			if obj:IsValid() then
+				obj:EnableMotion(false)
+			end
+		end
+	end
 
-    if ply ~= SF.Superuser then
-        gamemode.Call("PlayerSpawnedRagdoll", ply, model, ent)
+	if ply ~= SF.Superuser then
+		gamemode.Call("PlayerSpawnedRagdoll", ply, model, ent)
 
-        if propUndo then
-            undo.Create("Ragdoll")
-                undo.SetPlayer(ply)
-                undo.AddEntity(ent)
-            undo.Finish("Ragdoll (" .. tostring(model) .. ")")
-        end
-        ply:AddCleanup("ragdolls", ent)
-    end
+		if propUndo then
+			undo.Create("Ragdoll")
+				undo.SetPlayer(ply)
+				undo.AddEntity(ent)
+			undo.Finish("Ragdoll (" .. tostring(model) .. ")")
+		end
+		ply:AddCleanup("ragdolls", ent)
+	end
 
-    return ewrap(ent)
+	return ewrap(ent)
 end
 
 --- Creates a custom prop.
@@ -356,6 +356,65 @@ function props_library.getSpawnableSents(categorized)
 	add("starfall_creatable_sent")
 
 	return tbl
+end
+
+--- Creates a seat.
+-- @param Vector pos Position of created seat
+-- @param Angle ang Angle of created seat
+-- @param string model Model of created seat
+-- @param boolean frozen True to spawn frozen
+-- @server
+-- @return Entity The seat object
+function props_library.createSeat(pos, ang, model, frozen)
+	checkpermission(instance, nil, "prop.create")
+	checkluatype(model, TYPE_STRING)
+	frozen = frozen and true or false
+
+	local pos = SF.clampPos(vunwrap(pos))
+	local ang = aunwrap(ang)
+
+	local ply = instance.player
+	model = SF.CheckModel(model, ply)
+	if not model then SF.Throw("Invalid model", 2) end
+
+	plyPropBurst:use(ply, 1)
+	plyCount:checkuse(ply, 1)
+
+	local class = "prop_vehicle_prisoner_pod"
+
+	local prop
+
+	prop = ents.Create(class)
+	prop:SetModel(model)
+
+	prop:SetPos(pos)
+	prop:SetAngles(ang)
+	prop:Spawn()
+	prop:SetKeyValue( "limitview", 0 )
+	prop:Activate()
+
+	register(prop, instance)
+
+	prop:SetCreator( ply )
+
+	local phys = prop:GetPhysicsObject()
+	if phys:IsValid() then
+		phys:EnableMotion(not frozen)
+	end
+
+	if ply ~= SF.Superuser then
+		if propUndo then
+			undo.Create("SF")
+				undo.SetPlayer(ply)
+				undo.AddEntity(prop)
+			undo.Finish("SF (" .. class .. ")")
+		end
+
+		ply:AddCleanup("props", prop)
+		gamemode.Call("PlayerSpawnedVehicle", ply, prop)
+	end
+
+	return owrap(prop)
 end
 
 --- Creates a sent.
