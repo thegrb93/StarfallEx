@@ -114,9 +114,9 @@ end
 local function quatInv(q)
 	local len = getQuatLenSqr(q)
 	q[1] = q[1] / len
-	q[2] = q[2] / len
-	q[3] = q[3] / len
-	q[4] = q[4] / len
+	q[2] = -q[2] / len
+	q[3] = -q[3] / len
+	q[4] = -q[4] / len
 end
 
 local function quatConj(q)
