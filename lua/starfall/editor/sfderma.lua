@@ -195,6 +195,53 @@ end
 vgui.Register("StarfallPanel", PANEL, "DPanel")
 -- End Starfall Panel
 
+--------------------------------------------------------------
+--------------------------------------------------------------
+
+-- File Node
+PANEL = {}
+
+function PANEL:Init()
+end
+
+function PANEL:AddNode(strName, strIcon)
+	self:CreateChildNodes()
+
+	local pNode = vgui.Create( "StarfallFileNode", self )
+	pNode:SetText( strName )
+	pNode:SetParentNode( self )
+	pNode:SetTall( self:GetLineHeight() )
+	pNode:SetRoot( self:GetRoot() )
+	pNode:SetIcon( strIcon )
+	pNode:SetDrawLines( !self:IsRootNode() )
+
+	self:InstallDraggable( pNode )
+
+	self.ChildNodes:Add( pNode )
+	self:InvalidateLayout()
+
+	-- Let addons do whatever they need
+	self:OnNodeAdded( pNode )
+
+	return pNode
+end
+
+function PANEL:MoveToBefore(pnl)
+	print("MOVEMENT BEFORE :O")
+
+	self:GetParent().MoveToBefore(self, pnl)
+end
+
+function PANEL:MoveToAfter(pnl)
+	print("MOVEMENT AFTER :O")
+end
+
+derma.DefineControl("StarfallFileNode", "", PANEL, "DTree_Node")
+-- End File Node
+
+--------------------------------------------------------------
+--------------------------------------------------------------
+
 -- File Tree
 local invalid_filename_chars = {
 	["*"] = "",
@@ -208,11 +255,20 @@ local invalid_filename_chars = {
 PANEL = {}
 
 function PANEL:Init()
+	self.RootNode = vgui.Create("StarfallFileNode", self)
+
+	self.RootNode:SetRoot( self )
+	self.RootNode:SetParentNode( self )
+	self.RootNode:Dock( TOP )
+	self.RootNode:SetText( "" )
+	self.RootNode:SetExpanded( true, true )
+	self.RootNode:DockMargin( 0, 4, 0, 0 )
 end
 
 function PANEL:Setup(folder)
 	self.folder = folder
 	self.Root = self.RootNode:AddNode(folder)
+	self.Root:SetDraggableName("sf_filenode")
 	self.Root:SetFolder(folder)
 
 	local examples_url = "https://api.github.com/repos/thegrb93/StarfallEx/contents/lua/starfall/examples"
@@ -242,6 +298,7 @@ local function sort(tbl)
 	for k, v in pairs(sorted) do tbl[k] = v[2] end
 end
 local function addFiles(search, dir, node)
+
 	local found = false
 	local allFiles, allFolders = file.Find(dir .. "/*", "DATA")
 	allFiles = allFiles or {}
@@ -252,10 +309,14 @@ local function addFiles(search, dir, node)
 		for k, v in pairs(allFolders) do
 			local newNode = node:AddNode(v)
 			newNode:SetFolder(dir .. "/" .. v)
+			-- function newNode:MoveToBefore(node) print("move detected!") end
+			-- function newNode:MoveToAfter(node) print("move detected!") end
 			addFiles(search, dir .. "/" .. v, newNode)
 		end
 		for k, v in pairs(allFiles) do
 			local fnode = node:AddNode(v, "icon16/page_white.png")
+			-- function fnode:MoveToBefore(node) print("move detected!") end
+			-- function fnode:MoveToAfter(node) print("move detected!") end
 			fnode:SetFileName(dir.."/"..v)
 		end
 	else
