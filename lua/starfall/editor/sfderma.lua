@@ -272,11 +272,12 @@ local function moveFile(fileNode, toNode, callback)
 		local destPath = toNode:GetFolder() .. "/" .. string.GetFileFromFilename(fileNode:GetFolder())
 
 		if (fileNode == toNode) then return end
-		if (SF.FolderHasContents(destPath)) then return end
+		if (SF.FolderHasContents(destPath)) then return end -- a kinda okay way to check for folder existence...
 
 		local folders = {fileNode}
-		local originalFolderPath = fileNode:GetFolder()
+		local originalFolderPath = fileNode:GetFolder() -- nodes get updated in place, save original path for deletion
 
+		-- being recursive file copying (iterative approach derived from SF.DeleteFolder())
 		while #folders > 0 do
 			local folder = folders[#folders]
 			local workingPath = destPath .. "/" .. string.gsub(folder:GetFolder(), fileNode:GetFolder(), "")
