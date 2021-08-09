@@ -277,7 +277,7 @@ local function moveFile(fileNode, toNode, callback)
 		local folders = {fileNode}
 		local originalFolderPath = fileNode:GetFolder() -- nodes get updated in place, save original path for deletion
 
-		-- being recursive file copying (iterative approach derived from SF.DeleteFolder())
+		-- begin recursive file copying (iterative approach derived from SF.DeleteFolder())
 		while #folders > 0 do
 			local folder = folders[#folders]
 			local workingPath = destPath .. "/" .. string.gsub(folder:GetFolder(), fileNode:GetFolder(), "")
