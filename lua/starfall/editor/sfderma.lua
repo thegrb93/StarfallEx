@@ -199,44 +199,44 @@ vgui.Register("StarfallPanel", PANEL, "DPanel")
 --------------------------------------------------------------
 
 -- File Node
-PANEL = {}
+-- PANEL = {}
 
-function PANEL:Init()
-end
+-- function PANEL:Init()
+-- end
 
-function PANEL:AddNode(strName, strIcon)
-	self:CreateChildNodes()
+-- function PANEL:AddNode(strName, strIcon)
+-- 	self:CreateChildNodes()
 
-	local pNode = vgui.Create( "StarfallFileNode", self )
-	pNode:SetText( strName )
-	pNode:SetParentNode( self )
-	pNode:SetTall( self:GetLineHeight() )
-	pNode:SetRoot( self:GetRoot() )
-	pNode:SetIcon( strIcon )
-	pNode:SetDrawLines( !self:IsRootNode() )
+-- 	local pNode = vgui.Create( "StarfallFileNode", self )
+-- 	pNode:SetText( strName )
+-- 	pNode:SetParentNode( self )
+-- 	pNode:SetTall( self:GetLineHeight() )
+-- 	pNode:SetRoot( self:GetRoot() )
+-- 	pNode:SetIcon( strIcon )
+-- 	pNode:SetDrawLines( !self:IsRootNode() )
 
-	self:InstallDraggable( pNode )
+-- 	self:InstallDraggable( pNode )
 
-	self.ChildNodes:Add( pNode )
-	self:InvalidateLayout()
+-- 	self.ChildNodes:Add( pNode )
+-- 	self:InvalidateLayout()
 
-	-- Let addons do whatever they need
-	self:OnNodeAdded( pNode )
+-- 	-- Let addons do whatever they need
+-- 	self:OnNodeAdded( pNode )
 
-	return pNode
-end
+-- 	return pNode
+-- end
 
-function PANEL:MoveToBefore(pnl)
-	print("MOVEMENT BEFORE :O")
+-- function PANEL:MoveToBefore(pnl)
+-- 	print("MOVEMENT BEFORE :O")
 
-	self:GetParent().MoveToBefore(self, pnl)
-end
+-- 	self:GetParent().MoveToBefore(self, pnl)
+-- end
 
-function PANEL:MoveToAfter(pnl)
-	print("MOVEMENT AFTER :O")
-end
+-- function PANEL:MoveToAfter(pnl)
+-- 	print("MOVEMENT AFTER :O")
+-- end
 
-derma.DefineControl("StarfallFileNode", "", PANEL, "DTree_Node")
+-- derma.DefineControl("StarfallFileNode", "", PANEL, "DTree_Node")
 -- End File Node
 
 --------------------------------------------------------------
@@ -255,19 +255,79 @@ local invalid_filename_chars = {
 PANEL = {}
 
 function PANEL:Init()
-	self.RootNode = vgui.Create("StarfallFileNode", self)
+end
 
-	self.RootNode:SetRoot( self )
-	self.RootNode:SetParentNode( self )
-	self.RootNode:Dock( TOP )
-	self.RootNode:SetText( "" )
-	self.RootNode:SetExpanded( true, true )
-	self.RootNode:DockMargin( 0, 4, 0, 0 )
+local function moveFile(fileNode, toNode, callback)
+	print("\n=== DRAG FILE ATTEMPT ===")
+	print("From:")
+	print(fileNode)
+	print("file: "..(fileNode:GetFileName() or "nil").." | folder: "..(fileNode:GetFolder() or "nil"))
+	print("\nTo:")
+	print(toNode)
+	print("file: "..(toNode:GetFileName() or "nil").." | folder: "..(toNode:GetFolder() or "nil"))
+
+	if (toNode:GetFileName()) then return end
+
+	if (fileNode:GetFolder()) then
+		if (fileNode == toNode) then return end
+
+		local destPath = toNode:GetFolder() .. "/" .. string.GetFileFromFilename(fileNode:GetFolder())
+		if (SF.FolderHasContents(destPath)) then return end
+
+		local folders = {fileNode}
+
+		while #folders > 0 do
+			local folder = folders[#folders]
+			local workingPath = destPath .. "/" .. string.gsub(folder:GetFolder(), fileNode:GetFolder(), "")
+			folders[#folders] = nil
+
+			file.CreateDir(workingPath)
+
+			for _, childNode in pairs(folder:GetChildNodes()) do
+				if (childNode:GetFileName()) then
+					local childFile = string.GetFileFromFilename(childNode:GetFileName())
+					SF.FileWrite(workingPath .. "/" .. childFile, file.Read(childNode:GetFileName()))
+				elseif (childNode:GetFolder()) then
+					folders[#folders + 1] = childNode
+				end
+			end
+		end
+
+		SF.DeleteFolder(fileNode:GetFolder())
+	elseif fileNode:GetFileName() then
+		local nodeFile = string.GetFileFromFilename(fileNode:GetFileName())
+
+		if (file.Exists(toNode:GetFolder() .. "/" .. nodeFile, "DATA")) then return end
+		
+		SF.FileWrite(toNode:GetFolder() .. "/" .. nodeFile, file.Read(fileNode:GetFileName()))
+		file.Delete(fileNode:GetFileName())
+	end
+
+	print("SUCCESS!")
+	callback()
+end
+
+local function addDragHandling(node)
+	local setParent = node.SetParent
+	local droppedOn = node.DroppedOn
+
+	function node:MoveToBefore(pnl) end
+	function node:MoveToAfter(pnl) end
+	
+	function node:DroppedOn(pnl)
+		moveFile(pnl, node, function () droppedOn(node, pnl) end)
+	end
+	
+	function node:SetParent(pnl)
+		moveFile(node, pnl:GetParent(), function () setParent(node, pnl) end)
+	end
+
+	return node
 end
 
 function PANEL:Setup(folder)
 	self.folder = folder
-	self.Root = self.RootNode:AddNode(folder)
+	self.Root = addDragHandling(self.RootNode:AddNode(folder))
 	self.Root:SetDraggableName("sf_filenode")
 	self.Root:SetFolder(folder)
 
@@ -307,21 +367,17 @@ local function addFiles(search, dir, node)
 	sort(allFolders)
 	if search=="" then
 		for k, v in pairs(allFolders) do
-			local newNode = node:AddNode(v)
+			local newNode = addDragHandling(node:AddNode(v))
 			newNode:SetFolder(dir .. "/" .. v)
-			-- function newNode:MoveToBefore(node) print("move detected!") end
-			-- function newNode:MoveToAfter(node) print("move detected!") end
 			addFiles(search, dir .. "/" .. v, newNode)
 		end
 		for k, v in pairs(allFiles) do
-			local fnode = node:AddNode(v, "icon16/page_white.png")
-			-- function fnode:MoveToBefore(node) print("move detected!") end
-			-- function fnode:MoveToAfter(node) print("move detected!") end
+			local fnode = addDragHandling(node:AddNode(v, "icon16/page_white.png"))
 			fnode:SetFileName(dir.."/"..v)
 		end
 	else
 		for k, v in pairs(allFolders) do
-			local newNode = node:AddNode(v)
+			local newNode = addDragHandling(node:AddNode(v))
 			newNode:SetFolder(v)
 			if addFiles(search, dir .. "/" .. v, newNode) then
 				newNode:SetExpanded(true)
@@ -332,7 +388,7 @@ local function addFiles(search, dir, node)
 		end
 		for k, v in pairs(allFiles) do
 			if string.find(string.lower(v), string.lower(search)) then
-				local fnode = node:AddNode(v, "icon16/page_white.png")
+				local fnode = decorateNode(node:AddNode(v, "icon16/page_white.png"))
 				fnode:SetFileName(dir.."/"..v)
 				found = true
 			end

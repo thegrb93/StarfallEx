@@ -669,6 +669,14 @@ function SF.DeleteFolder(folder)
 	end
 end
 
+function SF.FolderHasContents(folder)
+	local files, directories = file.Find(folder.."/*", "DATA")
+
+	if (#files > 0 or #directories > 0) then return true end
+
+	return false
+end
+
 --- Throws an error like the throw function in builtins
 -- @param msg Message
 -- @param level Which level in the stacktrace to blame
