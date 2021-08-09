@@ -393,7 +393,7 @@ local function addFiles(search, dir, node)
 		end
 		for k, v in pairs(allFiles) do
 			if string.find(string.lower(v), string.lower(search)) then
-				local fnode = decorateNode(node:AddNode(v, "icon16/page_white.png"))
+				local fnode = addDragHandling(node:AddNode(v, "icon16/page_white.png"))
 				fnode:SetFileName(dir.."/"..v)
 				found = true
 			end
