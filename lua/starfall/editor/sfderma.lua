@@ -275,9 +275,6 @@ end
 
 local function addDragHandling(node)
 	local setParent = node.SetParent
-
-	-- function node:MoveToBefore(pnl) end
-	-- function node:MoveToAfter(pnl) end
 	
 	function node:SetParent(pnl)
 		moveFile(node, pnl:GetParent(), function () setParent(node, pnl) end)
