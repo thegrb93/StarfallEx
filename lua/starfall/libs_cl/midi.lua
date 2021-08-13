@@ -21,7 +21,7 @@ local midi_library = instance.Libraries.midi
 -- @libtbl midi_library
 -- @param number time the exact systime which the event occured
 -- @param number command the command code of the event.  First 4 bits are the command code and last 4 are the channel
--- @param ... number parameters.  Each command has their own set of parameters, see below
+-- @param number ... Each command has their own set of parameters, see below
 -- Commands and their parameters:
 -- 0x80 "NOTE_OFF" : param1 = key, param2 = velocity
 -- 0x90 "NOTE_ON" : param1 = key, param2 = velocity
@@ -66,7 +66,7 @@ function midi_library.closeAllPorts()
 end
 
 -- Gets a table of all midi devices' ports.
--- @return table table of all midi ports.
+-- @return table the table of midi ports.  Starts at index 0
 midi_library.getPorts = midi.GetPorts
 
 -- Grabs the current midi command code from the command. Essentially does: bit.band(command, 0xF0)
