@@ -225,40 +225,10 @@ local function moveFile(fileNode, toNode, callback)
 	if (toNode:GetFileName()) then return end
 
 	if (fileNode:GetFolder()) then
-		local destPath = toNode:GetFolder() .. "/" .. string.GetFileFromFilename(fileNode:GetFolder())
-
 		if (fileNode == toNode) then return end
-		if (SF.FolderHasContents(destPath)) then return end -- a kinda okay way to check for folder existence...
-
-		local folders = {fileNode}
-		local originalFolderPath = fileNode:GetFolder() -- nodes get updated in place, save original path for deletion
-
-		-- begin recursive file copying (iterative approach derived from SF.DeleteFolder())
-		while #folders > 0 do
-			local folder = folders[#folders]
-			local workingPath = destPath .. "/" .. string.gsub(folder:GetFolder(), fileNode:GetFolder(), "")
-			folders[#folders] = nil
-
-			if (folder == fileNode) then workingPath = destPath end
-
-			file.CreateDir(workingPath)
-
-			for _, childNode in pairs(folder:GetChildNodes()) do
-				if (childNode:GetFileName()) then
-					if not (file.Exists(childNode:GetFileName(), "DATA")) then continue end
-
-					local childFile = string.GetFileFromFilename(childNode:GetFileName())
-					SF.FileWrite(workingPath .. "/" .. childFile, file.Read(childNode:GetFileName()))
-					childNode:SetFileName(workingPath .. "/" .. childFile)
-				elseif (childNode:GetFolder()) then
-					folders[#folders + 1] = childNode
-				end
-			end
-
-			folder:SetFolder(workingPath)
+		if (SF.CopyFolder(fileNode:GetFolder(), toNode:GetFolder())) then
+			SF.DeleteFolder(fileNode:GetFolder())
 		end
-
-		SF.DeleteFolder(originalFolderPath)
 	elseif fileNode:GetFileName() then
 		local nodeFile = string.GetFileFromFilename(fileNode:GetFileName())
 
@@ -277,7 +247,7 @@ local function addDragHandling(node)
 	local setParent = node.SetParent
 	
 	function node:SetParent(pnl)
-		moveFile(node, pnl:GetParent(), function () setParent(node, pnl) end)
+		moveFile(node, pnl:GetParent(), function () node:GetRoot():ReloadTree() end)
 	end
 
 	return node

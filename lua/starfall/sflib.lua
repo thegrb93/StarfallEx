@@ -670,11 +670,46 @@ function SF.DeleteFolder(folder)
 end
 
 function SF.FolderHasContents(folder)
+	-- A kinda okay way to check for existence
 	local files, directories = file.Find(folder.."/*", "DATA")
 
 	if (#files > 0 or #directories > 0) then return true end
 
 	return false
+end
+
+function SF.CopyFolder(originFolder, toFolder)
+	local destPath = toFolder .. "/" .. string.GetFileFromFilename(originFolder)
+
+	if (originFolder == destPath) then return false end
+	if (SF.FolderHasContents(destPath)) then return false end
+
+	local folders = {originFolder}
+
+	-- begin recursive file copying (iterative approach derived from SF.DeleteFolder())
+	while #folders > 0 do
+		local folder = folders[#folders]
+		local newFolder = destPath .. "/" .. string.gsub(folder, originFolder, "") -- only need the reference to child folders, if applicable
+		local files, directories = file.Find(folder .. "/*", "DATA")
+		folders[#folders] = nil
+
+		if (folder == originFolder) then newFolder = destPath end -- Avoid trailing '/' for the top most directory
+
+		file.CreateDir(newFolder)
+
+		for I = 1, #files do
+			local originFile = folder .. "/" .. files[I]
+			if not (file.Exists(originFile, "DATA")) then continue end
+
+			SF.FileWrite(newFolder .. "/" .. files[I], file.Read(originFile))
+		end
+
+		for I = 1, #directories do
+			folders[#folders + 1] = folder .. "/" .. directories[I]
+		end
+	end
+
+	return true
 end
 
 --- Throws an error like the throw function in builtins
