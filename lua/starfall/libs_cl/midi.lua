@@ -7,7 +7,7 @@ if not SF.Require("midi") then return function() end end
 SF.RegisterLibrary("midi")
 
 return function(instance)
--- Only usable by the owner of the starfal chip
+-- Only usable by the owner of the starfall chip
 if LocalPlayer() ~= instance.player then return end
 
 local midi_library = instance.Libraries.midi
@@ -15,7 +15,7 @@ local midi_library = instance.Libraries.midi
 -- Event hook for midi
 -- @class hook
 -- @client
--- @lib_tbl midi_library
+-- @libtbl midi_library
 -- @param number time the exact systime which the event occured
 -- @param number command the command code of the event.  First 4 bits are the command code and last 4 are the channel
 -- @param varargs the different parameters of the midi event.  Can have 1 or more.
