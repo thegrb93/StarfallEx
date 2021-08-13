@@ -678,6 +678,13 @@ function SF.FolderHasContents(folder)
 	return false
 end
 
+function SF.CopyFile(filepath, toFolder)
+	local filename = string.GetFileFromFilename(filepath)
+
+	if (file.Exists(toFolder .. "/" .. filename, "DATA")) then return false end
+	return SF.FileWrite(toFolder .. "/" .. filename, file.Read(filepath))
+end
+
 function SF.CopyFolder(originFolder, toFolder)
 	local destPath = toFolder .. "/" .. string.GetFileFromFilename(originFolder)
 
@@ -698,10 +705,7 @@ function SF.CopyFolder(originFolder, toFolder)
 		file.CreateDir(newFolder)
 
 		for I = 1, #files do
-			local originFile = folder .. "/" .. files[I]
-			if not (file.Exists(originFile, "DATA")) then continue end
-
-			SF.FileWrite(newFolder .. "/" .. files[I], file.Read(originFile))
+			SF.CopyFile(folder .. "/" .. files[I], newFolder)
 		end
 
 		for I = 1, #directories do
