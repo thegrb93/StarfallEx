@@ -15,6 +15,12 @@ if LocalPlayer() ~= instance.player then return end
 
 local midi_library = instance.Libraries.midi
 
+-- Close all ports when SF chip is deleted
+-- Ensures that the midi port can still be used in other applications after the SF chip is deleted
+instance:AddHook("deinitialize", function()
+    midi_library.closeAllPorts()
+end)
+
 -- Event hook for midi devices.  Everytime a midi device outputs a signal, the callback function on the hook is called.
 -- @class hook
 -- @client
@@ -37,9 +43,7 @@ SF.hookAdd("MIDI", "midi")
 -- @return string the name of the midi device opened at the given port.
 function midi_library.openPort(port)
     checkluatype(port, TYPE_NUMBER)
-    if midi_library.isPortOpen(port) then
-        midi_library.closePort(port)
-    end
+    if midi_library.isPortOpen(port) then return end
     return midi.Open(port)
 end
 
