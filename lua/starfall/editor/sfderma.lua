@@ -214,14 +214,6 @@ function PANEL:Init()
 end
 
 local function moveFile(fileNode, toNode, callback)
-	print("\n=== DRAG FILE ATTEMPT ===")
-	print("From:")
-	print(fileNode)
-	print("file: "..(fileNode:GetFileName() or "nil").." | folder: "..(fileNode:GetFolder() or "nil"))
-	print("\nTo:")
-	print(toNode)
-	print("file: "..(toNode:GetFileName() or "nil").." | folder: "..(toNode:GetFolder() or "nil"))
-
 	if (toNode:GetFileName()) then return end
 
 	if (fileNode:GetFolder()) then
