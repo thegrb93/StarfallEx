@@ -23,13 +23,13 @@ local midi_library = instance.Libraries.midi
 -- @param number command the command code of the event.  First 4 bits are the command code and last 4 are the channel
 -- @param number ... Each command has their own set of parameters, see below
 -- Commands and their parameters:
--- 0x80 "NOTE_OFF" : param1 = key, param2 = velocity
--- 0x90 "NOTE_ON" : param1 = key, param2 = velocity
--- 0xA0 "AFTERTOUCH" : param1 = key, param2 = touch
--- 0xB0 "CONTINUOUS_CONTROLLER" : param1 = button_number, param2 = button_value
--- 0xC0 "PATCH_CHANGE" : param1 = patch number
--- 0xD0 "CHANNEL_PRESSURE" : param1 = pressure
--- 0xE0 "PITCH_BEND" : param1 = lsb(least signifigant byte), param2 = msb(most signifigant byte)
+-- 0x80 "NOTE_OFF"              : param1 = key                         param2 = velocity
+-- 0x90 "NOTE_ON"               : param1 = key                         param2 = velocity
+-- 0xA0 "AFTERTOUCH"            : param1 = key                         param2 = touch
+-- 0xB0 "CONTINUOUS_CONTROLLER" : param1 = button_number               param2 = button_value
+-- 0xC0 "PATCH_CHANGE"          : param1 = patch number
+-- 0xD0 "CHANNEL_PRESSURE"      : param1 = pressure
+-- 0xE0 "PITCH_BEND"            : param1 = lsb(least signifigant bit)  param2 = msb(most signifigant bit)
 SF.hookAdd("MIDI", "midi")
 
 -- Opens the midi port to make it available to grab events from.  This must be called before the hook.
