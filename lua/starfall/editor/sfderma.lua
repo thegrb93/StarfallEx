@@ -228,10 +228,18 @@ local function moveFile(fileNode, toNode, callback)
 		if (fileNode == toNode) then return end
 		if (SF.CopyFolder(fileNode:GetFolder(), toNode:GetFolder())) then
 			SF.DeleteFolder(fileNode:GetFolder())
+			local successMessage = "Successfully moved " .. fileNode:GetFolder() .. " to " .. toNode:GetFolder()
+
+			SF.AddNotify(LocalPlayer(), successMessage, "GENERIC", 7, "DRIP3")
+			print(successMessage)
 		else return end
 	elseif fileNode:GetFileName() then
 		if (SF.CopyFile(fileNode:GetFileName(), toNode:GetFolder())) then
 			file.Delete(fileNode:GetFileName())
+			local successMessage = "Successfully moved " .. string.GetFileFromFilename(fileNode:GetFileName()) .. " to " .. toNode:GetFolder()
+
+			SF.AddNotify(LocalPlayer(), successMessage, "GENERIC", 7, "DRIP3")
+			print(successMessage)
 		else return end
 	end
 
