@@ -79,22 +79,25 @@ midi_library.getPorts = midi.GetPorts
 -- @return string the name of the midi device closed at the given port.
 midi_library.closePort = midi.Close
 
---- Grabs the current midi command code from the command. Essentially does: bit.band(command, 0xF0)
--- @name midi_library.getCommandCode
+--- Grabs the midi command code from the command.
+-- @name midi_library.getCode
 -- @class function
+-- @param number command the command
 -- @return number the command code
-midi_library.getCommandCode = midi.GetCommandCode
+midi_library.getCode = midi.GetCommandCode
 
---- Grabs the current midi channel from the command. Essentially does: bit.rshift(command, 8)
--- @name midi_library.getCommandChannel
+--- Grabs the midi channel from the command.
+-- @name midi_library.getChannel
 -- @class function
+-- @param number command the command
 -- @return number the midi channel
-midi_library.getCommandChannel = midi.GetCommandChannel
+midi_library.getChannel = midi.GetCommandChannel
 
 --- Grabs the command code in a readable name.
--- @name midi_library.getCommandName
+-- @name midi_library.getName
 -- @class function
+-- @param number command the command
 -- @return string command name
-midi_library.getCommandName = midi.GetCommandName
+midi_library.getName = midi.GetCommandName
 
 end
