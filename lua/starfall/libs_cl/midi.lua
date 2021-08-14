@@ -22,6 +22,7 @@ instance:AddHook("deinitialize", function()
 end)
 
 --- Event hook for midi devices.  Everytime a midi device outputs a signal, the callback function on the hook is called. Look at ENUMS
+-- @name midi
 -- @class hook
 -- @client
 -- @libtbl midi_library
@@ -54,17 +55,10 @@ function midi_library.isPortOpen(port)
 	return midi.IsOpened(port)
 end
 
---- Closes the specified midi port.
--- @param number port the midi port to close.
--- @return string the name of the midi device closed at the given port.
-function midi_library.closePort(port)
-	if not midi_library.isPortOpen(port) then return end
-	return midi.Close(port)
-end
-
 --- Closes all midi ports.
 function midi_library.closeAllPorts()
 	for k, v in pairs(midi_library.getPorts()) do
+		if not midi_library.isPortOpen(k) then continue end
 		midi_library.closePort(k)
 	end
 end
@@ -74,6 +68,13 @@ end
 -- @class function
 -- @return table the table of midi ports.  Starts at index 0
 midi_library.getPorts = midi.GetPorts
+
+--- Closes the specified midi port.
+-- @name midi_library.closePort
+-- @class function
+-- @param number port the midi port to close.
+-- @return string the name of the midi device closed at the given port.
+midi_library.closePort = midi.Close
 
 --- Grabs the current midi command code from the command. Essentially does: bit.band(command, 0xF0)
 -- @name midi_library.getCommandCode
