@@ -2,7 +2,7 @@ if not SF.Require("midi") then return function() end end
 
 local checkluatype = SF.CheckLuaType
 
--- Midi Library
+--- Midi Library
 -- Polls midi event information from midi devices.
 -- @name midi
 -- @class library
@@ -18,10 +18,10 @@ local midi_library = instance.Libraries.midi
 -- Close all ports when SF chip is deleted
 -- Ensures that the midi port can still be used in other applications after the SF chip is deleted
 instance:AddHook("deinitialize", function()
-    midi_library.closeAllPorts()
+	midi_library.closeAllPorts()
 end)
 
--- Event hook for midi devices.  Everytime a midi device outputs a signal, the callback function on the hook is called.
+--- Event hook for midi devices.  Everytime a midi device outputs a signal, the callback function on the hook is called. Look at ENUMS
 -- @class hook
 -- @client
 -- @libtbl midi_library
@@ -38,50 +38,60 @@ end)
 -- 0xE0 "PITCH_BEND"            : param1 = lsb(least signifigant bit)  param2 = msb(most signifigant bit)
 SF.hookAdd("MIDI", "midi")
 
--- Opens the midi port to make it available to grab events from.  This must be called before the hook.
+--- Opens the midi port to make it available to grab events from.  This must be called before the hook.
 -- @param number port the midi port to open. Passing nothing defaults to 0.
 -- @return string the name of the midi device opened at the given port.
 function midi_library.openPort(port)
-    checkluatype(port, TYPE_NUMBER)
-    if midi_library.isPortOpen(port) then return end
-    return midi.Open(port)
+	checkluatype(port, TYPE_NUMBER)
+	if midi_library.isPortOpen(port) then return end
+	return midi.Open(port)
 end
 
--- Checks if the midi port is currently opened.
+--- Checks if the specified midi port is currently opened.
 -- @return boolean if the port is open
 function midi_library.isPortOpen(port)
-    checkluatype(port, TYPE_NUMBER)
-    return midi.IsOpened(port)
+	checkluatype(port, TYPE_NUMBER)
+	return midi.IsOpened(port)
 end
 
--- Closes the midi port. Checks if they are open to prevent binary library failure.
+--- Closes the specified midi port.
 -- @param number port the midi port to close.
 -- @return string the name of the midi device closed at the given port.
 function midi_library.closePort(port)
-    if not midi_library.isPortOpen(port) then return end
-    return midi.Close(port)
+	if not midi_library.isPortOpen(port) then 
+		SF.Throw("This port is not open!", 2)
+	end
+	return midi.Close(port)
 end
 
--- Closes all midi ports.
+--- Closes all midi ports.
 function midi_library.closeAllPorts()
-    for k, v in pairs(midi_library.getPorts()) do
-        midi_library.closePort(k)
-    end
+	for k, v in pairs(midi_library.getPorts()) do
+		midi_library.closePort(k)
+	end
 end
 
--- Gets a table of all midi devices' ports.
+--- Gets a table of all midi devices' ports.
+-- @name midi_library.getPorts
+-- @class function
 -- @return table the table of midi ports.  Starts at index 0
 midi_library.getPorts = midi.GetPorts
 
--- Grabs the current midi command code from the command. Essentially does: bit.band(command, 0xF0)
+--- Grabs the current midi command code from the command. Essentially does: bit.band(command, 0xF0)
+-- @name midi_library.getCommandCode
+-- @class function
 -- @return number the command code
 midi_library.getCommandCode = midi.GetCommandCode
 
--- Grabs the current midi channel from the command. Essentially does: bit.rshift(command, 8)
+--- Grabs the current midi channel from the command. Essentially does: bit.rshift(command, 8)
+-- @name midi_library.getCommandChannel
+-- @class function
 -- @return number the midi channel
 midi_library.getCommandChannel = midi.GetCommandChannel
 
--- Grabs the command code in a readable name.
+--- Grabs the command code in a readable name.
+-- @name midi_library.getCommandName
+-- @class function
 -- @return string command name
 midi_library.getCommandName = midi.GetCommandName
 
