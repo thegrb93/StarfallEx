@@ -47,7 +47,9 @@ SF.hookAdd("MIDI", "midi")
 -- @return string the name of the midi device opened at the given port.
 function midi_library.openPort(port)
 	checkluatype(port, TYPE_NUMBER)
-	if midi_library.isPortOpen(port) then return end
+	if midi_library.isPortOpen(port) then 
+		SF.Throw("This port is already open!")
+	end
 	return midi.Open(port)
 end
 
