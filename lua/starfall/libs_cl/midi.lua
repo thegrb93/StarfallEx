@@ -58,9 +58,7 @@ end
 -- @param number port the midi port to close.
 -- @return string the name of the midi device closed at the given port.
 function midi_library.closePort(port)
-	if not midi_library.isPortOpen(port) then 
-		SF.Throw("This port is not open!", 2)
-	end
+	if not midi_library.isPortOpen(port) then return end
 	return midi.Close(port)
 end
 
