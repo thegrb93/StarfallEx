@@ -4,6 +4,9 @@ local checkluatype = SF.CheckLuaType
 
 --- Midi Library
 -- Polls midi event information from midi devices.
+-- Requires a custom binary -> https://github.com/FPtje/gmcl_midi/releases/tag/v0.2.0
+-- GNU/Linux and MacOS users will have to compile their own binaries, as the ones provided in the release section are outdated.
+-- Instructions here -> https://github.com/FPtje/gmcl_midi/blob/master/Compiling.md
 -- @name midi
 -- @class library
 -- @libtbl midi_library
