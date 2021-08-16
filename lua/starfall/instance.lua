@@ -458,6 +458,7 @@ local function safeThrow(self, msg, nocatch, force)
 end
 
 function SF.Instance:checkCpu()
+	if self.run ~= self.runWithOps then return end
 	self.cpu_total = SysTime() - self.start_time
 	local usedRatio = self:movingCPUAverage() / self.cpuQuota
 	if usedRatio>1 then
