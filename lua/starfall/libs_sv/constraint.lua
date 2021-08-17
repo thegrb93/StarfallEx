@@ -479,6 +479,48 @@ function constraint_library.setElasticLength(index, e, length)
 	end
 end
 
+--- Sets the damping of an elastic attached to the entity
+-- @param number index Index of the elastic constraint
+-- @param Entity e Entity that has the elastic
+-- @param number damping New Damping value of the elastic
+-- @server
+function constraint_library.setElasticDamping(index, e, damping)
+	local ent1 = getent(e)
+
+	checkpermission(instance, ent1, "constraints.elastic")
+
+	checkluatype(damping, TYPE_NUMBER)
+	damping = math.max(damping, 0)
+
+	if e.Elastics then
+		local con = e.Elastics[index]
+		if (con and con:IsValid()) then
+			con:Fire("SetSpringDamping", damping, 0)
+		end
+	end
+end
+
+--- Sets the constant of an elastic attached to the entity
+-- @param number index Index of the elastic constraint
+-- @param Entity e Entity that has the elastic
+-- @param number constant New constant value of the elastic
+-- @server
+function constraint_library.setElasticConstant(index, e, constant)
+	local ent1 = getent(e)
+
+	checkpermission(instance, ent1, "constraints.elastic")
+
+	checkluatype(constant, TYPE_NUMBER)
+	constant = math.max(constant, 0)
+
+	if e.Elastics then
+		local con = e.Elastics[index]
+		if (con and con:IsValid()) then
+			con:Fire("SetSpringConstant", constant, 0)
+		end
+	end
+end
+
 --- Breaks all constraints on an entity
 -- @param Entity e Entity to remove the constraints from
 -- @server
