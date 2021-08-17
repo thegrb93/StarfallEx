@@ -181,13 +181,14 @@ end
 -- @param number y Y position on the screen
 -- @param number screenWidth Screen width
 -- @param number screenHeight Screen height
+-- @return Vector The aim vector
 function trace_library.aimVector(viewAngles, viewFOV, x, y, screenWidth, screenHeight)
 	checkluatype(viewFOV, TYPE_NUMBER)
 	checkluatype(x, TYPE_NUMBER)
 	checkluatype(y, TYPE_NUMBER)
 	checkluatype(screenWidth, TYPE_NUMBER)
 	checkluatype(screenHeight, TYPE_NUMBER)
-	return util.AimVector(aunwrap(viewAngles), viewFOV, x, y, screenWidth, screenHeight)
+	return vwrap(util.AimVector(aunwrap(viewAngles), viewFOV, x, y, screenWidth, screenHeight))
 end
 
 end
