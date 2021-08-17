@@ -174,4 +174,20 @@ function trace_library.pointContents(position)
 	return util.PointContents(vunwrap(position))
 end
 
+--- Calculates the aim vector from a 2D screen position. This is essentially a generic version of input.screenToVector, where you can define the view angles and screen size manually.
+-- @param Angle viewAngles View angles
+-- @param number viewFOV View field of view
+-- @param number x X position on the screen
+-- @param number y Y position on the screen
+-- @param number screenWidth Screen width
+-- @param number screenHeight Screen height
+function trace_library.aimVector(viewAngles, viewFOV, x, y, screenWidth, screenHeight)
+	checkluatype(viewFOV, TYPE_NUMBER)
+	checkluatype(x, TYPE_NUMBER)
+	checkluatype(y, TYPE_NUMBER)
+	checkluatype(screenWidth, TYPE_NUMBER)
+	checkluatype(screenHeight, TYPE_NUMBER)
+	return util.AimVector(aunwrap(viewAngles), viewFOV, x, y, screenWidth, screenHeight)
+end
+
 end
