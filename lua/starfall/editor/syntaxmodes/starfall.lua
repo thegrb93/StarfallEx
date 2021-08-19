@@ -150,7 +150,7 @@ function EDITOR:BlockCommentSelection(removecomment)
 			self:SetSelection("--[[" .. self:GetSelection() .. "]]")
 		end
 	elseif mode == 2 then -- Old
-		local comment_char = "%-%-"
+		local comment_char = "%-%- "
 		if removecomment then
 			-- shift-TAB with a selection --
 			local tmp = string_gsub("\n"..self:GetSelection(), "\n"..comment_char, "\n")
@@ -158,7 +158,7 @@ function EDITOR:BlockCommentSelection(removecomment)
 			self:SetSelection(tmp:sub(2))
 		else
 			-- plain TAB with a selection --
-			self:SetSelection(comment_char .. self:GetSelection():gsub("\n", "\n"..comment_char))
+			self:SetSelection("-- "..self:GetSelection():gsub("\n", "\n"..comment_char))
 		end
 	else
 		ErrorNoHalt("Invalid block comment style")
