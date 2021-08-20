@@ -213,36 +213,43 @@ PANEL = {}
 function PANEL:Init()
 end
 
-local function moveFile(fileNode, toNode, callback)
-	if (toNode:GetFileName()) then return end
+local function moveFile(fileNode, toNode)
+	if (toNode:GetFileName()) then return false end
 
 	if (fileNode:GetFolder()) then
-		if (fileNode == toNode) then return end
-		if (SF.CopyFolder(fileNode:GetFolder(), toNode:GetFolder())) then
-			SF.DeleteFolder(fileNode:GetFolder())
-			local successMessage = "Successfully moved " .. fileNode:GetFolder() .. " to " .. toNode:GetFolder()
+		if (fileNode == toNode) then return false end
+		local folderName = string.GetFileFromFilename(fileNode:GetFolder())
 
-			SF.AddNotify(LocalPlayer(), successMessage, "GENERIC", 7, "DRIP3")
-			print(successMessage)
-		else return end
+		if (file.Exists(toNode:GetFolder() .. "/" .. folderName, "Data")) then
+			SF.AddNotify(LocalPlayer(), "Cannot move " .. folderName .. ", it already exists in: " .. toNode:GetFolder(), "ERROR", 7, "ERROR1")
+			return false
+		end
+		
+		if (file.Rename(fileNode:GetFolder(), toNode:GetFolder() .. "/" .. folderName)) then
+			SF.AddNotify(LocalPlayer(), "Successfully moved " .. folderName .. " to " .. toNode:GetFolder(), "GENERIC", 7, "DRIP3")
+		else return false end
 	elseif fileNode:GetFileName() then
-		if (SF.CopyFile(fileNode:GetFileName(), toNode:GetFolder())) then
-			file.Delete(fileNode:GetFileName())
-			local successMessage = "Successfully moved " .. string.GetFileFromFilename(fileNode:GetFileName()) .. " to " .. toNode:GetFolder()
+		local fileName = string.GetFileFromFilename(fileNode:GetFileName())
 
-			SF.AddNotify(LocalPlayer(), successMessage, "GENERIC", 7, "DRIP3")
-			print(successMessage)
-		else return end
+		if (file.Exists(toNode:GetFolder() .. "/" .. fileName, "Data")) then
+			SF.AddNotify(LocalPlayer(), "Cannot move " .. fileName .. ", it already exists in: " .. toNode:GetFolder(), "ERROR", 7, "ERROR1")
+			return false
+		end
+
+		if (file.Rename(fileNode:GetFileName(), toNode:GetFolder() .. "/" .. fileName)) then
+			SF.AddNotify(LocalPlayer(), "Successfully moved " .. fileName .. " to " .. toNode:GetFolder(), "GENERIC", 7, "DRIP3")
+		else return false end
 	end
 
-	callback()
+	return true
 end
 
 local function addDragHandling(node)
-	local setParent = node.SetParent
-	
+	-- Monkey patch solution, the current implementation of draggable DTree_nodes requires extending and
+	-- overriding AddNode. Along with copy-pasting behavior due to an annoying hard-code.
 	function node:SetParent(pnl)
-		moveFile(node, pnl:GetParent(), function () node:GetRoot():ReloadTree() end)
+		moveFile(node, pnl:GetParent())
+		node:GetRoot():ReloadTree()
 	end
 
 	return node
