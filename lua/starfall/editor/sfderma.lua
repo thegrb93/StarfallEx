@@ -216,17 +216,16 @@ end
 local function moveFile(fileNode, toNode)
 	if (toNode:GetFileName()) then return false end
 	if (fileNode == toNode) then return false end
-	local sourceName
 	local sourcePath
 
 	if (fileNode:GetFolder()) then
 		sourcePath = fileNode:GetFolder()
-		sourceName = string.GetFileFromFilename(sourcePath)
 	elseif fileNode:GetFileName() then
 		sourcePath = fileNode:GetFileName()
-		sourceName = string.GetFileFromFilename(sourcePath)
 	end
 
+	local sourceName = string.GetFileFromFilename(sourcePath)
+	
 	if (file.Exists(toNode:GetFolder() .. "/" .. sourceName, "Data")) then
 		SF.AddNotify(LocalPlayer(), "Cannot move " .. sourceName .. ", it already exists in: " .. toNode:GetFolder(), "ERROR", 7, "ERROR1")
 		return false
@@ -283,7 +282,6 @@ local function sort(tbl)
 	for k, v in pairs(sorted) do tbl[k] = v[2] end
 end
 local function addFiles(search, dir, node)
-
 	local found = false
 	local allFiles, allFolders = file.Find(dir .. "/*", "DATA")
 	allFiles = allFiles or {}
