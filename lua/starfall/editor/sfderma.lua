@@ -214,11 +214,11 @@ function PANEL:Init()
 end
 
 local function moveFile(fileNode, toNode)
-	if (toNode:GetFileName()) then return false end
-	if (fileNode == toNode) then return false end
+	if toNode:GetFileName() then return false end
+	if fileNode == toNode then return false end
 	local sourcePath
 
-	if (fileNode:GetFolder()) then
+	if fileNode:GetFolder() then
 		sourcePath = fileNode:GetFolder()
 	elseif fileNode:GetFileName() then
 		sourcePath = fileNode:GetFileName()
@@ -226,13 +226,13 @@ local function moveFile(fileNode, toNode)
 
 	local sourceName = string.GetFileFromFilename(sourcePath)
 	
-	if (file.Exists(toNode:GetFolder() .. "/" .. sourceName, "Data")) then
-		SF.AddNotify(LocalPlayer(), "Cannot move " .. sourceName .. ", it already exists in: " .. toNode:GetFolder(), "ERROR", 7, "ERROR1")
+	if file.Exists(toNode:GetFolder() .. "/" .. sourceName, "Data") then
+		SF.AddNotify(LocalPlayer(), "Failed to move " .. sourceName .. ", it already exists in: " .. toNode:GetFolder(), "ERROR", 7, "ERROR1")
 		return false
 	end
 
-	if (file.Rename(sourcePath, toNode:GetFolder() .. "/" .. sourceName)) then
-		SF.AddNotify(LocalPlayer(), "Successfully moved " .. sourceName .. " to " .. toNode:GetFolder(), "GENERIC", 7, "DRIP3")
+	if file.Rename(sourcePath, toNode:GetFolder() .. "/" .. sourceName) then
+		SF.AddNotify(LocalPlayer(), "Moved " .. sourceName .. " to " .. toNode:GetFolder(), "GENERIC", 7, "DRIP3")
 	else return false end
 
 	return true
