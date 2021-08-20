@@ -215,31 +215,26 @@ end
 
 local function moveFile(fileNode, toNode)
 	if (toNode:GetFileName()) then return false end
+	if (fileNode == toNode) then return false end
+	local sourceName
+	local sourcePath
 
 	if (fileNode:GetFolder()) then
-		if (fileNode == toNode) then return false end
-		local folderName = string.GetFileFromFilename(fileNode:GetFolder())
-
-		if (file.Exists(toNode:GetFolder() .. "/" .. folderName, "Data")) then
-			SF.AddNotify(LocalPlayer(), "Cannot move " .. folderName .. ", it already exists in: " .. toNode:GetFolder(), "ERROR", 7, "ERROR1")
-			return false
-		end
-		
-		if (file.Rename(fileNode:GetFolder(), toNode:GetFolder() .. "/" .. folderName)) then
-			SF.AddNotify(LocalPlayer(), "Successfully moved " .. folderName .. " to " .. toNode:GetFolder(), "GENERIC", 7, "DRIP3")
-		else return false end
+		sourcePath = fileNode:GetFolder()
+		sourceName = string.GetFileFromFilename(sourcePath)
 	elseif fileNode:GetFileName() then
-		local fileName = string.GetFileFromFilename(fileNode:GetFileName())
-
-		if (file.Exists(toNode:GetFolder() .. "/" .. fileName, "Data")) then
-			SF.AddNotify(LocalPlayer(), "Cannot move " .. fileName .. ", it already exists in: " .. toNode:GetFolder(), "ERROR", 7, "ERROR1")
-			return false
-		end
-
-		if (file.Rename(fileNode:GetFileName(), toNode:GetFolder() .. "/" .. fileName)) then
-			SF.AddNotify(LocalPlayer(), "Successfully moved " .. fileName .. " to " .. toNode:GetFolder(), "GENERIC", 7, "DRIP3")
-		else return false end
+		sourcePath = fileNode:GetFileName()
+		sourceName = string.GetFileFromFilename(sourcePath)
 	end
+
+	if (file.Exists(toNode:GetFolder() .. "/" .. sourceName, "Data")) then
+		SF.AddNotify(LocalPlayer(), "Cannot move " .. sourceName .. ", it already exists in: " .. toNode:GetFolder(), "ERROR", 7, "ERROR1")
+		return false
+	end
+
+	if (file.Rename(sourcePath, toNode:GetFolder() .. "/" .. sourceName)) then
+		SF.AddNotify(LocalPlayer(), "Successfully moved " .. sourceName .. " to " .. toNode:GetFolder(), "GENERIC", 7, "DRIP3")
+	else return false end
 
 	return true
 end
