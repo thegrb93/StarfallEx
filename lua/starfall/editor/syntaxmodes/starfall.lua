@@ -442,7 +442,7 @@ function EDITOR:SyntaxColorLine(row)
 						local pos = self.position -- We are saving that, so we can move tokenizer back
 						local c = self.character
 						local td = self.tokendata
-						if self:NextPattern("%s*%(") then -- we are checking if there is ( after name
+						if self:NextPattern("%s*[({'\"]") then -- we are checking if there is ( after name, or if single parameter function with string literal or table literal
 							tokenname = "function"
 							self.position = pos -- We dont want to move tokenizer as we were just checking without parsing
 							self.character = c
