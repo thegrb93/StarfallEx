@@ -195,9 +195,6 @@ end
 vgui.Register("StarfallPanel", PANEL, "DPanel")
 -- End Starfall Panel
 
---------------------------------------------------------------
---------------------------------------------------------------
-
 -- File Tree
 local invalid_filename_chars = {
 	["*"] = "",
@@ -241,17 +238,18 @@ end
 local function addDragHandling(node)
 	-- Monkey patch solution, the current implementation of draggable DTree_nodes requires extending and
 	-- overriding AddNode. Along with copy-pasting behavior due to an annoying hard-code.
+	local setparent = node.SetParent
 	function node:SetParent(pnl)
 		moveFile(node, pnl:GetParent())
+		setparent(self, pnl)
 		node:GetRoot():ReloadTree()
 	end
-
-	return node
 end
 
 function PANEL:Setup(folder)
 	self.folder = folder
-	self.Root = addDragHandling(self.RootNode:AddNode(folder))
+	self.Root = self.RootNode:AddNode(folder)
+	addDragHandling(self.Root)
 	self.Root:SetDraggableName("sf_filenode")
 	self.Root:SetFolder(folder)
 
@@ -290,17 +288,20 @@ local function addFiles(search, dir, node)
 	sort(allFolders)
 	if search=="" then
 		for k, v in pairs(allFolders) do
-			local newNode = addDragHandling(node:AddNode(v))
+			local newNode = node:AddNode(v)
+			addDragHandling(newNode)
 			newNode:SetFolder(dir .. "/" .. v)
 			addFiles(search, dir .. "/" .. v, newNode)
 		end
 		for k, v in pairs(allFiles) do
-			local fnode = addDragHandling(node:AddNode(v, "icon16/page_white.png"))
+			local fnode = node:AddNode(v, "icon16/page_white.png")
+			addDragHandling(fnode)
 			fnode:SetFileName(dir.."/"..v)
 		end
 	else
 		for k, v in pairs(allFolders) do
-			local newNode = addDragHandling(node:AddNode(v))
+			local newNode = node:AddNode(v)
+			addDragHandling(newNode)
 			newNode:SetFolder(v)
 			if addFiles(search, dir .. "/" .. v, newNode) then
 				newNode:SetExpanded(true)
@@ -311,7 +312,8 @@ local function addFiles(search, dir, node)
 		end
 		for k, v in pairs(allFiles) do
 			if string.find(string.lower(v), string.lower(search)) then
-				local fnode = addDragHandling(node:AddNode(v, "icon16/page_white.png"))
+				local fnode = node:AddNode(v, "icon16/page_white.png")
+				addDragHandling(fnode)
 				fnode:SetFileName(dir.."/"..v)
 				found = true
 			end
