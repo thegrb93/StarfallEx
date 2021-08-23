@@ -142,8 +142,7 @@ if CLIENT then
 	function SF.Editor.renameFile(oldFile, newFile)
 		if file.Exists(newFile, "DATA") then
 			SF.AddNotify(LocalPlayer(), "Failed to rename. File already exists there.", "ERROR", 7, "ERROR1")
-		elseif SF.FileWrite(newFile, file.Read(oldFile)) then
-			file.Delete(oldFile)
+		elseif file.Rename(oldFile, newFile) then
 			SF.AddNotify(LocalPlayer(), "File renamed as " .. newFile .. ".", "GENERIC", 7, "DRIP3")
 			for i = 1, SF.Editor.editor:GetNumTabs() do
 				local ed = SF.Editor.editor:GetTabContent(i)
