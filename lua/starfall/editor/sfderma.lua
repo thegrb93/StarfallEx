@@ -210,9 +210,47 @@ PANEL = {}
 function PANEL:Init()
 end
 
+local function moveFile(fileNode, toNode)
+	if toNode:GetFileName() then return false end
+	if fileNode == toNode then return false end
+	local sourcePath
+
+	if fileNode:GetFolder() then
+		sourcePath = fileNode:GetFolder()
+	elseif fileNode:GetFileName() then
+		sourcePath = fileNode:GetFileName()
+	end
+
+	local sourceName = string.GetFileFromFilename(sourcePath)
+	
+	if file.Exists(toNode:GetFolder() .. "/" .. sourceName, "Data") then
+		SF.AddNotify(LocalPlayer(), "Failed to move " .. sourceName .. ", it already exists in: " .. toNode:GetFolder(), "ERROR", 7, "ERROR1")
+		return false
+	end
+
+	if file.Rename(sourcePath, toNode:GetFolder() .. "/" .. sourceName) then
+		SF.AddNotify(LocalPlayer(), "Moved " .. sourceName .. " to " .. toNode:GetFolder(), "GENERIC", 7, "DRIP3")
+	else return false end
+
+	return true
+end
+
+local function addDragHandling(node)
+	-- Monkey patch solution, the current implementation of draggable DTree_nodes requires extending and
+	-- overriding AddNode. Along with copy-pasting behavior due to an annoying hard-code.
+	local setparent = node.SetParent
+	function node:SetParent(pnl)
+		moveFile(node, pnl:GetParent())
+		setparent(self, pnl)
+		node:GetRoot():ReloadTree()
+	end
+end
+
 function PANEL:Setup(folder)
 	self.folder = folder
 	self.Root = self.RootNode:AddNode(folder)
+	addDragHandling(self.Root)
+	self.Root:SetDraggableName("sf_filenode")
 	self.Root:SetFolder(folder)
 
 	local examples_url = "https://api.github.com/repos/thegrb93/StarfallEx/contents/lua/starfall/examples"
@@ -251,16 +289,19 @@ local function addFiles(search, dir, node)
 	if search=="" then
 		for k, v in pairs(allFolders) do
 			local newNode = node:AddNode(v)
+			addDragHandling(newNode)
 			newNode:SetFolder(dir .. "/" .. v)
 			addFiles(search, dir .. "/" .. v, newNode)
 		end
 		for k, v in pairs(allFiles) do
 			local fnode = node:AddNode(v, "icon16/page_white.png")
+			addDragHandling(fnode)
 			fnode:SetFileName(dir.."/"..v)
 		end
 	else
 		for k, v in pairs(allFolders) do
 			local newNode = node:AddNode(v)
+			addDragHandling(newNode)
 			newNode:SetFolder(v)
 			if addFiles(search, dir .. "/" .. v, newNode) then
 				newNode:SetExpanded(true)
@@ -272,6 +313,7 @@ local function addFiles(search, dir, node)
 		for k, v in pairs(allFiles) do
 			if string.find(string.lower(v), string.lower(search)) then
 				local fnode = node:AddNode(v, "icon16/page_white.png")
+				addDragHandling(fnode)
 				fnode:SetFileName(dir.."/"..v)
 				found = true
 			end
