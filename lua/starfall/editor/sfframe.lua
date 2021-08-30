@@ -1611,7 +1611,7 @@ end
 function Editor:LoadFile(Line, forcenewtab)
 	if not Line or file.IsDir(Line, "DATA") then return end
 
-	local f = file.Open(Line, "r", "DATA")
+	local f = file.Open(Line, "rb", "DATA")
 	if not f then
 		ErrorNoHalt("Erroring opening file: " .. Line)
 	else
