@@ -73,4 +73,24 @@ env.STENCIL = {
 	DECR = STENCIL_DECR
 }
 
+--- Midi Command ENUMS
+-- @name midi_library.MIDI
+-- @class table
+-- @field NOTE_OFF
+-- @field NOTE_ON
+-- @field AFTERTOUCH
+-- @field CONTINUOUS_CONTROLLER
+-- @field PATCH_CHANGE
+-- @field CHANNEL_PRESSURE
+-- @field PITCH_BEND
+env.MIDI = {
+	NOTE_OFF = 0x80,
+	NOTE_ON = 0x90,
+	AFTERTOUCH = 0xA0,
+	CONTINUOUS_CONTROLLER = 0xB0,
+	PATCH_CHANGE = 0xC0,
+	CHANNEL_PRESSURE = 0xD0,
+	PITCH_BEND = 0xE0
+}
+
 end
