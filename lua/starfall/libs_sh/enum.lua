@@ -570,6 +570,40 @@ env.COLLISION_GROUP = {
 	["WORLD"] = COLLISION_GROUP_WORLD
 }
 
+--- ENUMs of mesh types. To be used with mesh.generate.
+-- @name builtins_library.MATERIAL
+-- @class table
+-- @field LINES
+-- @field LINE_LOOP
+-- @field LINE_STRIP
+-- @field POINTS
+-- @field POLYGON
+-- @field QUADS
+-- @field TRIANGLES
+-- @field TRIANGLE_STRIP
+env.MATERIAL = {
+	["POINTS"] = MATERIAL_POINTS or 0,
+	["LINES"] = MATERIAL_LINES or 1,
+	["TRIANGLES"] = MATERIAL_TRIANGLES or 2,
+	["TRIANGLE_STRIP"] = MATERIAL_TRIANGLE_STRIP or 3,
+	["LINE_STRIP"] = MATERIAL_LINE_STRIP or 4,
+	["LINE_LOOP"] = MATERIAL_LINE_LOOP or 5,
+	["POLYGON"] = MATERIAL_POLYGON or 6,
+	["QUADS"] = MATERIAL_QUADS or 7
+}
+
+--- ENUMs of fog modes to use with render.setFogMode.
+-- @name builtins_library.MATERIAL_FOG
+-- @class table
+-- @field NONE
+-- @field LINEAR
+-- @field LINEAR_BELOW_FOG_Z
+env.MATERIAL_FOG = {
+	["NONE"] = MATERIAL_FOG_NONE or 0,
+	["LINEAR"] = MATERIAL_FOG_LINEAR or 1,
+	["LINEAR_BELOW_FOG_Z"] = MATERIAL_FOG_LINEAR_BELOW_FOG_Z or 2
+}
+
 --- ENUMs used as trace masks in the trace library. These are simply combinations of the CONTENTS enums.
 -- @name builtins_library.MASK
 -- @class table
@@ -686,6 +720,44 @@ env.CONTENTS = {
 	["CURRENT_90"] = CONTENTS_CURRENT_90,
 	["OPAQUE"] = CONTENTS_OPAQUE,
 	["WATER"] = CONTENTS_WATER
+}
+
+--- ENUMs of stencil comparisons and operations
+-- @name builtins_library.STENCIL
+-- @class table
+-- @field NEVER
+-- @field LESS
+-- @field EQUAL
+-- @field LESSEQUAL
+-- @field GREATER
+-- @field NOTEQUAL
+-- @field GREATEREQUAL
+-- @field ALWAYS
+-- @field KEEP
+-- @field ZERO
+-- @field REPLACE
+-- @field INCRSAT
+-- @field DECRSAT
+-- @field INVERT
+-- @field INCR
+-- @field DECR
+env.STENCIL = {
+	["NEVER"] = STENCIL_NEVER or 1,
+	["LESS"] = STENCIL_LESS or 2,
+	["EQUAL"] = STENCIL_EQUAL or 3,
+	["LESSEQUAL"] = STENCIL_LESSEQUAL or 4,
+	["GREATER"] = STENCIL_GREATER or 5,
+	["NOTEQUAL"] = STENCIL_NOTEQUAL or 6,
+	["GREATEREQUAL"] = STENCIL_GREATEREQUAL or 7,
+	["ALWAYS"] = STENCIL_ALWAYS or 8,
+	["KEEP"] = STENCIL_KEEP or 1,
+	["ZERO"] = STENCIL_ZERO or 2,
+	["REPLACE"] = STENCIL_REPLACE or 3,
+	["INCRSAT"] = STENCIL_INCRSAT or 4,
+	["DECRSAT"] = STENCIL_DECRSAT or 5,
+	["INVERT"] = STENCIL_INVERT or 6,
+	["INCR"] = STENCIL_INCR or 7,
+	["DECR"] = STENCIL_DECR or 8
 }
 
 --- ENUMs of texture filtering modes
@@ -951,6 +1023,26 @@ env.FSASYNC = {
 	STATUS_INPROGRESS = FSASYNC_STATUS_INPROGRESS,
 	STATUS_ABORTED = FSASYNC_STATUS_ABORTED,
 	STATUS_UNSERVICED = FSASYNC_STATUS_UNSERVICED
+}
+
+--- Midi Command ENUMS
+-- @name midi_library.MIDI
+-- @class table
+-- @field NOTE_OFF
+-- @field NOTE_ON
+-- @field AFTERTOUCH
+-- @field CONTINUOUS_CONTROLLER
+-- @field PATCH_CHANGE
+-- @field CHANNEL_PRESSURE
+-- @field PITCH_BEND
+env.MIDI = {
+	NOTE_OFF = 0x80,
+	NOTE_ON = 0x90,
+	AFTERTOUCH = 0xA0,
+	CONTINUOUS_CONTROLLER = 0xB0,
+	PATCH_CHANGE = 0xC0,
+	CHANNEL_PRESSURE = 0xD0,
+	PITCH_BEND = 0xE0
 }
 
 end
