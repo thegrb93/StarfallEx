@@ -187,7 +187,7 @@ function sound_methods:isPlaying()
 end
 
 --- Sets the sound level in dB. Won't work unless the sound is playing.
--- @param number level dB level, see <a href='https://developer.valvesoftware.com/wiki/Soundscripts#SoundLevel'> Vale Dev Wiki</a>, for information on the value to use.
+-- @param number level dB level, see <a href='https://developer.valvesoftware.com/wiki/Soundscripts#SoundLevel'>Valve Dev Wiki</a>, for information on the value to use.
 function sound_methods:setSoundLevel(level)
 	checkluatype(level, TYPE_NUMBER)
 	unwrap(self):SetSoundLevel(math.Clamp(level, 0, 511))
