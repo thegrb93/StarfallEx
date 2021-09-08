@@ -80,13 +80,13 @@ env.TEXT_ALIGN = {
 -- @field PAD_0
 -- @field KP_END
 -- @field PAD_1
--- @field KP_DOWNARROW 
+-- @field KP_DOWNARROW
 -- @field PAD_2
 -- @field KP_PGDN
 -- @field PAD_3
 -- @field KP_LEFTARROW
 -- @field PAD_4
--- @field KP_5 
+-- @field KP_5
 -- @field PAD_5
 -- @field KP_RIGHTARROW
 -- @field PAD_6
@@ -220,13 +220,13 @@ env.KEY = {
 	["PAD_0"] = 37,
 	["KP_END"] = 38,
 	["PAD_1"] = 38,
-	["KP_DOWNARROW "] = 39,
+	["KP_DOWNARROW"] = 39,
 	["PAD_2"] = 39,
 	["KP_PGDN"] = 40,
 	["PAD_3"] = 40,
 	["KP_LEFTARROW"] = 41,
 	["PAD_4"] = 41,
-	["KP_5 "] = 42,
+	["KP_5"] = 42,
 	["PAD_5"] = 42,
 	["KP_RIGHTARROW"] = 43,
 	["PAD_6"] = 43,
@@ -573,23 +573,23 @@ env.COLLISION_GROUP = {
 --- ENUMs of mesh types. To be used with mesh.generate.
 -- @name builtins_library.MATERIAL
 -- @class table
--- @field MATERIAL_LINES
--- @field MATERIAL_LINE_LOOP
--- @field MATERIAL_LINE_STRIP
--- @field MATERIAL_POINTS
--- @field MATERIAL_POLYGON
--- @field MATERIAL_QUADS
--- @field MATERIAL_TRIANGLES
--- @field MATERIAL_TRIANGLE_STRIP
+-- @field LINES
+-- @field LINE_LOOP
+-- @field LINE_STRIP
+-- @field POINTS
+-- @field POLYGON
+-- @field QUADS
+-- @field TRIANGLES
+-- @field TRIANGLE_STRIP
 env.MATERIAL = {
-	["LINES"] = MATERIAL_LINES,
-	["LINE_LOOP"] = MATERIAL_LINE_LOOP,
-	["LINE_STRIP"] = MATERIAL_LINE_STRIP,
-	["POINTS"] = MATERIAL_POINTS,
-	["POLYGON"] = MATERIAL_POLYGON,
-	["QUADS"] = MATERIAL_QUADS,
-	["TRIANGLES"] = MATERIAL_TRIANGLES,
-	["TRIANGLE_STRIP"] = MATERIAL_TRIANGLE_STRIP
+	["POINTS"] = MATERIAL_POINTS or 0,
+	["LINES"] = MATERIAL_LINES or 1,
+	["TRIANGLES"] = MATERIAL_TRIANGLES or 2,
+	["TRIANGLE_STRIP"] = MATERIAL_TRIANGLE_STRIP or 3,
+	["LINE_STRIP"] = MATERIAL_LINE_STRIP or 4,
+	["LINE_LOOP"] = MATERIAL_LINE_LOOP or 5,
+	["POLYGON"] = MATERIAL_POLYGON or 6,
+	["QUADS"] = MATERIAL_QUADS or 7
 }
 
 --- ENUMs of fog modes to use with render.setFogMode.
@@ -599,9 +599,9 @@ env.MATERIAL = {
 -- @field LINEAR
 -- @field LINEAR_BELOW_FOG_Z
 env.MATERIAL_FOG = {
-	["NONE"] = MATERIAL_FOG_NONE,
-	["LINEAR"] = MATERIAL_FOG_LINEAR,
-	["LINEAR_BELOW_FOG_Z"] = MATERIAL_FOG_LINEAR_BELOW_FOG_Z,
+	["NONE"] = MATERIAL_FOG_NONE or 0,
+	["LINEAR"] = MATERIAL_FOG_LINEAR or 1,
+	["LINEAR_BELOW_FOG_Z"] = MATERIAL_FOG_LINEAR_BELOW_FOG_Z or 2
 }
 
 --- ENUMs used as trace masks in the trace library. These are simply combinations of the CONTENTS enums.
@@ -649,7 +649,7 @@ env.MASK = {
 	["NPCSOLID_BRUSHONLY"] = MASK_NPCSOLID_BRUSHONLY,
 	["SHOT_PORTAL"] = MASK_SHOT_PORTAL,
 	["WATER"] = MASK_WATER,
-	["PLAYERSOLID"] = MASK_PLAYERSOLID	
+	["PLAYERSOLID"] = MASK_PLAYERSOLID
 }
 
 --- ENUMs used as masks in the trace library.
@@ -719,7 +719,7 @@ env.CONTENTS = {
 	["HITBOX"] = CONTENTS_HITBOX,
 	["CURRENT_90"] = CONTENTS_CURRENT_90,
 	["OPAQUE"] = CONTENTS_OPAQUE,
-	["WATER"] = CONTENTS_WATER	
+	["WATER"] = CONTENTS_WATER
 }
 
 --- ENUMs of stencil comparisons and operations
@@ -742,22 +742,22 @@ env.CONTENTS = {
 -- @field INCR
 -- @field DECR
 env.STENCIL = {
-	NEVER = STENCIL_NEVER,
-	LESS = STENCIL_LESS,
-	EQUAL = STENCIL_EQUAL,
-	LESSEQUAL = STENCIL_LESSEQUAL,
-	GREATER = STENCIL_GREATER,
-	NOTEQUAL = STENCIL_NOTEQUAL,
-	GREATEREQUAL = STENCIL_GREATEREQUAL,
-	ALWAYS = STENCIL_ALWAYS,
-	KEEP = STENCIL_KEEP,
-	ZERO = STENCIL_ZERO,
-	REPLACE = STENCIL_REPLACE,
-	INCRSAT = STENCIL_INCRSAT,
-	DECRSAT = STENCIL_DECRSAT,
-	INVERT = STENCIL_INVERT,
-	INCR = STENCIL_INCR,
-	DECR = STENCIL_DECR
+	["NEVER"] = STENCIL_NEVER or 1,
+	["LESS"] = STENCIL_LESS or 2,
+	["EQUAL"] = STENCIL_EQUAL or 3,
+	["LESSEQUAL"] = STENCIL_LESSEQUAL or 4,
+	["GREATER"] = STENCIL_GREATER or 5,
+	["NOTEQUAL"] = STENCIL_NOTEQUAL or 6,
+	["GREATEREQUAL"] = STENCIL_GREATEREQUAL or 7,
+	["ALWAYS"] = STENCIL_ALWAYS or 8,
+	["KEEP"] = STENCIL_KEEP or 1,
+	["ZERO"] = STENCIL_ZERO or 2,
+	["REPLACE"] = STENCIL_REPLACE or 3,
+	["INCRSAT"] = STENCIL_INCRSAT or 4,
+	["DECRSAT"] = STENCIL_DECRSAT or 5,
+	["INVERT"] = STENCIL_INVERT or 6,
+	["INCR"] = STENCIL_INCR or 7,
+	["DECR"] = STENCIL_DECR or 8
 }
 
 --- ENUMs of texture filtering modes
@@ -1044,4 +1044,5 @@ env.MIDI = {
 	CHANNEL_PRESSURE = 0xD0,
 	PITCH_BEND = 0xE0
 }
+
 end
