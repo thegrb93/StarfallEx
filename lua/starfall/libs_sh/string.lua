@@ -98,13 +98,6 @@ string_library.format = sfstring.format
 -- @return string|table Formatted string or a table
 string_library.formattedTime = sfstring.FormattedTime
 
---- Returns char value from the specified index in the supplied string. (DEPRECATED! You should use string.sub instead)
--- @class function
--- @param string str The string that you will be searching with the supplied index
--- @param number index The index's value of the string to be returned
--- @return string The selected character
-string_library.getChar = sfstring.GetChar
-
 --- Returns extension of the file-path.
 -- @class function
 -- @param string str File-path to get the file extensions from
@@ -123,13 +116,6 @@ string_library.getFileFromFilename = sfstring.GetFileFromFilename
 -- @return string The path
 string_library.getPathFromFilename = sfstring.GetPathFromFilename
 
---- Returns an iterator function that is called for every complete match of the pattern, all sub matches will be passed as to the loop. (DEPRECATED! You should use string.gmatch instead)
--- @class function
--- @param string data The string to search in
--- @param string pattern The pattern to search for
--- @return function The iterator function that can be used in a for-in loop
-string_library.gfind = sfstring.gfind
-
 --- Using Patterns, returns an iterator which will return either one value if no capture groups are defined, or any capture group matches.
 -- @class function
 -- @param string data The string to search in
@@ -146,13 +132,6 @@ string_library.gmatch = sfstring.gmatch
 -- @return string String with replaced parts
 -- @return number Replacements count
 string_library.gsub = sfstring.gsub
-
---- Joins the values of a table together to form a string. (DEPRECATED! You should use table.concat instead)
--- @class function
--- @param string separator The separator to insert between each piece
--- @param table pieces The table of pieces to concatenate. The keys for these must be numeric and sequential
--- @return string Imploded string
-string_library.implode = sfstring.Implode
 
 --- Escapes special characters for JavaScript in a string, making the string safe for inclusion in to JavaScript strings.
 -- @class function
