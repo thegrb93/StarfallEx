@@ -321,7 +321,7 @@ function input_library.lockControls(enabled)
 	end
 end
 
---- Gets whether the player's control is currenty locked
+--- Gets whether the player's control is currently locked
 -- @client
 -- @return boolean Whether the player's control is locked
 function input_library.isControlLocked()

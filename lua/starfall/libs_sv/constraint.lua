@@ -113,7 +113,7 @@ function constraint_library.weld(e1, e2, bone1, bone2, force_lim, nocollide)
 	end
 end
 
---- Axis two entities. v1 in e1's coordinates and v2 in e2's coodinates (or laxis in e1's coordinates again) define the axis
+--- Axis two entities. v1 in e1's coordinates and v2 in e2's coordinates (or laxis in e1's coordinates again) define the axis
 -- @param Entity e1 The first entity
 -- @param Entity e2 The second entity
 -- @param number? bone1 Number bone of the first entity. Default 0

@@ -76,7 +76,7 @@ local function createTimer(name, delay, reps, func, simple)
 	else
 		timername = mangle_timer_name(name)
 	end
-	
+
 	local timerdata = {reps = reps, func = func}
 	local function timerCallback()
 		if timerdata.reps ~= 0 then
@@ -97,7 +97,7 @@ end
 --- Creates (and starts) a timer
 -- @param string name The timer name
 -- @param number delay The time, in seconds, to set the timer to.
--- @param number reps The repititions of the timer. 0 = infinte
+-- @param number reps The repetitions of the timer. 0 = infinite
 -- @param function func The function to call when the timer is fired
 function timer_library.create(name, delay, reps, func)
 	checkluatype(name, TYPE_STRING)

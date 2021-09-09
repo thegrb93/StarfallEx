@@ -160,7 +160,7 @@ function find_library.allPlayers(filter)
 	return convert(player.GetAll(), filter)
 end
 
---- Finds all entitites
+--- Finds all entities
 -- @param function? filter Optional function to filter results
 -- @return table An array of found entities
 function find_library.all(filter)

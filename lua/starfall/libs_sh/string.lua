@@ -91,7 +91,7 @@ string_library.find = sfstring.find
 string_library.format = sfstring.format
 
 --- Returns the time as a formatted string or table. http://www.cplusplus.com/reference/cstdio/printf/
--- If format is not specified, the table will contain the following keys: ms (miliseconds); s (seconds); m (minutes); h (hours).
+-- If format is not specified, the table will contain the following keys: ms (milliseconds); s (seconds); m (minutes); h (hours).
 -- @class function
 -- @param number time The time in seconds to format
 -- @param string? format An optional formatting to use. If no format it specified, a table will be returned instead
@@ -277,7 +277,7 @@ string_library.sub = sfstring.sub
 -- @return string Given time in "MM:SS" format
 string_library.toMinutesSeconds = sfstring.ToMinutesSeconds
 
---- Converts time to minutes, seconds and miliseconds string.
+--- Converts time to minutes, seconds and milliseconds string.
 -- @class function
 -- @param number time Time in seconds
 -- @return string Returns given time in "MM:SS:MS" format
@@ -292,7 +292,7 @@ function string_library.toHoursMinutesSeconds( seconds )
 	return sfstring.format("%02i:%02i:%02i", formattedTime.h, formattedTime.m, formattedTime.s)
 end
 
---- Converts time to hours, minutes, seconds and miliseconds string.
+--- Converts time to hours, minutes, seconds and milliseconds string.
 -- @class function
 -- @param number time Time in seconds
 -- @return string Returns given time in "HH:MM:SS.MS" format

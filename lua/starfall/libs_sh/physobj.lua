@@ -343,8 +343,8 @@ if SERVER then
 
 		phys:SetInertia(vec)
 	end
-	
-	
+
+
 	local validGameFlags = FVPHYSICS_DMG_DISSOLVE + FVPHYSICS_DMG_SLICE + FVPHYSICS_HEAVY_OBJECT + FVPHYSICS_NO_IMPACT_DMG +
 		FVPHYSICS_NO_NPC_IMPACT_DMG + FVPHYSICS_NO_PLAYER_PICKUP
 	--- Adds game flags to the physics object. Some flags cannot be modified. Can be:
@@ -366,7 +366,7 @@ if SERVER then
 			SF.Throw("Invalid flags " .. invalidFlags, 2)
 		end
 	end
-	
+
 	--- Clears game flags from the physics object. Some flags cannot be modified. Can be:
 	-- FVPHYSICS.DMG_DISSOLVE
 	-- FVPHYSICS.DMG_SLICE
@@ -386,7 +386,7 @@ if SERVER then
 			SF.Throw("Invalid flags " .. invalidFlags, 2)
 		end
 	end
-	
+
 	--- Returns whether the game flags of the physics object are set.
 	-- @param number flags The flags to test. FVPHYSICS enum.
 	-- @return boolean If the flags are set
@@ -395,7 +395,7 @@ if SERVER then
 		local phys = unwrap(self)
 		return phys:HasGameFlag(flags)
 	end
-	
+
 	--- Sets bone gravity
 	-- @param boolean grav Should the bone respect gravity?
 	function physobj_methods:enableGravity(grav)
@@ -406,7 +406,7 @@ if SERVER then
 	end
 
 	--- Sets the bone drag state
-	-- @param boolean drag Should the bone have air resistence?
+	-- @param boolean drag Should the bone have air resistance?
 	function physobj_methods:enableDrag(drag)
 		local phys = unwrap(self)
 		checkpermission(instance, phys:GetEntity(), "entities.enableDrag")
@@ -445,7 +445,7 @@ if SERVER then
 		local phys = unwrap(self)
 		return phys:GetDamping()
 	end
-	
+
 	--- Sets the movement damping of the bone. Unlike air drag, it doesn't take into account the cross-section of the object.
 	-- @param number linear Number of the linear damping
 	-- @param number angular Number of the angular damping
@@ -456,7 +456,7 @@ if SERVER then
 		checkpermission(instance, phys:GetEntity(), "entities.setDamping")
 		phys:SetDamping(linear, angular)
 	end
-	
+
 	--- Sets the bone movement state
 	-- @param boolean move Should the bone move?
 	function physobj_methods:enableMotion(move)
@@ -489,7 +489,7 @@ if SERVER then
 		checkpermission(instance, phys:GetEntity(), "entities.applyForce")
 		phys:Wake()
 	end
-	
+
 	--- Returns table of tables of friction data of a contact against the physobj
 	-- @server
 	-- @return table Table of tables of data. Each table will contain:
@@ -508,14 +508,14 @@ if SERVER then
 		end
 		return result
 	end
-	
+
 	--- Returns the volume in source units cubed. Or nil if the PhysObj is a generated sphere or box.
 	-- @shared
 	-- @return number? The volume or nil if the PhysObj is a generated sphere or box.
 	function physobj_methods:getVolume()
 		return unwrap(self):GetVolume()
 	end
-	
+
 end
 
 end

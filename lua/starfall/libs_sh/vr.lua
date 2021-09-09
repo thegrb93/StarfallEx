@@ -79,7 +79,7 @@ function vr_library.isPlayerInVR(ply)
 	return vrmod.IsPlayerInVR(getply(ply))
 end
 
---- Checks wether the player is using empty hands
+--- Checks whether the player is using empty hands
 -- @param Player target Player to check
 -- @return boolean True if player is using empty hands
 function vr_library.usingEmptyHands(ply)
