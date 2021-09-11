@@ -345,16 +345,6 @@ function player_methods:getTeamName()
 	return team.GetName(getply(self):Team())
 end
 
---- Returns the player's unique ID. Returns 1 in singleplayer.
--- Returns a Int32 that remains constant for a player across joins/leaves and across different servers.
--- This can be used when a string is inappropriate - e.g. in a database primary key.
--- Deprecated! You should use the SteamID functions instead.
--- @shared
--- @return number UniqueID
-function player_methods:getUniqueID()
-	return getply(self):UniqueID()
-end
-
 --- Returns the player's UserID
 -- @shared
 -- @return number UserID
