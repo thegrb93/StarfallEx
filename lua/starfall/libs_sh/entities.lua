@@ -673,11 +673,13 @@ end
 -- @return boolean True if valid, false if not
 function ents_methods:isValid()
 	local ent = eunwrap(self)
-	if ent and ent:IsValid() then
-		return true
-	else
-		return false
+	if ent then
+		local isValid = ent.IsValid
+		if isValid then
+			return isValid(ent)
+		end
 	end
+	return false
 end
 
 --- Checks if an entity is a player.
