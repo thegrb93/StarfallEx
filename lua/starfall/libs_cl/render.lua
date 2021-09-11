@@ -369,7 +369,7 @@ function instance:prepareRender()
 	render.SetColorMaterial()
 	draw.NoTexture()
 	surface.SetDrawColor(255, 255, 255, 255)
-	surface.DisableClipping( true ) 
+	surface.DisableClipping( true )
 	renderdata.isRendering = true
 	renderdata.needRT = false
 	renderdata.oldW = ScrW()
@@ -392,7 +392,7 @@ function instance:cleanupRender()
 	render.OverrideDepthEnable(false, false)
 	render.SetScissorRect(0, 0, 0, 0, false)
 	render.CullMode(MATERIAL_CULLMODE_CCW)
-	render.SetLightingMode(0) 
+	render.SetLightingMode(0)
 	pp.colour:SetTexture("$fbtexture", tex_screenEffect)
 	pp.downsample:SetTexture("$fbtexture", tex_screenEffect)
 	for i = #matrix_stack, 1, -1 do
@@ -1330,7 +1330,7 @@ end
 -- @param table dataR Red channel data.
 -- @param table dataG Green channel data.
 -- @param table dataB Blue channel data.
-function render_library.drawPixelsRGB(w, h, dataR, dataG, dataB) 
+function render_library.drawPixelsRGB(w, h, dataR, dataG, dataB)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if not renderdata.usingRT then SF.Throw("Cannot use this function outside of a rendertarget.", 2) end
 	for i = 1, w*h do
@@ -1392,7 +1392,7 @@ end
 -- @param table dataG Green channel data.
 -- @param table dataB Blue channel data.
 -- @param table dataA Alpha channel data.
-function render_library.drawPixelsSubrectRGBA(dstX, dstY, srcX, srcY, srcW, srcH, subrectW, subrectH, dataR, dataG, dataB, dataA) 
+function render_library.drawPixelsSubrectRGBA(dstX, dstY, srcX, srcY, srcW, srcH, subrectW, subrectH, dataR, dataG, dataB, dataA)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if not renderdata.usingRT then SF.Throw("Cannot use this function outside of a rendertarget.", 2) end
 	for i = 0, subrectW*subrectH-1 do
@@ -1407,7 +1407,7 @@ end
 --- Draws a line. Use 3D functions for float coordinates
 -- @param number x1 X start integer coordinate
 -- @param number y1 Y start integer coordinate
--- @param number x2 X end interger coordinate
+-- @param number x2 X end integer coordinate
 -- @param number y2 Y end integer coordinate
 function render_library.drawLine(x1, y1, x2, y2)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
@@ -1806,7 +1806,7 @@ function render_library.cursorPos(ply, screen)
 	else
 		ply = LocalPlayer()
 	end
-	
+
 	if screen~=nil then screen = getent(screen) else screen = renderdata.renderEnt end
 	if not (screen and screen.Transform) then SF.Throw("Invalid screen", 2) end
 
@@ -1838,7 +1838,7 @@ function render_library.cursorPos(ply, screen)
 	return nil
 end
 
---- Returns information about the screen, such as world offsets, dimentions, and rotation.
+--- Returns information about the screen, such as world offsets, dimensions, and rotation.
 -- Note: this does a table copy so move it out of your draw hook
 -- @param Entity e The screen to get info from.
 -- @return table A table describing the screen.
@@ -1926,13 +1926,13 @@ function render_library.renderView(tbl)
 	if tbl.znear~=nil then checkluatype(tbl.znear, TYPE_NUMBER) end
 	if tbl.drawmonitors~=nil then checkluatype(tbl.drawmonitors, TYPE_BOOL) end
 	if tbl.drawviewmodel~=nil then checkluatype(tbl.drawviewmodel, TYPE_BOOL) end
-	if tbl.ortho~=nil then 
+	if tbl.ortho~=nil then
 		checkluatype(tbl.ortho, TYPE_TABLE)
 		checkluatype(tbl.ortho.left, TYPE_NUMBER)
 		checkluatype(tbl.ortho.right, TYPE_NUMBER)
 		checkluatype(tbl.ortho.top, TYPE_NUMBER)
 		checkluatype(tbl.ortho.bottom, TYPE_NUMBER)
-		ortho = { 
+		ortho = {
 			left = tbl.ortho.left,
 			right = tbl.ortho.right,
 			top = tbl.ortho.top,
@@ -1943,23 +1943,23 @@ function render_library.renderView(tbl)
 	if tbl.bloomtone~=nil then checkluatype(tbl.bloomtone, TYPE_BOOL) end
 	if tbl.znearviewmodel~=nil then checkluatype(tbl.znearviewmodel, TYPE_NUMBER) end
 	if tbl.zfarviewmodel~=nil then checkluatype(tbl.zfarviewmodel, TYPE_NUMBER) end
-	if tbl.offcenter~=nil then 
+	if tbl.offcenter~=nil then
 		checkluatype(tbl.offcenter, TYPE_TABLE)
 		checkluatype(tbl.offcenter.left, TYPE_NUMBER)
 		checkluatype(tbl.offcenter.right, TYPE_NUMBER)
 		checkluatype(tbl.offcenter.top, TYPE_NUMBER)
 		checkluatype(tbl.offcenter.bottom, TYPE_NUMBER)
-		offcenter = { 
+		offcenter = {
 			left = tbl.offcenter.left,
 			right = tbl.offcenter.right,
 			top = tbl.offcenter.top,
 			bottom = tbl.offcenter.bottom,
 		}
 	end
-	
+
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if !renderdata.isScenic then SF.Throw("Can't use render.renderView outside of renderscene hook.", 2) end
-	
+
 	if renderdata.renderingView then
 		SF.Throw("Already rendering a view.", 2)
 	end
@@ -2026,7 +2026,7 @@ function render_library.renderView(tbl)
 		zfarviewmodel = tbl.zfarviewmodel,
 		offcenter = offcenter,
 	})
-	
+
 	cam.End3D()
 	render.PopRenderTarget()
 
@@ -2039,7 +2039,7 @@ function render_library.renderView(tbl)
 	renderdata.usingRT = prevData.usingRT
 	pushedClippingPlanes = prevData.pushedClippingPlanes
 
-	renderingView = false	
+	renderingView = false
 	renderdata.renderingView = false
 	renderdata.isRendering = true
 end

@@ -98,7 +98,7 @@ end
 
 --- Returns whether the weapon is visible
 -- @shared
--- @return boolean Whether the weapon is visble or not
+-- @return boolean Whether the weapon is visible or not
 function weapon_methods:isWeaponVisible()
 	return unwrap(self):IsWeaponVisible()
 end

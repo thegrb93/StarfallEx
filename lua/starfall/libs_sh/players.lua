@@ -15,16 +15,16 @@ local playerAnimRemove
 local playerAnimGet
 if CLIENT then
 	local playerAnimation
-	
+
 	playerAnimAdd = function(ply, anim)
 		if next(playerAnimation) == nil then
 			hook.Add("CalcMainActivity", "sf_player_animation", function(ply, vel)
 				local anim = playerAnimation[ply]
 				if not anim then return end
-				
+
 				if anim.auto then
 					anim.progress = anim.progress + FrameTime() / anim.duration * anim.rate / anim.range
-					
+
 					local more = anim.progress > 1
 					if more or anim.progress < 0 then
 						if anim.loop then
@@ -36,36 +36,36 @@ if CLIENT then
 							end
 						else
 							playerAnimRemove(ply)
-							
+
 							return
 						end
 					end
 				end
-				
+
 				ply:SetCycle(anim.min + anim.progress * anim.range)
-				
+
 				local seq = anim.sequence
 				return anim.activity or seq, seq
 			end)
 		end
-		
+
 		playerAnimation[ply] = anim
-		
+
 		return anim
 	end
-	
+
 	playerAnimRemove = function(ply)
 		playerAnimation[ply] = nil
-		
+
 		if next(playerAnimation) == nil then
 			hook.Remove("CalcMainActivity", "sf_player_animation")
 		end
 	end
-	
+
 	playerAnimGet = function(ply)
 		return playerAnimation[ply]
 	end
-	
+
 	playerAnimation = SF.EntityTable("playerAnimation", playerAnimRemove, true)
 end
 
@@ -763,7 +763,7 @@ if CLIENT then
 		anim.rate = rate
 	end
 
-	--- Sets the animation audo advance
+	--- Sets the animation auto advance
 	-- @client
 	-- @param boolean auto_advance Should the animation handle advancing itself?
 	function player_methods:setAnimationAutoAdvance(auto_advance)

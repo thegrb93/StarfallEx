@@ -605,7 +605,7 @@ function quat_methods:getInverse()
 	return ret
 end
 
---- Calculates inverse of the quaternon.
+--- Calculates inverse of the quaternion.
 -- Self-Modifies. Does not return anything
 function quat_methods:inverse()
 	quatInv(self)

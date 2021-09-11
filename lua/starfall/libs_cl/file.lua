@@ -177,7 +177,7 @@ local file_methods, file_meta, wrap, unwrap = instance.Types.File.Methods, insta
 
 --- Opens and returns a file
 -- @param string path Filepath relative to data/sf_filedata/.
--- @param string mode The file mode to use. See lua manual for explaination
+-- @param string mode The file mode to use. See lua manual for explanation
 -- @return File? File object or nil if it failed
 function file_library.open(path, mode)
 	checkpermission (instance, path, "file.open")
@@ -344,7 +344,7 @@ end
 
 --- Enumerates a directory relative to gmod
 -- @param string path The folder to enumerate, relative to garrysmod.
--- @param string? sorting Optional sorting arguement. Either nameasc, namedesc, dateasc, datedesc
+-- @param string? sorting Optional sorting argument. Either nameasc, namedesc, dateasc, datedesc
 -- @return table Table of file names
 -- @return table Table of directory names
 function file_library.findInGame(path, sorting)

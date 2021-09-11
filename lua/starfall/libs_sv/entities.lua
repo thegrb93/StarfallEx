@@ -392,7 +392,7 @@ function ents_methods:setDrawShadow(draw, ply)
 	end
 end
 
---- Sets the entitiy's position. No interpolation will occur clientside, use physobj.setPos to have interpolation.
+--- Sets the entity's position. No interpolation will occur clientside, use physobj.setPos to have interpolation.
 -- @param Vector vec New position
 function ents_methods:setPos(vec)
 	local ent = getent(self)
@@ -648,7 +648,7 @@ function ents_methods:enableGravity(grav)
 end
 
 --- Sets the entity drag state
--- @param boolean drag Should the entity have air resistence?
+-- @param boolean drag Should the entity have air resistance?
 function ents_methods:enableDrag(drag)
 	local ent = getent(self)
 	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end

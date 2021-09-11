@@ -7,7 +7,7 @@ function SF.ParseObj(obj, thread_yield, Vector, triangulate)
 	local meshes = {}
 	local name, nextname
 	local lines = string.gmatch(obj, "[^\r\n]+")
-	
+
 	local pos, norm, uv, faces = {}, {}, {}, {}
 	local map = {
 		v = function(f) pos[#pos + 1] = Vector(tonumber(f()), tonumber(f()), tonumber(f())) end,
@@ -15,13 +15,13 @@ function SF.ParseObj(obj, thread_yield, Vector, triangulate)
 		vn = function(f) norm[#norm + 1] = Vector(tonumber(f()), tonumber(f()), tonumber(f())) end,
 	}
 	local ignore = { ["#"] = true, ["mtllib"] = true, ["usemtl"] = true, ["s"] = true }
-		
+
 	while true do
 		local timeToStop = false
 
 		local face = {}
 		if triangulate then
-			map.f = function(f) 
+			map.f = function(f)
 				local points = {}
 				local c = 0
 				for p in f do
@@ -99,7 +99,7 @@ function SF.ParseObj(obj, thread_yield, Vector, triangulate)
 		end
 
 		SF.GenerateTangents(vertices, thread_yield, Vector)
-		
+
 		if thread_yield then thread_yield() end
 		meshes[name] = vertices
 		faces[name] = face
@@ -179,19 +179,19 @@ function SF.GenerateUV(vertices, scale, Vector, Angle, worldtolocal)
 	local a = Angle()
 	local cross = v.cross or v.Cross
 	local getangle = v.getAngle or v.Angle
-	
+
 	local function uv(vertex, ang)
 		local p = worldtolocal(vertex.pos, a, v, ang)
 		vertex.u = p.y * scale
 		vertex.v = p.z * scale
 	end
-	
+
 	for i = 1, #vertices - 2, 3 do
 		local a = vertices[i]
 		local b = vertices[i + 1]
 		local c = vertices[i + 2]
 		local ang = getangle(cross(b.pos - a.pos, c.pos - a.pos))
-		
+
 		uv(a, ang)
 		uv(b, ang)
 		uv(c, ang)
@@ -206,26 +206,26 @@ function SF.GenerateNormals(vertices, inverted, smoothrad, Vector)
 	local add = v.add or v.Add
 	local div = v.div or v.Div
 	smoothrad = math.cos(smoothrad)
-	
+
 	if inverted then
 		local org = cross
 		cross = function(a, b)
 			return org(b, a)
 		end
 	end
-	
+
 	for i = 1, #vertices - 2, 3 do
 		local a = vertices[i]
 		local b = vertices[i + 1]
 		local c = vertices[i + 2]
 		local norm = cross(b.pos - a.pos, c.pos - a.pos)
 		normalize(norm)
-		
+
 		a.normal = norm
 		b.normal = norm
 		c.normal = norm
 	end
-	
+
 	if smoothrad ~= 1 then
 		local norms = setmetatable({},{__index = function(t,k) local r=setmetatable({},{__index=function(t,k) local r=setmetatable({},{__index=function(t,k) local r={} t[k]=r return r end}) t[k]=r return r end}) t[k]=r return r end})
 		for _, vertex in ipairs(vertices) do
@@ -233,19 +233,19 @@ function SF.GenerateNormals(vertices, inverted, smoothrad, Vector)
 			local norm = norms[pos[1]][pos[2]][pos[3]]
 			norm[#norm+1] = vertex.normal
 		end
-		
+
 		for _, vertex in ipairs(vertices) do
 			local normal = Vector()
 			local count = 0
 			local pos = vertex.pos
-			
+
 			for _, norm in ipairs(norms[pos[1]][pos[2]][pos[3]]) do
 				if dot(vertex.normal, norm) >= smoothrad then
 					add(normal, norm)
 					count = count + 1
 				end
 			end
-			
+
 			if count > 1 then
 				div(normal, count)
 				vertex.normal = normal
@@ -273,7 +273,7 @@ do
 			if not isValid(point.ent) then continue end
 			local cur_pos = point.ent:getPos()
 			if not changed and ( not point.vec or point.vec != cur_pos ) then changed = true end
-			
+
 			point.vec = cur_pos
 			point.x = point.vec.x
 			point.y = point.vec.y
@@ -306,13 +306,13 @@ do
 	function face_vertices( face )
 		local first_edge = face.edge
 		local cur_edge = first_edge
-		
+
 		local vertices = {}
 		repeat
 			vertices[#vertices + 1] = cur_edge.vert
-			cur_edge = cur_edge.next    
+			cur_edge = cur_edge.next
 		until cur_edge == first_edge
-		
+
 		return unpack(vertices)
 	end
 
@@ -333,21 +333,21 @@ do
 				end
 			end
 		end
-		
+
 		-- Find 3rd point of base triangle
 		local point3_dist = 0
 		local point3 = nil
 		for i=1,#points do
 			local p = points[i]
 			if p == point1 or p == point2 then continue end
-			
+
 			local tmp_dist = dist_to_line(p, point1, point2)
 			if tmp_dist > point3_dist then
 				point3_dist = tmp_dist
 				point3 = p
 			end
 		end
-		
+
 		-- First face
 		local he_face1 = {plane = find_plane( point1, point2, point3 ), points = {}}
 		local he_f1_edge1 = {face = he_face1}
@@ -363,7 +363,7 @@ do
 		he_f1_edge2.vert.edge = he_f1_edge2
 		he_f1_edge3.vert.edge = he_f1_edge3
 		he_face1.edge = he_f1_edge1
-		
+
 		-- Second face
 		local he_face2 = {plane = find_plane( point2, point1, point3 ), points = {}}
 		local he_f2_edge1 = {face = he_face2}
@@ -379,7 +379,7 @@ do
 		he_f2_edge2.vert.edge = he_f2_edge2
 		he_f2_edge3.vert.edge = he_f2_edge3
 		he_face2.edge = he_f2_edge1
-		
+
 		-- Join faces
 		he_f1_edge1.twin = he_f2_edge1
 		he_f1_edge2.twin = he_f2_edge3
@@ -387,7 +387,7 @@ do
 		he_f2_edge1.twin = he_f1_edge1
 		he_f2_edge2.twin = he_f1_edge3
 		he_f2_edge3.twin = he_f1_edge2
-		
+
 		point1.ignore = true
 		point2.ignore = true
 		point3.ignore = true
@@ -407,7 +407,7 @@ do
 
 	function find_lightfaces( point, face, ret )
 		if not ret then ret = {} end
-		
+
 		if face.lightface or dist_to_plane( point, face.plane ) <= 0 then
 			return ret
 		end
@@ -418,14 +418,14 @@ do
 		find_lightfaces( point, face.edge.twin.face, ret )
 		find_lightfaces( point, face.edge.next.twin.face, ret )
 		find_lightfaces( point, face.edge.next.next.twin.face, ret )
-		
+
 		return ret
 	end
 
 	function next_horizon_edge( horizon_edge )
 		local cur_edge = horizon_edge.next
 		while cur_edge.twin.face.lightface do
-			cur_edge = cur_edge.twin.next    
+			cur_edge = cur_edge.twin.next
 		end
 		return cur_edge
 	end
@@ -449,28 +449,28 @@ do
 
 		local face_list = {}  -- (linked list) Faces that been processed (although they can still be removed from list)
 		local face_stack = {} -- Faces to be processed
-		
+
 		-- Push faces onto stack
 		for k1, face in pairs(faces) do
 			face_stack[#face_stack + 1] = face
 		end
-		
+
 		while #face_stack > 0 do
 			-- Pop face from stack
 			local curface = face_stack[#face_stack]
 			face_stack[#face_stack] = nil
-			
+
 			-- Ignore previous lightfaces
 			if curface.lightface then continue end
-			
+
 			-- If no points, the face is processed
 			if #curface.points == 0 then
 				curface.list_parent = face_list
 				face_list = {next=face_list, value=curface}
-				
+
 				continue
 			end
-			
+
 			-- Find distant point
 			local point_dist = 0
 			local point = nil
@@ -485,20 +485,20 @@ do
 
 			-- Find all faces visible to point
 			local light_faces = find_lightfaces( point, curface )
-			
+
 			-- Find first horizon edge
 			local first_horizon_edge = nil
 			for k, face in pairs(light_faces) do
-				if not face.edge.twin.face.lightface then 
+				if not face.edge.twin.face.lightface then
 					first_horizon_edge = face.edge
-				elseif not face.edge.next.twin.face.lightface then 
+				elseif not face.edge.next.twin.face.lightface then
 					first_horizon_edge = face.edge.next
-				elseif not face.edge.next.next.twin.face.lightface then 
-					first_horizon_edge = face.edge.next.next 
+				elseif not face.edge.next.next.twin.face.lightface then
+					first_horizon_edge = face.edge.next.next
 				else continue end
 				break
 			end
-			
+
 			-- Find all horizon edges
 			local horizon_edges = {}
 			local current_horizon_edge = first_horizon_edge
@@ -506,40 +506,40 @@ do
 				current_horizon_edge = next_horizon_edge( current_horizon_edge )
 				horizon_edges[#horizon_edges + 1] = current_horizon_edge
 			until current_horizon_edge == first_horizon_edge
-			
+
 			-- Assign new faces
 			for i=1, #horizon_edges do
-				local cur_edge = horizon_edges[i] 
-				
+				local cur_edge = horizon_edges[i]
+
 				local he_face = {edge=cur_edge}
-				
+
 				local he_vert1 = {vec=cur_edge.vert.vec     , point=cur_edge.vert.point}
 				local he_vert2 = {vec=cur_edge.next.vert.vec, point=cur_edge.next.vert.point}
 				local he_vert3 = {vec=point.vec             , point=point}
-				
+
 				local he_edge1 = cur_edge
 				local he_edge2 = {}
 				local he_edge3 = {}
-				
+
 				he_edge1.next = he_edge2
 				he_edge2.next = he_edge3
 				he_edge3.next = he_edge1
-				
+
 				he_edge1.vert = he_vert1
 				he_edge2.vert = he_vert2
 				he_edge3.vert = he_vert3
-				
+
 				he_edge1.face = he_face
 				he_edge2.face = he_face
 				he_edge3.face = he_face
-				
+
 				he_vert1.edge = he_edge1
 				he_vert2.edge = he_edge2
 				he_vert3.edge = he_edge3
-				
+
 				he_face.plane = find_plane( he_vert1, he_vert2, he_vert3 )
 				he_face.points = {}
-				
+
 				-- Assign points to new faces
 				for k, lface in pairs(light_faces) do
 					for k1, p in pairs(lface.points) do
@@ -551,7 +551,7 @@ do
 					end
 				end
 			end
-			
+
 			-- Connect new faces
 			for i=1, #horizon_edges do
 				local prev_i = (i-1-1)%#horizon_edges + 1
@@ -559,20 +559,20 @@ do
 				local prev_edge1 = horizon_edges[prev_i]
 				local cur_edge1 = horizon_edges[i]
 				local next_edge1 = horizon_edges[next_i]
-				
+
 				local prev_edge2 = prev_edge1.next
-				
+
 				local cur_edge2 = cur_edge1.next
 				local cur_edge3 = cur_edge2.next
-				
+
 				local next_edge3 = next_edge1.next.next
-				
+
 				cur_edge2.twin = next_edge3
 				cur_edge3.twin = prev_edge2
 				face_stack[#face_stack + 1] = cur_edge1.face
 			end
 		end
-		
+
 		-- Convert linked list into array
 		local ret_points_added = {}
 		local ret_points = {}
@@ -582,7 +582,7 @@ do
 			local face = l.value
 			l = l.next
 			if face.lightface then continue end -- Filter out invalid faces
-			
+
 			for k,vert in pairs({face_vertices(face)}) do
 				local point = vert.point
 				if ret_points_added[point] then continue end
@@ -591,7 +591,7 @@ do
 			end
 			ret_faces[#ret_faces+1] = face
 		end
-		
+
 		return ret_faces, ret_points
 	end
 
@@ -605,19 +605,19 @@ do
 	COLOR_WHITE = Color(255,255,255)
 	function face_to_mesh_vertex(face, color, offset)
 		local norm = face.plane.n
-		
+
 		local tv1 = ( norm:cross( math.abs( norm:dot( Vector(0,0,1) ) ) == 1 and Vector(0,1,0) or Vector(0,0,-1) ) ):cross( norm )
 		local tv2 = norm:cross( tv1 )
 		local textureVecs = {{x=tv2.x,y=tv2.y,z=tv2.z,offset=0},
 							{x=tv1.x,y=tv1.y,z=tv1.z,offset=0}}-- texinfo.textureVecs
-							
+
 		local p1, p2, p3 = face_vertices(face)
-		
-		
+
+
 		local u1,v1 = findUV(p1.vec, textureVecs, 32, 32)
 		local u2,v2 = findUV(p2.vec, textureVecs, 32, 32)
 		local u3,v3 = findUV(p3.vec, textureVecs, 32, 32)
-		
+
 		return  {pos=p1.vec-offset,color=color or COLOR_WHITE,normal=norm,u=u1,v=v1},
 				{pos=p2.vec-offset,color=color or COLOR_WHITE,normal=norm,u=u2,v=v2},
 				{pos=p3.vec-offset,color=color or COLOR_WHITE,normal=norm,u=u3,v=v3}
@@ -760,16 +760,16 @@ if CLIENT then
 	}
 
 	--- Creates a mesh from vertex data.
-	-- @param table verteces Table containing vertex data. http://wiki.facepunch.com/gmod/Structures/MeshVertex
+	-- @param table vertices Table containing vertex data. http://wiki.facepunch.com/gmod/Structures/MeshVertex
 	-- @param boolean? threaded Optional bool, use threading object that can be used to load the mesh over time to prevent hitting quota limit. The thread will yield with number of vertices remaining to be processed. After 0 is yielded, the final expensive phase starts.
 	-- @return Mesh Mesh object
 	-- @client
-	function mesh_library.createFromTable(verteces, threaded)
+	function mesh_library.createFromTable(vertices, threaded)
 		checkpermission (instance, nil, "mesh")
-		checkluatype (verteces, TYPE_TABLE)
+		checkluatype (vertices, TYPE_TABLE)
 		if threaded ~= nil then checkluatype(threaded, TYPE_BOOL) if threaded and not coroutine.running() then SF.Throw("Tried to use threading while not in a thread!", 2) end end
 
-		local nvertices = #verteces
+		local nvertices = #vertices
 		if nvertices<3 or nvertices%3~=0 then SF.Throw("Expected a multiple of 3 vertices for the mesh's triangles.", 2) end
 		if nvertices > 65535 then SF.Throw("The max number of vertices for a mesh is 65535.", 2) end
 		local ntriangles = nvertices / 3
@@ -778,7 +778,7 @@ if CLIENT then
 		plyMeshCount:checkuse(instance.player, 1)
 
 		local unwrapped = {}
-		for i, vertex in ipairs(verteces) do
+		for i, vertex in ipairs(vertices) do
 			local vert = {}
 			for k, v in pairs(vertex) do
 				if vertexCheck[k] and vertexCheck[k](v) then
@@ -788,7 +788,7 @@ if CLIENT then
 				end
 			end
 			unwrapped[i] = vert
-			if threaded and i%100==0 and i<#verteces then thread_yield(#verteces - i) end
+			if threaded and i%100==0 and i<#vertices then thread_yield(#vertices - i) end
 		end
 
 		if threaded then thread_yield(0) end
@@ -942,7 +942,7 @@ if CLIENT then
 
 		local tri_count = math.max(1, math.ceil(prim_trifunc(prim_count)))
 		if mesh_obj == nil then
-			if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end 
+			if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 			plyTriangleRenderBurst:use(instance.player, tri_count)
 			meshgenerating = true
 			mesh.Begin(prim_type, prim_count)
