@@ -265,6 +265,7 @@ end
 --- Checks if the chip is capable of performing an action.
 -- @param string perm The permission id to check
 -- @param any obj Optional object to pass to the permission system.
+-- @return boolean Whether the client has granted the specified permission.
 function builtins_library.hasPermission(perm, obj)
 	checkluatype(perm, TYPE_STRING)
 	if not SF.Permissions.permissionchecks[perm] then SF.Throw("Permission doesn't exist", 2) end
@@ -915,7 +916,7 @@ function builtins_library.pcall(func, ...)
 end
 
 local function xpcall_Callback(err)
-	return {err, debug.traceback(tostring(err), 2)} -- only way to return 2 values; level 2 to branch 
+	return {err, debug.traceback(tostring(err), 2)} -- only way to return 2 values; level 2 to branch
 end
 
 --- Lua's xpcall with SF throw implementation, and a traceback for debugging.
