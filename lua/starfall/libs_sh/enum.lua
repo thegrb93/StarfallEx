@@ -40,16 +40,16 @@ env.TEXT_ALIGN = {
 -- @class table
 -- @field FIRST
 -- @field NONE
--- @field 0
--- @field 1
--- @field 2
--- @field 3
--- @field 4
--- @field 5
--- @field 6
--- @field 7
--- @field 8
--- @field 9
+-- @field _0
+-- @field _1
+-- @field _2
+-- @field _3
+-- @field _4
+-- @field _5
+-- @field _6
+-- @field _7
+-- @field _8
+-- @field _9
 -- @field A
 -- @field B
 -- @field C
@@ -180,16 +180,26 @@ env.TEXT_ALIGN = {
 env.KEY = {
 	["FIRST"] = 0,
 	["NONE"] = 0,
-	["0"] = 1,
-	["1"] = 2,
-	["2"] = 3,
-	["3"] = 4,
-	["4"] = 5,
-	["5"] = 6,
-	["6"] = 7,
-	["7"] = 8,
-	["8"] = 9,
-	["9"] = 10,
+	["0"] = KEY_0,
+	["_0"] = KEY_0,
+	["1"] = KEY_1,
+	["_1"] = KEY_1,
+	["2"] = KEY_2,
+	["_2"] = KEY_2,
+	["3"] = KEY_3,
+	["_3"] = KEY_3,
+	["4"] = KEY_4,
+	["_4"] = KEY_4,
+	["5"] = KEY_5,
+	["_5"] = KEY_5,
+	["6"] = KEY_6,
+	["_6"] = KEY_6,
+	["7"] = KEY_7,
+	["_7"] = KEY_7,
+	["8"] = KEY_8,
+	["_8"] = KEY_8,
+	["9"] = KEY_9,
+	["_9"] = KEY_9,
 	["A"] = 11,
 	["B"] = 12,
 	["C"] = 13,
@@ -326,7 +336,7 @@ env.KEY = {
 	["NUMLOCKTOGGLE"] = 105,
 	["SCROLLLOCKTOGGLE"] = 106,
 	["LAST"] = 106,
-	["COUNT"] = 106
+	["COUNT"] = 107
 }
 
 --- ENUMs of mouse buttons for use with input library
@@ -339,9 +349,7 @@ env.KEY = {
 -- @field MOUSE3
 -- @field MIDDLE
 -- @field MOUSE4
--- @field 4
 -- @field MOUSE5
--- @field 5
 -- @field MWHEELUP
 -- @field WHEEL_UP
 -- @field MWHEELDOWN
