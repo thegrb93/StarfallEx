@@ -233,7 +233,7 @@ end
 function net_library.readStream(cb)
 	checkluatype (cb, TYPE_FUNCTION)
 	if streams[instance.player] then SF.Throw("The previous stream must finish before reading another.", 2) end
-	
+
 	local streamOwner, target
 	if instance.player ~= SF.Superuser then
 		streamOwner = instance.player
@@ -332,7 +332,7 @@ end
 
 --- Writes a boolean to the net message
 -- @shared
--- @param number t The bit to be written. (boolean)
+-- @param boolean t The bit to be written.
 function net_library.writeBool(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
 
@@ -344,7 +344,7 @@ end
 
 --- Reads a boolean from the net message
 -- @shared
--- @return number The boolean that was read.
+-- @return boolean The boolean that was read.
 function net_library.readBool()
 	return net.ReadBool()
 end
