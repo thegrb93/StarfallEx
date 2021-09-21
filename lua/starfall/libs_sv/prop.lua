@@ -605,28 +605,49 @@ function props_library.createSent(pos, ang, class, frozen, data)
 			end
 		end
 
-		-- Supply additional data
-		enttbl.Data = enttbl
-		enttbl.Name = ""
-		enttbl.Class = class
-		enttbl.Pos = pos
-		enttbl.Angle = ang
+		if class == "gmod_wire_expression2" and MakeWireExpression2 then
+			-- Special case for spawning an Expression 2 chip :>
+			entity = MakeWireExpression2( -- this function is defined in Wiremod (entities\gmod_wire_expression2\init.lua)
+				ply, -- the player (i.e. creator/owner)
+				pos, -- initial origin at which the chip should spawn
+				ang, -- initial rotation which the chip should have
+				enttbl.Model, -- chip model, defaults to "models/beer/wiremod/gate_e2.mdl"
+				enttbl._original or "", -- the main E2 code to be executed
+				enttbl._name or "generic", -- ineffective (overlay name); use @name in E2 instead
+				{{}, {}}, -- E2 inputs (leave this empty, because Setup will handle this based on E2 code/buffer; use @inputs in E2)
+				{{}, {}}, -- E2 outputs (leave this empty, because Setup will handle this based on E2 code/buffer; use @outputs in E2)
+				{}, -- dupe vars (just leave this empty, it is fine)
+				enttbl.inc_files, -- defaults to empty table (filename-code pair dictionary, for use with #include E2 directive)
+				"" -- file path (does not really matter, empty string is fine)
+			)
+			if entity then -- entity is either false, or a valid spawned E2 entity object
+				-- finally, do the magic and "start up" the E2 for real
+				entity:Setup(entity.buffer, entity.inc_files)
+			end
+		else
+			-- Supply additional data
+			enttbl.Data = enttbl
+			enttbl.Name = ""
+			enttbl.Class = class
+			enttbl.Pos = pos
+			enttbl.Angle = ang
 
-		if sent2._preFactory then
-			sent2._preFactory(ply, enttbl)
-		end
+			if sent2._preFactory then
+				sent2._preFactory(ply, enttbl)
+			end
 
-		entity = duplicator.CreateEntityFromTable(ply, enttbl)
+			entity = duplicator.CreateEntityFromTable(ply, enttbl)
 
-		if sent2._postFactory then
-			sent2._postFactory(ply, entity, enttbl)
-		end
+			if sent2._postFactory then
+				sent2._postFactory(ply, entity, enttbl)
+			end
 
-		if entity.PreEntityCopy then
-			entity:PreEntityCopy() -- To build dupe modifiers
-		end
-		if entity.PostEntityPaste then
-			entity:PostEntityPaste(ply, entity, {[entity:EntIndex()] = entity})
+			if entity.PreEntityCopy then
+				entity:PreEntityCopy() -- To build dupe modifiers
+			end
+			if entity.PostEntityPaste then
+				entity:PostEntityPaste(ply, entity, {[entity:EntIndex()] = entity})
+			end
 		end
 
 		hookcall = "PlayerSpawnedSENT"
