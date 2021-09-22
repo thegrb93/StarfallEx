@@ -45,7 +45,7 @@ end
 function SF.CompressFiles(files)
 	local header = SF.StringStream()
 	header:writeInt32(table.Count(files))
-	
+
 	local filecodes = {}
 	for filename, code in pairs(files) do
 		if #filename > 255 then error("File name too large: " .. #filename .. " (max is 255)") end
@@ -143,12 +143,81 @@ else
 		net.SendToServer()
 	end
 
-	net.Receive("starfall_upload", function(len)
+	local GetUsingURLs, IterateUsingURLs
+	do
+		local string_find, usingPattern = string.find, "%-%-@using ([^%s]*)"
+		GetUsingURLs, IterateUsingURLs = function(code)
+			local data, endPos, startPos, url = {}, 1
+			do
+				-- goto is actually beneficial (in JIT), when you know how to use it sparingly
+				-- this code can still be optimized, but it is fine for now
+				::loop_begin::
+				startPos, endPos, url = string_find(code, usingPattern, endPos)
+				if startPos then
+					data[#data + 1], endPos = {url, startPos, endPos}, endPos + 1
+					goto loop_begin
+				end
+			end
+			return data
+		end, function(code)
+			local endPos, startPos, url = 1
+			return function()
+				startPos, endPos, url = string_find(code, usingPattern, endPos)
+				if startPos then
+					endPos = endPos + 1
+					return url, startPos, endPos - 1
+				end
+			end
+		end
+	end
+
+	local string_Replace = string.Replace
+	net.Receive("starfall_upload", function()
 		local mainfile = net.ReadString()
 		if #mainfile==0 then mainfile = nil end
 		SF.Editor.BuildIncludesTable(mainfile,
 			function(list)
-				SF.SendStarfall("starfall_upload", {files = list.files, mainfile = list.mainfile})
+				local files, usingCounter = list.files, 0
+				local function CheckAndUploadIfReady()
+					usingCounter = usingCounter - 1
+					timer.Simple(0, function()
+						-- required to ensure our loop below have run to finish, postpone upload onto next tick
+						-- (it will take more than one tick to fetch HTTP anyways, so this should be fine)
+						if usingCounter > 0 then return end
+						-- This should run at the end (when the whole HTTP queue has finished):
+						SF.SendStarfall("starfall_upload", {files = files, mainfile = list.mainfile})
+					end)
+				end
+				local usings = {} -- this acts as a temporary HTTP in-memory cache
+				for fileName, code in next, files do
+					--local bonusLength = 0 -- this is needed per-file, because we'll substitute all in one go
+					for url--[[, startPos, endPos]] in IterateUsingURLs(code) do
+						local HttpSuccessCallback, HttpFailedCallback = function(_, contents)
+							--usings[url] = contents
+							--code = string.sub(code, 1, startPos + bonusLength) .. -- bah...
+							code = string_Replace(code, "--@using " .. url, contents) -- simplify my life. thx.
+							files[fileName] = code
+							CheckAndUploadIfReady()
+						end, function()
+							usings[url] = false -- preserves original code (directive line)
+							CheckAndUploadIfReady()
+						end
+						if usings[url] == nil then -- must strictly check against nil (because false means existing request has failed)
+							usingCounter = usingCounter + 1
+							--print("Found @using in " .. fileName, url)
+							if HTTP {
+								method = "GET";
+								url = url;
+								success = HttpSuccessCallback;
+								failed = HttpFailedCallback;
+							} then
+								usings[url] = true -- prevents duplicate requests to the same URL
+							else
+								HttpFailedCallback()
+							end
+						end
+					end
+				end
 			end,
 			function(err)
 				SF.SendStarfall("starfall_upload", {files = {}, mainfile = ""})
@@ -157,5 +226,3 @@ else
 		)
 	end)
 end
-
-
