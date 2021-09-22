@@ -146,6 +146,7 @@ else
 	local GetUsingURLs, IterateUsingURLs
 	do
 		local string_find, usingPattern = string.find, "%-%-@using ([^%s]*)"
+		-- Note: Currently, these functions does not care about comments and strings, therefore it will end up searching everywhere.
 		GetUsingURLs, IterateUsingURLs = function(code)
 			local data, endPos, startPos, url = {}, 1
 			do
@@ -154,7 +155,7 @@ else
 				::loop_begin::
 				startPos, endPos, url = string_find(code, usingPattern, endPos)
 				if startPos then
-					data[#data + 1], endPos = {url, startPos, endPos}, endPos + 1
+					data[#data + 1], endPos = url, endPos + 1
 					goto loop_begin
 				end
 			end
@@ -165,7 +166,7 @@ else
 				startPos, endPos, url = string_find(code, usingPattern, endPos)
 				if startPos then
 					endPos = endPos + 1
-					return url, startPos, endPos - 1
+					return url
 				end
 			end
 		end
@@ -177,6 +178,8 @@ else
 		if #mainfile==0 then mainfile = nil end
 		SF.Editor.BuildIncludesTable(mainfile,
 			function(list)
+				-- TODO: figure out how to access ppdata here (... or not, since we scan for --@using ourselves)
+				-- TODO: Refactor and get rid of usingCounter
 				local files, usingCounter = list.files, 0
 				local function CheckAndUploadIfReady()
 					usingCounter = usingCounter - 1
@@ -190,13 +193,9 @@ else
 				end
 				local usings = {} -- this acts as a temporary HTTP in-memory cache
 				for fileName, code in next, files do
-					--local bonusLength = 0 -- this is needed per-file, because we'll substitute all in one go
-					for url--[[, startPos, endPos]] in IterateUsingURLs(code) do
+					for url in IterateUsingURLs(code) do
 						local HttpSuccessCallback, HttpFailedCallback = function(_, contents)
-							--usings[url] = contents
-							--code = string.sub(code, 1, startPos + bonusLength) .. -- bah...
-							code = string_Replace(code, "--@using " .. url, contents) -- simplify my life. thx.
-							files[fileName] = code
+							files[fileName] = string_Replace(code, "--@using " .. url, contents)
 							CheckAndUploadIfReady()
 						end, function()
 							usings[url] = false -- preserves original code (directive line)
@@ -204,7 +203,6 @@ else
 						end
 						if usings[url] == nil then -- must strictly check against nil (because false means existing request has failed)
 							usingCounter = usingCounter + 1
-							--print("Found @using in " .. fileName, url)
 							if HTTP {
 								method = "GET";
 								url = url;

@@ -196,10 +196,4 @@ SF.Preprocessor.SetGlobalDirective("superuser", function(args, filename, data)
 	data.superuser[filename] = true
 end)
 
-SF.Preprocessor.SetGlobalDirective("using", function(url, fileName, data)
-	if fileName == "file" then return end -- ignore when run by editor
-	--if not data.using then data.using = {} end
-	--data.using[url] = false
-	--print("SF preproc @using:", url, fileName)
-	--PrintTable(data, 1)
-end)
+SF.Preprocessor.SetGlobalDirective("using", function(url, fileName, data) end)
