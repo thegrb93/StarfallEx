@@ -143,10 +143,10 @@ else
 		net.SendToServer()
 	end
 
+	-- Note: Current implementation does not care about comments/strings, therefore it will end up searching/replacing everywhere.
 	local GetUsingURLs, IterateUsingURLs
 	do
 		local string_find, usingPattern = string.find, "%-%-@using ([^%s]*)"
-		-- Note: Currently, these functions does not care about comments and strings, therefore it will end up searching everywhere.
 		GetUsingURLs, IterateUsingURLs = function(code)
 			local data, endPos, startPos, url = {}, 1
 			do
@@ -172,49 +172,66 @@ else
 		end
 	end
 
-	local string_Replace = string.Replace
+	local HTTP, string_Replace = HTTP, string.Replace
 	net.Receive("starfall_upload", function()
 		local mainfile = net.ReadString()
 		if #mainfile==0 then mainfile = nil end
 		SF.Editor.BuildIncludesTable(mainfile,
 			function(list)
-				-- TODO: figure out how to access ppdata here (... or not, since we scan for --@using ourselves)
-				-- TODO: Refactor and get rid of usingCounter
-				local files, usingCounter = list.files, 0
+				-- TODO: Figure out how to access ppdata here (... or not, since we scan for --@using ourselves)
+				local files, pendingRequestCount = list.files, 0
+				local usings = {} -- a temporary HTTP in-memory cache
+				-- First stage: Scan for "--@using <url>" lines in all files, and assemble a HTTP queue structure.
+				for fileName, code in next, files do
+					for url in IterateUsingURLs(code) do
+						if usings[url] == nil then -- must strictly check against nil (because false means existing request has failed)
+							usings[url] = true -- prevents duplicate requests to the same URL
+							pendingRequestCount = pendingRequestCount + 1
+						end
+					end
+				end
+				print("[SF] pendingRequestCount: " .. pendingRequestCount)
+				-- Second stage: Once we know the total amount of requests and URLs, we fetch all URLs as HTTP resources.
+				--               Then we wait for all HTTP requests to complete.
 				local function CheckAndUploadIfReady()
-					usingCounter = usingCounter - 1
+					pendingRequestCount = pendingRequestCount - 1
 					timer.Simple(0, function()
-						-- required to ensure our loop below have run to finish, postpone upload onto next tick
+						-- required to ensure our loop below has run to finish, postpone upload onto next tick
 						-- (it will take more than one tick to fetch HTTP anyways, so this should be fine)
-						if usingCounter > 0 then return end
-						-- This should run at the end (when the whole HTTP queue has finished):
+						if pendingRequestCount > 0 then return end
+						-- The following should run only once, at the end when there are no more pending HTTP requests:
+						-- Final stage: Substitute "--@using <url>" lines in all files with the contents of their HTTP response.
+						for fileName, code in next, files do
+							for url, result in next, usings do
+								if result then -- if HTTP request succeeded, we have a string (otherwise, result is false)
+									code = string_Replace(code, "--@using " .. url, result)
+									print("[SF] fileName: " .. fileName .. "  url: " .. url)
+									print(code)
+									files[fileName] = code
+								end
+							end
+						end
 						SF.SendStarfall("starfall_upload", {files = files, mainfile = list.mainfile})
 					end)
 				end
-				local usings = {} -- this acts as a temporary HTTP in-memory cache
-				for fileName, code in next, files do
-					for url in IterateUsingURLs(code) do
-						local HttpSuccessCallback, HttpFailedCallback = function(_, contents)
-							files[fileName] = string_Replace(code, "--@using " .. url, contents)
+				for url in next, usings do
+					print("[SF] using URL: " .. url)
+					HTTP {
+						method = "GET";
+						url = url;
+						success = function(_, contents)
+							print("[SF] HTTP success - " .. url)
+							print(contents)
+							usings[url] = contents
 							CheckAndUploadIfReady()
-						end, function()
+						end;
+						failed = function(err)
+							print("[SF] HTTP failed - " .. url)
+							print(err)
 							usings[url] = false -- preserves original code (directive line)
 							CheckAndUploadIfReady()
-						end
-						if usings[url] == nil then -- must strictly check against nil (because false means existing request has failed)
-							usingCounter = usingCounter + 1
-							if HTTP {
-								method = "GET";
-								url = url;
-								success = HttpSuccessCallback;
-								failed = HttpFailedCallback;
-							} then
-								usings[url] = true -- prevents duplicate requests to the same URL
-							else
-								HttpFailedCallback()
-							end
-						end
-					end
+						end;
+					}
 				end
 			end,
 			function(err)
