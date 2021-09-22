@@ -1131,3 +1131,7 @@ end
 -- @name superuser
 -- @class directive
 
+--- Automatically fetch the contents of the given URL and include it as part of the code.
+-- @name using
+-- @class directive
+-- @param url URL of the single-file library to be included
