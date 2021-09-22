@@ -190,43 +190,39 @@ else
 						end
 					end
 				end
-				print("[SF] pendingRequestCount: " .. pendingRequestCount)
+				print("[SF] 1st stage | pendingRequestCount: " .. pendingRequestCount)
 				-- Second stage: Once we know the total amount of requests and URLs, we fetch all URLs as HTTP resources.
 				--               Then we wait for all HTTP requests to complete.
 				local function CheckAndUploadIfReady()
 					pendingRequestCount = pendingRequestCount - 1
-					timer.Simple(0, function()
-						-- required to ensure our loop below has run to finish, postpone upload onto next tick
-						-- (it will take more than one tick to fetch HTTP anyways, so this should be fine)
-						if pendingRequestCount > 0 then return end
-						-- The following should run only once, at the end when there are no more pending HTTP requests:
-						-- Final stage: Substitute "--@using <url>" lines in all files with the contents of their HTTP response.
-						for fileName, code in next, files do
-							for url, result in next, usings do
-								if result then -- if HTTP request succeeded, we have a string (otherwise, result is false)
-									code = string_Replace(code, "--@using " .. url, result)
-									print("[SF] fileName: " .. fileName .. "  url: " .. url)
-									print(code)
-									files[fileName] = code
-								end
+					if pendingRequestCount > 0 then return end
+					-- The following should run only once, at the end when there are no more pending HTTP requests:
+					-- Final stage: Substitute "--@using <url>" lines in all files with the contents of their HTTP response.
+					for fileName, code in next, files do
+						for url, result in next, usings do
+							if result then -- if HTTP request succeeded, we have a string (otherwise, result is false)
+								code = string_Replace(code, "--@using " .. url, result)
+								print("[SF] 3rd stage | fileName: " .. fileName .. "  url: " .. url)
+								print(code)
+								files[fileName] = code
 							end
 						end
-						SF.SendStarfall("starfall_upload", {files = files, mainfile = list.mainfile})
-					end)
+					end
+					SF.SendStarfall("starfall_upload", {files = files, mainfile = list.mainfile})
 				end
 				for url in next, usings do
-					print("[SF] using URL: " .. url)
+					print("[SF] 2nd stage | using URL: " .. url)
 					HTTP {
 						method = "GET";
 						url = url;
 						success = function(_, contents)
-							print("[SF] HTTP success - " .. url)
+							print("[SF] 2nd stage | HTTP success - " .. url)
 							print(contents)
 							usings[url] = contents
 							CheckAndUploadIfReady()
 						end;
 						failed = function(err)
-							print("[SF] HTTP failed - " .. url)
+							print("[SF] 2nd stage | HTTP failed - " .. url)
 							print(err)
 							usings[url] = false -- preserves original code (directive line)
 							CheckAndUploadIfReady()
