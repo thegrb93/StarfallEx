@@ -872,13 +872,13 @@ function Editor:InitComponents()
 	self.C.Inf.DoClick = function(btn)
 		self.C.Credit:SetVisible(not self.C.Credit:IsVisible())
 		self.CreditCount = self.CreditCount + 1
-		
+
 		if self.CreditCount == 6 then
-		
+
 		http.Fetch( "https://api.github.com/repos/thegrb93/StarfallEx/contributors",
 			function( body, len, headers, code )
 				local data = util.JSONToTable(body)
-				
+
 				local awesomePeople = "List of awesome people that contributed to StarfallEx:\n";
 				for k,v in ipairs(data) do
 					if v.login != "web-flow" then
@@ -887,14 +887,14 @@ function Editor:InitComponents()
 				end
 				awesomePeople = awesomePeople .. "\n \nThanks!"
 				SF.Editor.openWithCode("Awesome people!", awesomePeople)
-				
+
 			end,
 			function( error )
 			end
 		 )
-		
+
 		end
-		
+
 	end
 
 	self.C.Sav:SetImage("icon16/disk.png")
@@ -1093,7 +1093,7 @@ function Editor:GetSettings()
 
 	----- Tab settings
 	for k, v in pairs(SF.Editor.TabHandlers) do -- We let TabHandlers register their settings but only if they are current editor or arent editor at all
-		if v.RegisterSettings and (not v.IsEditor or (v.IsEditor and SF.Editor.CurrentTabHandler:GetString() == k)) then 
+		if v.RegisterSettings and (not v.IsEditor or (v.IsEditor and SF.Editor.CurrentTabHandler:GetString() == k)) then
 			AddCategory(v:RegisterSettings())
 		end
 	end
@@ -1302,6 +1302,7 @@ function Editor:InitShutdownHook()
 end
 
 function Editor:SaveTabs()
+	if not SF.Editor.initialized or not SF.Editor.editor then return end
 	if not self.TabsLoaded then return end
 	local tabs = {}
 	local activeTab = self:GetActiveTabIndex()
@@ -1745,7 +1746,7 @@ PANEL  = {}
 
 function PANEL:Block(ply)
 	SF.BlockUser(ply)
-	for k, v in pairs(ents.FindByClass("starfall_processor")) do 
+	for k, v in pairs(ents.FindByClass("starfall_processor")) do
 		if v.owner == ply and v.instance then
 			v:Error({message = "Blocked by user", traceback = ""})
 		end
@@ -1754,7 +1755,7 @@ end
 
 function PANEL:Unblock(ply)
 	SF.UnblockUser(ply)
-	for k, v in pairs(ents.FindByClass("starfall_processor")) do 
+	for k, v in pairs(ents.FindByClass("starfall_processor")) do
 		if v.owner == ply then
 			v:Compile()
 		end
@@ -1778,7 +1779,7 @@ function PANEL:UpdatePlayers(players)
 		header:SetSize(0, 32)
 		header:Dock(TOP)
 		header:SetBackgroundColor(Color(0,0,0,20))
-		
+
 		local blocked = SF.BlockedUsers[ply:SteamID()]~=nil
 		local button = vgui.Create("StarfallButton", header)
 		button.active = blocked
@@ -1816,18 +1817,18 @@ function PANEL:UpdatePlayers(players)
 			counter:Dock(LEFT)
 			counter:SetBackgroundColor(Color(0,0,0,20))
 			counter:SetTooltip(k)
-			
+
 			local icon = vgui.Create("DImage", counter)
 			icon:SetImage(v.icon)
 			icon:SetSize(16, 16)
 			icon:Dock(TOP)
-			
+
 			local count = vgui.Create("DLabel", counter)
 			count:SetFont("DermaDefault")
 			count:SetColor(Color(255, 255, 255))
 			count:Dock(BOTTOM)
 			count:SizeToContents()
-			
+
 			counter.nextThink = 0
 			function counter:Think()
 				local t = CurTime()
@@ -1842,7 +1843,7 @@ function PANEL:UpdatePlayers(players)
 				count:SizeToContents()
 			end
 		end
-		
+
 		local cpuManager = vgui.Create("StarfallPanel", header)
 		cpuManager:DockMargin(15, 0, 0, 0)
 		cpuManager:SetSize(210, 32)

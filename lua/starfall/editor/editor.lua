@@ -380,8 +380,7 @@ if CLIENT then
 					CheckAndUploadIfReady()
 				end;
 				failed = function(reason)
-					print(string.format("[SF] 2nd stage | HTTP failed - url: %q", url))
-					print(reason)
+					print(string.format("[SF] 2nd stage | HTTP failed - reason: %q  url: %q", reason, url))
 					onErrorSignal(string.format("Could not fetch --@using link (due %s): %s", reason, url))
 				end;
 			}
