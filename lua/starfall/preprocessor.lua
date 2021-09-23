@@ -11,8 +11,9 @@ SF.Preprocessor.directives = {}
 --- Sets a global preprocessor directive.
 -- @param directive The directive to set.
 -- @param func The callback. Takes the directive arguments, the file name, and instance.data
-function SF.Preprocessor.SetGlobalDirective(directive, func)
-	SF.Preprocessor.directives[directive] = func
+-- @param argPattern Lua pattern to be combined and used for more accurate matching the rest of the line (after directive name).
+function SF.Preprocessor.SetGlobalDirective(directive, func, argPattern)
+	SF.Preprocessor.directives[directive] = { func, argPattern }
 end
 
 local function FindComments(line)
@@ -83,9 +84,9 @@ local function FindComments(line)
 	return ret, count
 end
 
-
+local directivePattern = "%-%-@(%w+)"
 --- Parses a source file for directives.
--- @param filename The file name of the source code
+-- @param filename The file name of the source code (or "file" if being run by SF editor).
 -- @param source The source code to parse.
 -- @param data The data table passed to the directives.
 function SF.Preprocessor.ParseDirectives(filename, source, data)
@@ -96,7 +97,7 @@ function SF.Preprocessor.ParseDirectives(filename, source, data)
 	local ending = nil
 	local endingLevel = nil
 	local lines = string.Explode("\r?\n", source, true)
-	for _, line in ipairs(lines) do
+	for _, line in next, lines do
 		for _, comment in ipairs(FindComments(line)) do
 			if ending then
 				if comment.type == ending then
@@ -104,7 +105,7 @@ function SF.Preprocessor.ParseDirectives(filename, source, data)
 						if comment.level and comment.level == endingLevel then
 							ending = nil
 							endingLevel = nil
-							end
+						end
 					else
 						ending = nil
 					end
@@ -117,10 +118,15 @@ function SF.Preprocessor.ParseDirectives(filename, source, data)
 				ending = "end"
 				endingLevel = comment.level
 			elseif comment.type == "line" then
-				local directive, args = string.match(line, "--@(%S+)%s*(.*)")
-				local func = SF.Preprocessor.directives[directive]
-				if func then
-					func(args, filename, data)
+				local directive = string.match(line, directivePattern)
+				if directive then
+					local obj = SF.Preprocessor.directives[directive]
+					if obj then
+						local func, argPattern = obj[1], obj[2]
+						argPattern = "(" .. directivePattern .. "[\t ]" .. (argPattern and ("+(" .. argPattern .. ")") or "*(.*)") .. ")"
+						local fullMatch, _, args = string.match(line, argPattern)
+						func(args, filename, data, fullMatch)
+					end
 				end
 			end
 		end
@@ -197,13 +203,14 @@ SF.Preprocessor.SetGlobalDirective("superuser", function(args, filename, data)
 	data.superuser[filename] = true
 end)
 
-SF.Preprocessor.SetGlobalDirective("using", function(args, fileName, data)
-	print("[SF] SetGlobalDirective | fileName: " .. fileName .. "  args: " .. args)
+SF.Preprocessor.SetGlobalDirective("using", function(args, fileName, data, fullMatch)
+	if not args then return end -- silently continue, because there are no args (no URL at all)
+	print(string.format("[SF] SetGlobalDirective | fileName: %q  args: %q", fileName, args))
 	local using = data.using or {}
 	local fileUsing = using[fileName] or {}
 	args = string.Trim(args)
-	local url, name = string.match(args, "(.+) as (.+)")
-	fileUsing[#fileUsing + 1] = { url or args, name }
+	local url, name = string.match(args, "^(.+)[\t ]+as[\t ]+(.+)$")
+	fileUsing[#fileUsing + 1] = { fullMatch, url or args, name }
 	using[fileName] = fileUsing
 	data.using = using
-end)
+end, "https?://.+")

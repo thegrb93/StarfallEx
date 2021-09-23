@@ -338,7 +338,7 @@ if CLIENT then
 		-- First stage: Iterate through all --@using directives in all files and prepare our HTTP queue structure.
 		for fileName, fileUsing in next, ppdata.using do
 			for _, data in next, fileUsing do
-				local url, name = data[1], data[2]
+				local url, name = data[2], data[3]
 				if not usingCache[url] then
 					usingCache[url] = name or true -- prevents duplicate requests to the same URL
 					pendingRequestCount = pendingRequestCount + 1
@@ -350,20 +350,18 @@ if CLIENT then
 		--               Then we wait for all HTTP requests to complete.
 		local function CheckAndUploadIfReady()
 			pendingRequestCount = pendingRequestCount - 1
+			print(string.format("[SF] 3rd stage | pendingRequestCount: %d", pendingRequestCount))
 			if pendingRequestCount > 0 then return end
 			-- The following should run only once, at the end when there are no more pending HTTP requests:
-			-- Final stage: Substitute "--@using <url>" lines in all files with the contents of their HTTP response.
+			-- Final stage: Substitute all --@using directives with the contents of their HTTP response.
 			for fileName, fileUsing in next, ppdata.using do
 				local code = files[fileName]
 				for _, data in next, fileUsing do
-					local url, name = data[1], data[2]
+					local fullMatch, url, name = data[1], data[2], data[3]
 					local result = usingCache[url]
-					if name then
-						code = string_Replace(code, "--@using " .. url .. " as " .. name, name .. "=" .. result)
-					else
-						code = string_Replace(code, "--@using " .. url, result)
-					end
-					print("[SF] 3rd stage | fileName: " .. fileName .. "  url: " .. url)
+					name = name and (name .. "=") or ""
+					print(string.format("[SF] 3rd stage | fileName: %q  url: %q  name: %q", fileName, url, name))
+					code = string_Replace(code, fullMatch, name .. result)
 					print(code)
 					files[fileName] = code
 				end
@@ -371,21 +369,20 @@ if CLIENT then
 			onSuccessSignal(list)
 		end
 		for url in next, usingCache do
-			print("[SF] 2nd stage | using URL: " .. url)
+			print(string.format("[SF] 2nd stage | using URL: %q", url))
 			HTTP {
 				method = "GET";
 				url = url;
 				success = function(_, contents)
-					print("[SF] 2nd stage | HTTP success - " .. url)
+					print(string.format("[SF] 2nd stage | HTTP success - url: %q", url))
 					print(contents)
 					usingCache[url] = contents
 					CheckAndUploadIfReady()
 				end;
 				failed = function(reason)
-					print("[SF] 2nd stage | HTTP failed - " .. url)
+					print(string.format("[SF] 2nd stage | HTTP failed - url: %q", url))
 					print(reason)
-					--usingCache[url] = false -- preserves original code (a directive line)
-					onErrorSignal(string.format("Failed to fetch --@using link (due %s): %s", reason, url))
+					onErrorSignal(string.format("Could not fetch --@using link (due %s): %s", reason, url))
 				end;
 			}
 		end
