@@ -205,7 +205,6 @@ end)
 
 SF.Preprocessor.SetGlobalDirective("using", function(args, fileName, data, fullMatch)
 	if not args then return end -- silently continue, because there are no args (no URL at all)
-	print(string.format("[SF] SetGlobalDirective | fileName: %q  args: %q", fileName, args))
 	local using = data.using or {}
 	local fileUsing = using[fileName] or {}
 	args = string.Trim(args)

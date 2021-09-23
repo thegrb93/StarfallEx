@@ -330,10 +330,6 @@ if CLIENT then
 			return onSuccessSignal(list)
 		end
 		local files = list.files
-		print("[SF] HandlePostProcessing | list of files:")
-		PrintTable(files, 1)
-		print("[SF] HandlePostProcessing | ppdata:")
-		PrintTable(ppdata, 1)
 		local usingCache, pendingRequestCount = {}, 0 -- a temporary HTTP in-memory cache
 		-- First stage: Iterate through all --@using directives in all files and prepare our HTTP queue structure.
 		for fileName, fileUsing in next, ppdata.using do
@@ -345,12 +341,10 @@ if CLIENT then
 				end
 			end
 		end
-		print("[SF] 1st stage | total pendingRequestCount: " .. pendingRequestCount)
 		-- Second stage: Once we know the total amount of requests and URLs, we fetch all URLs as HTTP resources.
 		--               Then we wait for all HTTP requests to complete.
 		local function CheckAndUploadIfReady()
 			pendingRequestCount = pendingRequestCount - 1
-			print(string.format("[SF] 3rd stage | pendingRequestCount: %d", pendingRequestCount))
 			if pendingRequestCount > 0 then return end
 			-- The following should run only once, at the end when there are no more pending HTTP requests:
 			-- Final stage: Substitute all --@using directives with the contents of their HTTP response.
@@ -360,27 +354,21 @@ if CLIENT then
 					local fullMatch, url, name = data[1], data[2], data[3]
 					local result = usingCache[url]
 					name = name and (name .. "=") or ""
-					print(string.format("[SF] 3rd stage | fileName: %q  url: %q  name: %q", fileName, url, name))
 					code = string_Replace(code, fullMatch, name .. result)
-					print(code)
 					files[fileName] = code
 				end
 			end
 			onSuccessSignal(list)
 		end
 		for url in next, usingCache do
-			print(string.format("[SF] 2nd stage | using URL: %q", url))
 			HTTP {
 				method = "GET";
 				url = url;
 				success = function(_, contents)
-					print(string.format("[SF] 2nd stage | HTTP success - url: %q", url))
-					print(contents)
 					usingCache[url] = contents
 					CheckAndUploadIfReady()
 				end;
 				failed = function(reason)
-					print(string.format("[SF] 2nd stage | HTTP failed - reason: %q  url: %q", reason, url))
 					onErrorSignal(string.format("Could not fetch --@using link (due %s): %s", reason, url))
 				end;
 			}
