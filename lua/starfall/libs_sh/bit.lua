@@ -623,7 +623,7 @@ function bit_library.stringToTable(s)
 	return SF.StringToTable(s, instance)
 end
 
---- Compresses a string
+--- Compresses a string using LZMA.
 -- @param string s String to compress
 -- @return string Compressed string
 function bit_library.compress(s)
@@ -634,7 +634,7 @@ function bit_library.compress(s)
 	return ret
 end
 
---- Decompresses a string
+--- Decompresses a string using LZMA.
 -- @param string s Compressed string to decode
 -- @return string Decompressed string or nil if the input was invalid
 function bit_library.decompress(s)
