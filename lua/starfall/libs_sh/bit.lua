@@ -640,6 +640,23 @@ end
 function bit_library.decompress(s)
 	checkluatype(s, TYPE_STRING)
 	if #s > 1e8 then SF.Throw("String is too long!") end
+	if #s <= 13 then return nil end -- Size of header is 13 bytes, so it can't possibly have any data if it's that size or smaller.
+	local uncompressedSize = string.sub(s, 6, 13)
+	if uncompressedSize == '\xff\xff\xff\xff\xff\xff\xff\xff' then
+		-- "streamed" means the uncompressed size isn't specified in the header.
+		-- XZ Utils will always produce streamed LZMA. Use the older LZMA Utils if you need non-streamed.
+		SF.Throw("streamed LZMA not supported")
+	end
+	if string.sub(uncompressedSize, 5, 8) ~= '\x00\x00\x00\x00' then
+		-- 32-bit ints can fit okay in doubles, but 64-bit can't, so just don't even try if it can't be represented as 32-bit.
+		SF.Throw("uncompressed string would be too long")
+	end
+	-- Decode unsigned little-endian 32-bit integer (actually 64-bit, but see previous comment)
+	local b1, b2, b3, b4 = string.byte(uncompressedSize, 1, 4)
+	uncompressedSize = b1+b2*0x100+b3*0x10000+b4*0x1000000
+	if uncompressedSize > 1e8 then
+		SF.Throw("uncompressed string would be too long")
+	end
 	local ret = util.Decompress(s)
 	instance:checkCpu()
 	return ret
