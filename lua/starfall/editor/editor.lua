@@ -352,10 +352,7 @@ if CLIENT then
 				local code = files[fileName]
 				for _, data in next, fileUsing do
 					local fullMatch, url, name = data[1], data[2], data[3]
-					local result = usingCache[url]
-					name = name and (name .. "=") or ""
-					code = string_Replace(code, fullMatch, name .. result)
-					files[fileName] = code
+					files[fileName] = string_Replace(code, fullMatch, (name and (name .. "=") or "") .. usingCache[url])
 				end
 			end
 			onSuccessSignal(list)
