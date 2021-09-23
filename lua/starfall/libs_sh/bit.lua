@@ -625,7 +625,7 @@ end
 
 --- Compresses a string using LZMA.
 -- @param string s String to compress
--- @return string Compressed string
+-- @return string? Compressed string, or nil if compression failed
 function bit_library.compress(s)
 	checkluatype(s, TYPE_STRING)
 	if #s > 1e8 then SF.Throw("String is too long!") end
@@ -635,8 +635,10 @@ function bit_library.compress(s)
 end
 
 --- Decompresses a string using LZMA.
--- @param string s Compressed string to decode
--- @return string Decompressed string or nil if the input was invalid
+-- XZ Utils will always produce streamed (i.e. the decompressed size is not specified in the header) LZMA data. If you're trying to compress data from outside of GMod and then decompress it inside of GMod, it probably won't work unless you use the older, deprecated 'LZMA Utils', or util.Compress.
+-- @param string s String to decompress
+-- @param number? maxSize Maximum allowed size of decompressed data
+-- @return string? Decompressed string, or nil if decompression failed
 function bit_library.decompress(s, maxSize)
 	checkluatype(s, TYPE_STRING)
 	if maxSize ~= nil then
@@ -650,9 +652,7 @@ function bit_library.decompress(s, maxSize)
 	if #s > 1e8 then SF.Throw("String is too long!") end
 	if #s <= 13 then return nil end -- Size of header is 13 bytes, so it can't possibly have any data if it's that size or smaller.
 	if string.sub(s, 6, 13) == '\xff\xff\xff\xff\xff\xff\xff\xff' then
-		-- "streamed" means the uncompressed size isn't specified in the header.
-		-- XZ Utils will always produce streamed LZMA. Use the older LZMA Utils or util.Compress if you need non-streamed.
-		SF.Throw("streamed LZMA is not supported")
+		return nil--, "streamed LZMA is not supported"
 	end
 	local ret = util.Decompress(s, maxSize)
 	instance:checkCpu()
