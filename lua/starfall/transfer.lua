@@ -143,31 +143,15 @@ else
 		net.SendToServer()
 	end
 
-	-- Note: Current implementation does not care about comments/strings, therefore it will end up searching/replacing everywhere.
-	local GetUsingURLs, IterateUsingURLs
-	do
-		local string_find, usingPattern = string.find, "%-%-@using ([^%s]*)"
-		GetUsingURLs, IterateUsingURLs = function(code)
-			local data, endPos, startPos, url = {}, 1
-			do
-				-- goto is actually beneficial (in JIT), when you know how to use it sparingly
-				-- this code can still be optimized, but it is fine for now
-				::loop_begin::
-				startPos, endPos, url = string_find(code, usingPattern, endPos)
-				if startPos then
-					data[#data + 1], endPos = url, endPos + 1
-					goto loop_begin
-				end
-			end
-			return data
-		end, function(code)
-			local endPos, startPos, url = 1
-			return function()
-				startPos, endPos, url = string_find(code, usingPattern, endPos)
-				if startPos then
-					endPos = endPos + 1
-					return url
-				end
+	-- BUG: Current implementation does not care about comments/strings, therefore it will end up searching/replacing --@using everywhere.
+	local string_find, usingDirectivePattern = string.find, "%-%-@using (https?://[^%s]*)"
+	local FindAllUsingDirectiveURLs = function(code)
+		local endPos, startPos, url = 1
+		return function()
+			startPos, endPos, url = string_find(code, usingDirectivePattern, endPos)
+			if startPos then
+				endPos = endPos + 1
+				return url
 			end
 		end
 	end
@@ -183,7 +167,7 @@ else
 				local usings = {} -- a temporary HTTP in-memory cache
 				-- First stage: Scan for "--@using <url>" lines in all files, and assemble a HTTP queue structure.
 				for fileName, code in next, files do
-					for url in IterateUsingURLs(code) do
+					for url in FindAllUsingDirectiveURLs(code) do
 						if usings[url] == nil then -- must strictly check against nil (because false means existing request has failed)
 							usings[url] = true -- prevents duplicate requests to the same URL
 							pendingRequestCount = pendingRequestCount + 1
