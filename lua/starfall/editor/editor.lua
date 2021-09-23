@@ -326,10 +326,10 @@ if CLIENT then
 	local HTTP, string_Replace = HTTP, string.Replace
 	--- Handles post-processing (as part of BuildIncludesTable)
 	function SF.Editor.HandlePostProcessing(list, ppdata, onSuccessSignal, onErrorSignal)
-		local files = list.files
 		if not ppdata.using then -- short-circuit; fast return when there are none --@using directives
 			return onSuccessSignal(list)
 		end
+		local files = list.files
 		print("[SF] HandlePostProcessing | list of files:")
 		PrintTable(files, 1)
 		print("[SF] HandlePostProcessing | ppdata:")
@@ -337,9 +337,10 @@ if CLIENT then
 		local usingCache, pendingRequestCount = {}, 0 -- a temporary HTTP in-memory cache
 		-- First stage: Iterate through all --@using directives in all files and prepare our HTTP queue structure.
 		for fileName, fileUsing in next, ppdata.using do
-			for _, url in next, fileUsing do
+			for _, data in next, fileUsing do
+				local url, name = data[1], data[2]
 				if not usingCache[url] then
-					usingCache[url] = true -- prevents duplicate requests to the same URL
+					usingCache[url] = name or true -- prevents duplicate requests to the same URL
 					pendingRequestCount = pendingRequestCount + 1
 				end
 			end
@@ -352,17 +353,21 @@ if CLIENT then
 			if pendingRequestCount > 0 then return end
 			-- The following should run only once, at the end when there are no more pending HTTP requests:
 			-- Final stage: Substitute "--@using <url>" lines in all files with the contents of their HTTP response.
-			for fileName, code in next, files do
-				for url, result in next, usingCache do
-					if result then -- if HTTP request succeeded, we have a string; otherwise, result is false
+			for fileName, fileUsing in next, ppdata.using do
+				local code = files[fileName]
+				for _, data in next, fileUsing do
+					local url, name = data[1], data[2]
+					local result = usingCache[url]
+					if name then
+						code = string_Replace(code, "--@using " .. url .. " as " .. name, name .. "=" .. result)
+					else
 						code = string_Replace(code, "--@using " .. url, result)
-						print("[SF] 3rd stage | fileName: " .. fileName .. "  url: " .. url)
-						print(code)
-						files[fileName] = code
 					end
+					print("[SF] 3rd stage | fileName: " .. fileName .. "  url: " .. url)
+					print(code)
+					files[fileName] = code
 				end
 			end
-			--SF.SendStarfall("starfall_upload", {files = files, mainfile = list.mainfile})
 			onSuccessSignal(list)
 		end
 		for url in next, usingCache do
@@ -376,12 +381,11 @@ if CLIENT then
 					usingCache[url] = contents
 					CheckAndUploadIfReady()
 				end;
-				failed = function(err)
+				failed = function(reason)
 					print("[SF] 2nd stage | HTTP failed - " .. url)
-					print(err)
-					usingCache[url] = false -- preserves original code (a directive line)
-					--CheckAndUploadIfReady()
-					onErrorSignal("Failed to fetch --@using link: " .. url)
+					print(reason)
+					--usingCache[url] = false -- preserves original code (a directive line)
+					onErrorSignal(string.format("Failed to fetch --@using link (due %s): %s", reason, url))
 				end;
 			}
 		end

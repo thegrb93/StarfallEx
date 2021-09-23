@@ -197,11 +197,13 @@ SF.Preprocessor.SetGlobalDirective("superuser", function(args, filename, data)
 	data.superuser[filename] = true
 end)
 
-SF.Preprocessor.SetGlobalDirective("using", function(url, fileName, data)
-	print("[SF] SetGlobalDirective | fileName: " .. fileName .. "  url: " .. url)
+SF.Preprocessor.SetGlobalDirective("using", function(args, fileName, data)
+	print("[SF] SetGlobalDirective | fileName: " .. fileName .. "  args: " .. args)
 	local using = data.using or {}
 	local fileUsing = using[fileName] or {}
-	fileUsing[#fileUsing + 1] = string.Trim(url)
+	args = string.Trim(args)
+	local url, name = string.match(args, "(.+) as (.+)")
+	fileUsing[#fileUsing + 1] = { url or args, name }
 	using[fileName] = fileUsing
 	data.using = using
 end)
