@@ -143,76 +143,12 @@ else
 		net.SendToServer()
 	end
 
-	-- BUG: Current implementation does not care about comments/strings, therefore it will end up searching/replacing --@using everywhere.
-	local string_find, usingDirectivePattern = string.find, "%-%-@using (https?://[^%s]*)"
-	local FindAllUsingDirectiveURLs = function(code)
-		local endPos, startPos, url = 1
-		return function()
-			startPos, endPos, url = string_find(code, usingDirectivePattern, endPos)
-			if startPos then
-				endPos = endPos + 1
-				return url
-			end
-		end
-	end
-
-	local HTTP, string_Replace = HTTP, string.Replace
 	net.Receive("starfall_upload", function()
 		local mainfile = net.ReadString()
 		if #mainfile==0 then mainfile = nil end
 		SF.Editor.BuildIncludesTable(mainfile,
 			function(list)
-				-- TODO: Figure out how to access ppdata here (... or not, since we scan for --@using ourselves)
-				local files, pendingRequestCount = list.files, 0
-				local usings = {} -- a temporary HTTP in-memory cache
-				-- First stage: Scan for "--@using <url>" lines in all files, and assemble a HTTP queue structure.
-				for fileName, code in next, files do
-					for url in FindAllUsingDirectiveURLs(code) do
-						if not usings[url] then
-							usings[url] = true -- prevents duplicate requests to the same URL
-							pendingRequestCount = pendingRequestCount + 1
-						end
-					end
-				end
-				print("[SF] 1st stage | pendingRequestCount: " .. pendingRequestCount)
-				-- Second stage: Once we know the total amount of requests and URLs, we fetch all URLs as HTTP resources.
-				--               Then we wait for all HTTP requests to complete.
-				local function CheckAndUploadIfReady()
-					pendingRequestCount = pendingRequestCount - 1
-					if pendingRequestCount > 0 then return end
-					-- The following should run only once, at the end when there are no more pending HTTP requests:
-					-- Final stage: Substitute "--@using <url>" lines in all files with the contents of their HTTP response.
-					for fileName, code in next, files do
-						for url, result in next, usings do
-							if result then -- if HTTP request succeeded, we have a string (otherwise, result is false)
-								code = string_Replace(code, "--@using " .. url, result)
-								print("[SF] 3rd stage | fileName: " .. fileName .. "  url: " .. url)
-								print(code)
-								files[fileName] = code
-							end
-						end
-					end
-					SF.SendStarfall("starfall_upload", {files = files, mainfile = list.mainfile})
-				end
-				for url in next, usings do
-					print("[SF] 2nd stage | using URL: " .. url)
-					HTTP {
-						method = "GET";
-						url = url;
-						success = function(_, contents)
-							print("[SF] 2nd stage | HTTP success - " .. url)
-							print(contents)
-							usings[url] = contents
-							CheckAndUploadIfReady()
-						end;
-						failed = function(err)
-							print("[SF] 2nd stage | HTTP failed - " .. url)
-							print(err)
-							usings[url] = false -- preserves original code (a directive line)
-							CheckAndUploadIfReady()
-						end;
-					}
-				end
+				SF.SendStarfall("starfall_upload", {files = list.files, mainfile = list.mainfile})
 			end,
 			function(err)
 				SF.SendStarfall("starfall_upload", {files = {}, mainfile = ""})

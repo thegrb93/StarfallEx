@@ -72,7 +72,7 @@ if CLIENT then
 
 	function SF.Editor.init(callback)
 		if SF.Editor.initialized or SF.Editor.editor then return end
-		
+
 		if not SF.Docs then
 			if not SF.WaitingForDocs then
 				local docfile = file.Open("sf_docs.txt", "rb", "DATA")
@@ -224,7 +224,7 @@ if CLIENT then
 	-- @return A table with mainfile name and files
 	function SF.Editor.BuildIncludesTable(mainfile, success, err)
 		if not SF.Editor.initialized then SF.Editor.init(function() SF.Editor.BuildIncludesTable(mainfile, success, err) end) return end
-		
+
 		local openfiles = SF.Editor.getOpenFiles()
 		if not (mainfile and (openfiles[mainfile] or file.Exists("starfall/" .. mainfile, "DATA"))) then
 			mainfile = SF.Editor.getOpenFile() or "main"
@@ -316,10 +316,74 @@ if CLIENT then
 				err("Clientmain not found: " .. clientmain) return
 			end
 
-			success(tbl)
+			SF.Editor.HandlePostProcessing(tbl, ppdata, success, err)
 		else
 			local file = string.match(msg, "(Bad include%: .*)")
 			err(file or msg)
+		end
+	end
+
+	local HTTP, string_Replace = HTTP, string.Replace
+	--- Handles post-processing (as part of BuildIncludesTable)
+	function SF.Editor.HandlePostProcessing(list, ppdata, onSuccessSignal, onErrorSignal)
+		local files = list.files
+		if not ppdata.using then -- short-circuit; fast return when there are none --@using directives
+			return onSuccessSignal(list)
+		end
+		print("[SF] HandlePostProcessing | list of files:")
+		PrintTable(files, 1)
+		print("[SF] HandlePostProcessing | ppdata:")
+		PrintTable(ppdata, 1)
+		local usingCache, pendingRequestCount = {}, 0 -- a temporary HTTP in-memory cache
+		-- First stage: Iterate through all --@using directives in all files and prepare our HTTP queue structure.
+		for fileName, fileUsing in next, ppdata.using do
+			for _, url in next, fileUsing do
+				if not usingCache[url] then
+					usingCache[url] = true -- prevents duplicate requests to the same URL
+					pendingRequestCount = pendingRequestCount + 1
+				end
+			end
+		end
+		print("[SF] 1st stage | total pendingRequestCount: " .. pendingRequestCount)
+		-- Second stage: Once we know the total amount of requests and URLs, we fetch all URLs as HTTP resources.
+		--               Then we wait for all HTTP requests to complete.
+		local function CheckAndUploadIfReady()
+			pendingRequestCount = pendingRequestCount - 1
+			if pendingRequestCount > 0 then return end
+			-- The following should run only once, at the end when there are no more pending HTTP requests:
+			-- Final stage: Substitute "--@using <url>" lines in all files with the contents of their HTTP response.
+			for fileName, code in next, files do
+				for url, result in next, usingCache do
+					if result then -- if HTTP request succeeded, we have a string; otherwise, result is false
+						code = string_Replace(code, "--@using " .. url, result)
+						print("[SF] 3rd stage | fileName: " .. fileName .. "  url: " .. url)
+						print(code)
+						files[fileName] = code
+					end
+				end
+			end
+			--SF.SendStarfall("starfall_upload", {files = files, mainfile = list.mainfile})
+			onSuccessSignal(list)
+		end
+		for url in next, usingCache do
+			print("[SF] 2nd stage | using URL: " .. url)
+			HTTP {
+				method = "GET";
+				url = url;
+				success = function(_, contents)
+					print("[SF] 2nd stage | HTTP success - " .. url)
+					print(contents)
+					usingCache[url] = contents
+					CheckAndUploadIfReady()
+				end;
+				failed = function(err)
+					print("[SF] 2nd stage | HTTP failed - " .. url)
+					print(err)
+					usingCache[url] = false -- preserves original code (a directive line)
+					--CheckAndUploadIfReady()
+					onErrorSignal("Failed to fetch --@using link: " .. url)
+				end;
+			}
 		end
 	end
 
@@ -361,7 +425,7 @@ if CLIENT then
 			end
 		end
 	end)
-	
+
 	local forceCloseEditor = function()
 		if not SF.Editor.initialized then return end
 		SF.Editor.editor:Close()
@@ -373,13 +437,13 @@ if CLIENT then
 		SF.Editor.editor = nil
 
 	end
-	
+
 	concommand.Add("sf_editor_reload", function()
 		pcall(forceCloseEditor)
 		include("starfall/editor/editor.lua")
 		print("Editor reloaded")
 	end)
-	
+
 	local function initDocs(data)
 		local ok, docs
 		if data then
@@ -449,7 +513,7 @@ elseif SERVER then
 		net.WriteBit(false)
 		net.Broadcast()
 	end
-	
+
 	net.Receive("starfall_docs", function(len, ply)
 		if not ply.SF_SentDocs then
 			ply.SF_SentDocs = true

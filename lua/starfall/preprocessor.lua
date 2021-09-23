@@ -16,6 +16,7 @@ function SF.Preprocessor.SetGlobalDirective(directive, func)
 end
 
 local function FindComments(line)
+	-- TODO: Add support to find Garry's C-style comments // and /* */
 	local ret, count, pos, found = {}, 0, 1
 	repeat
 		found = line:find('["%-%[%]]', pos)
@@ -196,4 +197,11 @@ SF.Preprocessor.SetGlobalDirective("superuser", function(args, filename, data)
 	data.superuser[filename] = true
 end)
 
-SF.Preprocessor.SetGlobalDirective("using", function(url, fileName, data) end)
+SF.Preprocessor.SetGlobalDirective("using", function(url, fileName, data)
+	print("[SF] SetGlobalDirective | fileName: " .. fileName .. "  url: " .. url)
+	local using = data.using or {}
+	local fileUsing = using[fileName] or {}
+	fileUsing[#fileUsing + 1] = string.Trim(url)
+	using[fileName] = fileUsing
+	data.using = using
+end)
