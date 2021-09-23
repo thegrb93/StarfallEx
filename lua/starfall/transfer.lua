@@ -168,7 +168,7 @@ else
 				-- First stage: Scan for "--@using <url>" lines in all files, and assemble a HTTP queue structure.
 				for fileName, code in next, files do
 					for url in FindAllUsingDirectiveURLs(code) do
-						if usings[url] == nil then -- must strictly check against nil (because false means existing request has failed)
+						if not usings[url] then
 							usings[url] = true -- prevents duplicate requests to the same URL
 							pendingRequestCount = pendingRequestCount + 1
 						end
@@ -208,7 +208,7 @@ else
 						failed = function(err)
 							print("[SF] 2nd stage | HTTP failed - " .. url)
 							print(err)
-							usings[url] = false -- preserves original code (directive line)
+							usings[url] = false -- preserves original code (a directive line)
 							CheckAndUploadIfReady()
 						end;
 					}
