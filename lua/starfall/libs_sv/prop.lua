@@ -639,7 +639,12 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		end)
 
 		SF.runningOps = runningOpsBackup -- Restore back runningOps to SF control, and everything is fine :)
-		if not isOk then SF.Throw("Failed to create entity: " .. errorMsg, 2) end
+		if not isOk then
+			if IsValid(entity) then
+				entity:Remove()
+			end
+			SF.Throw("Failed to create entity: " .. errorMsg, 2)
+		end
 
 		hookcall = "PlayerSpawnedSENT"
 	end
