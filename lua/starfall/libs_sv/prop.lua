@@ -619,7 +619,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		SF.runningOps = nil
 
 		-- Better be safe, pcall this to ensure we continue running our code, in case these external functions cause an error...
-		pcall(function()
+		local isOk, errorMsg = pcall(function()
 			if sent2._preFactory then
 				sent2._preFactory(ply, enttbl)
 			end
@@ -639,6 +639,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		end)
 
 		SF.runningOps = runningOpsBackup -- Restore back runningOps to SF control, and everything is fine :)
+		if not isOk then SF.Throw("Failed to create entity: " .. errorMsg, 2) end
 
 		hookcall = "PlayerSpawnedSENT"
 	end
