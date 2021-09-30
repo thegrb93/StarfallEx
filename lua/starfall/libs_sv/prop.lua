@@ -612,21 +612,38 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		enttbl.Pos = pos
 		enttbl.Angle = ang
 
-		if sent2._preFactory then
-			sent2._preFactory(ply, enttbl)
-		end
+		-- Temporarily disable SF runningOps, because SENT like E2 rely on string metatable methods!
+		-- E2 calls string:find with colon sugar syntax, this means E2 code ended up calling into string __index metamethod (see sflib.lua where SF does metatable patching).
+		-- In case of E2, it usually results in obscure errors being thrown (such as "error in error handling", random things being nil, etc).
+		local runningOpsBackup = SF.runningOps
+		SF.runningOps = nil
 
-		entity = duplicator.CreateEntityFromTable(ply, enttbl)
+		-- Better be safe, pcall this to ensure we continue running our code, in case these external functions cause an error...
+		local isOk, errorMsg = pcall(function()
+			if sent2._preFactory then
+				sent2._preFactory(ply, enttbl)
+			end
 
-		if sent2._postFactory then
-			sent2._postFactory(ply, entity, enttbl)
-		end
+			entity = duplicator.CreateEntityFromTable(ply, enttbl)
 
-		if entity.PreEntityCopy then
-			entity:PreEntityCopy() -- To build dupe modifiers
-		end
-		if entity.PostEntityPaste then
-			entity:PostEntityPaste(ply, entity, {[entity:EntIndex()] = entity})
+			if sent2._postFactory then
+				sent2._postFactory(ply, entity, enttbl)
+			end
+
+			if entity.PreEntityCopy then
+				entity:PreEntityCopy() -- To build dupe modifiers
+			end
+			if entity.PostEntityPaste then
+				entity:PostEntityPaste(ply, entity, {[entity:EntIndex()] = entity})
+			end
+		end)
+
+		SF.runningOps = runningOpsBackup -- Restore back runningOps to SF control, and everything is fine :)
+		if not isOk then
+			if IsValid(entity) then
+				entity:Remove()
+			end
+			SF.Throw("Failed to create entity: " .. errorMsg, 2)
 		end
 
 		hookcall = "PlayerSpawnedSENT"
