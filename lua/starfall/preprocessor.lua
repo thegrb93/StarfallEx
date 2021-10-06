@@ -11,9 +11,8 @@ SF.Preprocessor.directives = {}
 --- Sets a global preprocessor directive.
 -- @param directive The directive to set.
 -- @param func The callback. Takes the directive arguments, the file name, and instance.data
--- @param argPattern Lua pattern to be combined and used for more accurate matching the rest of the line (after directive name).
-function SF.Preprocessor.SetGlobalDirective(directive, func, argPattern)
-	SF.Preprocessor.directives[directive] = { func, argPattern }
+function SF.Preprocessor.SetGlobalDirective(directive, func)
+	SF.Preprocessor.directives[directive] = func
 end
 
 local function FindComments(line)
@@ -84,7 +83,6 @@ local function FindComments(line)
 	return ret, count
 end
 
-local directivePattern = "%-%-@(%w+)"
 --- Parses a source file for directives.
 -- @param filename The file name of the source code (or "file" if being run by SF editor).
 -- @param source The source code to parse.
@@ -118,15 +116,10 @@ function SF.Preprocessor.ParseDirectives(filename, source, data)
 				ending = "end"
 				endingLevel = comment.level
 			elseif comment.type == "line" then
-				local directive = string.match(line, directivePattern)
-				if directive then
-					local obj = SF.Preprocessor.directives[directive]
-					if obj then
-						local func, argPattern = obj[1], obj[2]
-						argPattern = "(" .. directivePattern .. "[\t ]" .. (argPattern and ("+(" .. argPattern .. ")") or "*(.*)") .. ")"
-						local fullMatch, _, args = string.match(line, argPattern)
-						func(args, filename, data, fullMatch)
-					end
+				local directive, args = string.match(line, "--@(%w+)%s*(.*)")
+				local func = SF.Preprocessor.directives[directive]
+				if func then
+					func(args, filename, data)
 				end
 			end
 		end
@@ -135,12 +128,27 @@ function SF.Preprocessor.ParseDirectives(filename, source, data)
 	end
 end
 
-local function directive_include(args, filename, data)
-	if not data.includes then data.includes = {} end
-	if not data.includes[filename] then data.includes[filename] = {} end
-
-	local incl = data.includes[filename]
-	incl[#incl + 1] = string.Trim(args)
+local function directive_include(args, fileName, data)
+	args = string.Trim(args)
+	if #args == 0 then return end -- Silently continue, because there are no args at all
+	local httpArg = string.match(args, "^(https?://.+)")
+	if httpArg then
+		-- HTTP approach
+		local httpUrl, httpName = string.match(httpArg, "^(.+)[\t ]+as[\t ]+(.+)$")
+		if httpName then
+			local using = data.using or {}
+			local fileUsing = using[fileName] or {}
+			fileUsing[#fileUsing + 1] = { httpUrl or httpArg, httpName }
+			using[fileName] = fileUsing
+			data.using = using
+		end
+	else
+		-- Standard/Filesystem approach
+		if not data.includes then data.includes = {} end
+		if not data.includes[fileName] then data.includes[fileName] = {} end
+		local incl = data.includes[fileName]
+		incl[#incl + 1] = args
+	end
 end
 SF.Preprocessor.SetGlobalDirective("include", directive_include)
 
@@ -202,14 +210,3 @@ SF.Preprocessor.SetGlobalDirective("superuser", function(args, filename, data)
 	if not data.superuser then data.superuser = {} end
 	data.superuser[filename] = true
 end)
-
-SF.Preprocessor.SetGlobalDirective("using", function(args, fileName, data, fullMatch)
-	if not args then return end -- silently continue, because there are no args (no URL at all)
-	local using = data.using or {}
-	local fileUsing = using[fileName] or {}
-	args = string.Trim(args)
-	local url, name = string.match(args, "^(.+)[\t ]+as[\t ]+(.+)$")
-	fileUsing[#fileUsing + 1] = { fullMatch, url or args, name }
-	using[fileName] = fileUsing
-	data.using = using
-end, "https?://.+")

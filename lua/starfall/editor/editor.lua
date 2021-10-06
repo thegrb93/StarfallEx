@@ -323,7 +323,6 @@ if CLIENT then
 		end
 	end
 
-	local HTTP, string_Replace = HTTP, string.Replace
 	--- Handles post-processing (as part of BuildIncludesTable)
 	function SF.Editor.HandlePostProcessing(list, ppdata, onSuccessSignal, onErrorSignal)
 		if not ppdata.using then -- short-circuit; fast return when there are none --@using directives
@@ -334,7 +333,7 @@ if CLIENT then
 		-- First stage: Iterate through all --@using directives in all files and prepare our HTTP queue structure.
 		for fileName, fileUsing in next, ppdata.using do
 			for _, data in next, fileUsing do
-				local url, name = data[2], data[3]
+				local url, name = data[1], data[2]
 				if not usingCache[url] then
 					usingCache[url] = name or true -- prevents duplicate requests to the same URL
 					pendingRequestCount = pendingRequestCount + 1
@@ -351,11 +350,9 @@ if CLIENT then
 			for fileName, fileUsing in next, ppdata.using do
 				local code = files[fileName]
 				for _, data in next, fileUsing do
-					local fullMatch, url, name = data[1], data[2], data[3]
+					local url, name = data[1], data[2]
 					local result = usingCache[url]
-					name = name and (name .. "=") or ""
-					code = string_Replace(code, fullMatch, name .. result)
-					files[fileName] = code
+					files[name] = result
 				end
 			end
 			onSuccessSignal(list)
@@ -369,7 +366,7 @@ if CLIENT then
 					CheckAndUploadIfReady()
 				end;
 				failed = function(reason)
-					onErrorSignal(string.format("Could not fetch --@using link (due %s): %s", reason, url))
+					onErrorSignal(string.format("Could not fetch --@include link (due %s): %s", reason, url))
 				end;
 			}
 		end
