@@ -45,7 +45,7 @@ end
 function SF.CompressFiles(files)
 	local header = SF.StringStream()
 	header:writeInt32(table.Count(files))
-	
+
 	local filecodes = {}
 	for filename, code in pairs(files) do
 		if #filename > 255 then error("File name too large: " .. #filename .. " (max is 255)") end
@@ -143,7 +143,7 @@ else
 		net.SendToServer()
 	end
 
-	net.Receive("starfall_upload", function(len)
+	net.Receive("starfall_upload", function()
 		local mainfile = net.ReadString()
 		if #mainfile==0 then mainfile = nil end
 		SF.Editor.BuildIncludesTable(mainfile,
@@ -157,5 +157,3 @@ else
 		)
 	end)
 end
-
-

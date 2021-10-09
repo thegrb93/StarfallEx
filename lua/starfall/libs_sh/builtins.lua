@@ -1076,7 +1076,7 @@ end
 -- This is required to use the file in require() and dofile()
 -- @name include
 -- @class directive
--- @param path Path to the file
+-- @param path Path to the file, or URL of the single-file library to be included
 
 --- Mark a directory to be included in the upload.
 -- This is optional to include all files in the directory in require() and dofile()
@@ -1130,4 +1130,3 @@ end
 --- Lets the chip run with no restrictions and the chip owner becomes SF.Superuser. Can only be used in the main file. --@superuser
 -- @name superuser
 -- @class directive
-

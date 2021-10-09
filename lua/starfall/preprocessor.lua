@@ -16,6 +16,7 @@ function SF.Preprocessor.SetGlobalDirective(directive, func)
 end
 
 local function FindComments(line)
+	-- TODO: Add support to find Garry's C-style comments // and /* */
 	local ret, count, pos, found = {}, 0, 1
 	repeat
 		found = line:find('["%-%[%]]', pos)
@@ -82,9 +83,8 @@ local function FindComments(line)
 	return ret, count
 end
 
-
 --- Parses a source file for directives.
--- @param filename The file name of the source code
+-- @param filename The file name of the source code (or "file" if being run by SF editor).
 -- @param source The source code to parse.
 -- @param data The data table passed to the directives.
 function SF.Preprocessor.ParseDirectives(filename, source, data)
@@ -95,7 +95,7 @@ function SF.Preprocessor.ParseDirectives(filename, source, data)
 	local ending = nil
 	local endingLevel = nil
 	local lines = string.Explode("\r?\n", source, true)
-	for _, line in ipairs(lines) do
+	for _, line in next, lines do
 		for _, comment in ipairs(FindComments(line)) do
 			if ending then
 				if comment.type == ending then
@@ -103,7 +103,7 @@ function SF.Preprocessor.ParseDirectives(filename, source, data)
 						if comment.level and comment.level == endingLevel then
 							ending = nil
 							endingLevel = nil
-							end
+						end
 					else
 						ending = nil
 					end
@@ -116,7 +116,7 @@ function SF.Preprocessor.ParseDirectives(filename, source, data)
 				ending = "end"
 				endingLevel = comment.level
 			elseif comment.type == "line" then
-				local directive, args = string.match(line, "--@(%S+)%s*(.*)")
+				local directive, args = string.match(line, "--@(%w+)%s*(.*)")
 				local func = SF.Preprocessor.directives[directive]
 				if func then
 					func(args, filename, data)
@@ -128,12 +128,27 @@ function SF.Preprocessor.ParseDirectives(filename, source, data)
 	end
 end
 
-local function directive_include(args, filename, data)
-	if not data.includes then data.includes = {} end
-	if not data.includes[filename] then data.includes[filename] = {} end
-
-	local incl = data.includes[filename]
-	incl[#incl + 1] = string.Trim(args)
+local function directive_include(args, fileName, data)
+	args = string.Trim(args)
+	if #args == 0 then return end -- Silently continue, because there are no args at all
+	local httpArg = string.match(args, "^(https?://.+)")
+	if httpArg then
+		-- HTTP approach
+		local httpUrl, httpName = string.match(httpArg, "^(.+)[\t ]+as[\t ]+(.+)$")
+		if httpName then
+			local using = data.using or {}
+			local fileUsing = using[fileName] or {}
+			fileUsing[#fileUsing + 1] = { httpUrl or httpArg, httpName }
+			using[fileName] = fileUsing
+			data.using = using
+		end
+	else
+		-- Standard/Filesystem approach
+		if not data.includes then data.includes = {} end
+		if not data.includes[fileName] then data.includes[fileName] = {} end
+		local incl = data.includes[fileName]
+		incl[#incl + 1] = args
+	end
 end
 SF.Preprocessor.SetGlobalDirective("include", directive_include)
 
