@@ -1073,6 +1073,7 @@ builtins_library.class = SF.Class
 end
 
 --- Mark a file to be included in the upload.
+-- URL is also supported, e.g. --@include http://mydomain.com/myfile as myfile.txt
 -- This is required to use the file in require() and dofile()
 -- @name include
 -- @class directive

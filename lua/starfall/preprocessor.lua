@@ -3,8 +3,6 @@
 -- Processes code for compile time directives.
 -------------------------------------------------------------------------------
 
--- TODO: Make an @include-only parser
-
 SF.Preprocessor = {}
 SF.Preprocessor.directives = {}
 
@@ -15,132 +13,33 @@ function SF.Preprocessor.SetGlobalDirective(directive, func)
 	SF.Preprocessor.directives[directive] = func
 end
 
-local function FindComments(line)
-	-- TODO: Add support to find Garry's C-style comments // and /* */
-	local ret, count, pos, found = {}, 0, 1
-	repeat
-		found = line:find('["%-%[%]]', pos)
-		if (found) then -- We found something
-			local oldpos = pos
-
-			local char = line:sub(found, found)
-			if char == "-" then
-				if line:sub(found, found + 1) == "--" then
-					-- Comment beginning
-					if line:sub(found, found + 3) == "--[[" then
-						-- Block Comment beginning
-						count = count + 1
-						ret[count] = { type = "start", pos = found }
-						pos = found + 4
-					else
-						-- Line comment beginning
-						count = count + 1
-						ret[count] = { type = "line", pos = found }
-						pos = found + 2
-					end
-				else
-					pos = found + 1
-				end
-			elseif char == "[" then
-				local level = line:sub(found + 1):match("^(=*)")
-				if level then level = string.len(level) else level = 0 end
-
-				if line:sub(found + level + 1, found + level + 1) == "[" then
-					-- Block string start
-					count = count + 1
-					ret[count] = { type = "stringblock", pos = found, level = level }
-					pos = found + level + 2
-				else
-					pos = found + 1
-				end
-			elseif char == "]" then
-				local level = line:sub(found + 1):match("^(=*)")
-				if level then level = string.len(level) else level = 0 end
-
-				if line:sub(found + level + 1, found + level + 1) == "]" then
-					-- Ending
-					count = count + 1
-					ret[count] = { type = "end", pos = found, level = level }
-					pos = found + level + 2
-				else
-					pos = found + 1
-				end
-			elseif char == "\"" then
-				if line:sub(found-1, found-1) == "\\" and line:sub(found-2, found-1) ~= "\\\\" then
-					-- Escaped character
-					pos = found + 1
-				else
-					-- String
-					count = count + 1
-					ret[count] = { type = "string", pos = found }
-					pos = found + 1
-				end
-			end
-
-			if oldpos == pos then error("Regex found something, but nothing handled it") end
-		end
-	until not found
-	return ret, count
-end
-
 --- Parses a source file for directives.
 -- @param filename The file name of the source code (or "file" if being run by SF editor).
 -- @param source The source code to parse.
 -- @param data The data table passed to the directives.
 function SF.Preprocessor.ParseDirectives(filename, source, data)
-	local includesdata = data.includesdata
-	if includesdata and includesdata[filename] then
-		return
-	end
-	local ending = nil
-	local endingLevel = nil
-	local lines = string.Explode("\r?\n", source, true)
-	for _, line in next, lines do
-		for _, comment in ipairs(FindComments(line)) do
-			if ending then
-				if comment.type == ending then
-					if endingLevel then
-						if comment.level and comment.level == endingLevel then
-							ending = nil
-							endingLevel = nil
-						end
-					else
-						ending = nil
-					end
-				end
-			elseif comment.type == "start" then
-				ending = "end"
-			elseif comment.type == "string" then
-				ending = "string"
-			elseif comment.type == "stringblock" then
-				ending = "end"
-				endingLevel = comment.level
-			elseif comment.type == "line" then
-				local directive, args = string.match(line, "--@(%w+)%s*(.*)")
-				local func = SF.Preprocessor.directives[directive]
-				if func then
-					func(args, filename, data)
-				end
-			end
-		end
+	if data.includesdata and data.includesdata[filename] then return end
 
-		if ending == "newline" then ending = nil end
+	for directive, args in string.gmatch(source, "--@(%w+)([^\r\n]*)") do
+		local func = SF.Preprocessor.directives[directive]
+		if func then
+			func(string.Trim(args), filename, data)
+		end
 	end
 end
 
 local function directive_include(args, fileName, data)
-	args = string.Trim(args)
-	if #args == 0 then return end -- Silently continue, because there are no args at all
-	local httpArg = string.match(args, "^(https?://.+)")
-	if httpArg then
+	if #args == 0 then error("Empty include directive") end
+	if string.match(args, "^https?://") then
 		-- HTTP approach
-		local httpUrl, httpName = string.match(httpArg, "^(.+)[\t ]+as[\t ]+(.+)$")
-		if httpName then
-			local using = data.using or {}
-			local fileUsing = using[fileName] or {}
-			fileUsing[#fileUsing + 1] = { httpUrl or httpArg, httpName }
-			using[fileName] = fileUsing
-			data.using = using
+		local httpUrl, httpName = string.match(args, "^(.+)%s+as%s+(.+)$")
+		if httpUrl then
+			if not data.httpincludes then data.httpincludes = {} end
+			if not data.httpincludes[fileName] then data.httpincludes[fileName] = {} end
+			local incl = data.httpincludes[fileName]
+			incl[#incl + 1] = { httpUrl, httpName }
+		else
+			error("Bad include format - Expected '--@include http://url as filename'")
 		end
 	else
 		-- Standard/Filesystem approach
@@ -153,20 +52,22 @@ end
 SF.Preprocessor.SetGlobalDirective("include", directive_include)
 
 local function directive_includedir(args, filename, data)
+	if #args == 0 then error("Empty includedir directive") end
 	if not data.includedirs then data.includedirs = {} end
 	if not data.includedirs[filename] then data.includedirs[filename] = {} end
 
 	local incl = data.includedirs[filename]
-	incl[#incl + 1] = string.Trim(args)
+	incl[#incl + 1] = args
 end
 SF.Preprocessor.SetGlobalDirective("includedir", directive_includedir)
 
 SF.Preprocessor.SetGlobalDirective("includedata", function(args, filename, data)
+	if #args == 0 then error("Empty includedata directive") end
 	if not data.includesdata then data.includesdata = {} end
 	if not data.includesdata[filename] then data.includesdata[filename] = {} end
 
 	local incl = data.includesdata[filename]
-	incl[#incl + 1] = string.Trim(args)
+	incl[#incl + 1] = args
 
 	directive_include(args, filename, data)
 end)

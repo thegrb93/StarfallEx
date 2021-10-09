@@ -1656,7 +1656,7 @@ function Editor:Close()
 	if activeWep:IsValid() and activeWep:GetClass() == "gmod_tool" and activeWep.Mode == "starfall_processor" then
 		local model = nil
 		local ppdata = {}
-		SF.Preprocessor.ParseDirectives("file", self:GetCode(), ppdata)
+		pcall(SF.Preprocessor.ParseDirectives, "file", self:GetCode(), ppdata)
 		if ppdata.models and ppdata.models.file ~= "" then
 			model = ppdata.models.file
 		end

@@ -325,13 +325,11 @@ if CLIENT then
 
 	--- Handles post-processing (as part of BuildIncludesTable)
 	function SF.Editor.HandlePostProcessing(list, ppdata, onSuccessSignal, onErrorSignal)
-		if not ppdata.using then -- short-circuit; fast return when there are none --@using directives
-			return onSuccessSignal(list)
-		end
+		if not ppdata.httpincludes then onSuccessSignal(list) return end
 		local files = list.files
 		local usingCache, pendingRequestCount = {}, 0 -- a temporary HTTP in-memory cache
-		-- First stage: Iterate through all --@using directives in all files and prepare our HTTP queue structure.
-		for fileName, fileUsing in next, ppdata.using do
+		-- First stage: Iterate through all http --@include directives in all files and prepare our HTTP queue structure.
+		for fileName, fileUsing in next, ppdata.httpincludes do
 			for _, data in next, fileUsing do
 				local url, name = data[1], data[2]
 				if not usingCache[url] then
@@ -346,8 +344,8 @@ if CLIENT then
 			pendingRequestCount = pendingRequestCount - 1
 			if pendingRequestCount > 0 then return end
 			-- The following should run only once, at the end when there are no more pending HTTP requests:
-			-- Final stage: Substitute all --@using directives with the contents of their HTTP response.
-			for fileName, fileUsing in next, ppdata.using do
+			-- Final stage: Substitute all http --@include directives with the contents of their HTTP response.
+			for fileName, fileUsing in next, ppdata.httpincludes do
 				local code = files[fileName]
 				for _, data in next, fileUsing do
 					local url, name = data[1], data[2]

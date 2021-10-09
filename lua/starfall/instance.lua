@@ -57,7 +57,10 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 
 	instance.ppdata = {}
 	for filename, source in pairs(code) do
-		SF.Preprocessor.ParseDirectives(filename, source, instance.ppdata)
+		local ok, err = pcall(SF.Preprocessor.ParseDirectives, filename, source, instance.ppdata)
+		if not ok then
+			return false, { message = err, traceback = "" }
+		end
 	end
 
 	if player:IsWorld() then
