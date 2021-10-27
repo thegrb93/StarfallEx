@@ -220,10 +220,9 @@ local function checkExtension(filename)
 	if not allowedExtensions[string.GetExtensionFromFilename(filename)] then SF.Throw("Invalid file extension!", 3) end
 end
 
---- Writes to a file
+--- Writes to a file. Throws an error if it failed to write
 -- @param string path Filepath relative to data/sf_filedata/.
 -- @param string data The data to write
--- @return boolean? True if OK, nil if error
 function file_library.write(path, data)
 	checkpermission (instance, path, "file.write")
 	checkluatype (path, TYPE_STRING)
