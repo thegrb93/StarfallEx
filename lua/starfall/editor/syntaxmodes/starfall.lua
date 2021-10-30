@@ -283,9 +283,9 @@ function EDITOR:SyntaxColorLine(row)
 	local spaces = self:SkipPattern(" *")
 	if spaces then addToken("whitespace", spaces) end
 
-	found = self:NextPattern("local%s*function")  -- local function
+	found = self:NextPattern("local%s*function%s")  -- local function
 	if found then
-		local l, spaces, f = self.tokendata:match("(local)(%s*)(function)")
+		local l, spaces, f = self.tokendata:match("(local)(%s*)(function)%s")
 
 		addToken("keyword", l)
 		if spaces and #spaces>0 then addToken("whitespace", spaces) end
