@@ -701,8 +701,13 @@ function Editor:CloseTab(_tab,dontask)
 	end
 	local ed = activetab:GetPanel()
 	if not ed:IsSaved() and not dontask and not ed.IsOnline then
-		local question = string.format("Do you want to close <color=255,30,30>%q</color> ?", activetab:GetText())
-		SF.Editor.Query("Are you sure?", question, "Close", function() self:CloseTab(activetab, true) end, "Cancel", function() end)
+		if IsValid(self.closeDialogue) then
+			self.closeDialogue:MakePopup()
+		else
+			self.closeDialogue = SF.Editor.Query("Are you sure?", string.format("Do you want to close <color=255,30,30>%q</color> ?", activetab:GetText()), "Close", function()
+				self:CloseTab(activetab, true)
+			end, "Cancel", function() end)
+		end
 		return
 	end
 

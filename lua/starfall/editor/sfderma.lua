@@ -1066,6 +1066,7 @@ SF.Editor.Query = function(...)
 	frame:MakePopup()
 	frame:Center()
 	frame:Open()
+	return frame
 end
 PANEL = {}
 
