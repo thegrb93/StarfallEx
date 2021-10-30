@@ -238,10 +238,10 @@ function EDITOR:SyntaxColorLine(row)
 
 		addToken("comment", self.tokendata)
 	elseif self.multilinestring then
+		local ending = "%]"..string.rep('=',self.multilinestring).."%]"
 		while self.character do -- Find the ending ]]
-			if self:NextPattern(".-%]"..string.rep('=',self.multilinestring).."%]") then
+			if self:NextPattern(ending) then
 				self.multilinestring = nil
-				self:NextCharacter()
 				break
 			end
 			if self.character == "\\" then self:NextCharacter() end
@@ -512,9 +512,9 @@ function EDITOR:SyntaxColorLine(row)
 			end
 		elseif self:NextPattern("%[=*%[") then -- Multiline strings
 			local reps = #self.tokendata:match("%[(=*)%[")
-			self:NextCharacter()
+			local ending = "%]"..string.rep("=",reps).."%]"
 			while self.character do -- Find the ending ]] if it isnt really multline(who does that?! Shame on you!)
-				if self:NextPattern("%]"..string.rep("=",reps).."%]") then
+				if self:NextPattern(ending) then
 					tokenname = "string"
 					break
 				end
@@ -525,8 +525,6 @@ function EDITOR:SyntaxColorLine(row)
 			if tokenname == "" then -- If no ending ]] was found...
 				self.multilinestring = reps
 				tokenname = "string"
-			else
-				self:NextCharacter()
 			end
 			--"string"
 		elseif self.character == '"' then -- Singleline "string"
