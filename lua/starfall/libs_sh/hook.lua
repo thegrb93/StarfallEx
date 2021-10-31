@@ -287,6 +287,18 @@ else
 	-- @client
 	-- @param Player ply Player who stopped talking
 	add("PlayerEndVoice")
+
+	--- Called when the player opens the context menu
+	-- @name OnContextMenuOpen
+	-- @class hook
+	-- @client
+	add("OnContextMenuOpen")
+
+	--- Called when the player closes the context menu
+	-- @name OnContextMenuClose
+	-- @class hook
+	-- @client
+	add("OnContextMenuClose")
 end
 
 -- Shared hooks
