@@ -143,7 +143,9 @@ builtins_library.next = next
 --- This function takes a numeric indexed table and return all the members as a vararg.
 -- @name builtins_library.unpack
 -- @class function
--- @param table tbl To get elements out of
+-- @param table tbl Table to get elements out of
+-- @param number? startIndex Which index to start from (default 1)
+-- @param number? endIndex Which index to end at (default #tbl)
 -- @return ... Elements of tbl
 builtins_library.unpack = unpack
 
