@@ -1652,9 +1652,10 @@ end
 -- @param Vector pos Position of the sprite.
 -- @param number width Width of the sprite.
 -- @param number height Height of the sprite.
-function render_library.draw3DSprite(pos, width, height)
+-- @param Color? Color tint to give the sprite. Default: white
+function render_library.draw3DSprite(pos, width, height, color)
 	pos = vunwrap(pos)
-	render.DrawSprite(pos, width, height)
+	render.DrawSprite(pos, width, height, color)
 end
 
 --- Draws a sphere
