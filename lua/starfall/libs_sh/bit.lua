@@ -503,7 +503,7 @@ end
 -- @name ss_methods.writeEntity
 -- @class function
 -- @param Entity e The entity to be written
-local function writeEntity(instance, e)
+local function writeEntity(self, instance, e)
 	self:writeInt16(instance.Types.Entity.GetEntity(e):EntIndex())
 end
 	
@@ -512,7 +512,7 @@ end
 -- @class function
 -- @param function? callback (Client only) optional callback to be ran whenever the entity becomes valid; returns nothing if this is used. The callback passes the entity if it succeeds or nil if it fails.
 -- @return Entity The entity that was read
-local function readEntity(instance, callback)
+local function readEntity(self, instance, callback)
 	local index = self:readUInt16()
 	if callback ~= nil and CLIENT then
 		checkluatype(callback, TYPE_FUNCTION)
@@ -634,10 +634,10 @@ bit_library.tohex = bit.tohex
 function bit_library.stringstream(stream, i, endian)
 	local ret = SF.StringStream(stream, i, endian)
 	function ret:writeEntity(e)
-		writeEntity(instance, e)
+		writeEntity(self, instance, e)
 	end
 	function ret:readEntity(callback)
-		return readEntity(instance, callback)
+		return readEntity(self, instance, callback)
 	end
 	return ret
 end
