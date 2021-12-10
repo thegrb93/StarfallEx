@@ -179,7 +179,6 @@ function net_library.writeString(t)
 	checkluatype (t, TYPE_STRING)
 
 	write(net.WriteString, (#t+1)*8, t)
-	return true
 end
 
 --- Reads a string from the net message
@@ -201,7 +200,6 @@ function net_library.writeData(t, n)
 
 	n = math.Clamp(n, 0, 64000)
 	write(net.WriteData, n*8, t, n)
-	return true
 end
 
 --- Reads a string from the net message
@@ -224,7 +222,6 @@ function net_library.writeStream(str, compress)
 	checkluatype (str, TYPE_STRING)
 	if #str > 64e6 then SF.Throw("String is too long!") end
 	write(net.WriteStream, 8*8, str, nil, compress == false)
-	return true
 end
 
 --- Reads a large string stream from the net message.
@@ -275,7 +272,6 @@ function net_library.writeInt(t, n)
 
 	n = math.Clamp(n, 0, 32)
 	write(net.WriteInt, n, t, n)
-	return true
 end
 
 --- Reads an integer from the net message
@@ -299,7 +295,6 @@ function net_library.writeUInt(t, n)
 
 	n = math.Clamp(n, 0, 32)
 	write(net.WriteUInt, n, t, n)
-	return true
 end
 
 --- Reads an unsigned integer from the net message
@@ -320,7 +315,6 @@ function net_library.writeBit(t)
 	checkluatype (t, TYPE_NUMBER)
 
 	write(net.WriteBit, 1, t~=0)
-	return true
 end
 
 --- Reads a bit from the net message
@@ -339,7 +333,6 @@ function net_library.writeBool(t)
 	checkluatype (t, TYPE_BOOL)
 
 	write(net.WriteBool, 1, t)
-	return true
 end
 
 --- Reads a boolean from the net message
@@ -358,7 +351,6 @@ function net_library.writeDouble(t)
 	checkluatype (t, TYPE_NUMBER)
 
 	write(net.WriteDouble, 8*8, t)
-	return true
 end
 
 --- Reads a double from the net message
@@ -377,7 +369,6 @@ function net_library.writeFloat(t)
 	checkluatype (t, TYPE_NUMBER)
 
 	write(net.WriteFloat, 4*8, t)
-	return true
 end
 
 --- Reads a float from the net message
@@ -395,7 +386,6 @@ function net_library.writeAngle(t)
 	write(net.WriteFloat, 4*8, t[1])
 	write(net.WriteFloat, 4*8, t[2])
 	write(net.WriteFloat, 4*8, t[3])
-	return true
 end
 
 --- Reads an angle from the net message
@@ -413,7 +403,6 @@ function net_library.writeVector(t)
 	write(net.WriteFloat, 4*8, t[1])
 	write(net.WriteFloat, 4*8, t[2])
 	write(net.WriteFloat, 4*8, t[3])
-	return true
 end
 
 --- Reads a vector from the net message
@@ -432,7 +421,6 @@ function net_library.writeMatrix(t)
 	for i=1, 16 do
 		write(net.WriteFloat, 4*8, vals[i])
 	end
-	return true
 end
 
 --- Reads a matrix from the net message
@@ -450,7 +438,6 @@ end
 function net_library.writeColor(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
 	write(net.WriteColor, 4*8, cunwrap(t))
-	return true
 end
 
 --- Reads a color from the net message
@@ -466,7 +453,6 @@ end
 function net_library.writeEntity(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
 	write(net.WriteUInt, 16, getent(t):EntIndex(), 16)
-	return true
 end
 
 --- Reads a entity from the net message
