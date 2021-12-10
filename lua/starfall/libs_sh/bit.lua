@@ -499,12 +499,6 @@ function ss_methods:writeString(str)
 	self:write("\0")
 end
 
---- Writes an entity to the buffer and advances the buffer pointer.
--- @param Entity e The entity to be written
-function ss_methods:writeEntity(e)
-	self:writeInt16(getent(e):EntIndex())
-end
-
 --- Returns the buffer as a string
 -- @return string The buffer as a string
 function ss_methods:getString()
@@ -520,6 +514,11 @@ SF.RegisterLibrary("bit")
 
 
 return function(instance)
+
+local getent
+instance:AddHook("initialize", function()
+	getent = instance.Types.Entity.GetEntity
+end)
 
 local bit_library = instance.Libraries.bit
 --- Returns the arithmetically shifted value.
@@ -698,6 +697,12 @@ function bit_library.sha1(s)
 	return ret
 end
 
+--- Writes an entity to the buffer and advances the buffer pointer.
+-- @param Entity e The entity to be written
+function ss_methods:writeEntity(e)
+	self:writeInt16(getent(e):EntIndex())
+end
+	
 --- Reads an entity from the byte stream and advances the buffer pointer.
 -- @param function? callback (Client only) optional callback to be ran whenever the entity becomes valid; returns nothing if this is used. The callback passes the entity if it succeeds or nil if it fails.
 -- @return Entity The entity that was read
