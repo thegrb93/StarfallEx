@@ -631,7 +631,6 @@ bit_library.tohex = bit.tohex
 -- @param number i The initial buffer pointer (default 1)
 -- @param string endian The endianness of number types. "big" or "little" (default "little")
 -- @return StringStream StringStream object
-bit_library.stringstream = SF.StringStream
 function bit_library.stringstream(stream, i, endian)
 	local ret = SF.StringStream(stream, i, endian)
 	function ret:writeEntity(e)
