@@ -503,7 +503,6 @@ end
 -- @param Entity e The entity to be written
 function ss_methods:writeEntity(e)
 	self:writeInt16(getent(e):EntIndex())
-	return true
 end
 
 --- Returns the buffer as a string
