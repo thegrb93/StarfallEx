@@ -25,7 +25,7 @@ SF.RegisterLibrary("navmesh")
 -- @class type
 -- @libtbl navarea_methods
 -- @libtbl navarea_meta
-SF.RegisterType("NavArea", true, false, debug.getregistry().NavArea, "LockedNavArea")
+SF.RegisterType("NavArea", true, false, nil, "LockedNavArea")
 SF.RegisterType("LockedNavArea", true, false) -- NavArea that can't be modified.
 
 local plyCount = SF.LimitObject("navareas", "navareas", 40, "The number of CNavAreas allowed to spawn via Starfall")
@@ -460,7 +460,6 @@ return function(instance)
 	-- @name navarea_methods.getExtentInfo
 	-- @return table Struct containing the above keys
 	function lnavarea_methods:getExtentInfo()
-		local extent = lnavunwrap(self):GetExtent()
 		return SF.StructWrapper(instance, lnavunwrap(self):GetExtent(), "NavExtentInfo")
 	end
 
