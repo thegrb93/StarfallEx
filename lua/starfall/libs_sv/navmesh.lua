@@ -86,13 +86,15 @@ return function(instance)
 	end
 
 	--- Whether we're currently generating a new navmesh with navmesh.beginGeneration
-	--@type function
-	--@return boolean Whether we're generating a nav mesh or not.
+	-- @class function
+	-- @name navmesh_library.isGenerating
+	-- @return boolean Whether we're generating a nav mesh or not.
 	navmesh_library.isGenerating = navmesh.IsGenerating
 
 	--- Returns true if a navmesh has been loaded when loading the map.
-	--@type function
-	--@return boolean Whether a navmesh has been loaded when loading the map.
+	-- @class function
+	-- @name navmesh_library.isLoaded
+	-- @return boolean Whether a navmesh has been loaded when loading the map.
 	navmesh_library.isLoaded = navmesh.IsLoaded
 
 	--- Loads a new navmesh from the .nav file for current map discarding any changes made to the navmesh previously.
@@ -183,7 +185,7 @@ return function(instance)
 	--- Returns an integer indexed table of all `NavArea`s on the current map.
 	-- If the map doesn't have a navmesh generated then this will return an empty table.
 	-- The navareas will be immutable.
-	--@return table A table of all the `NavArea`s on the current map
+	-- @return table A table of all the `NavArea`s on the current map
 	function navmesh_library.getAllNavAreas()
 		local out = {}
 		for idx, navarea in ipairs(navmesh.GetAllNavAreas()) do
@@ -193,11 +195,11 @@ return function(instance)
 	end
 
 	--- Returns a bunch of areas within distance, used to find hiding spots by NextBots for example.
-	--@param Vector pos The position to search around
-	--@param number radius Radius to search within (max 100000)
-	--@param number stepdown Maximum fall distance allowed (max 50000)
-	--@param number stepup Maximum jump height allowed (max 50000)
-	--@return table A table of immutable `NavArea`s
+	-- @param Vector pos The position to search around
+	-- @param number radius Radius to search within (max 100000)
+	-- @param number stepdown Maximum fall distance allowed (max 50000)
+	-- @param number stepup Maximum jump height allowed (max 50000)
+	-- @return table A table of immutable `NavArea`s
 	function navmesh_library.find(pos, radius, stepdown, stepup)
 		checkluatype(radius, TYPE_NUMBER)
 		checkluatype(stepdown, TYPE_NUMBER)
@@ -215,13 +217,14 @@ return function(instance)
 
 	--- Returns the highest ID of all nav areas on the map.
 	-- While this can be used to get all nav areas, this number may not actually be the actual number of nav areas on the map.
-	--@type function
-	--@return number The highest ID of all nav areas on the map.
+	-- @class function
+	-- @name navmesh_library.getNavAreaCount
+	-- @return number The highest ID of all nav areas on the map.
 	navmesh_library.getNavAreaCount = navmesh.GetNavAreaCount
 
 	--- Returns the NavArea at the given id.
-	--@param number id ID of the NavArea to get. Starts with 1.
-	--@return NavArea The NavArea with given ID.
+	-- @param number id ID of the NavArea to get. Starts with 1.
+	-- @return NavArea The NavArea with given ID.
 	function navmesh_library.getNavAreaByID(id)
 		checkluatype(id, TYPE_NUMBER)
 		return lnavwrap( navmesh.GetNavAreaByID(id) )
@@ -249,7 +252,7 @@ return function(instance)
 	end
 
 	--- Returns the position of the edit cursor when nav_edit is set to 1.
-	--@return Vector The position of the edit cursor.
+	-- @return Vector The position of the edit cursor.
 	function navmesh_library.getGetEditCursorPosition()
 		return vwrap(navmesh.GetEditCursorPosition())
 	end
@@ -273,14 +276,15 @@ return function(instance)
 	end
 
 	-- Returns whether this NavArea is valid or not.
-	--@return boolean Whether this NavArea is valid or not
+	-- @name navarea_methods.isValid
+	-- @return boolean Whether this NavArea is valid or not
 	function lnavarea_methods:isValid()
 		return lnavunwrap(self):IsValid()
 	end
 
 	--- Whether this NavArea is placed underwater.
 	-- @name navarea_methods.isUnderwater
-	--@return boolean Whether we're underwater or not.
+	-- @return boolean Whether we're underwater or not.
 	function lnavarea_methods:isUnderwater()
 		return lnavunwrap(self):IsUnderwater()
 	end
@@ -367,6 +371,7 @@ return function(instance)
 	--- Returns a table of all the CNavAreas that have a ( one and two way ) connection from this CNavArea in given direction.
 	-- If an area has a one-way incoming connection to this CNavArea, then it will not be returned from this function, use CNavArea:GetIncomingConnections to get all incoming connections.
 	-- See CNavArea:getAdjacentAreas for a function that returns all areas from all sides/directions.
+	-- @name navarea_methods.getAdjacentAreasAtSide
 	-- @param number navDir The direction, in which to look for CNavAreas, see NAV_DIR enums
 	-- @return table A table of all CNavArea that have a ( one and two way ) connection from this CNavArea in given direction.
 	function lnavarea_methods:getAdjacentAreasAtSide(navDir)
@@ -436,6 +441,7 @@ return function(instance)
 
 	--- Returns a table of very bad hiding spots in this area.
 	-- See also NavArea:getHidingSpots
+	-- @name navarea_methods.getExposedSpots
 	-- @return table A table of Vectors
 	function lnavarea_methods:getExposedSpots()
 		local out = {}
