@@ -1045,4 +1045,104 @@ env.MIDI = {
 	PITCH_BEND = 0xE0
 }
 
+--- NavArea direction ENUMs
+-- @name navmesh_library.NAV_DIR
+-- @class table
+-- @field NORTH 0
+-- @field SOUTH 1
+-- @field EAST 2
+-- @field WEST 3
+env.NAV_DIR = {
+	NORTH = 0,
+	EAST = 1,
+	SOUTH = 2,
+	WEST = 3
+}
+
+--- ENUMs used by NavArea:getAttributes and NavArea:hasAttributes
+-- @name navmesh_library.NAV_MESH
+-- @class table
+-- @field INVALID The nav area is invalid.
+-- @field CROUCH Must crouch to use this node/area
+-- @field JUMP Must jump to traverse this area (only used during generation)
+-- @field PRECISE Do not adjust for obstacles, just move along area
+-- @field NO_JUMP Inhibit discontinuity jumping
+-- @field STOP Must stop when entering this area
+-- @field RUN Must run to traverse this area
+-- @field WALK Must walk to traverse this area
+-- @field AVOID Avoid this area unless alternatives are too dangerous
+-- @field TRANSIENT Area may become blocked, and should be periodically checked
+-- @field DONT_HIDE Area should not be considered for hiding spot generation
+-- @field STAND Bots hiding in this area should stand
+-- @field NO_HOSTAGES Hostages shouldn't use this area
+-- @field STAIRS This area represents stairs, do not attempt to climb or jump them - just walk up
+-- @field NO_MERGE Don't merge this area with adjacent areas
+-- @field OBSTACLE_TOP This nav area is the climb point on the tip of an obstacle
+-- @field CLIFF This nav area is adjacent to a drop of at least CliffHeight
+-- @field FUNC_COST Area has designer specified cost controlled by func_nav_cost entities
+-- @field HAS_ELEVATOR Area is in an elevator's path
+-- @field NAV_BLOCKER -2147483648
+env.NAV_MESH = {
+	INVALID = 0,
+	CROUCH = 1,
+	JUMP = 2,
+	PRECISE = 4,
+	NO_JUMP = 8,
+	STOP = 16,
+	RUN = 32,
+	WALK = 64,
+	AVOID = 128,
+	TRANSIENT = 256,
+	DONT_HIDE = 512,
+	STAND = 1024,
+	NO_HOSTAGES = 2048,
+	STAIRS = 4096,
+	NO_MERGE = 8192,
+	OBSTACLE_TOP = 16384,
+	CLIFF = 32768,
+	FUNC_COST = 536870912,
+	HAS_ELEVATOR = 1073741824,
+	NAV_BLOCKER = -2147483648
+}
+
+--- ENUMs used by NavArea methods. These Enums correspond to each corner of a CNavArea
+-- @name navmesh_library.NAV_CORNER
+-- @class table
+-- @field NORTH_WEST 0
+-- @field NORTH_EAST 1
+-- @field SOUTH_EAST 2
+-- @field SOUTH_WEST 3
+-- @field NUM_CORNERS Represents all corners, only applicable to certain functions, such as NavArea:placeOnGround.
+env.NAV_CORNER = {
+	NORTH_WEST = 0,
+	NORTH_EAST = 1,
+	SOUTH_EAST = 2,
+	SOUTH_WEST = 3,
+	NUM_CORNERS = 4
+}
+
+--- ENUMs used by NavArea:getParentHow.
+-- @class table
+-- @name navmesh_library.NAV_TRAVERSE_TYPE
+-- @field GO_NORTH 0
+-- @field GO_EAST 1
+-- @field GO_SOUTH 2
+-- @field GO_WEST 3
+-- @field GO_LADDER_UP 4
+-- @field GO_LADDER_DOWN 5
+-- @field GO_JUMP 6
+-- @field GO_ELEVATOR_UP 7
+-- @field GO_ELEVATOR_DOWN 8
+env.NAV_TRAVERSE_TYPE = {
+	GO_NORTH = 0,
+	GO_EAST = 1,
+	GO_SOUTH = 2,
+	GO_WEST = 3,
+	GO_LADDER_UP = 4,
+	GO_LADDER_DOWN = 5,
+	GO_JUMP = 6,
+	GO_ELEVATOR_UP = 7,
+	GO_ELEVATOR_DOWN = 8
+}
+
 end
