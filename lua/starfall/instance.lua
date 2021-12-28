@@ -21,6 +21,7 @@ else
 	SF.softLockProtectionOwner = CreateConVar("sf_timebuffersoftlock_cl_owner", 1, FCVAR_ARCHIVE, "If sf_timebuffersoftlock_cl is 0, this enabled will make it only your own chips will be affected.")
 	SF.RamCap = CreateConVar("sf_ram_max_cl", 1500000, FCVAR_ARCHIVE, "If ram exceeds this limit (in kB), starfalls will be terminated")
 	SF.AllowSuperUser = CreateConVar("sf_superuserallowed", 0, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Whether the starfall superuser feature is allowed")
+	SF.InputLockCooldown = CreateConVar("sf_input_lock_cooldown", 10, FCVAR_ARCHIVE, "Cooldown for input.lockControls() in seconds", 0)
 end
 
 SF.Instance = {}
