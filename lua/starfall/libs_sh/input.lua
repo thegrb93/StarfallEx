@@ -2,6 +2,7 @@
 local registerprivilege = SF.Permissions.registerPrivilege
 local haspermission = SF.Permissions.hasAccess
 local checkluatype = SF.CheckLuaType
+local inputLockCooldown = SF.InputLockCooldown
 
 -- This should manage the player button hooks for singleplayer games.
 local PlayerButtonDown, PlayerButtonUp
@@ -311,10 +312,10 @@ function input_library.lockControls(enabled)
 	end
 
 	if enabled then
-		if lockedControlCooldown > CurTime() then
+		if lockedControlCooldown + inputLockCooldown:getFloat() > CurTime() then
 			SF.Throw("Cannot lock the player's controls yet", 2)
 		end
-		lockedControlCooldown = CurTime() + 10
+		lockedControlCooldown = CurTime()
 		lockControls(instance)
 	else
 		unlockControls(instance)
