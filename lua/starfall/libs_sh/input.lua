@@ -333,7 +333,7 @@ end
 -- @client
 -- @return boolean Whether the player's control can be locked
 function input_library.canLockControls()
-	return SF.IsHUDActive(instance.entity) and lockedControlCooldown <= CurTime()
+	return SF.IsHUDActive(instance.entity) and lockedControlCooldown + inputLockCooldown:GetFloat() <= CurTime()
 end
 
 
