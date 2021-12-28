@@ -312,7 +312,7 @@ function input_library.lockControls(enabled)
 	end
 
 	if enabled then
-		if lockedControlCooldown + inputLockCooldown:getFloat() > CurTime() then
+		if lockedControlCooldown + inputLockCooldown:GetFloat() > CurTime() then
 			SF.Throw("Cannot lock the player's controls yet", 2)
 		end
 		lockedControlCooldown = CurTime()
