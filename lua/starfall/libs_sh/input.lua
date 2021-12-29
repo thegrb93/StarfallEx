@@ -2,7 +2,10 @@
 local registerprivilege = SF.Permissions.registerPrivilege
 local haspermission = SF.Permissions.hasAccess
 local checkluatype = SF.CheckLuaType
-local inputLockCooldown = CreateConVar("sf_input_lock_cooldown", 10, FCVAR_ARCHIVE, "Cooldown for input.lockControls() in seconds", 0)
+local inputLockCooldown
+if CLIENT then
+	inputLockCooldown = CreateConVar("sf_input_lock_cooldown", 10, FCVAR_ARCHIVE, "Cooldown for input.lockControls() in seconds", 0)
+end
 
 -- This should manage the player button hooks for singleplayer games.
 local PlayerButtonDown, PlayerButtonUp
