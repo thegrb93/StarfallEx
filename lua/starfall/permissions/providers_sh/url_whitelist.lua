@@ -222,3 +222,18 @@ simple [[yp.shoutcast.com]]
 --- Examples:
 --- http://translate.google.com/translate_tts?&q=Hello%20World&ie=utf-8&client=tw-ob&tl=en
 simple [[translate.google.com]]
+
+-- Youtube Image Hosting
+--- Examples:
+--- https://i.ytimg.com/vi_webp/NTw9LRFdUeE/maxresdefault.webp
+simple [[i.ytimg.com]]
+
+-- Spotify Image CDN
+--- Examples:
+--- https://i.scdn.co/image/ab67616d0000b27343e93700df19c025747eebd2
+simple [[i.scdn.co]]
+
+-- Deezer Image CDN
+--- Examples:
+--- https://e-cdns-images.dzcdn.net/images/cover/dfa0fb51f7c872d87309943e17e30e81/1000x1000-000000-80-0-0.jpg
+pattern [[([%w-_]+)%.dzcdn%.net/(.+)]]
