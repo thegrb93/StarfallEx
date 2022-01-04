@@ -90,6 +90,12 @@ table_library.getWinningKey = table.GetWinningKey
 -- @param any val Value to search for
 -- @return boolean Returns true if the table has that value, false otherwise
 table_library.hasValue = table.HasValue
+	
+--- Checks if a table contains any value.
+-- @class function
+-- @param table tbl Table to check
+-- @return boolean Returns true if the table contains any value, false otherwise
+table_library.isEmpty = table.IsEmpty
 
 --- Copies any missing data from base to target, and sets the target's BaseClass member to the base table's pointer.
 -- @class function
@@ -103,6 +109,7 @@ table_library.inherit = table.Inherit
 -- @param table tbl The table to insert the variable into
 -- @param any pos The position in the table to insert the variable. If the third argument is not provided, this argument becomes the value to insert at the end of given table
 -- @param any val The variable to insert into the table
+-- @return number The index the variable was placed at.
 table_library.insert = function(a,b,c) if c~=nil then b = math.Clamp(b, 1, 2^31-1) return table.insert(a,b,c) else return table.insert(a,b) end end
 
 --- Returns whether or not the table's keys are sequential.
