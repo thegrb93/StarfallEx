@@ -1028,6 +1028,7 @@ SF.Editor.Query = function(...)
 	local m = markup.Parse(text)
 	local w,h = m:Size()
 	local frame = vgui.Create("StarfallFrame")
+	frame:SetDeleteOnClose(true)
 	frame.CloseButton:Remove()
 	frame:SetTitle(title)
 
