@@ -142,7 +142,7 @@ return function(instance)
 
 	--- Returns the classname of the player spawn entity.
 	-- @name navmesh_library.getPlayerSpawnName
-	-- @type function
+	-- @class function
 	-- @return string The classname of the spawn point entity. By default returns "info_player_start"
 	navmesh_library.getPlayerSpawnName = navmesh.GetPlayerSpawnName
 
@@ -632,7 +632,7 @@ return function(instance)
 	--- Returns whether this CNavArea can potentially see the given CNavArea.
 	-- @name navarea_methods.isPotentiallyVisible
 	-- @param NavArea area The area to test.
-	-- @boolean Whether the given area is visible from this area
+	-- @return boolean Whether the given area is visible from this area
 	function lnavarea_methods:isPotentiallyVisible(area)
 		return lnavunwrap(self):IsPotentiallyVisible( lnavunwrap(area) )
 	end
