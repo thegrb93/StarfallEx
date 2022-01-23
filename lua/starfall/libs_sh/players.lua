@@ -590,7 +590,7 @@ if CLIENT then
 	-- @param number? weight Optional float (Default 1), the weight of the gesture. Ranging from 0-1
 	function player_methods:playGesture(animation, loop, slot, weight)
 		local ply = getply(self)
-		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		if slot == nil then slot = GESTURE_SLOT_CUSTOM else checkluatype(slot, TYPE_NUMBER) end
 		if weight == nil then weight = 1 else checkluatype(weight, TYPE_NUMBER) end
@@ -611,7 +611,7 @@ if CLIENT then
 	-- @param number? slot Optional int (Default GESTURE_SLOT.CUSTOM), the gesture slot to use. GESTURE_SLOT table values
 	function player_methods:resetGesture(slot)
 		local ply = getply(self)
-		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		if slot == nil then slot = GESTURE_SLOT_CUSTOM else checkluatype(slot, TYPE_NUMBER) end
 
@@ -624,7 +624,7 @@ if CLIENT then
 	-- @param number? weight Optional float (Default 1), the weight of the gesture. Ranging from 0-1
 	function player_methods:setGestureWeight(slot, weight)
 		local ply = getply(self)
-		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		if slot == nil then slot = GESTURE_SLOT_CUSTOM else checkluatype(slot, TYPE_NUMBER) end
 		if weight == nil then weight = 1 else checkluatype(weight, TYPE_NUMBER) end
@@ -642,11 +642,7 @@ if CLIENT then
 	-- @param string|number|nil act Optional number or string name (Default sequence value), the activity the player should use
 	function player_methods:setAnimation(seq, progress, rate, loop, auto_advance, act)
 		local ply = getply(self)
-		if SERVER and ply == instance.player then
-			checkpermission(instance, ply, "entities.setPlayerRenderProperty")
-		else
-			checkpermission(instance, ply, "entities.setRenderProperty")
-		end
+		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		if isstring(seq) then
 			seq = ply:LookupSequence(seq)
@@ -688,7 +684,7 @@ if CLIENT then
 	-- @client
 	function player_methods:resetAnimation()
 		local ply = getply(self)
-		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		playerAnimRemove(ply)
 	end
@@ -698,7 +694,7 @@ if CLIENT then
 	-- @param number|string|nil activity Activity, nil to use the current animation sequence
 	function player_methods:setAnimationActivity(act)
 		local ply = getply(self)
-		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		local anim = playerAnimGet(ply)
 		if not anim then SF.Throw("No animation is playing.", 2) end
@@ -717,7 +713,7 @@ if CLIENT then
 	-- @param number progress The progress of the animation. Ranging from 0-1
 	function player_methods:setAnimationProgress(progress)
 		local ply = getply(self)
-		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		local anim = playerAnimGet(ply)
 		if not anim then SF.Throw("No animation is playing.", 2) end
@@ -732,7 +728,7 @@ if CLIENT then
 	-- @param number time The time of the animation in seconds. Float
 	function player_methods:setAnimationTime(time)
 		local ply = getply(self)
-		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		local anim = playerAnimGet(ply)
 		if not anim then SF.Throw("No animation is playing.", 2) end
@@ -747,7 +743,7 @@ if CLIENT then
 	-- @param number rate The playback rate of the animation. Float
 	function player_methods:setAnimationRate(rate)
 		local ply = getply(self)
-		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		local anim = playerAnimGet(ply)
 		if not anim then SF.Throw("No animation is playing.", 2) end
@@ -762,7 +758,7 @@ if CLIENT then
 	-- @param boolean auto_advance Should the animation handle advancing itself?
 	function player_methods:setAnimationAutoAdvance(auto_advance)
 		local ply = getply(self)
-		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		local anim = playerAnimGet(ply)
 		if not anim then SF.Throw("No animation is playing.", 2) end
@@ -777,7 +773,7 @@ if CLIENT then
 	-- @param boolean bounce Should the animation bounce instead of loop?
 	function player_methods:setAnimationBounce(bounce)
 		local ply = getply(self)
-		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		local anim = playerAnimGet(ply)
 		if not anim then SF.Throw("No animation is playing.", 2) end
@@ -792,7 +788,7 @@ if CLIENT then
 	-- @param boolean loop Should the animation loop?
 	function player_methods:setAnimationLoop(loop)
 		local ply = getply(self)
-		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		local anim = playerAnimGet(ply)
 		if not anim then SF.Throw("No animation is playing.", 2) end
@@ -808,7 +804,7 @@ if CLIENT then
 	-- @param number max Max. Ranging from 0-1
 	function player_methods:setAnimationRange(min, max)
 		local ply = getply(self)
-		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		local anim = playerAnimGet(ply)
 		if not anim then SF.Throw("No animation is playing.", 2) end
