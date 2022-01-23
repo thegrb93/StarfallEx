@@ -642,7 +642,11 @@ if CLIENT then
 	-- @param string|number|nil act Optional number or string name (Default sequence value), the activity the player should use
 	function player_methods:setAnimation(seq, progress, rate, loop, auto_advance, act)
 		local ply = getply(self)
-		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		if SERVER and ply == instance.player then
+			checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		else
+			checkpermission(instance, ply, "entities.setRenderProperty")
+		end
 
 		if isstring(seq) then
 			seq = ply:LookupSequence(seq)
