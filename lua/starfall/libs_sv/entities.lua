@@ -75,7 +75,7 @@ local function chainTooLong(parent, child)
 	end
 
 	local function getChildLength(curchild, count)
-		if count > 16 then return 16 end
+		if count > 16 then return count end
 		local max = 0
 		for k, v in pairs(curchild:GetChildren()) do
 			max = math.max(max, getChildLength(v, count + 1))
