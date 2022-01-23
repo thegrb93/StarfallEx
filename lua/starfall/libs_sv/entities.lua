@@ -66,7 +66,7 @@ end)
 
 -- ------------------------- Methods ------------------------- --
 
-local function chainLength(parent, child)
+local function chainTooLong(parent, child)
 	local index = parent
 	local parentLength = 0
 	while index:IsValid() do
@@ -75,6 +75,7 @@ local function chainLength(parent, child)
 	end
 
 	local function getChildLength(curchild, count)
+		if count > 16 then return 16 end
 		local max = 0
 		for k, v in pairs(curchild:GetChildren()) do
 			max = math.max(max, getChildLength(v, count + 1))
@@ -83,7 +84,7 @@ local function chainLength(parent, child)
 	end
 	local childLength = getChildLength(child, 1)
 
-	return parentLength + childLength
+	return parentLength + childLength > 16
 end
 
 --- Parents the entity to another entity
@@ -104,7 +105,7 @@ function ents_methods:setParent(parent, attachment)
 			checkpermission(instance, parentent, "entities.parent")
 		end
 
-		if chainLength(parentent, ent) > 16 then SF.Throw("Parenting chain of entities can't exceed 16 or crash may occur", 2) end
+		if chainTooLong(parentent, ent) then SF.Throw("Parenting chain of entities can't exceed 16 or crash may occur", 2) end
 		ent:SetParent(parentent)
 
 		if attachment~=nil then
