@@ -95,7 +95,7 @@ end
 
 --- Loads a sound channel from an URL.
 -- @param string path URL path to play from.
--- @param string flags Flags for the sound (`3d`, `mono`, `noplay`, `noblock`).
+-- @param string flags Flags for the sound (`3d`, `mono`, `noplay`, `noblock`). noblock will fail if the webserver doesn't provide file length.
 -- @param function callback Function which is called when the sound channel is loaded. It'll get 3 arguments: `Bass` object, error number and name.
 function bass_library.loadURL(path, flags, callback)
 	checkpermission(instance, path, "bass.loadURL")
