@@ -43,12 +43,9 @@ end
 -- @param function? callbackFail The function to be called on request fail, taking the failing reason as an argument
 -- @param table? headers GET headers to be sent
 function http_library.get(url, callbackSuccess, callbackFail, headers)
+	checkluatype(url, TYPE_STRING)
 	checkpermission(instance, url, "http.get")
 
-	if requests[instance.player] then SF.Throw("You can't run a new http request yet", 2) end
-	requests[instance.player] = true
-
-	checkluatype(url, TYPE_STRING)
 	checkluatype(callbackSuccess, TYPE_FUNCTION)
 	if callbackFail ~= nil then checkluatype(callbackFail, TYPE_FUNCTION) end
 	if headers~=nil then
@@ -60,8 +57,10 @@ function http_library.get(url, callbackSuccess, callbackFail, headers)
 		end
 	end
 
-	if CLIENT then SF.HTTPNotify(instance.player, url) end
+	if requests[instance.player] then SF.Throw("You can't run a new http request yet", 2) end
+	requests[instance.player] = true
 
+	if CLIENT then SF.HTTPNotify(instance.player, url) end
 	http.Fetch(url, runCallback(callbackSuccess), runCallback(callbackFail), headers)
 end
 
@@ -74,9 +73,6 @@ end
 function http_library.post(url, payload, callbackSuccess, callbackFail, headers)
 	checkluatype(url, TYPE_STRING)
 	checkpermission(instance, url, "http.post")
-
-	if requests[instance.player] then SF.Throw("You can't run a new http request yet", 2) end
-	requests[instance.player] = true
 
 	local request = {
 		url = url,
@@ -119,14 +115,17 @@ function http_library.post(url, payload, callbackSuccess, callbackFail, headers)
 
 	if callbackSuccess ~= nil then checkluatype(callbackSuccess, TYPE_FUNCTION) end
 	if callbackFail ~= nil then checkluatype(callbackFail, TYPE_FUNCTION) end
+
 	request.success = function(code, body, headers)
 		local callback = runCallback(callbackSuccess)
 		callback(body, #body, headers, code)
 	end
 	request.failed = runCallback(callbackFail)
 
-	if CLIENT then SF.HTTPNotify(instance.player, url) end
+	if requests[instance.player] then SF.Throw("You can't run a new http request yet", 2) end
+	requests[instance.player] = true
 
+	if CLIENT then SF.HTTPNotify(instance.player, url) end
 	HTTP(request)
 end
 
