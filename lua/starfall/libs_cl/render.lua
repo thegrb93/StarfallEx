@@ -1858,12 +1858,9 @@ end
 
 --- Dumps the current render target and allows the pixels to be accessed by render.readPixel.
 function render_library.capturePixels()
-	if not renderdata.isRendering then
-		SF.Throw("Not in rendering hook.", 2)
-	end
-	if renderdata.usingRT then
-		render.CapturePixels()
-	end
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not renderdata.usingRT then SF.Throw("Not in rendertarget context.", 2) end
+	render.CapturePixels()
 end
 
 --- Captures a part of the current render target and returns the data as a binary string in the given format.
@@ -1872,12 +1869,10 @@ function render_library.captureImage(captureData)
 	checkluatype(captureData, TYPE_TABLE)
 	checkpermission(instance, nil, "render.captureImage")
 
-	if not renderdata.isRendering then
-		SF.Throw("Not in rendering hook.", 2)
-	end
-	if renderdata.usingRT then
-		return render.Capture(captureData)
-	end
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not renderdata.usingRT then SF.Throw("Not in rendertarget context.", 2) end
+
+	return render.Capture(captureData)
 end
 
 --- Reads the color of the specified pixel.
