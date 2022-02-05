@@ -16,7 +16,7 @@ registerprivilege("render.renderView", "Render View", "Allows the user to render
 registerprivilege("render.renderscene", "Render Scene", "Allows the user to render a world again without a screen with custom perspective", { client = {} })
 registerprivilege("render.effects", "Render Effects", "Allows the user to render special effects such as screen blur, color modification, and bloom", { client = {} })
 registerprivilege("render.calcview", "Render CalcView", "Allows the use of the CalcView hook", { client = {} })
-registerprivilege("render.capture", "Render Capture", "Allows the use of the render.capture() function", { client = { default = 1 } })
+registerprivilege("render.captureImage", "Render Capture Image", "Allows capturing a rendertarget into an image format", { client = { default = 1 } })
 registerprivilege("render.fog", "Render Fog", "Allows the user to control fog", { client = {} })
 
 local cv_max_fonts = CreateConVar("sf_render_maxfonts", "30", { FCVAR_ARCHIVE })
@@ -1868,9 +1868,9 @@ end
 
 --- Captures a part of the current render target and returns the data as a binary string in the given format.
 -- @param table captureData Parameters of the capture. See https://wiki.facepunch.com/gmod/Structures/RenderCaptureData
-function render_library.capture(captureData)
+function render_library.captureImage(captureData)
 	checkluatype(captureData, TYPE_TABLE)
-	checkpermission(instance, nil, "render.capture")
+	checkpermission(instance, nil, "render.captureImage")
 
 	if not renderdata.isRendering then
 		SF.Throw("Not in rendering hook.", 2)
