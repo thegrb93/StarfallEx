@@ -1865,6 +1865,7 @@ end
 
 --- Captures a part of the current render target and returns the data as a binary string in the given format.
 -- @param table captureData Parameters of the capture. See https://wiki.facepunch.com/gmod/Structures/RenderCaptureData
+-- @return string Image binary data
 function render_library.captureImage(captureData)
 	checkluatype(captureData, TYPE_TABLE)
 	checkpermission(instance, nil, "render.captureImage")
