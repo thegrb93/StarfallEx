@@ -68,7 +68,7 @@ if SERVER then
 	-- @param number wallet How much money the player had before receiving the money.
 	SF.hookAdd("playerWalletChanged", nil, function(instance, ply, amount, wallet)
 		if instance.player ~= SF.Superuser then
-			SF.Permissions.Check(instance, nil, "darkrp.playerWalletChanged")
+			SF.Permissions.check(instance, nil, "darkrp.playerWalletChanged")
 			if instance.player ~= ply then return false end
 		end
 		return true, {ply and instance.Types.Player.Wrap(ply) or nil, amount, wallet}
@@ -137,7 +137,7 @@ if SERVER then
 	-- @param table trace The trace result.
 	SF.hookAdd("lockpickStarted", nil, function(instance, ply, ent, trace)
 		if instance.player ~= SF.Superuser then
-			SF.Permissions.Check(instance, nil, "darkrp.lockpickHooks")
+			SF.Permissions.check(instance, nil, "darkrp.lockpickHooks")
 			if instance.player ~= ply then return false end
 		end
 		return true, {
@@ -147,7 +147,7 @@ if SERVER then
 		}
 	end)
 
-	--- Called when a player has successfully picked a lock. DarkRP only.
+	--- Called when a player has finished picking a lock, successfully or otherwise. DarkRP only.
 	-- Will only be called if the lockpicker is the owner of the chip, or if the chip is running in superuser mode.
 	-- @name onLockpickCompleted
 	-- @class hook
@@ -157,7 +157,7 @@ if SERVER then
 	-- @param Entity ent The entity that was lockpicked.
 	SF.hookAdd("onLockpickCompleted", nil, function(instance, ply, success, ent)
 		if instance.player ~= SF.Superuser then
-			SF.Permissions.Check(instance, nil, "darkrp.lockpickHooks")
+			SF.Permissions.check(instance, nil, "darkrp.lockpickHooks")
 			if instance.player ~= ply then return false end
 		end
 		return true, {
@@ -165,7 +165,7 @@ if SERVER then
 			success,
 			ent and instance.Types.Entity.Wrap(ent) or nil
 		}
-	end, nil, true) -- Addons can override default behavior by returning in this hook, so we need to run last.
+	end)
 end
 
 --- Functions relating to DarkRP.
