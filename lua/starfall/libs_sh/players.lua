@@ -889,14 +889,14 @@ if DarkRP then
 	
 	--- Get whether the player can lock a given door. DarkRP only.
 	-- @param Entity door The door
-	-- @return boolean? Whether the player is allowed to lock the door.
+	-- @return boolean? Whether the player is allowed to lock the door. May be nil instead of false.
 	function player_methods:canKeysLock(door)
 		return getply(self):canKeysLock(eunwrap(door))
 	end
 	
 	--- Get whether the player can unlock a given door. DarkRP only.
 	-- @param Entity door The door
-	-- @return boolean? Whether the player is allowed to unlock the door.
+	-- @return boolean? Whether the player is allowed to unlock the door. May be nil instead of false.
 	function player_methods:canKeysUnlock(door)
 		return getply(self):canKeysUnlock(eunwrap(door))
 	end
@@ -940,49 +940,49 @@ if DarkRP then
 	end
 	
 	--- Whether this player is arrested. DarkRP only.
-	-- @return boolean? Whether this player is arrested
+	-- @return boolean? Whether this player is arrested. May be nil instead of false.
 	function player_methods:isArrested()
 		return getply(self):isArrested()
 	end
 	
 	--- Whether this player is a Chief. DarkRP only.
-	-- @return boolean? Whether this player is a Chief.
+	-- @return boolean? Whether this player is a Chief. May be nil instead of false.
 	function player_methods:isChief()
 		return getply(self):isChief()
 	end
 	
 	--- Whether this player is a cook. DarkRP only. Only works if hungermod is enabled.
-	-- @return boolean? Whether this player is a cook.
+	-- @return boolean? Whether this player is a cook. May be nil instead of false.
 	function player_methods:isCook()
 		return getply(self):isCook()
 	end
 	
 	--- Whether this player is part of the police force (Mayor, CP, Chief). DarkRP only.
-	-- @return boolean? Whether this player is a part of the police force.
+	-- @return boolean Whether this player is a part of the police force.
 	function player_methods:isCP()
 		return getply(self):isCP()
 	end
 	
 	--- Whether this player is a hitman. DarkRP only.
-	-- @return boolean Whether this player is a hitman.
+	-- @return boolean? Whether this player is a hitman. May be nil instead of false.
 	function player_methods:isHitman()
 		return getply(self):isHitman()
 	end
 	
 	--- Whether this player is the Mayor. DarkRP only.
-	-- @return boolean? Whether this player is the Mayor.
+	-- @return boolean? Whether this player is the Mayor. May be nil instead of false.
 	function player_methods:isMayor()
 		return getply(self):isMayor()
 	end
 	
 	--- Whether this player is a medic. DarkRP only.
-	-- @return boolean? Whether this player is a medic.
+	-- @return boolean? Whether this player is a medic. May be nil instead of false.
 	function player_methods:isMedic()
 		return getply(self):isMedic()
 	end
 	
 	--- Whether this player is wanted. DarkRP only. Use Player:getWantedReason if you want to know the reason.
-	-- @return boolean? Whether this player is wanted.
+	-- @return boolean? Whether this player is wanted. May be nil instead of false.
 	function player_methods:isWanted()
 		return getply(self):isWanted()
 	end
