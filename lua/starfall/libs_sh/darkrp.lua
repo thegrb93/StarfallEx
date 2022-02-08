@@ -294,19 +294,6 @@ else
 		DarkRP.openPocketMenu()
 	end
 	
-	--- Wrap a text around when reaching a certain width.
-	-- Note: Long input strings may cause a "Regex too complex!" error.
-	-- @client
-	-- @param string text The text to wrap.
-	-- @param string font The font of the text.
-	-- @param number width The maximum width in pixels.
-	-- @return string The wrapped string.
-	function darkrp_library.textWrap(text, font, width)
-		checkpattern(text, "(%s?[%S]+)") -- Pattern used by DarkRP internally
-		if not SF.DefinedFonts[font] then SF.Throw("Font does not exist.", 2) return end
-		return DarkRP.textWrap(text, font, width)
-	end
-	
 	--- Toggle the state of the F4 menu (open or closed).
 	-- @client
 	function darkrp_library.toggleF4Menu()
