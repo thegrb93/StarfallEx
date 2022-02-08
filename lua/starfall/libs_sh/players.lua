@@ -855,7 +855,7 @@ if DarkRP then
 		function player_methods:keysUnOwnAll()
 			self = getply(self)
 			if instance.player ~= SF.Superuser and instance.player ~= self then SF.Throw("may not use this function on anyone other than owner", 2) return end
-			return self:keysUnOwnAll()
+			self:keysUnOwnAll()
 		end
 		
 		--- Returns the time left on a player's team ban. DarkRP only.

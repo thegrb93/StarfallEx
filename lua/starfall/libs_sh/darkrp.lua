@@ -1,112 +1,158 @@
 local checkluatype = SF.CheckLuaType
 local checkpattern = SF.CheckPattern
+local registerprivilege = SF.Permissions.registerPrivilege
+
+if SERVER then
+	registerprivilege("darkrp.moneyPrinterHooks", "Get own money printer info", "Allows the user to know when their own money printers catch fire or print money (and how much was printed)")
+	registerprivilege("darkrp.playerWalletChanged", "Be notified of wallet changes", "Allows the user to know when their own wallet changes")
+	registerprivilege("darkrp.lockdownHooks", "Know when lockdowns begin and end", "Allows the user to know when a lockdown begins or ends")
+	registerprivilege("darkrp.lawHooks", "Know when laws change", "Allows the user to know when a law is added or removed, and when the laws are reset")
+	registerprivilege("darkrp.lockpickHooks", "Know when they start picking a lock", "Allows the user to know when they start picking a lock")
+end
+
+--if not DarkRP then return function() end end
+
+if SERVER then
+	--- Called when a money printer is about to catch fire. DarkRP only. Called between moneyPrinterPrintMoney and moneyPrinterPrinted.
+	-- Only works if the owner of the chip also owns the money printer, or if the chip is running in superuser mode.
+	-- @name moneyPrinterCatchFire
+	-- @class hook
+	-- @server
+	-- @param Entity moneyprinter The money printer that is about to catch fire
+	SF.hookAdd("moneyPrinterCatchFire", nil, function(instance, moneyprinter)
+		if instance.player ~= SF.Superuser then
+			if instance.player ~= moneyprinter:Getowning_ent() then return false end
+			SF.Permissions.check(instance, nil, "darkrp.moneyPrinter")
+		end
+		return true, {instance.Types.Entity.Wrap(moneyprinter)}
+	end)
+
+	--- Called after a money printer is has printed money. DarkRP only.
+	-- Only works if the owner of the chip also owns the money printer, or if the chip is running in superuser mode.
+	-- @name moneyPrinterPrinted
+	-- @class hook
+	-- @server
+	-- @param Entity moneyprinter The money printer
+	-- @param Entity moneybag The moneybag produed by the printer.
+	SF.hookAdd("moneyPrinterPrinted", nil, function(instance, moneyprinter, moneybag)
+		if instance.player ~= SF.Superuser then
+			if instance.player ~= moneyprinter:Getowning_ent() then return false end
+			SF.Permissions.check(instance, nil, "darkrp.moneyPrinter")
+		end
+		return true, {instance.Types.Entity.Wrap(moneyprinter), instance.Types.Entity.Wrap(moneybag)}
+	end)
+
+	--- Called when a money printer is about to print money. DarkRP only.
+	-- You should use moneyPrinterPrinted instead, as the printer is not guaranteed to print money even if this hook is called.
+	-- Only works if the owner of the chip also owns the money printer, or if the chip is running in superuser mode.
+	-- @name moneyPrinterPrintMoney
+	-- @class hook
+	-- @server
+	-- @param Entity moneyprinter The money printer
+	-- @param number amount The amount to be printed
+	SF.hookAdd("moneyPrinterPrintMoney", nil, function(instance, moneyprinter, amount)
+		if instance.player ~= SF.Superuser then
+			if instance.player ~= moneyprinter:Getowning_ent() then return false end
+			SF.Permissions.check(instance, nil, "darkrp.moneyPrinter")
+		end
+		return true, {instance.Types.Entity.Wrap(moneyprinter), amount}
+	end)
+	
+	--- Called when a player receives money. DarkRP only.
+	-- Will only be called if the recipient is the owner of the chip, or if the chip is running in superuser mode.
+	-- @name playerWalletChanged
+	-- @class hook
+	-- @server
+	-- @param Player ply The player who is getting money.
+	-- @param number amount The amount of money given to the player.
+	-- @param number wallet How much money the player had before receiving the money.
+	SF.hookAdd("playerWalletChanged", nil, function(instance, ply, amount, wallet)
+		if instance.player ~= SF.Superuser then
+			SF.Permissions.Check(instance, nil, "darkrp.playerWalletChanged")
+			if instance.player ~= ply then return false end
+		end
+		return true, {ply and instance.Types.Player.Wrap(ply) or nil, amount, wallet}
+	end)
+	
+	--- Called when a lockdown has ended. DarkRP only.
+	-- @name lockdownEnded
+	-- @class hook
+	-- @server
+	-- @param Player? actor The player who ended the lockdown, or nil.
+	SF.hookAdd("lockdownEnded", nil, function(instance, actor)
+		if instance.player ~= SF.Superuser then SF.Permissions.check(instance, nil, "darkrp.lockdownHooks") end
+		return true, {actor and instance.Types.Player.Wrap(actor) or nil}
+	end)
+
+	--- Called when a lockdown has started. DarkRP only.
+	-- @name lockdownStarted
+	-- @class hook
+	-- @server
+	-- @param Player? actor The player who started the lockdown, or nil.
+	SF.hookAdd("lockdownStarted", nil, function(instance, actor)
+		if instance.player ~= SF.Superuser then SF.Permissions.check(instance, nil, "darkrp.lockdownHooks") end
+		return true, {actor and instance.Types.Player.Wrap(actor) or nil}
+	end)
+
+	--- Called when a law is added. DarkRP only.
+	-- @name addLaw
+	-- @class hook
+	-- @param number index Index of the law
+	-- @param string law Law string
+	-- @param Player? player The player who added the law.
+	SF.hookAdd("addLaw", nil, function(instance, index, law, player)
+		if instance.player ~= SF.Superuser then SF.Permissions.check(instance, nil, "darkrp.lawHooks") end
+		return true, {index, law, player and instance.Types.Player.Wrap(player) or nil}
+	end)
+
+	--- Called when a law is removed. DarkRP only.
+	-- @name addLaw
+	-- @class hook
+	-- @server
+	-- @param number index Index of the law
+	-- @param string law Law string
+	-- @param Player? player The player who removed the law.
+	SF.hookAdd("removeLaw", nil, function(instance, index, law, player)
+		if instance.player ~= SF.Superuser then SF.Permissions.check(instance, nil, "darkrp.lawHooks") end
+		return true, {index, law, player and instance.Types.Player.Wrap(player) or nil}
+	end)
+
+	--- Called when laws are reset. DarkRP only. This is the only hook called when /resetlaws is used.
+	-- @name addLaw
+	-- @class hook
+	-- @server
+	-- @param Player? player The player resetting the laws.
+	SF.hookAdd("resetLaws", nil, function(instance, player)
+		if instance.player ~= SF.Superuser then SF.Permissions.check(instance, nil, "darkrp.lawHooks") end
+		return true, {player and instance.Types.Player.Wrap(player) or nil}
+	end)
+
+	--- Called when a player is about to pick a lock. DarkRP only.
+	-- Will only be called if the lockpicker is the owner of the chip, or if the chip is running in superuser mode.
+	-- @name lockpickStarted
+	-- @class hook
+	-- @server
+	-- @param Player ply The player that is about to pick a lock.
+	-- @param Entity ent The entity being lockpicked.
+	-- @param table trace The trace result.
+	SF.hookAdd("lockpickStarted", nil, function(instance, ply, ent, trace)
+		if instance.player ~= SF.Superuser then
+			SF.Permissions.Check(instance, nil, "darkrp.lockpickHooks")
+			if instance.player ~= ply then return false end
+		end
+		return true, {
+			ply and instance.Types.Player.Wrap(ply) or nil,
+			ent and instance.Types.Entity.Wrap(ent) or nil,
+			trace and SF.StructWrapper(instance, trace, "TraceResult") or nil
+		}
+	end)
+end
 
 --- Functions relating to DarkRP.
 -- @name darkrp
 -- @class library
 -- @libtbl darkrp_library
 SF.RegisterLibrary("darkrp")
-
---- Called when a law is added. DarkRP only.
--- @name addLaw
--- @class hook
--- @param number index Index of the law
--- @param string law Law string
--- @param Player? player The player who added the law, or nil if clientside for some reason
-SF.hookAdd("addLaw", "addlaw", function(instance, index, law, player)
-	return true, {index, law, player and instance.Types.Player.Wrap(player) or nil}
-end)
-
---- Called when a lockdown has ended. DarkRP only.
--- @name lockdownEnded
--- @class hook
--- @server
--- @param Entity actor The player who ended the lockdown. Could also be the world entity, because that makes perfect sense.
-SF.hookAdd("lockdownEnded", "lockdownended", function(instance, actor)
-	return true, {actor and instance.Types.Player.Wrap(actor) or nil}
-end)
-
---- Called when a lockdown has started. DarkRP only.
--- @name lockdownStarted
--- @class hook
--- @server
--- @param Entity actor The player who started the lockdown. Could also be the world entity, because that makes perfect sense.
-SF.hookAdd("lockdownStarted", "lockdownstarted", function(instance, actor)
-	return true, {actor and instance.Types.Player.Wrap(actor) or nil}
-end)
-
---- Called when a player is about to pick a lock. DarkRP only.
--- Will only be called if the lockpicker is the owner of the chip, or if the chip is running in superuser mode.
--- @name lockpickStarted
--- @class hook
--- @param Player ply The player that is about to pick a lock.
--- @param Entity ent The entity being lockpicked.
--- @param table trace The trace result.
-SF.hookAdd("lockpickStarted", "lockpickstarted", function(instance, ply, ent, trace)
-	if instance.player ~= SF.Superuser and instance.player ~= ply then return false end
-	return true, {
-		ply and instance.Types.Player.Wrap(ply) or nil,
-		ent and instance.Types.Entity.Wrap(ent) or nil,
-		trace and SF.StructWrapper(instance, trace, "TraceResult") or nil
-	}
-end)
-
-if SERVER then
-	--- Called when a money printer is about to catch fire. DarkRP only. Called between moneyPrinterPrintMoney and moneyPrinterPrinted.
-	-- Will only be called if the owner of the chip also owns the money printer, or if the chip is running in superuser mode.
-	-- @name moneyPrinterCatchFire
-	-- @class hook
-	-- @server
-	-- @param Entity moneyprinter The money printer that is about to catch fire
-	SF.hookAdd("moneyPrinterCatchFire", "moneyprintercatchfire", function(instance, moneyprinter)
-		if instance.player ~= SF.Superuser and instance.player ~= moneyprinter:Getowning_ent() then return false end
-		return true, {instance.Types.Entity.Wrap(moneyprinter)}
-	end)
-
-	--- Called after a money printer is has printed money. DarkRP only.
-	-- Will only be called if the owner of the chip also owns the money printer, or if the chip is running in superuser mode.
-	-- @name moneyPrinterPrinted
-	-- @class hook
-	-- @server
-	-- @param Entity moneyprinter The money printer
-	-- @param Entity moneybag The moneybag produed by the printer.
-	SF.hookAdd("moneyPrinterPrinted", "moneyprinterprinted", function(instance, moneyprinter, moneybag)
-		if instance.player ~= SF.Superuser and instance.player ~= moneyprinter:Getowning_ent() then return false end
-		return true, {instance.Types.Entity.Wrap(moneyprinter), instance.Types.Entity.Wrap(moneybag)}
-	end)
-
-	--- Called when a money printer is about to print money. DarkRP only.
-	-- Will only be called if the owner of the chip also owns the money printer, or if the chip is running in superuser mode.
-	-- @name moneyPrinterPrintMoney
-	-- @class hook
-	-- @server
-	-- @param Entity moneyprinter The money printer
-	-- @param number amount The amount to be printed
-	SF.hookAdd("moneyPrinterPrintMoney", "moneyprinterprintmoney", function(instance, moneyprinter, amount)
-		if instance.player ~= SF.Superuser and instance.player ~= moneyprinter:Getowning_ent() then return false end
-		return true, {instance.Types.Entity.Wrap(moneyprinter), amount}
-	end)
-end
-
---- Called when a law is removed. DarkRP only.
--- @name addLaw
--- @class hook
--- @param number index Index of the law
--- @param string law Law string
--- @param Player? player The player who removed the law, or nil if clientside for some reason
-SF.hookAdd("removeLaw", "removelaw", function(instance, index, law, player)
-	return true, {index, law, player and instance.Types.Player.Wrap(player) or nil}
-end)
-
---- Called when laws are reset. DarkRP only.
--- Serverside, this is the only hook called when /resetlaws is used.
--- Clientside, the addLaw hook is run 3 times (once for each of the default laws), then this hook runs.
--- @name addLaw
--- @class hook
--- @param Player? player The player resetting the laws, or nil if clientside for some reason.
-SF.hookAdd("resetLaws", "resetlaws", function(instance, player)
-	return true, {player and instance.Types.Player.Wrap(player) or nil}
-end)
 
 return function(instance)
 
