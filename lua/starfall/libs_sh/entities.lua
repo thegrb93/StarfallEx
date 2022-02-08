@@ -1569,4 +1569,54 @@ function ents_methods:getNWVarTable()
 	return instance.Sanitize(getent(self):GetNWVarTable())
 end
 
+if DarkRP then
+	if SERVER then
+		--- Get the DarkRP door index of a door. Use this to store door information in the database.
+		-- @server
+		-- @return number The door index.
+		function ents_methods:doorIndex()
+			return getent(self):doorIndex()
+		end
+	
+		--- Get whether this door/vehicle is locked. DarkRP only.
+		-- @server
+		-- @return boolean Whether it's locked.
+		function ents_methods:isLocked()
+			return getent(self):isLocked()
+		end
+	end
+	
+	--- Get the owner of a door. DarkRP only.
+	-- @return Player? The owner of the door, or nil if the door is unowned.
+	function ents_methods:getDoorOwner()
+		local owner = getent(self):getDoorOwner()
+		if owner then return plywrap(owner) end
+	end
+	
+	--- Get the title of this door or vehicle. DarkRP only.
+	-- @return string? The title of the door or vehicle, or nil if none is set.
+	function ents_methods:getKeysTitle()
+		return getent(self):getKeysTitle()
+	end
+	
+	--- Get whether this entity is considered a door by DarkRP.
+	-- @return boolean Whether it's a door.
+	function ents_methods:isDoor()
+		return getent(self):isDoor()
+	end
+	
+	--- Get whether this entity is money or not (e.g. created by /dropmoney). DarkRP only.
+	-- @return boolean Whether it's a door.
+	function ents_methods:isMoneyBag()
+		return getent(self):isMoneyBag()
+	end
+	
+	--- Get the amount of money in a "money bag" or cheque. DarkRP only.
+	-- @return number? Amount of money, or nil if not money
+	function ents_methods:getAmount()
+		self = getent(self)
+		return self.Getamount and self:Getamount() or nil
+	end
+end
+
 end

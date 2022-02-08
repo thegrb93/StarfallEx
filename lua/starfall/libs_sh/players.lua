@@ -848,5 +848,144 @@ if CLIENT then
 	end
 end
 
+if DarkRP then
+	if SERVER then
+		--- Unown every door and vehicle owned by this player. DarkRP only.
+		-- @server
+		function player_methods:keysUnOwnAll()
+			self = getply(self)
+			if instance.player ~= SF.Superuser and instance.player ~= self then SF.Throw("may not use this function on anyone other than owner", 2) return end
+			return self:keysUnOwnAll()
+		end
+		
+		--- Returns the time left on a player's team ban. DarkRP only.
+		-- @server
+		-- @param number? team The number of the job (e.g. TEAM_MEDIC). Uses the player's team if nil.
+		-- @return number? The time left on the team ban in seconds, or nil if not banned.
+		function player_methods:teamBanTimeLeft(team)
+			if team ~= nil then checkluatype(team, TYPE_NUMBER) end
+			self = getply(self)
+			if instance.player ~= SF.Superuser and instance.player ~= self then SF.Throw("may not use this function on anyone other than owner", 2) return end
+			return self:teamBanTimeLeft()
+		end
+	else
+		--- Whether this player is in the same room as the LocalPlayer. DarkRP only.
+		-- @client
+		-- @return boolean Whether this player is in the same room.
+		function player_methods:isInRoom()
+			local bool = getply(self):isInRoom()
+			instance:checkCpu() -- This function could potentially be expensive, so this check is a good idea.
+			return bool
+		end
+	end
+	
+	--- Get whether the player can afford the given amount of money. DarkRP only.
+	-- @param number amount The amount of money
+	-- @return boolean Whether the player can afford it
+	function player_methods:canAfford(amount)
+		checkluatype(amount, TYPE_NUMBER)
+		return getply(self):canAfford(amount)
+	end
+	
+	--- Get whether the player can lock a given door. DarkRP only.
+	-- @param Entity door The door
+	-- @return boolean? Whether the player is allowed to lock the door.
+	function player_methods:canKeysLock(door)
+		return getply(self):canKeysLock(eunwrap(door))
+	end
+	
+	--- Get whether the player can unlock a given door. DarkRP only.
+	-- @param Entity door The door
+	-- @return boolean? Whether the player is allowed to unlock the door.
+	function player_methods:canKeysUnlock(door)
+		return getply(self):canKeysUnlock(eunwrap(door))
+	end
+	
+	local whitelist = {number=true, string=true, boolean=true}
+	--- Get the value of a DarkRPVar, which is shared between server and client. Case-sensitive.
+	-- List of DarkRP variables: https://darkrp.miraheze.org/wiki/Functions/Player/Shared/getDarkRPVar
+	-- @param string var The name of the variable.
+	-- @return any The value of the DarkRP var.
+	function player_methods:getDarkRPVar(k)
+		checkluatype(k, TYPE_STRING)
+		local v = getply(self):getDarkRPVar(k)
+		if whitelist[type(v)] then
+			return v
+		end
+	end
+	
+	--- Get the job table of a player. DarkRP only.
+	-- @return table Table with the job information.
+	function player_methods:getJobTable()
+		return instance.Sanitize(getply(self):getJobTable())
+	end
+	
+	--- Get a player's pocket items. DarkRP only.
+	-- @return table A table containing information about the items in the pocket.
+	function player_methods:getPocketItems()
+		return instance.Sanitize(getply(self):getPocketItems())
+	end
+	
+	--- Get the reason why someone is wanted. DarkRP only.
+	-- @return string? The reason, or nil if not wanted
+	function player_methods:getWantedReason()
+		return getply(self):getWantedReason()
+	end
+	
+	--- Whether the player has a certain DarkRP privilege.
+	-- @return boolean Whether the player has the privilege.
+	function player_methods:hasDarkRPPrivilege(priv)
+		checkluatype(priv, TYPE_STRING)
+		return getply(self):hasDarkRPPrivilege(priv)
+	end
+	
+	--- Whether this player is arrested. DarkRP only.
+	-- @return boolean? Whether this player is arrested
+	function player_methods:isArrested()
+		return getply(self):isArrested()
+	end
+	
+	--- Whether this player is a Chief. DarkRP only.
+	-- @return boolean? Whether this player is a Chief.
+	function player_methods:isChief()
+		return getply(self):isChief()
+	end
+	
+	--- Whether this player is a cook. DarkRP only. Only works if hungermod is enabled.
+	-- @return boolean? Whether this player is a cook.
+	function player_methods:isCook()
+		return getply(self):isCook()
+	end
+	
+	--- Whether this player is part of the police force (Mayor, CP, Chief). DarkRP only.
+	-- @return boolean? Whether this player is a part of the police force.
+	function player_methods:isCP()
+		return getply(self):isCP()
+	end
+	
+	--- Whether this player is a hitman. DarkRP only.
+	-- @return boolean Whether this player is a hitman.
+	function player_methods:isHitman()
+		return getply(self):isHitman()
+	end
+	
+	--- Whether this player is the Mayor. DarkRP only.
+	-- @return boolean? Whether this player is the Mayor.
+	function player_methods:isMayor()
+		return getply(self):isMayor()
+	end
+	
+	--- Whether this player is a medic. DarkRP only.
+	-- @return boolean? Whether this player is a medic.
+	function player_methods:isMedic()
+		return getply(self):isMedic()
+	end
+	
+	--- Whether this player is wanted. DarkRP only. Use Player:getWantedReason if you want to know the reason.
+	-- @return boolean? Whether this player is wanted.
+	function player_methods:isWanted()
+		return getply(self):isWanted()
+	end
+end
 
 end

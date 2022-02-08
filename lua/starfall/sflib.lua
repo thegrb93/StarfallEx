@@ -1406,6 +1406,7 @@ do
 		end
 		SF.Throw("Regex is too complex! " .. msg, 3)
 	end
+	SF.CheckRegex = checkregex
 
 	local checkluatype = SF.CheckLuaType
 	local string_library = {}
