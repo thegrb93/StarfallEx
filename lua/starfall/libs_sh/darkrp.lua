@@ -146,6 +146,26 @@ if SERVER then
 			trace and SF.StructWrapper(instance, trace, "TraceResult") or nil
 		}
 	end)
+
+	--- Called when a player has successfully picked a lock. DarkRP only.
+	-- Will only be called if the lockpicker is the owner of the chip, or if the chip is running in superuser mode.
+	-- @name onLockpickCompleted
+	-- @class hook
+	-- @server
+	-- @param Player ply The player attempting to lockpick the entity.
+	-- @param boolean success Whether the player succeeded in lockpicking the entity.
+	-- @param Entity ent The entity that was lockpicked.
+	SF.hookAdd("onLockpickCompleted", nil, function(instance, ply, success, ent)
+		if instance.player ~= SF.Superuser then
+			SF.Permissions.Check(instance, nil, "darkrp.lockpickHooks")
+			if instance.player ~= ply then return false end
+		end
+		return true, {
+			ply and instance.Types.Player.Wrap(ply) or nil,
+			success,
+			ent and instance.Types.Entity.Wrap(ent) or nil
+		}
+	end, nil, true) -- Addons can override default behavior by returning in this hook, so we need to run last.
 end
 
 --- Functions relating to DarkRP.
