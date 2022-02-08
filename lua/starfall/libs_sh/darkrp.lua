@@ -22,7 +22,7 @@ if SERVER then
 	SF.hookAdd("moneyPrinterCatchFire", nil, function(instance, moneyprinter)
 		if instance.player ~= SF.Superuser then
 			if instance.player ~= moneyprinter:Getowning_ent() then return false end
-			SF.Permissions.check(instance, nil, "darkrp.moneyPrinter")
+			SF.Permissions.check(instance, nil, "darkrp.moneyPrinterHooks")
 		end
 		return true, {instance.Types.Entity.Wrap(moneyprinter)}
 	end)
@@ -37,7 +37,7 @@ if SERVER then
 	SF.hookAdd("moneyPrinterPrinted", nil, function(instance, moneyprinter, moneybag)
 		if instance.player ~= SF.Superuser then
 			if instance.player ~= moneyprinter:Getowning_ent() then return false end
-			SF.Permissions.check(instance, nil, "darkrp.moneyPrinter")
+			SF.Permissions.check(instance, nil, "darkrp.moneyPrinterHooks")
 		end
 		return true, {instance.Types.Entity.Wrap(moneyprinter), instance.Types.Entity.Wrap(moneybag)}
 	end)
@@ -53,7 +53,7 @@ if SERVER then
 	SF.hookAdd("moneyPrinterPrintMoney", nil, function(instance, moneyprinter, amount)
 		if instance.player ~= SF.Superuser then
 			if instance.player ~= moneyprinter:Getowning_ent() then return false end
-			SF.Permissions.check(instance, nil, "darkrp.moneyPrinter")
+			SF.Permissions.check(instance, nil, "darkrp.moneyPrinterHooks")
 		end
 		return true, {instance.Types.Entity.Wrap(moneyprinter), amount}
 	end)
