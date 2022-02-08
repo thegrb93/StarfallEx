@@ -128,10 +128,6 @@ return function(instance)
 
 if not DarkRP then return end
 
-instance:AddHook("deinitialize", function()
-	-- TODO
-end)
-
 local darkrp_library = instance.Libraries.darkrp
 local ply_meta = instance.Types.Player
 local plywrap, plyunwrap = ply_meta.Wrap, ply_meta.Unwrap
