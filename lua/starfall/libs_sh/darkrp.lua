@@ -134,11 +134,11 @@ end)
 
 local darkrp_library = instance.Libraries.darkrp
 local ply_meta = instance.Types.Player
-local pwrap, punwrap = ply_meta.Wrap, ply_meta.Unwrap
+local plywrap, plyunwrap = ply_meta.Wrap, ply_meta.Unwrap
 local ent_meta = instance.Types.Entity
 local ewrap, eunwrap = ent_meta.Wrap, ent_meta.Unwrap
 local function getply(self)
-	local ent = punwrap(self)
+	local ent = plyunwrap(self)
 	if ent:IsValid() then
 		return ent
 	else
