@@ -1,5 +1,5 @@
 local checkluatype = SF.CheckLuaType
-local checkregex = SF.CheckRegex
+local checkpattern = SF.CheckPattern
 
 --- Functions relating to DarkRP.
 -- @name darkrp
@@ -255,7 +255,7 @@ else
 	-- @param number width The maximum width in pixels.
 	-- @return string The wrapped string.
 	function darkrp_library.textWrap(text, font, width)
-		checkregex(text, "(%s?[%S]+)") -- Pattern used by DarkRP internally
+		checkpattern(text, "(%s?[%S]+)") -- Pattern used by DarkRP internally
 		if not SF.DefinedFonts[font] then SF.Throw("Font does not exist.", 2) return end
 		return DarkRP.textWrap(text, font, width)
 	end
