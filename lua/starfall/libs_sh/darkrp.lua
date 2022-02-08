@@ -249,6 +249,7 @@ else
 	end
 	
 	--- Wrap a text around when reaching a certain width.
+	-- Note: Long input strings may cause a "Regex too complex!" error.
 	-- @client
 	-- @param string text The text to wrap.
 	-- @param string font The font of the text.
