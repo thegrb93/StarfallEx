@@ -58,14 +58,9 @@ if SERVER then
 	-- @class hook
 	-- @server
 	-- @param Entity moneyprinter The money printer that is about to catch fire
-	-- @return boolean? Set to true to prevent the money printer from catching fire (superuser only)
 	SF.hookAdd("moneyPrinterCatchFire", "moneyprintercatchfire", function(instance, moneyprinter)
 		if instance.player ~= SF.Superuser and instance.player ~= moneyprinter:Getowning_ent() then return false end
 		return true, {instance.Types.Entity.Wrap(moneyprinter)}
-	end, function(instance, args)
-		if args[1] and instance.player == SF.Superuser then
-			return true
-		end
 	end)
 
 	--- Called after a money printer is has printed money. DarkRP only.
@@ -87,20 +82,9 @@ if SERVER then
 	-- @server
 	-- @param Entity moneyprinter The money printer
 	-- @param number amount The amount to be printed
-	-- @return boolean? Set to true to prevent the money printer from printing the money. Superuser only.
-	-- @return number? Optionally override the amount of money that will be printed. Superuser only.
 	SF.hookAdd("moneyPrinterPrintMoney", "moneyprinterprintmoney", function(instance, moneyprinter, amount)
 		if instance.player ~= SF.Superuser and instance.player ~= moneyprinter:Getowning_ent() then return false end
 		return true, {instance.Types.Entity.Wrap(moneyprinter), amount}
-	end, function(instance, args)
-		if instance.player ~= SF.Superuser then
-			return
-		end
-		if args[1] then
-			return true
-		elseif type(args[2]) == 'number' then
-			return nil, args[2]
-		end
 	end)
 end
 
