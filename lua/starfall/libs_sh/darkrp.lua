@@ -226,6 +226,12 @@ function darkrp_library.getLaws()
 	return instance.Sanitize(DarkRP.getLaws())
 end
 
+--- Get a list of possible shipments. DarkRP only.
+-- @return table? A table with the contents of the GLua global "CustomShipments", or nil if it doesn't exist.
+function darkrp_library.getCustomShipments()
+	return CustomShipments and instance.Sanitize(CustomShipments) or nil
+end
+
 if SERVER then
 	--- Get the entity corresponding to a door index. Note: The door MUST have been created by the map!
 	-- @server

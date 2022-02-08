@@ -1611,11 +1611,18 @@ if DarkRP then
 		return getent(self):isMoneyBag()
 	end
 	
-	--- Get the amount of money in a "money bag" or cheque. DarkRP only.
-	-- @return number? Amount of money, or nil if not money
+	--- Get the amount of money in a "money bag" or cheque, or number of items in a dropped item stack. DarkRP only.
+	-- @return number? Amount of money or number of items
 	function ents_methods:getAmount()
 		self = getent(self)
 		return self.Getamount and self:Getamount() or nil
+	end
+	
+	--- Get the number of items remaining in a shipment. DarkRP only.
+	-- @return number? Number of items remaining, or nil if not a shipment
+	function ents_methods:getCount()
+		self = getent(self)
+		return self.Getcount and self:Getcount() or nil
 	end
 end
 
