@@ -1605,8 +1605,8 @@ if DarkRP then
 		return getent(self):isDoor()
 	end
 	
-	--- Get whether this entity is money or not (e.g. created by /dropmoney). DarkRP only.
-	-- @return boolean Whether it's a door.
+	--- Get whether this entity is a "money bag", i.e. dropped money from a money printer or /dropmoney. DarkRP only.
+	-- @return boolean Whether this entity is a money bag.
 	function ents_methods:isMoneyBag()
 		return getent(self):isMoneyBag()
 	end
