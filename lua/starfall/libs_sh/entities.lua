@@ -1625,6 +1625,22 @@ if DarkRP then
 		self = getent(self)
 		return self.Getcount and assertsafety(self:Getcount()) or nil
 	end
+	
+	--- Get the index of the contents of the shipment, which should then be looked up in the output of "darkrp.getCustomShipments". DarkRP only.
+	-- @return number? Index of contents, or nil if not a shipment
+	function ents_methods:getShipmentContentsIndex()
+		self = getent(self)
+		return self.Getcontents and assertsafety(self:Getcontents()) or nil
+	end
+	
+	--- Get the info for the contents of the shipment. DarkRP only.
+	-- Equivalent to "darkrp.getCustomShipments()[ent:getShipmentContentsIndex()]"
+	-- @return table? Contents, or nil if not a shipment
+	function ents_methods:getShipmentContents()
+		self = getent(self)
+		if not CustomShipments or not self.Getcontents then return end
+		return instance.Sanitize(CustomShipments[self:Getcontents()])
+	end
 end
 
 end
