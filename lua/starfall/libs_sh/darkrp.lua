@@ -10,8 +10,6 @@ if SERVER then
 	registerprivilege("darkrp.lockpickHooks", "Know when they start picking a lock", "Allows the user to know when they start picking a lock")
 end
 
-if not DarkRP then return function(instance) end end
-
 if SERVER then
 	--- Called when a money printer is about to catch fire. DarkRP only. Called between moneyPrinterPrintMoney and moneyPrinterPrinted.
 	-- Only works if the owner of the chip also owns the money printer, or if the chip is running in superuser mode.
@@ -71,7 +69,7 @@ if SERVER then
 	-- @param number wallet How much money the player had before receiving the money.
 	SF.hookAdd("playerWalletChanged", nil, function(instance, ply, amount, wallet)
 		if instance.player ~= SF.Superuser then
-			if not SF.Permissions.checkSafe(instance, nil, "darkrp.playerWalletChanged") then return false
+			if not SF.Permissions.checkSafe(instance, nil, "darkrp.playerWalletChanged") then return false end
 			if instance.player ~= ply then return false end
 		end
 		return true, {ply and instance.Types.Player.Wrap(ply) or nil, amount, wallet}
@@ -178,6 +176,8 @@ end
 SF.RegisterLibrary("darkrp")
 
 return function(instance)
+
+if not DarkRP then return end
 
 local darkrp_library = instance.Libraries.darkrp
 local ply_meta = instance.Types.Player
