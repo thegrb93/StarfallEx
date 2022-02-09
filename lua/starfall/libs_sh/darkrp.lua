@@ -1,6 +1,8 @@
 local checkluatype = SF.CheckLuaType
 local checkpattern = SF.CheckPattern
 local registerprivilege = SF.Permissions.registerPrivilege
+local checksafety = SF.CheckSafety
+local assertsafety = SF.AssertSafety
 
 if SERVER then
 	registerprivilege("darkrp.moneyPrinterHooks", "Get own money printer info", "Allows the user to know when their own money printers catch fire or print money (and how much was printed)")
@@ -51,6 +53,7 @@ if SERVER then
 	-- @param Entity moneyprinter The money printer
 	-- @param number amount The amount to be printed
 	SF.hookAdd("moneyPrinterPrintMoney", nil, function(instance, moneyprinter, amount)
+		if not checksafety(amount) then return false end
 		if not moneyprinter then return false end
 		if instance.player ~= SF.Superuser then
 			if not moneyprinter.Getowning_ent or instance.player ~= moneyprinter:Getowning_ent() then return false end
@@ -68,6 +71,7 @@ if SERVER then
 	-- @param number amount The amount of money given to the player.
 	-- @param number wallet How much money the player had before receiving the money.
 	SF.hookAdd("playerWalletChanged", nil, function(instance, ply, amount, wallet)
+		if not checksafety(amount) or not checksafety(wallet) then return false end
 		if instance.player ~= SF.Superuser then
 			if not SF.Permissions.checkSafe(instance, nil, "darkrp.playerWalletChanged") then return false end
 			if instance.player ~= ply then return false end
@@ -102,6 +106,7 @@ if SERVER then
 	-- @param string law Law string
 	-- @param Player? player The player who added the law.
 	SF.hookAdd("addLaw", nil, function(instance, index, law, player)
+		if not checksafety(index) or not checksafety(law) then return false end
 		if instance.player ~= SF.Superuser and not SF.Permissions.checkSafe(instance, nil, "darkrp.lawHooks") then return false end
 		return true, {index, law, player and instance.Types.Player.Wrap(player) or nil}
 	end)
@@ -114,6 +119,7 @@ if SERVER then
 	-- @param string law Law string
 	-- @param Player? player The player who removed the law.
 	SF.hookAdd("removeLaw", nil, function(instance, index, law, player)
+		if not checksafety(index) or not checksafety(law) then return false end
 		if instance.player ~= SF.Superuser and not SF.Permissions.checkSafe(instance, nil, "darkrp.lawHooks") then return false end
 		return true, {index, law, player and instance.Types.Player.Wrap(player) or nil}
 	end)
@@ -157,6 +163,7 @@ if SERVER then
 	-- @param boolean success Whether the player succeeded in lockpicking the entity.
 	-- @param Entity ent The entity that was lockpicked.
 	SF.hookAdd("onLockpickCompleted", nil, function(instance, ply, success, ent)
+		if not checksafety(success) then return false end
 		if instance.player ~= SF.Superuser then
 			if not SF.Permissions.checkSafe(instance, nil, "darkrp.lockpickHooks") then return false end
 			if instance.player ~= ply then return false end
@@ -199,7 +206,7 @@ local checkpermission = instance.player == SF.Superuser and function() end or SF
 -- @return string The money as a nice string, e.g. "$100,000".
 function darkrp_library.formatMoney(n)
 	checkluatype(n, TYPE_NUMBER)
-	return DarkRP.formatMoney(n)
+	return assertsafety(DarkRP.formatMoney(n))
 end
 
 --- Get the available vehicles that DarkRP supports.
@@ -250,7 +257,7 @@ if SERVER then
 	-- @server
 	-- @return number The number of jail positions in the current map.
 	function darkrp_library.jailPosCount()
-		return DarkRP.jailPosCount()
+		return assertsafety(DarkRP.jailPosCount())
 	end
 	
 	--- Make one player give money to the other player.

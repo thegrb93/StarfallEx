@@ -1,6 +1,7 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
+local assertsafety = SF.AssertSafety
 
 registerprivilege("entities.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { client = (CLIENT and {} or nil), entities = {} })
 registerprivilege("entities.setPlayerRenderProperty", "PlayerRenderProperty", "Allows the user to change the rendering of themselves", {})
@@ -1575,14 +1576,14 @@ if DarkRP then
 		-- @server
 		-- @return number The door index.
 		function ents_methods:doorIndex()
-			return getent(self):doorIndex()
+			return assertsafety(getent(self):doorIndex())
 		end
 	
 		--- Get whether this door/vehicle is locked. DarkRP only.
 		-- @server
 		-- @return boolean Whether it's locked.
 		function ents_methods:isLocked()
-			return getent(self):isLocked()
+			return assertsafety(getent(self):isLocked())
 		end
 	end
 	
@@ -1596,33 +1597,33 @@ if DarkRP then
 	--- Get the title of this door or vehicle. DarkRP only.
 	-- @return string? The title of the door or vehicle, or nil if none is set.
 	function ents_methods:getKeysTitle()
-		return getent(self):getKeysTitle()
+		return assertsafety(getent(self):getKeysTitle())
 	end
 	
 	--- Get whether this entity is considered a door by DarkRP.
 	-- @return boolean Whether it's a door.
 	function ents_methods:isDoor()
-		return getent(self):isDoor()
+		return assertsafety(getent(self):isDoor())
 	end
 	
 	--- Get whether this entity is a "money bag", i.e. dropped money from a money printer or /dropmoney. DarkRP only.
 	-- @return boolean Whether this entity is a money bag.
 	function ents_methods:isMoneyBag()
-		return getent(self):isMoneyBag()
+		return assertsafety(getent(self):isMoneyBag())
 	end
 	
 	--- Get the amount of money in a "money bag" or cheque, or number of items in a dropped item stack. DarkRP only.
 	-- @return number? Amount of money or number of items
 	function ents_methods:getAmount()
 		self = getent(self)
-		return self.Getamount and self:Getamount() or nil
+		return self.Getamount and assertsafety(self:Getamount()) or nil
 	end
 	
 	--- Get the number of items remaining in a shipment. DarkRP only.
 	-- @return number? Number of items remaining, or nil if not a shipment
 	function ents_methods:getCount()
 		self = getent(self)
-		return self.Getcount and self:Getcount() or nil
+		return self.Getcount and assertsafety(self:Getcount()) or nil
 	end
 end
 

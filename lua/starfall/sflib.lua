@@ -759,6 +759,36 @@ function SF.CheckLuaType(val, typ, level, msg)
 	end
 end
 
+local whitelist = {
+	["nil"] = true,
+	["boolean"] = true,
+	["number"] = true,
+	["string"] = true,
+}
+--- Checks if given arguments are safe to share between host/guest
+-- @param ... vararg The values to be checked
+-- @return boolean Whether all values are safe
+-- @return number? First unsafe vararg found, or nil if none are unsafe
+function SF.CheckSafety(...)
+	for k=1, select("#", ...) do
+		local v = select(k, ...)
+		if not whitelist[type(v)] then
+			return false, k
+		end
+	end
+	return true
+end
+--- Checks if given arguments are safe to share between host/guest. Throws if unsafe.
+-- @param ... vararg The values to be checked
+-- @return ... The same values
+function SF.AssertSafety(...)
+	local isSafe, k = SF.CheckSafety(...)
+	if isSafe then
+		return ...
+	end
+	SF.Throw("argument #"..k.." is not safe", 2)
+end
+
 function SF.EntIsReady(ent)
 	if ent:IsWorld() then return true end
 	if ent:IsValid() then
