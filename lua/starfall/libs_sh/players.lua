@@ -869,6 +869,32 @@ if DarkRP then
 			if instance.player ~= SF.Superuser and instance.player ~= self then SF.Throw("may not use this function on anyone other than owner", 2) return end
 			return assertsafety(self:teamBanTimeLeft())
 		end
+		
+		--- Request money from a player. This function will be subject to a ratelimit, so don't abuse it.
+		-- @server
+		-- @param string? message An optional custom message that will be shown in the money request prompt. May not exceed 60 bytes in length.
+		-- @param number amount The amount of money to ask for.
+		-- @param function? callbackSuccess Optional function to call if request succeeds.
+		-- @param function? callbackFailure Optional function to call if request fails.
+		-- @param Player? receiver The player who may or may not receive the money, or the owner of the chip if not specified. Superuser only.
+		function player_methods:requestMoney(message, amount, callbackSuccess, callbackFailure, receiver)
+			return instance.guestRequestMoney(self, amount, message, callbackSuccess, callbackFailure)
+		end
+		
+		--- Give this player money.
+		-- @server
+		-- @param number amount The amount of money to give.
+		function player_methods:giveMoney(amount)
+			checkluatype(amount, TYPE_NUMBER)
+			amount = math.ceil(amount)
+			if amount <= 0 then SF.Throw("amount must be positive", 2) return end
+			checkpermission(instance, nil, "darkrp.giveMoney")
+			if instance.player:canAfford(amount) then
+				DarkRP.payPlayer(instance.player, getply(self), amount)
+			else
+				SF.Throw("you can't afford to pay "..DarkRP.formatMoney(amount), 2)
+			end
+		end
 	else
 		--- Whether this player is in the same room as the LocalPlayer. DarkRP only.
 		-- @client
@@ -982,6 +1008,12 @@ if DarkRP then
 	-- @return boolean? Whether this player is wanted. May be nil instead of false.
 	function player_methods:isWanted()
 		return assertsafety(getply(self):isWanted())
+	end
+	
+	--- Get the amount of money this player has. DarkRP only.
+	-- @return number The amount of money.
+	function player_methods:getMoney()
+		return assertsafety(getply(self):getDarkRPVar("money"))
 	end
 end
 

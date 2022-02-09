@@ -16,10 +16,11 @@ if SERVER then
 	registerprivilege("darkrp.playerWalletChanged", "Be notified of wallet changes", "Allows the user to know when their own wallet changes")
 	registerprivilege("darkrp.lockdownHooks", "Know when lockdowns begin and end", "Allows the user to know when a lockdown begins or ends")
 	registerprivilege("darkrp.lawHooks", "Know when laws change", "Allows the user to know when a law is added or removed, and when the laws are reset")
-	registerprivilege("darkrp.lockpickHooks", "Know when they start picking a lock", "Allows the user to know when they start picking a lock")
+	registerprivilege("darkrp.lockpickHooks", "Know when they start picking a lock", "Allows the user to know when they start or finish lockpicking")
 	registerprivilege("darkrp.requestMoney", "Ask players for money", "Allows the user to prompt other users for money (similar to E2 moneyRequest)")
+	registerprivilege("darkrp.giveMoney", "Give players money", "Allows the user to give other users money")
 	
-	requests = setmetatable({}, {__mode="k"}) -- Pretty sure this doesn't work with Player keys, but let's do it anyway.
+	requests = setmetatable({}, {__mode="k"}) -- Pretty sure __mode doesn't work with Player keys, but let's do it anyway.
 	SF.MoneyRequests = requests
 	timeoutCvar = CreateConVar("sf_moneyrequest_timeout", 30, FCVAR_ARCHIVE, "Amount of time in seconds until a StarfallEx money request expires.", 1, 600)
 	local function requestsUpdate()
@@ -82,10 +83,19 @@ if SERVER then
 			return chatPrint(executor, "sf_moneyrequest: no such request at given index")
 		end
 		local receiver, amount, expiry = request.receiver, request.amount, request.expiry
-		if action == "accept" then
-			printDebug("SF: %s accepted money request %d for %s from %s.", target:SteamID(), index, DarkRP.formatMoney(amount), receiver:SteamID())
+		if not IsValid(receiver) then
+			printDebug("SF: %s attempted to interact with money request %d for %s, but the receiver was invalid.", target:SteamID(), index, DarkRP.formatMoney(amount))
 			requests[target][index] = nil
-			DarkRP.payPlayer(target, receiver, amount)
+			return chatPrint(executor, "sf_moneyrequest: invalid receiver")
+		end
+		if action == "accept" then
+			requests[target][index] = nil
+			if target:canAfford(amount) then
+				printDebug("SF: %s accepted money request %d for %s from %s.", target:SteamID(), index, DarkRP.formatMoney(amount), receiver:SteamID())
+				DarkRP.payPlayer(target, receiver, amount)
+			else
+				printDebug("SF: %s attempted to accept money request %d for %s from %s, but the target couldn't afford it.", target:SteamID(), index, DarkRP.formatMoney(amount), receiver:SteamID())
+			end
 		elseif action == "decline" then
 			printDebug("SF: %s declined money request %d for %s from %s.", target:SteamID(), index, DarkRP.formatMoney(amount), receiver:SteamID())
 			requests[target][index] = nil
@@ -151,6 +161,8 @@ else
 		local receiver = net.ReadEntity()
 		local amount = net.ReadUInt(32)
 		local expiry = net.ReadFloat()
+		local length = net.ReadUInt(8)
+		local message = length ~= 0 and net.ReadData(length) or nil
 		if index == 0 or not IsValid(receiver) or amount == 0 or expiry <= CurTime() then
 			return printDebug("SF: Ignoring money request with index of %d because it is malformed.", index)
 		end
@@ -161,7 +173,7 @@ else
 			return printDebug("SF: Ignoring money request because the receiver is in \"SF.BlockedMoneyRequests\".")
 		end
 		local mrf = vgui.Create("StarfallMoneyRequestFrame")
-		mrf:Init2(index, receiver, amount, expiry)
+		mrf:Init2(index, receiver, amount, expiry, message)
 	end)
 	local PANEL = {}
 	function PANEL:Init()
@@ -170,7 +182,7 @@ else
 		self:SetTitle("StarfallEx money request")
 		self:MakePopup()
 	end
-	function PANEL:Init2(index, receiver, amount, expiry)
+	function PANEL:Init2(index, receiver, amount, expiry, message)
 		if not IsValid(receiver) then
 			self:Close()
 			return
@@ -217,15 +229,22 @@ else
 			RunConsoleCommand("sf_moneyrequest", 0, "accept", index, expiry)
 			self:Close()
 		end
-		function blockRequests:OnChange(bool)
-			btnAccept:SetEnabled(not bool)
-		end
 		local receiverSteamID = receiver:SteamID() -- In case they disconnect between now and the window closing
 		function self:OnClose()
 			if blockRequests:GetChecked() then
 				blocked[receiverSteamID] = true
 			end
 		end
+		local me = LocalPlayer()
+		local function updateAcceptEnabled(bool)
+			if not me:canAfford(amount) then
+				btnAccept:SetEnabled(false)
+			elseif bool ~= nil then
+				btnAccept:SetEnabled(not bool)
+			end
+		end
+		blockRequests.OnChange = updateAcceptEnabled
+		updateAcceptEnabled()
 	end
 	vgui.Register("StarfallMoneyRequestFrame", PANEL, "DFrame")
 end
@@ -394,7 +413,7 @@ if SERVER then
 	end)
 end
 
---- Functions relating to DarkRP.
+--- Functions relating to DarkRP. These functions WILL NOT EXIST if DarkRP is not in use.
 -- @name darkrp
 -- @class library
 -- @libtbl darkrp_library
@@ -486,21 +505,37 @@ if SERVER then
 	-- @param number amount The amount of money.
 	function darkrp_library.payPlayer(sender, receiver, amount)
 		checkluatype(amount, TYPE_NUMBER)
+		amount = math.ceil(amount)
+		if amount <= 0 then SF.Throw("amount must be positive", 2) return end
+		checkpermission(instance, nil, "darkrp.giveMoney")
 		sender = getply(sender)
 		if instance.player ~= SF.Superuser and instance.player ~= sender then SF.Throw("may not transfer money from player other than owner", 2) return end
-		DarkRP.payPlayer(sender, getply(receiver), amount)
+		if sender:canAfford(amount) then
+			DarkRP.payPlayer(sender, getply(receiver), amount)
+		else
+			SF.Throw("sender can't afford to pay "..DarkRP.formatMoney(amount), 2)
+		end
 	end
 	
-	--- Request money from a player. Receiver must be owner of chip if chip is not running in superuser mode.
-	-- This function will be subject to a ratelimit, so don't abuse it.
+	--- Request money from a player. This function will be subject to a ratelimit, so don't abuse it.
 	-- @server
 	-- @param Player sender The player who may or may not send the money.
 	-- @param number amount The amount of money to ask for.
-	-- @param Player? receiver The player who may or may not receive the money, or the owner of the chip if not specified.
-	function darkrp_library.requestMoney(sender, amount, receiver)
+	-- @param string? message An optional custom message that will be shown in the money request prompt. May not exceed 60 bytes in length.
+	-- @param function? callbackSuccess Optional function to call if request succeeds.
+	-- @param function? callbackFailure Optional function to call if request fails.
+	-- @param Player? receiver The player who may or may not receive the money, or the owner of the chip if not specified. Superuser only.
+	function darkrp_library.requestMoney(sender, amount, message, callbackSuccess, callbackFailure, receiver)
 		-- TODO: add ratelimiting (IMPORTANT)
 		checkluatype(amount, TYPE_NUMBER)
+		if callbackSuccess ~= nil then checkluatype(callbackSuccess, TYPE_FUNCTION) end
+		if callbackFailure ~= nil then checkluatype(callbackFailure, TYPE_FUNCTION) end
+		if message ~= nil then
+			checkluatype(message, TYPE_STRING)
+			if #message > 60 then SF.Throw("money request message may not exceed 60 bytes", 2) return end
+		end
 		amount = math.ceil(amount)
+		if amount <= 0 then SF.Throw("amount must be positive", 2) return end
 		checkpermission(instance, nil, "darkrp.requestMoney")
 		sender = getply(sender)
 		receiver = receiver ~= nil and getply(receiver) or instance.player
@@ -514,7 +549,11 @@ if SERVER then
 		local request = {
 			receiver = receiver,
 			amount = amount,
-			expiry = expiry
+			expiry = expiry,
+			message = message,
+			instance = instance,
+			callbackSuccess = callbackSuccess,
+			callbackFailure = callbackFailure
 		}
 		local index = table.insert(requestsForSender, request)
 		request.index = index
@@ -524,8 +563,15 @@ if SERVER then
 			net.WriteEntity(receiver)
 			net.WriteUInt(amount, 32)
 			net.WriteFloat(expiry)
+			if message then
+				net.WriteUInt(#message, 8)
+				net.WriteData(message)
+			else
+				net.WriteUInt(0, 8)
+			end
 		net.Send(sender)
 	end
+	instance.guestRequestMoney = darkrp_library.requestMoney
 else
 	--- Open the F1 help menu. Roughly equivalent to pressing F1 (or running gm_showhelp), but won't close it if it's already open.
 	-- Only works if the local player is the owner of the chip, or if the chip is running in superuser mode.
