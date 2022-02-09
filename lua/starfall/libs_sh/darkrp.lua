@@ -26,17 +26,20 @@ if SERVER then
 		for player, requestsForPlayer in pairs(requests) do
 			if IsValid(player) then
 				for index, request in pairs(requestsForPlayer) do
-					if now >= request.expiry or not IsValid(request.receiver) then
-						printDebug("invalidated request #%d of steamid %q (now: %s, expiry: %s)", index, player:SteamID(), now, request.expiry)
+					if not IsValid(request.receiver) then
+						printDebug("SF: Removed money request with index %d for %s because the receiver was invalid.", index, player:SteamID())
+						requestsForPlayer[index] = nil
+					elseif now >= request.expiry then
+						printDebug("SF: Removed money request with index %d for %s because it expired %s second(s) ago.", index, player:SteamID(), now-request.expiry)
 						requestsForPlayer[index] = nil
 					end
 				end
 				if not next(requestsForPlayer) then
-					printDebug("purged table for steamid %q because it had no requests", player:SteamID())
+					printDebug("SF: Purged money request table for %s because it was empty.", player:SteamID())
 					requests[player] = nil
 				end
 			else
-				printDebug("purged... someone's table because the key was invalid")
+				printDebug("SF: Purged a mystery money request table because the player object used as its key was invalid.")
 				requests[player] = nil
 			end
 		end
@@ -79,14 +82,14 @@ if SERVER then
 		end
 		local receiver, amount, expiry = request.receiver, request.amount, request.expiry
 		if action == "accept" then
-			printDebug("target %q accepted request for %s from receiver %q", target:SteamID(), DarkRP.formatMoney(amount), receiver:SteamID())
+			printDebug("SF: %s accepted money request %d for %s from %s.", target:SteamID(), index, DarkRP.formatMoney(amount), receiver:SteamID())
 			requests[target][index] = nil
 			DarkRP.payPlayer(target, receiver, amount)
 		elseif action == "decline" then
-			printDebug("target %q declined request for %s from receiver %q", target:SteamID(), DarkRP.formatMoney(amount), receiver:SteamID())
+			printDebug("SF: %s declined money request %d for %s from %s.", target:SteamID(), index, DarkRP.formatMoney(amount), receiver:SteamID())
 			requests[target][index] = nil
 		elseif action == "info" then
-			chatPrint(executor, "sf_moneyrequest: %q requested %s from target, will expire at curtime %s", receiver:SteamID(), DarkRP.formatMoney(amount), expiry)
+			chatPrint(executor, "sf_moneyrequest: %q requested %s from target, will expire at curtime %s (currently %s)", receiver:SteamID(), DarkRP.formatMoney(amount), expiry, CurTime())
 		else
 			chatPrint(executor, "sf_moneyrequest: invalid action")
 		end
@@ -146,13 +149,13 @@ else
 		local amount = net.ReadUInt(32)
 		local expiry = net.ReadFloat()
 		if index == 0 or not IsValid(receiver) or amount == 0 or expiry <= CurTime() then
-			return printDebug("rejecting request #%d because it is malformed", index)
+			return printDebug("SF: Ignoring money request with index of %d because it is malformed.", index)
 		end
-		printDebug("received request #%d for %s to be sent to %s (expires %s)", index, DarkRP.formatMoney(amount), receiver:SteamID(), expiry)
+		printDebug("SF: Received money request (index %d) for %s to be sent to %s. It expires at CurTime %s.", index, DarkRP.formatMoney(amount), receiver:SteamID(), expiry)
 		if SF.BlockedUsers[receiver:SteamID()] then
-			return printDebug("ignoring because the user is in SF.BlockedUsers")
+			return printDebug("SF: Ignoring money request because the receiver is in \"SF.BlockedUsers\".")
 		elseif blocked[receiver:SteamID()] then
-			return printDebug("ignoring because the user is in SF.BlockedMoneyRequests")
+			return printDebug("SF: Ignoring money request because the receiver is in \"SF.BlockedMoneyRequests\".")
 		end
 		local mrf = vgui.Create("StarfallMoneyRequestFrame")
 		mrf:Init2(index, receiver, amount, expiry)
@@ -499,7 +502,6 @@ if SERVER then
 		sender = getply(sender)
 		receiver = receiver ~= nil and getply(receiver) or instance.player
 		if instance.player ~= SF.Superuser and receiver ~= instance.player then SF.Throw("receiver must be chip owner if not superuser", 2) return end
-		printDebug("player %q is requesting %s from player %q", receiver:SteamID(), DarkRP.formatMoney(amount), sender:SteamID())
 		local requestsForSender = requests[sender]
 		if not requestsForSender then
 			requestsForSender = {}
@@ -513,6 +515,7 @@ if SERVER then
 		}
 		local index = table.insert(requestsForSender, request)
 		request.index = index
+		printDebug("SF: %s sent a money request for %s to %s (index %d).", receiver:SteamID(), DarkRP.formatMoney(amount), sender:SteamID(), index)
 		net.Start("sf_moneyrequest")
 			net.WriteUInt(index, 32)
 			net.WriteEntity(receiver)
