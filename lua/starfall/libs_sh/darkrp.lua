@@ -71,7 +71,7 @@ if SERVER then
 	-- @param number amount The amount of money given to the player.
 	-- @param number wallet How much money the player had before receiving the money.
 	SF.hookAdd("playerWalletChanged", nil, function(instance, ply, amount, wallet)
-		if not checksafety(amount) or not checksafety(wallet) then return false end
+		if not checksafety(amount, wallet) then return false end
 		if instance.player ~= SF.Superuser then
 			if not SF.Permissions.checkSafe(instance, nil, "darkrp.playerWalletChanged") then return false end
 			if instance.player ~= ply then return false end
@@ -106,7 +106,7 @@ if SERVER then
 	-- @param string law Law string
 	-- @param Player? player The player who added the law.
 	SF.hookAdd("addLaw", nil, function(instance, index, law, player)
-		if not checksafety(index) or not checksafety(law) then return false end
+		if not checksafety(index, law) then return false end
 		if instance.player ~= SF.Superuser and not SF.Permissions.checkSafe(instance, nil, "darkrp.lawHooks") then return false end
 		return true, {index, law, player and instance.Types.Player.Wrap(player) or nil}
 	end)
@@ -119,7 +119,7 @@ if SERVER then
 	-- @param string law Law string
 	-- @param Player? player The player who removed the law.
 	SF.hookAdd("removeLaw", nil, function(instance, index, law, player)
-		if not checksafety(index) or not checksafety(law) then return false end
+		if not checksafety(index, law) then return false end
 		if instance.player ~= SF.Superuser and not SF.Permissions.checkSafe(instance, nil, "darkrp.lawHooks") then return false end
 		return true, {index, law, player and instance.Types.Player.Wrap(player) or nil}
 	end)
