@@ -60,33 +60,25 @@ function P.registerPrivilege(id, name, description, arg)
 	P.privileges[id] = {name, description, arg}
 end
 
+--- Checks whether a player may perform an action. Throws an error if not allowed
+-- @param instance The instance checking permission
+-- @param target the object on which the action is being performed
+-- @param key a string identifying the action being performed
+function P.check(instance, target, key)
+	if not (instance.permissionOverrides and instance.permissionOverrides[key]) then
+		local notok, reason = P.permissionchecks[key](instance, target)
+		if notok then
+			SF.Throw("Permission " .. key .. ": " .. reason, 3)
+		end
+	end
+end
+
 --- Checks whether a player may perform an action.
 -- @param instance The instance checking permission
 -- @param target the object on which the action is being performed
 -- @param key a string identifying the action being performed
 -- @return boolean Whether the player may perform the action
 -- @return string? Reason for action to not be allowed, or nil if it is allowed
-function P.checkSafe(instance, target, key)
-	if not (instance.permissionOverrides and instance.permissionOverrides[key]) then
-		local notok, reason = P.permissionchecks[key](instance, target)
-		if notok then
-			return false, reason
-		end
-	end
-	return true
-end
-
---- Checks whether a player may perform an action. Throws an error if not allowed
--- @param instance The instance checking permission
--- @param target the object on which the action is being performed
--- @param key a string identifying the action being performed
-function P.check(instance, target, key)
-	local ok, reason = P.checkSafe(instance, target, key)
-	if not ok then
-		SF.Throw("Permission " .. key .. ": " .. reason, 3)
-	end
-end
-
 function P.hasAccess(instance, target, key)
 	if (instance.permissionOverrides and instance.permissionOverrides[key]) then
 		return true

@@ -260,7 +260,7 @@ if SERVER then
 		if not moneyprinter then return false end
 		if instance.player ~= SF.Superuser then
 			if not moneyprinter.Getowning_ent or instance.player ~= moneyprinter:Getowning_ent() then return false end
-			if not SF.Permissions.checkSafe(instance, nil, "darkrp.moneyPrinterHooks") then return false end
+			if not SF.Permissions.hasAccess(instance, nil, "darkrp.moneyPrinterHooks") then return false end
 		end
 		return true, {instance.Types.Entity.Wrap(moneyprinter)}
 	end)
@@ -276,7 +276,7 @@ if SERVER then
 		if not moneyprinter then return false end
 		if instance.player ~= SF.Superuser then
 			if not moneyprinter.Getowning_ent or instance.player ~= moneyprinter:Getowning_ent() then return false end
-			if not SF.Permissions.checkSafe(instance, nil, "darkrp.moneyPrinterHooks") then return false end
+			if not SF.Permissions.hasAccess(instance, nil, "darkrp.moneyPrinterHooks") then return false end
 		end
 		return true, {instance.Types.Entity.Wrap(moneyprinter), instance.Types.Entity.Wrap(moneybag)}
 	end)
@@ -294,7 +294,7 @@ if SERVER then
 		if not moneyprinter then return false end
 		if instance.player ~= SF.Superuser then
 			if not moneyprinter.Getowning_ent or instance.player ~= moneyprinter:Getowning_ent() then return false end
-			if not SF.Permissions.checkSafe(instance, nil, "darkrp.moneyPrinterHooks") then return false end
+			if not SF.Permissions.hasAccess(instance, nil, "darkrp.moneyPrinterHooks") then return false end
 		end
 		return true, {instance.Types.Entity.Wrap(moneyprinter), amount}
 	end)
@@ -310,7 +310,7 @@ if SERVER then
 	SF.hookAdd("playerWalletChanged", nil, function(instance, ply, amount, wallet)
 		if not checksafety(amount, wallet) then return false end
 		if instance.player ~= SF.Superuser then
-			if not SF.Permissions.checkSafe(instance, nil, "darkrp.playerWalletChanged") then return false end
+			if not SF.Permissions.hasAccess(instance, nil, "darkrp.playerWalletChanged") then return false end
 			if instance.player ~= ply then return false end
 		end
 		return true, {ply and instance.Types.Player.Wrap(ply) or nil, amount, wallet}
@@ -322,7 +322,7 @@ if SERVER then
 	-- @server
 	-- @param Player? actor The player who ended the lockdown, or nil.
 	SF.hookAdd("lockdownEnded", nil, function(instance, actor)
-		if instance.player ~= SF.Superuser and not SF.Permissions.checkSafe(instance, nil, "darkrp.lockdownHooks") then return false end
+		if instance.player ~= SF.Superuser and not SF.Permissions.hasAccess(instance, nil, "darkrp.lockdownHooks") then return false end
 		return true, {actor and instance.Types.Player.Wrap(actor) or nil}
 	end)
 
@@ -332,7 +332,7 @@ if SERVER then
 	-- @server
 	-- @param Player? actor The player who started the lockdown, or nil.
 	SF.hookAdd("lockdownStarted", nil, function(instance, actor)
-		if instance.player ~= SF.Superuser and not SF.Permissions.checkSafe(instance, nil, "darkrp.lockdownHooks") then return false end
+		if instance.player ~= SF.Superuser and not SF.Permissions.hasAccess(instance, nil, "darkrp.lockdownHooks") then return false end
 		return true, {actor and instance.Types.Player.Wrap(actor) or nil}
 	end)
 
@@ -344,7 +344,7 @@ if SERVER then
 	-- @param Player? player The player who added the law.
 	SF.hookAdd("addLaw", nil, function(instance, index, law, player)
 		if not checksafety(index, law) then return false end
-		if instance.player ~= SF.Superuser and not SF.Permissions.checkSafe(instance, nil, "darkrp.lawHooks") then return false end
+		if instance.player ~= SF.Superuser and not SF.Permissions.hasAccess(instance, nil, "darkrp.lawHooks") then return false end
 		return true, {index, law, player and instance.Types.Player.Wrap(player) or nil}
 	end)
 
@@ -357,7 +357,7 @@ if SERVER then
 	-- @param Player? player The player who removed the law.
 	SF.hookAdd("removeLaw", nil, function(instance, index, law, player)
 		if not checksafety(index, law) then return false end
-		if instance.player ~= SF.Superuser and not SF.Permissions.checkSafe(instance, nil, "darkrp.lawHooks") then return false end
+		if instance.player ~= SF.Superuser and not SF.Permissions.hasAccess(instance, nil, "darkrp.lawHooks") then return false end
 		return true, {index, law, player and instance.Types.Player.Wrap(player) or nil}
 	end)
 
@@ -367,7 +367,7 @@ if SERVER then
 	-- @server
 	-- @param Player? player The player resetting the laws.
 	SF.hookAdd("resetLaws", nil, function(instance, player)
-		if instance.player ~= SF.Superuser and not SF.Permissions.checkSafe(instance, nil, "darkrp.lawHooks") then return false end
+		if instance.player ~= SF.Superuser and not SF.Permissions.hasAccess(instance, nil, "darkrp.lawHooks") then return false end
 		return true, {player and instance.Types.Player.Wrap(player) or nil}
 	end)
 
@@ -381,7 +381,7 @@ if SERVER then
 	-- @param table trace The trace result.
 	SF.hookAdd("lockpickStarted", nil, function(instance, ply, ent, trace)
 		if instance.player ~= SF.Superuser then
-			if not SF.Permissions.checkSafe(instance, nil, "darkrp.lockpickHooks") then return false end
+			if not SF.Permissions.hasAccess(instance, nil, "darkrp.lockpickHooks") then return false end
 			if instance.player ~= ply then return false end
 		end
 		return true, {
@@ -402,7 +402,7 @@ if SERVER then
 	SF.hookAdd("onLockpickCompleted", nil, function(instance, ply, success, ent)
 		if not checksafety(success) then return false end
 		if instance.player ~= SF.Superuser then
-			if not SF.Permissions.checkSafe(instance, nil, "darkrp.lockpickHooks") then return false end
+			if not SF.Permissions.hasAccess(instance, nil, "darkrp.lockpickHooks") then return false end
 			if instance.player ~= ply then return false end
 		end
 		return true, {
