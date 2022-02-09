@@ -57,27 +57,25 @@ if SERVER then
 	end
 	concommand.Add("sf_moneyrequest", function(executor, command, args)
 		if not DarkRP then
-			chatPrint(executor, "sf_moneyrequest: DarkRP not present")
-			return
+			return chatPrint(executor, "sf_moneyrequest: DarkRP not present")
 		end
-		local target, action, index = tonumber(args[1]), args[2], tonumber(args[3])
+		local target, action, index, maxAge = tonumber(args[1]), args[2], tonumber(args[3]), tonumber(args[4])
 		if not target or not action or not index then
-			chatPrint(executor, "sf_moneyrequest: malformed parameters (do \"help sf_moneyrequest\")")
-			return
+			return chatPrint(executor, "sf_moneyrequest: malformed parameters (do \"help sf_moneyrequest\")")
+		end
+		if maxAge and CurTime() >= maxAge then
+			return chatPrint(executor, "sf_moneyrequest: exceeded max age")
 		end
 		target = target == 0 and executor or Entity(target)
 		if not IsValid(target) or not target:IsPlayer() then
-			chatPrint(executor, "sf_moneyrequest: invalid target")
-			return
+			return chatPrint(executor, "sf_moneyrequest: invalid target")
 		end
 		if IsValid(executor) and target ~= executor and not executor:IsSuperAdmin() then
-			chatPrint(executor, "sf_moneyrequest: only superadmins can interact with other people's money requests")
-			return
+			return chatPrint(executor, "sf_moneyrequest: only superadmins can interact with other people's money requests")
 		end
 		local request = (requests[target] or {})[index]
 		if not request then
-			chatPrint(executor, "sf_moneyrequest: no such request at given index")
-			return
+			return chatPrint(executor, "sf_moneyrequest: no such request at given index")
 		end
 		local receiver, amount, expiry = request.receiver, request.amount, request.expiry
 		if action == "accept" then
@@ -110,17 +108,77 @@ if SERVER then
 		chatPrint(executor, "sf_moneyrequest_purge: done")
 	end, nil, "Manually trigger a purge of all money requests. Superadmin/RCON only.", FCVAR_UNREGISTERED)
 else
+	local blocked = {}
+	SF.BlockedMoneyRequests = blocked
 	net.Receive("sf_moneyrequest", function()
 		local index = net.ReadUInt(32)
 		local receiver = net.ReadEntity()
 		local amount = net.ReadUInt(32)
 		local expiry = net.ReadFloat()
 		if index == 0 or not IsValid(receiver) or amount == 0 or expiry <= CurTime() then
-			printDebug("rejecting request #%d because it is malformed", index)
-			return
+			return printDebug("rejecting request #%d because it is malformed", index)
 		end
 		printDebug("received request #%d for %s to be sent to %s (expires %s)", index, DarkRP.formatMoney(amount), receiver:SteamID(), expiry)
+		if SF.BlockedUsers[receiver:SteamID()] then
+			return printDebug("ignoring because the user is in SF.BlockedUsers")
+		elseif blocked[receiver:SteamID()] then
+			return printDebug("ignoring because the user is in SF.BlockedMoneyRequests")
+		end
+		local mrf = vgui.Create("StarfallMoneyRequestFrame")
+		mrf:Init2(index, receiver, amount, expiry)
 	end)
+	local PANEL = {}
+	function PANEL:Init()
+		self:SetSize(300, 200)
+		self:Center()
+		self:SetTitle("StarfallEx money request")
+		self:MakePopup()
+	end
+	function PANEL:Init2(index, receiver, amount, expiry)
+		local desc = vgui.Create("DLabel", self)
+		desc:SetText(string.format("%q (%s)'s StarfallEx chip is asking you for %s. Would you like to send them money?", receiver:GetName(), receiver:SteamID(), DarkRP.formatMoney(amount)))
+		--desc:SizeToContents()
+		desc:SetHeight(60) -- hacky
+		desc:SetWrap(true)
+		desc:Dock(TOP)
+		local descExpires = vgui.Create("DLabel", self)
+		descExpires:SetText("This request expires in XXX seconds.")
+		--descExpires:SizeToContents()
+		descExpires:SetWrap(true)
+		descExpires:DockMargin(0, 5, 0, 0)
+		descExpires:Dock(TOP)
+		function self:Think()
+			local remaining = expiry-CurTime()
+			descExpires:SetText(string.format("This request expires in %s.", string.NiceTime(remaining)))
+			if remaining <= 0 then
+				self:Close()
+			end
+		end
+		local blockRequests = vgui.Create("DCheckBoxLabel", self)
+		blockRequests:SetText("Block future money requests from this user")
+		--blockRequests:SizeToContents()
+		blockRequests:SetWrap(true)
+		blockRequests:DockMargin(0, 5, 0, 0)
+		blockRequests:Dock(TOP)
+		local buttons = vgui.Create('Panel', self)
+		buttons:DockMargin(0, 5, 0, 0)
+		buttons:Dock(TOP)
+		local btnDecline = vgui.Create("DButton", buttons)
+		btnDecline:Dock(LEFT)
+		btnDecline:SetText("Decline")
+		function btnDecline.DoClick()
+			RunConsoleCommand("sf_moneyrequest", 0, "decline", index, expiry)
+			self:Close()
+		end
+		local btnAccept = vgui.Create("DButton", buttons)
+		btnAccept:Dock(RIGHT)
+		btnAccept:SetText("Accept")
+		function btnAccept.DoClick()
+			RunConsoleCommand("sf_moneyrequest", 0, "accept", index, expiry)
+			self:Close()
+		end
+	end
+	vgui.Register("StarfallMoneyRequestFrame", PANEL, "DFrame")
 end
 
 if SERVER then
