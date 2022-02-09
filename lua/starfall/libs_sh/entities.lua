@@ -1,7 +1,6 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
-local assertsafety = SF.AssertSafety
 
 registerprivilege("entities.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { client = (CLIENT and {} or nil), entities = {} })
 registerprivilege("entities.setPlayerRenderProperty", "PlayerRenderProperty", "Allows the user to change the rendering of themselves", {})
@@ -1568,80 +1567,6 @@ end
 -- @return table The table of networked objects
 function ents_methods:getNWVarTable()
 	return instance.Sanitize(getent(self):GetNWVarTable())
-end
-
-if DarkRP then
-	if SERVER then
-		--- Get the DarkRP door index of a door. Use this to store door information in the database.
-		-- @server
-		-- @return number The door index.
-		function ents_methods:doorIndex()
-			return assertsafety(getent(self):doorIndex())
-		end
-	
-		--- Get whether this door/vehicle is locked. DarkRP only.
-		-- @server
-		-- @return boolean Whether it's locked.
-		function ents_methods:isLocked()
-			return assertsafety(getent(self):isLocked())
-		end
-	end
-	
-	--- Get the owner of a door. DarkRP only.
-	-- @return Player? The owner of the door, or nil if the door is unowned.
-	function ents_methods:getDoorOwner()
-		local owner = getent(self):getDoorOwner()
-		if owner then return plywrap(owner) end
-	end
-	
-	--- Get the title of this door or vehicle. DarkRP only.
-	-- If you don't know what this is referring to, that's because it's not a commonly used feature. Press F2 on a door and click "Set Door Title".
-	-- @return string? The title of the door or vehicle, or nil if none is set.
-	function ents_methods:getKeysTitle()
-		return assertsafety(getent(self):getKeysTitle())
-	end
-	
-	--- Get whether this entity is considered a door by DarkRP.
-	-- @return boolean Whether it's a door.
-	function ents_methods:isDoor()
-		return assertsafety(getent(self):isDoor())
-	end
-	
-	--- Get whether this entity is a "money bag", i.e. dropped money from a money printer or /dropmoney. DarkRP only.
-	-- @return boolean Whether this entity is a money bag.
-	function ents_methods:isMoneyBag()
-		return assertsafety(getent(self):isMoneyBag())
-	end
-	
-	--- Get the amount of money in a "money bag" or cheque, or number of items in a dropped item stack. DarkRP only.
-	-- @return number? Amount of money or number of items
-	function ents_methods:getAmount()
-		self = getent(self)
-		return self.Getamount and assertsafety(self:Getamount()) or nil
-	end
-	
-	--- Get the number of items remaining in a shipment. DarkRP only.
-	-- @return number? Number of items remaining, or nil if not a shipment
-	function ents_methods:getCount()
-		self = getent(self)
-		return self.Getcount and assertsafety(self:Getcount()) or nil
-	end
-	
-	--- Get the index of the contents of the shipment, which should then be looked up in the output of "darkrp.getCustomShipments". DarkRP only.
-	-- @return number? Index of contents, or nil if not a shipment
-	function ents_methods:getShipmentContentsIndex()
-		self = getent(self)
-		return self.Getcontents and assertsafety(self:Getcontents()) or nil
-	end
-	
-	--- Get the info for the contents of the shipment. DarkRP only.
-	-- Equivalent to "darkrp.getCustomShipments()[ent:getShipmentContentsIndex()]"
-	-- @return table? Contents, or nil if not a shipment
-	function ents_methods:getShipmentContents()
-		self = getent(self)
-		if not CustomShipments or not self.Getcontents then return end
-		return instance.Sanitize(CustomShipments[self:Getcontents()])
-	end
 end
 
 end
