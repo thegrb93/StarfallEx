@@ -4,6 +4,9 @@ local registerprivilege = SF.Permissions.registerPrivilege
 local checksafety = SF.CheckSafety
 local assertsafety = SF.AssertSafety
 
+-- I am not 100% confident that the help text I chose is actually accurate. Please take it with a pinch of salt.
+local moneyrequestBurst = SF.BurstObject("moneyrequests", "moneyrequests", 0.5, 1, "The rate at which the cooldown for money requests that can be made for a single instance decreases per second. Lower is stricter, higher is looser.", "Number of money requests that can be made by a single instance in a short time.")
+
 local requests, timeoutCvar, debugCvar
 local function printDebug(...)
 	if not debugCvar:GetBool() then return end
@@ -485,6 +488,21 @@ function darkrp_library.getCustomShipments()
 	return CustomShipments and instance.Sanitize(CustomShipments) or nil
 end
 
+--- Returns number of money requests left.
+-- By default, this replenishes at a rate of 1 every 2 seconds, up to a maximum of 1.
+-- In other words, you can make a maximum of 1 money request every 2 seconds.
+-- TODO: Verify that this is actually true
+-- @return number Number of money requests able to be created. This could be a decimal, so you might want to floor it
+function darkrp_library.moneyRequestsLeft()
+	return moneyrequestBurst:check(instance.player)
+end
+
+--- Returns whether you can make another money request this tick.
+-- @return boolean If you can make another money request
+function darkrp_library.canMakeMoneyRequest()
+	return moneyrequestBurst:check(instance.player) >= 1
+end
+
 if SERVER then
 	--- Get the entity corresponding to a door index. Note: The door MUST have been created by the map!
 	-- @server
@@ -548,6 +566,7 @@ if SERVER then
 		sender = getply(sender)
 		receiver = receiver ~= nil and getply(receiver) or instance.player
 		if instance.player ~= SF.Superuser and receiver ~= instance.player then SF.Throw("receiver must be chip owner if not superuser", 2) return end
+		moneyrequestBurst:use(instance.player, 1)
 		local requestsForSender = requests[sender]
 		if not requestsForSender then
 			requestsForSender = {}
