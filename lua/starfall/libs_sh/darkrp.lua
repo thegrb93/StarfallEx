@@ -4,7 +4,12 @@ local registerprivilege = SF.Permissions.registerPrivilege
 local checksafety = SF.CheckSafety
 local assertsafety = SF.AssertSafety
 
-local requests, timeoutCvar, printDebug
+local requests, timeoutCvar
+local debugCvar = CreateConVar("sf_moneyrequest_verbose", 0, FCVAR_REPLICATED, "Prints extra information to server console. Intended for debugging.", 0, 1)
+local function printDebug(...)
+	if not debugCvar:GetBool() then return end
+	return print(string.format(...))
+end
 if SERVER then
 	registerprivilege("darkrp.moneyPrinterHooks", "Get own money printer info", "Allows the user to know when their own money printers catch fire or print money (and how much was printed)")
 	registerprivilege("darkrp.playerWalletChanged", "Be notified of wallet changes", "Allows the user to know when their own wallet changes")
@@ -12,12 +17,6 @@ if SERVER then
 	registerprivilege("darkrp.lawHooks", "Know when laws change", "Allows the user to know when a law is added or removed, and when the laws are reset")
 	registerprivilege("darkrp.lockpickHooks", "Know when they start picking a lock", "Allows the user to know when they start picking a lock")
 	registerprivilege("darkrp.requestMoney", "Ask players for money", "Allows the user to prompt other users for money (similar to E2 moneyRequest)")
-	
-	local debugCvar = CreateConVar("sf_moneyrequest_verbose", 0, nil, "Prints extra information to server console. Intended for debugging.", 0, 1)
-	function printDebug(...)
-		if not debugCvar:GetBool() then return end
-		return print(string.format(...))
-	end
 	
 	requests = setmetatable({}, {__mode="k"}) -- Pretty sure this doesn't work with Player keys, but let's do it anyway.
 	SF.MoneyRequests = requests
@@ -111,7 +110,17 @@ if SERVER then
 		chatPrint(executor, "sf_moneyrequest_purge: done")
 	end, nil, "Manually trigger a purge of all money requests. Superadmin/RCON only.", FCVAR_UNREGISTERED)
 else
-	
+	net.Receive("sf_moneyrequest", function()
+		local index = net.ReadUInt(32)
+		local receiver = net.ReadEntity()
+		local amount = net.ReadUInt(32)
+		local expiry = net.ReadFloat()
+		if index == 0 or not IsValid(receiver) or amount == 0 or expiry <= CurTime() then
+			printDebug("rejecting request #%d because it is malformed", index)
+			return
+		end
+		printDebug("received request #%d for %s to be sent to %s (expires %s)", index, DarkRP.formatMoney(amount), receiver:SteamID(), expiry)
+	end)
 end
 
 if SERVER then
