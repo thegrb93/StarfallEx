@@ -548,7 +548,7 @@ end
 
 --- Returns the table of constraints on an entity
 -- @param Entity ent The entity
--- @return table Table of entity constraints
+-- @return table Table of tables containing constraint information
 function constraint_library.getTable(ent)
 	return instance.Sanitize(constraint.GetTable(getent(ent)))
 end
