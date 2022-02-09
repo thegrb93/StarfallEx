@@ -759,34 +759,42 @@ function SF.CheckLuaType(val, typ, level, msg)
 	end
 end
 
-local whitelist = {
-	["nil"] = true,
-	["boolean"] = true,
-	["number"] = true,
-	["string"] = true,
-}
---- Checks if given arguments are safe to share between host/guest
--- @param ... vararg The values to be checked
--- @return boolean Whether all values are safe
--- @return number? First unsafe vararg found, or nil if none are unsafe
-function SF.CheckSafety(...)
-	for k=1, select("#", ...) do
-		local v = select(k, ...)
-		if not whitelist[type(v)] then
-			return false, k
+do
+	local whitelist = {
+		["nil"] = true,
+		["boolean"] = true,
+		["number"] = true,
+		["string"] = true,
+	}
+	local pairs = pairs
+	local select = select
+	local type = type
+	local unpack = unpack
+	--- Check if arguments are safe for sharing between host/guest.
+	-- @param ... vararg The values to be checked
+	-- @return boolean If all arguments are safe
+	function SF.CheckSafety(...)
+		for k=1, select("#", ...) do
+			local v = select(k, ...)
+			if not whitelist[type(v)] then
+				return false
+			end
 		end
+		return true
 	end
-	return true
-end
---- Checks if given arguments are safe to share between host/guest. Throws if unsafe.
--- @param ... vararg The values to be checked
--- @return ... The same values
-function SF.AssertSafety(...)
-	local isSafe, k = SF.CheckSafety(...)
-	if isSafe then
-		return ...
+	--- Replaces unsafe arguments with nil for safe sharing between host/guest.
+	-- Similar to instance.Sanitize but simpler.
+	-- @param ... vararg The values to be checked
+	-- @return ... The same values
+	function SF.AssertSafety(...)
+		local args = {...}
+		for k, v in pairs(args) do
+			if not whitelist[type(v)] then
+				args[k] = nil
+			end
+		end
+		return unpack(args)
 	end
-	SF.Throw("argument #"..k.." is not safe", 2)
 end
 
 function SF.EntIsReady(ent)
