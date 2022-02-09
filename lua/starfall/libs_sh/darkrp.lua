@@ -4,12 +4,114 @@ local registerprivilege = SF.Permissions.registerPrivilege
 local checksafety = SF.CheckSafety
 local assertsafety = SF.AssertSafety
 
+local requests, timeoutCvar, printDebug
 if SERVER then
 	registerprivilege("darkrp.moneyPrinterHooks", "Get own money printer info", "Allows the user to know when their own money printers catch fire or print money (and how much was printed)")
 	registerprivilege("darkrp.playerWalletChanged", "Be notified of wallet changes", "Allows the user to know when their own wallet changes")
 	registerprivilege("darkrp.lockdownHooks", "Know when lockdowns begin and end", "Allows the user to know when a lockdown begins or ends")
 	registerprivilege("darkrp.lawHooks", "Know when laws change", "Allows the user to know when a law is added or removed, and when the laws are reset")
 	registerprivilege("darkrp.lockpickHooks", "Know when they start picking a lock", "Allows the user to know when they start picking a lock")
+	registerprivilege("darkrp.requestMoney", "Ask players for money", "Allows the user to prompt other users for money (similar to E2 moneyRequest)")
+	
+	local debugCvar = CreateConVar("sf_moneyrequest_verbose", 0, nil, "Prints extra information to server console. Intended for debugging.", 0, 1)
+	function printDebug(...)
+		if not debugCvar:GetBool() then return end
+		return print(string.format(...))
+	end
+	
+	requests = setmetatable({}, {__mode="k"}) -- Pretty sure this doesn't work with Player keys, but let's do it anyway.
+	SF.MoneyRequests = requests
+	timeoutCvar = CreateConVar("sf_moneyrequest_timeout", 30, FCVAR_ARCHIVE, "Amount of time in seconds until a StarfallEx money request expires.", 1, 600)
+	local function requestsUpdate()
+		local now = CurTime()
+		for player, requestsForPlayer in pairs(requests) do
+			if IsValid(player) then
+				for index, request in pairs(requestsForPlayer) do
+					if now >= request.expiry or not IsValid(request.receiver) then
+						printDebug("invalidated request #%d of steamid %q (now: %s, expiry: %s)", index, player:SteamID(), now, request.expiry)
+						requestsForPlayer[index] = nil
+					end
+				end
+				if not next(requestsForPlayer) then
+					printDebug("purged table for steamid %q because it had no requests", player:SteamID())
+					requests[player] = nil
+				end
+			else
+				printDebug("purged... someone's table because the key was invalid")
+				requests[player] = nil
+			end
+		end
+	end
+	timer.Create("sf_moneyrequest_timeout", timeoutCvar:GetFloat()/2, 0, requestsUpdate)
+	cvars.AddChangeCallback("sf_moneyrequest_timeout", function(name, old, new)
+		timer.Adjust("sf_moneyrequest_timeout", math.max(new/2, 0.5))
+	end, "sf_timer_update")
+	util.AddNetworkString("sf_moneyrequest")
+	
+	local function chatPrint(target, ...)
+		local message = string.format(...)
+		if IsValid(target) and target:IsPlayer() then
+			target:PrintMessage(HUD_PRINTCONSOLE, message)
+		else
+			print(message)
+		end
+	end
+	concommand.Add("sf_moneyrequest", function(executor, command, args)
+		if not DarkRP then
+			chatPrint(executor, "sf_moneyrequest: DarkRP not present")
+			return
+		end
+		local target, action, index = tonumber(args[1]), args[2], tonumber(args[3])
+		if not target or not action or not index then
+			chatPrint(executor, "sf_moneyrequest: malformed parameters (do \"help sf_moneyrequest\")")
+			return
+		end
+		target = target == 0 and executor or Entity(target)
+		if not IsValid(target) or not target:IsPlayer() then
+			chatPrint(executor, "sf_moneyrequest: invalid target")
+			return
+		end
+		if IsValid(executor) and target ~= executor and not executor:IsSuperAdmin() then
+			chatPrint(executor, "sf_moneyrequest: only superadmins can interact with other people's money requests")
+			return
+		end
+		local request = (requests[target] or {})[index]
+		if not request then
+			chatPrint(executor, "sf_moneyrequest: no such request at given index")
+			return
+		end
+		local receiver, amount, expiry = request.receiver, request.amount, request.expiry
+		if action == "accept" then
+			printDebug("target %q accepted request for %s from receiver %q", target:SteamID(), DarkRP.formatMoney(amount), receiver:SteamID())
+			requests[target][index] = nil
+			DarkRP.payPlayer(target, receiver, amount)
+		elseif action == "decline" then
+			printDebug("target %q declined request for %s from receiver %q", target:SteamID(), DarkRP.formatMoney(amount), receiver:SteamID())
+			requests[target][index] = nil
+		elseif action == "info" then
+			chatPrint(executor, "sf_moneyrequest: %q requested %s from target, will expire at curtime %s", receiver:SteamID(), DarkRP.formatMoney(amount), expiry)
+		else
+			chatPrint(executor, "sf_moneyrequest: invalid action")
+		end
+	end, nil, "Accept, decline, or view info about a StarfallEx money request. Usage: sf_moneyrequest <entindex or 0> <accept|decline|info> <request index>", FCVAR_CLIENTCMD_CAN_EXECUTE)
+	concommand.Add("sf_moneyrequest_update", function(executor)
+		if IsValid(executor) and not executor:IsSuperAdmin() then
+			return
+		end
+		requestsUpdate()
+		chatPrint(executor, "sf_moneyrequest_update: done")
+	end, nil, "Manually trigger a purge of expired/invalid money requests. Superadmin/RCON only.", FCVAR_UNREGISTERED)
+	concommand.Add("sf_moneyrequest_purge", function(executor)
+		if IsValid(executor) and not executor:IsSuperAdmin() then
+			return
+		end
+		for k in pairs(requests) do
+			requests[k] = nil
+		end
+		chatPrint(executor, "sf_moneyrequest_purge: done")
+	end, nil, "Manually trigger a purge of all money requests. Superadmin/RCON only.", FCVAR_UNREGISTERED)
+else
+	
 end
 
 if SERVER then
@@ -271,6 +373,42 @@ if SERVER then
 		sender = getply(sender)
 		if instance.player ~= SF.Superuser and instance.player ~= sender then SF.Throw("may not transfer money from player other than owner", 2) return end
 		DarkRP.payPlayer(sender, getply(receiver), amount)
+	end
+	
+	--- Request money from a player. Receiver must be owner of chip if chip is not running in superuser mode.
+	-- This function will be subject to a ratelimit, so don't abuse it.
+	-- @server
+	-- @param Player sender The player who may or may not send the money.
+	-- @param number amount The amount of money to ask for.
+	-- @param Player? receiver The player who may or may not receive the money, or the owner of the chip if not specified.
+	function darkrp_library.requestMoney(sender, amount, receiver)
+		-- TODO: add ratelimiting (IMPORTANT)
+		checkluatype(amount, TYPE_NUMBER)
+		amount = math.ceil(amount)
+		checkpermission(instance, nil, "darkrp.requestMoney")
+		sender = getply(sender)
+		receiver = receiver ~= nil and getply(receiver) or instance.player
+		if instance.player ~= SF.Superuser and receiver ~= instance.player then SF.Throw("receiver must be chip owner if not superuser", 2) return end
+		printDebug("player %q is requesting %s from player %q", receiver:SteamID(), DarkRP.formatMoney(amount), sender:SteamID())
+		local requestsForSender = requests[sender]
+		if not requestsForSender then
+			requestsForSender = {}
+			requests[sender] = requestsForSender
+		end
+		local expiry = CurTime()+timeoutCvar:GetFloat()
+		local request = {
+			receiver = receiver,
+			amount = amount,
+			expiry = expiry
+		}
+		local index = table.insert(requestsForSender, request)
+		request.index = index
+		net.Start("sf_moneyrequest")
+			net.WriteUInt(index, 32)
+			net.WriteEntity(receiver)
+			net.WriteUInt(amount, 32)
+			net.WriteFloat(expiry)
+		net.Send(sender)
 	end
 else
 	--- Open the F1 help menu. Roughly equivalent to pressing F1 (or running gm_showhelp), but won't close it if it's already open.
