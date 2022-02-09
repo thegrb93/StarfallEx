@@ -64,12 +64,26 @@ end
 -- @param instance The instance checking permission
 -- @param target the object on which the action is being performed
 -- @param key a string identifying the action being performed
-function P.check(instance, target, key)
+-- @return boolean Whether the player may perform the action
+-- @return string? Reason for action to not be allowed, or nil if it is allowed
+function P.checkSafe(instance, target, key)
 	if not (instance.permissionOverrides and instance.permissionOverrides[key]) then
 		local notok, reason = P.permissionchecks[key](instance, target)
 		if notok then
-			SF.Throw("Permission " .. key .. ": " .. reason, 3)
+			return false, reason
 		end
+	end
+	return true
+end
+
+--- Checks whether a player may perform an action. Throws an error if not allowed
+-- @param instance The instance checking permission
+-- @param target the object on which the action is being performed
+-- @param key a string identifying the action being performed
+function P.check(instance, target, key)
+	local ok, reason = P.checkSafe(instance, target, key)
+	if not ok then
+		SF.Throw("Permission " .. key .. ": " .. reason, 3)
 	end
 end
 
