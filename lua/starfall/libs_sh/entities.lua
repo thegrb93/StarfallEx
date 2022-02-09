@@ -1595,6 +1595,7 @@ if DarkRP then
 	end
 	
 	--- Get the title of this door or vehicle. DarkRP only.
+	-- If you don't know what this is referring to, that's because it's not a commonly used feature. Press F2 on a door and click "Set Door Title".
 	-- @return string? The title of the door or vehicle, or nil if none is set.
 	function ents_methods:getKeysTitle()
 		return assertsafety(getent(self):getKeysTitle())

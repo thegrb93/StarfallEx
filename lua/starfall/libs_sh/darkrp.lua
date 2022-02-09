@@ -244,7 +244,7 @@ if SERVER then
 	--- Get the entity corresponding to a door index. Note: The door MUST have been created by the map!
 	-- @server
 	-- @param number doorIndex The door index
-	-- @return Entity? The door entity, or nil if door index is invalid
+	-- @return Entity? The door entity, or nil if the index is invalid or the door was removed.
 	function darkrp_library.doorIndexToEnt(doorIndex)
 		checkluatype(doorIndex, TYPE_NUMBER)
 		local entIndex = DarkRP.doorToEntIndex(doorIndex)
@@ -253,7 +253,7 @@ if SERVER then
 		end
 	end
 	
-	--- The number of jail positions in the current map.
+	--- Get the number of jail positions in the current map.
 	-- @server
 	-- @return number The number of jail positions in the current map.
 	function darkrp_library.jailPosCount()
@@ -261,6 +261,7 @@ if SERVER then
 	end
 	
 	--- Make one player give money to the other player.
+	-- Only works if the sender is the owner of the chip, or if the chip is running in superuser mode.
 	-- @server
 	-- @param Player sender The player who gives the money.
 	-- @param Player receiver The player who receives the money.
@@ -272,14 +273,16 @@ if SERVER then
 		DarkRP.payPlayer(sender, getply(receiver), amount)
 	end
 else
-	--- Open the F1 help menu.
+	--- Open the F1 help menu. Roughly equivalent to pressing F1 (or running gm_showhelp), but won't close it if it's already open.
+	-- Only works if the local player is the owner of the chip, or if the chip is running in superuser mode.
 	-- @client
 	function darkrp_library.openF1Menu()
 		if instance.player ~= SF.Superuser and instance.player ~= LocalPlayer() then SF.Throw("may not use this function on anyone other than owner", 2) return end
 		DarkRP.openF1Menu()
 	end
 	
-	--- Open the F4 menu (the one where you can choose your job, buy shipments, ammo, money printers, etc).
+	--- Open the F4 menu (the one where you can choose your job, buy shipments, ammo, money printers, etc). Roughly equivalent to pressing F4 (or running gm_showspare2), but won't close it if it's already open.
+	-- Only works if the local player is the owner of the chip, or if the chip is running in superuser mode.
 	-- @client
 	function darkrp_library.openF4Menu()
 		if instance.player ~= SF.Superuser and instance.player ~= LocalPlayer() then SF.Throw("may not use this function on anyone other than owner", 2) return end
@@ -287,6 +290,7 @@ else
 	end
 	
 	--- Open the menu that requests a hit.
+	-- Only works if the local player is the owner of the chip, or if the chip is running in superuser mode.
 	-- @client
 	-- @param Player hitman The hitman to request the hit to.
 	function darkrp_library.openHitMenu(hitman)
@@ -294,21 +298,24 @@ else
 		DarkRP.openHitMenu(getply(hitman))
 	end
 	
-	--- Buy the door the local player is looking at, or open the menu if it's already bought. Equivalent to pressing F2.
+	--- Buy the door the local player is looking at, or open the menu if it's already bought. Equivalent to pressing F2 (or running gm_showteam).
+	-- Only works if the local player is the owner of the chip, or if the chip is running in superuser mode.
 	-- @client
 	function darkrp_library.openKeysMenu()
 		if instance.player ~= SF.Superuser and instance.player ~= LocalPlayer() then SF.Throw("may not use this function on anyone other than owner", 2) return end
 		DarkRP.openKeysMenu()
 	end
 	
-	--- Open the DarkRP pocket menu.
+	--- Open the DarkRP pocket menu. This refers to DarkRP's built-in "pocket", and probably not your server's custom inventory system.
+	-- Only works if the local player is the owner of the chip, or if the chip is running in superuser mode.
 	-- @client
 	function darkrp_library.openPocketMenu()
 		if instance.player ~= SF.Superuser and instance.player ~= LocalPlayer() then SF.Throw("may not use this function on anyone other than owner", 2) return end
 		DarkRP.openPocketMenu()
 	end
 	
-	--- Toggle the state of the F4 menu (open or closed).
+	--- Toggle the state of the F4 menu (open or closed). Equivalent to pressing F4 (or running gm_showspare2).
+	-- Only works if the local player is the owner of the chip, or if the chip is running in superuser mode.
 	-- @client
 	function darkrp_library.toggleF4Menu()
 		if instance.player ~= SF.Superuser and instance.player ~= LocalPlayer() then SF.Throw("may not use this function on anyone other than owner", 2) return end
