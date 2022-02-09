@@ -4,13 +4,14 @@ local registerprivilege = SF.Permissions.registerPrivilege
 local checksafety = SF.CheckSafety
 local assertsafety = SF.AssertSafety
 
-local requests, timeoutCvar
-local debugCvar = CreateConVar("sf_moneyrequest_verbose", 0, FCVAR_REPLICATED, "Prints extra information to server console. Intended for debugging.", 0, 1)
+local requests, timeoutCvar, debugCvar
 local function printDebug(...)
 	if not debugCvar:GetBool() then return end
 	return print(string.format(...))
 end
 if SERVER then
+	debugCvar = CreateConVar("sf_moneyrequest_verbose_sv", 1, FCVAR_ARCHIVE, "Prints information about money requests to console.", 0, 1)
+
 	registerprivilege("darkrp.moneyPrinterHooks", "Get own money printer info", "Allows the user to know when their own money printers catch fire or print money (and how much was printed)")
 	registerprivilege("darkrp.playerWalletChanged", "Be notified of wallet changes", "Allows the user to know when their own wallet changes")
 	registerprivilege("darkrp.lockdownHooks", "Know when lockdowns begin and end", "Allows the user to know when a lockdown begins or ends")
@@ -111,6 +112,8 @@ if SERVER then
 		chatPrint(executor, "sf_moneyrequest_purge: done")
 	end, nil, "Manually trigger a purge of all money requests. Superadmin/RCON only.", FCVAR_UNREGISTERED)
 else
+	debugCvar = CreateConVar("sf_moneyrequest_verbose_cl", 1, FCVAR_ARCHIVE, "Prints information about money requests to console.", 0, 1)
+	
 	local blocked = {}
 	SF.BlockedMoneyRequests = blocked
 	concommand.Add("sf_moneyrequest_block", function(executor, cmd, args)
