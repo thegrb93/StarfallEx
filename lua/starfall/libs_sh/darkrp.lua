@@ -20,7 +20,7 @@ local function checksafety(...)
 	end
 	return true
 end
-local function assertsafety(a, ...)
+local function assertsafety(...)
 	-- This is basically the same thing as "checksafety", but it removes unsafe values, and then returns them.
 	local args = {...}
 	for i=#args, 1, -1 do
@@ -30,6 +30,10 @@ local function assertsafety(a, ...)
 	end
 	return unpack(args)
 end
+
+SF.BlacklistedDarkRPVars = {
+	hitTarget = true, -- The person a hitman has a hit on is generally not made visible to players (despite being accessible clientside).
+} -- Exposed so server owners and other addons can add/remove blacklist entries
 
 local givemoneyBurst, moneyrequestBurst
 
@@ -504,6 +508,14 @@ function darkrp_library.getCustomShipments()
 	return CustomShipments and instance.Sanitize(CustomShipments) or nil
 end
 
+--- Get whether a DarkRPVar is blacklisted from being read by Starfall.
+-- @param string var The name of the variable
+-- @return boolean If the variable is blacklisted
+function darkrp_library.isDarkRPVarBlacklisted(k)
+	checkluatype(k, TYPE_STRING)
+	return not not SF.BlacklistedDarkRPVars[k]
+end
+
 if SERVER then
 	--- Get the entity corresponding to a door index. Note: The door MUST have been created by the map!
 	-- @server
@@ -845,11 +857,14 @@ function player_methods:canKeysUnlock(door)
 end
 
 --- Get the value of a DarkRPVar, which is shared between server and client. Case-sensitive.
--- List of DarkRP variables: https://darkrp.miraheze.org/wiki/Functions/Player/Shared/getDarkRPVar
+-- Possible variables include (but are not limited to): AFK, AFKDemoted, money, salaryRL, rpname, job, HasGunlicense, Arrested, wanted, wantedReason, agenda, zombieToggle, hitTarget, hitPrice, lastHitTime, Energy
+-- For money specifically, you can use "Player:getMoney".
+-- Some variables may be blacklisted so that you can't read their value.
 -- @param string var The name of the variable.
 -- @return any The value of the DarkRP var.
 function player_methods:getDarkRPVar(k)
 	checkluatype(k, TYPE_STRING)
+	if instance.player ~= SF.Superuser and SF.BlacklistedDarkRPVars[k] then return end
 	return assertsafety(getply(self):getDarkRPVar(k))
 end
 
@@ -927,8 +942,9 @@ function player_methods:isWanted()
 end
 
 --- Get the amount of money this player has. DarkRP only.
--- @return number The amount of money.
+-- @return number? The amount of money, or nil if not accessible.
 function player_methods:getMoney()
+	if instance.player ~= SF.Superuser and SF.BlacklistedDarkRPVars.money then return end
 	return assertsafety(getply(self):getDarkRPVar("money"))
 end
 
