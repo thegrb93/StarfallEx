@@ -31,7 +31,7 @@ local function assertsafety(a, ...)
 	return unpack(args)
 end
 
-local moneyrequestBurst
+local givemoneyBurst, moneyrequestBurst
 
 local requests, timeoutCvar, debugCvar
 local function printDebug(...)
@@ -39,7 +39,8 @@ local function printDebug(...)
 	return print(string.format(...))
 end
 if SERVER then
-	moneyrequestBurst = SF.BurstObject("moneyrequests", "money request", 0.5, 1, "The rate at which the cooldown for money requests that can be made for a single player decreases per second. Lower is stricter, higher is looser.", "Number of money requests that can be made by a single player in a short time.")
+	givemoneyBurst = SF.BurstObject("givemoney", "money giving", 0.5, 2, "The rate at which the cooldown for giving out that can be made for a single player decreases per second. Lower is longer, higher is shorter.", "Number of times a single player can give out money in a short time.")
+	moneyrequestBurst = SF.BurstObject("moneyrequest", "money request", 0.5, 1, "The rate at which the cooldown for money requests that can be made for a single player decreases per second. Lower is longer, higher is shorter.", "Number of money requests that can be made by a single player in a short time.")
 	debugCvar = CreateConVar("sf_moneyrequest_verbose_sv", 1, FCVAR_ARCHIVE, "Prints information about money requests to console.", 0, 1)
 
 	registerprivilege("darkrp.moneyPrinterHooks", "Get own money printer info", "Allows the user to know when their own money printers catch fire or print money (and how much was printed)")
@@ -524,6 +525,7 @@ if SERVER then
 	end
 	
 	--- Make one player give money to the other player.
+	-- This is subject to a burst limit. Use "darkrp.canGiveMoney" to check if you can give out money that tick.
 	-- Only works if the sender is the owner of the chip, or if the chip is running in superuser mode.
 	-- @server
 	-- @param Player sender The player who gives the money.
@@ -536,6 +538,7 @@ if SERVER then
 		checkpermission(instance, nil, "darkrp.giveMoney")
 		sender = getply(sender)
 		if instance.player ~= SF.Superuser and instance.player ~= sender then SF.Throw("may not transfer money from player other than owner", 2) return end
+		givemoneyBurst:use(instance.player, 1)
 		if sender:canAfford(amount) then
 			DarkRP.payPlayer(sender, getply(receiver), amount)
 		else
@@ -543,7 +546,8 @@ if SERVER then
 		end
 	end
 	
-	--- Request money from a player. This function will be subject to a ratelimit, so don't abuse it.
+	--- Request money from a player.
+	-- This is subject to a burst limit. Use "darkrp.canMakeMoneyRequest" to check if you can request money that tick.
 	-- @server
 	-- @param Player sender The player who may or may not send the money.
 	-- @param number amount The amount of money to ask for.
@@ -602,7 +606,7 @@ if SERVER then
 
 	--- Returns number of money requests left.
 	-- By default, this replenishes at a rate of 1 every 2 seconds, up to a maximum of 1.
-	-- In other words, you can make a maximum of 1 money request every 2 seconds. (May vary from server to server)
+	-- In other words, you can make a maximum of 1 money request every 2 seconds. May vary from server to server.
 	-- @server
 	-- @return number Number of money requests able to be created. This could be a decimal, so floor it first
 	function darkrp_library.moneyRequestsLeft()
@@ -614,6 +618,22 @@ if SERVER then
 	-- @return boolean If you can make another money request
 	function darkrp_library.canMakeMoneyRequest()
 		return moneyrequestBurst:check(instance.player) >= 1
+	end
+
+	--- Returns number of times you can give someone money.
+	-- By default, this replenishes at a rate of 1 every 2 seconds, up to a maximum of 2.
+	-- In other words, you can give out money two times at once, then you have to wait two seconds. May vary from server to server.
+	-- @server
+	-- @return number Number of money requests able to be created. This could be a decimal, so floor it first
+	function darkrp_library.moneyGivingsLeft()
+		return givemoneyBurst:check(instance.player)
+	end
+
+	--- Returns whether you can give someone money this tick.
+	-- @server
+	-- @return boolean If you can give someone money
+	function darkrp_library.canGiveMoney()
+		return givemoneyBurst:check(instance.player) >= 1
 	end
 else
 	--- Open the F1 help menu. Roughly equivalent to pressing F1 (or running gm_showhelp), but won't close it if it's already open.
@@ -782,6 +802,7 @@ if SERVER then
 		amount = math.ceil(amount)
 		if amount <= 0 then SF.Throw("amount must be positive", 2) return end
 		checkpermission(instance, nil, "darkrp.giveMoney")
+		givemoneyBurst:use(instance.player, 1)
 		if instance.player:canAfford(amount) then
 			DarkRP.payPlayer(instance.player, getply(self), amount)
 		else
