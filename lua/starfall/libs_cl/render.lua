@@ -1405,11 +1405,11 @@ function render_library.drawPixelsSubrectRGBA(dstX, dstY, srcX, srcY, srcW, srcH
 	render.SetViewPort(0, 0, 1024, 1024)
 end
 
---- Draws a line. Use 3D functions for float coordinates
--- @param number x1 X start integer coordinate
--- @param number y1 Y start integer coordinate
--- @param number x2 X end integer coordinate
--- @param number y2 Y end integer coordinate
+--- Draws a line.
+-- @param number x1 X start float coordinate
+-- @param number y1 Y start float coordinate
+-- @param number x2 X end float coordinate
+-- @param number y2 Y end float coordinate
 function render_library.drawLine(x1, y1, x2, y2)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	surface.DrawLine(x1, y1, x2, y2)
