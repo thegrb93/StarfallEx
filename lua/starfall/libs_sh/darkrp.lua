@@ -58,6 +58,7 @@ if SERVER then
 	requests = setmetatable({}, {__mode="k"}) -- Pretty sure __mode doesn't work with Player keys, but let's do it anyway.
 	SF.MoneyRequests = requests
 	timeoutCvar = CreateConVar("sf_moneyrequest_timeout", 30, FCVAR_ARCHIVE, "Amount of time in seconds until a StarfallEx money request expires.", 5, 600)
+	local requestsUpdateCvar = CreateConVar("sf_moneyrequest_updaterate", 0, FCVAR_ARCHIVE, "How often StarfallEx will traverse the table of money requests and discard expired or invalid ones. This should be a low value.", 0, 60)
 	local function requestsUpdate()
 		local now = CurTime()
 		for player, requestsForPlayer in pairs(requests) do
@@ -66,9 +67,15 @@ if SERVER then
 					if not IsValid(request.receiver) then
 						printDebug("SF: Removed money request with index %d for %s because the receiver was invalid.", index, player:SteamID())
 						requestsForPlayer[index] = nil
+						if request.callbackFailure and request.instance and not request.instance.error then
+							request.instance:runFunction(request.callbackFailure, "RECEIVER_INVALID")
+						end
 					elseif now >= request.expiry then
 						printDebug("SF: Removed money request with index %d for %s because it expired %s second(s) ago.", index, player:SteamID(), now-request.expiry)
 						requestsForPlayer[index] = nil
+						if request.callbackFailure and request.instance and not request.instance.error then
+							request.instance:runFunction(request.callbackFailure, "REQUEST_TIMEOUT")
+						end
 					end
 				end
 				if not next(requestsForPlayer) then
@@ -81,11 +88,11 @@ if SERVER then
 			end
 		end
 	end
-	timer.Create("sf_moneyrequest_timeout", timeoutCvar:GetFloat()/2, 0, requestsUpdate)
-	cvars.AddChangeCallback("sf_moneyrequest_timeout", function(name, old, new)
-		timer.Adjust("sf_moneyrequest_timeout", math.max(new/2, 0.5))
-	end, "sf_timer_update")
-	util.AddNetworkString("sf_moneyrequest")
+	timer.Create("sf_moneyrequest_update", requestsUpdateCvar:GetFloat(), 0, requestsUpdate)
+	cvars.AddChangeCallback("sf_moneyrequest_updaterate", function(name, old, new)
+		timer.Adjust("sf_moneyrequest_update", new)
+	end, "sf_updaterate")
+	util.AddNetworkString("sf_moneyrequest2")
 	
 	local function chatPrint(target, ...)
 		local message = string.format(...)
@@ -117,7 +124,7 @@ if SERVER then
 		if not request then
 			return chatPrint(executor, "sf_moneyrequest: no such request at given index")
 		end
-		local receiver, amount, expiry = request.receiver, request.amount, request.expiry
+		local receiver, amount, expiry, instance = request.receiver, request.amount, request.expiry, request.instance
 		if not IsValid(receiver) then
 			printDebug("SF: %s attempted to interact with money request %d for %s, but the receiver was invalid.", target:SteamID(), index, DarkRP.formatMoney(amount))
 			requests[target][index] = nil
@@ -125,15 +132,29 @@ if SERVER then
 		end
 		if action == "accept" then
 			requests[target][index] = nil
-			if target:canAfford(amount) then
+			if not instance or instance.error then
+				printDebug("SF: %s attempted to accept money request %d for %s from %s, but the instance was dead.", target:SteamID(), index, DarkRP.formatMoney(amount), receiver:SteamID())
+				chatPrint(executor, "sf_moneyrequest: instance dead")
+			elseif target:canAfford(amount) then
 				printDebug("SF: %s accepted money request %d for %s from %s.", target:SteamID(), index, DarkRP.formatMoney(amount), receiver:SteamID())
 				DarkRP.payPlayer(target, receiver, amount)
+				if request.callbackSuccess then
+					instance:runFunction(request.callbackSuccess, request.message, instance.Types.Player.Wrap(target), amount)
+				end
 			else
 				printDebug("SF: %s attempted to accept money request %d for %s from %s, but the target couldn't afford it.", target:SteamID(), index, DarkRP.formatMoney(amount), receiver:SteamID())
 			end
 		elseif action == "decline" then
-			printDebug("SF: %s declined money request %d for %s from %s.", target:SteamID(), index, DarkRP.formatMoney(amount), receiver:SteamID())
 			requests[target][index] = nil
+			if not instance or instance.error then
+				printDebug("SF: %s attempted to decline money request %d for %s from %s, but the instance was dead.", target:SteamID(), index, DarkRP.formatMoney(amount), receiver:SteamID())
+				chatPrint(executor, "sf_moneyrequest: instance dead")
+			else
+				printDebug("SF: %s declined money request %d for %s from %s.", target:SteamID(), index, DarkRP.formatMoney(amount), receiver:SteamID())
+				if request.callbackFailure then
+					instance:runFunction(request.callbackFailure, "REQUEST_DENIED")
+				end
+			end
 		elseif action == "info" then
 			chatPrint(executor, "sf_moneyrequest: %q requested %s from target, will expire at curtime %s (currently %s)", receiver:SteamID(), DarkRP.formatMoney(amount), expiry, CurTime())
 		else
@@ -191,7 +212,7 @@ else
 			print(steamid)
 		end
 	end, nil, "List players you have blocked from sending you money requests.")
-	net.Receive("sf_moneyrequest", function()
+	net.Receive("sf_moneyrequest2", function()
 		local index = net.ReadUInt(32)
 		local receiver = net.ReadEntity()
 		local amount = net.ReadUInt(32)
@@ -624,7 +645,7 @@ if SERVER then
 		local index = table.insert(requestsForSender, request)
 		request.index = index
 		printDebug("SF: %s sent a money request for %s to %s (index %d).", receiver:SteamID(), DarkRP.formatMoney(amount), sender:SteamID(), index)
-		net.Start("sf_moneyrequest")
+		net.Start("sf_moneyrequest2")
 			net.WriteUInt(index, 32)
 			net.WriteEntity(receiver)
 			net.WriteUInt(amount, 32)
