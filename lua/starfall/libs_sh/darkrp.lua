@@ -456,25 +456,13 @@ if not DarkRP then return end
 
 local darkrp_library = instance.Libraries.darkrp
 local ply_meta = instance.Types.Player
-local player_methods, plywrap, plyunwrap = ply_meta.Methods, ply_meta.Wrap, ply_meta.Unwrap
-local function getply(self)
-	local ent = plyunwrap(self)
-	if ent:IsValid() then
-		return ent
-	else
-		SF.Throw("Entity is not valid.", 3)
-	end
-end
+local player_methods, plywrap, plyunwrap, getply = ply_meta.Methods, ply_meta.Wrap, ply_meta.Unwrap
 local ent_meta = instance.Types.Entity
-local ents_methods, ewrap, eunwrap = ent_meta.Methods, ent_meta.Wrap, ent_meta.Unwrap
-local function getent(self)
-	local ent = eunwrap(self)
-	if ent:IsValid() or ent:IsWorld() then
-		return ent
-	else
-		SF.Throw("Entity is not valid.", 3)
-	end
-end
+local ents_methods, ewrap, eunwrap, getent = ent_meta.Methods, ent_meta.Wrap, ent_meta.Unwrap
+instance:AddHook("initialize", function()
+	getent = instance.Types.Entity.GetEntity
+	getply = instance.Types.Player.GetPlayer
+end)
 local checkpermission = instance.player == SF.Superuser and function() end or SF.Permissions.check
 
 --- Format a number as a money value. Includes currency symbol.
