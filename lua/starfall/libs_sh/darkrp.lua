@@ -538,8 +538,8 @@ if SERVER then
 		checkpermission(instance, nil, "darkrp.giveMoney")
 		sender = getply(sender)
 		if instance.player ~= SF.Superuser and instance.player ~= sender then SF.Throw("may not transfer money from player other than owner", 2) return end
-		givemoneyBurst:use(instance.player, 1)
 		if sender:canAfford(amount) then
+			givemoneyBurst:use(instance.player, 1)
 			DarkRP.payPlayer(sender, getply(receiver), amount)
 		else
 			SF.Throw("sender can't afford to pay "..DarkRP.formatMoney(amount), 2)
@@ -782,7 +782,8 @@ if SERVER then
 		return assertsafety(self:teamBanTimeLeft())
 	end
 	
-	--- Request money from a player. This function will be subject to a ratelimit, so don't abuse it.
+	--- Request money from a player.
+	-- This is subject to a burst limit. Use "darkrp.canMakeMoneyRequest" to check if you can request money that tick.
 	-- @server
 	-- @param string? message An optional custom message that will be shown in the money request prompt. May not exceed 60 bytes in length.
 	-- @param number amount The amount of money to ask for.
@@ -795,6 +796,7 @@ if SERVER then
 	end
 	
 	--- Give this player money.
+	-- This is subject to a burst limit. Use "darkrp.canGiveMoney" to check if you can request money that tick.
 	-- @server
 	-- @param number amount The amount of money to give.
 	function player_methods:giveMoney(amount)
@@ -802,8 +804,8 @@ if SERVER then
 		amount = math.ceil(amount)
 		if amount <= 0 then SF.Throw("amount must be positive", 2) return end
 		checkpermission(instance, nil, "darkrp.giveMoney")
-		givemoneyBurst:use(instance.player, 1)
 		if instance.player:canAfford(amount) then
+			givemoneyBurst:use(instance.player, 1)
 			DarkRP.payPlayer(instance.player, getply(self), amount)
 		else
 			SF.Throw("you can't afford to pay "..DarkRP.formatMoney(amount), 2)
