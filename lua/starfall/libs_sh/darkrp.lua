@@ -1,11 +1,38 @@
 local checkluatype = SF.CheckLuaType
 local checkpattern = SF.CheckPattern
 local registerprivilege = SF.Permissions.registerPrivilege
-local checksafety = SF.CheckSafety
-local assertsafety = SF.AssertSafety
 
--- I am not 100% confident that the help text I chose is actually accurate. Please take it with a pinch of salt.
-local moneyrequestBurst = SF.BurstObject("moneyrequests", "moneyrequests", 0.5, 1, "The rate at which the cooldown for money requests that can be made for a single instance decreases per second. Lower is stricter, higher is looser.", "Number of money requests that can be made by a single instance in a short time.")
+-- checksafety and assertsafety are here to ensure that even if DarkRP's API changes, it won't create a security vulnerability.
+local whitelist = {
+	["nil"] = true,
+	["boolean"] = true,
+	["number"] = true,
+	["string"] = true,
+}
+local pairs = pairs
+local select = select
+local type = type
+local unpack = unpack
+local function checksafety(...)
+	for k=1, select("#", ...) do
+		local v = select(k, ...)
+		if not whitelist[type(v)] then
+			return false
+		end
+	end
+	return true
+end
+local function assertsafety(...)
+	local args = {...}
+	for k, v in pairs(args) do
+		if not whitelist[type(v)] then
+			args[k] = nil
+		end
+	end
+	return unpack(args)
+end
+
+local moneyrequestBurst
 
 local requests, timeoutCvar, debugCvar
 local function printDebug(...)
@@ -13,6 +40,7 @@ local function printDebug(...)
 	return print(string.format(...))
 end
 if SERVER then
+	moneyrequestBurst = SF.BurstObject("moneyrequests", "moneyrequests", 0.5, 1, "The rate at which the cooldown for money requests that can be made for a single instance decreases per second. Lower is stricter, higher is looser.", "Number of money requests that can be made by a single instance in a short time.")
 	debugCvar = CreateConVar("sf_moneyrequest_verbose_sv", 1, FCVAR_ARCHIVE, "Prints information about money requests to console.", 0, 1)
 
 	registerprivilege("darkrp.moneyPrinterHooks", "Get own money printer info", "Allows the user to know when their own money printers catch fire or print money (and how much was printed)")
@@ -488,21 +516,6 @@ function darkrp_library.getCustomShipments()
 	return CustomShipments and instance.Sanitize(CustomShipments) or nil
 end
 
---- Returns number of money requests left.
--- By default, this replenishes at a rate of 1 every 2 seconds, up to a maximum of 1.
--- In other words, you can make a maximum of 1 money request every 2 seconds.
--- TODO: Verify that this is actually true
--- @return number Number of money requests able to be created. This could be a decimal, so you might want to floor it
-function darkrp_library.moneyRequestsLeft()
-	return moneyrequestBurst:check(instance.player)
-end
-
---- Returns whether you can make another money request this tick.
--- @return boolean If you can make another money request
-function darkrp_library.canMakeMoneyRequest()
-	return moneyrequestBurst:check(instance.player) >= 1
-end
-
 if SERVER then
 	--- Get the entity corresponding to a door index. Note: The door MUST have been created by the map!
 	-- @server
@@ -599,6 +612,22 @@ if SERVER then
 		net.Send(sender)
 	end
 	instance.guestRequestMoney = darkrp_library.requestMoney
+
+	--- Returns number of money requests left.
+	-- By default, this replenishes at a rate of 1 every 2 seconds, up to a maximum of 1.
+	-- In other words, you can make a maximum of 1 money request every 2 seconds. (May vary from server to server)
+	-- @server
+	-- @return number Number of money requests able to be created. This could be a decimal, so floor it first
+	function darkrp_library.moneyRequestsLeft()
+		return moneyrequestBurst:check(instance.player)
+	end
+
+	--- Returns whether you can make another money request this tick.
+	-- @server
+	-- @return boolean If you can make another money request
+	function darkrp_library.canMakeMoneyRequest()
+		return moneyrequestBurst:check(instance.player) >= 1
+	end
 else
 	--- Open the F1 help menu. Roughly equivalent to pressing F1 (or running gm_showhelp), but won't close it if it's already open.
 	-- Only works if the local player is the owner of the chip, or if the chip is running in superuser mode.
