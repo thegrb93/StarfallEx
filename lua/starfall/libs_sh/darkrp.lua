@@ -10,12 +10,10 @@ local whitelist = {
 	["string"] = true,
 }
 local pairs = pairs
-local select = select
 local type = type
 local unpack = unpack
 local function checksafety(...)
-	for k=1, select("#", ...) do
-		local v = select(k, ...)
+	for k, v in pairs({...}) do -- Determined to be faster than "select"
 		if not whitelist[type(v)] then
 			return false
 		end
