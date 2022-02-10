@@ -20,11 +20,12 @@ local function checksafety(...)
 	end
 	return true
 end
-local function assertsafety(...)
+local function assertsafety(a, ...)
+	-- This is basically the same thing as "checksafety", but it removes unsafe values, and then returns them.
 	local args = {...}
-	for k, v in pairs(args) do
-		if not whitelist[type(v)] then
-			args[k] = nil
+	for i=#args, 1, -1 do
+		if not whitelist[type(args[i])] then
+			table.remove(args, i)
 		end
 	end
 	return unpack(args)
