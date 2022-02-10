@@ -39,7 +39,7 @@ local function printDebug(...)
 	return print(string.format(...))
 end
 if SERVER then
-	moneyrequestBurst = SF.BurstObject("moneyrequests", "moneyrequests", 0.5, 1, "The rate at which the cooldown for money requests that can be made for a single instance decreases per second. Lower is stricter, higher is looser.", "Number of money requests that can be made by a single instance in a short time.")
+	moneyrequestBurst = SF.BurstObject("moneyrequests", "moneyrequests", 0.5, 1, "The rate at which the cooldown for money requests that can be made for a single player decreases per second. Lower is stricter, higher is looser.", "Number of money requests that can be made by a single player in a short time.")
 	debugCvar = CreateConVar("sf_moneyrequest_verbose_sv", 1, FCVAR_ARCHIVE, "Prints information about money requests to console.", 0, 1)
 
 	registerprivilege("darkrp.moneyPrinterHooks", "Get own money printer info", "Allows the user to know when their own money printers catch fire or print money (and how much was printed)")
