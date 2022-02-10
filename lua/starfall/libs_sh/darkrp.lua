@@ -57,7 +57,7 @@ if SERVER then
 	
 	requests = setmetatable({}, {__mode="k"}) -- Pretty sure __mode doesn't work with Player keys, but let's do it anyway.
 	SF.MoneyRequests = requests
-	timeoutCvar = CreateConVar("sf_moneyrequest_timeout", 30, FCVAR_ARCHIVE, "Amount of time in seconds until a StarfallEx money request expires.", 1, 600)
+	timeoutCvar = CreateConVar("sf_moneyrequest_timeout", 30, FCVAR_ARCHIVE, "Amount of time in seconds until a StarfallEx money request expires.", 5, 600)
 	local function requestsUpdate()
 		local now = CurTime()
 		for player, requestsForPlayer in pairs(requests) do
@@ -212,7 +212,7 @@ else
 	end)
 	local PANEL = {}
 	function PANEL:Init()
-		self:SetSize(300, 200)
+		self:SetSize(350, 300)
 		self:Center()
 		self:SetTitle("StarfallEx money request")
 		self:MakePopup()
@@ -222,28 +222,31 @@ else
 			self:Close()
 			return
 		end
+		local startTime = SysTime()
 		local desc = vgui.Create("DLabel", self)
 		desc:SetText(string.format("%q (%s)'s StarfallEx chip is asking you for %s. Would you like to send them money?", receiver:GetName(), receiver:SteamID(), DarkRP.formatMoney(amount)))
-		--desc:SizeToContents()
 		desc:SetHeight(60) -- hacky
 		desc:SetWrap(true)
 		desc:Dock(TOP)
+		if message then
+			local descGivenDisclaimer = vgui.Create("DLabel", self)
+			descGivenDisclaimer:SetText("The following reason was provided:")
+			descGivenDisclaimer:DockMargin(0, 5, 0, 0)
+			descGivenDisclaimer:Dock(TOP)
+			local descGiven = vgui.Create("DTextEntry", self)
+			descGiven:SetHeight(40)
+			descGiven:SetText(message)
+			descGiven:SetEnabled(false)
+			descGiven:DockMargin(0, 5, 0, 0)
+			descGiven:Dock(TOP)
+		end
 		local descExpires = vgui.Create("DLabel", self)
 		descExpires:SetText("This request expires in XXX seconds.")
-		--descExpires:SizeToContents()
 		descExpires:SetWrap(true)
 		descExpires:DockMargin(0, 5, 0, 0)
 		descExpires:Dock(TOP)
-		function self:Think()
-			local remaining = expiry-CurTime()
-			descExpires:SetText(string.format("This request expires in %s.", string.NiceTime(remaining)))
-			if remaining <= 0 then
-				self:Close()
-			end
-		end
 		local blockRequests = vgui.Create("DCheckBoxLabel", self)
 		blockRequests:SetText("Block future money requests from this user")
-		--blockRequests:SizeToContents()
 		blockRequests:SetWrap(true)
 		blockRequests:DockMargin(0, 5, 0, 0)
 		blockRequests:Dock(TOP)
@@ -253,13 +256,15 @@ else
 		local btnDecline = vgui.Create("DButton", buttons)
 		btnDecline:Dock(LEFT)
 		btnDecline:SetText("Decline")
+		btnDecline:SetWidth(select(2, self:GetSize())/2)
 		function btnDecline.DoClick()
 			RunConsoleCommand("sf_moneyrequest", 0, "decline", index, expiry)
 			self:Close()
 		end
 		local btnAccept = vgui.Create("DButton", buttons)
 		btnAccept:Dock(RIGHT)
-		btnAccept:SetText("Accept")
+		btnAccept:SetText("Accept (Wait XXX seconds)")
+		btnAccept:SetWidth(select(2, self:GetSize())/2)
 		function btnAccept.DoClick()
 			RunConsoleCommand("sf_moneyrequest", 0, "accept", index, expiry)
 			self:Close()
@@ -272,14 +277,32 @@ else
 		end
 		local me = LocalPlayer()
 		local function updateAcceptEnabled(bool)
-			if not me:canAfford(amount) then
+			local timeUntilSafe = 2-(SysTime()-startTime)
+			if timeUntilSafe >= 0 then
 				btnAccept:SetEnabled(false)
-			elseif bool ~= nil then
-				btnAccept:SetEnabled(not bool)
+				btnAccept:SetText(string.format("Accept (Wait %s)", string.NiceTime(math.ceil(timeUntilSafe))))
+			else
+				btnAccept:SetText("Accept")
+				if not me:canAfford(amount) then
+					btnAccept:SetEnabled(false)
+				else
+					if bool == nil then
+						bool = blockRequests:GetChecked()
+					end
+					btnAccept:SetEnabled(not bool)
+				end
 			end
 		end
 		blockRequests.OnChange = updateAcceptEnabled
 		updateAcceptEnabled()
+		function self:Think()
+			updateAcceptEnabled()
+			local remaining = expiry-CurTime()
+			descExpires:SetText(string.format("This request expires in %s.", string.NiceTime(remaining)))
+			if remaining <= 0 then
+				self:Close()
+			end
+		end
 	end
 	vgui.Register("StarfallMoneyRequestFrame", PANEL, "DFrame")
 end
