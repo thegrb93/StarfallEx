@@ -606,7 +606,7 @@ if SERVER then
 	end
 	
 	--- Request money from a player.
-	-- This is subject to a burst limit. Use "darkrp.canMakeMoneyRequest" to check if you can request money that tick.
+	-- This is subject to a burst limit, and a limit of one money request per sender per receiver at a time. Use "darkrp.canMakeMoneyRequest" to check if you can request money that tick for that player.
 	-- @server
 	-- @param Player sender The player who may or may not send the money.
 	-- @param number amount The amount of money to ask for.
@@ -628,9 +628,14 @@ if SERVER then
 		checkpermission(instance, nil, "darkrp.requestMoney")
 		sender = getply(sender)
 		receiver = receiver ~= nil and getply(receiver) or instance.player
-		if instance.player ~= SF.Superuser and receiver ~= instance.player then SF.Throw("receiver must be chip owner if not superuser", 2) return end
-		moneyrequestBurst:use(instance.player, 1)
 		local requestsForSender = requests[sender]
+		if instance.player ~= SF.Superuser then
+			if receiver ~= instance.player then SF.Throw("receiver must be chip owner if not superuser", 2) return end
+			for _, request in pairs(requestsForSender or {}) do
+				if request.receiver == receiver then SF.Throw("you already have a pending request for this sender", 2) return end
+			end
+		end
+		moneyrequestBurst:use(instance.player, 1)
 		if not requestsForSender then
 			requestsForSender = {}
 			requests[sender] = requestsForSender
@@ -673,10 +678,19 @@ if SERVER then
 	end
 
 	--- Returns whether you can make another money request this tick.
+	-- If a player is provided as a parameter, will also check if you can request money from that particular player this tick.
 	-- @server
+	-- @param Player? sender Player you intend to ask for money from later
 	-- @return boolean If you can make another money request
-	function darkrp_library.canMakeMoneyRequest()
-		return moneyrequestBurst:check(instance.player) >= 1
+	function darkrp_library.canMakeMoneyRequest(sender)
+		if moneyrequestBurst:check(instance.player) < 1 then return false end
+		if sender ~= nil then
+			local requestsForSender = requests[getply(sender)]
+			for _, request in pairs(requestsForSender or {}) do
+				if request.receiver == instance.player then return false end
+			end
+		end
+		return true
 	end
 
 	--- Returns number of times you can give someone money.

@@ -21,14 +21,18 @@ local products = {
 
 if SERVER then
     -- Because there's a limit on how often we can make money requests,
-    -- we need a FIFO (first in, first out) queue to deal with multiple players buying items in a short time span.
+    -- we need a queue to deal with multiple players buying items in a short time span.
     local queue = {}
     hook.add("think", "queue", function()
+        local i = 1
         while darkrp.canMakeMoneyRequest() do
-            local firstInQueue = queue[1]
+            local firstInQueue = queue[i]
             if not firstInQueue then return end
-            firstInQueue.shop:processTransaction(firstInQueue.ply, firstInQueue.item)
-            table.remove(queue, 1)
+            if firstInQueue.shop:processTransaction(firstInQueue.ply, firstInQueue.item) then
+                i = i+1
+            else
+                table.remove(queue, 1)
+            end
         end
     end)
 
@@ -41,6 +45,9 @@ if SERVER then
         if not ply:isValid() then
             self.customers[ply] = nil
             return
+        end
+        if not darkrp.canMakeMoneyRequest(ply) then
+            return true
         end
         ply:requestMoney(item.name, item.price, function()
             if ply:isValid() then
@@ -58,6 +65,7 @@ if SERVER then
         if self.customers[ply] then return end
         item = self.products[item]
         if not item then return end
+        self.customers[ply] = true
         table.insert(queue, {
             ply = ply,
             item = item,
