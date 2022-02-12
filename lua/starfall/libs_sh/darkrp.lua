@@ -274,17 +274,19 @@ else
 		local buttons = vgui.Create('Panel', self)
 		buttons:DockMargin(0, 5, 0, 0)
 		buttons:Dock(TOP)
-		local btnDecline = vgui.Create("DButton", buttons)
+		local btnDecline = vgui.Create("StarfallButton", buttons)
 		btnDecline:Dock(LEFT)
 		btnDecline:SetText("Decline")
+		btnDecline:SetAutoSize(false)
 		btnDecline:SetWidth(select(2, self:GetSize())/2)
 		function btnDecline.DoClick()
 			RunConsoleCommand("sf_moneyrequest", 0, "decline", index, expiry)
 			self:Close()
 		end
-		local btnAccept = vgui.Create("DButton", buttons)
+		local btnAccept = vgui.Create("StarfallButton", buttons)
 		btnAccept:Dock(RIGHT)
 		btnAccept:SetText("Accept (Wait XXX seconds)")
+		btnAccept:SetAutoSize(false)
 		btnAccept:SetWidth(select(2, self:GetSize())/2)
 		function btnAccept.DoClick()
 			RunConsoleCommand("sf_moneyrequest", 0, "accept", index, expiry)
@@ -324,8 +326,9 @@ else
 				self:Close()
 			end
 		end
+		self:Open()
 	end
-	vgui.Register("StarfallMoneyRequestFrame", PANEL, "DFrame")
+	vgui.Register("StarfallMoneyRequestFrame", PANEL, "StarfallFrame")
 end
 
 if SERVER then
