@@ -1445,7 +1445,7 @@ end
 -- \- Lucida Console
 -- \- Times New Roman
 
-function render_library.createFont(font, size, weight, antialias, additive, shadow, outline, blur, extended)
+function render_library.createFont(font, size, weight, antialias, additive, shadow, outline, blur, scanlines, extended)
 	size = tonumber(size) or 16
 	weight = tonumber(weight) or 400
 	blur = tonumber(blur) or 0
@@ -1455,8 +1455,8 @@ function render_library.createFont(font, size, weight, antialias, additive, shad
 	outline = tobool(outline)
 	extended = tobool(extended)
 
-	local name = string.format("sf_screen_font_%s_%d_%d_%d_%d%d%d%d%d",
-		font, size, weight, blur,
+	local name = string.format("sf_screen_font_%s_%d_%d_%d_%d_%d%d%d%d%d",
+		font, size, weight, blur, scanlines,
 		antialias and 1 or 0,
 		additive and 1 or 0,
 		shadow and 1 or 0,
@@ -1471,13 +1471,13 @@ function render_library.createFont(font, size, weight, antialias, additive, shad
 		surface.CreateFont(name, { size = size, weight = weight,
 			antialias = antialias, additive = additive, font = font,
 			shadow = shadow, outline = outline, blur = blur,
-			extended = extended })
+			scanlines = scalines, extended = extended })
 
 		defined_fonts[name] = true
 	end
 	return name
 end
-defaultFont = render_library.createFont("Default", 16, 400, false, false, false, false, 0)
+defaultFont = render_library.createFont("Default", 16, 400, false, false, false, false, 0, 0)
 
 --- Gets the size of the specified text. Don't forget to use setFont before calling this function
 -- @param string text Text to get the size of
