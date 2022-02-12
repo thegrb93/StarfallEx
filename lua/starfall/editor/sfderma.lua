@@ -147,7 +147,9 @@ function PANEL:PerformLayout()
 	end
 end
 PANEL.Paint = function (button, w, h)
-	if button.Hovered or button.active then
+	if not button:IsEnabled() then
+		draw.RoundedBox(0, 0, 0, w, h, button.backgroundDisabledCol or SF.Editor.colors.meddark)
+	elseif button.Hovered or button.active then
 		draw.RoundedBox(0, 0, 0, w, h, button.backgroundHoverCol or SF.Editor.colors.med)
 	else
 		draw.RoundedBox(0, 0, 0, w, h, button.backgroundCol or SF.Editor.colors.meddark)
@@ -158,11 +160,20 @@ PANEL.Paint = function (button, w, h)
 		surface.DrawTexturedRect(6, h/2 - 8, 16, 16)
 	end
 end
+function PANEL:PaintOver(w, h)
+	if not self:IsEnabled() then
+		surface.SetDrawColor(Color(127, 127, 127, 127))
+		surface.DrawRect(0, 0, w, h)
+	end
+end
 function PANEL:UpdateColours(skin)
 	return self:SetTextStyleColor(self.labelCol or SF.Editor.colors.light)
 end
 function PANEL:SetHoverColor(col)
 	self.backgroundHoverCol = col
+end
+function PANEL:SetDisabledColor(col)
+	self.backgroundDisabledCol = col
 end
 function PANEL:SetColor(col)
 	self.backgroundCol = col
