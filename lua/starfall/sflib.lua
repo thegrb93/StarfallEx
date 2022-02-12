@@ -88,16 +88,20 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 	end
 end)
 
+-- Create a list of users that aren't allowed to run code on this client (or server, I guess),
+-- and allow the local player to block/unblock users at will.
 do
 	local f = file.Open("sf_blockedusers.txt","r","DATA")
 	if f then
 		while not f:EndOfFile() do
-			SF.BlockedUsers[f:ReadLine()] = true
+			local line = f:ReadLine():Trim()
+			if line:find('^STEAM_') then
+				SF.BlockedUsers[line] = true
+			end
 		end
 		f:Close()
 	end
 end
-
 function SF.BlockUser(ply, id)
 	id = id or ply:SteamID()
 	if SF.BlockedUsers[id] then return end
@@ -112,7 +116,6 @@ function SF.BlockUser(ply, id)
 		end
 	end
 end
-
 function SF.UnblockUser(ply, id)
 	id = id or ply:SteamID()
 	if not SF.BlockedUsers[id] then return end
@@ -129,7 +132,40 @@ function SF.UnblockUser(ply, id)
 		end
 	end
 end
-
+if CLIENT then
+	local function autocomplete(cmd)
+		local tbl = {}
+		for steamid, player in pairs(cmd == 'sf_block' and player.GetHumans() or SF.BlockedUsers) do
+			if type(steamid) == 'string' then
+				player = nil
+			else
+				steamid = player:SteamID()
+			end
+			table.insert(tbl, cmd.." \""..steamid.."\" "..(player and "// "..player:GetName():gsub('[%z\x01-\x1f\x7f;"\']', "") or ""))
+		end
+		return tbl
+	end
+	concommand.Add("sf_block", function(executor, cmd, args)
+		if not args[1] then return print("Usage: sf_block <steamid>") end
+		if not args[1]:find('[^%d]') then args[1] = util.SteamIDFrom64(args[1]) end
+		if not args[1]:find('^STEAM_') then return print("Invalid SteamID.") end
+		SF.BlockUser(player.GetBySteamID(args[1]), args[1])
+	end, autocomplete, "Block a user from running Starfall code on your client.")
+	concommand.Add("sf_unblock", function(executor, cmd, args)
+		if not args[1] then return print("Usage: sf_unblock <steamid>") end
+		if not args[1]:find('[^%d]') then args[1] = util.SteamIDFrom64(args[1]) end
+		if not args[1]:find('^STEAM_') then return print("Invalid SteamID.") end
+		SF.UnblockUser(player.GetBySteamID(args[1]), args[1])
+	end, autocomplete, "Unblock a user from running Starfall code on your client.")
+	concommand.Add("sf_blocklist", function(executor, cmd, args)
+		local i = 0
+		for steamid in pairs(SF.BlockedUsers) do
+			i = i+1
+			print(steamid)
+		end
+		print("You have "..i.." players on your block list.")
+	end, nil, "List players you have blocked from running Starfall code on your client.")
+end
 
 -------------------------------------------------------------------------------
 -- Declare Basic Starfall Types
