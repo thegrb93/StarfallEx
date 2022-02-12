@@ -180,6 +180,38 @@ if SERVER then
 else
 	debugCvar = CreateConVar("sf_moneyrequest_verbose_cl", 1, FCVAR_ARCHIVE, "Prints information about money requests to console.", 0, 1)
 	
+	local blocked = {}
+	SF.BlockedMoneyRequests = blocked
+	concommand.Add("sf_moneyrequest_block", function(executor, cmd, args)
+		if not args[1] then return print("sf_moneyrequest_block: missing steamid") end
+		if not args[1]:find('[^%d]') then args[1] = util.SteamIDFrom64(args[1]) end
+		if not args[1]:find('^STEAM_') then return print("sf_moneyrequest_block: invalid steamid") end
+		blocked[args[1]] = true
+	end, function(cmd)
+		local tbl = {}
+		for _, player in pairs(player.GetHumans()) do
+			table.insert(tbl, cmd.." \""..player:SteamID().."\" // "..player:GetName():gsub('[%z\x01-\x1f\x7f;"\']', ""))
+		end
+		return tbl
+	end, "Block a user from sending you money requests. Lasts until the remainder of your session, even if they relog.")
+	concommand.Add("sf_moneyrequest_unblock", function(executor, cmd, args)
+		if not args[1] then return print("sf_moneyrequest_unblock: missing steamid") end
+		if not args[1]:find('[^%d]') then args[1] = util.SteamIDFrom64(args[1]) end
+		if not args[1]:find('^STEAM_') then return print("sf_moneyrequest_unblock: invalid steamid") end
+		blocked[args[1]] = nil
+	end, function(cmd)
+		local tbl = {}
+		for steamid in pairs(blocked) do
+			local target = player.GetBySteamID(steamid)
+			table.insert(tbl, cmd.." \""..steamid..(IsValid(target) and "\" // "..target:GetName():gsub('[%z\x01-\x1f\x7f;"\']', "") or ""))
+		end
+		return tbl
+	end, "Unblock a user from sending you money requests.")
+	concommand.Add("sf_moneyrequest_blocklist", function(executor, cmd, args)
+		for steamid in pairs(blocked) do
+			print(steamid)
+		end
+	end, nil, "List players you have blocked from sending you money requests.")
 	net.Receive("sf_moneyrequest2", function()
 		local index = net.ReadUInt(32)
 		local receiver = net.ReadEntity()
@@ -193,6 +225,8 @@ else
 		printDebug("SF: Received money request (index %d) for %s to be sent to %s. It expires at CurTime %s.", index, DarkRP.formatMoney(amount), receiver:SteamID(), expiry)
 		if SF.BlockedUsers[receiver:SteamID()] then
 			return printDebug("SF: Ignoring money request because the receiver is in \"SF.BlockedUsers\".")
+		elseif blocked[receiver:SteamID()] then
+			return printDebug("SF: Ignoring money request because the receiver is in \"SF.BlockedMoneyRequests\".")
 		end
 		local mrf = vgui.Create("StarfallMoneyRequestFrame")
 		mrf:Init2(index, receiver, amount, expiry, message)
@@ -233,8 +267,7 @@ else
 		descExpires:DockMargin(0, 5, 0, 0)
 		descExpires:Dock(TOP)
 		local blockRequests = vgui.Create("DCheckBoxLabel", self)
-		blockRequests:SetText("Block this user's Starfall chips")
-		blockRequests:SetTooltip("This will prevent the user from sending you money requests, and from running any StarfallEx code on your client. You can unblock them by holding C, clicking \"Starfall List\", then \"Unblock\".")
+		blockRequests:SetText("Block future money requests from this user")
 		blockRequests:SetWrap(true)
 		blockRequests:DockMargin(0, 5, 0, 0)
 		blockRequests:Dock(TOP)
@@ -262,7 +295,7 @@ else
 		local receiverSteamID = receiver:SteamID() -- In case they disconnect between now and the window closing
 		function self:OnClose()
 			if blockRequests:GetChecked() then
-				SF.BlockUser(nil, receiverSteamID)
+				blocked[receiverSteamID] = true
 			end
 		end
 		local me = LocalPlayer()
