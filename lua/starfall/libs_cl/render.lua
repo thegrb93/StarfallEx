@@ -1445,7 +1445,7 @@ end
 -- \- Lucida Console
 -- \- Times New Roman
 
-function render_library.createFont(font, size, weight, antialias, additive, shadow, outline, blur, scanlines, extended)
+function render_library.createFont(font, size, weight, antialias, additive, shadow, outline, blur, extended, scanlines)
 	size = tonumber(size) or 16
 	weight = tonumber(weight) or 400
 	blur = tonumber(blur) or 0
