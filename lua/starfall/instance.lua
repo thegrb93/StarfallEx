@@ -655,12 +655,9 @@ end
 function SF.Instance:deinitialize()
 	self:RunHook("deinitialize")
 	SF.allInstances[self] = nil
-	local playerInstances = SF.playerInstances[self.player]
-	if playerInstances then
-		playerInstances[self] = nil
-		if not next(playerInstances) then
-			SF.playerInstances[self.player] = nil
-		end
+	SF.playerInstances[self.player][self] = nil
+	if not next(SF.playerInstances[self.player]) then
+		SF.playerInstances[self.player] = nil
 	end
 	self.error = true
 end
