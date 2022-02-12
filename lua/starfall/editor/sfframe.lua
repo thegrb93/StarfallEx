@@ -1751,20 +1751,10 @@ PANEL  = {}
 
 function PANEL:Block(ply)
 	SF.BlockUser(ply)
-	for k, v in pairs(ents.FindByClass("starfall_processor")) do
-		if v.owner == ply and v.instance then
-			v:Error({message = "Blocked by user", traceback = ""})
-		end
-	end
 end
 
 function PANEL:Unblock(ply)
 	SF.UnblockUser(ply)
-	for k, v in pairs(ents.FindByClass("starfall_processor")) do
-		if v.owner == ply then
-			v:Compile()
-		end
-	end
 end
 
 function PANEL:UpdatePlayers(players)
@@ -1911,7 +1901,7 @@ function PANEL:UpdatePlayers(players)
 
 			local svtotal = 0
 			local cltotal = 0
-			for instance, _ in pairs(SF.playerInstances[ply]) do
+			for instance, _ in pairs(SF.playerInstances[ply] or {}) do
 				svtotal = svtotal + instance.entity:GetNWInt("CPUus")
 				cltotal = cltotal + instance.cpu_average
 			end

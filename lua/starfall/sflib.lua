@@ -105,6 +105,11 @@ function SF.BlockUser(ply)
 	local f = file.Open("sf_blockedusers.txt","a","DATA")
 	f:Write(id.."\n")
 	f:Close()
+	for k, v in pairs(ents.FindByClass("starfall_processor")) do
+		if v.owner == ply and v.instance then
+			v:Error({message = "Blocked by user", traceback = ""})
+		end
+	end
 end
 
 function SF.UnblockUser(ply)
@@ -116,6 +121,11 @@ function SF.UnblockUser(ply)
 		f:Write(id.."\n")
 	end
 	f:Close()
+	for k, v in pairs(ents.FindByClass("starfall_processor")) do
+		if v.owner == ply then
+			v:Compile()
+		end
+	end
 end
 
 
