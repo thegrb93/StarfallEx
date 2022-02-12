@@ -98,13 +98,14 @@ do
 	end
 end
 
-function SF.BlockUser(ply)
-	local id = ply:SteamID()
+function SF.BlockUser(ply, id)
+	id = id or ply:SteamID()
 	if SF.BlockedUsers[id] then return end
 	SF.BlockedUsers[id] = true
 	local f = file.Open("sf_blockedusers.txt","a","DATA")
 	f:Write(id.."\n")
 	f:Close()
+	if not ply then return end
 	for k, v in pairs(ents.FindByClass("starfall_processor")) do
 		if v.owner == ply and v.instance then
 			v:Error({message = "Blocked by user", traceback = ""})
@@ -112,8 +113,8 @@ function SF.BlockUser(ply)
 	end
 end
 
-function SF.UnblockUser(ply)
-	local id = ply:SteamID()
+function SF.UnblockUser(ply, id)
+	id = id or ply:SteamID()
 	if not SF.BlockedUsers[id] then return end
 	SF.BlockedUsers[id] = nil
 	local f = file.Open("sf_blockedusers.txt","w","DATA")
@@ -121,6 +122,7 @@ function SF.UnblockUser(ply)
 		f:Write(id.."\n")
 	end
 	f:Close()
+	if not ply then return end
 	for k, v in pairs(ents.FindByClass("starfall_processor")) do
 		if v.owner == ply then
 			v:Compile()
