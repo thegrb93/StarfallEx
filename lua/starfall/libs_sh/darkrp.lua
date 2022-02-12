@@ -190,7 +190,7 @@ else
 	end, function(cmd)
 		local tbl = {}
 		for _, player in pairs(player.GetHumans()) do
-			table.insert(tbl, cmd.." \""..player:SteamID().."\" // "..player:GetName())
+			table.insert(tbl, cmd.." \""..player:SteamID().."\" // "..player:GetName():gsub('[%z\x01-\x1f\x7f;"\']', ""))
 		end
 		return tbl
 	end, "Block a user from sending you money requests. Lasts until the remainder of your session, even if they relog.")
@@ -203,7 +203,7 @@ else
 		local tbl = {}
 		for steamid in pairs(blocked) do
 			local target = player.GetBySteamID(steamid)
-			table.insert(tbl, cmd.." \""..steamid..(IsValid(target) and "\" // "..target:GetName() or ""))
+			table.insert(tbl, cmd.." \""..steamid..(IsValid(target) and "\" // "..target:GetName():gsub('[%z\x01-\x1f\x7f;"\']', "") or ""))
 		end
 		return tbl
 	end, "Unblock a user from sending you money requests.")
