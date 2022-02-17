@@ -1,5 +1,6 @@
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
+local debug_getmetatable = debug.getmetatable
 
 -- Register privileges
 registerprivilege("wire.setOutputs", "Set outputs", "Allows the user to specify the set of outputs")
@@ -79,6 +80,7 @@ local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local wirelink_methods, wirelink_meta, wlwrap, wlunwrap = instance.Types.Wirelink.Methods, instance.Types.Wirelink, instance.Types.Wirelink.Wrap, instance.Types.Wirelink.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local vec2_meta, v2wrap, v2unwrap = instance.Types.Vector2, instance.Types.Vector2.Wrap, instance.Types.Vector2.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 local wirelink_meta, wlwrap, wlunwrap = instance.Types.Wirelink, instance.Types.Wirelink.Wrap, instance.Types.Wirelink.Unwrap
@@ -89,7 +91,8 @@ local function identity(data) return data end
 local typeToE2Type = {
 	[TYPE_NUMBER] = {identity, "n"},
 	[TYPE_STRING] = {identity, "s"},
-	[TYPE_VECTOR] = {function(x) return {x.x, x.y, x.z} end, "v"},
+	[TYPE_VECTOR] = {function(x) return {x[1], x[2], x[3]} end, "v"},
+	[vec2_meta] = {function(v) return {v[1], v[2]} end, "xv2"},
 	[TYPE_ANGLE] = {function(x) return {x.p, x.y, x.r} end, "a"},
 	[TYPE_ENTITY] = {identity, "e"}
 }
@@ -100,6 +103,7 @@ inputConverters =
 	NORMAL = identity,
 	STRING = identity,
 	VECTOR = function(vec) return setmetatable({ vec[1] or vec.x, vec[2] or vec.y, vec[3] or vec.z }, vec_meta) end,
+	VECTOR2 = function(vec) return setmetatable({ vec[1] or vec.x, vec[2] or vec.y }, vec2_meta) end,
 	ANGLE = function(ang) return setmetatable({ ang[1] or ang.p, ang[2] or ang.y, ang[3] or ang.r }, ang_meta) end,
 	WIRELINK = wlwrap,
 	ENTITY = owrap,
@@ -139,8 +143,12 @@ inputConverters =
 	ARRAY = function(tbl)
 		local ret = {}
 		for i, v in ipairs(tbl) do
-			if istable(v) and isnumber(v[1] or v.x or v.p) and isnumber(v[2] or v.y) and isnumber(v[3] or v.z or v.r) then
-				ret[i] = inputConverters.VECTOR(v)
+			if istable(v) and isnumber(v[1] or v.x or v.p) and isnumber(v[2] or v.y) then
+				if isnumber(v[3] or v.z or v.r) then
+					ret[i] = inputConverters.VECTOR(v)
+				else
+					ret[i] = inputConverters.VECTOR2(v)
+				end
 			else
 				ret[i] = owrap(v)
 			end
@@ -151,6 +159,7 @@ inputConverters =
 inputConverters.n = inputConverters.NORMAL
 inputConverters.s = inputConverters.STRING
 inputConverters.v = inputConverters.VECTOR
+inputConverters.xv2 = inputConverters.VECTOR2
 inputConverters.a = inputConverters.ANGLE
 inputConverters.xwl = inputConverters.WIRELINK
 inputConverters.e = inputConverters.ENTITY
@@ -170,6 +179,11 @@ local outputConverters =
 	end,
 	VECTOR = function(data)
 		return vunwrap(data)
+	end,
+	VECTOR2 = function(data)
+		-- Not sure why all these funcs do useless tail calls instead of VECTOR = vunwrap etc
+		-- However it might be to prevent passing more than the first arg for some reason so I've done the same here
+		return v2unwrap(data)
 	end,
 	ANGLE = function(data)
 		return aunwrap(data)
@@ -196,9 +210,10 @@ local outputConverters =
 					continue
 				end
 
+				local vMeta = debug_getmetatable(value) -- Get the metatable before the next line unwraps
 				value = ounwrap(value) or value
 				local vtyp = TypeID(value)
-				local convert = typeToE2Type[vtyp]
+				local convert = vtyp == TYPE_TABLE and typeToE2Type[vMeta] or typeToE2Type[vtyp]
 
 				if convert then
 					valueList[key] = convert[1](value)
@@ -220,7 +235,8 @@ local outputConverters =
 		for i, v in ipairs(data) do
 			local obj = ounwrap(v)
 			if obj then
-				local typ = typeToE2Type[TypeID(obj)]
+				local typeId = TypeID(obj)
+				local typ = typeId == TYPE_TABLE and typeToE2Type[debug_getmetatable(v)] or typeToE2Type[typeId]
 				ret[i] = typ and typ[1](obj)
 			end
 		end
@@ -234,6 +250,7 @@ local sfTypeToWireTypeTable = {
 	N = "NORMAL",
 	S = "STRING",
 	V = "VECTOR",
+	XV2 = "VECTOR2",
 	A = "ANGLE",
 	XWL = "WIRELINK",
 	E = "ENTITY",
