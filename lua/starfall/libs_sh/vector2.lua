@@ -2,7 +2,7 @@
 local checkluatype = SF.CheckLuaType
 local dgetmeta = debug.getmetatable
 
---- Vector2 type for use with Wire xv2 I/O (you can use this for other means but it's not networkable)
+--- Vector2 type For use with Wire xv2 I/O (you can use this for other means but it's not networkable)
 -- @name Vector2
 -- @class type
 -- @libtbl vec2_methods
