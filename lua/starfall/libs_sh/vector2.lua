@@ -2,7 +2,7 @@
 local checkluatype = SF.CheckLuaType
 local dgetmeta = debug.getmetatable
 
---- Vector2 type
+--- Vector2 type for use with Wire xv2 I/O (you can use this for other means but it's not networkable)
 -- @name Vector2
 -- @class type
 -- @libtbl vec2_methods
@@ -13,7 +13,7 @@ SF.RegisterType("Vector2", nil, nil, debug.getregistry().Vector, nil, function(c
 	end,
 	function(obj)
 		checktype(obj, vec2_meta, 2)
-		return Vector(obj[1], obj[2], 0)
+		return { obj[1], obj[2] }
 	end
 end)
 
