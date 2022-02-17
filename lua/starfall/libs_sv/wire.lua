@@ -233,12 +233,15 @@ local outputConverters =
 	ARRAY = function(data)
 		local ret = {}
 		for i, v in ipairs(data) do
-			local obj = ounwrap(v)
-			if obj then
-				local typeId = TypeID(obj)
-				local typ = typeId == TYPE_TABLE and typeToE2Type[debug_getmetatable(v)] or typeToE2Type[typeId]
-				ret[i] = typ and typ[1](obj)
-			end
+			local obj = ounwrap(v) or v
+			local typeId = TypeID(obj)
+			local typ = typeId == TYPE_TABLE and typeToE2Type[debug_getmetatable(v)] or typeToE2Type[typeId]
+
+			-- The previous `if obj` and `typ and typ[1](obj)` code caused an unsequential array
+			-- which should trigger an error as it'll cause all other elements after to be unreadable
+			if not typ then SF.Throw("Unsupported type in Wire array", 3) end
+
+			ret[i] = typ[1](obj)
 		end
 		return ret
 	end
