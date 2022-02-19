@@ -1,0 +1,6 @@
+VertexLitGeneric
+{
+	$basetexture "models/spacecode/sfchip"
+	$selfillum 1
+	$surfaceprop "metal"
+}

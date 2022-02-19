@@ -1,0 +1,10 @@
+* text=auto
+
+# Source files
+# ============
+*.lua       text
+
+# Luadoc output
+# =============
+*.html      text
+*.css text
