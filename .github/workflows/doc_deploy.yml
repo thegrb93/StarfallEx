@@ -15,9 +15,6 @@ jobs:
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v2
-          with:
-            fetch-depth: 0
-            ref: ${{ github.event.pull_request.head.sha }}
 
         # Amend the sf_version file
         - name: Write version
@@ -28,6 +25,15 @@ jobs:
             git add "lua/starfall/sfversion.lua"
             git commit --amend --no-edit
             git push -f
+
+        # Clone docgen branch, run build_docs.sh in order to build sf_doc.json
+        - name: Build Docs
+          run: |
+            git clone -b docgen --single-branch https://github.com/thegrb93/StarfallEx.git docgen
+            chmod -R +xrw .
+            cd docgen
+            . ./build_docs.sh
+            cd ..
 
         # Move Docs from ./docgen/sf_doc.json to ./out/sf_doc.json
         - name: Move Docs
