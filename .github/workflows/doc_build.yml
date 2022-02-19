@@ -17,9 +17,9 @@ jobs:
           with:
             fetch-depth: 0
 
-      if: github.event.action == 'closed' && github.event.pull_request.merged == 'true'
-          # Amend the sf_version file
-          - name: Write version
+        # Amend the sf_version file
+        - name: Write version
+          if: github.event.action == 'closed' && github.event.pull_request.merged == 'true'
             run: |
               git config user.name github
               git config user.email github@github.com
