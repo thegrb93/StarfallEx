@@ -14,9 +14,6 @@ jobs:
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v2
-          with:
-            fetch-depth: 0
-            ref: ${{ github.event.pull_request.head.sha }}
 
         # Clone docgen branch, run build_docs.sh in order to build sf_doc.json
         - name: Build Docs
