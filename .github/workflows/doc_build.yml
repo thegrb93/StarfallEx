@@ -18,16 +18,6 @@ jobs:
             fetch-depth: 0
             ref: ${{ github.event.pull_request.head.sha }}
 
-        # Amend the sf_version file
-        - name: Write version
-          run: |
-            git config user.name github
-            git config user.email github@github.com
-            echo "SF_VERSION = \""$(git rev-parse HEAD)"\"" > "lua/starfall/sfversion.lua"
-            git add "lua/starfall/sfversion.lua"
-            git commit --amend --no-edit
-            git push -f
-
         # Clone docgen branch, run build_docs.sh in order to build sf_doc.json
         - name: Build Docs
           run: |
