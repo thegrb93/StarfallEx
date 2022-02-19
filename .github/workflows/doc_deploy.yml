@@ -1,0 +1,56 @@
+name: Build & Deploy Documentation
+
+# On commits, build & deploy docs
+
+on:
+  # Only run on commits from master branch
+  push:
+      branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build_and_deploy:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+
+        # Amend the sf_version file
+        - name: Write version
+          run: |
+            git config user.name github
+            git config user.email github@github.com
+            git checkout "${GITHUB_REF:11}"
+            echo "SF_VERSION = \""$(git rev-parse HEAD)"\"" > "lua/starfall/sfversion.lua"
+            git add "lua/starfall/sfversion.lua"
+            git commit --amend --no-edit
+            git push -f
+
+        # Clone docgen branch, run build_docs.sh in order to build sf_doc.json
+        - name: Build Docs
+          run: |
+            git clone -b docgen --single-branch https://github.com/thegrb93/StarfallEx.git docgen
+            chmod -R +xrw .
+            cd docgen
+            . ./build_docs.sh
+            cd ..
+
+        # Move Docs from ./docgen/sf_doc.json to ./out/sf_doc.json
+        - name: Move Docs
+          run: |
+            mkdir out
+            cp -f docgen/sf_doc.json out/
+
+        # Deploy to gh-pages
+        - name: Deploy Docs
+          uses: peaceiris/actions-gh-pages@v3
+          with:
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            publish_dir: ./out
+            publish_branch: gh-pages # Doesn't need to be explicit
+            user_name: 'github-actions[bot]'
+            user_email: 'github-actions[bot]@users.noreply.github.com'
+            commit_message: ${{ github.event.head_commit.message }}
+            keep_files: true
+            disable_nojekyll: true
