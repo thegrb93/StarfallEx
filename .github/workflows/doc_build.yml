@@ -15,6 +15,13 @@ jobs:
       steps:
         - uses: actions/checkout@v2
 
+        # Amend the sf_version file
+        - name: Write version
+          run: |
+            echo "SF_VERSION = \""$(git rev-parse --abbrev-ref HEAD)"-"$(git describe --tags --long --dirty)"\"" > "lua/starfall/sfversion.lua"
+            git add "lua/starfall/sfversion.lua"
+            git commit --amend
+
         # Clone docgen branch, run build_docs.sh in order to build sf_doc.json
         - name: Build Docs
           run: |
