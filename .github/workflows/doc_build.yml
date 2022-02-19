@@ -20,6 +20,8 @@ jobs:
         # Amend the sf_version file
         - name: Write version
           run: |
+            git config user.name github
+            git config user.email github@github.com
             echo "SF_VERSION = \""$(git rev-parse HEAD)"\"" > "lua/starfall/sfversion.lua"
             git add "lua/starfall/sfversion.lua"
             git commit --amend --no-edit
