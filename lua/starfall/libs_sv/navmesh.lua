@@ -54,7 +54,7 @@ return function(instance)
 		plyCount:free(instance.player, 1)
 
 		if navarea and navarea:IsValid() then
-			nav:Remove()
+			navarea:Remove()
 		end
 
 
@@ -68,9 +68,6 @@ return function(instance)
 
 	instance:AddHook("deinitialize", function()
 		for navarea in pairs(navareas) do
-			if navarea and navarea:IsValid() then
-				navarea:Remove()
-			end
 			destroy(navarea)
 		end
 	end)
