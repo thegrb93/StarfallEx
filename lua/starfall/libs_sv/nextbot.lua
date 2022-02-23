@@ -114,6 +114,14 @@ function nextbot_library.create(pos, mdl)
 	table.insert(nextbots, nb)
 	return nbwrap(nb)
 end
+	
+--- Checks if a user can spawn anymore nextbots.
+-- @server
+-- @return boolean True if user can spawn nextbots, False if not.
+function nextbot_library.canSpawn()
+	if not SF.Permissions.hasAccess(instance, nil, "nextbot.create") then return false end
+	return nbCount:check(instance.player) > 0
+end
 
 --- Makes the nextbot try to go to a specified position.
 -- @server
