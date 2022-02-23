@@ -142,7 +142,7 @@ end
 
 --- Returns the Vector the nextbot is trying to go to, set by setGotoPos
 -- @server
--- @return Vector isgoingto Vector nextbot is trying to go to if it exists, else returns nil.
+-- @return Vector Vector nextbot is trying to go to if it exists, else returns nil.
 function nb_methods:isGoingTo()
 	local nb = nbunwrap(self)
 	if nb.goTo then
@@ -505,6 +505,7 @@ end
 
 --- Returns whether this nextbot can reach and/or traverse/move in given NavArea.
 -- @server
+-- @param NavArea NavArea to check.
 -- @return boolean Whether this nextbot can traverse given NavArea.
 function nb_methods:isAreaTraversable(nav)
 	local nb = nbunwrap(self)
