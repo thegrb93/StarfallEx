@@ -353,7 +353,7 @@ end
 
 --- Enable or disable ragdolling on death for the NextBot.
 -- @server
--- @param boolean Whether the nextbot should ragdoll on death.
+-- @param boolean ragdollondeath Whether the nextbot should ragdoll on death.
 function nb_methods:ragdollOnDeath(bool)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.ragdollOnDeath")
