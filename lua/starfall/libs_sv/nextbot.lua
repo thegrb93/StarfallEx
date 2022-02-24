@@ -235,7 +235,7 @@ end
 function nb_methods:addDeathCallback(id, func)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.addDeathCallback")
-	nb.DeathCallbacks[id] = func
+	nb.DeathCallbacks:add(id, func)
 end
 
 --- Removes a death callback function from the NextBot.
@@ -244,7 +244,7 @@ end
 function nb_methods:removeDeathCallback(id)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.removeDeathCallback")
-	nb.DeathCallbacks[id] = nil
+	nb.DeathCallbacks:remove(id)
 end
 
 --- Adds a callback function that will be run when this nextbot is injured.
@@ -254,7 +254,7 @@ end
 function nb_methods:addInjuredCallback(id, func)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.addInjuredCallback")
-	nb.InjuredCallbacks[id] = func
+	nb.InjuredCallbacks:add(id, func)
 end
 
 --- Removes a injury callback function from the NextBot.
@@ -263,7 +263,7 @@ end
 function nb_methods:removeInjuredCallback(id)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.removeInjuredCallback")
-	nb.InjuredCallbacks[id] = nil
+	nb.InjuredCallbacks:remove(id)
 end
 
 --- Adds a callback function that will be run when this nextbot lands on the ground.
@@ -273,7 +273,7 @@ end
 function nb_methods:addLandCallback(id, func)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.addLandCallback")
-	nb.LandCallbacks[id] = func
+	nb.LandCallbacks:add(id, func)
 end
 
 --- Removes a landing callback function from the NextBot.
@@ -282,7 +282,7 @@ end
 function nb_methods:removeLandCallback(id)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.removeLandCallback")
-	nb.LandCallbacks[id] = nil
+	nb.LandCallbacks:remove(id)
 end
 
 --- Adds a callback function that will be run when this nextbot leaves the ground.
@@ -292,7 +292,7 @@ end
 function nb_methods:addLeaveGroundCallback(id, func)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.addLeaveGroundCallback")
-	nb.JumpCallbacks[id] = func
+	nb.JumpCallbacks:add(id, func)
 end
 
 --- Removes a landing callback function from the NextBot.
@@ -301,7 +301,7 @@ end
 function nb_methods:removeLeaveGroundCallback(id)	
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.removeLeaveGroundCallback")
-	nb.JumpCallbacks[id] = nil
+	nb.JumpCallbacks:remove(id)
 end
 
 --- Adds a callback function that will be run when this nextbot gets ignited.
@@ -311,7 +311,7 @@ end
 function nb_methods:addIgniteCallback(id, func)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.addIgniteCallback")
-	nb.IgniteCallbacks[id] = func
+	nb.IgniteCallbacks:add(id, func)
 end
 
 --- Removes a ignite callback function from the NextBot.
@@ -320,7 +320,7 @@ end
 function nb_methods:removeIgniteCallback(id)	
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.removeIgniteCallback")
-	nb.IgniteCallbacks[id] = nil
+	nb.IgniteCallbacks:remove(id)
 end
 
 --- Adds a callback function that will be run when the nextbot enters a new nav area.
@@ -330,7 +330,7 @@ end
 function nb_methods:addNavChangeCallback(id, func)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.addNavChangeCallback")
-	nb.NavChangeCallbacks[id] = func
+	nb.NavChangeCallbacks:add(id, func)
 end
 
 --- Removes a nav area change callback function from the NextBot.
@@ -339,7 +339,7 @@ end
 function nb_methods:removeNavChangeCallback(id)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.removeNavChangeCallback")
-	nb.NavChangeCallbacks[id] = nil
+	nb.NavChangeCallbacks:remove(id)
 end
 
 --- Sets a callback function that will be run when this nextbot touches another entity. Only 1 per NB. Setting a new callback will replace the old one.
