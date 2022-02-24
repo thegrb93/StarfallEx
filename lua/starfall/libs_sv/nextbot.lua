@@ -380,7 +380,7 @@ end
 --- Gets the move speed of the NextBot.
 -- @server
 -- @return number NB's move speed.
-function nb_methods:setMoveSpeed(val)	
+function nb_methods:getMoveSpeed(val)	
 	local nb = nbunwrap(self)
 	return nb.MoveSpeed
 end
