@@ -17,12 +17,12 @@ function ENT:Initialize()
 		self.IDLEACT = ACT_IDLE
 		self.MoveSpeed = 200
 		
-		self.DeathCallbacks = {}
-		self.InjuredCallbacks = {}
-		self.LandCallbacks = {}
-		self.JumpCallbacks = {}
-		self.IgniteCallbacks = {}
-		self.NavChangeCallbacks = {}
+		self.DeathCallbacks = SF.HookTable()
+		self.InjuredCallbacks = SF.HookTable()
+		self.LandCallbacks = SF.HookTable()
+		self.JumpCallbacks = SF.HookTable()
+		self.IgniteCallbacks = SF.HookTable()
+		self.NavChangeCallbacks = SF.HookTable()
 	end
 
 	self:SetModel( self:GetNBModel() )
@@ -86,9 +86,9 @@ end
 
 -- TO DO: Maybe look into caching the table counts as I don't know how expensive the counting function is
 function ENT:OnInjured(dmginfo)
-	if table.Count(self.InjuredCallbacks) > 0 then
+	if !self.InjuredCallbacks:isEmpty() then
 		local inst = self.chip.instance
-		for _, v in pairs(self.InjuredCallbacks) do
+		for _, v in self.InjuredCallbacks:pairs() do
 			inst:runFunction(v, inst.Types.NextBot.Wrap(self), dmginfo:GetDamage(), inst.Types.Entity.Wrap(dmginfo:GetAttacker()), inst.Types.Entity.Wrap(dmginfo:GetInflictor()), inst.Types.Vector.Wrap(dmginfo:GetDamagePosition()), 
 			inst.Types.Vector.Wrap(dmginfo:GetDamageForce()), dmginfo:GetDamageType())
 		end
@@ -96,9 +96,9 @@ function ENT:OnInjured(dmginfo)
 end
 
 function ENT:OnKilled(dmginfo)
-	if table.Count(self.DeathCallbacks) > 0 then
+	if !self.DeathCallbacks:isEmpty() then
 		local inst = self.chip.instance
-		for _, v in pairs(self.DeathCallbacks) do
+		for _, v in self.DeathCallbacks:pairs() do
 			inst:runFunction(v, inst.Types.NextBot.Wrap(self), dmginfo:GetDamage(), inst.Types.Entity.Wrap(dmginfo:GetAttacker()), inst.Types.Entity.Wrap(dmginfo:GetInflictor()), inst.Types.Vector.Wrap(dmginfo:GetDamagePosition()), 
 			inst.Types.Vector.Wrap(dmginfo:GetDamageForce()), dmginfo:GetDamageType())
 		end
@@ -107,9 +107,9 @@ function ENT:OnKilled(dmginfo)
 end
 
 function ENT:OnLandOnGround(groundent)
-	if table.Count(self.LandCallbacks) > 0 then
+	if !self.LandCallbacks:isEmpty() then
 		local inst = self.chip.instance
-		for _, v in pairs(self.LandCallbacks) do
+		for _, v in self.LandCallbacks:pairs() do
 			local wrappedgroundent = inst.Types.Entity.Wrap(groundent)
 			inst:runFunction(v, inst.Types.NextBot.Wrap(self), wrappedgroundent)
 		end
@@ -117,9 +117,9 @@ function ENT:OnLandOnGround(groundent)
 end
 
 function ENT:OnLeaveGround(groundent)
-	if table.Count(self.JumpCallbacks) > 0 then
+	if !self.JumpCallbacks:isEmpty() then
 		local inst = self.chip.instance
-		for _, v in pairs(self.JumpCallbacks) do
+		for _, v in self.JumpCallbacks:pairs() do
 			local wrappedgroundent = self.chip.instance.Types.Entity.Wrap(groundent)
 			inst:runFunction(v, inst.Types.NextBot.Wrap(self), wrappedgroundent)
 		end
@@ -127,20 +127,20 @@ function ENT:OnLeaveGround(groundent)
 end
 
 function ENT:OnIgnite()
-	if table.Count(self.IgniteCallbacks) > 0 then
+	if !self.IgniteCallbacks:isEmpty() then
 		local inst = self.chip.instance
-		for _, v in pairs(self.IgniteCallbacks) do
+		for _, v in self.IgniteCallbacks:pairs() do
 			inst:runFunction(v, inst.Types.NextBot.Wrap(self))
 		end
 	end
 end
 
 function ENT:OnNavAreaChanged(old, new)
-	if table.Count(self.NavChangeCallbacks) > 0 then
+	if !self.NavChangeCallbacks:isEmpty() then
 		local inst = self.chip.instance
 		local wrappedold = inst.Types.NavArea.Wrap(old)
 		local wrappednew = inst.Types.NavArea.Wrap(new)
-		for _, v in pairs(self.NavChangeCallbacks) do
+		for _, v in self.NavChangeCallbacks:pairs() do
 			inst:runFunction(v, inst.Types.NextBot.Wrap(self), wrappedold, wrappednew)
 		end
 	end
@@ -155,7 +155,8 @@ function ENT:OnContact(colent)
 	end
 end
 
--- Need to add a modifier for body_yaw here so that it works with NPCs that use 8-way animations
+-- Need to add a modifier for body_yaw here so that it works with NPCs that use 8-way animations.
+-- This expression borrowed from the PAC3 wiki should work. atan2(-owner_velocity_right(),-owner_velocity_forward())/(-PI)
 function ENT:BodyUpdate()
 	self:BodyMoveXY()
 end
