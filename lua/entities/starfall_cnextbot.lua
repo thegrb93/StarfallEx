@@ -155,8 +155,6 @@ function ENT:OnContact(colent)
 	end
 end
 
--- Need to add a modifier for body_yaw here so that it works with NPCs that use 8-way animations.
--- This expression borrowed from the PAC3 wiki should work. atan2(-owner_velocity_right(),-owner_velocity_forward())/(-PI)
 function ENT:BodyUpdate()
 	self:BodyMoveXY()
 	
