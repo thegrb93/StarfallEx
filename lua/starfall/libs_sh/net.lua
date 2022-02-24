@@ -471,6 +471,31 @@ function net_library.readEntity(callback)
 		return instance.WrapObject(Entity(index))
 	end
 end
+	
+	--- Writes a nextbot to the net message
+-- @shared
+-- @param NextBot t The nextbot to be written
+function net_library.writeNextBot(t)
+	if not netStarted then SF.Throw("net message not started", 2) end
+	write(net.WriteUInt, 16, getent(t):EntIndex(), 16)
+end
+
+--- Reads a nextbot from the net message
+-- @shared
+-- @param function? callback (Client only) optional callback to be ran whenever the nextbot becomes valid; returns nothing if this is used. The callback passes the nextbot if it succeeds or nil if it fails.
+-- @return NextBot The nextbot that was read
+function net_library.readNextBot(callback)
+	local index = net.ReadUInt(16)
+	if callback ~= nil and CLIENT then
+		checkluatype(callback, TYPE_FUNCTION)
+		SF.WaitForEntity(index, function(ent)
+			if ent ~= nil then ent = ewrap(ent) end
+			instance:runFunction(callback, ent)
+		end)
+	else
+		return ewrap(Entity(index))
+	end
+end
 
 --- Like glua net.Receive, adds a callback that is called when a net message with the matching name is received. If this happens, the net hook won't be called.
 -- @shared
