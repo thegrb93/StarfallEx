@@ -89,7 +89,6 @@ function ENT:OnInjured(dmginfo)
 	if self.InjuredCallbacks:isEmpty() then return end
 	local inst = self.chip.instance
 	self.InjuredCallbacks:run(inst,
-		inst.Types.NextBot.Wrap(self),
 		dmginfo:GetDamage(),
 		inst.Types.Entity.Wrap(dmginfo:GetAttacker()),
 		inst.Types.Entity.Wrap(dmginfo:GetInflictor()),
