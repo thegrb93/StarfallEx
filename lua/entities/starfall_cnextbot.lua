@@ -86,73 +86,60 @@ end
 
 -- TO DO: Maybe look into caching the table counts as I don't know how expensive the counting function is
 function ENT:OnInjured(dmginfo)
-	if !self.InjuredCallbacks:isEmpty() then
-		local inst = self.chip.instance
-		for _, v in self.InjuredCallbacks:pairs() do
-			inst:runFunction(v, inst.Types.NextBot.Wrap(self), dmginfo:GetDamage(), inst.Types.Entity.Wrap(dmginfo:GetAttacker()), inst.Types.Entity.Wrap(dmginfo:GetInflictor()), inst.Types.Vector.Wrap(dmginfo:GetDamagePosition()), 
-			inst.Types.Vector.Wrap(dmginfo:GetDamageForce()), dmginfo:GetDamageType())
-		end
-	end
+	if self.InjuredCallbacks:isEmpty() then return end
+	local inst = self.chip.instance
+	self.InjuredCallbacks:run(inst,
+		inst.Types.NextBot.Wrap(self),
+		dmginfo:GetDamage(),
+		inst.Types.Entity.Wrap(dmginfo:GetAttacker()),
+		inst.Types.Entity.Wrap(dmginfo:GetInflictor()),
+		inst.Types.Vector.Wrap(dmginfo:GetDamagePosition()), 
+		inst.Types.Vector.Wrap(dmginfo:GetDamageForce()),
+		dmginfo:GetDamageType())
 end
 
 function ENT:OnKilled(dmginfo)
-	if !self.DeathCallbacks:isEmpty() then
-		local inst = self.chip.instance
-		for _, v in self.DeathCallbacks:pairs() do
-			inst:runFunction(v, inst.Types.NextBot.Wrap(self), dmginfo:GetDamage(), inst.Types.Entity.Wrap(dmginfo:GetAttacker()), inst.Types.Entity.Wrap(dmginfo:GetInflictor()), inst.Types.Vector.Wrap(dmginfo:GetDamagePosition()), 
-			inst.Types.Vector.Wrap(dmginfo:GetDamageForce()), dmginfo:GetDamageType())
-		end
-	end
+	if self.DeathCallbacks:isEmpty() then return end
+	local inst = self.chip.instance
+	self.DeathCallbacks:run(inst,
+		dmginfo:GetDamage(),
+		inst.Types.Entity.Wrap(dmginfo:GetAttacker()),
+		inst.Types.Entity.Wrap(dmginfo:GetInflictor()),
+		inst.Types.Vector.Wrap(dmginfo:GetDamagePosition()),
+		inst.Types.Vector.Wrap(dmginfo:GetDamageForce()),
+		dmginfo:GetDamageType())
 	if self.RagdollOnDeath then self:BecomeRagdoll(dmginfo) end
 end
 
 function ENT:OnLandOnGround(groundent)
-	if !self.LandCallbacks:isEmpty() then
-		local inst = self.chip.instance
-		for _, v in self.LandCallbacks:pairs() do
-			local wrappedgroundent = inst.Types.Entity.Wrap(groundent)
-			inst:runFunction(v, inst.Types.NextBot.Wrap(self), wrappedgroundent)
-		end
-	end
+	if self.LandCallbacks:isEmpty() then return end
+	local inst = self.chip.instance
+	self.LandCallbacks:run(inst, inst.Types.Entity.Wrap(groundent))
 end
 
 function ENT:OnLeaveGround(groundent)
-	if !self.JumpCallbacks:isEmpty() then
-		local inst = self.chip.instance
-		for _, v in self.JumpCallbacks:pairs() do
-			local wrappedgroundent = self.chip.instance.Types.Entity.Wrap(groundent)
-			inst:runFunction(v, inst.Types.NextBot.Wrap(self), wrappedgroundent)
-		end
-	end
+	if self.JumpCallbacks:isEmpty() then return end
+	local inst = self.chip.instance
+	self.JumpCallbacks:run(inst, self.chip.instance.Types.Entity.Wrap(groundent))
 end
 
 function ENT:OnIgnite()
-	if !self.IgniteCallbacks:isEmpty() then
-		local inst = self.chip.instance
-		for _, v in self.IgniteCallbacks:pairs() do
-			inst:runFunction(v, inst.Types.NextBot.Wrap(self))
-		end
-	end
+	if self.IgniteCallbacks:isEmpty() then return end
+	self.IgniteCallbacks:run(inst)
 end
 
 function ENT:OnNavAreaChanged(old, new)
-	if !self.NavChangeCallbacks:isEmpty() then
-		local inst = self.chip.instance
-		local wrappedold = inst.Types.NavArea.Wrap(old)
-		local wrappednew = inst.Types.NavArea.Wrap(new)
-		for _, v in self.NavChangeCallbacks:pairs() do
-			inst:runFunction(v, inst.Types.NextBot.Wrap(self), wrappedold, wrappednew)
-		end
-	end
+	if self.NavChangeCallbacks:isEmpty() then return end
+	local inst = self.chip.instance
+	self.NavChangeCallbacks:run(inst,
+		inst.Types.NavArea.Wrap(old),
+		inst.Types.NavArea.Wrap(new))
 end
 
--- Only 1 callback because I'm not sure about the performance implications of many callbacks running at once on every collision.
 function ENT:OnContact(colent)
-	if self.ContactCallback and self.chip.instance then
-		local inst = self.chip.instance
-		local wrappedcolent = inst.Types.Entity.Wrap(colent)
-		self.chip.instance:runFunction(self.ContactCallback, inst.Types.NextBot.Wrap(self), wrappedcolent)
-	end
+	if self.ContactCallbacks:isEmpty() then return end
+	local inst = self.chip.instance
+	self.ContactCallbacks:run(inst, inst.Types.Entity.Wrap(colent))
 end
 
 function ENT:BodyUpdate()
@@ -165,6 +152,6 @@ function ENT:BodyUpdate()
 	self:SetPoseParameter("move_yaw", remappedRange )
 	
 	if CLIENT then
-	self:InvalidateBoneCache()
+		self:InvalidateBoneCache()
 	end
 end

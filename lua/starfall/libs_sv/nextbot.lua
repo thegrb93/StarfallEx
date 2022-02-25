@@ -17,7 +17,7 @@ SF.RegisterType("NextBot", false, true, debug.getregistry().NextBot, "Entity")
 SF.RegisterLibrary("nextbot")
 
 registerprivilege("nextbot.create", "Create nextbot", "Allows the user to create nextbots.")
-registerprivilege("nextbot.setContactCallback", "Add contact callback", "Allows the user to add a collision callback to the entity which is called every tick when touched.", {usergroups = {default = 1} } )
+registerprivilege("nextbot.addContactCallback", "Add contact callback", "Allows the user to add a collision callback to the entity which is called every tick when touched.", {usergroups = {default = 1} } )
 registerprivilege("nextbot.setGotoPos", "Set nextbot goto pos", "Allows the user to set a vector pos for the nextbot to try and go to.", {entites = {}})
 registerprivilege("nextbot.removeGotoPos", "Remove nextbot goto pos", "Allows the user to remove the goto pos from a nextbot.", {entites = {}})
 registerprivilege("nextbot.playSequence", "Play nextbot sequence", "Allows the user to set an animation for the nextbot to play.", {entites = {}})
@@ -344,19 +344,21 @@ end
 
 --- Sets a callback function that will be run when this nextbot touches another entity. Only 1 per NB. Setting a new callback will replace the old one.
 -- @server
+-- @param string callbackid The unique ID this callback will use.
 -- @param function callback The function to run when the NB touches another entity. The arguments are: (The NextBot, The entity the NB touched.)
-function nb_methods:setContactCallback(func)
+function nb_methods:addContactCallback(id, func)
 	local nb = nbunwrap(self)
-	checkpermission(instance, nil, "nextbot.setContactCallback")
-	nb.ContactCallback = func
+	checkpermission(instance, nb, "nextbot.addContactCallback")
+	nb.ContactCallbacks:add(id, func)
 end
 
 --- Removes the contact callback function from the NextBot if present.
 -- @server
-function nb_methods:removeContactCallback()
+-- @param string callbackid The unique ID of the callback to remove.
+function nb_methods:removeContactCallback(id)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.removeContactCallback")
-	nb.ContactCallback = nil
+	nb.ContactCallbacks:remove(id)
 end
 
 --- Enable or disable ragdolling on death for the NextBot.
