@@ -255,6 +255,7 @@ function PANEL:Setup(folder)
 
 	self.Libraries = self.RootNode:AddNode("Public Libs","icon16/plugin.png")
 	for k, v in pairs{
+		Async = "https://raw.githubusercontent.com/keever50/StarfallLibraries/master/async.txt",
 		CriticalPD = "https://raw.githubusercontent.com/thegrb93/MyStarfallScripts/master/libs/CriticalPD.txt",
 		Console = "https://raw.githubusercontent.com/Derpius/public-starfalls/master/console/console.txt",
 		GifLoader = "https://raw.githubusercontent.com/thegrb93/MyStarfallScripts/master/libs/gifspritesheet.txt",
