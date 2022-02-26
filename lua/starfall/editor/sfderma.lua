@@ -255,12 +255,12 @@ function PANEL:Setup(folder)
 
 	self.Libraries = self.RootNode:AddNode("Public Libs","icon16/plugin.png")
 	for k, v in pairs{
-		CriticalPD = "https://github.com/thegrb93/MyStarfallScripts/blob/master/libs/CriticalPD.txt",
+		CriticalPD = "https://raw.githubusercontent.com/thegrb93/MyStarfallScripts/master/libs/CriticalPD.txt",
 		Console = "https://raw.githubusercontent.com/Derpius/public-starfalls/master/console/console.txt",
-		GifLoader = "https://github.com/thegrb93/MyStarfallScripts/blob/master/libs/gifspritesheet.txt",
+		GifLoader = "https://raw.githubusercontent.com/thegrb93/MyStarfallScripts/master/libs/gifspritesheet.txt",
 		HoloText = "https://raw.githubusercontent.com/Derpius/public-starfalls/master/libs/holotext/main.txt",
 		SafeNet = "https://raw.githubusercontent.com/Jacbo1/Public-Starfall/main/SafeNet/safeNet.lua",
-		XInputNet = "https://github.com/thegrb93/MyStarfallScripts/blob/master/libs/xinput.txt",
+		XInputNet = "https://raw.githubusercontent.com/thegrb93/MyStarfallScripts/master/libs/xinput.txt",
 	} do
 		local node = self.Libraries:AddNode(k, "icon16/page_white.png")
 		node.FileURL = v
