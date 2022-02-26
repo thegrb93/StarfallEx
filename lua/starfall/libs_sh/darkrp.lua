@@ -756,12 +756,36 @@ else
 		DarkRP.openF1Menu()
 	end
 	
+	--- Close the F1 help menu.
+	-- Only works if the local player is the owner of the chip, or if the chip is running in superuser mode.
+	-- @client
+	function darkrp_library.closeF1Menu()
+		if instance.player ~= SF.Superuser and instance.player ~= LocalPlayer() then SF.Throw("may not use this function on anyone other than owner", 2) return end
+		DarkRP.closeF1Menu()
+	end
+	
 	--- Open the F4 menu (the one where you can choose your job, buy shipments, ammo, money printers, etc). Roughly equivalent to pressing F4 (or running gm_showspare2), but won't close it if it's already open.
 	-- Only works if the local player is the owner of the chip, or if the chip is running in superuser mode.
 	-- @client
 	function darkrp_library.openF4Menu()
 		if instance.player ~= SF.Superuser and instance.player ~= LocalPlayer() then SF.Throw("may not use this function on anyone other than owner", 2) return end
 		DarkRP.openF4Menu()
+	end
+	
+	--- Close the F4 menu (the one where you can choose your job, buy shipments, ammo, money printers, etc).
+	-- Only works if the local player is the owner of the chip, or if the chip is running in superuser mode.
+	-- @client
+	function darkrp_library.closeF4Menu()
+		if instance.player ~= SF.Superuser and instance.player ~= LocalPlayer() then SF.Throw("may not use this function on anyone other than owner", 2) return end
+		DarkRP.closeF4Menu()
+	end
+	
+	--- Toggle the state of the F4 menu (open or closed). Equivalent to pressing F4 (or running gm_showspare2).
+	-- Only works if the local player is the owner of the chip, or if the chip is running in superuser mode.
+	-- @client
+	function darkrp_library.toggleF4Menu()
+		if instance.player ~= SF.Superuser and instance.player ~= LocalPlayer() then SF.Throw("may not use this function on anyone other than owner", 2) return end
+		DarkRP.toggleF4Menu()
 	end
 	
 	--- Buy the door the local player is looking at, or open the menu if it's already bought. Equivalent to pressing F2 (or running gm_showteam).
@@ -778,14 +802,6 @@ else
 	function darkrp_library.openPocketMenu()
 		if instance.player ~= SF.Superuser and instance.player ~= LocalPlayer() then SF.Throw("may not use this function on anyone other than owner", 2) return end
 		DarkRP.openPocketMenu()
-	end
-	
-	--- Toggle the state of the F4 menu (open or closed). Equivalent to pressing F4 (or running gm_showspare2).
-	-- Only works if the local player is the owner of the chip, or if the chip is running in superuser mode.
-	-- @client
-	function darkrp_library.toggleF4Menu()
-		if instance.player ~= SF.Superuser and instance.player ~= LocalPlayer() then SF.Throw("may not use this function on anyone other than owner", 2) return end
-		DarkRP.toggleF4Menu()
 	end
 end
 
