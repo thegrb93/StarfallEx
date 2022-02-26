@@ -367,6 +367,7 @@ end
 
 if SERVER then
 	--- Called when a money printer is about to catch fire. DarkRP only. Called between moneyPrinterPrintMoney and moneyPrinterPrinted.
+	-- Not guaranteed to work for non-vanilla money printers.
 	-- Only works if the owner of the chip also owns the money printer, or if the chip is running in superuser mode.
 	-- @name moneyPrinterCatchFire
 	-- @class hook
@@ -382,6 +383,7 @@ if SERVER then
 	end)
 
 	--- Called after a money printer is has printed money. DarkRP only.
+	-- Not guaranteed to work for non-vanilla money printers.
 	-- Only works if the owner of the chip also owns the money printer, or if the chip is running in superuser mode.
 	-- @name moneyPrinterPrinted
 	-- @class hook
@@ -398,6 +400,7 @@ if SERVER then
 	end)
 
 	--- Called when a money printer is about to print money. DarkRP only.
+	-- Not guaranteed to work for non-vanilla money printers.
 	-- You should use moneyPrinterPrinted instead, as the printer is not guaranteed to print money even if this hook is called.
 	-- Only works if the owner of the chip also owns the money printer, or if the chip is running in superuser mode.
 	-- @name moneyPrinterPrintMoney
@@ -464,8 +467,8 @@ if SERVER then
 		return true, {index, law, player and instance.Types.Player.Wrap(player) or nil}
 	end)
 
-	--- Called when a law is removed. DarkRP only.
-	-- @name addLaw
+	--- Called when a law is removed. DarkRP only. Not usually called when /resetlaws is used.
+	-- @name removeLaw
 	-- @class hook
 	-- @server
 	-- @param number index Index of the law
@@ -477,8 +480,8 @@ if SERVER then
 		return true, {index, law, player and instance.Types.Player.Wrap(player) or nil}
 	end)
 
-	--- Called when laws are reset. DarkRP only. This is the only hook called when /resetlaws is used.
-	-- @name addLaw
+	--- Called when laws are reset. DarkRP only. Usually the only hook called when /resetlaws is used.
+	-- @name resetLaws
 	-- @class hook
 	-- @server
 	-- @param Player? player The player resetting the laws.
@@ -583,7 +586,7 @@ function darkrp_library.getLaws()
 	return instance.Sanitize(DarkRP.getLaws())
 end
 
---- Get a list of possible shipments. DarkRP only.
+--- Get a list of possible shipments.
 -- @return table? A table with the contents of the GLua global "CustomShipments", or nil if it doesn't exist.
 function darkrp_library.getCustomShipments()
 	return CustomShipments and instance.Sanitize(CustomShipments) or nil
