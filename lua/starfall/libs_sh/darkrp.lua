@@ -2,51 +2,70 @@ local checkluatype = SF.CheckLuaType
 local checkpattern = SF.CheckPattern
 local registerprivilege = SF.Permissions.registerPrivilege
 
--- checksafety and assertsafety are here to ensure that even if DarkRP's API changes, it won't create a security vulnerability.
-local whitelist = {
-	["nil"] = true,
-	["boolean"] = true,
-	["number"] = true,
-	["string"] = true,
-}
-local pairs = pairs
-local type = type
-local unpack = unpack
-local function checksafety(...)
-	for k, v in pairs({...}) do -- Determined to be faster than "select"
-		if not whitelist[type(v)] then
-			return false
+-- Under normal circumstances, an API change could introduce security
+-- vulnerabilities. Suppose a DarkRP function changes to also return a Player
+-- or Entity object, whereas before it only returned safe types like numbers
+-- and strings. Starfall code unaware of the change might expose that function
+-- in a way that ends in a tail call, which would result in all values being
+-- returned as-is. That would be bad, as it would allow a guest to obtain
+-- unwrapped objects.
+-- checksafety and assertsafety resolve this by ensuring that unsafe values
+-- don't make it to the guest. The way they are implemented have the downside
+-- of those values not making it to the client at all, when they could be
+-- wrapped. I could have done something like this to mitigate that:
+--return unwrap(instance.Sanitize({...}))
+-- ...but since nearly every single hook and function (in this file) is going
+-- to be using these functions, I wanted to keep the added overhead as small
+-- as possible.
+local checksafety, assertsafety
+do
+	local whitelist = {
+		["nil"] = true,
+		["boolean"] = true,
+		["number"] = true,
+		["string"] = true,
+	}
+	local pairs = pairs
+	local type = type
+	function checksafety(...)
+		for k, v in pairs({...}) do -- 'pairs' was determined to be faster than 'select'
+			if not whitelist[type(v)] then
+				return false
+			end
 		end
+		return true
 	end
-	return true
-end
-local function assertsafety(...)
-	-- This is basically the same thing as "checksafety", but it removes unsafe values, and then returns them.
-	local args = {...}
-	for i=#args, 1, -1 do
-		if not whitelist[type(args[i])] then
-			table.remove(args, i)
+	local table_remove = table.remove
+	local unpack = unpack
+	function assertsafety(...)
+		local args = {...}
+		for i=#args, 1, -1 do
+			if not whitelist[type(args[i])] then
+				table_remove(args, i)
+			end
 		end
+		return unpack(args)
 	end
-	return unpack(args)
 end
 
+-- Exposed so server owners and other addons can add/remove blacklist entries
 SF.BlacklistedDarkRPVars = {
 	hitTarget = true, -- The person a hitman has a hit on is generally not made visible to players (despite being accessible clientside).
-} -- Exposed so server owners and other addons can add/remove blacklist entries
+}
 
-local givemoneyBurst, moneyrequestBurst
-
-local requests, timeoutCvar, debugCvar
+local givemoneyBurst, moneyrequestBurst, requests, timeoutCvar, debugCvar
 local function printDebug(...)
 	if not debugCvar:GetBool() then return end
 	return print(string.format(...))
 end
 if SERVER then
+	debugCvar = CreateConVar("sf_moneyrequest_verbose_sv", 1, FCVAR_ARCHIVE, "Prints information about money requests to console.", 0, 1)
+	
+	util.AddNetworkString("sf_moneyrequest2")
+	
 	givemoneyBurst = SF.BurstObject("givemoney", "money giving", 0.5, 2, "The rate at which the cooldown for giving out that can be made for a single player decreases per second. Lower is longer, higher is shorter.", "Number of times a single player can give out money in a short time.")
 	moneyrequestBurst = SF.BurstObject("moneyrequest", "money request", 0.5, 1, "The rate at which the cooldown for money requests that can be made for a single player decreases per second. Lower is longer, higher is shorter.", "Number of money requests that can be made by a single player in a short time.")
-	debugCvar = CreateConVar("sf_moneyrequest_verbose_sv", 1, FCVAR_ARCHIVE, "Prints information about money requests to console.", 0, 1)
-
+	
 	registerprivilege("darkrp.moneyPrinterHooks", "Get own money printer info", "Allows the user to know when their own money printers catch fire or print money (and how much was printed)")
 	registerprivilege("darkrp.playerWalletChanged", "Be notified of wallet changes", "Allows the user to know when their own wallet changes")
 	registerprivilege("darkrp.lockdownHooks", "Know when lockdowns begin and end", "Allows the user to know when a lockdown begins or ends")
@@ -55,7 +74,8 @@ if SERVER then
 	registerprivilege("darkrp.requestMoney", "Ask players for money", "Allows the user to prompt other users for money (similar to E2 moneyRequest)")
 	registerprivilege("darkrp.giveMoney", "Give players money", "Allows the user to give other users money")
 	
-	requests = setmetatable({}, {__mode="k"}) -- Pretty sure __mode doesn't work with Player keys, but let's do it anyway.
+	-- We need to keep track of money requests, so that they can be accepted and declined, as well as expire on their own.
+	requests = setmetatable({}, {__mode="k"}) -- I'm pretty sure __mode doesn't work with Player keys, but let's use it anyway.
 	SF.MoneyRequests = requests
 	timeoutCvar = CreateConVar("sf_moneyrequest_timeout", 30, FCVAR_ARCHIVE, "Amount of time in seconds until a StarfallEx money request expires.", 5, 600)
 	local requestsUpdateCvar = CreateConVar("sf_moneyrequest_updaterate", 0, FCVAR_ARCHIVE, "How often StarfallEx will traverse the table of money requests and discard expired or invalid ones. This should be a low value.", 0, 60)
@@ -92,8 +112,8 @@ if SERVER then
 	cvars.AddChangeCallback("sf_moneyrequest_updaterate", function(name, old, new)
 		timer.Adjust("sf_moneyrequest_update", new)
 	end, "sf_updaterate")
-	util.AddNetworkString("sf_moneyrequest2")
 	
+	-- Console commands for managing money requests
 	local function chatPrint(target, ...)
 		local message = string.format(...)
 		if IsValid(target) and target:IsPlayer() then
@@ -180,8 +200,14 @@ if SERVER then
 else
 	debugCvar = CreateConVar("sf_moneyrequest_verbose_cl", 1, FCVAR_ARCHIVE, "Prints information about money requests to console.", 0, 1)
 	
+	-- Allow blocking/unblocking money requests from some players, to help mitigate abuse
 	local blocked = {}
 	SF.BlockedMoneyRequests = blocked
+	local function get_name(ply)
+		-- DarkRP already forbids unsafe characters, and the "//" means injection
+		-- shouldn't be possible anyway, but let's sanitize just to be safe.
+		return ply:GetName():gsub('[%z\x01-\x1f\x7f;"\']', "")
+	end
 	concommand.Add("sf_moneyrequest_block", function(executor, cmd, args)
 		if not args[1] then return print("sf_moneyrequest_block: missing steamid") end
 		if not args[1]:find('[^%d]') then args[1] = util.SteamIDFrom64(args[1]) end
@@ -189,8 +215,8 @@ else
 		blocked[args[1]] = true
 	end, function(cmd)
 		local tbl = {}
-		for _, player in pairs(player.GetHumans()) do
-			table.insert(tbl, cmd.." \""..player:SteamID().."\" // "..player:GetName():gsub('[%z\x01-\x1f\x7f;"\']', ""))
+		for _, ply in pairs(player.GetHumans()) do
+			table.insert(tbl, cmd.." \""..ply:SteamID().."\" // "..get_name(ply))
 		end
 		return tbl
 	end, "Block a user from sending you money requests. Lasts until the remainder of your session, even if they relog.")
@@ -203,15 +229,20 @@ else
 		local tbl = {}
 		for steamid in pairs(blocked) do
 			local target = player.GetBySteamID(steamid)
-			table.insert(tbl, cmd.." \""..steamid..(IsValid(target) and "\" // "..target:GetName():gsub('[%z\x01-\x1f\x7f;"\']', "") or ""))
+			table.insert(tbl, cmd.." \""..steamid..(IsValid(target) and "\" // "..get_name(target) or ""))
 		end
 		return tbl
 	end, "Unblock a user from sending you money requests.")
 	concommand.Add("sf_moneyrequest_blocklist", function(executor, cmd, args)
+		local i = 0
 		for steamid in pairs(blocked) do
 			print(steamid)
+			i = i+1
 		end
+		print(string.format("You have %d players on your block list.", i))
 	end, nil, "List players you have blocked from sending you money requests.")
+	
+	-- Display the money request prompt when notified
 	net.Receive("sf_moneyrequest2", function()
 		local index = net.ReadUInt(32)
 		local receiver = net.ReadEntity()
@@ -231,6 +262,8 @@ else
 		local mrf = vgui.Create("StarfallMoneyRequestFrame")
 		mrf:Init2(index, receiver, amount, expiry, message)
 	end)
+	
+	-- The actual money request prompt itself
 	local PANEL = {}
 	function PANEL:Init()
 		self:SetSize(350, 250)
@@ -616,7 +649,6 @@ if SERVER then
 	-- @param function? callbackFailure Optional function to call if request fails.
 	-- @param Player? receiver The player who may or may not receive the money, or the owner of the chip if not specified. Superuser only.
 	function darkrp_library.requestMoney(sender, amount, message, callbackSuccess, callbackFailure, receiver)
-		-- TODO: add ratelimiting (IMPORTANT)
 		checkluatype(amount, TYPE_NUMBER)
 		if callbackSuccess ~= nil then checkluatype(callbackSuccess, TYPE_FUNCTION) end
 		if callbackFailure ~= nil then checkluatype(callbackFailure, TYPE_FUNCTION) end
@@ -632,6 +664,12 @@ if SERVER then
 		local requestsForSender = requests[sender]
 		if instance.player ~= SF.Superuser then
 			if receiver ~= instance.player then SF.Throw("receiver must be chip owner if not superuser", 2) return end
+			-- In theory, measuring the time it takes for this function to execute could
+			-- allow a malicious chip to determine how many pending requests exist for a
+			-- particular player. In testing, I was unable to come to any conclusions
+			-- based on timing, even in extreme cases like having 1,000 pending requests.
+			-- Even if such an attack is possible, it is not a particularly major issue.
+			-- One should be aware that it may be possible, however.
 			for _, request in pairs(requestsForSender or {}) do
 				if request.receiver == receiver then SF.Throw("you already have a pending request for this sender", 2) return end
 			end
@@ -819,6 +857,7 @@ function ents_methods:isMoneyBag()
 end
 
 --- Get the amount of money in a "money bag" or cheque, or number of items in a dropped item stack. DarkRP only.
+-- Equivalent to GLua Entity:Getamount.
 -- @return number? Amount of money or number of items
 function ents_methods:getAmount()
 	self = getent(self)
@@ -826,6 +865,7 @@ function ents_methods:getAmount()
 end
 
 --- Get the number of items remaining in a shipment. DarkRP only.
+-- Equivalent to GLua Entity:Getcount.
 -- @return number? Number of items remaining, or nil if not a shipment
 function ents_methods:getCount()
 	self = getent(self)
@@ -833,6 +873,8 @@ function ents_methods:getCount()
 end
 
 --- Get the index of the contents of the shipment, which should then be looked up in the output of "darkrp.getCustomShipments". DarkRP only.
+-- Equivalent to GLua Entity:Getcontents.
+-- You may prefer to use Entity:getShipmentContents instead, although that function is slightly slower.
 -- @return number? Index of contents, or nil if not a shipment
 function ents_methods:getShipmentContentsIndex()
 	self = getent(self)
@@ -860,6 +902,7 @@ if SERVER then
 	end
 	
 	--- Returns the time left on a player's team ban. DarkRP only.
+	-- Only works if the player is the owner of the chip, or if the chip is running in superuser mode.
 	-- @server
 	-- @param number? team The number of the job (e.g. TEAM_MEDIC). Uses the player's team if nil.
 	-- @return number? The time left on the team ban in seconds, or nil if not banned.
@@ -871,7 +914,7 @@ if SERVER then
 	end
 	
 	--- Request money from a player.
-	-- This is subject to a burst limit. Use "darkrp.canMakeMoneyRequest" to check if you can request money that tick.
+	-- This is subject to a burst limit. Use the darkrp.canMakeMoneyRequest function to check if you can request money that tick.
 	-- @server
 	-- @param string? message An optional custom message that will be shown in the money request prompt. May not exceed 60 bytes in length.
 	-- @param number amount The amount of money to ask for.
@@ -884,7 +927,7 @@ if SERVER then
 	end
 	
 	--- Give this player money.
-	-- This is subject to a burst limit. Use "darkrp.canGiveMoney" to check if you can request money that tick.
+	-- This is subject to a burst limit. Use the darkrp.canGiveMoney function to check if you can request money that tick.
 	-- @server
 	-- @param number amount The amount of money to give.
 	function player_methods:giveMoney(amount)
@@ -934,7 +977,7 @@ end
 
 --- Get the value of a DarkRPVar, which is shared between server and client. Case-sensitive.
 -- Possible variables include (but are not limited to): AFK, AFKDemoted, money, salaryRL, rpname, job, HasGunlicense, Arrested, wanted, wantedReason, agenda, zombieToggle, hitTarget, hitPrice, lastHitTime, Energy
--- For money specifically, you can use "Player:getMoney".
+-- For money specifically, you may optionally use Player:getMoney instead.
 -- Some variables may be blacklisted so that you can't read their value.
 -- @param string var The name of the variable.
 -- @return any The value of the DarkRP var.
@@ -1018,6 +1061,7 @@ function player_methods:isWanted()
 end
 
 --- Get the amount of money this player has. DarkRP only.
+-- Equivalent to "ply:getDarkRPVar('money')"
 -- @return number? The amount of money, or nil if not accessible.
 function player_methods:getMoney()
 	if instance.player ~= SF.Superuser and SF.BlacklistedDarkRPVars.money then return end
