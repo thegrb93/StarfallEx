@@ -253,6 +253,14 @@ function PANEL:Setup(folder)
 	self.Root:SetDraggableName("sf_filenode")
 	self.Root:SetFolder(folder)
 
+	self.Libraries = self.RootNode:AddNode("Public Libs","icon16/plugin.png")
+	for k, v in pairs{
+		SafeNet = "https://raw.githubusercontent.com/Jacbo1/Public-Starfall/main/SafeNet/safeNet.lua",
+	} do
+		local node = self.Libraries:AddNode(k, "icon16/page_white.png")
+		node.FileURL = v
+	end
+
 	local examples_url = "https://api.github.com/repos/thegrb93/StarfallEx/contents/lua/starfall/examples"
 	http.Fetch( examples_url,
 		function( body, len, headers, code )
