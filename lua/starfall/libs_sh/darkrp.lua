@@ -764,15 +764,6 @@ else
 		DarkRP.openF4Menu()
 	end
 	
-	--- Open the menu that requests a hit.
-	-- Only works if the local player is the owner of the chip, or if the chip is running in superuser mode.
-	-- @client
-	-- @param Player hitman The hitman to request the hit to.
-	function darkrp_library.openHitMenu(hitman)
-		if instance.player ~= SF.Superuser and instance.player ~= LocalPlayer() then SF.Throw("may not use this function on anyone other than owner", 2) return end
-		DarkRP.openHitMenu(getply(hitman))
-	end
-	
 	--- Buy the door the local player is looking at, or open the menu if it's already bought. Equivalent to pressing F2 (or running gm_showteam).
 	-- Only works if the local player is the owner of the chip, or if the chip is running in superuser mode.
 	-- @client
