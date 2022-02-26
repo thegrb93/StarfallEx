@@ -891,6 +891,7 @@ if SERVER then
 		if instance.player ~= SF.Superuser and instance.player ~= self then SF.Throw("may not use this function on anyone other than owner", 2) return end
 		assertsafety(self:keysUnOwnAll())
 	end
+	player_methods.keysUnownAll = player_methods.keysUnOwnAll
 	
 	--- Returns the time left on a player's team ban. DarkRP only.
 	-- Only works if the player is the owner of the chip, or if the chip is running in superuser mode.
