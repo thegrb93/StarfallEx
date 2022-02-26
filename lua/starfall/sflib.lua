@@ -489,9 +489,18 @@ do
 	SF.HookTable = {
 		__index = {
 			add = function(self, index, func)
+				if not (self.hooks[index] or self.hookstoadd[index]) then
+					self.n = self.n + 1
+					if self.n>128 then
+						SF.Throw("Max hooks limit reached", 3)
+					end
+				end
 				self.hookstoadd[index] = func
 			end,
 			remove = function(self, index)
+				if self.hooks[index] or self.hookstoadd[index] then
+					self.n = self.n - 1
+				end
 				self.hooks[index] = nil
 				self.hookstoadd[index] = nil
 			end,
@@ -509,7 +518,8 @@ do
 		__call = function(p)
 			return setmetatable({
 				hooks = {},
-				hookstoadd = {}
+				hookstoadd = {},
+				n = 0
 			}, p)
 		end
 	}
