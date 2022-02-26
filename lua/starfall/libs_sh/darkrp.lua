@@ -765,7 +765,7 @@ end
 if SERVER then
 	--- Get the DarkRP door index of a door. Use this to store door information in the database.
 	-- @server
-	-- @return number The door index.
+	-- @return number? The door index, or nil if not a door.
 	function ents_methods:doorIndex()
 		return assertsafety(getent(self):doorIndex())
 	end
@@ -796,6 +796,20 @@ end
 -- @return boolean Whether it's a door.
 function ents_methods:isDoor()
 	return assertsafety(getent(self):isDoor())
+end
+
+--- Get whether this door is owned by someone.
+-- @return boolean Whether it's owned.
+function ents_methods:isKeysOwned()
+	return assertsafety(getent(self):isKeysOwned())
+end
+
+--- Get whether this door is owned or co-owned by this player.
+-- @param Player ply The player to query.
+-- @return boolean Whether this door is (co-)owned by the player.
+function ents_methods:isKeysOwnedBy(ply)
+	ply = getply(ply)
+	return assertsafety(getent(self):isKeysOwnedBy(ply))
 end
 
 --- Get whether this entity is a "money bag", i.e. dropped money from a money printer or /dropmoney. DarkRP only.
