@@ -471,7 +471,7 @@ function net_library.readEntity(callback)
 		return instance.WrapObject(Entity(index))
 	end
 end
-	
+
 --- Like glua net.Receive, adds a callback that is called when a net message with the matching name is received. If this happens, the net hook won't be called.
 -- @shared
 -- @param string name The name of the net message
