@@ -1425,6 +1425,7 @@ end
 -- @param boolean? outline Enable outline? Default false
 -- @param boolean? blur Enable blur? Default false
 -- @param boolean? extended Allows the font to display glyphs outside of Latin-1 range. Unicode code points above 0xFFFF are not supported. Required to use FontAwesome
+-- @param number? scanlines Scanline interval. Must be greater than 1 to work. Shares uniqueness with blursize so you cannot create more than one scanline type of font with the same blursize. Default 0
 -- @return string The font name that can be used with the rest of the font functions.
 -- Base font can be one of (keep in mind that these may not exist on all clients if they are not shipped with starfall):
 -- \- Akbar
@@ -1449,14 +1450,15 @@ function render_library.createFont(font, size, weight, antialias, additive, shad
 	size = tonumber(size) or 16
 	weight = tonumber(weight) or 400
 	blur = tonumber(blur) or 0
+	scanlines = tonumber(scanlines) or 0
 	antialias = tobool(antialias)
 	additive = tobool(additive)
 	shadow = tobool(shadow)
 	outline = tobool(outline)
 	extended = tobool(extended)
 
-	local name = string.format("sf_screen_font_%s_%d_%d_%d_%d_%d%d%d%d%d",
-		font, size, weight, blur, scanlines,
+	local name = string.format("sf_screen_font_%s_%d_%d_%d_%d%d%d%d%d",
+		font, size, weight, blur,
 		antialias and 1 or 0,
 		additive and 1 or 0,
 		shadow and 1 or 0,
@@ -1471,7 +1473,7 @@ function render_library.createFont(font, size, weight, antialias, additive, shad
 		surface.CreateFont(name, { size = size, weight = weight,
 			antialias = antialias, additive = additive, font = font,
 			shadow = shadow, outline = outline, blur = blur,
-			scanlines = scalines, extended = extended })
+			scanlines = scanlines, extended = extended })
 
 		defined_fonts[name] = true
 	end
