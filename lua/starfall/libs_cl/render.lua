@@ -1423,7 +1423,7 @@ end
 -- @param boolean? additive If true, adds brightness to pixels behind it rather than drawing over them. Default false
 -- @param boolean? shadow Enable drop shadow? Default false
 -- @param boolean? outline Enable outline? Default false
--- @param boolean? blur Enable blur? Default false
+-- @param boolean? blursize The size of the blur Default 0
 -- @param boolean? extended Allows the font to display glyphs outside of Latin-1 range. Unicode code points above 0xFFFF are not supported. Required to use FontAwesome
 -- @param number? scanlines Scanline interval. Must be greater than 1 to work. Shares uniqueness with blursize so you cannot create more than one scanline type of font with the same blursize. Default 0
 -- @return string The font name that can be used with the rest of the font functions.
@@ -1446,10 +1446,10 @@ end
 -- \- Lucida Console
 -- \- Times New Roman
 
-function render_library.createFont(font, size, weight, antialias, additive, shadow, outline, blur, extended, scanlines)
+function render_library.createFont(font, size, weight, antialias, additive, shadow, outline, blursize, extended, scanlines)
 	size = tonumber(size) or 16
 	weight = tonumber(weight) or 400
-	blur = tonumber(blur) or 0
+	blursize = tonumber(blursize) or 0
 	scanlines = tonumber(scanlines) or 0
 	antialias = tobool(antialias)
 	additive = tobool(additive)
@@ -1458,7 +1458,7 @@ function render_library.createFont(font, size, weight, antialias, additive, shad
 	extended = tobool(extended)
 
 	local name = string.format("sf_screen_font_%s_%d_%d_%d_%d%d%d%d%d",
-		font, size, weight, blur,
+		font, size, weight, blursize,
 		antialias and 1 or 0,
 		additive and 1 or 0,
 		shadow and 1 or 0,
@@ -1472,7 +1472,7 @@ function render_library.createFont(font, size, weight, antialias, additive, shad
 
 		surface.CreateFont(name, { size = size, weight = weight,
 			antialias = antialias, additive = additive, font = font,
-			shadow = shadow, outline = outline, blur = blur,
+			shadow = shadow, outline = outline, blursize = blursize,
 			scanlines = scanlines, extended = extended })
 
 		defined_fonts[name] = true
