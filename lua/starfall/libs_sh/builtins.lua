@@ -156,6 +156,41 @@ builtins_library.unpack = unpack
 -- @return table tbl with metatable set to meta
 builtins_library.setmetatable = setmetatable
 
+--- Returns if the given input is a number
+-- @name builtins_library.isnumber
+-- @class function
+-- @param any x Input to check
+-- @return boolean If the object is a number or not
+builtins_library.isnumber = isnumber
+
+--- Returns if the given input is a string
+-- @name builtins_library.isstring
+-- @class function
+-- @param any x Input to check
+-- @return boolean If the object is a string or not
+builtins_library.isstring = isstring
+
+--- Returns if the given input is a table
+-- @name builtins_library.istable
+-- @class function
+-- @param any x Input to check
+-- @return boolean If the object is a table or not
+builtins_library.istable = istable
+
+--- Returns if the given input is a boolean
+-- @name builtins_library.isbool
+-- @class function
+-- @param any x Input to check
+-- @return boolean If the object is a boolean or not
+builtins_library.isbool = isbool
+
+--- Returns if the given input is a function
+-- @name builtins_library.isfunction
+-- @class function
+-- @param any x Input to check
+-- @return boolean If the object is a function or not
+builtins_library.isfunction = isfunction
+
 --- Returns the metatable of an object. Doesn't work on most internal metatables
 -- @param table tbl Table to get metatable of
 -- @return table The metatable of tbl
