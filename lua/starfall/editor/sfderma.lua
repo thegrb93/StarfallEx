@@ -253,6 +253,21 @@ function PANEL:Setup(folder)
 	self.Root:SetDraggableName("sf_filenode")
 	self.Root:SetFolder(folder)
 
+	self.Libraries = self.RootNode:AddNode("Public Libs","icon16/plugin.png")
+	for k, v in pairs{
+		{"Async", "https://raw.githubusercontent.com/keever50/StarfallLibraries/master/async.txt"},
+		{"Console", "https://raw.githubusercontent.com/Derpius/public-starfalls/master/console/console.txt"},
+		{"CriticalPD", "https://raw.githubusercontent.com/thegrb93/MyStarfallScripts/master/libs/CriticalPD.txt"},
+		{"GifLoader", "https://raw.githubusercontent.com/thegrb93/MyStarfallScripts/master/libs/gifspritesheet.txt"},
+		{"HoloText", "https://raw.githubusercontent.com/Derpius/public-starfalls/master/libs/holotext/main.txt"},
+		{"HttpQueue", "https://raw.githubusercontent.com/ANormalTwig/PublicStarfalls/main/libraries/http_queueing.lua"},
+		{"SafeNet", "https://raw.githubusercontent.com/Jacbo1/Public-Starfall/main/SafeNet/safeNet.lua"},
+		{"XInputNet", "https://raw.githubusercontent.com/thegrb93/MyStarfallScripts/master/libs/xinput.txt"},
+	} do
+		local node = self.Libraries:AddNode(v[1], "icon16/page_white.png")
+		node.FileURL = v[2]
+	end
+
 	local examples_url = "https://api.github.com/repos/thegrb93/StarfallEx/contents/lua/starfall/examples"
 	http.Fetch( examples_url,
 		function( body, len, headers, code )
