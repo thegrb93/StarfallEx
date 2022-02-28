@@ -197,7 +197,7 @@ end
 --- Gets the command bound to a key
 -- @client
 -- @param number key The key id, see input
--- @return string binding The command bound to the key
+-- @return string The command bound to the key
 function input_library.lookupKeyBinding(key)
 	checkluatype(key, TYPE_NUMBER)
 	checkpermission(instance, nil, "input.bindings")

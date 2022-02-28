@@ -1128,7 +1128,7 @@ local notificationsMap = {
 
 if SERVER then
 	util.AddNetworkString("starfall_addnotify")
-	util.AddNetworkString("starfall_console_print")
+	util.AddNetworkString("starfall_print")
 
 	function SF.AddNotify(ply, msg, notifyType, duration, sound)
 		if not (ply and ply:IsValid()) then return end
@@ -1146,8 +1146,10 @@ if SERVER then
 	end
 
 	function SF.Print(ply, msg)
-		net.Start("starfall_console_print")
-			net.WriteString(msg)
+		net.Start("starfall_print")
+			net.WriteBool(true)
+			net.WriteUInt(1, 32)
+			net.WriteType(msg)
 		if ply then net.Send(ply) else net.Broadcast() end
 	end
 
@@ -1184,16 +1186,18 @@ else
 		MsgC(Color(255, 255, 0), "SF HTTP: " .. plyStr .. ": requested url ", Color(255,255,255), url, "\n")
 	end
 
-	net.Receive("starfall_console_print", function ()
-		print(net.ReadString())
-	end)
-
-	net.Receive("starfall_chatprint", function ()
+	net.Receive("starfall_print", function ()
+		local console = net.ReadBool()
 		local recv = {}
 		for i = 1, net.ReadUInt(32) do
 			recv[i] = net.ReadType()
 		end
-		chat.AddText(unpack(recv))
+		if console then
+			table.insert(recv, "\n")
+			MsgC(unpack(recv))
+		else
+			chat.AddText(unpack(recv))
+		end
 	end)
 end
 

@@ -6,7 +6,6 @@ SF.Permissions.registerPrivilege("console.command", "Console command", "Allows t
 
 local userdataLimit, printBurst
 if SERVER then
-	util.AddNetworkString("starfall_chatprint")
 	userdataLimit = CreateConVar("sf_userdata_max", "1048576", { FCVAR_ARCHIVE }, "The maximum size of userdata (in bytes) that can be stored on a Starfall chip (saved in duplications).")
 	printBurst = SF.BurstObject("print", "print", 3000, 10000, "The print burst regen rate in Bytes/sec.", "The print burst limit in Bytes")
 end
@@ -469,8 +468,9 @@ local function argsToChat(...)
 end
 
 if SERVER then
-	local function sendPrintToPlayer(ply, data)
-		net.Start("starfall_chatprint")
+	local function sendPrintToPlayer(ply, data, console)
+		net.Start("starfall_print")
+		net.WriteBool(console)
 		net.WriteUInt(#data, 32)
 		for i, v in ipairs(data) do
 			net.WriteType(v)
@@ -484,7 +484,16 @@ if SERVER then
 	function builtins_library.print(...)
 		local data, strlen, size = argsToChat(...)
 		printBurst:use(instance.player, size)
-		sendPrintToPlayer(instance.player, data)
+		sendPrintToPlayer(instance.player, data, false)
+	end
+
+	--- Prints a message to the player's console.
+	-- @shared
+	-- @param ... printArgs Values to print. Colors before text will set the text color
+	function builtins_library.printConsole(...)
+		local data, strlen, size = argsToChat(...)
+		printBurst:use(instance.player, size)
+		sendPrintToPlayer(instance.player, data, true)
 	end
 
 	--- Prints a message to a target player's chat as long as they're connected to a hud.
@@ -504,7 +513,7 @@ if SERVER then
 				data[k] = string.gsub(v, "[\r\n%z\t]", "")
 			end
 		end
-		sendPrintToPlayer(ply, data)
+		sendPrintToPlayer(ply, data, false)
 	end
 
 	--- Prints a table to player's chat
@@ -589,6 +598,14 @@ else
 			end
 		end
 		chat.AddText(unpack(data))
+	end
+
+	function builtins_library.printConsole(...)
+		if instance.player == LocalPlayer() then
+			local data = argsToChat(...)
+			table.insert(data, "\n")
+			MsgC(unpack(data))
+		end
 	end
 
 	function builtins_library.printTable(tbl)
