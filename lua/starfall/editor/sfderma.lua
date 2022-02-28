@@ -260,6 +260,7 @@ function PANEL:Setup(folder)
 		Console = "https://raw.githubusercontent.com/Derpius/public-starfalls/master/console/console.txt",
 		GifLoader = "https://raw.githubusercontent.com/thegrb93/MyStarfallScripts/master/libs/gifspritesheet.txt",
 		HoloText = "https://raw.githubusercontent.com/Derpius/public-starfalls/master/libs/holotext/main.txt",
+		HttpQueue = "https://raw.githubusercontent.com/ANormalTwig/PublicStarfalls/main/libraries/http_queueing.lua",
 		SafeNet = "https://raw.githubusercontent.com/Jacbo1/Public-Starfall/main/SafeNet/safeNet.lua",
 		XInputNet = "https://raw.githubusercontent.com/thegrb93/MyStarfallScripts/master/libs/xinput.txt",
 	} do
