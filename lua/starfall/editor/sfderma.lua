@@ -1213,7 +1213,6 @@ function PANEL:Init()
 			self.FontData.size,
 			self.FontData.weight,
 			tostring(self.FontData.antialias),
-			-- tostring(self.FontData.scanlines,
 			-- tostring(self.FontData.underline,
 			-- tostring(self.FontData.italic,
 			-- tostring(self.FontData.strikeout,
