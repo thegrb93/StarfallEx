@@ -3,6 +3,7 @@ local checkluatype = SF.CheckLuaType
 local dgetmeta = debug.getmetatable
 
 SF.Permissions.registerPrivilege("console.command", "Console command", "Allows the starfall to run console commands", { client = { default = 4 } })
+SF.Permissions.registerPrivilege("enablehud", "Allow enabling hud", "Allows the starfall to enable hud rendering", { client = {}, enablehud = {} })
 
 local userdataLimit, printBurst
 if SERVER then
@@ -1109,11 +1110,8 @@ function builtins_library.enableHud(ply, active)
 		SF.EnableHud(ply, instance.entity, nil, active)
 	else
 		local vehicle = ply:GetVehicle()
-		if vehicle:IsValid() and SF.Permissions.getOwner(vehicle)==instance.player then
-			SF.EnableHud(ply, instance.entity, vehicle, active)
-		else
-			SF.Throw("Player must be sitting in owner's vehicle or be owner of the chip!", 2)
-		end
+		checkpermission(instance, vehicle, "enablehud")
+		SF.EnableHud(ply, instance.entity, vehicle, active)
 	end
 end
 
