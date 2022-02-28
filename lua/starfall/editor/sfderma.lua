@@ -1228,7 +1228,6 @@ function PANEL:Init()
 			self.FontData.size,
 			self.FontData.weight,
 			tostring(self.FontData.antialias),
-			-- tostring(self.FontData.scanlines,
 			-- tostring(self.FontData.underline,
 			-- tostring(self.FontData.italic,
 			-- tostring(self.FontData.strikeout,
@@ -1237,8 +1236,9 @@ function PANEL:Init()
 			tostring(self.FontData.additive),
 			tostring(self.FontData.shadow),
 			tostring(self.FontData.outline),
-			self.FontData.blursize,
-			tostring(self.FontData.extended)},",")..")")
+			tostring(self.FontData.blursize),
+			tostring(self.FontData.extended),
+			tostring(self.FontData.scanlines)},",")..")")
 	end
 	self:SetSize(300,600)
 	self:Center()
