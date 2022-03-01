@@ -144,11 +144,8 @@ end
 function ENT:BodyUpdate()
 	self:BodyMoveXY()
 	
-	local velForw = self:EyeAngles():Forward():Dot(self.loco:GetVelocity())
-	local velRight = self:EyeAngles():Right():Dot(self.loco:GetVelocity())
-	local range = math.atan2(-velRight, velForw) / math.pi
-	local remappedRange = math.Remap(range, -1, 1, -180, 180)
-	self:SetPoseParameter("move_yaw", remappedRange )
+	local localVel = self:WorldToLocal(self.loco:GetVelocity() + self:GetPos())
+	self:SetPoseParameter("move_yaw", math.deg(math.atan2(localVel.x, localVel.y)))
 	
 	if CLIENT then
 		self:InvalidateBoneCache()
