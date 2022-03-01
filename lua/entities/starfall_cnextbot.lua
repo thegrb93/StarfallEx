@@ -1,6 +1,6 @@
 AddCSLuaFile()
 
-ENT.Base 			= "base_nextbot"
+ENT.Base 		= "base_nextbot"
 ENT.Spawnable		= true
 
 
@@ -84,7 +84,6 @@ function ENT:RunBehaviour()
 	
 end
 
--- TO DO: Maybe look into caching the table counts as I don't know how expensive the counting function is
 function ENT:OnInjured(dmginfo)
 	if self.InjuredCallbacks:isEmpty() then return end
 	local inst = self.chip.instance
