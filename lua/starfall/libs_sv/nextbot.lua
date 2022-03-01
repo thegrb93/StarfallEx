@@ -78,13 +78,8 @@ local function register(ent)
 end
 
 instance:AddHook("deinitialize", function()
-	if #nextbots > 0 then
-		for nextbot in pairs(nextbots) do
-			-- For some reason there's numbers being added to the nextbots table when they're created so I have to do this or it errors. Why does it add numbers to the table? I wish I knew.
-			if IsEntity(nextbot) then
-				nextbot:Remove()
-			end
-		end
+	for nextbot in pairs(nextbots) do
+		nextbot:Remove()
 	end
 end)
 
@@ -111,7 +106,7 @@ function nextbot_library.create(pos, mdl)
 	nb:SetNBModel(mdl or "models/kleiner.mdl")
 	nb.chip = instance.entity
 	nb:Spawn()
-	table.insert(nextbots, nb)
+	nextbots[nb] = true
 	return nbwrap(nb)
 end
 	
@@ -142,8 +137,8 @@ end
 
 --- Returns the Vector the nextbot is trying to go to, set by setGotoPos
 -- @server
--- @return Vector Vector nextbot is trying to go to if it exists, else returns nil.
-function nb_methods:isGoingTo()
+-- @return Vector? Where the nextbot is trying to go to if it exists, else returns nil.
+function nb_methods:getGoingTo()
 	local nb = nbunwrap(self)
 	if nb.goTo then
 		return vwrap(nb.goTo)
@@ -173,6 +168,7 @@ end
 -- @server
 -- @param number runact The activity the nextbot will use.
 function nb_methods:setRunAct(act)
+	checkluatype(act, TYPE_NUMBER)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setRunAct")
 	nb.RUNACT = act
@@ -181,7 +177,7 @@ end
 --- Gets the activity the nextbot uses for running.
 -- @server
 -- @return number The run activity.
-function nb_methods:getRunAct(act)
+function nb_methods:getRunAct()
 	local nb = nbunwrap(self)
 	return nb.RUNACT
 end
@@ -190,6 +186,7 @@ end
 -- @server
 -- @param number runact The activity the nextbot will use.
 function nb_methods:setIdleAct(act)
+	checkluatype(act, TYPE_NUMBER)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setIdleAct")
 	nb.IDLEACT = act
@@ -197,8 +194,8 @@ end
 
 --- Gets the activity the nextbot uses for idling.
 -- @server
--- @return number The run activity.
-function nb_methods:getRunAct(act)
+-- @return number The idle activity.
+function nb_methods:getIdleAct()
 	local nb = nbunwrap(self)
 	return nb.IDLEACT
 end
@@ -233,6 +230,8 @@ end
 -- @param string callbackid The unique ID this callback will use.
 -- @param function callback The function to run when the NB dies. The arguments are: (The NextBot, Damage, Attacker, Inflictor, Damage Pos, Damage Force, Damage Type)
 function nb_methods:addDeathCallback(id, func)
+	checkluatype(id, TYPE_STRING)
+	checkluatype(func, TYPE_FUNCTION)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.addDeathCallback")
 	nb.DeathCallbacks:add(id, func)
@@ -242,6 +241,7 @@ end
 -- @server
 -- @param string callbackid The unique ID of the callback to remove.
 function nb_methods:removeDeathCallback(id)
+	checkluatype(id, TYPE_STRING)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.removeDeathCallback")
 	nb.DeathCallbacks:remove(id)
@@ -252,6 +252,8 @@ end
 -- @param string callbackid The unique ID this callback will use.
 -- @param function callback The function to run when the NB gets injured. The arguments are: (The NextBot, Damage, Attacker, Inflictor, Damage Pos, Damage Force, Damage Type)
 function nb_methods:addInjuredCallback(id, func)
+	checkluatype(id, TYPE_STRING)
+	checkluatype(func, TYPE_FUNCTION)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.addInjuredCallback")
 	nb.InjuredCallbacks:add(id, func)
@@ -261,6 +263,7 @@ end
 -- @server
 -- @param string callbackid The unique ID of the callback to remove.
 function nb_methods:removeInjuredCallback(id)
+	checkluatype(id, TYPE_STRING)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.removeInjuredCallback")
 	nb.InjuredCallbacks:remove(id)
@@ -271,6 +274,8 @@ end
 -- @param string callbackid The unique ID this callback will use.
 -- @param function callback The function to run when the NB lands on the ground. The arguments are: (The NextBot, The entity the NB landed on.)
 function nb_methods:addLandCallback(id, func)
+	checkluatype(id, TYPE_STRING)
+	checkluatype(func, TYPE_FUNCTION)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.addLandCallback")
 	nb.LandCallbacks:add(id, func)
@@ -280,6 +285,7 @@ end
 -- @server
 -- @param string callbackid The unique ID of the callback to remove.
 function nb_methods:removeLandCallback(id)
+	checkluatype(id, TYPE_STRING)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.removeLandCallback")
 	nb.LandCallbacks:remove(id)
@@ -290,6 +296,8 @@ end
 -- @param string callbackid The unique ID this callback will use.
 -- @param function callback The function to run when the NB leaves the ground. The arguments are: (The NextBot, The entity the NB "jumped" from.)
 function nb_methods:addLeaveGroundCallback(id, func)
+	checkluatype(id, TYPE_STRING)
+	checkluatype(func, TYPE_FUNCTION)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.addLeaveGroundCallback")
 	nb.JumpCallbacks:add(id, func)
@@ -298,7 +306,8 @@ end
 --- Removes a landing callback function from the NextBot.
 -- @server
 -- @param string callbackid The unique ID of the callback to remove.
-function nb_methods:removeLeaveGroundCallback(id)	
+function nb_methods:removeLeaveGroundCallback(id)
+	checkluatype(id, TYPE_STRING)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.removeLeaveGroundCallback")
 	nb.JumpCallbacks:remove(id)
@@ -309,6 +318,8 @@ end
 -- @param string callbackid The unique ID this callback will use.
 -- @param function callback The function to run when the NB gets ignited. The arguments are: (The NextBot)
 function nb_methods:addIgniteCallback(id, func)
+	checkluatype(id, TYPE_STRING)
+	checkluatype(func, TYPE_FUNCTION)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.addIgniteCallback")
 	nb.IgniteCallbacks:add(id, func)
@@ -317,7 +328,8 @@ end
 --- Removes a ignite callback function from the NextBot.
 -- @server
 -- @param string callbackid The unique ID of the callback to remove.
-function nb_methods:removeIgniteCallback(id)	
+function nb_methods:removeIgniteCallback(id)
+	checkluatype(id, TYPE_STRING)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.removeIgniteCallback")
 	nb.IgniteCallbacks:remove(id)
@@ -328,6 +340,8 @@ end
 -- @param string callbackid The unique ID this callback will use.
 -- @param function callback The function to run when the NB enters a new nav area. The arguments are: (The NextBot, Old Nav Area, New Nav Area)
 function nb_methods:addNavChangeCallback(id, func)
+	checkluatype(id, TYPE_STRING)
+	checkluatype(func, TYPE_FUNCTION)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.addNavChangeCallback")
 	nb.NavChangeCallbacks:add(id, func)
@@ -337,6 +351,7 @@ end
 -- @server
 -- @param string callbackid The unique ID of the callback to remove.
 function nb_methods:removeNavChangeCallback(id)
+	checkluatype(id, TYPE_STRING)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.removeNavChangeCallback")
 	nb.NavChangeCallbacks:remove(id)
@@ -347,6 +362,8 @@ end
 -- @param string callbackid The unique ID this callback will use.
 -- @param function callback The function to run when the NB touches another entity. The arguments are: (The NextBot, The entity the NB touched.)
 function nb_methods:addContactCallback(id, func)
+	checkluatype(id, TYPE_STRING)
+	checkluatype(func, TYPE_FUNCTION)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.addContactCallback")
 	nb.ContactCallbacks:add(id, func)
@@ -356,6 +373,7 @@ end
 -- @server
 -- @param string callbackid The unique ID of the callback to remove.
 function nb_methods:removeContactCallback(id)
+	checkluatype(id, TYPE_STRING)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.removeContactCallback")
 	nb.ContactCallbacks:remove(id)
@@ -494,7 +512,7 @@ end
 -- @return Vector A vector representing the X and Y movement.
 function nb_methods:getGroundMotionVector()
 	local nb = nbunwrap(self)
-	return nb.loco:GetGroundMotionVector()
+	return vwrap(nb.loco:GetGroundMotionVector())
 end
 
 --- Returns whether the nextbot this locomotion is attached to is on ground or not.
