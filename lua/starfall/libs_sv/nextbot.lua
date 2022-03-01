@@ -17,7 +17,6 @@ SF.RegisterType("NextBot", false, true, debug.getregistry().NextBot, "Entity")
 SF.RegisterLibrary("nextbot")
 
 registerprivilege("nextbot.create", "Create nextbot", "Allows the user to create nextbots.")
-registerprivilege("nextbot.addContactCallback", "Add contact callback", "Allows the user to add a collision callback to the entity which is called every tick when touched.", {usergroups = {default = 1} } )
 registerprivilege("nextbot.setGotoPos", "Set nextbot goto pos", "Allows the user to set a vector pos for the nextbot to try and go to.", {entites = {}})
 registerprivilege("nextbot.removeGotoPos", "Remove nextbot goto pos", "Allows the user to remove the goto pos from a nextbot.", {entites = {}})
 registerprivilege("nextbot.playSequence", "Play nextbot sequence", "Allows the user to set an animation for the nextbot to play.", {entites = {}})
@@ -34,6 +33,7 @@ registerprivilege("nextbot.addLandCallback", "Add nextbot land callback", "Allow
 registerprivilege("nextbot.removeLandCallback", "Remove nextbot land callback", "Allows the user to remove an on land callback function from the nextbot.", {entities = {}})
 registerprivilege("nextbot.addLeaveGroundCallback", "Add nextbot jump callback", "Allows the user to add a callback function to run when the nextbot leaves the ground.", {entities = {}})
 registerprivilege("nextbot.removeLeaveGroundCallback", "Remove nextbot jump callback", "Allows the user to remove an on jump callback function from the nextbot.", {entities = {}})
+registerprivilege("nextbot.addContactCallback", "Add contact callback", "Allows the user to add a collision callback to the entity which is called every tick when touched.", {entities = {}, usergroups = {default = 1} } )
 registerprivilege("nextbot.removeContactCallback", "Remove nextbot contact callback", "Allows the user to remove the on contact callback from the nextbot.", {entities = {}})
 registerprivilege("nextbot.addIgniteCallback", "Add nextbot ignite callback", "Allows the user to add a callback function to run when the nextbot gets set on fire.", {entities = {}})
 registerprivilege("nextbot.removeIgniteCallback", "Remove nextbot ignite callback", "Allows the user to remove an on ignite callback function from the nextbot.", {entities = {}})
@@ -79,7 +79,7 @@ end
 
 instance:AddHook("deinitialize", function()
 	if #nextbots > 0 then
-		for nextbot, _ in pairs(nextbots) do
+		for nextbot in pairs(nextbots) do
 			-- For some reason there's numbers being added to the nextbots table when they're created so I have to do this or it errors. Why does it add numbers to the table? I wish I knew.
 			if IsEntity(nextbot) then
 				nextbot:Remove()
