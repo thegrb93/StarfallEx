@@ -90,8 +90,8 @@ function ENT:OnInjured(dmginfo)
 	local inst = self.chip.instance
 	self.InjuredCallbacks:run(inst,
 		dmginfo:GetDamage(),
-		inst.Types.Entity.Wrap(dmginfo:GetAttacker()),
-		inst.Types.Entity.Wrap(dmginfo:GetInflictor()),
+		inst.WrapObject(dmginfo:GetAttacker()),
+		inst.WrapObject(dmginfo:GetInflictor()),
 		inst.Types.Vector.Wrap(dmginfo:GetDamagePosition()), 
 		inst.Types.Vector.Wrap(dmginfo:GetDamageForce()),
 		dmginfo:GetDamageType())
@@ -102,8 +102,8 @@ function ENT:OnKilled(dmginfo)
 	local inst = self.chip.instance
 	self.DeathCallbacks:run(inst,
 		dmginfo:GetDamage(),
-		inst.Types.Entity.Wrap(dmginfo:GetAttacker()),
-		inst.Types.Entity.Wrap(dmginfo:GetInflictor()),
+		inst.WrapObject(dmginfo:GetAttacker()),
+		inst.WrapObject(dmginfo:GetInflictor()),
 		inst.Types.Vector.Wrap(dmginfo:GetDamagePosition()),
 		inst.Types.Vector.Wrap(dmginfo:GetDamageForce()),
 		dmginfo:GetDamageType())
@@ -113,13 +113,13 @@ end
 function ENT:OnLandOnGround(groundent)
 	if self.LandCallbacks:isEmpty() then return end
 	local inst = self.chip.instance
-	self.LandCallbacks:run(inst, inst.Types.Entity.Wrap(groundent))
+	self.LandCallbacks:run(inst, inst.WrapObject(groundent))
 end
 
 function ENT:OnLeaveGround(groundent)
 	if self.JumpCallbacks:isEmpty() then return end
 	local inst = self.chip.instance
-	self.JumpCallbacks:run(inst, self.chip.instance.Types.Entity.Wrap(groundent))
+	self.JumpCallbacks:run(inst, inst.WrapObject(groundent))
 end
 
 function ENT:OnIgnite()
@@ -138,7 +138,7 @@ end
 function ENT:OnContact(colent)
 	if self.ContactCallbacks:isEmpty() then return end
 	local inst = self.chip.instance
-	self.ContactCallbacks:run(inst, inst.Types.Entity.Wrap(colent))
+	self.ContactCallbacks:run(inst, inst.WrapObject(colent))
 end
 
 function ENT:BodyUpdate()
