@@ -6,7 +6,6 @@ SF.Permissions.registerPrivilege("console.command", "Console command", "Allows t
 
 local userdataLimit, printBurst
 if SERVER then
-	util.AddNetworkString("starfall_chatprint")
 	userdataLimit = CreateConVar("sf_userdata_max", "1048576", { FCVAR_ARCHIVE }, "The maximum size of userdata (in bytes) that can be stored on a Starfall chip (saved in duplications).")
 	printBurst = SF.BurstObject("print", "print", 3000, 10000, "The print burst regen rate in Bytes/sec.", "The print burst limit in Bytes")
 end
@@ -156,6 +155,41 @@ builtins_library.unpack = unpack
 -- @param table meta The metatable to use
 -- @return table tbl with metatable set to meta
 builtins_library.setmetatable = setmetatable
+
+--- Returns if the given input is a number
+-- @name builtins_library.isnumber
+-- @class function
+-- @param any x Input to check
+-- @return boolean If the object is a number or not
+builtins_library.isnumber = isnumber
+
+--- Returns if the given input is a string
+-- @name builtins_library.isstring
+-- @class function
+-- @param any x Input to check
+-- @return boolean If the object is a string or not
+builtins_library.isstring = isstring
+
+--- Returns if the given input is a table
+-- @name builtins_library.istable
+-- @class function
+-- @param any x Input to check
+-- @return boolean If the object is a table or not
+builtins_library.istable = istable
+
+--- Returns if the given input is a boolean
+-- @name builtins_library.isbool
+-- @class function
+-- @param any x Input to check
+-- @return boolean If the object is a boolean or not
+builtins_library.isbool = isbool
+
+--- Returns if the given input is a function
+-- @name builtins_library.isfunction
+-- @class function
+-- @param any x Input to check
+-- @return boolean If the object is a function or not
+builtins_library.isfunction = isfunction
 
 --- Returns the metatable of an object. Doesn't work on most internal metatables
 -- @param table tbl Table to get metatable of
@@ -469,8 +503,9 @@ local function argsToChat(...)
 end
 
 if SERVER then
-	local function sendPrintToPlayer(ply, data)
-		net.Start("starfall_chatprint")
+	local function sendPrintToPlayer(ply, data, console)
+		net.Start("starfall_print")
+		net.WriteBool(console)
 		net.WriteUInt(#data, 32)
 		for i, v in ipairs(data) do
 			net.WriteType(v)
@@ -484,7 +519,16 @@ if SERVER then
 	function builtins_library.print(...)
 		local data, strlen, size = argsToChat(...)
 		printBurst:use(instance.player, size)
-		sendPrintToPlayer(instance.player, data)
+		sendPrintToPlayer(instance.player, data, false)
+	end
+
+	--- Prints a message to the player's console.
+	-- @shared
+	-- @param ... printArgs Values to print. Colors before text will set the text color
+	function builtins_library.printConsole(...)
+		local data, strlen, size = argsToChat(...)
+		printBurst:use(instance.player, size)
+		sendPrintToPlayer(instance.player, data, true)
 	end
 
 	--- Prints a message to a target player's chat as long as they're connected to a hud.
@@ -504,7 +548,7 @@ if SERVER then
 				data[k] = string.gsub(v, "[\r\n%z\t]", "")
 			end
 		end
-		sendPrintToPlayer(ply, data)
+		sendPrintToPlayer(ply, data, false)
 	end
 
 	--- Prints a table to player's chat
@@ -589,6 +633,14 @@ else
 			end
 		end
 		chat.AddText(unpack(data))
+	end
+
+	function builtins_library.printConsole(...)
+		if instance.player == LocalPlayer() then
+			local data = argsToChat(...)
+			table.insert(data, "\n")
+			MsgC(unpack(data))
+		end
 	end
 
 	function builtins_library.printTable(tbl)

@@ -88,14 +88,22 @@ local function hologramOnDestroy(holo)
 	plyCount:free(instance.player, 1)
 end
 
-local function removeHolo(holo)
-	if CLIENT and instance.data.render.isRendering then SF.Throw("Cannot remove while in rendering hook!", 2) end
-	if not holo:IsValid() or not holo.IsSFHologram then return end
-
+local function removeHoloInternal(holo)
 	holo:RemoveCallOnRemove("starfall_hologram_delete")
 	hologramOnDestroy(holo)
-
 	holo:Remove()
+end
+
+local function removeHolo(holo)
+	if CLIENT and instance.data.render.isRendering then SF.Throw("Cannot remove while in rendering hook!", 3) end
+	if not holo:IsValid() or not holo.IsSFHologram then SF.Throw("Invalid hologram!", 3) end
+	return removeHoloInternal(holo)
+end
+
+local function removeAllHolosInternal()
+	for holoent, _ in pairs(holograms) do 
+		removeHoloInternal(holoent) 
+	end
 end
 
 local function removeAllHolos()
@@ -106,9 +114,14 @@ end
 
 instance:AddHook("deinitialize", function()
 	if SERVER then
-		removeAllHolos()
+		removeAllHolosInternal()
 	else
-		timer.Simple(0, removeAllHolos)
+		if instance.data.render.isRendering then
+			-- Removing hologram in render hook = crash
+			timer.Simple(0, removeAllHolosInternal)
+		else
+			removeAllHolosInternal()
+		end
 	end
 end)
 

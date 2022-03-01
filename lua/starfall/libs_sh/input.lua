@@ -45,6 +45,7 @@ if SERVER then
 end
 
 registerprivilege("input", "Input", "Allows the user to see what buttons you're pressing.", { client = {} })
+registerprivilege("input.bindings", "Input", "Allows the user to see your bindings.", { client = { default = 1 } })
 registerprivilege("input.emulate", "Input", "Allows starfall to emulate user input.", { client = { default = 1 } })
 
 local controlsLocked = false
@@ -191,6 +192,16 @@ function input_library.lookupBinding(binding)
 
 		return instance.env.KEY[bind] or instance.env.MOUSE[bind], bind
 	end
+end
+
+--- Gets the command bound to a key
+-- @client
+-- @param number key The key id, see input
+-- @return string The command bound to the key
+function input_library.lookupKeyBinding(key)
+	checkluatype(key, TYPE_NUMBER)
+	checkpermission(instance, nil, "input.bindings")
+	return input.LookupKeyBinding(key)
 end
 
 --- Gets whether a key is down
