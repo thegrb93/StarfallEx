@@ -96,13 +96,14 @@ function nextbot_library.create(pos, mdl)
 
 	checkpermission(instance, nil, "nextbot.create")
 	checkluatype(mdl, TYPE_STRING)
+	local upos = vunwrap(pos)
 	
 	local ply = instance.player
 	nbCount:checkuse(ply, 1)
 
 	local nb = ents.Create("starfall_cnextbot")
 	register(nb, instance)
-	nb:SetPos(vunwrap(pos))
+	nb:SetPos(upos)
 	nb:SetNBModel(mdl or "models/kleiner.mdl")
 	nb.chip = instance.entity
 	nb:Spawn()
@@ -150,6 +151,7 @@ end
 -- @server
 -- @param string seqtoplay The name of the sequence to play.
 function nb_methods:playSequence(seq)
+	checkluatype(seq, TYPE_STRING)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.playSequence")
 	nb.playSeq = seq
@@ -383,6 +385,7 @@ end
 -- @server
 -- @param boolean ragdollondeath Whether the nextbot should ragdoll on death.
 function nb_methods:ragdollOnDeath(bool)
+	checkluatype(bool, TYPE_BOOL)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.ragdollOnDeath")
 	nb.RagdollOnDeath = bool
@@ -391,7 +394,8 @@ end
 --- Sets the move speed of the NextBot.
 -- @server
 -- @param number newmovespeed NB's new move speed. Default is 200.
-function nb_methods:setMoveSpeed(val)	
+function nb_methods:setMoveSpeed(val)
+	checkluatype(val, TYPE_NUMBER)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setMoveSpeed")
 	nb.MoveSpeed = val
@@ -400,7 +404,7 @@ end
 --- Gets the move speed of the NextBot.
 -- @server
 -- @return number NB's move speed.
-function nb_methods:getMoveSpeed(val)	
+function nb_methods:getMoveSpeed()	
 	local nb = nbunwrap(self)
 	return nb.MoveSpeed
 end
@@ -409,6 +413,7 @@ end
 -- @server
 -- @param number newaccel NB's new acceleration. Default is 400
 function nb_methods:setAcceleration(val)
+	checkluatype(val, TYPE_NUMBER)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setAcceleration")
 	nb.loco:SetAcceleration(val)
@@ -425,7 +430,8 @@ end
 --- Sets the deceleration speed of the NextBot.
 -- @server
 -- @param number newaccel NB's new deceleration. Default is 400
-function nb_methods:setDeceleration(val)	
+function nb_methods:setDeceleration(val)
+	checkluatype(val, TYPE_NUMBER)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setDeceleration")
 	nb.loco:SetDeceleration(val)
@@ -451,6 +457,7 @@ end
 -- @server
 -- @param number newmaxyawrate Desired new maximum yaw rate
 function nb_methods:setMaxYawRate(val)
+	checkluatype(val, TYPE_NUMBER)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setMaxYawRate")
 	nb.loco:SetMaxYawRate(val)
@@ -468,6 +475,7 @@ end
 -- @server
 -- @param number newgravity NB's new gravity. Default is 1000
 function nb_methods:setGravity(val)
+	checkluatype(val, TYPE_NUMBER)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setGravity")
 	nb.loco:SetGravity(val)
@@ -477,6 +485,7 @@ end
 -- @server
 -- @param number newdeathdropheight New height nextbot is afraid of. Default is 200.
 function nb_methods:setDeathDropHeight(val)
+	checkluatype(val, TYPE_NUMBER)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setDeathDropHeight")
 	nb.loco:SetDeathDropHeight(val)
@@ -494,6 +503,7 @@ end
 -- @server
 -- @param number stepheight Height (default is 18)
 function nb_methods:setStepHeight(val)
+	checkluatype(val, TYPE_NUMBER)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setStepHeight")
 	nb.loco:SetStepHeight(val)
@@ -502,7 +512,7 @@ end
 --- Gets the max height the bot can step up.
 -- @server
 -- @return number The max height the bot can step up.
-function nb_methods:getStepHeight(val)
+function nb_methods:getStepHeight()
 	local nb = nbunwrap(self)
 	return nb.loco:GetStepHeight()
 end
@@ -538,6 +548,7 @@ end
 -- @server
 -- @param boolean avoidallowed Whether this bot should be allowed to try to avoid obstacles.
 function nb_methods:setAvoidAllowed(val)
+	checkluatype(val, TYPE_BOOL)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setAvoidAllowed")
 	nb.loco:SetAvoidAllowed(val)
@@ -555,6 +566,7 @@ end
 -- @server
 -- @param boolean climballowed Whether this bot should be allowed to climb.
 function nb_methods:setClimbAllowed(val)
+	checkluatype(val, TYPE_BOOL)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setClimbAllowed")
 	nb.loco:SetClimbAllowed(val)
@@ -572,6 +584,7 @@ end
 -- @server
 -- @param boolean jumpgapsallowed Whether this bot should be allowed to jump gaps.
 function nb_methods:setJumpGapsAllowed(val)
+	checkluatype(val, TYPE_BOOL)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setJumpGapsAllowed")
 	nb.loco:SetJumpGapsAllowed(val)
@@ -589,6 +602,7 @@ end
 -- @server
 -- @param number jumpheight Height (default is 58)
 function nb_methods:setJumpHeight(val)
+	checkluatype(val, TYPE_NUMBER)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setJumpHeight")
 	nb.loco:SetJumpHeight(val)
