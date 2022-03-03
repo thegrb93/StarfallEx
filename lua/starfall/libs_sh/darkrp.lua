@@ -398,7 +398,7 @@ if SERVER then
 	-- @param Entity moneyprinter The money printer
 	-- @param Entity moneybag The moneybag produed by the printer.
 	SF.hookAdd("moneyPrinterPrinted", nil, function(instance, moneyprinter, moneybag)
-		if not moneyprinter then return false end
+		if not moneyprinter or not moneybag then return false end
 		if instance.player ~= SF.Superuser then
 			if not moneyprinter.Getowning_ent or instance.player ~= moneyprinter:Getowning_ent() then return false end
 			if not SF.Permissions.hasAccess(instance, nil, "darkrp.moneyPrinterHooks") then return false end
@@ -940,7 +940,7 @@ if SERVER then
 	-- @param function? callbackFailure Optional function to call if request fails.
 	-- @param Player? receiver The player who may or may not receive the money, or the owner of the chip if not specified. Superuser only.
 	function player_methods:requestMoney(message, amount, callbackSuccess, callbackFailure, receiver)
-		-- Argument order is different for purposes of compatibility with loganlearner/starfall-darkrp-library
+		-- Argument order is different for purposes of compatibility with https://github.com/loganlearner/starfall-darkrp-library
 		return instance.guestRequestMoney(self, amount, message, callbackSuccess, callbackFailure, receiver)
 	end
 	
