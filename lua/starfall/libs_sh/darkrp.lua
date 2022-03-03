@@ -123,9 +123,6 @@ if SERVER then
 		end
 	end
 	concommand.Add("sf_moneyrequest", function(executor, command, args)
-		if not DarkRP then
-			return chatPrint(executor, "sf_moneyrequest: DarkRP not present")
-		end
 		local target, action, index, maxAge = tonumber(args[1]), args[2], tonumber(args[3]), tonumber(args[4])
 		if not target or not action or not index then
 			return chatPrint(executor, "sf_moneyrequest: malformed parameters (do \"help sf_moneyrequest\")")
