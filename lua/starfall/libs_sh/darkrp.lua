@@ -226,7 +226,7 @@ else
 			table.insert(tbl, cmd.." \""..ply:SteamID().."\" // "..get_name(ply))
 		end
 		return tbl
-	end, "Block a user from sending you money requests. Lasts until the remainder of your session, even if they relog.")
+	end, "Block a user from sending you money requests. Lasts until the end of your session, even if they relog.")
 	concommand.Add("sf_moneyrequest_unblock", function(executor, cmd, args)
 		if not args[1] then return print("sf_moneyrequest_unblock: missing steamid") end
 		if not args[1]:find('[^%d]') then args[1] = util.SteamIDFrom64(args[1]) end
