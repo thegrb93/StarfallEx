@@ -86,6 +86,10 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 			return unpack(result)
 		end
 	end
+	
+	if SERVER and util.NetworkStringToID("sf_moneyrequest") ~= 0 then
+		ErrorNoHalt("SF: loganlearner/starfall-darkrp-library is not compatible with newer versions of StarfallEx, as StarfallEx now has built-in DarkRP functions. Please uninstall loganlearner/starfall-darkrp-library. Until you do, your players may experience issues relating to DarkRP functions in StarfallEx.\n")
+	end
 end)
 
 do
