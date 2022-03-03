@@ -138,7 +138,7 @@ end
 --- Returns the Vector the nextbot is trying to go to, set by setGotoPos
 -- @server
 -- @return Vector? Where the nextbot is trying to go to if it exists, else returns nil.
-function nb_methods:getGoingTo()
+function nb_methods:getGotoPos()
 	local nb = nbunwrap(self)
 	if nb.goTo then
 		return vwrap(nb.goTo)
