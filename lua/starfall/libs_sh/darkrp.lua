@@ -78,21 +78,31 @@ if SERVER then
 	requests = setmetatable({}, {__mode="k"}) -- I'm pretty sure __mode doesn't work with Player keys, but let's use it anyway.
 	SF.MoneyRequests = requests
 	timeoutCvar = CreateConVar("sf_moneyrequest_timeout", 30, FCVAR_ARCHIVE, "Amount of time in seconds until a StarfallEx money request expires.", 5, 600)
-	local requestsUpdateCvar = CreateConVar("sf_moneyrequest_updaterate", 0, FCVAR_ARCHIVE, "How often StarfallEx will traverse the table of money requests and discard expired or invalid ones. This should be a low value.", 0, 60)
+	local requestsUpdateCvar = CreateConVar("sf_moneyrequest_updaterate", 1, FCVAR_ARCHIVE, "StarfallEx will traverse the table of money requests and discard expired or invalid ones every this many seconds. This should be a low value.", 0, 60)
 	local function requestsUpdate()
 		local now = CurTime()
 		for player, requestsForPlayer in pairs(requests) do
 			if IsValid(player) then
 				for index, request in pairs(requestsForPlayer) do
-					if not IsValid(request.receiver) then
-						printDebug("SF: Removed money request with index %d for %s because the receiver was invalid.", index, player:SteamID())
-						requestsForPlayer[index] = nil
+					if request.timeToDie then
+						if SysTime() >= request.timeToDie then
+							-- The reason requests are given a "time to die" is to mitigate a potential
+							-- vulnerability where if a player accepts a money request right as it
+							-- expires, they could accidentally accept a different money request created
+							-- immediately after the previous one expired, potentially resulting in a
+							-- considerable sum of money being mistakenly sent to a malicious player.
+							printDebug("SF: Removed damned money request with index %d for %s.", index, player:SteamID())
+							requestsForPlayer[index] = nil
+						end
+					elseif not IsValid(request.receiver) then
+						printDebug("SF: Damned money request with index %d for %s because the receiver was invalid.", index, player:SteamID())
+						request.timeToDie = SysTime()+10
 						if request.callbackFailure and request.instance and not request.instance.error then
 							request.instance:runFunction(request.callbackFailure, "RECEIVER_INVALID")
 						end
 					elseif now >= request.expiry then
-						printDebug("SF: Removed money request with index %d for %s because it expired %s second(s) ago.", index, player:SteamID(), now-request.expiry)
-						requestsForPlayer[index] = nil
+						printDebug("SF: Damned money request with index %d for %s because it expired %s second(s) ago.", index, player:SteamID(), now-request.expiry)
+						request.timeToDie = SysTime()+10
 						if request.callbackFailure and request.instance and not request.instance.error then
 							request.instance:runFunction(request.callbackFailure, "REQUEST_TIMEOUT")
 						end
