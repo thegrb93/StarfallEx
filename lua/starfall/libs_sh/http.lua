@@ -161,7 +161,7 @@ end
 -- @param string url The url to convert
 -- @return string The converted url
 function http_library.urlGoogleDriveToRaw(url)
-    local id = string.match(url, "https://drive%.google%.com/file/d/(.+)/view")
+    local id = string.match(url, "https://drive%.google%.com/file/d/([^/]+)/view")
 	if not id then SF.Throw("Failed to parse google drive link!", 2) end
     return "https://drive.google.com/uc?export=download&id="..id
 end
