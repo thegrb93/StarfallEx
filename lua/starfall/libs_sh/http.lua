@@ -162,7 +162,7 @@ end
 -- @return string The converted data
 function http_library.urlDecode(data)
 	checkluatype(data, TYPE_STRING)
-	data = string.gsub(data, "%(..)", function(char)
+	data = string.gsub(data, "%%(..)", function(char)
 		char = tonumber(char, 16)
 		if char==nil or char < 0 or char > 255 then error("Invalid '%' value found: "..char) end
 		return string.char(char)
