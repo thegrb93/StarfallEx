@@ -97,6 +97,57 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 local wirelink_meta, wlwrap, wlunwrap = instance.Types.Wirelink, instance.Types.Wirelink.Wrap, instance.Types.Wirelink.Unwrap
 local COLOR_WHITE = Color(255, 255, 255)
 
+--#region Vector2 metaevents
+local table_concat = table.concat
+function vec2_meta.__tostring(a)
+	return table_concat(a, ' ', 1, 2)
+end
+
+function vec2_meta.__mul(a, b)
+	if isnumber(b) then
+		return v2wrap({ a[1] * b, a[2] * b })
+	elseif isnumber(a) then
+		return v2wrap({ b[1] * a, b[2] * a })
+	elseif debug_getmetatable(a) == vec_meta and debug_getmetatable(b) == vec_meta then
+		return v2wrap({ a[1] * b[1], a[2] * b[2] })
+	elseif debug_getmetatable(a) == vec_meta then
+		checkluatype(b, TYPE_NUMBER)
+	else
+		checkluatype(a, TYPE_NUMBER)
+	end
+end
+
+function vec2_meta.__div(a, b)
+	if isnumber(b) then
+		return v2wrap({ a[1] / b, a[2] / b })
+	elseif isnumber(a) then
+		return v2wrap({ a / b[1], a / b[2] })
+	elseif debug_getmetatable(a) == vec_meta and debug_getmetatable(b) == vec_meta then
+		return v2wrap({ a[1] / b[1], a[2] / b[2] })
+	elseif debug_getmetatable(a) == vec_meta then
+		checkluatype(b, TYPE_NUMBER)
+	else
+		checkluatype(a, TYPE_NUMBER)
+	end
+end
+
+function vec2_meta.__add(a, b)
+	return v2wrap({ a[1] + b[1], a[2] + b[2] })
+end
+
+function vec2_meta.__sub(a, b)
+	return v2wrap({ a[1] - b[1], a[2] - b[2] })
+end
+
+function vec2_meta.__unm(a)
+	return v2wrap({ -a[1], -a[2] })
+end
+
+function vec2_meta.__eq(a, b)
+	return a[1] == b[1] and a[2] == b[2]
+end
+--#endregion
+
 --- Creates a Vector2 struct for use with wire xv2 type
 -- @name builtins_library.Vector2
 -- @class function
