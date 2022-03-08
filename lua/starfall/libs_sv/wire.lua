@@ -26,6 +26,17 @@ SF.RegisterLibrary("wire")
 -- @libtbl wirelink_meta
 SF.RegisterType("Wirelink", false, true)
 
+-- Vector2 type for wire xv2
+SF.RegisterType("Vector2", nil, nil, nil, "Vector", function(checktype, vec2_meta)
+	return function(vec)
+		return setmetatable({ vec[1], vec[2], 0 }, vec2_meta)
+	end,
+	function(obj)
+		checktype(obj, vec2_meta, 2)
+		return Vector(obj[1], obj[2], 0)
+	end
+end)
+
 return function(instance)
 if not (WireLib and WireLib.CreateInputs) then return end
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
@@ -86,6 +97,17 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 local wirelink_meta, wlwrap, wlunwrap = instance.Types.Wirelink, instance.Types.Wirelink.Wrap, instance.Types.Wirelink.Unwrap
 local COLOR_WHITE = Color(255, 255, 255)
 
+--- Creates a Vector2 struct for use with wire xv2 type
+-- @name builtins_library.Vector2
+-- @class function
+-- @param number x X value
+-- @param number y Y value
+-- @return Vector2 Vector2
+function instance.env.Vector2(x, y)
+	if x ~= nil then checkluatype(x, TYPE_NUMBER) else x = 0 end
+	if y ~= nil then checkluatype(y, TYPE_NUMBER) else y = x end
+	return v2wrap({ x, y })
+end
 
 local function identity(data) return data end
 local typeToE2Type = {
