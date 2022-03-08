@@ -29,11 +29,11 @@ SF.RegisterType("Wirelink", false, true)
 -- Vector2 type for wire xv2
 SF.RegisterType("Vector2", nil, nil, nil, "Vector", function(checktype, vec2_meta)
 	return function(vec)
-		return setmetatable({ vec[1], vec[2], 0 }, vec2_meta)
+		return setmetatable({vec[1], vec[2]}, vec2_meta)
 	end,
 	function(obj)
 		checktype(obj, vec2_meta, 2)
-		return Vector(obj[1], obj[2], 0)
+		return {obj[1], obj[2]}
 	end
 end)
 
