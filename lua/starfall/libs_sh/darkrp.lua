@@ -276,15 +276,13 @@ else
 		end, function(cmd)
 			local tbl = {}
 			for steamid in pairs(blocked) do
-				local ply = player.GetBySteamID(steamid)
-				table.insert(tbl, getCompletion(cmd, ply, steamid))
+				table.insert(tbl, getCompletion(cmd, player.GetBySteamID(steamid), steamid))
 			end
 			return tbl
 		end, "Unblock a user from sending you money requests.")
 		concommand.Add(prefix.."_blocklist", function(executor, cmd, args)
 			for steamid in pairs(blocked) do
-				local ply = player.GetBySteamID(steamid)
-				print(getCompletion("", ply, steamid))
+				print(getCompletion("", player.GetBySteamID(steamid), steamid))
 			end
 		end, nil, "List players you have blocked from sending you money requests.")
 	end
