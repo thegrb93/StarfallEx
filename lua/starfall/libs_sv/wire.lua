@@ -108,9 +108,9 @@ function vec2_meta.__mul(a, b)
 		return v2wrap({ a[1] * b, a[2] * b })
 	elseif isnumber(a) then
 		return v2wrap({ b[1] * a, b[2] * a })
-	elseif debug_getmetatable(a) == vec_meta and debug_getmetatable(b) == vec_meta then
+	elseif debug_getmetatable(a) == vec2_meta and debug_getmetatable(b) == vec2_meta then
 		return v2wrap({ a[1] * b[1], a[2] * b[2] })
-	elseif debug_getmetatable(a) == vec_meta then
+	elseif debug_getmetatable(a) == vec2_meta then
 		checkluatype(b, TYPE_NUMBER)
 	else
 		checkluatype(a, TYPE_NUMBER)
@@ -122,9 +122,9 @@ function vec2_meta.__div(a, b)
 		return v2wrap({ a[1] / b, a[2] / b })
 	elseif isnumber(a) then
 		return v2wrap({ a / b[1], a / b[2] })
-	elseif debug_getmetatable(a) == vec_meta and debug_getmetatable(b) == vec_meta then
+	elseif debug_getmetatable(a) == vec2_meta and debug_getmetatable(b) == vec2_meta then
 		return v2wrap({ a[1] / b[1], a[2] / b[2] })
-	elseif debug_getmetatable(a) == vec_meta then
+	elseif debug_getmetatable(a) == vec2_meta then
 		checkluatype(b, TYPE_NUMBER)
 	else
 		checkluatype(a, TYPE_NUMBER)
@@ -162,12 +162,17 @@ end
 
 local function identity(data) return data end
 local typeToE2Type = {
-	[TYPE_NUMBER] = {identity, "n"},
-	[TYPE_STRING] = {identity, "s"},
-	[TYPE_VECTOR] = {function(x) return {x[1], x[2], x[3]} end, "v"},
-	[vec2_meta] = {function(v) return {v[1], v[2]} end, "xv2"},
-	[TYPE_ANGLE] = {function(x) return {x.p, x.y, x.r} end, "a"},
-	[TYPE_ENTITY] = {identity, "e"}
+	[TYPE_NUMBER] = function(x) return x, "n" end,
+	[TYPE_STRING] = function(x) return x, "s" end,
+	[vec_meta] = function(x) return {x[1], x[2], x[3]}, "v" end,
+	[vec2_meta] = function(v) return {v[1], v[2]}, "xv2" end,
+	[ang_meta] = function(x) return {x.p, x.y, x.r}, "a" end,
+	[TYPE_TABLE] = function(x)
+		local meta = debug_getmetatable(x)
+		if typeToE2Type[meta] then return typeToE2Type[meta](x) end
+		x = ounwrap(x)
+		if isentity(x) then return x, "e" end
+	end
 }
 
 local inputConverters
@@ -254,8 +259,6 @@ local outputConverters =
 		return vunwrap(data)
 	end,
 	VECTOR2 = function(data)
-		-- Not sure why all these funcs do useless tail calls instead of VECTOR = vunwrap etc
-		-- However it might be to prevent passing more than the first arg for some reason so I've done the same here
 		return v2unwrap(data)
 	end,
 	ANGLE = function(data)
@@ -283,14 +286,14 @@ local outputConverters =
 					continue
 				end
 
-				local vMeta = debug_getmetatable(value) -- Get the metatable before the next line unwraps
-				value = ounwrap(value) or value
 				local vtyp = TypeID(value)
-				local convert = vtyp == TYPE_TABLE and typeToE2Type[vMeta] or typeToE2Type[vtyp]
+				local convertVal, convertType
+				if typeToE2Type[vtyp] then
+					convertVal, convertType = typeToE2Type[vtyp](value)
+				end
 
-				if convert then
-					valueList[key] = convert[1](value)
-					typeList[key] = convert[2]
+				if convertVal then
+					valueList[key], typeList[key] = convertVal, convertType
 					ret.size = ret.size + 1
 				elseif vtyp == TYPE_TABLE then
 					valueList[key] = completed_tables[value] or recursiveConvert(value)
@@ -306,15 +309,8 @@ local outputConverters =
 	ARRAY = function(data)
 		local ret = {}
 		for i, v in ipairs(data) do
-			local obj = ounwrap(v) or v
-			local typeId = TypeID(obj)
-			local typ = typeId == TYPE_TABLE and typeToE2Type[debug_getmetatable(v)] or typeToE2Type[typeId]
-
-			-- The previous `if obj` and `typ and typ[1](obj)` code caused an unsequential array
-			-- which should trigger an error as it'll cause all other elements after to be unreadable
-			if not typ then SF.Throw("Unsupported type in Wire array", 3) end
-
-			ret[i] = typ[1](obj)
+			local typ = typeToE2Type[TypeID(obj)]
+			ret[i] = typ and (typ(obj)) or SF.Throw("Invalid type in array at index: " .. i, 3)
 		end
 		return ret
 	end
