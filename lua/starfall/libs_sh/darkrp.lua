@@ -48,6 +48,14 @@ do
 	end
 end
 
+if SERVER then
+	timer.Simple(0, function()
+		if util.NetworkStringToID("sf_moneyrequest") ~= 0 then
+			ErrorNoHalt("SF: loganlearner/starfall-darkrp-library is not compatible with newer versions of StarfallEx, as StarfallEx now has built-in DarkRP functions. Please uninstall loganlearner/starfall-darkrp-library. Until you do, your players may experience issues relating to DarkRP functions in StarfallEx.\n")
+		end
+	end)
+end
+
 -- Exposed so server owners and other addons can add/remove blacklist entries
 SF.BlacklistedDarkRPVars = {
 	hitTarget = true, -- The person a hitman has a hit on is generally not made visible to players (despite being accessible clientside).
