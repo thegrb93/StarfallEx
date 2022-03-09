@@ -166,7 +166,7 @@ if SERVER then
 
 	function MoneyRequest:think()
 		local now = CurTime()
-		for sender, requestsForPlayer in pairs(requests) do
+		for sender, requestsForPlayer in pairs(self.requests) do
 			if IsValid(sender) then
 				for receiver, request in pairs(requestsForPlayer) do
 					if not receiver:IsValid() then
