@@ -244,48 +244,54 @@ if SERVER then
 else
 	debugCvar = CreateConVar("sf_moneyrequest_verbose_cl", 1, FCVAR_ARCHIVE, "Prints information about money requests to console.", 0, 1)
 	
+	local function createBlockCommands(blocked, prefix)
+		local function getCompletion(cmd, ply, steamid)
+			if IsValid(ply) then
+				-- DarkRP already forbids unsafe characters, and the "//" means injection
+				-- shouldn't be possible anyway, but let's sanitize just to be safe.
+				return cmd.." \""..steamid.."\" // "..string.gsub(ply:GetName(), '[%z\x01-\x1f\x7f;"\']', "")
+			else
+				return cmd.." \""..steamid.."\""
+			end
+		end
+		local function setBlocked(arg, val)
+			if not arg then return print("sf_moneyrequest_block: missing steamid") end
+			if not string.match(arg, '[^%d]') then arg = util.SteamIDFrom64(arg) or "" end
+			if not string.match(arg, '^STEAM_') then return print("sf_moneyrequest_block: invalid steamid") end
+			blocked[arg] = val
+		end
+		concommand.Add(prefix.."_block", function(executor, cmd, args)
+			setBlocked(args[1], true)
+		end, function(cmd)
+			local tbl = {}
+			for _, ply in pairs(player.GetHumans()) do
+				table.insert(tbl, getCompletion(cmd, ply, ply:SteamID()))
+			end
+			return tbl
+		end, "Block a user from sending you money requests. Lasts until the end of your session, even if they relog.")
+		concommand.Add(prefix.."_unblock", function(executor, cmd, args)
+			setBlocked(args[1], nil)
+		end, function(cmd)
+			local tbl = {}
+			for steamid in pairs(blocked) do
+				local ply = player.GetBySteamID(steamid)
+				table.insert(tbl, getCompletion(cmd, ply, steamid))
+			end
+			return tbl
+		end, "Unblock a user from sending you money requests.")
+		concommand.Add(prefix.."_blocklist", function(executor, cmd, args)
+			for steamid in pairs(blocked) do
+				local ply = player.GetBySteamID(steamid)
+				print(getCompletion("", ply, steamid))
+			end
+		end, nil, "List players you have blocked from sending you money requests.")
+	end
+
 	-- Allow blocking/unblocking money requests from some players, to help mitigate abuse
 	local blocked = {}
 	SF.BlockedMoneyRequests = blocked
-	local function get_name(ply)
-		-- DarkRP already forbids unsafe characters, and the "//" means injection
-		-- shouldn't be possible anyway, but let's sanitize just to be safe.
-		return string.gsub(ply:GetName(), '[%z\x01-\x1f\x7f;"\']', "")
-	end
-	concommand.Add("sf_moneyrequest_block", function(executor, cmd, args)
-		if not args[1] then return print("sf_moneyrequest_block: missing steamid") end
-		if not args[1]:find('[^%d]') then args[1] = util.SteamIDFrom64(args[1]) end
-		if not args[1]:find('^STEAM_') then return print("sf_moneyrequest_block: invalid steamid") end
-		blocked[args[1]] = true
-	end, function(cmd)
-		local tbl = {}
-		for _, ply in pairs(player.GetHumans()) do
-			table.insert(tbl, cmd.." \""..ply:SteamID().."\" // "..get_name(ply))
-		end
-		return tbl
-	end, "Block a user from sending you money requests. Lasts until the end of your session, even if they relog.")
-	concommand.Add("sf_moneyrequest_unblock", function(executor, cmd, args)
-		if not args[1] then return print("sf_moneyrequest_unblock: missing steamid") end
-		if not args[1]:find('[^%d]') then args[1] = util.SteamIDFrom64(args[1]) end
-		if not args[1]:find('^STEAM_') then return print("sf_moneyrequest_unblock: invalid steamid") end
-		blocked[args[1]] = nil
-	end, function(cmd)
-		local tbl = {}
-		for steamid in pairs(blocked) do
-			local ply = player.GetBySteamID(steamid)
-			table.insert(tbl, cmd.." \""..steamid..(IsValid(ply) and "\" // "..get_name(ply) or ""))
-		end
-		return tbl
-	end, "Unblock a user from sending you money requests.")
-	concommand.Add("sf_moneyrequest_blocklist", function(executor, cmd, args)
-		local i = 0
-		for steamid in pairs(blocked) do
-			print(steamid)
-			i = i+1
-		end
-		print(string.format("You have %d players on your block list.", i))
-	end, nil, "List players you have blocked from sending you money requests.")
-	
+	createBlockCommands(blocked, "sf_moneyrequest")
+
 	-- The actual money request prompt itself
 	local function createMoneyRequestPanel(receiver, amount, expiry, message)
 		local self = vgui.Create("StarfallFrame")
