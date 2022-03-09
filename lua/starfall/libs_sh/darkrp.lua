@@ -136,16 +136,16 @@ if SERVER then
 		net.Send(self.sender)
 	end
 	
-	function manager.exists(sender, receiver)
-		return manager.requests[sender] and manager.requests[sender][receiver] ~= nil
+	function manager:exists(sender, receiver)
+		return self.requests[sender] ~= nil and self.requests[sender][receiver] ~= nil
 	end
-	function manager.add(sender, receiver, amount, message, instance, callbackSuccess, callbackFailure)
-		if next(manager.requests) == nil then hook.Add("Think", "SF_DarkRpMoneyRequests", manager.think) end
+	function manager:add(sender, receiver, amount, message, instance, callbackSuccess, callbackFailure)
+		if next(self.requests) == nil then hook.Add("Think", "SF_DarkRpMoneyRequests", function() self:think() end) end
 
-		local requestsForSender = manager.requests[sender]
+		local requestsForSender = self.requests[sender]
 		if not requestsForSender then
 			requestsForSender = {}
-			manager.requests[sender] = requestsForSender
+			self.requests[sender] = requestsForSender
 		end
 
 		local expiry = CurTime()+timeoutCvar:GetFloat()
@@ -156,19 +156,19 @@ if SERVER then
 		request:send()
 		printDebug("SF: Sent a money request.", request)
 	end
-	function manager.think()
+	function manager:think()
 		local now = CurTime()
-		for sender, requestsForPlayer in pairs(manager.requests) do
+		for sender, requestsForPlayer in pairs(self.requests) do
 			if IsValid(sender) then
 				for receiver, request in pairs(requestsForPlayer) do
 					if not receiver:IsValid() then
-						manager.pop(sender, receiver)
+						self:pop(sender, receiver)
 						printDebug("SF: Removed money request because the receiver was invalid.", request)
 						if request.callbackFailure then
 							request.instance:runFunction(request.callbackFailure, "RECEIVER_INVALID")
 						end
 					elseif now >= request.expiry then
-						manager.pop(sender, receiver)
+						self:pop(sender, receiver)
 						printDebug("SF: Removed money request because it expired.", request)
 						if request.callbackFailure then
 							request.instance:runFunction(request.callbackFailure, "REQUEST_TIMEOUT")
@@ -177,21 +177,21 @@ if SERVER then
 				end
 			else
 				for receiver in pairs(requestsForPlayer) do
-					manager.pop(sender, receiver)
+					self:pop(sender, receiver)
 				end
 			end
 		end
 	end
-	function manager.pop(sender, receiver)
-		local requestsForPlayer = manager.requests[sender]
+	function manager:pop(sender, receiver)
+		local requestsForPlayer = self.requests[sender]
 		if not requestsForPlayer then return end
 		
 		local request = requestsForPlayer[receiver]
 		requestsForPlayer[receiver] = nil
 		
 		if next(requestsForPlayer) == nil then
-			manager.requests[sender] = nil
-			if next(manager.requests) == nil then hook.Remove("Think", "SF_DarkRpMoneyRequests") end
+			self.requests[sender] = nil
+			if next(self.requests) == nil then hook.Remove("Think", "SF_DarkRpMoneyRequests") end
 		end
 		
 		if not request then return end
@@ -228,7 +228,7 @@ if SERVER then
 		if executor:IsValid() and sender ~= executor and not executor:IsSuperAdmin() then
 			return chatPrint(executor, "sf_moneyrequest: only superadmins can interact with other people's money requests")
 		end
-		local request = manager.pop(sender, receiver)
+		local request = manager:pop(sender, receiver)
 		if request then
 			if action == "accept" then
 				request:accept()
@@ -393,7 +393,7 @@ else
 	end
 	
 	-- Display the money request prompt when notified
-	function manager.receive()
+	function manager:receive()
 		local receiver, amount, expiry, length = net.ReadEntity(), net.ReadUInt(32), net.ReadFloat(), net.ReadUInt(8)
 		local message
 		if length > 0 then
@@ -402,7 +402,7 @@ else
 		return requestClass:new(LocalPlayer(), receiver, amount, message, expiry)
 	end
 	net.Receive("sf_moneyrequest2", function()
-		local request = manager.receive()
+		local request = manager:receive()
 		local receiver, amount, expiry, message = request.receiver, request.amount, request.expiry, request.message
 		if not receiver:IsValid() or amount == 0 or expiry <= CurTime() then
 			printDebug("SF: Ignoring malformed request.", request)
@@ -723,9 +723,9 @@ if SERVER then
 			receiver = instance.player
 		end
 
-		if manager.exists(sender, receiver) then SF.Throw("You already have a pending request for this sender", 2) end
+		if manager:exists(sender, receiver) then SF.Throw("You already have a pending request for this sender", 2) end
 		moneyrequestBurst:use(instance.player, 1)
-		manager.add(sender, receiver, amount, message, instance, callbackSuccess, callbackFailure)
+		manager:add(sender, receiver, amount, message, instance, callbackSuccess, callbackFailure)
 	end
 
 	--- Returns number of money requests left.
@@ -745,7 +745,7 @@ if SERVER then
 	function darkrp_library.canMakeMoneyRequest(sender)
 		if moneyrequestBurst:check(instance.player) < 1 then return false end
 		if sender ~= nil then
-			if manager.exists(getply(sender), instance.player) then return false end
+			if manager:exists(getply(sender), instance.player) then return false end
 		end
 		return true
 	end
