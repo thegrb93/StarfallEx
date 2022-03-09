@@ -340,8 +340,13 @@ else
 		btnDecline:SetText("Decline")
 		btnDecline:SetAutoSize(false)
 		btnDecline:SetWidth(w*0.5)
+
+		-- In case they disconnect between now and the window closing
+		local receiverSteamID = receiver:SteamID()
+		local receiverIndex = receiver:EntIndex()
+
 		function btnDecline.DoClick()
-			RunConsoleCommand("sf_moneyrequest", 0, "decline", receiver:EntIndex(), expiry)
+			RunConsoleCommand("sf_moneyrequest", 0, "decline", receiverIndex)
 			self:Close()
 		end
 		local btnAccept = vgui.Create("StarfallButton", buttons)
@@ -350,10 +355,9 @@ else
 		btnAccept:SetAutoSize(false)
 		btnAccept:SetWidth(w*0.5)
 		function btnAccept.DoClick()
-			RunConsoleCommand("sf_moneyrequest", 0, "accept", receiver:EntIndex(), expiry)
+			RunConsoleCommand("sf_moneyrequest", 0, "accept", receiverIndex)
 			self:Close()
 		end
-		local receiverSteamID = receiver:SteamID() -- In case they disconnect between now and the window closing
 		function self:OnClose()
 			if blockRequests:GetChecked() then
 				blocked[receiverSteamID] = true
