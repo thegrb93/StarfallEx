@@ -48,14 +48,6 @@ do
 	end
 end
 
-if SERVER then
-	timer.Simple(0, function()
-		if util.NetworkStringToID("sf_moneyrequest") ~= 0 then
-			ErrorNoHalt("SF: loganlearner/starfall-darkrp-library is not compatible with newer versions of StarfallEx, as StarfallEx now has built-in DarkRP functions. Please uninstall loganlearner/starfall-darkrp-library. Until you do, your players may experience issues relating to DarkRP functions in StarfallEx.\n")
-		end
-	end)
-end
-
 -- Exposed so server owners and other addons can add/remove blacklist entries
 SF.BlacklistedDarkRPVars = {
 	hitTarget = true, -- The person a hitman has a hit on is generally not made visible to players (despite being accessible clientside).
@@ -249,15 +241,6 @@ if SERVER then
 			chatPrint(executor, "sf_moneyrequest: no such request")
 		end
 	end, nil, "Accept, decline, or view info about a StarfallEx money request. Usage: sf_moneyrequest <entindex or 0> <accept|decline|info> <request index>", FCVAR_CLIENTCMD_CAN_EXECUTE)
-	concommand.Add("sf_moneyrequest_purge", function(executor)
-		if executor:IsValid() and not executor:IsSuperAdmin() then
-			return
-		end
-		for k in pairs(manager.requests) do
-			manager.requests[k] = nil
-		end
-		chatPrint(executor, "sf_moneyrequest_purge: done")
-	end, nil, "Manually trigger a purge of all money requests. Superadmin/RCON only.")
 else
 	debugCvar = CreateConVar("sf_moneyrequest_verbose_cl", 1, FCVAR_ARCHIVE, "Prints information about money requests to console.", 0, 1)
 	
@@ -267,7 +250,7 @@ else
 	local function get_name(ply)
 		-- DarkRP already forbids unsafe characters, and the "//" means injection
 		-- shouldn't be possible anyway, but let's sanitize just to be safe.
-		return ply:GetName():gsub('[%z\x01-\x1f\x7f;"\']', "")
+		return string.gsub(ply:GetName(), '[%z\x01-\x1f\x7f;"\']', "")
 	end
 	concommand.Add("sf_moneyrequest_block", function(executor, cmd, args)
 		if not args[1] then return print("sf_moneyrequest_block: missing steamid") end
@@ -689,7 +672,7 @@ if SERVER then
 	function darkrp_library.payPlayer(sender, receiver, amount)
 		checkluatype(amount, TYPE_NUMBER)
 		amount = math.ceil(amount)
-		if amount <= 0 then SF.Throw("amount must be positive", 2) return end
+		if amount <= 0 or amount >= (2^32) then SF.Throw("amount must be positive", 2) return end
 		checkpermission(instance, nil, "darkrp.giveMoney")
 		sender = getply(sender)
 		if instance.player ~= SF.Superuser and instance.player ~= sender then SF.Throw("may not transfer money from player other than owner", 2) return end
@@ -747,15 +730,12 @@ if SERVER then
 	--- Returns whether you can make another money request this tick.
 	-- If a player is provided as a parameter, will also check if you can request money from that particular player this tick.
 	-- @server
-	-- @param Player? sender Player you intend to ask for money from later
+	-- @param Player? sender Player you intend to ask for money from later (if nil, will only check your money request rate)
 	-- @return boolean If you can make another money request
 	function darkrp_library.canMakeMoneyRequest(sender)
 		if moneyrequestBurst:check(instance.player) < 1 then return false end
 		if sender ~= nil then
-			local requestsForSender = requests[getply(sender)]
-			for _, request in pairs(requestsForSender or {}) do
-				if request.receiver == instance.player then return false end
-			end
+			if manager.exists(getply(sender), instance.player) then return false end
 		end
 		return true
 	end
@@ -948,7 +928,8 @@ if SERVER then
 		if instance.player ~= SF.Superuser and instance.player ~= self then SF.Throw("may not use this function on anyone other than owner", 2) return end
 		return assertsafety(self:teamBanTimeLeft())
 	end
-	
+
+	local requestMoney = darkrp_library.requestMoney
 	--- Request money from a player.
 	-- This is subject to a burst limit. Use the darkrp.canMakeMoneyRequest function to check if you can request money that tick.
 	-- @server
@@ -959,7 +940,7 @@ if SERVER then
 	-- @param Player? receiver The player who may or may not receive the money, or the owner of the chip if not specified. Superuser only.
 	function player_methods:requestMoney(message, amount, callbackSuccess, callbackFailure, receiver)
 		-- Argument order is different for purposes of compatibility with https://github.com/loganlearner/starfall-darkrp-library
-		return darkrp_library.requestMoney(self, amount, message, callbackSuccess, callbackFailure, receiver)
+		return requestMoney(self, amount, message, callbackSuccess, callbackFailure, receiver)
 	end
 	
 	--- Give this player money.
