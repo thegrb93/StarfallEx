@@ -62,12 +62,21 @@ SF.BlacklistedDarkRPVars = {
 }
 
 local givemoneyBurst, moneyrequestBurst, debugCvar
+local function printDebug(msg, request)
+	if not debugCvar:GetBool() then return end
+	if request then
+		print(msg, request)
+	else
+		print(msg) -- Avoid "nil" being printed
+	end
+end
 
-local MoneyRequest = {}
-MoneyRequest.Request = {}
-MoneyRequest.Request.__index = MoneyRequest.Request
-
-function MoneyRequest:newRequest(sender, receiver, amount, message, expiry, instance, callbackSuccess, callbackFailure)
+local manager = {}
+SF.MoneyRequestManager = manager -- Exposed so other addons can manage money requests
+local requestClass = {}
+requestClass.__index = requestClass
+manager.requestClass = requestClass
+function requestClass:new(sender, receiver, amount, message, expiry, instance, callbackSuccess, callbackFailure)
 	return setmetatable({
 		sender = sender,
 		receiver = receiver,
@@ -77,17 +86,12 @@ function MoneyRequest:newRequest(sender, receiver, amount, message, expiry, inst
 		instance = instance,
 		callbackSuccess = callbackSuccess,
 		callbackFailure = callbackFailure
-	}, MoneyRequest.Request)
+	}, self)
+end
+function requestClass:__tostring()
+	return "From ("..self.sender:SteamID().."), To ("..self.receiver:SteamID()..", Ammount ("..DarkRP.formatMoney(self.amount)..") Expires in ("..(self.expiry - CurTime())..")" -- TODO: revise
 end
 
-function MoneyRequest.Request:info()
-	return "From ("..self.sender:SteamID().."), To ("..self.receiver:SteamID()..", Ammount ("..DarkRP.formatMoney(self.amount)..") Expires in ("..(self.expiry - CurTime())..")"
-end
-
-local function printDebug(msg, request)
-	if not debugCvar:GetBool() then return end
-	print(msg, request:info())
-end
 if SERVER then
 	debugCvar = CreateConVar("sf_moneyrequest_verbose_sv", 1, FCVAR_ARCHIVE, "Prints information about money requests to console.", 0, 1)
 	local timeoutCvar = CreateConVar("sf_moneyrequest_timeout", 30, FCVAR_ARCHIVE, "Amount of time in seconds until a StarfallEx money request expires.", 5, 600)
@@ -105,11 +109,9 @@ if SERVER then
 	registerprivilege("darkrp.requestMoney", "Ask players for money", "Allows the user to prompt other users for money (similar to E2 moneyRequest)")
 	registerprivilege("darkrp.giveMoney", "Give players money", "Allows the user to give other users money")
 	
-	MoneyRequest.requests = SF.EntityTable("MoneyRequests")
-
-	function MoneyRequest.Request:accept()
+	manager.requests = SF.EntityTable("MoneyRequests")
+	function requestClass:accept()
 		local sender, receiver, amount, instance = self.sender, self.receiver, self.amount, self.instance
-
 		if sender:canAfford(amount) then
 			printDebug("SF: Accepted money request.", self)
 			DarkRP.payPlayer(sender, receiver, amount)
@@ -120,15 +122,13 @@ if SERVER then
 			printDebug("SF: Attempted to accept money request but the sender couldn't afford it.", self)
 		end
 	end
-	
-	function MoneyRequest.Request:decline()
+	function requestClass:decline()
 		printDebug("SF: Declined money request.", self)
 		if self.callbackFailure then
 			self.instance:runFunction(self.callbackFailure, "REQUEST_DENIED")
 		end
 	end
-		
-	function MoneyRequest.Request:send()
+	function requestClass:send()
 		net.Start("sf_moneyrequest2")
 			net.WriteEntity(self.receiver)
 			net.WriteUInt(self.amount, 32)
@@ -141,43 +141,41 @@ if SERVER then
 			end
 		net.Send(self.sender)
 	end
-
-	function MoneyRequest:exists(sender, receiver)
-		return self.requests[sender]~=nil and self.requests[sender][receiver]~=nil
+	
+	function manager.exists(sender, receiver)
+		return manager.requests[sender] and manager.requests[sender][receiver] ~= nil
 	end
+	function manager.add(sender, receiver, amount, message, instance, callbackSuccess, callbackFailure)
+		if next(manager.requests) == nil then hook.Add("Think", "SF_DarkRpMoneyRequests", manager.think) end
 
-	function MoneyRequest:add(sender, receiver, amount, message, instance, callbackSuccess, callbackFailure)
-		if next(self.requests) == nil then hook.Add("Think","SF_DarkRpMoneyRequests",function() self:think() end) end
-
-		local requestsForSender = self.requests[sender]
+		local requestsForSender = manager.requests[sender]
 		if not requestsForSender then
 			requestsForSender = {}
-			self.requests[sender] = requestsForSender
+			manager.requests[sender] = requestsForSender
 		end
 
 		local expiry = CurTime()+timeoutCvar:GetFloat()
 
-		local request = self:newRequest(sender, receiver, amount, message, expiry, instance, callbackSuccess, callbackFailure)
+		local request = requestClass:new(sender, receiver, amount, message, expiry, instance, callbackSuccess, callbackFailure)
 		requestsForSender[receiver] = request
 		
 		request:send()
 		printDebug("SF: Sent a money request.", request)
 	end
-
-	function MoneyRequest:think()
+	function manager.think()
 		local now = CurTime()
-		for sender, requestsForPlayer in pairs(self.requests) do
+		for sender, requestsForPlayer in pairs(manager.requests) do
 			if IsValid(sender) then
 				for receiver, request in pairs(requestsForPlayer) do
 					if not receiver:IsValid() then
-						self:popRequest(sender, receiver)
-						printDebug("SF: Damned money request because the receiver was invalid.", request)
+						manager.pop(sender, receiver)
+						printDebug("SF: Removed money request because the receiver was invalid.", request)
 						if request.callbackFailure then
 							request.instance:runFunction(request.callbackFailure, "RECEIVER_INVALID")
 						end
 					elseif now >= request.expiry then
-						self:popRequest(sender, receiver)
-						printDebug("SF: Damned money request because it expired.", request)
+						manager.pop(sender, receiver)
+						printDebug("SF: Removed money request because it expired.", request)
 						if request.callbackFailure then
 							request.instance:runFunction(request.callbackFailure, "REQUEST_TIMEOUT")
 						end
@@ -185,30 +183,29 @@ if SERVER then
 				end
 			else
 				for receiver in pairs(requestsForPlayer) do
-					self:popRequest(sender, receiver)
+					manager.pop(sender, receiver)
 				end
 			end
 		end
 	end
-
-	function MoneyRequest:popRequest(sender, receiver)
-		local requestsForPlayer = self.requests[sender]
+	function manager.pop(sender, receiver)
+		local requestsForPlayer = manager.requests[sender]
 		if not requestsForPlayer then return end
-
+		
 		local request = requestsForPlayer[receiver]
 		requestsForPlayer[receiver] = nil
-
+		
 		if next(requestsForPlayer) == nil then
-			self.requests[sender] = nil
-			if next(self.requests) == nil then hook.Remove("Think","SF_DarkRpMoneyRequests") end
+			manager.requests[sender] = nil
+			if next(manager.requests) == nil then hook.Remove("Think", "SF_DarkRpMoneyRequests") end
 		end
 		
 		if not request then return end
-		if request.instance.error then
-			printDebug("SF: Attempted to accept money request but the instance was dead.", request)
+		if request.instance and request.instance.error then
+			printDebug("SF: Attempted to pop money request but the instance was dead.", request)
 			return
 		end
-
+		
 		return request
 	end
 
@@ -221,7 +218,6 @@ if SERVER then
 			print(message)
 		end
 	end
-
 	concommand.Add("sf_moneyrequest", function(executor, command, args)
 		local sender, action, receiver = tonumber(args[1]), args[2], tonumber(args[3])
 		if not sender or not action or not receiver then
@@ -238,14 +234,14 @@ if SERVER then
 		if executor:IsValid() and sender ~= executor and not executor:IsSuperAdmin() then
 			return chatPrint(executor, "sf_moneyrequest: only superadmins can interact with other people's money requests")
 		end
-		local request = MoneyRequest:popRequest(sender, receiver)
+		local request = manager.pop(sender, receiver)
 		if request then
 			if action == "accept" then
 				request:accept()
 			elseif action == "decline" then
 				request:decline()
 			elseif action == "info" then
-				chatPrint(executor, request:info())
+				chatPrint(executor, tostring(request)) -- TODO: revise
 			else
 				chatPrint(executor, "sf_moneyrequest: invalid action")
 			end
@@ -253,34 +249,18 @@ if SERVER then
 			chatPrint(executor, "sf_moneyrequest: no such request")
 		end
 	end, nil, "Accept, decline, or view info about a StarfallEx money request. Usage: sf_moneyrequest <entindex or 0> <accept|decline|info> <request index>", FCVAR_CLIENTCMD_CAN_EXECUTE)
-	concommand.Add("sf_moneyrequest_update", function(executor)
-		if executor:IsValid() and not executor:IsSuperAdmin() then
-			return
-		end
-		requestsUpdate()
-		chatPrint(executor, "sf_moneyrequest_update: done")
-	end, nil, "Manually trigger a purge of expired/invalid money requests. Superadmin/RCON only.", FCVAR_UNREGISTERED)
 	concommand.Add("sf_moneyrequest_purge", function(executor)
 		if executor:IsValid() and not executor:IsSuperAdmin() then
 			return
 		end
-		for k in pairs(requests) do
-			requests[k] = nil
+		for k in pairs(manager.requests) do
+			manager.requests[k] = nil
 		end
 		chatPrint(executor, "sf_moneyrequest_purge: done")
-	end, nil, "Manually trigger a purge of all money requests. Superadmin/RCON only.", FCVAR_UNREGISTERED)
+	end, nil, "Manually trigger a purge of all money requests. Superadmin/RCON only.")
 else
 	debugCvar = CreateConVar("sf_moneyrequest_verbose_cl", 1, FCVAR_ARCHIVE, "Prints information about money requests to console.", 0, 1)
 	
-	function MoneyRequest:receive()
-		local receiver, amount, expiry, length = net.ReadEntity(), net.ReadUInt(32), net.ReadFloat(), net.ReadUInt(8)
-		local message
-		if length>0 then
-			message = net.ReadData(length)
-		end
-		return self:newRequest(LocalPlayer(), receiver, amount, message, expiry)
-	end
-
 	-- Allow blocking/unblocking money requests from some players, to help mitigate abuse
 	local blocked = {}
 	SF.BlockedMoneyRequests = blocked
@@ -420,8 +400,16 @@ else
 	end
 	
 	-- Display the money request prompt when notified
+	function manager.receive()
+		local receiver, amount, expiry, length = net.ReadEntity(), net.ReadUInt(32), net.ReadFloat(), net.ReadUInt(8)
+		local message
+		if length > 0 then
+			message = net.ReadData(length)
+		end
+		return requestClass:new(LocalPlayer(), receiver, amount, message, expiry)
+	end
 	net.Receive("sf_moneyrequest2", function()
-		local request = MoneyRequest:receive()
+		local request = manager.receive()
 		local receiver, amount, expiry, message = request.receiver, request.amount, request.expiry, request.message
 		if not receiver:IsValid() or amount == 0 or expiry <= CurTime() then
 			printDebug("SF: Ignoring malformed request.", request)
@@ -742,9 +730,9 @@ if SERVER then
 			receiver = instance.player
 		end
 
-		if MoneyRequest:exists(sender, receiver) then SF.Throw("You already have a pending request for this sender", 2) end
+		if manager.exists(sender, receiver) then SF.Throw("You already have a pending request for this sender", 2) end
 		moneyrequestBurst:use(instance.player, 1)
-		MoneyRequest:add(sender, receiver, amount, message, instance, callbackSuccess, callbackFailure)
+		manager.add(sender, receiver, amount, message, instance, callbackSuccess, callbackFailure)
 	end
 
 	--- Returns number of money requests left.
