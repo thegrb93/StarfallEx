@@ -1035,12 +1035,19 @@ function ents_methods:getVelocity()
 	return vwrap(getent(self):GetVelocity())
 end
 
+--- Gets the velocity of the entity in its local coordinate system
+-- @shared
+-- @return Vector Vector velocity of the physics object local to itself
+function ents_methods:getLocalVelocity()
+	local ent = getent(self)
+	return vwrap(ent:WorldToLocal(ent:GetVelocity() + ent:GetPos()))
+end
+
 --- Returns the angular velocity of the entity
 -- @shared
 -- @return Vector The angular velocity as a vector
 function ents_methods:getAngleVelocity()
-	local ent = getent(self)
-	local phys = ent:GetPhysicsObject()
+	local phys = getent(self):GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 	return vwrap(phys:GetAngleVelocity())
 end
@@ -1049,8 +1056,7 @@ end
 -- @shared
 -- @return Angle The angular velocity as an angle
 function ents_methods:getAngleVelocityAngle()
-	local ent = getent(self)
-	local phys = ent:GetPhysicsObject()
+	local phys = getent(self):GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 	local vec = phys:GetAngleVelocity()
 	return awrap(Angle(vec.y, vec.z, vec.x))
