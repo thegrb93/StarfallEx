@@ -81,9 +81,13 @@ function requestClass:new(sender, receiver, amount, message, expiry, instance, c
 	}, self)
 end
 function requestClass:__tostring()
-	local senderId = self.sender:IsValid() and self.sender:SteamID() or "Invalid player"
-	local receiverId = self.receiver:IsValid() and self.receiver:SteamID() or "Invalid player"
-	return "From ("..senderId.."), To ("..receiverId..", Ammount ("..DarkRP.formatMoney(self.amount)..") Expires in ("..(self.expiry - CurTime())..")" -- TODO: revise
+	return string.format(
+		"%s from %s to %s, expiring in %.02f seconds",
+		DarkRP.formatMoney(self.amount),
+		self.sender:IsValid() and self.sender:SteamID() or "<INVALID>",
+		self.receiver:IsValid() and self.receiver:SteamID() or "<INVALID>",
+		self.expiry-CurTime()
+	)
 end
 
 if SERVER then
