@@ -1,5 +1,6 @@
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
+local debug_getmetatable = debug.getmetatable
 
 -- Register privileges
 registerprivilege("wire.setOutputs", "Set outputs", "Allows the user to specify the set of outputs")
@@ -24,6 +25,17 @@ SF.RegisterLibrary("wire")
 -- @libtbl wirelink_methods
 -- @libtbl wirelink_meta
 SF.RegisterType("Wirelink", false, true)
+
+-- Vector2 type for wire xv2
+SF.RegisterType("Vector2", nil, nil, nil, "Vector", function(checktype, vec2_meta)
+	return function(vec)
+		return setmetatable({vec[1], vec[2], 0}, vec2_meta)
+	end,
+	function(obj)
+		checktype(obj, vec2_meta, 2)
+		return {obj[1], obj[2]}
+	end
+end)
 
 return function(instance)
 if not (WireLib and WireLib.CreateInputs) then return end
@@ -79,19 +91,88 @@ local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local wirelink_methods, wirelink_meta, wlwrap, wlunwrap = instance.Types.Wirelink.Methods, instance.Types.Wirelink, instance.Types.Wirelink.Wrap, instance.Types.Wirelink.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local vec2_meta, v2wrap, v2unwrap = instance.Types.Vector2, instance.Types.Vector2.Wrap, instance.Types.Vector2.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 local wirelink_meta, wlwrap, wlunwrap = instance.Types.Wirelink, instance.Types.Wirelink.Wrap, instance.Types.Wirelink.Unwrap
 local COLOR_WHITE = Color(255, 255, 255)
 
+--#region Vector2 metaevents
+local table_concat = table.concat
+function vec2_meta.__tostring(a)
+	return table_concat(a, ' ', 1, 2)
+end
+
+function vec2_meta.__mul(a, b)
+	if isnumber(b) then
+		return v2wrap({ a[1] * b, a[2] * b })
+	elseif isnumber(a) then
+		return v2wrap({ b[1] * a, b[2] * a })
+	elseif debug_getmetatable(a) == vec2_meta and debug_getmetatable(b) == vec2_meta then
+		return v2wrap({ a[1] * b[1], a[2] * b[2] })
+	elseif debug_getmetatable(a) == vec2_meta then
+		checkluatype(b, TYPE_NUMBER)
+	else
+		checkluatype(a, TYPE_NUMBER)
+	end
+end
+
+function vec2_meta.__div(a, b)
+	if isnumber(b) then
+		return v2wrap({ a[1] / b, a[2] / b })
+	elseif isnumber(a) then
+		return v2wrap({ a / b[1], a / b[2] })
+	elseif debug_getmetatable(a) == vec2_meta and debug_getmetatable(b) == vec2_meta then
+		return v2wrap({ a[1] / b[1], a[2] / b[2] })
+	elseif debug_getmetatable(a) == vec2_meta then
+		checkluatype(b, TYPE_NUMBER)
+	else
+		checkluatype(a, TYPE_NUMBER)
+	end
+end
+
+function vec2_meta.__add(a, b)
+	return v2wrap({ a[1] + b[1], a[2] + b[2] })
+end
+
+function vec2_meta.__sub(a, b)
+	return v2wrap({ a[1] - b[1], a[2] - b[2] })
+end
+
+function vec2_meta.__unm(a)
+	return v2wrap({ -a[1], -a[2] })
+end
+
+function vec2_meta.__eq(a, b)
+	return a[1] == b[1] and a[2] == b[2]
+end
+--#endregion
+
+--- Creates a Vector2 struct for use with wire xv2 type
+-- @name builtins_library.Vector2
+-- @class function
+-- @param number x X value
+-- @param number y Y value
+-- @return Vector2 Vector2
+function instance.env.Vector2(x, y)
+	if x ~= nil then checkluatype(x, TYPE_NUMBER) else x = 0 end
+	if y ~= nil then checkluatype(y, TYPE_NUMBER) else y = x end
+	return v2wrap({ x, y })
+end
 
 local function identity(data) return data end
 local typeToE2Type = {
-	[TYPE_NUMBER] = {identity, "n"},
-	[TYPE_STRING] = {identity, "s"},
-	[TYPE_VECTOR] = {function(x) return {x.x, x.y, x.z} end, "v"},
-	[TYPE_ANGLE] = {function(x) return {x.p, x.y, x.r} end, "a"},
-	[TYPE_ENTITY] = {identity, "e"}
+	[TYPE_NUMBER] = function(x) return x, "n" end,
+	[TYPE_STRING] = function(x) return x, "s" end,
+	[vec_meta] = function(x) return {x[1], x[2], x[3]}, "v" end,
+	[vec2_meta] = function(v) return {v[1], v[2]}, "xv2" end,
+	[ang_meta] = function(x) return {x[1], x[2], x[3]}, "a" end,
+	[TYPE_TABLE] = function(x)
+		local meta = debug_getmetatable(x)
+		if typeToE2Type[meta] then return typeToE2Type[meta](x) end
+		x = ounwrap(x)
+		if isentity(x) then return x, "e" end
+	end
 }
 
 local inputConverters
@@ -100,6 +181,7 @@ inputConverters =
 	NORMAL = identity,
 	STRING = identity,
 	VECTOR = function(vec) return setmetatable({ vec[1] or vec.x, vec[2] or vec.y, vec[3] or vec.z }, vec_meta) end,
+	VECTOR2 = function(vec) return setmetatable({ vec[1] or vec.x, vec[2] or vec.y }, vec2_meta) end,
 	ANGLE = function(ang) return setmetatable({ ang[1] or ang.p, ang[2] or ang.y, ang[3] or ang.r }, ang_meta) end,
 	WIRELINK = wlwrap,
 	ENTITY = owrap,
@@ -139,8 +221,12 @@ inputConverters =
 	ARRAY = function(tbl)
 		local ret = {}
 		for i, v in ipairs(tbl) do
-			if istable(v) and isnumber(v[1] or v.x or v.p) and isnumber(v[2] or v.y) and isnumber(v[3] or v.z or v.r) then
-				ret[i] = inputConverters.VECTOR(v)
+			if istable(v) and isnumber(v[1] or v.x or v.p) and isnumber(v[2] or v.y) then
+				if isnumber(v[3] or v.z or v.r) then
+					ret[i] = inputConverters.VECTOR(v)
+				else
+					ret[i] = inputConverters.VECTOR2(v)
+				end
 			else
 				ret[i] = owrap(v)
 			end
@@ -151,6 +237,7 @@ inputConverters =
 inputConverters.n = inputConverters.NORMAL
 inputConverters.s = inputConverters.STRING
 inputConverters.v = inputConverters.VECTOR
+inputConverters.xv2 = inputConverters.VECTOR2
 inputConverters.a = inputConverters.ANGLE
 inputConverters.xwl = inputConverters.WIRELINK
 inputConverters.e = inputConverters.ENTITY
@@ -170,6 +257,9 @@ local outputConverters =
 	end,
 	VECTOR = function(data)
 		return vunwrap(data)
+	end,
+	VECTOR2 = function(data)
+		return v2unwrap(data)
 	end,
 	ANGLE = function(data)
 		return aunwrap(data)
@@ -196,13 +286,14 @@ local outputConverters =
 					continue
 				end
 
-				value = ounwrap(value) or value
 				local vtyp = TypeID(value)
-				local convert = typeToE2Type[vtyp]
+				local convertVal, convertType
+				if typeToE2Type[vtyp] then
+					convertVal, convertType = typeToE2Type[vtyp](value)
+				end
 
-				if convert then
-					valueList[key] = convert[1](value)
-					typeList[key] = convert[2]
+				if convertVal then
+					valueList[key], typeList[key] = convertVal, convertType
 					ret.size = ret.size + 1
 				elseif vtyp == TYPE_TABLE then
 					valueList[key] = completed_tables[value] or recursiveConvert(value)
@@ -218,11 +309,8 @@ local outputConverters =
 	ARRAY = function(data)
 		local ret = {}
 		for i, v in ipairs(data) do
-			local obj = ounwrap(v)
-			if obj then
-				local typ = typeToE2Type[TypeID(obj)]
-				ret[i] = typ and typ[1](obj)
-			end
+			local typ = typeToE2Type[TypeID(obj)]
+			ret[i] = typ and (typ(obj)) or SF.Throw("Invalid type in array at index: " .. i, 3)
 		end
 		return ret
 	end
@@ -234,6 +322,7 @@ local sfTypeToWireTypeTable = {
 	N = "NORMAL",
 	S = "STRING",
 	V = "VECTOR",
+	XV2 = "VECTOR2",
 	A = "ANGLE",
 	XWL = "WIRELINK",
 	E = "ENTITY",
