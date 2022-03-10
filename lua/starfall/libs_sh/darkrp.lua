@@ -250,7 +250,7 @@ else
 	debugCvar = CreateConVar("sf_moneyrequest_verbose_cl", 1, FCVAR_ARCHIVE, "Prints information about money requests to console.", 0, 1)
 
 	-- Allow blocking/unblocking money requests from some players, to help mitigate abuse
-	SF.BlockedMoneyRequests = SF.BlockedList("sf_moneyrequest", "sending you money requests")
+	SF.BlockedMoneyRequests = SF.BlockedList("moneyrequest", "sending you money requests")
 
 	-- The actual money request prompt itself
 	local function createMoneyRequestPanel(receiver, amount, expiry, message)

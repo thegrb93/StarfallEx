@@ -424,11 +424,11 @@ SF.BlockedList = {
 		end
 		local function getId(arg)
 			if not arg then print("missing steamid") return end
-			if not string.match(arg, '[^%d]') then arg = util.SteamIDFrom64(arg) or "" end
-			if not string.match(arg, '^STEAM_') then return print("invalid steamid") end
+			if not string.find(arg, '[^%d]') then arg = util.SteamIDFrom64(arg) or "" end
+			if string.sub(arg, 1, 6) ~= 'STEAM_' then return print("invalid steamid") end
 			return arg
 		end
-		concommand.Add(prefix.."_block", function(executor, cmd, args)
+		concommand.Add("sf_"..prefix.."_block", function(executor, cmd, args)
 			local id = getId(args[1])
 			if id then
 				blocked:block(id)
@@ -440,7 +440,7 @@ SF.BlockedList = {
 			end
 			return tbl
 		end, "Block a user from " .. desc)
-		concommand.Add(prefix.."_unblock", function(executor, cmd, args)
+		concommand.Add("sf_"..prefix.."_unblock", function(executor, cmd, args)
 			local id = getId(args[1])
 			if id then
 				blocked:unblock(id)
@@ -452,11 +452,14 @@ SF.BlockedList = {
 			end
 			return tbl
 		end, "Unblock a user from " .. desc)
-		concommand.Add(prefix.."_listblocked", function(executor, cmd, args)
+		concommand.Add("sf_"..prefix.."_blocklist", function(executor, cmd, args)
+			local n = 0
 			for steamid in pairs(blocked.list) do
 				print(getCompletion("", player.GetBySteamID(steamid), steamid))
+				n = n+1
 			end
-		end, nil, "List players you have blocked from" .. desc)
+			print("You have blocked "..n.." players from "..desc)
+		end, nil, "List players you have blocked from " .. desc)
 
 		return blocked
 	end
