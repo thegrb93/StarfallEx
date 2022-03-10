@@ -167,7 +167,8 @@ if SERVER then
 						if request.callbackFailure then
 							request.instance:runFunction(request.callbackFailure, "RECEIVER_INVALID")
 						end
-					elseif now >= request.expiry then
+					elseif now >= request.expiry+5 then
+						request.expiry = math.huge
 						self:pop(sender, receiver)
 						printDebug("SF: Removed money request because it expired.", request)
 						if request.callbackFailure then
@@ -187,6 +188,8 @@ if SERVER then
 		if not requestsForPlayer then return end
 		
 		local request = requestsForPlayer[receiver]
+		-- Don't pop an expired request
+		if request and request.expiry < CurTime() then return end
 		requestsForPlayer[receiver] = nil
 		
 		if next(requestsForPlayer) == nil then
