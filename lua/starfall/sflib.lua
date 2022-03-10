@@ -447,7 +447,7 @@ SF.BlockedList = {
 			end
 		end, function(cmd)
 			local tbl = {}
-			for steamid in pairs(blocked) do
+			for steamid in pairs(blocked.list) do
 				table.insert(tbl, getCompletion(cmd, player.GetBySteamID(steamid), steamid))
 			end
 			return tbl
