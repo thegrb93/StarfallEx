@@ -88,47 +88,6 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 	end
 end)
 
-do
-	local f = file.Open("sf_blockedusers.txt","r","DATA")
-	if f then
-		while not f:EndOfFile() do
-			SF.BlockedUsers[f:ReadLine()] = true
-		end
-		f:Close()
-	end
-end
-
-function SF.BlockUser(ply)
-	local id = ply:SteamID()
-	if SF.BlockedUsers[id] then return end
-	SF.BlockedUsers[id] = true
-	local f = file.Open("sf_blockedusers.txt","a","DATA")
-	f:Write(id.."\n")
-	f:Close()
-	for k, v in pairs(ents.FindByClass("starfall_processor")) do
-		if v.owner == ply and v.instance then
-			v:Error({message = "Blocked by user", traceback = ""})
-		end
-	end
-end
-
-function SF.UnblockUser(ply)
-	local id = ply:SteamID()
-	if not SF.BlockedUsers[id] then return end
-	SF.BlockedUsers[id] = nil
-	local f = file.Open("sf_blockedusers.txt","w","DATA")
-	for id, v in pairs(SF.BlockedUsers) do
-		f:Write(id.."\n")
-	end
-	f:Close()
-	for k, v in pairs(ents.FindByClass("starfall_processor")) do
-		if v.owner == ply then
-			v:Compile()
-		end
-	end
-end
-
-
 -------------------------------------------------------------------------------
 -- Declare Basic Starfall Types
 -------------------------------------------------------------------------------
@@ -398,6 +357,113 @@ SF.StringRestrictor = {
 setmetatable(SF.StringRestrictor, SF.StringRestrictor)
 
 
+--- Returns a class that can keep a list of blocked users
+SF.BlockedList = {
+	__index = {
+		block = function(self, steamid)
+			if self.list[steamid] then return end
+			self.list[steamid] = true
+
+			if self.filename then
+				local f = file.Open("sf_blockedusers.txt","a","DATA")
+				f:Write(steamid.."\n")
+				f:Close()
+			end
+
+			if self.onblock then
+				self.onblock(steamid)
+			end
+		end,
+		unblock = function(self, steamid)
+			if not self.list[steamid] then return end
+			self.list[steamid] = nil
+
+			if self.filename then
+				local f = file.Open(self.filename,"w","DATA")
+				for id in pairs(self.list) do
+					f:Write(id.."\n")
+				end
+				f:Close()
+			end
+
+			if self.onunblock then
+				self.onunblock(steamid)
+			end
+		end,
+		isBlocked = function(self, steamid)
+			return self.list[steamid] ~= nil
+		end,
+		readFile = function(self)
+			local f = file.Open(self.filename,"r","DATA")
+			if f then
+				while not f:EndOfFile() do
+					self.list[f:ReadLine()] = true
+				end
+				f:Close()
+			end
+		end
+	},
+	__call = function(p, prefix, desc, filename, onblock, onunblock)
+		local blocked = setmetatable({
+			list = {},
+			filename = filename,
+			onblock = onblock,
+			onunblock = onunblock
+		}, p)
+
+		if filename then
+			blocked:readFile()
+		end
+
+		local function getCompletion(cmd, ply, steamid)
+			if IsValid(ply) then
+				return cmd.." \""..steamid.."\" // "..string.gsub(ply:GetName(), '[%z\x01-\x1f\x7f;"\']', "")
+			else
+				return cmd.." \""..steamid.."\""
+			end
+		end
+		local function getId(arg)
+			if not arg then print("missing steamid") return end
+			if not string.match(arg, '[^%d]') then arg = util.SteamIDFrom64(arg) or "" end
+			if not string.match(arg, '^STEAM_') then return print("invalid steamid") end
+			return arg
+		end
+		concommand.Add(prefix.."_block", function(executor, cmd, args)
+			local id = getId(args[1])
+			if id then
+				blocked:block(id)
+			end
+		end, function(cmd)
+			local tbl = {}
+			for _, ply in pairs(player.GetHumans()) do
+				table.insert(tbl, getCompletion(cmd, ply, ply:SteamID()))
+			end
+			return tbl
+		end, "Block a user from " .. desc)
+		concommand.Add(prefix.."_unblock", function(executor, cmd, args)
+			local id = getId(args[1])
+			if id then
+				blocked:unblock(id)
+			end
+		end, function(cmd)
+			local tbl = {}
+			for steamid in pairs(blocked) do
+				table.insert(tbl, getCompletion(cmd, player.GetBySteamID(steamid), steamid))
+			end
+			return tbl
+		end, "Unblock a user from " .. desc)
+		concommand.Add(prefix.."_listblocked", function(executor, cmd, args)
+			for steamid in pairs(blocked.list) do
+				print(getCompletion("", player.GetBySteamID(steamid), steamid))
+			end
+		end, nil, "List players you have blocked from" .. desc)
+
+		return blocked
+	end
+}
+setmetatable(SF.StringRestrictor, SF.StringRestrictor)
+
+
 -- Error type containing error info
 SF.Errormeta = {
 	__tostring = function(t) return t.message end,
@@ -617,6 +683,27 @@ end
 -------------------------------------------------------------------------------
 -- Utility functions
 -------------------------------------------------------------------------------
+
+SF.BlockedUsers = SF.BlockedList("sf_user", "running clientside starfall code", "sf_blockedusers.txt",
+	function(steamid)
+		local ply = player.GetBySteamID(steamid)
+		if not ply then return end
+		for k, v in pairs(ents.FindByClass("starfall_processor")) do
+			if v.owner == ply and v.instance then
+				v:Error({message = "Blocked by user", traceback = ""})
+			end
+		end
+	end,
+	function(steamid)
+		local ply = player.GetBySteamID(steamid)
+		if not ply then return end
+		for k, v in pairs(ents.FindByClass("starfall_processor")) do
+			if v.owner == ply then
+				v:Compile()
+			end
+		end
+	end
+)
 
 --- Require .dll but doesn't throw an error. Returns true if success or false if fail.
 function SF.Require(moduleName)

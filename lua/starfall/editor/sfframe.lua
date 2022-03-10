@@ -1749,14 +1749,6 @@ vgui.Register("StarfallEditorFrame", Editor, "DFrame")
 -- Starfall Users
 PANEL  = {}
 
-function PANEL:Block(ply)
-	SF.BlockUser(ply)
-end
-
-function PANEL:Unblock(ply)
-	SF.UnblockUser(ply)
-end
-
 function PANEL:UpdatePlayers(players)
 	local sortedplayers = {}
 	for ply in pairs(self.players) do
@@ -1768,6 +1760,7 @@ function PANEL:UpdatePlayers(players)
 	self.scrollPanel:Clear()
 	for _, tbl in ipairs(sortedplayers) do
 		local ply = tbl.ply
+		local steamid = ply:SteamID()
 
 		local header = vgui.Create("StarfallPanel")
 		header:DockMargin(0, 5, 0, 0)
@@ -1775,7 +1768,7 @@ function PANEL:UpdatePlayers(players)
 		header:Dock(TOP)
 		header:SetBackgroundColor(Color(0,0,0,20))
 
-		local blocked = SF.BlockedUsers[ply:SteamID()]~=nil
+		local blocked = SF.BlockedUsers:isBlocked(steamid)
 		local button = vgui.Create("StarfallButton", header)
 		button.active = blocked
 		button:SetText(blocked and "Unblock" or "Block")
@@ -1783,7 +1776,11 @@ function PANEL:UpdatePlayers(players)
 		button:Dock(LEFT)
 
 		button.DoClick = function()
-			if blocked then self:Unblock(ply) else self:Block(ply) end
+			if blocked then
+				SF.BlockedUsers:unblock(steamid)
+			else
+				SF.BlockedUsers:block(steamid)
+			end
 			blocked = not blocked
 			button:SetText(blocked and "Unblock" or "Block")
 		end
@@ -1916,7 +1913,7 @@ end
 function PANEL:CheckPlayersChanged()
 	local players = {}
 	for k, v in pairs(player.GetAll()) do
-		if SF.playerInstances[v] or SF.BlockedUsers[v:SteamID()] then
+		if SF.playerInstances[v] or SF.BlockedUsers:isBlocked(v:SteamID()) then
 			players[v] = true
 		end
 	end

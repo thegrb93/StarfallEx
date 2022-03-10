@@ -245,52 +245,9 @@ if SERVER then
 	end, nil, "Accept, decline, or view info about a StarfallEx money request. Usage: sf_moneyrequest <entindex or 0> <accept|decline|info> <request index>", FCVAR_CLIENTCMD_CAN_EXECUTE)
 else
 	debugCvar = CreateConVar("sf_moneyrequest_verbose_cl", 1, FCVAR_ARCHIVE, "Prints information about money requests to console.", 0, 1)
-	
-	local function createBlockCommands(blocked, prefix)
-		local function getCompletion(cmd, ply, steamid)
-			if IsValid(ply) then
-				-- DarkRP already forbids unsafe characters, and the "//" means injection
-				-- shouldn't be possible anyway, but let's sanitize just to be safe.
-				return cmd.." \""..steamid.."\" // "..string.gsub(ply:GetName(), '[%z\x01-\x1f\x7f;"\']', "")
-			else
-				return cmd.." \""..steamid.."\""
-			end
-		end
-		local function setBlocked(arg, val)
-			if not arg then return print("sf_moneyrequest_block: missing steamid") end
-			if not string.match(arg, '[^%d]') then arg = util.SteamIDFrom64(arg) or "" end
-			if not string.match(arg, '^STEAM_') then return print("sf_moneyrequest_block: invalid steamid") end
-			blocked[arg] = val
-		end
-		concommand.Add(prefix.."_block", function(executor, cmd, args)
-			setBlocked(args[1], true)
-		end, function(cmd)
-			local tbl = {}
-			for _, ply in pairs(player.GetHumans()) do
-				table.insert(tbl, getCompletion(cmd, ply, ply:SteamID()))
-			end
-			return tbl
-		end, "Block a user from sending you money requests. Lasts until the end of your session, even if they relog.")
-		concommand.Add(prefix.."_unblock", function(executor, cmd, args)
-			setBlocked(args[1], nil)
-		end, function(cmd)
-			local tbl = {}
-			for steamid in pairs(blocked) do
-				table.insert(tbl, getCompletion(cmd, player.GetBySteamID(steamid), steamid))
-			end
-			return tbl
-		end, "Unblock a user from sending you money requests.")
-		concommand.Add(prefix.."_blocklist", function(executor, cmd, args)
-			for steamid in pairs(blocked) do
-				print(getCompletion("", player.GetBySteamID(steamid), steamid))
-			end
-		end, nil, "List players you have blocked from sending you money requests.")
-	end
 
 	-- Allow blocking/unblocking money requests from some players, to help mitigate abuse
-	local blocked = {}
-	SF.BlockedMoneyRequests = blocked
-	createBlockCommands(blocked, "sf_moneyrequest")
+	SF.BlockedMoneyRequests = SF.BlockedList("sf_moneyrequest", "sending you money requests")
 
 	-- The actual money request prompt itself
 	local function createMoneyRequestPanel(receiver, amount, expiry, message)
@@ -358,7 +315,7 @@ else
 		end
 		function self:OnClose()
 			if blockRequests:GetChecked() then
-				blocked[receiverSteamID] = true
+				SF.BlockedMoneyRequests:block(receiverSteamID)
 			end
 		end
 		local me = LocalPlayer()
@@ -408,9 +365,11 @@ else
 			printDebug("SF: Ignoring malformed request.", request)
 		end
 		printDebug("SF: Received money request.", request)
-		if SF.BlockedUsers[receiver:SteamID()] then
+		if SF.BlockedUsers:isBlocked(receiver:SteamID()) then
+			RunConsoleCommand("sf_moneyrequest", 0, "decline", receiver:EntIndex())
 			return printDebug("SF: Ignoring money request because the receiver is in \"SF.BlockedUsers\".", request)
-		elseif blocked[receiver:SteamID()] then
+		elseif SF.BlockedMoneyRequests:isBlocked(receiver:SteamID()) then
+			RunConsoleCommand("sf_moneyrequest", 0, "decline", receiver:EntIndex())
 			return printDebug("SF: Ignoring money request because the receiver is in \"SF.BlockedMoneyRequests\".", request)
 		end
 		createMoneyRequestPanel(receiver, amount, expiry, message)
