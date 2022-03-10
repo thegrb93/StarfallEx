@@ -104,7 +104,7 @@ function nextbot_library.create(pos, mdl)
 	local nb = ents.Create("starfall_cnextbot")
 	register(nb, instance)
 	nb:SetPos(upos)
-	nb:SetNBModel(mdl or "models/kleiner.mdl")
+	nb:SetModel(mdl or "models/kleiner.mdl")
 	nb.chip = instance.entity
 	nb:Spawn()
 	nextbots[nb] = true

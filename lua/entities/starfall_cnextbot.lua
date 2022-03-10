@@ -3,14 +3,8 @@ AddCSLuaFile()
 ENT.Base 		= "base_nextbot"
 ENT.Spawnable		= true
 
-
--- Had to do some fuckery to get model to set on both realms when the bot is created from a chip
-function ENT:SetupDataTables()
-	self:NetworkVar( "String", 0, "NBModel" )
-end
-
-function ENT:Initialize()
-	if SERVER then
+if SERVER then
+	function ENT:Initialize()
 		self.RagdollOnDeath = true
 		self.WALKACT = ACT_WALk
 		self.RUNACT = ACT_RUN
@@ -23,14 +17,8 @@ function ENT:Initialize()
 		self.JumpCallbacks = SF.HookTable()
 		self.IgniteCallbacks = SF.HookTable()
 		self.NavChangeCallbacks = SF.HookTable()
+		self.ContactCallbacks = SF.HookTable()
 	end
-
-	self:SetModel( self:GetNBModel() )
-	self:ResetModel()
-end
-
-function ENT:ResetModel()
-	self:SetModel(self:GetNBModel())
 end
 
 function ENT:ChasePos(options)
@@ -38,16 +26,19 @@ function ENT:ChasePos(options)
 	local path = Path( "Follow" )
 	path:SetMinLookAheadDistance( options.lookahead or 300 )
 	path:SetGoalTolerance( options.tolerance or 20 )
-	path:Compute( self, self.goTo )		-- Compute the path towards the enemy's position
+	-- Compute the path towards the enemy's position
+	path:Compute( self, self.goTo )
 
 	if ( !path:IsValid() ) then return "failed" end
 
 	while ( path:IsValid() and self.goTo ) do
-	
-		if ( path:GetAge() > 0.1 ) then					-- Since we are following the player we have to constantly remake the path
-			path:Compute(self, self.goTo)-- Compute the path towards the enemy's position again
+		-- Since we are following the player we have to constantly remake the path
+		if ( path:GetAge() > 0.1 ) then
+			-- Compute the path towards the enemy's position again
+			path:Compute(self, self.goTo)
 		end
-		path:Update( self )								-- This function moves the bot along the path
+		-- This function moves the bot along the path
+		path:Update( self )
 		
 		if ( options.draw ) then path:Draw() end
 		-- If we're stuck then call the HandleStuck function and abandon
@@ -55,16 +46,13 @@ function ENT:ChasePos(options)
 			self:HandleStuck()
 			return "stuck"
 		end
-
 		coroutine.yield()
-
 	end
 
 	return "ok"
 end
 
 function ENT:RunBehaviour()
-	
 	while true do
 		if self.playSeq then
 			self:PlaySequenceAndWait( self.playSeq )
@@ -76,12 +64,9 @@ function ENT:RunBehaviour()
 			self:StartActivity(self.IDLEACT)
 			self.goTo = nil
 		end
-		
 		coroutine.wait( 1 )
-		
 		coroutine.yield()
 	end
-	
 end
 
 function ENT:OnInjured(dmginfo)
@@ -142,10 +127,10 @@ end
 
 function ENT:BodyUpdate()
 	self:BodyMoveXY()
-	
+
 	local localVel = self:WorldToLocal(self.loco:GetVelocity() + self:GetPos())
-	self:SetPoseParameter("move_yaw", math.deg(math.atan2(localVel.x, localVel.y)))
-	
+	self:SetPoseParameter("move_yaw", math.deg(math.atan2(localVel.y, localVel.x)))
+
 	if CLIENT then
 		self:InvalidateBoneCache()
 	end
