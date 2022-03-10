@@ -461,7 +461,7 @@ SF.BlockedList = {
 		return blocked
 	end
 }
-setmetatable(SF.StringRestrictor, SF.StringRestrictor)
+setmetatable(SF.BlockedList, SF.BlockedList)
 
 
 -- Error type containing error info
