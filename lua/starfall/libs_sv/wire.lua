@@ -161,7 +161,8 @@ function instance.env.Vector2(x, y)
 end
 
 local function identity(data) return data end
-local typeToE2Type = {
+local typeToE2Type -- Assign next line since some funcs need it
+typeToE2Type = {
 	[TYPE_NUMBER] = function(x) return x, "n" end,
 	[TYPE_STRING] = function(x) return x, "s" end,
 	[vec_meta] = function(x) return {x[1], x[2], x[3]}, "v" end,
