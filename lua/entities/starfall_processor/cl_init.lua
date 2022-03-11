@@ -45,7 +45,7 @@ function ENT:GetOverlayText()
 		serverstr = "None"
 	end
 	
-	local authorstr =  self.author and self.author:Trim() != "" and "\nAuthor: " .. self.author or ""
+	local authorstr =  self.author and self.author:Trim() ~= "" and "\nAuthor: " .. self.author or ""
 	
 	return "- Starfall Processor -\n[ " .. self.name .. " ]"..authorstr.."\nServer CPU: " .. serverstr .. "\nClient CPU: " .. clientstr
 end

@@ -215,7 +215,7 @@ function table_library.copy( tbl, lookup_table )
 	local copy = {}
 	setmetatable( copy, meta )
 	for i, v in pairs( tbl ) do
-		if ( !istable( v ) ) then
+		if ( not istable( v ) ) then
 			copy[ i ] = v
 		else
 			lookup_table = lookup_table or {}

@@ -935,7 +935,7 @@ function PANEL:Think()
 	local scrollPanel = self.permissionsPanel:GetChild( self.area - 1 )
 	local VBar = scrollPanel:GetVBar()
 	local dest = self.reservedTall + math.Clamp( scrollPanel:GetCanvas():GetTall(), 0, ScrH() - self.reservedTall )
-	if self:GetTall() != dest then
+	if self:GetTall() ~= dest then
 		self.tallAnimation = true
 		VBar:SetAlpha( 0 )
 		local step = Lerp( 0.6, 0, dest - self:GetTall() )
@@ -1131,7 +1131,7 @@ function PANEL:getFont(tab)
 	local weight = tab.weight or 500
 	local blursize = tab.blursize or 0
 	local scanlines = tab.scanlines or 0
-	local antialias = (tab.antialias != false) and 1 or 0
+	local antialias = (tab.antialias ~= false) and 1 or 0
 	local underline = tab.underline and 1 or 0
 	local italic = tab.italic and 1 or 0
 	local strikeout = tab.strikeout and 1 or 0
@@ -1196,7 +1196,7 @@ function PANEL:Init()
 	local function setupItem(item, name)
 		item:SetValue(self.FontData[name])
 		item.OnChange = function(_, val)
-			if val != nil then
+			if val ~= nil then
 				self.FontData[name] = val
 			else
 				self.FontData[name] = item:GetValue()

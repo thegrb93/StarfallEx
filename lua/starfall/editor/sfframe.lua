@@ -448,7 +448,7 @@ function Editor:UpdateTabText(tab, title)
 	local tabtext = title or text
 	tab:SetToolTip(ed.chosenfile)
 	tabtext = tabtext or "Generic"
-	if not ed:IsSaved() and tabtext:sub(-1) != "*" then
+	if not ed:IsSaved() and tabtext:sub(-1) ~= "*" then
 		tabtext = tabtext.." *"
 	end
 
@@ -886,7 +886,7 @@ function Editor:InitComponents()
 
 				local awesomePeople = "List of awesome people that contributed to StarfallEx:\n";
 				for k,v in ipairs(data) do
-					if v.login != "web-flow" then
+					if v.login ~= "web-flow" then
 						awesomePeople = awesomePeople .. "\n" .. v.login
 					end
 				end
