@@ -98,14 +98,24 @@ end
 -- @param string name The timer name
 -- @param number delay The time, in seconds, to set the timer to.
 -- @param number reps The repetitions of the timer. 0 = infinite
+-- @param boolean immediate? Optional, True to immediately start the timer instead of waiting
 -- @param function func The function to call when the timer is fired
-function timer_library.create(name, delay, reps, func)
+function timer_library.create(name, delay, reps, immediate, func)
+	if type(immediate) == "function" then
+		func = immediate
+		immediate = nil
+	end
 	checkluatype(name, TYPE_STRING)
 	checkluatype(delay, TYPE_NUMBER)
 	checkluatype(reps, TYPE_NUMBER)
 	checkluatype(func, TYPE_FUNCTION)
-
-	createTimer(name, delay, reps, func, false)
+	
+	if immediate then
+		instance:runFunction(func)
+		createTimer(name, delay, reps - 1, func, false)
+	else
+		createTimer(name, delay, reps, func, false)
+	end
 end
 
 --- Creates a simple timer, has no name, can't be stopped, paused, or destroyed.
