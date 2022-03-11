@@ -272,7 +272,7 @@ do
 		for k, point in pairs( points ) do
 			if not isValid(point.ent) then continue end
 			local cur_pos = point.ent:getPos()
-			if not changed and ( not point.vec or point.vec != cur_pos ) then changed = true end
+			if not changed and ( not point.vec or point.vec ~= cur_pos ) then changed = true end
 
 			point.vec = cur_pos
 			point.x = point.vec.x

@@ -183,10 +183,10 @@ if CLIENT then
 	end
 
 	function SF.Editor.createGlobalPermissionsPanel(client, server)
-		if server != false then -- default to true
+		if server ~= false then -- default to true
 			server = true
 		end
-		if client != false then -- defualt to true
+		if client ~= false then -- defualt to true
 			client = true
 		end
 		local permsPanel = vgui.Create("StarfallPermissions")

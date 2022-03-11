@@ -1972,7 +1972,7 @@ function render_library.renderView(tbl)
 	end
 
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	if !renderdata.isScenic then SF.Throw("Can't use render.renderView outside of renderscene hook.", 2) end
+	if not renderdata.isScenic then SF.Throw("Can't use render.renderView outside of renderscene hook.", 2) end
 
 	if renderdata.renderingView then
 		SF.Throw("Already rendering a view.", 2)

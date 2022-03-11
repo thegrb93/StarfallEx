@@ -281,11 +281,11 @@ function vmatrix_methods:getAxisAngle()
 		m20, m21, m22, m23 = unwrap(self):Unpack()
 
 	if math.abs(m01-m10)< epsilon and math.abs(m02-m20)< epsilon and math.abs(m12-m21)< epsilon then
-		// singularity found
+		-- singularity found
 		if math.abs(m01+m10) < epsilon and math.abs(m02+m20) < epsilon and math.abs(m12+m21) < epsilon and math.abs(m00+m11+m22-3) < epsilon then
 			return vwrap2({1,0,0}), 0
 		end
-		// otherwise this singularity is angle = math.pi
+		-- otherwise this singularity is angle = math.pi
 		local xx = (m00+1)/2
 		local yy = (m11+1)/2
 		local zz = (m22+1)/2

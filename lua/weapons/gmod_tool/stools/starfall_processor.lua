@@ -100,7 +100,7 @@ function TOOL:LeftClick(trace)
 		if sf==ent then return end
 		local ret
 		if ent:IsValid() then
-			if self:GetClientNumber( "parent", 0 ) != 0 then
+			if self:GetClientNumber( "parent", 0 ) ~= 0 then
 				sf:SetParent(ent)
 			else
 				local const = constraint.Weld(sf, ent, 0, trace.PhysicsBone, 0, true, true)

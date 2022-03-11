@@ -136,7 +136,7 @@ function TOOL:LeftClick(trace)
 
 		local const
 		if trace.Entity:IsValid() then
-			if self:GetClientNumber( "parent", 0 ) != 0 then
+			if self:GetClientNumber( "parent", 0 ) ~= 0 then
 				sf:SetParent(trace.Entity)
 			else
 				const = constraint.Weld(sf, trace.Entity, 0, trace.PhysicsBone, 0, true, true)
@@ -167,7 +167,7 @@ function TOOL:LeftClick(trace)
 
 		local const
 		if trace.Entity:IsValid() then
-			if self:GetClientNumber( "parent", 0 ) != 0 then
+			if self:GetClientNumber( "parent", 0 ) ~= 0 then
 				sf:SetParent(trace.Entity)
 			else
 				const = constraint.Weld(sf, trace.Entity, 0, trace.PhysicsBone, 0, true, true)

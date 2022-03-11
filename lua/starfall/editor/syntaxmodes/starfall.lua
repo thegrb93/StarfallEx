@@ -717,7 +717,7 @@ function EDITOR:PopulateContextMenu(menu)
 				ColorPicker.OnColorPicked = function(_, color)
 					self.Start = {caret[1], startpos}
 					self.Caret = {caret[1], endpos + 1}
-					if a or color.a != 255 then
+					if a or color.a ~= 255 then
 						self:SetSelection(string.format("%d, %d, %d, %d", color.r, color.g, color.b, color.a))
 					else
 						self:SetSelection(string.format("%d, %d, %d", color.r, color.g, color.b))

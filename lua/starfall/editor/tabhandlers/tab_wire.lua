@@ -279,8 +279,8 @@ function TabHandler:RegisterSettings()
 end
 
 local PANEL = {}
-function PANEL:OnValidate(s, r, m, goto)
-	if s or not goto then return end
+function PANEL:OnValidate(s, r, m, go_to)
+	if s or not go_to then return end
 	self:SetCaret({ r, 0 })
 end
 
@@ -1166,7 +1166,7 @@ function PANEL:Paint()
 	surface_DrawRect(self.LineNumberWidth + 5, 0, self:GetWide() - (self.LineNumberWidth + 5), self:GetTall())
 
 	local scr  = math_floor(self.ScrollBar:GetScroll() + 1)
-	if scr != prevScroll then
+	if scr ~= prevScroll then
 		local cScroll = 0
 
 		for k,v in ipairs(self.Rows) do
@@ -2800,7 +2800,7 @@ function PANEL:Think()
 		line = lines[self.RealLine[line]] or lines[line]
 
 		if line and line[2] and line[2].foldable then
-			if self.cur != "pointer" then
+			if self.cur ~= "pointer" then
 				self:SetCursor("hand")
 				self.cur = "pointer"
 			end
