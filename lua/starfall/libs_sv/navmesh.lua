@@ -72,7 +72,7 @@ return function(instance)
 		end
 	end)
 
-	function navarea_meta:__tostring()
+	function lnavarea_meta:__tostring()
 		return "NavArea"
 	end
 

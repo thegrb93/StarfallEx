@@ -157,4 +157,26 @@ function http_library.urlEncode(data)
 	return data
 end
 
+--- Decodes the % escaped chars in a url
+-- @param string data The data to convert
+-- @return string The converted data
+function http_library.urlDecode(data)
+	checkluatype(data, TYPE_STRING)
+	data = string.gsub(data, "%%(..)", function(char)
+		char = tonumber(char, 16)
+		if char==nil or char < 0 or char > 255 then error("Invalid '%' value found: "..char) end
+		return string.char(char)
+	end)
+	return data
+end
+
+--- Converts a simple google drive url to a raw one
+-- @param string url The url to convert
+-- @return string The converted url
+function http_library.urlGoogleDriveToRaw(url)
+    local id = string.match(url, "https://drive%.google%.com/file/d/([^/]+)/view")
+	if not id then SF.Throw("Failed to parse google drive link!", 2) end
+    return "https://drive.google.com/uc?export=download&id="..id
+end
+
 end

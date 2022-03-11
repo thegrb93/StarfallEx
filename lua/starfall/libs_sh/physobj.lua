@@ -72,6 +72,14 @@ function physobj_methods:getVelocity()
 	return vwrap(unwrap(self):GetVelocity())
 end
 
+--- Gets the velocity of the physics object in coordinates local to itself
+-- @shared
+-- @return Vector Vector velocity of the physics object local to itself
+function physobj_methods:getLocalVelocity()
+	local phys = unwrap(self)
+	return vwrap(phys:WorldToLocalVector(phys:GetVelocity()))
+end
+
 --- Gets the axis aligned bounding box of the physics object
 -- @shared
 -- @return Vector The mins of the AABB
