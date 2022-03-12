@@ -1,6 +1,10 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local haspermission = SF.Permissions.hasAccess
+local registerprivilege = SF.Permissions.registerPrivilege
+
+-- Register privileges
+registerprivilege("entities.blockDamage", "Block Damage", "Allows the user to block incoming entity damage", { entities = {} })
 
 --Can only return if you are the first argument
 local function returnOnlyOnYourself(instance, args, ply)
@@ -199,6 +203,10 @@ if SERVER then
 			instance.Types.Vector.Wrap(dmg:GetDamagePosition()),
 			instance.Types.Vector.Wrap(dmg:GetDamageForce())
 		}
+	end, function(instance, args, target)
+		if args[1] and args[2] == true and (instance.player == SF.Superuser or haspermission(instance, target, "entities.blockDamage")) then
+			return true
+		end
 	end)
 
 	--- Called whenever an NPC is killed.
