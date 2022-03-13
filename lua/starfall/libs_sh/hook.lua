@@ -193,6 +193,7 @@ if SERVER then
 	-- @param number type Type of the damage
 	-- @param Vector position Position of the damage
 	-- @param Vector force Force of the damage
+	-- @return boolean? Return true to prevent the entity from taking damage
 	add("EntityTakeDamage", nil, function(instance, target, dmg)
 		return true, {
 			instance.WrapObject(target),
