@@ -3,9 +3,6 @@ local checkluatype = SF.CheckLuaType
 local haspermission = SF.Permissions.hasAccess
 local registerprivilege = SF.Permissions.registerPrivilege
 
--- Register privileges
-registerprivilege("entities.blockDamage", "Block Damage", "Allows the user to block incoming entity damage", { entities = {} })
-
 --Can only return if you are the first argument
 local function returnOnlyOnYourself(instance, args, ply)
 	if args[1] and instance.player == ply then return args[2] end
@@ -181,6 +178,9 @@ if SERVER then
 	-- @param Player ply Player
 	-- @param Weapon wep Weapon
 	add("PlayerCanPickupWeapon", nil, nil, returnOnlyOnYourselfFalse)
+
+	-- Register privileges
+	registerprivilege("entities.blockDamage", "Block Damage", "Allows the user to block incoming entity damage", { entities = {} })
 
 	--- Called when an entity is damaged
 	-- @name EntityTakeDamage
