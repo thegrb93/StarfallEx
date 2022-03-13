@@ -250,6 +250,9 @@ if SERVER then
 	end
 
 	local parentChainTooLong = SF.ParentChainTooLong
+	--- Parents a hologram to the specified parent's bone
+	-- @param Entity? parent Entity parent (nil to unparent)
+	-- @param number bone Bone ID
 	function hologram_methods:followBone(parent, bone)
 		local holo = getent(self)
 		if parent then
