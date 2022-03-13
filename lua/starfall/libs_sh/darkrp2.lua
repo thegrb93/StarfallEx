@@ -558,6 +558,10 @@ SF.RegisterLibrary("darkrp")
 
 return function(instance)
 
+if SERVER and util.NetworkStringToID("sf_moneyrequest") ~= 0 then
+	SF.AddNotify(instance.player, "SF: loganlearner/starfall-darkrp-library is not compatible with newer versions of StarfallEx\nPlease uninstall loganlearner/starfall-darkrp-library", "ERROR", 7, "ERROR1")
+	return
+end
 if not DarkRP then return end
 
 local darkrp_library = instance.Libraries.darkrp
