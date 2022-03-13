@@ -166,14 +166,13 @@ if SERVER then
 			if IsValid(sender) then
 				for receiver, request in pairs(requestsForPlayer) do
 					if not receiver:IsValid() then
-						self:pop(sender, receiver)
+						self:pop(sender, receiver, true)
 						printDebug("SF: Removed money request because the receiver was invalid.", request)
 						if request.callbackFailure then
 							request.instance:runFunction(request.callbackFailure, "RECEIVER_INVALID")
 						end
 					elseif now >= request.expiry+5 then
-						request.expiry = math.huge
-						self:pop(sender, receiver)
+						self:pop(sender, receiver, true)
 						printDebug("SF: Removed money request because it expired.", request)
 						if request.callbackFailure then
 							request.instance:runFunction(request.callbackFailure, "REQUEST_TIMEOUT")
@@ -182,7 +181,7 @@ if SERVER then
 				end
 			else
 				for receiver, request in pairs(requestsForPlayer) do
-					self:pop(sender, receiver)
+					self:pop(sender, receiver, true)
 					if request.callbackFailure then
 						request.instance:runFunction(request.callbackFailure, "SENDER_INVALID")
 					end
@@ -190,13 +189,13 @@ if SERVER then
 			end
 		end
 	end
-	function manager:pop(sender, receiver)
+	function manager:pop(sender, receiver, force)
 		local requestsForPlayer = self.requests[sender]
 		if not requestsForPlayer then return end
 		
 		local request = requestsForPlayer[receiver]
 		-- Don't pop an expired request
-		if request and request.expiry < CurTime() then return end
+		if not force and (request and request.expiry < CurTime()) then return end
 		requestsForPlayer[receiver] = nil
 		
 		if next(requestsForPlayer) == nil then
