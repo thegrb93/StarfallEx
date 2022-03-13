@@ -34,7 +34,7 @@ if CLIENT then
 			if child and child:IsValid() then
 				child:SetPos(parent:LocalToWorld(data.pos))
 				child:SetAngles(parent:LocalToWorldAngles(data.ang))
-				child[data.func](parent, data.bone)
+				child[data.func](child, parent, data.bone)
 				
 				if child.sf_children then
 					return reparentChildren(child)
@@ -265,11 +265,15 @@ else
 	-- @param Vector vec New position
 	function hologram_methods:setPos(vec)
 		local holo = getholo(self)
-		local vec = vunwrap(vec)
-
+		local pos = SF.clampPos(vunwrap(vec))
 		checkpermission(instance, holo, "hologram.setRenderProperty")
-
-		holo:SetPos(SF.clampPos(vec))
+		
+		holo:SetPos(pos)
+		
+		local parent = holo.sf_parent
+		if parent and parent:IsValid() then
+			parent.sf_children[holo].pos = parent:WorldToLocal(pos)
+		end
 	end
 
 	--- Sets the hologram's angles.
@@ -277,11 +281,15 @@ else
 	-- @param Angle ang New angles
 	function hologram_methods:setAngles(ang)
 		local holo = getholo(self)
-		local ang = aunwrap(ang)
-
+		local angle = aunwrap(ang)
 		checkpermission(instance, holo, "hologram.setRenderProperty")
 
-		holo:SetAngles(ang)
+		holo:SetAngles(angle)
+		
+		local parent = holo.sf_parent
+		if parent and parent:IsValid() then
+			parent.sf_children[holo].ang = parent:WorldToLocalAngles(angle)
+		end
 	end
 
 	--- Sets the texture filtering function when viewing a close texture
