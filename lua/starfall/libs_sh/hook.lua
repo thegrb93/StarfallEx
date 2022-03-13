@@ -1,6 +1,7 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local haspermission = SF.Permissions.hasAccess
+local registerprivilege = SF.Permissions.registerPrivilege
 
 --Can only return if you are the first argument
 local function returnOnlyOnYourself(instance, args, ply)
@@ -178,6 +179,9 @@ if SERVER then
 	-- @param Weapon wep Weapon
 	add("PlayerCanPickupWeapon", nil, nil, returnOnlyOnYourselfFalse)
 
+	-- Register privileges
+	registerprivilege("entities.blockDamage", "Block Damage", "Allows the user to block incoming entity damage", { entities = {} })
+
 	--- Called when an entity is damaged
 	-- @name EntityTakeDamage
 	-- @class hook
@@ -189,6 +193,7 @@ if SERVER then
 	-- @param number type Type of the damage
 	-- @param Vector position Position of the damage
 	-- @param Vector force Force of the damage
+	-- @return boolean? Return true to prevent the entity from taking damage
 	add("EntityTakeDamage", nil, function(instance, target, dmg)
 		return true, {
 			instance.WrapObject(target),
@@ -199,6 +204,10 @@ if SERVER then
 			instance.Types.Vector.Wrap(dmg:GetDamagePosition()),
 			instance.Types.Vector.Wrap(dmg:GetDamageForce())
 		}
+	end, function(instance, args, target)
+		if args[1] and args[2] == true and (instance.player == SF.Superuser or haspermission(instance, target, "entities.blockDamage")) then
+			return true
+		end
 	end)
 
 	--- Called whenever an NPC is killed.
