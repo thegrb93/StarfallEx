@@ -3,22 +3,33 @@ AddCSLuaFile()
 ENT.Base 		= "base_nextbot"
 ENT.Spawnable		= true
 
-if SERVER then
-	function ENT:Initialize()
-		self.RagdollOnDeath = true
-		self.WALKACT = ACT_WALk
-		self.RUNACT = ACT_RUN
-		self.IDLEACT = ACT_IDLE
-		self.MoveSpeed = 200
-		
-		self.DeathCallbacks = SF.HookTable()
-		self.InjuredCallbacks = SF.HookTable()
-		self.LandCallbacks = SF.HookTable()
-		self.JumpCallbacks = SF.HookTable()
-		self.IgniteCallbacks = SF.HookTable()
-		self.NavChangeCallbacks = SF.HookTable()
-		self.ContactCallbacks = SF.HookTable()
+function ENT:BodyUpdate()
+	self:BodyMoveXY()
+
+	local localVel = self:WorldToLocal(self.loco:GetVelocity() + self:GetPos())
+	self:SetPoseParameter("move_yaw", math.deg(math.atan2(localVel.y, localVel.x)))
+
+	if CLIENT then
+		self:InvalidateBoneCache()
 	end
+end
+
+if CLIENT then return end
+
+function ENT:Initialize()
+	self.RagdollOnDeath = true
+	self.WALKACT = ACT_WALK
+	self.RUNACT = ACT_RUN
+	self.IDLEACT = ACT_IDLE
+	self.MoveSpeed = 200
+	
+	self.DeathCallbacks = SF.HookTable()
+	self.InjuredCallbacks = SF.HookTable()
+	self.LandCallbacks = SF.HookTable()
+	self.JumpCallbacks = SF.HookTable()
+	self.IgniteCallbacks = SF.HookTable()
+	self.NavChangeCallbacks = SF.HookTable()
+	self.ContactCallbacks = SF.HookTable()
 end
 
 function ENT:ChasePos(options)
@@ -123,15 +134,4 @@ function ENT:OnContact(colent)
 	if self.ContactCallbacks:isEmpty() then return end
 	local inst = self.chip.instance
 	self.ContactCallbacks:run(inst, inst.WrapObject(colent))
-end
-
-function ENT:BodyUpdate()
-	self:BodyMoveXY()
-
-	local localVel = self:WorldToLocal(self.loco:GetVelocity() + self:GetPos())
-	self:SetPoseParameter("move_yaw", math.deg(math.atan2(localVel.y, localVel.x)))
-
-	if CLIENT then
-		self:InvalidateBoneCache()
-	end
 end
