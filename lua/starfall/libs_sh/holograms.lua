@@ -28,24 +28,23 @@ local cl_hologram_meta = {
 
 if CLIENT then
 	registerprivilege("hologram.setParent", "Set Parent", "Allows the user to parent a hologram", { entities = {} })
-
-	local function parentChildren(ent)
-		for child, data in pairs(ent.sf_children) do
+	
+	local function reparentChildren(parent)
+		for child, data in pairs(parent.sf_children) do
 			if child and child:IsValid() then
-				child:SetParent(ent, data[1])
-				child:SetPos(ent:LocalToWorld(data[2]))
-				child:SetAngles(ent:LocalToWorldAngles(data[3]))
-
+				child:SetPos(parent:LocalToWorld(data.pos))
+				child:SetAngles(parent:LocalToWorldAngles(data.ang))
+				child[data.func](parent, data.bone)
+				
 				if child.sf_children then
-					return parentChildren(child)
+					return reparentChildren(child)
 				end
 			end
 		end
 	end
-
-	hook.Add("NotifyShouldTransmit", "starfall_hologram_parents", function(ent, transmit)
+	hook.Add("NotifyShouldTransmit", "StarfallHologramReparent", function(ent)
 		if ent and ent:IsValid() and ent.sf_children then
-			parentChildren(ent)
+			reparentChildren(ent)
 		end
 	end)
 end
@@ -250,7 +249,15 @@ if SERVER then
 		holo:SetLocalAngularVelocity(aunwrap(angvel))
 	end
 
-
+	-- TODO: Limit parent chain to 16 just like Entity.setParent
+	function hologram_methods:followBone(parent, bone)
+		if parent then
+			checkluatype(bone, TYPE_NUMBER)
+			getent(self):FollowBone(getent(parent), bone)
+		else
+			getent(self):FollowBone()
+		end
+	end
 
 else
 	--- Sets the hologram's position.
@@ -332,45 +339,68 @@ else
 		end
 	end
 
+	local function clearParentFix(ent)
+		if ent.sf_parent then
+			ent.sf_parent.sf_children[ent] = nil
+			ent.sf_parent = nil
+		end
+	end
+	
+	local function setParentFix(ent, parent, bone, func)
+		if not parent.sf_children then
+			parent.sf_children = {}
+		end
+		
+		if ent.sf_parent and ent.sf_parent ~= parent then
+			ent.sf_parent.sf_children[ent] = nil
+		end
+		
+		ent.sf_parent = parent
+		parent.sf_children[ent] = {
+			func = func,
+			bone = bone, -- or attachment, dep. on `func`
+			pos  = parent:WorldToLocal(ent:GetPos()),
+			ang  = parent:WorldToLocalAngles(ent:GetAngles())
+		}
+	end
+	
 	--- Parents a hologram
-	-- @param Entity? ent Entity parent (nil to unparent)
+	-- @param Entity? parent Entity parent (nil to unparent)
 	-- @param number? attachment Optional attachment ID
-	function hologram_methods:setParent(ent, attachment)
-
+	function hologram_methods:setParent(parent, attachment)
 		local holo = getholo(self)
-
 		checkpermission(instance, holo, "hologram.setParent")
 
-		if ent ~= nil then
-			local parent = getent(ent)
-
-			if attachment == nil then attachment = -1 end
+		if parent ~= nil then
+			parent = getent(parent)
+			attachment = attachment or -1
 			checkluatype(attachment, TYPE_NUMBER)
-
-			if not parent.sf_children then
-				parent.sf_children = {}
-			end
-
-			if holo.sf_parent then
-				holo.sf_parent.sf_children[holo] = nil
-			end
-
-			parent.sf_children[holo] = {attachment, parent:WorldToLocal(holo:GetPos()), parent:WorldToLocalAngles(holo:GetAngles())}
-			holo.sf_parent = parent
-
+			
+			setParentFix(holo, parent, attachment, "SetParent")
 			holo:SetParent(parent, attachment)
-
 		else
-
-			if holo.sf_parent then
-				holo.sf_parent.sf_children[holo] = nil
-			end
-
-			holo.sf_parent = nil
+			clearParentFix(holo)
 			holo:SetParent()
-
 		end
-
+	end
+	
+	--- Parents a hologram to the specified parent's bone
+	-- @param Entity? parent Entity parent (nil to unparent)
+	-- @param number bone Bone ID
+	function hologram_methods:followBone(parent, bone)
+		local holo = getent(self)
+		checkpermission(instance, holo, "hologram.setParent")
+		
+		if parent ~= nil then
+			parent = getent(parent)
+			checkluatype(bone, TYPE_NUMBER)
+			
+			setParentFix(holo, parent, bone, "FollowBone")
+			holo:FollowBone(parent, bone)
+		else
+			clearParentFix(holo)
+			holo:FollowBone()
+		end
 	end
 
 	--- Manually draws a hologram, requires a 3d render context
