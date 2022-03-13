@@ -255,6 +255,8 @@ if SERVER then
 	-- @param number bone Bone ID
 	function hologram_methods:followBone(parent, bone)
 		local holo = getent(self)
+		checkpermission(instance, holo, "hologram.setParent")
+		
 		if parent then
 			parent = getent(parent)
 			checkluatype(bone, TYPE_NUMBER)
