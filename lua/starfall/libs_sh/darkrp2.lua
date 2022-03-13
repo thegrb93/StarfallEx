@@ -673,8 +673,8 @@ if SERVER then
 	-- @param Player sender The player who may or may not send the money.
 	-- @param number amount The amount of money to ask for.
 	-- @param string? message An optional custom message that will be shown in the money request prompt. May not exceed 60 bytes in length.
-	-- @param function? callbackSuccess Optional function to call if request succeeds.
-	-- @param function? callbackFailure Optional function to call if request fails.
+	-- @param function? callbackSuccess Optional function to call if request succeeds. Args (string: The request message, player: The money sender, number: The amount)
+	-- @param function? callbackFailure Optional function to call if request fails. Args (string: why it failed)
 	-- @param Player? receiver The player who may or may not receive the money, or the owner of the chip if not specified. Superuser only.
 	function darkrp_library.requestMoney(sender, amount, message, callbackSuccess, callbackFailure, receiver)
 		checkluatype(amount, TYPE_NUMBER)
