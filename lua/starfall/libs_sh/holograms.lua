@@ -249,13 +249,17 @@ if SERVER then
 		holo:SetLocalAngularVelocity(aunwrap(angvel))
 	end
 
-	-- TODO: Limit parent chain to 16 just like Entity.setParent
+	local parentChainTooLong = SF.ParentChainTooLong
 	function hologram_methods:followBone(parent, bone)
+		local holo = getent(self)
 		if parent then
+			parent = getent(parent)
 			checkluatype(bone, TYPE_NUMBER)
-			getent(self):FollowBone(getent(parent), bone)
+			
+			if parentChainTooLong(parent, holo) then SF.Throw("Parenting chain of entities can't exceed 16 or crash may occur", 2) end
+			holo:FollowBone(parent, bone)
 		else
-			getent(self):FollowBone()
+			holo:FollowBone()
 		end
 	end
 

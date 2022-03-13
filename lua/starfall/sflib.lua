@@ -1059,6 +1059,28 @@ function SF.NormalizePath(path)
 	return table.concat(pathtbl, "/")
 end
 
+--- Returns True if parent chain length is going to exceed 16
+function SF.ParentChainTooLong(parent, child)
+	local index = parent
+	local parentLength = 0
+	while index:IsValid() do
+		parentLength = parentLength + 1
+		index = index:GetParent()
+	end
+
+	local function getChildLength(curchild, count)
+		if count > 16 then return count end
+		local max = 0
+		for k, v in pairs(curchild:GetChildren()) do
+			max = math.max(max, getChildLength(v, count + 1))
+		end
+		return math.max(max, count)
+	end
+	local childLength = getChildLength(child, 1)
+
+	return parentLength + childLength > 16
+end
+
 -- This function clamps the position before moving the entity
 local minx, miny, minz = -16384, -16384, -16384
 local maxx, maxy, maxz = 16384, 16384, 16384

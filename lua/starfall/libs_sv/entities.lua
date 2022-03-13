@@ -66,27 +66,7 @@ end)
 
 -- ------------------------- Methods ------------------------- --
 
-local function chainTooLong(parent, child)
-	local index = parent
-	local parentLength = 0
-	while index:IsValid() do
-		parentLength = parentLength + 1
-		index = index:GetParent()
-	end
-
-	local function getChildLength(curchild, count)
-		if count > 16 then return count end
-		local max = 0
-		for k, v in pairs(curchild:GetChildren()) do
-			max = math.max(max, getChildLength(v, count + 1))
-		end
-		return math.max(max, count)
-	end
-	local childLength = getChildLength(child, 1)
-
-	return parentLength + childLength > 16
-end
-
+local parentChainTooLong = SF.ParentChainTooLong
 --- Parents the entity to another entity
 -- @param Entity? parent Entity to parent to. nil to unparent
 -- @param string? attachment Optional string attachment name to parent to
@@ -105,7 +85,7 @@ function ents_methods:setParent(parent, attachment)
 			checkpermission(instance, parentent, "entities.parent")
 		end
 
-		if chainTooLong(parentent, ent) then SF.Throw("Parenting chain of entities can't exceed 16 or crash may occur", 2) end
+		if parentChainTooLong(parentent, ent) then SF.Throw("Parenting chain of entities can't exceed 16 or crash may occur", 2) end
 		ent:SetParent(parentent)
 
 		if attachment~=nil then
