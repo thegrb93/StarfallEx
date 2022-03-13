@@ -181,8 +181,11 @@ if SERVER then
 					end
 				end
 			else
-				for receiver in pairs(requestsForPlayer) do
+				for receiver, request in pairs(requestsForPlayer) do
 					self:pop(sender, receiver)
+					if request.callbackFailure then
+						request.instance:runFunction(request.callbackFailure, "SENDER_INVALID")
+					end
 				end
 			end
 		end
