@@ -513,6 +513,11 @@ do
 					self.hookstoadd[k] = nil
 				end
 				return pairs(self.hooks)
+			end,
+			run = function(self, instance, ...)
+				for _, v in self:pairs() do
+					instance:runFunction(v, ...)
+				end
 			end
 		},
 		__call = function(p)
