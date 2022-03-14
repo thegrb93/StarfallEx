@@ -711,7 +711,9 @@ function Editor:CloseTab(_tab,dontask)
 			local newPopup = SF.Editor.Query("Unsaved changes!", string.format("Do you want to close <color=255,30,30>%q</color> ?", activetab:GetText()), "Close", function()
 				self:CloseTab(activetab, true)
 				self.closePopups[activetab] = nil
-			end, "Cancel", function() end)
+			end, "Cancel", function()
+				self.closePopups[activetab] = nil
+			end)
 			self.closePopups[activetab] = newPopup
 		end
 		
