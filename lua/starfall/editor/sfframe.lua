@@ -704,7 +704,7 @@ function Editor:CloseTab(_tab,dontask)
 	if not IsValid(activetab) then return end
 	
 	local ed = activetab:GetPanel()
-	if ed and not ed:IsSaved() and not dontask and not ed.IsOnline then
+	if not ed:IsSaved() and not dontask and not ed.IsOnline then
 		
 		local popup = self.closePopups[activetab]
 		if not IsValid(popup) then
