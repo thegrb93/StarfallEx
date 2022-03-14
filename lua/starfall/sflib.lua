@@ -702,7 +702,7 @@ end
 -- Utility functions
 -------------------------------------------------------------------------------
 
-SF.BlockedUsers = SF.BlockedList("sf_user", "running clientside starfall code", "sf_blockedusers.txt",
+SF.BlockedUsers = SF.BlockedList("user", "running clientside starfall code", "sf_blockedusers.txt",
 	function(steamid)
 		local ply = player.GetBySteamID(steamid)
 		if not ply then return end
