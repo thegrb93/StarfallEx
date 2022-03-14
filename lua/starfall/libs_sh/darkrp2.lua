@@ -1,3 +1,13 @@
+timer.Simple(0, function()
+	if util.NetworkStringToID("sf_moneyrequest") ~= 0 then
+		if SERVER then
+			ErrorNoHalt("SF: loganlearner/starfall-darkrp-library is obsolete as StarfallEx now has a built-in DarkRP library. Please uninstall loganlearner/starfall-darkrp-library\n")
+		else
+			print("SF: This server has loganlearner/starfall-darkrp-library installed, which is obsolete as StarfallEx now has a built-in DarkRP library. The built-in library will be disabled. If you experience any problems with DarkRP-specific code, this might be why!")
+		end
+	end
+end)
+
 local checkluatype = SF.CheckLuaType
 local checkpattern = SF.CheckPattern
 local registerprivilege = SF.Permissions.registerPrivilege
@@ -560,11 +570,14 @@ SF.RegisterLibrary("darkrp")
 
 return function(instance)
 
-if SERVER and util.NetworkStringToID("sf_moneyrequest") ~= 0 then
-	SF.AddNotify(instance.player, "SF: loganlearner/starfall-darkrp-library is not compatible with newer versions of StarfallEx\nPlease uninstall loganlearner/starfall-darkrp-library", "ERROR", 7, "ERROR1")
+if not DarkRP then return end
+
+if util.NetworkStringToID("sf_moneyrequest") ~= 0 then
+	if CLIENT and instance.player == LocalPlayer() then
+		print("SF: This server has loganlearner/starfall-darkrp-library installed, which is obsolete as StarfallEx now has a built-in DarkRP library. The built-in library will be disabled. If you experience any problems with DarkRP-specific code, this might be why!")
+	end
 	return
 end
-if not DarkRP then return end
 
 local darkrp_library = instance.Libraries.darkrp
 local ply_meta = instance.Types.Player
