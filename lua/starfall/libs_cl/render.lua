@@ -73,6 +73,7 @@ local defined_fonts = {
 	ContentHeader = true,
 	GModWorldtip = true,
 }
+SF.DefinedFonts = defined_fonts
 
 local currentcolor
 local defaultFont

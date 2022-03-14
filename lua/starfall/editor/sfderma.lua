@@ -10,30 +10,30 @@ PANEL.windows = {}
 surface.CreateFont( "SF_PermissionsWarning", {
 	font = "roboto", -- Use the font-name which is shown to you by your operating system Font Viewer, not the file name
 	size = 16,
-} )
+})
 
 surface.CreateFont( "SF_PermissionName", {
 	font = "roboto", -- Use the font-name which is shown to you by your operating system Font Viewer, not the file name
 	size = 20,
-} )
+})
 
 surface.CreateFont( "SF_PermissionDesc", {
 	font = "roboto", -- Use the font-name which is shown to you by your operating system Font Viewer, not the file name
 	size = 18,
-} )
+})
 
 surface.CreateFont( "SF_PermissionsTitle", {
 	font = "roboto", -- Use the font-name which is shown to you by your operating system Font Viewer, not the file name
 	size = 20,
-} )
+})
 
 surface.CreateFont("SFTitle", {
-		font = "Roboto",
-		size = 18,
-		weight = 500,
-		antialias = true,
-		additive = false,
-	})
+	font = "Roboto",
+	size = 18,
+	weight = 500,
+	antialias = true,
+	additive = false,
+})
 
 --[[ StarfallFrame ]]
 
@@ -64,7 +64,6 @@ function PANEL:Init()
 	self.CloseButton:Dock(RIGHT)
 	self.CloseButton.DoClick = function() self:Close() end
 
-
 	self._Close = self.Close
 	self.Close = self.new_Close
 end
@@ -75,9 +74,7 @@ end
 
 function PANEL:SetTitle(text)
 	self.Title = text
-	surface.SetFont("SFTitle")
 	self.TitleWidth = surface.GetTextSize(self.Title)
-
 end
 
 function PANEL:GetTitle()
@@ -85,6 +82,7 @@ function PANEL:GetTitle()
 end
 
 function PANEL:PaintTitle(w,h)
+	surface.SetFont("SFTitle")
 	surface.SetTextColor(255, 255, 255, 255)
 	surface.SetTextPos(0, 6)
 	surface.DrawText(self:GetParent().Title)
@@ -149,7 +147,9 @@ function PANEL:PerformLayout()
 	end
 end
 PANEL.Paint = function (button, w, h)
-	if button.Hovered or button.active then
+	if not button:IsEnabled() then
+		draw.RoundedBox(0, 0, 0, w, h, button.backgroundDisabledCol or SF.Editor.colors.meddark)
+	elseif button.Hovered or button.active then
 		draw.RoundedBox(0, 0, 0, w, h, button.backgroundHoverCol or SF.Editor.colors.med)
 	else
 		draw.RoundedBox(0, 0, 0, w, h, button.backgroundCol or SF.Editor.colors.meddark)
@@ -160,11 +160,20 @@ PANEL.Paint = function (button, w, h)
 		surface.DrawTexturedRect(6, h/2 - 8, 16, 16)
 	end
 end
+function PANEL:PaintOver(w, h)
+	if not self:IsEnabled() then
+		surface.SetDrawColor(Color(127, 127, 127, 127))
+		surface.DrawRect(0, 0, w, h)
+	end
+end
 function PANEL:UpdateColours(skin)
 	return self:SetTextStyleColor(self.labelCol or SF.Editor.colors.light)
 end
 function PANEL:SetHoverColor(col)
 	self.backgroundHoverCol = col
+end
+function PANEL:SetDisabledColor(col)
+	self.backgroundDisabledCol = col
 end
 function PANEL:SetColor(col)
 	self.backgroundCol = col
