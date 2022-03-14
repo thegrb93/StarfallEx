@@ -164,6 +164,7 @@ function Editor:Init()
 	self.GuiClick = 0
 	self.SimpleGUI = false
 	self.Location = ""
+	self.closePopups = {}
 
 	self.C = {}
 	self.Components = {}
@@ -699,15 +700,26 @@ function Editor:CloseTab(_tab,dontask)
 			end
 		end
 	end
+	
+	if not IsValid(activetab) then return end
+	
 	local ed = activetab:GetPanel()
-	if not ed:IsSaved() and not dontask and not ed.IsOnline then
-		if IsValid(self.closeDialogue) then
-			self.closeDialogue:MakePopup()
-		else
-			self.closeDialogue = SF.Editor.Query("Are you sure?", string.format("Do you want to close <color=255,30,30>%q</color> ?", activetab:GetText()), "Close", function()
+	if ed and not ed:IsSaved() and not dontask and not ed.IsOnline then
+		
+		local popup = self.closePopups[activetab]
+		if not IsValid(popup) then
+			local newPopup = SF.Editor.Query("Unsaved changes!", string.format("Do you want to close <color=255,30,30>%q</color> ?", activetab:GetText()), "Close", function()
 				self:CloseTab(activetab, true)
+				self.closePopups[activetab] = nil
 			end, "Cancel", function() end)
+			self.closePopups[activetab] = newPopup
 		end
+		
+		if IsValid(popup) then
+			popup:Center()
+			popup:MakePopup()
+		end
+		
 		return
 	end
 
