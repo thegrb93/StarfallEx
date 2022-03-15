@@ -390,7 +390,7 @@ else
 				else
 					SF.ThrowTypeError("string or number", SF.GetType(attachment), 2)
 				end
-				if attachment < 0 or attachment > 255 then SF.Throw("Invalid attachment/bone name provided", 2) end
+				if attachment < 0 or attachment > 255 then SF.Throw("Invalid attachment/bone provided", 2) end
 			end
 			
 			local parentFunc = bone and "FollowBone" or "SetParent"
