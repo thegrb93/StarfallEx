@@ -27,6 +27,7 @@ local cl_hologram_meta = {
 }
 
 local setParentFix, clearParentFix
+local parentChainTooLong = SF.ParentChainTooLong
 if CLIENT then
 	registerprivilege("hologram.setParent", "Set Parent", "Allows the user to parent a hologram", { entities = {} })
 	
@@ -276,7 +277,6 @@ if SERVER then
 		holo:SetLocalAngularVelocity(aunwrap(angvel))
 	end
 
-	local parentChainTooLong = SF.ParentChainTooLong
 	--- Parents a hologram to the specified parent's bone
 	-- @param Entity? parent Entity parent (nil to unparent)
 	-- @param number bone Bone ID
@@ -395,6 +395,7 @@ else
 			attachment = attachment or -1
 			checkluatype(attachment, TYPE_NUMBER)
 			
+			if parentChainTooLong(parent, holo) then SF.Throw("Parenting chain of entities can't exceed 16 or crash may occur", 2) end
 			setParentFix(holo, parent, attachment, "SetParent")
 			holo:SetParent(parent, attachment)
 		else
@@ -414,6 +415,7 @@ else
 			parent = getent(parent)
 			checkluatype(bone, TYPE_NUMBER)
 			
+			if parentChainTooLong(parent, holo) then SF.Throw("Parenting chain of entities can't exceed 16 or crash may occur", 2) end
 			setParentFix(holo, parent, bone, "FollowBone")
 			holo:FollowBone(parent, bone)
 		else
