@@ -382,14 +382,15 @@ else
 		
 		if parent ~= nil then
 			parent = getent(parent)
-			if bone ~= nil then checkluatype(bone, TYPE_BOOL) else bone = false end
+			if bone ~= nil then checkluatype(bone, TYPE_BOOL) end
 			if attachment ~= nil or bone then
-				if isstring(attachment) then
+				if isnumber(attachment) then
+				elseif isstring(attachment) then
 					attachment = bone and parent:LookupBone(attachment) or parent:LookupAttachment(attachment)
-					if attachment < 0 then SF.Throw("Invalid attachment/bone name provided", 2) end
-				elseif not isnumber(attachment) then
+				else
 					SF.ThrowTypeError("string or number", SF.GetType(attachment), 2)
 				end
+				if attachment < 0 or attachment > 255 then SF.Throw("Invalid attachment/bone name provided", 2) end
 			end
 			
 			local parentFunc = bone and "FollowBone" or "SetParent"
