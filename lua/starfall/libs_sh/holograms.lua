@@ -54,9 +54,8 @@ if CLIENT then
 	function clearParentFix(ent, unparent)
 		if ent.sf_parent and ent.sf_parent:IsValid() then
 			if unparent then
-				-- Call parenting function with no arguments to unparent
-				local func = ent.sf_parent.sf_children[ent]
-				ent[func](ent)
+				local func = ent.sf_parent.sf_children[ent].func
+				ent[func](ent, nil, func == "FollowBone" and 0 or nil)
 			end
 			
 			ent.sf_parent.sf_children[ent] = nil
@@ -393,8 +392,8 @@ else
 	
 	--- Parents a hologram
 	-- @param Entity? parent Entity parent (nil to unparent)
-	-- @param number? attachment Optional attachment ID
-	-- @param boolean? bone True to parent to a bone instead of an attachment
+	-- @param number|string? attachment Optional attachment name or ID
+	-- @param boolean? bone True to parent to a bone instead of an attachment (`attachment` parameter must be a number)
 	function hologram_methods:setParent(parent, attachment, bone)
 		local holo = getholo(self)
 		checkpermission(instance, holo, "hologram.setParent")
@@ -402,17 +401,30 @@ else
 		if parent ~= nil then
 			parent = getent(parent)
 			if bone ~= nil then checkluatype(bone, TYPE_BOOL) end
-			attachment = attachment or (bone and 0 or -1)
-			checkluatype(attachment, TYPE_NUMBER)
-			
-			if parentChainTooLong(parent, holo) then SF.Throw("Parenting chain of entities can't exceed 16 or crash may occur", 2) end
-			
-			-- Clear residue stuff from FollowBone if we switch to SetParent
-			if not bone and holo.sf_parent and holo.sf_parent.sf_children[ent].func == "FollowBone" then
-				clearParentFix(holo, true)
+			if bone then
+				attachment = attachment or 0
+				checkluatype(attachment, TYPE_NUMBER)
+			else
+				if isstring(attachment) then
+					attachment = parent:LookupAttachment(attachment)
+				else
+					attachment = attachment or -1
+					checkluatype(attachment, TYPE_NUMBER)
+				end
 			end
 			
-			setParentFix(holo, parent, attachment, bone and "FollowBone" or "SetParent")
+			local parentFunc = bone and "FollowBone" or "SetParent"
+			
+			-- FollowBone is ignored when SetParent or FollowBone with a different bone is present, additionally clear flags set by FollowBone before doing SetParent
+			if holo.sf_parent and holo.sf_parent:IsValid() then
+				local prvParentFunc =  holo.sf_parent.sf_children[holo].func
+				if prvParentFunc == "FollowBone" or prvParentFunc ~= parentFunc then
+					clearParentFix(holo, true)
+				end
+			end
+			
+			if parentChainTooLong(parent, holo) then SF.Throw("Parenting chain of entities can't exceed 16 or crash may occur", 2) end
+			setParentFix(holo, parent, attachment, parentFunc)
 		else
 			clearParentFix(holo, true)
 		end
