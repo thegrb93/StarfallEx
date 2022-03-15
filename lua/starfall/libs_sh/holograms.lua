@@ -109,6 +109,7 @@ instance:AddHook("initialize", function()
 end)
 
 local function hologramOnDestroy(holo)
+	clearParentFix(holo)
 	holograms[holo] = nil
 	plyCount:free(instance.player, 1)
 end
