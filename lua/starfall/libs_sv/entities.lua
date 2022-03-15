@@ -69,9 +69,11 @@ end)
 local parentChainTooLong = SF.ParentChainTooLong
 --- Parents the entity to another entity
 -- @param Entity? parent Entity to parent to. nil to unparent
--- @param string? attachment Optional string attachment name to parent to
-function ents_methods:setParent(parent, attachment)
+-- @param number|string? attachment Optional attachment name or ID
+-- @param boolean? bone True to parent to a bone instead of an attachment (`attachment` parameter must be a number)
+function ents_methods:setParent(parent, attachment, bone)
 	local ent = getent(self)
+	if bone ~= nil then checkluatype(bone, TYPE_BOOL) end
 	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
 	checkpermission(instance, ent, "entities.parent")
 
@@ -86,14 +88,38 @@ function ents_methods:setParent(parent, attachment)
 		end
 
 		if parentChainTooLong(parentent, ent) then SF.Throw("Parenting chain of entities can't exceed 16 or crash may occur", 2) end
-		ent:SetParent(parentent)
-
-		if attachment~=nil then
-			checkluatype(attachment, TYPE_STRING)
-			ent:Fire("SetParentAttachmentMaintainOffset", attachment, 0.01)
+		
+		if bone then
+			checkluatype(attachment, TYPE_NUMBER)
+			-- Undo previous FollowBone, otherwise offset will be kept
+			if ent.sf_parent == "FollowBone" then ent:FollowBone(nil, 0) end
+			ent.sf_parent = "FollowBone"
+			ent:FollowBone(parentent, attachment)
+		else
+			if isnumber(attachment) then
+				local attachments = parentent:GetAttachments()
+				if attachments and attachments[attachment] then
+					attachment = attachments[attachment].name
+				end
+			end
+			
+			-- Undo FollowBone to clear flags and reset offset
+			if ent.sf_parent == "FollowBone" then ent:FollowBone(nil, 0) end
+			ent.sf_parent = "SetParent"
+			ent:SetParent(parentent)
+			if attachment~=nil then
+				checkluatype(attachment, TYPE_STRING)
+				ent:Fire("SetParentAttachmentMaintainOffset", attachment, 0.01)
+			end
 		end
+		
 	else
-		ent:SetParent()
+		if ent.sf_parent == "FollowBone" then
+			ent:FollowBone(nil, 0)
+		else
+			ent:SetParent()
+		end
+		ent.sf_parent = nil
 	end
 end
 
