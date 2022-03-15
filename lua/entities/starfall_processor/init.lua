@@ -116,8 +116,12 @@ function ENT:PostEntityPaste(ply, ent, CreatedEntities)
 
 		if info.starfall then
 			if info.starfall.ver then
-				self.starfalluserdata = info.starfall.udata
-				self.sfdata = {owner = ply, files = SF.DecompressFiles(info.starfall.files), mainfile = info.starfall.mainfile}
+				if info.starfall.ver > 4.3 then
+					error("This server's starfall is too out of date to paste")
+				else
+					self.starfalluserdata = info.starfall.udata
+					self.sfdata = {owner = ply, files = SF.DecompressFiles(info.starfall.files), mainfile = info.starfall.mainfile}
+				end
 			else
 				-- Legacy duplications
 				local files, mainfile = SF.LegacyDeserializeCode(info.starfall)
