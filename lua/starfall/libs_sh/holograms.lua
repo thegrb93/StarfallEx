@@ -47,10 +47,18 @@ if CLIENT then
 			pos  = parent:WorldToLocal(ent:GetPos()),
 			ang  = parent:WorldToLocalAngles(ent:GetAngles())
 		}
+		
+		ent[func](parent, bone)
 	end
 	
-	function clearParentFix(ent)
+	function clearParentFix(ent, unparent)
 		if ent.sf_parent then
+			if unparent then
+				-- Call parenting function with no arguments to unparent
+				local func = ent.sf_parent.sf_children[ent]
+				ent[func](ent)
+			end
+			
 			ent.sf_parent.sf_children[ent] = nil
 			ent.sf_parent = nil
 		end
@@ -386,21 +394,26 @@ else
 	--- Parents a hologram
 	-- @param Entity? parent Entity parent (nil to unparent)
 	-- @param number? attachment Optional attachment ID
-	function hologram_methods:setParent(parent, attachment)
+	-- @param boolean? bone True to parent to a bone instead of an attachment
+	function hologram_methods:setParent(parent, attachment, bone)
 		local holo = getholo(self)
 		checkpermission(instance, holo, "hologram.setParent")
-
+		
 		if parent ~= nil then
 			parent = getent(parent)
 			attachment = attachment or -1
 			checkluatype(attachment, TYPE_NUMBER)
-			
+			if bone ~= nil then checkluatype(bone, TYPE_BOOLEAN) end
 			if parentChainTooLong(parent, holo) then SF.Throw("Parenting chain of entities can't exceed 16 or crash may occur", 2) end
-			setParentFix(holo, parent, attachment, "SetParent")
-			holo:SetParent(parent, attachment)
+			
+			-- Clear residue stuff from FollowBone if we switch to SetParent
+			if not bone and holo.sf_parent and holo.sf_parent.sf_children[ent].func == "FollowBone" then
+				holo:FollowBone()
+			end
+			
+			setParentFix(holo, parent, attachment, bone and "FollowBone" or "SetParent")
 		else
-			clearParentFix(holo)
-			holo:SetParent()
+			clearParentFix(holo, true)
 		end
 	end
 	
