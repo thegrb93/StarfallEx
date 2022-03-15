@@ -13,14 +13,14 @@ function net.ReadStarfall(ply, callback)
 	net.ReadStream(ply, function(data)
 		if data then
 			local ok, files = pcall(SF.DecompressFiles, data)
-			sfdata.files = files
 			if ok then
+				sfdata.files = files
 				callback(true, sfdata)
 			else
-				callback(false, sfdata)
+				callback(false, files)
 			end
 		else
-			callback(false, sfdata)
+			callback(false, "Net timeout")
 		end
 	end)
 
@@ -136,7 +136,7 @@ if SERVER then
 				end
 			else
 				if uploaddata[ply]==updata then
-					SF.AddNotify(ply, "There was a problem uploading your code ("..sfdata.files.."). Try again in a second.", "ERROR", 7, "ERROR1")
+					SF.AddNotify(ply, "There was a problem uploading your code ("..sfdata.."). Try again in a second.", "ERROR", 7, "ERROR1")
 				end
 			end
 			uploaddata[ply] = nil
