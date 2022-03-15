@@ -119,7 +119,7 @@ function ENT:PostEntityPaste(ply, ent, CreatedEntities)
 			if ver then
 				if ver > 4.8 then
 					error("This server's starfall is too out of date to paste")
-				if ver > 4.4 then
+				elseif ver > 4.4 then
 					-- 4.7 case
 					local files = SF.DecompressFiles(info.starfall.files)
 					self.starfalluserdata = info.starfall.udata
