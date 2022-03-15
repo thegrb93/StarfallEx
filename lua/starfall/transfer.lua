@@ -12,8 +12,9 @@ function net.ReadStarfall(ply, callback)
 
 	net.ReadStream(ply, function(data)
 		if data then
-			sfdata.files = SF.DecompressFiles(data)
-			if sfdata.files then
+			local ok, files = pcall(SF.DecompressFiles, data)
+			sfdata.files = files
+			if ok then
 				callback(true, sfdata)
 			else
 				callback(false, sfdata)
@@ -59,14 +60,33 @@ end
 
 function SF.DecompressFiles(data)
 	data = util.Decompress(data)
-	if not data then return end
-	if #data < 8 then return end
+	if not data or #data < 8 then error("Error decompressing starfall data!") end
 	data = SF.StringStream(data)
 	local files = {}
 	for i=1, data:readUInt16() do
 		local name = data:read(data:readUInt8())
 		local code = data:read(data:readUInt32())
 		files[name] = code
+	end
+	return files
+end
+
+-- Legacy decoder
+function SF.DecompressFiles4_3(data)
+	local files = {}
+	data = util.Decompress(data)
+	if not data or #data < 8 then error("Error decompressing starfall data!") end
+	local headersize = SF.StringStream(string.sub(data, 1, 4))
+	headersize = headersize:readUInt32()
+	local header = SF.StringStream(string.sub(data, 5, 4+headersize))
+	local headers = {}
+	for i=1, header:readUInt32() do
+		headers[#headers + 1] = {name = header:read(header:readUInt32()), size = header:readUInt32()}
+	end
+	local pos = headersize+5
+	for k, v in pairs(headers) do
+		files[v.name] = string.sub(data, pos, pos+v.size-1)
+		pos = pos + v.size
 	end
 	return files
 end
@@ -116,7 +136,7 @@ if SERVER then
 				end
 			else
 				if uploaddata[ply]==updata then
-					SF.AddNotify(ply, "There was a problem uploading your code. Try again in a second.", "ERROR", 7, "ERROR1")
+					SF.AddNotify(ply, "There was a problem uploading your code ("..sfdata.files.."). Try again in a second.", "ERROR", 7, "ERROR1")
 				end
 			end
 			uploaddata[ply] = nil
