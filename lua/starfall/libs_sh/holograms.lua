@@ -48,11 +48,11 @@ if CLIENT then
 			ang  = parent:WorldToLocalAngles(ent:GetAngles())
 		}
 		
-		ent[func](parent, bone)
+		ent[func](ent, parent, bone)
 	end
 	
 	function clearParentFix(ent, unparent)
-		if ent.sf_parent then
+		if ent.sf_parent and ent.sf_parent:IsValid() then
 			if unparent then
 				-- Call parenting function with no arguments to unparent
 				local func = ent.sf_parent.sf_children[ent]
@@ -401,9 +401,10 @@ else
 		
 		if parent ~= nil then
 			parent = getent(parent)
-			attachment = attachment or -1
+			if bone ~= nil then checkluatype(bone, TYPE_BOOL) end
+			attachment = attachment or (bone and 0 or -1)
 			checkluatype(attachment, TYPE_NUMBER)
-			if bone ~= nil then checkluatype(bone, TYPE_BOOLEAN) end
+			
 			if parentChainTooLong(parent, holo) then SF.Throw("Parenting chain of entities can't exceed 16 or crash may occur", 2) end
 			
 			-- Clear residue stuff from FollowBone if we switch to SetParent
