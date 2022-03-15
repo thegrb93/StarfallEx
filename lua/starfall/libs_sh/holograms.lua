@@ -283,25 +283,7 @@ if SERVER then
 
 		holo:SetLocalAngularVelocity(aunwrap(angvel))
 	end
-
-	--- Parents a hologram to the specified parent's bone
-	-- @param Entity? parent Entity parent (nil to unparent)
-	-- @param number bone Bone ID
-	function hologram_methods:followBone(parent, bone)
-		local holo = getent(self)
-		checkpermission(instance, holo, "hologram.setParent")
-		
-		if parent then
-			parent = getent(parent)
-			checkluatype(bone, TYPE_NUMBER)
-			
-			if parentChainTooLong(parent, holo) then SF.Throw("Parenting chain of entities can't exceed 16 or crash may occur", 2) end
-			holo:FollowBone(parent, bone)
-		else
-			holo:FollowBone()
-		end
-	end
-
+	
 else
 	--- Sets the hologram's position.
 	-- @shared
