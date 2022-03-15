@@ -26,8 +26,34 @@ local cl_hologram_meta = {
 	__eq = entmeta.__eq,
 }
 
+local setParentFix, clearParentFix
 if CLIENT then
 	registerprivilege("hologram.setParent", "Set Parent", "Allows the user to parent a hologram", { entities = {} })
+	
+	function setParentFix(ent, parent, bone, func)
+		if not parent.sf_children then
+			parent.sf_children = {}
+		end
+		
+		if ent.sf_parent and ent.sf_parent ~= parent then
+			ent.sf_parent.sf_children[ent] = nil
+		end
+		
+		ent.sf_parent = parent
+		parent.sf_children[ent] = {
+			func = func,
+			bone = bone, -- or attachment, dep. on `func`
+			pos  = parent:WorldToLocal(ent:GetPos()),
+			ang  = parent:WorldToLocalAngles(ent:GetAngles())
+		}
+	end
+	
+	function clearParentFix(ent)
+		if ent.sf_parent then
+			ent.sf_parent.sf_children[ent] = nil
+			ent.sf_parent = nil
+		end
+	end
 	
 	local function reparentChildren(parent)
 		for child, data in pairs(parent.sf_children) do
@@ -354,31 +380,6 @@ else
 			holo.HoloMatrix = nil
 			holo:DisableMatrix("RenderMultiply")
 		end
-	end
-
-	local function clearParentFix(ent)
-		if ent.sf_parent then
-			ent.sf_parent.sf_children[ent] = nil
-			ent.sf_parent = nil
-		end
-	end
-	
-	local function setParentFix(ent, parent, bone, func)
-		if not parent.sf_children then
-			parent.sf_children = {}
-		end
-		
-		if ent.sf_parent and ent.sf_parent ~= parent then
-			ent.sf_parent.sf_children[ent] = nil
-		end
-		
-		ent.sf_parent = parent
-		parent.sf_children[ent] = {
-			func = func,
-			bone = bone, -- or attachment, dep. on `func`
-			pos  = parent:WorldToLocal(ent:GetPos()),
-			ang  = parent:WorldToLocalAngles(ent:GetAngles())
-		}
 	end
 	
 	--- Parents a hologram
