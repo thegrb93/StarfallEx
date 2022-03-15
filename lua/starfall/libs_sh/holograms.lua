@@ -416,26 +416,6 @@ else
 			clearParentFix(holo, true)
 		end
 	end
-	
-	--- Parents a hologram to the specified parent's bone
-	-- @param Entity? parent Entity parent (nil to unparent)
-	-- @param number bone Bone ID
-	function hologram_methods:followBone(parent, bone)
-		local holo = getent(self)
-		checkpermission(instance, holo, "hologram.setParent")
-		
-		if parent ~= nil then
-			parent = getent(parent)
-			checkluatype(bone, TYPE_NUMBER)
-			
-			if parentChainTooLong(parent, holo) then SF.Throw("Parenting chain of entities can't exceed 16 or crash may occur", 2) end
-			setParentFix(holo, parent, bone, "FollowBone")
-			holo:FollowBone(parent, bone)
-		else
-			clearParentFix(holo)
-			holo:FollowBone()
-		end
-	end
 
 	--- Manually draws a hologram, requires a 3d render context
 	-- @client
