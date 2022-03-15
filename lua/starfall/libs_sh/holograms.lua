@@ -408,7 +408,7 @@ else
 			
 			-- Clear residue stuff from FollowBone if we switch to SetParent
 			if not bone and holo.sf_parent and holo.sf_parent.sf_children[ent].func == "FollowBone" then
-				holo:FollowBone()
+				clearParentFix(holo, true)
 			end
 			
 			setParentFix(holo, parent, attachment, bone and "FollowBone" or "SetParent")
