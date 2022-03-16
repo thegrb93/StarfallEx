@@ -384,10 +384,9 @@ else
 			parent = getent(parent)
 			if bone ~= nil then checkluatype(bone, TYPE_BOOL) end
 			if attachment ~= nil or bone then
-				if isnumber(attachment) then
-				elseif isstring(attachment) then
+				if isstring(attachment) then
 					attachment = bone and parent:LookupBone(attachment) or parent:LookupAttachment(attachment)
-				else
+				elseif not isnumber(attachment) then
 					SF.ThrowTypeError("string or number", SF.GetType(attachment), 2)
 				end
 				if attachment < 0 or attachment > 255 then SF.Throw("Invalid attachment/bone provided", 2) end
