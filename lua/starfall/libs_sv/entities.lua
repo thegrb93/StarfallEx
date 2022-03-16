@@ -79,8 +79,10 @@ function ents_methods:setParent(parent, attachment, bone)
 
 	if parent ~= nil then
 		local parentent = getent(parent)
+		local isEntHologram = ent:GetClass() == "starfall_hologram"
+		if bone and not isEntHologram then SF.Throw("Entity must be a hologram to bone parent", 2) end
 		if parentent:IsPlayer() then
-			if ent:GetClass()~="starfall_hologram" then
+			if not isEntHologram then
 				SF.Throw("Insufficient permissions", 2)
 			end
 		else
