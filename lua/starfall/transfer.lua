@@ -44,49 +44,35 @@ function net.WriteStarfall(sfdata, callback)
 end
 
 function SF.CompressFiles(files)
-	local data = SF.StringStream()
-	data:writeInt16(table.Count(files))
+	local header = SF.StringStream()
+	header:writeInt32(0) --Legacy
+	header:writeInt32(table.Count(files))
+	local filecodes = {""}
 	for filename, code in pairs(files) do
 		if #filename > 255 then error("File name too large: " .. #filename .. " (max is 255)") end
-		data:writeInt8(#filename)
-		data:write(filename)
-		data:writeInt32(#code)
-		data:write(code)
+		header:writeInt32(#filename)
+		header:write(filename)
+		header:writeInt32(#code)
+		filecodes[#filecodes + 1] = code
 	end
-	data = data:getString()
-	if #data > 64000000 then error("Too much file data!") end
-	return util.Compress(data)
-end
-
-function SF.DecompressFiles(data)
-	data = util.Decompress(data)
-	if not data or #data < 8 then error("Error decompressing starfall data!") end
-	data = SF.StringStream(data)
-	local files = {}
-	for i=1, data:readUInt16() do
-		local name = data:read(data:readUInt8())
-		local code = data:read(data:readUInt32())
-		files[name] = code
-	end
-	return files
+	filecodes[1] = header:getString()
+	filecodes = table.concat(filecodes)
+	if #filecodes > 64000000 then error("Too much file data!") end
+	return util.Compress(filecodes)
 end
 
 -- Legacy decoder
-function SF.DecompressFiles4_3(data)
-	local files = {}
+function SF.DecompressFiles(data)
 	data = util.Decompress(data)
 	if not data or #data < 8 then error("Error decompressing starfall data!") end
-	local headersize = SF.StringStream(string.sub(data, 1, 4))
-	headersize = headersize:readUInt32()
-	local header = SF.StringStream(string.sub(data, 5, 4+headersize))
+	local buff = SF.StringStream(data, 5)
 	local headers = {}
-	for i=1, header:readUInt32() do
-		headers[#headers + 1] = {name = header:read(header:readUInt32()), size = header:readUInt32()}
+	for i=1, buff:readUInt32() do
+		headers[#headers + 1] = {name = buff:read(buff:readUInt32()), size = buff:readUInt32()}
 	end
-	local pos = headersize+5
-	for k, v in pairs(headers) do
-		files[v.name] = string.sub(data, pos, pos+v.size-1)
-		pos = pos + v.size
+	local files = {}
+	for k, v in ipairs(headers) do
+		files[v.name] = buff:read(v.size)
 	end
 	return files
 end

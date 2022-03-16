@@ -82,7 +82,7 @@ function ENT:PreEntityCopy()
 	duplicator.ClearEntityModifier(self, "SFDupeInfo")
 	if self.sfdata then
 		local info = WireLib and WireLib.BuildDupeInfo(self) or {}
-		info.starfall = {mainfile = self.sfdata.mainfile, files = SF.CompressFiles(self.sfdata.files), udata = self.starfalluserdata, ver = 4.7}
+		info.starfall = {mainfile = self.sfdata.mainfile, files = SF.CompressFiles(self.sfdata.files), udata = self.starfalluserdata, ver = 4.3}
 		duplicator.StoreEntityModifier(self, "SFDupeInfo", info)
 	end
 
@@ -117,16 +117,11 @@ function ENT:PostEntityPaste(ply, ent, CreatedEntities)
 		if info.starfall then
 			local ver = tonumber(info.starfall.ver)
 			if ver then
-				if ver > 4.8 then
+				if ver > 4.3 then
 					error("This server's starfall is too out of date to paste")
-				elseif ver > 4.4 then
-					-- 4.7 case
-					local files = SF.DecompressFiles(info.starfall.files)
-					self.starfalluserdata = info.starfall.udata
-					self.sfdata = {owner = ply, files = files, mainfile = info.starfall.mainfile}
 				else
 					-- 4.3 case
-					local files = SF.DecompressFiles4_3(info.starfall.files)
+					local files = SF.DecompressFiles(info.starfall.files)
 					self.starfalluserdata = info.starfall.udata
 					self.sfdata = {owner = ply, files = files, mainfile = info.starfall.mainfile}
 				end
