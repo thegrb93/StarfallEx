@@ -386,7 +386,7 @@ else
 			if attachment ~= nil or bone then
 				if isstring(attachment) then
 					if bone then
-						attachment = parent:LookupBone(attachment) or 0
+						attachment = parent:LookupBone(attachment) or -1
 					else
 						attachment = parent:LookupAttachment(attachment)
 					end
