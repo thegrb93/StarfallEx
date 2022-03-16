@@ -374,8 +374,8 @@ else
 	
 	--- Parents a hologram
 	-- @param Entity? parent Entity parent (nil to unparent)
-	-- @param number|string? attachment Optional attachment name or ID
-	-- @param boolean? bone True to parent to a bone instead of an attachment (`attachment` parameter must be a number)
+	-- @param number|string? attachment Optional attachment (or bone) name or ID
+	-- @param boolean? bone True to parent to a bone instead of an attachment (requires the `attachment` parameter to be set)
 	function hologram_methods:setParent(parent, attachment, bone)
 		local holo = getholo(self)
 		checkpermission(instance, holo, "hologram.setParent")

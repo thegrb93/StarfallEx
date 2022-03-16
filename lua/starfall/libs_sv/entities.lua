@@ -69,8 +69,8 @@ end)
 local parentChainTooLong = SF.ParentChainTooLong
 --- Parents the entity to another entity
 -- @param Entity? parent Entity to parent to. nil to unparent
--- @param number|string? attachment Optional attachment name or ID
--- @param boolean? bone True to parent to a bone instead of an attachment (`attachment` parameter must be a number)
+-- @param number|string? attachment Optional attachment (or bone) name or ID
+-- @param boolean? bone True to parent to a bone instead of an attachment (requires the `attachment` to be set)
 function ents_methods:setParent(parent, attachment, bone)
 	local ent = getent(self)
 	if bone ~= nil then checkluatype(bone, TYPE_BOOL) end
