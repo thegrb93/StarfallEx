@@ -231,7 +231,8 @@ end
 -- @return boolean Boolean of whether the bass is valid.
 function bass_methods:isValid()
 	local uw = unwrap(self)
-	return uw.IsValid and uw:IsValid()
+	local isValid = uw.IsValid
+	return isValid and isValid(uw) or false
 end
 
 --- Gets the left and right levels of the audio channel
