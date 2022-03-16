@@ -88,29 +88,39 @@ function ents_methods:setParent(parent, attachment, bone)
 		else
 			checkpermission(instance, parentent, "entities.parent")
 		end
-
 		if parentChainTooLong(parentent, ent) then SF.Throw("Parenting chain of entities can't exceed 16 or crash may occur", 2) end
 		
 		if bone then
-			checkluatype(attachment, TYPE_NUMBER)
+			if attachment == nil then
+				attachment = 0
+			elseif isstring(attachment) then
+				attachment = parentent:LookupBone(attachment)
+			elseif not isnumber(attachment) then
+				SF.ThrowTypeError("string or number", SF.GetType(attachment), 2)
+			end
+			if attachment < 0 or attachment > 255 then SF.Throw("Invalid bone provided", 2) end
+			
 			-- Undo previous FollowBone, otherwise offset will be kept
 			if ent.sf_parent == "FollowBone" then ent:FollowBone(nil, 0) end
 			ent.sf_parent = "FollowBone"
 			ent:FollowBone(parentent, attachment)
 		else
-			if isnumber(attachment) then
-				local attachments = parentent:GetAttachments()
-				if attachments and attachments[attachment] then
-					attachment = attachments[attachment].name
-				end
-			end
-			
 			-- Undo FollowBone to clear flags and reset offset
 			if ent.sf_parent == "FollowBone" then ent:FollowBone(nil, 0) end
 			ent.sf_parent = "SetParent"
 			ent:SetParent(parentent)
+			
 			if attachment~=nil then
-				checkluatype(attachment, TYPE_STRING)
+				if isnumber(attachment) then
+					local attachments = parentent:GetAttachments()
+					if attachments and attachments[attachment] then
+						attachment = attachments[attachment].name
+					else
+						SF.Throw("Invalid attachment provided", 2)
+					end
+				elseif not isstring(attachment) then
+					SF.ThrowTypeError("string or number", SF.GetType(attachment), 2)
+				end
 				ent:Fire("SetParentAttachmentMaintainOffset", attachment, 0.01)
 			end
 		end
