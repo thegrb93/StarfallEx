@@ -100,8 +100,6 @@ function ents_methods:setParent(parent, attachment, bone)
 			end
 			if attachment < 0 or attachment > 255 then SF.Throw("Invalid bone provided", 2) end
 			
-			-- Undo previous FollowBone, otherwise offset will be kept
-			if ent.sf_parent == "FollowBone" then ent:FollowBone(nil, 0) end
 			ent.sf_parent = "FollowBone"
 			ent:FollowBone(parentent, attachment)
 		else
