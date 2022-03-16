@@ -12,14 +12,15 @@ function net.ReadStarfall(ply, callback)
 
 	net.ReadStream(ply, function(data)
 		if data then
-			sfdata.files = SF.DecompressFiles(data)
-			if sfdata.files then
+			local ok, files = pcall(SF.DecompressFiles, data)
+			if ok then
+				sfdata.files = files
 				callback(true, sfdata)
 			else
-				callback(false, sfdata)
+				callback(false, files)
 			end
 		else
-			callback(false, sfdata)
+			callback(false, "Net timeout")
 		end
 	end)
 
@@ -44,9 +45,9 @@ end
 
 function SF.CompressFiles(files)
 	local header = SF.StringStream()
+	header:writeInt32(0) --Legacy
 	header:writeInt32(table.Count(files))
-
-	local filecodes = {}
+	local filecodes = {""}
 	for filename, code in pairs(files) do
 		if #filename > 255 then error("File name too large: " .. #filename .. " (max is 255)") end
 		header:writeInt32(#filename)
@@ -54,30 +55,24 @@ function SF.CompressFiles(files)
 		header:writeInt32(#code)
 		filecodes[#filecodes + 1] = code
 	end
-	local headerdata = header:getString()
-	local headersize = SF.StringStream()
-	headersize:writeInt32(#headerdata)
-	table.insert(filecodes, 1, headersize:getString())
-	table.insert(filecodes, 2, headerdata)
+	filecodes[1] = header:getString()
 	filecodes = table.concat(filecodes)
 	if #filecodes > 64000000 then error("Too much file data!") end
 	return util.Compress(filecodes)
 end
 
+-- Legacy decoder
 function SF.DecompressFiles(data)
-	local files = {}
 	data = util.Decompress(data)
-	local headersize = SF.StringStream(string.sub(data, 1, 4))
-	headersize = headersize:readUInt32()
-	local header = SF.StringStream(string.sub(data, 5, 4+headersize))
+	if not data or #data < 8 then error("Error decompressing starfall data!") end
+	local buff = SF.StringStream(data, 5)
 	local headers = {}
-	for i=1, header:readUInt32() do
-		headers[#headers + 1] = {name = header:read(header:readUInt32()), size = header:readUInt32()}
+	for i=1, buff:readUInt32() do
+		headers[#headers + 1] = {name = buff:read(buff:readUInt32()), size = buff:readUInt32()}
 	end
-	local pos = headersize+5
-	for k, v in pairs(headers) do
-		files[v.name] = string.sub(data, pos, pos+v.size-1)
-		pos = pos + v.size
+	local files = {}
+	for k, v in ipairs(headers) do
+		files[v.name] = buff:read(v.size)
 	end
 	return files
 end
@@ -127,7 +122,7 @@ if SERVER then
 				end
 			else
 				if uploaddata[ply]==updata then
-					SF.AddNotify(ply, "There was a problem uploading your code. Try again in a second.", "ERROR", 7, "ERROR1")
+					SF.AddNotify(ply, "There was a problem uploading your code ("..sfdata.."). Try again in a second.", "ERROR", 7, "ERROR1")
 				end
 			end
 			uploaddata[ply] = nil
