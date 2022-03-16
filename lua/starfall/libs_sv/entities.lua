@@ -91,9 +91,7 @@ function ents_methods:setParent(parent, attachment, bone)
 		if parentChainTooLong(parentent, ent) then SF.Throw("Parenting chain of entities can't exceed 16 or crash may occur", 2) end
 		
 		if bone then
-			if attachment == nil then
-				attachment = 0
-			elseif isstring(attachment) then
+			if isstring(attachment) then
 				attachment = parentent:LookupBone(attachment)
 			elseif not isnumber(attachment) then
 				SF.ThrowTypeError("string or number", SF.GetType(attachment), 2)
