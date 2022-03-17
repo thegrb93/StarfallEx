@@ -1137,7 +1137,9 @@ end
 -- @param number id The ID of the animation
 -- @return table Animation info
 function ents_methods:getSequenceInfo(id)
+	local ent = getent(self)
 	checkluatype(id, TYPE_NUMBER)
+	if id < 0 or id > ent:GetSequenceCount() - 1 then SF.Throw("Sequence ID out of bounds", 2) end
 	return instance.Sanitize(getent(self):GetSequenceInfo(id))
 end
 
