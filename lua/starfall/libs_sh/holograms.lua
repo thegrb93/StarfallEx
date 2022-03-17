@@ -258,7 +258,7 @@ if SERVER then
 	-- @param number Movetype to set, either MOVETYPE.NOCLIP (default) or MOVETYPE.NONE
 	function hologram_methods:setMoveType(move)
 		if move ~= MOVETYPE_NONE and move ~= MOVETYPE_NOCLIP then
-			SF.Throw("Invalid movetype provided, must be either MOVETYPE.NOCLIP or MOVETYPE.NONE")
+			SF.Throw("Invalid movetype provided, must be either MOVETYPE.NOCLIP or MOVETYPE.NONE", 2)
 		end
 		local holo = getholo(self)
 		checkpermission(instance, holo, "hologram.setMoveType")
