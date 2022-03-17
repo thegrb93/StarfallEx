@@ -473,27 +473,27 @@ end)
 -- @name player_connect
 -- @class hook
 -- @shared
--- @param number bot 0 if the player isn't a bot, 1 if they are.
+-- @param boolean isbot False if the player isn't a bot, true if they are.
 -- @param string networkid The SteamID the player had. Will be "BOT" for bots and "STEAM_0:0:0" in single-player.
 -- @param string name The name the player had.
 -- @param Player player Player entity of the player.
 gameevent.Listen("player_connect")
 add("player_connect", nil, function(instance, data)
-	return true, {data.bot, data.networkid, data.name, instance.WrapObject(Player(data.userid))}
+	return true, {data.bot == 1, data.networkid, data.name, instance.WrapObject(Player(data.userid))}
 end)
 
 --- Called when a player disconnects from the server. (Game Event)
 -- @name player_disconnect
 -- @class hook
 -- @shared
--- @param number bot 0 if the player isn't a bot, 1 if they are.
+-- @param boolean isbot False if the player isn't a bot, true if they are.
 -- @param string networkid The SteamID the player had. Will be "BOT" for bots and "STEAM_0:0:0" in single-player.
 -- @param string name The name the player had.
 -- @param number userid The UserID the player had.
 -- @param string reason Reason for disconnecting.
 gameevent.Listen("player_disconnect")
 add("player_disconnect", nil, function(instance, data)
-	return true, {data.bot, data.networkid, data.name, instance.WrapObject(Player(data.userid)), data.reason}
+	return true, {data.bot == 1, data.networkid, data.name, instance.WrapObject(Player(data.userid)), data.reason}
 end)
 
 --- Called when a player takes damage. (Game Event)
