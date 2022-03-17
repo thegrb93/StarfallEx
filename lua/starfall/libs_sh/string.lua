@@ -7,12 +7,6 @@ local checkluatype = SF.CheckLuaType
 -- @libtbl string_library
 SF.RegisterLibrary("string")
 
-local markupEscapeSymbols = {
-	["&"] = "&amp;",
-	["<"] = "&lt;",
-	[">"] = "&gt;"
-}
-
 return function(instance)
 
 local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
@@ -195,7 +189,7 @@ string_library.patternSafe = sfstring.patternSafe
 -- @return string Sanitized text
 function string_library.escapeMarkup(str)
 	checkluatype(str, TYPE_STRING)
-	return ( string.gsub(str, "[&<>]", markupEscapeSymbols) )
+	return ( string.gsub(str, "[&<>]", {["&"]="&amp;",["<"]="&lt;",[">"]="&gt;"}) )
 end
 
 --- Repeats the given string n times
