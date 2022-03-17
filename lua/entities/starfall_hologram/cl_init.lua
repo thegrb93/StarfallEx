@@ -37,11 +37,13 @@ function ENT:OnScaleChanged(name, old, scale)
 	end
 end
 
-function ENT:Draw()
+function ENT:Think()
 	if self.AutomaticFrameAdvance then
 		self:FrameAdvance(0)
 	end
-	
+end
+
+function ENT:Draw()
 	if self:GetNoDraw() then return end
 	
 	local clipCount = 0
