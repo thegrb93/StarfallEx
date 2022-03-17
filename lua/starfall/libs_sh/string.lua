@@ -191,7 +191,6 @@ string_library.niceTime = sfstring.NiceTime
 string_library.patternSafe = sfstring.patternSafe
 
 --- Sanitizes text to be used in `render.parseMarkup`
--- @client
 -- @param string str Text to sanitize
 -- @return string Sanitized text
 function string_library.escapeMarkup(str)
