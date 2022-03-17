@@ -7,25 +7,18 @@ local checkluatype = SF.CheckLuaType
 -- @libtbl string_library
 SF.RegisterLibrary("string")
 
+local markupEscapeSymbols = {
+	["&"] = "&amp;",
+	["<"] = "&lt;",
+	[">"] = "&gt;"
+}
+
 return function(instance)
 
 local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 
 local string_library = instance.Libraries.string
 local sfstring = SF.SafeStringLib
-
-if CLIENT then
-	
-	--- Sanitizes text to be used in `render.parseMarkup`
-	-- @client
-	-- @param string str Text to sanitize
-	-- @return string Sanitized text
-	function string_library.escapeMarkup(str)
-		checkluatype(str, TYPE_STRING)
-		return markup.Escape(str)
-	end
-	
-end
 
 --- Converts color to a string.
 -- @class function
@@ -196,6 +189,15 @@ string_library.niceTime = sfstring.NiceTime
 -- @param string str The string to be sanitized
 -- @return string The sanitized string
 string_library.patternSafe = sfstring.patternSafe
+
+--- Sanitizes text to be used in `render.parseMarkup`
+-- @client
+-- @param string str Text to sanitize
+-- @return string Sanitized text
+function string_library.escapeMarkup(str)
+	checkluatype(str, TYPE_STRING)
+	return ( string.gsub(str, "[&<>]", markupEscapeSymbols) )
+end
 
 --- Repeats the given string n times
 -- @class function
