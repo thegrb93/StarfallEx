@@ -14,6 +14,19 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 local string_library = instance.Libraries.string
 local sfstring = SF.SafeStringLib
 
+if CLIENT then
+	
+	--- Sanitizes text to be used in `render.parseMarkup`
+	-- @client
+	-- @param string str Text to sanitize
+	-- @return string Sanitized text
+	function string_library.escapeMarkup(str)
+		checkluatype(str, TYPE_STRING)
+		return markup.Escape(str)
+	end
+	
+end
+
 --- Converts color to a string.
 -- @class function
 -- @param Color col The color to put in the string

@@ -1581,14 +1581,6 @@ function render_library.parseMarkup(str, maxsize)
 	return markwrap(markup.Parse(str, maxsize))
 end
 
---- Sanitizes text to be used in `render.parseMarkup`
--- @param string Text to sanitize
--- @return string Sanitized text
-function render_library.escapeMarkup(str)
-	checkluatype(str, TYPE_STRING)
-	return markup.Escape(str)
-end
-
 --- Draw the markup object
 -- @param number x number The x offset
 -- @param number y number The x offset
