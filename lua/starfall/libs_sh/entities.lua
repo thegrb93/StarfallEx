@@ -1155,6 +1155,12 @@ function ents_methods:isSequenceFinished()
 	return getent(self):IsSequenceFinished()
 end
 
+--- Gets the number of animations the entity has
+-- @return number Count of entity's animations
+function ents_methods:getSequenceCount()
+	return getent(self):GetSequenceCount()
+end
+
 --- Get the length of an animation
 -- @param number? id (Optional) The id of the sequence, or will default to the currently playing sequence
 -- @return number Length of the animation in seconds
