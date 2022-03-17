@@ -1133,6 +1133,26 @@ function ents_methods:getSequenceName(id)
 	return getent(self):GetSequenceName(id)
 end
 
+--- Gets various information about the specified animation
+-- @param number id The ID of the animation
+-- @return table Animation info
+function ents_methods:getSequenceInfo(id)
+	checkluatype(id, TYPE_NUMBER)
+	return instance.Sanitize(getent(self):GetSequenceInfo(id))
+end
+
+--- Returns all animations of the entity
+-- @return table List of animations, starts at index 0 where value is the animation's name
+function ents_methods:getSequenceList()
+	return instance.Sanitize(getent(self):GetSequenceList())
+end
+
+--- Checks whether the animation is playing
+-- @return boolean True if the animation is currently playing, False otherwise
+function ents_methods:isSequenceFinished()
+	return getent(self):IsSequenceFinished()
+end
+
 --- Get the length of an animation
 -- @param number? id (Optional) The id of the sequence, or will default to the currently playing sequence
 -- @return number Length of the animation in seconds
