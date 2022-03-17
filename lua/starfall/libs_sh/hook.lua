@@ -455,6 +455,79 @@ add("StartEntityDriving")
 -- @shared
 add("Tick")
 
+-- Game Events
+
+--- Called when a player changes their Steam name. (Game Event)
+-- @name player_changename
+-- @class hook
+-- @shared
+-- @param number userid The UserID of the player.
+-- @param string oldname Name before change.
+-- @param string newname Name after change.
+gameevent.Listen("player_changename")
+add("player_changename", nil, function(instance, data)
+	local userid = data.userid
+	local old = data.oldname
+	local new = data.newname
+
+	return true, {userid, old, new}
+end)
+
+--- Called when a player connects to the server. (Game Event)
+-- @name player_connect
+-- @class hook
+-- @shared
+-- @param number bot 0 if the player isn't a bot, 1 if they are.
+-- @param string networkid The SteamID the player had. Will be "BOT" for bots and "STEAM_0:0:0" in single-player.
+-- @param string name The name the player had.
+-- @param number userid The UserID the player had.
+-- @param number index The entity index of the player, minus one.
+gameevent.Listen("player_connect")
+add("player_connect", nil, function(instance, data)
+	local bot = data.bot
+	local networkid = data.networkid
+	local name = data.name
+	local userid = data.userid
+	local index = data.index
+
+	return true, {bot, networkid, name, userid, reason, index}
+end)
+
+--- Called when a player disconnects from the server. (Game Event)
+-- @name player_disconnect
+-- @class hook
+-- @shared
+-- @param number bot 0 if the player isn't a bot, 1 if they are.
+-- @param string networkid The SteamID the player had. Will be "BOT" for bots and "STEAM_0:0:0" in single-player.
+-- @param string name The name the player had.
+-- @param number userid The UserID the player had.
+-- @param string reason Reason for disconnecting.
+gameevent.Listen("player_disconnect")
+add("player_disconnect", nil, function(instance, data)
+	local bot = data.bot
+	local networkid = data.networkid
+	local name = data.name
+	local userid = data.userid
+	local reason = data.reason
+
+	return true, {bot, networkid, name, userid, reason}
+end)
+
+--- Called when a player takes damage. (Game Event)
+-- @name player_hurt
+-- @class hook
+-- @shared
+-- @param number health The new health after being damaged.
+-- @param number userid UserID of the victim.
+-- @param number attacker UserID of the attacker.
+gameevent.Listen("player_hurt")
+SF.hookAdd("player_hurt", nil, function(instance, data)
+	local health = data.health
+	local userid = data.userid
+	local attacker = data.attacker
+
+	return true, {health, userid, attacker}
+end)
 
 --- Deals with hooks
 -- @name hook
