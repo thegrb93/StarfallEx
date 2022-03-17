@@ -1140,13 +1140,13 @@ function ents_methods:getSequenceInfo(id)
 	local ent = getent(self)
 	checkluatype(id, TYPE_NUMBER)
 	if id < 0 or id > ent:GetSequenceCount() - 1 then SF.Throw("Sequence ID out of bounds", 2) end
-	return instance.Sanitize(getent(self):GetSequenceInfo(id))
+	return getent(self):GetSequenceInfo(id)
 end
 
 --- Returns all animations of the entity
 -- @return table List of animations, starts at index 0 where value is the animation's name
 function ents_methods:getSequenceList()
-	return instance.Sanitize(getent(self):GetSequenceList())
+	return getent(self):GetSequenceList()
 end
 
 --- Gets the number of animations the entity has
