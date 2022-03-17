@@ -466,11 +466,7 @@ add("Tick")
 -- @param string newname Name after change.
 gameevent.Listen("player_changename")
 add("player_changename", nil, function(instance, data)
-	local userid = data.userid
-	local old = data.oldname
-	local new = data.newname
-
-	return true, {userid, old, new}
+	return true, {data.userid, data.old, data.new}
 end)
 
 --- Called when a player connects to the server. (Game Event)
@@ -484,13 +480,7 @@ end)
 -- @param number index The entity index of the player, minus one.
 gameevent.Listen("player_connect")
 add("player_connect", nil, function(instance, data)
-	local bot = data.bot
-	local networkid = data.networkid
-	local name = data.name
-	local userid = data.userid
-	local index = data.index
-
-	return true, {bot, networkid, name, userid, reason, index}
+	return true, {data.bot, data.networkid, data.name, data.userid, data.reason, data.index}
 end)
 
 --- Called when a player disconnects from the server. (Game Event)
@@ -504,13 +494,7 @@ end)
 -- @param string reason Reason for disconnecting.
 gameevent.Listen("player_disconnect")
 add("player_disconnect", nil, function(instance, data)
-	local bot = data.bot
-	local networkid = data.networkid
-	local name = data.name
-	local userid = data.userid
-	local reason = data.reason
-
-	return true, {bot, networkid, name, userid, reason}
+	return true, {data.bot, data.networkid, data.name, data.userid, data.reason}
 end)
 
 --- Called when a player takes damage. (Game Event)
@@ -522,11 +506,7 @@ end)
 -- @param number attacker UserID of the attacker.
 gameevent.Listen("player_hurt")
 SF.hookAdd("player_hurt", nil, function(instance, data)
-	local health = data.health
-	local userid = data.userid
-	local attacker = data.attacker
-
-	return true, {health, userid, attacker}
+	return true, {data.health, data.userid, data.attacker}
 end)
 
 --- Deals with hooks
