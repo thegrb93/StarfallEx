@@ -1149,16 +1149,16 @@ function ents_methods:getSequenceList()
 	return instance.Sanitize(getent(self):GetSequenceList())
 end
 
---- Checks whether the animation is playing
--- @return boolean True if the animation is currently playing, False otherwise
-function ents_methods:isSequenceFinished()
-	return getent(self):IsSequenceFinished()
-end
-
 --- Gets the number of animations the entity has
 -- @return number Count of entity's animations
 function ents_methods:getSequenceCount()
 	return getent(self):GetSequenceCount()
+end
+
+--- Checks whether the animation is playing
+-- @return boolean True if the animation is currently playing, False otherwise
+function ents_methods:isSequenceFinished()
+	return getent(self):IsSequenceFinished()
 end
 
 --- Get the length of an animation
