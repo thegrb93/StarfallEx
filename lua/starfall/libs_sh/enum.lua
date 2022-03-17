@@ -425,6 +425,7 @@ env.EF = {
 	FOLLOWBONE = EF_FOLLOWBONE
 }
 
+--- ENUMs of physics object flags
 -- @name builtins_library.FVPHYSICS
 -- @class table
 -- @field CONSTRAINT_STATIC
@@ -454,6 +455,36 @@ env.FVPHYSICS = {
 	["PENETRATING"] = FVPHYSICS_PENETRATING,
 	["PLAYER_HELD"] = FVPHYSICS_PLAYER_HELD,
 	["WAS_THROWN"] = FVPHYSICS_WAS_THROWN,
+}
+
+--- ENUMs of entity move types
+-- @name builtins_library.MOVETYPE
+-- @class table
+-- @field NONE
+-- @field ISOMETRIC
+-- @field WALK
+-- @field STEP
+-- @field FLY
+-- @field FLYGRAVITY
+-- @field VPHYSICS
+-- @field PUSH
+-- @field NOCLIP
+-- @field LADDER
+-- @field OBSERVER
+-- @field CUSTOM
+env.MOVETYPE = {
+	NONE = MOVETYPE_NONE,
+	ISOMETRIC = MOVETYPE_ISOMETRIC,
+	WALK = MOVETYPE_WALK,
+	STEP = MOVETYPE_STEP,
+	FLY = MOVETYPE_FLY,
+	FLYGRAVITY = MOVETYPE_FLYGRAVITY,
+	VPHYSICS = MOVETYPE_VPHYSICS,
+	PUSH = MOVETYPE_PUSH,
+	NOCLIP = MOVETYPE_NOCLIP,
+	LADDER = MOVETYPE_LADDER,
+	OBSERVER = MOVETYPE_OBSERVER,
+	CUSTOM = MOVETYPE_CUSTOM,
 }
 
 --- ENUMs of in_keys for use with player:keyDown
