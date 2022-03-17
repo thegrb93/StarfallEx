@@ -184,6 +184,14 @@ string_library.niceTime = sfstring.NiceTime
 -- @return string The sanitized string
 string_library.patternSafe = sfstring.patternSafe
 
+--- Sanitizes text to be used in `render.parseMarkup`
+-- @param string str Text to sanitize
+-- @return string Sanitized text
+function string_library.escapeMarkup(str)
+	checkluatype(str, TYPE_STRING)
+	return ( string.gsub(str, "[&<>]", {["&"]="&amp;",["<"]="&lt;",[">"]="&gt;"}) )
+end
+
 --- Repeats the given string n times
 -- @class function
 -- @param string str The string to repeat

@@ -1584,17 +1584,19 @@ end
 --- Draw the markup object
 -- @param number x number The x offset
 -- @param number y number The x offset
--- @param number? xalign number The x TEXT_ALIGN. Default TEXT_ALIGN.LEFT
--- @param number? yalign number The y TEXT_ALIGN. Default TEXT_ALIGN.TOP
+-- @param number? xAlign number The x TEXT_ALIGN. Default TEXT_ALIGN.LEFT
+-- @param number? yAlign number The y TEXT_ALIGN. Default TEXT_ALIGN.TOP
 -- @param number? alpha The alpha to draw it with. Default 255
-function markup_methods:draw(x, y, xalign, yalign, a)
+-- @param number? contentAlign The content alignment TEXT_ALIGN. Default TEXT_ALIGN.LEFT
+function markup_methods:draw(x, y, xAlign, yAlign, alpha, contentAlign)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype(x, TYPE_NUMBER)
 	checkluatype(y, TYPE_NUMBER)
-	if xalign~=nil then checkluatype(xalign, TYPE_NUMBER) end
-	if yalign~=nil then checkluatype(yalign, TYPE_NUMBER) end
-	if a~=nil then checkluatype(a, TYPE_NUMBER) end
-	markunwrap(self):Draw(x, y, xalign, yalign, a)
+	if xAlign~=nil then checkluatype(xAlign, TYPE_NUMBER) end
+	if yAlign~=nil then checkluatype(yAlign, TYPE_NUMBER) end
+	if alpha~=nil then checkluatype(alpha, TYPE_NUMBER) end
+	if contentAlign~=nil then checkluatype(contentAlign, TYPE_NUMBER) end
+	markunwrap(self):Draw(x, y, xAlign, yAlign, alpha, contentAlign)
 end
 
 --- Get the object width
