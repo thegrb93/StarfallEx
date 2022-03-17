@@ -38,6 +38,12 @@ function ENT:OnScaleChanged(name, old, scale)
 end
 
 function ENT:Draw()
+	if self.AutomaticFrameAdvance then
+		self:FrameAdvance(0)
+	end
+	
+	if self:GetNoDraw() then return end
+	
 	local clipCount = 0
 	local prevClip
 	if next(self.clips) then
@@ -74,10 +80,6 @@ function ENT:Draw()
 			render.PopCustomClipPlane()
 		end
 		render.EnableClipping(prevClip)
-	end
-	
-	if self.AutomaticFrameAdvance then
-		self:FrameAdvance(0)
 	end
 end
 
