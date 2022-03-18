@@ -489,7 +489,7 @@ end)
 -- @param boolean isbot False if the player isn't a bot, true if they are.
 -- @param string networkid The SteamID the player had. Will be "BOT" for bots and "STEAM_0:0:0" in single-player.
 -- @param string name The name the player had.
--- @param number userid The UserID the player had.
+-- @param Player player Player entity the player had.
 -- @param string reason Reason for disconnecting.
 gameevent.Listen("player_disconnect")
 add("player_disconnect", nil, function(instance, data)
