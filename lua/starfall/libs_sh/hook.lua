@@ -458,19 +458,19 @@ add("Tick")
 -- Game Events
 
 --- Called when a player changes their Steam name. (Game Event)
--- @name player_changename
+-- @name PlayerChangenameEvent
 -- @class hook
 -- @shared
 -- @param Player player Player entity of the player.
 -- @param string oldname Name before change.
 -- @param string newname Name after change.
 gameevent.Listen("player_changename")
-add("player_changename", nil, function(instance, data)
+add("player_changename", "playerchangenameevent", function(instance, data)
 	return true, {instance.WrapObject(Player(data.userid)), data.oldname, data.newname}
 end)
 
 --- Called when a player connects to the server. (Game Event)
--- @name player_connect
+-- @name PlayerConnectEvent
 -- @class hook
 -- @shared
 -- @param string networkid The SteamID the player had. Will be "BOT" for bots and "STEAM_0:0:0" in single-player.
@@ -478,12 +478,12 @@ end)
 -- @param number userid The UserID the player has.
 -- @param boolean isbot False if the player isn't a bot, true if they are.
 gameevent.Listen("player_connect")
-add("player_connect", nil, function(instance, data)
+add("player_connect", "playerconnectevent", function(instance, data)
 	return true, {data.networkid, data.name, data.userid, data.bot == 1}
 end)
 
 --- Called when a player disconnects from the server. (Game Event)
--- @name player_disconnect
+-- @name PlayerDisconnectEvent
 -- @class hook
 -- @shared
 -- @param string networkid The SteamID the player had. Will be "BOT" for bots and "STEAM_0:0:0" in single-player.
@@ -492,19 +492,19 @@ end)
 -- @param string reason Reason for disconnecting.
 -- @param boolean isbot False if the player isn't a bot, true if they are.
 gameevent.Listen("player_disconnect")
-add("player_disconnect", nil, function(instance, data)
+add("player_disconnect", "playerdisconnectevent", function(instance, data)
 	return true, {data.networkid, data.name, instance.WrapObject(Player(data.userid)), data.reason, data.bot == 1}
 end)
 
 --- Called when a player takes damage. (Game Event)
--- @name player_hurt
+-- @name PlayerHurtEvent
 -- @class hook
 -- @shared
 -- @param number health The new health after being damaged.
 -- @param Player victim Player entity of the victim.
 -- @param Player attacker Player entity of the attacker.
 gameevent.Listen("player_hurt")
-SF.hookAdd("player_hurt", nil, function(instance, data)
+SF.hookAdd("player_hurt", "playerhurtevent", function(instance, data)
 	return true, {data.health, instance.WrapObject(Player(data.userid)), instance.WrapObject(Player(data.attacker))}
 end)
 
