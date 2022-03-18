@@ -476,10 +476,10 @@ end)
 -- @param boolean isbot False if the player isn't a bot, true if they are.
 -- @param string networkid The SteamID the player had. Will be "BOT" for bots and "STEAM_0:0:0" in single-player.
 -- @param string name The name the player had.
--- @param Player player Player entity of the player.
+-- @param number userid The UserID the player has.
 gameevent.Listen("player_connect")
 add("player_connect", nil, function(instance, data)
-	return true, {data.bot == 1, data.networkid, data.name, instance.WrapObject(Player(data.userid))}
+	return true, {data.bot == 1, data.networkid, data.name, data.userid}
 end)
 
 --- Called when a player disconnects from the server. (Game Event)
