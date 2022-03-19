@@ -14,7 +14,6 @@ registerprivilege("entities.setPos", "Set Position", "Allows the user to telepor
 registerprivilege("entities.setAngles", "Set Angles", "Allows the user to rotate an entity to another orientation", { entities = {} })
 registerprivilege("entities.setEyeAngles", "Set eye angles", "Allows the user to rotate the view of an entity to another orientation", { entities = {} })
 registerprivilege("entities.setVelocity", "Set Velocity", "Allows the user to change the velocity of an entity", { entities = {} })
-registerprivilege("entities.setFrozen", "Set Frozen", "Allows the user to freeze and unfreeze an entity", { entities = {} })
 registerprivilege("entities.setSolid", "Set Solid", "Allows the user to change the solidity of an entity", { entities = {} })
 registerprivilege("entities.setMass", "Set Mass", "Allows the user to change the mass of an entity", { entities = {} })
 registerprivilege("entities.setInertia", "Set Inertia", "Allows the user to change the inertia of an entity", { entities = {} })
@@ -505,28 +504,6 @@ function ents_methods:use(usetype, value)
     ent:Use(instance.player, instance.entity, usetype, value)
 end
 
---- Sets the entity frozen state
--- @param boolean freeze Should the entity be frozen?
-function ents_methods:setFrozen(freeze)
-	local ent = getent(self)
-	local phys = ent:GetPhysicsObject()
-	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
-
-	checkpermission(instance, ent, "entities.setFrozen")
-
-	phys:EnableMotion(not (freeze and true or false))
-	phys:Wake()
-end
-
---- Checks the entities frozen state
--- @return boolean True if entity is frozen
-function ents_methods:isFrozen()
-	local ent = getent(self)
-	local phys = ent:GetPhysicsObject()
-	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
-	return not phys:IsMoveable()
-end
-
 --- Sets the entity to be Solid or not.
 -- @param boolean solid Should the entity be solid?
 function ents_methods:setSolid(solid)
@@ -681,6 +658,20 @@ function ents_methods:enableMotion(move)
 	phys:Wake()
 end
 
+--- Sets the entity frozen state, same as `Entity.enableMotion` but inverted
+-- @param boolean freeze Should the entity be frozen?
+function ents_methods:setFrozen(freeze)
+	self:enableMotion(not freeze)
+end
+
+--- Checks the entities frozen state
+-- @return boolean True if entity is frozen
+function ents_methods:isFrozen()
+	local ent = getent(self)
+	local phys = ent:GetPhysicsObject()
+	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
+	return not phys:IsMoveable()
+end
 
 --- Sets the physics of an entity to be a sphere
 -- @param boolean enabled Should the entity be spherical?

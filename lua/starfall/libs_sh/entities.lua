@@ -327,6 +327,13 @@ function ents_methods:setNoDraw(draw)
 	ent:SetNoDraw(draw and true or false)
 end
 
+--- Checks whether the entity should be drawn
+-- @shared
+-- @return boolean True if should draw, False otherwise
+function ents_methods:getNoDraw()
+	return getent(self):GetNoDraw()
+end
+
 --- Sets the material of the entity
 -- @shared
 -- @param string material New material name.
@@ -1131,6 +1138,37 @@ end
 function ents_methods:getSequenceName(id)
 	checkluatype(id, TYPE_NUMBER)
 	return getent(self):GetSequenceName(id)
+end
+
+--- Gets various information about the specified animation
+-- @param number id The ID of the animation
+-- @return table Animation info
+function ents_methods:getSequenceInfo(id)
+	local ent = getent(self)
+	checkluatype(id, TYPE_NUMBER)
+	if id < 0 or id > ent:GetSequenceCount() - 1 then SF.Throw("Sequence ID out of bounds", 2) end
+	local info = getent(self):GetSequenceInfo(id)
+	info.bbmin = vwrap(info.bbmin)
+	info.bbmax = vwrap(info.bbmax)
+	return info
+end
+
+--- Returns all animations of the entity
+-- @return table List of animations, starts at index 0 where value is the animation's name
+function ents_methods:getSequenceList()
+	return getent(self):GetSequenceList()
+end
+
+--- Gets the number of animations the entity has
+-- @return number Count of entity's animations
+function ents_methods:getSequenceCount()
+	return getent(self):GetSequenceCount()
+end
+
+--- Checks whether the animation is playing
+-- @return boolean True if the animation is currently playing, False otherwise
+function ents_methods:isSequenceFinished()
+	return getent(self):IsSequenceFinished()
 end
 
 --- Get the length of an animation

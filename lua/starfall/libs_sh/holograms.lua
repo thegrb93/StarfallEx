@@ -28,7 +28,10 @@ local cl_hologram_meta = {
 
 local setParentFix, clearParentFix
 local parentChainTooLong = SF.ParentChainTooLong
-if CLIENT then
+if SERVER then
+	registerprivilege("hologram.setMoveType", "Set MoveType", "Allows the user to set hologram's movetype", { entities = {} })
+
+else
 	registerprivilege("hologram.setParent", "Set Parent", "Allows the user to parent a hologram", { entities = {} })
 	
 	function setParentFix(ent, parent, target, func)
@@ -283,7 +286,19 @@ if SERVER then
 
 		holo:SetLocalAngularVelocity(aunwrap(angvel))
 	end
-	
+
+	--- Sets the hologram's movetype
+	-- @server
+	-- @param number Movetype to set, either MOVETYPE.NOCLIP (default) or MOVETYPE.NONE
+	function hologram_methods:setMoveType(move)
+		if move ~= MOVETYPE_NONE and move ~= MOVETYPE_NOCLIP then
+			SF.Throw("Invalid movetype provided, must be either MOVETYPE.NOCLIP or MOVETYPE.NONE", 2)
+		end
+		local holo = getholo(self)
+		checkpermission(instance, holo, "hologram.setMoveType")
+		holo:SetMoveType(move)
+	end
+
 else
 	--- Sets the hologram's position.
 	-- @shared
