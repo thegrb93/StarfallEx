@@ -70,64 +70,35 @@ local parentChainTooLong = SF.ParentChainTooLong
 --- Parents the entity to another entity
 -- @param Entity? parent Entity to parent to. nil to unparent
 -- @param number|string? attachment Optional attachment (or bone) name or ID
--- @param boolean? bone True to parent to a bone instead of an attachment (requires the `attachment` to be set)
-function ents_methods:setParent(parent, attachment, bone)
+function ents_methods:setParent(parent, attachment)
 	local ent = getent(self)
-	if bone ~= nil then checkluatype(bone, TYPE_BOOL) end
 	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
 	checkpermission(instance, ent, "entities.parent")
 
 	if parent ~= nil then
 		local parentent = getent(parent)
-		local isEntHologram = ent:GetClass() == "starfall_hologram"
-		if bone and not isEntHologram then SF.Throw("Entity must be a hologram to bone parent", 2) end
-		if parentent:IsPlayer() then
-			if not isEntHologram then
-				SF.Throw("Insufficient permissions", 2)
-			end
-		else
-			checkpermission(instance, parentent, "entities.parent")
-		end
+		if parentent:IsPlayer() then SF.Throw("Target parent is a player", 2) end
+		checkpermission(instance, parentent, "entities.parent")
 		if parentChainTooLong(parentent, ent) then SF.Throw("Parenting chain of entities can't exceed 16 or crash may occur", 2) end
-		
-		if bone then
-			if isstring(attachment) then
-				attachment = parentent:LookupBone(attachment)
-			elseif not isnumber(attachment) then
+
+		ent:SetParent(parentent)
+
+		if attachment~=nil then
+			if isnumber(attachment) then
+				local attachments = parentent:GetAttachments()
+				if attachments and attachments[attachment] then
+					attachment = attachments[attachment].name
+				else
+					SF.Throw("Invalid attachment provided", 2)
+				end
+			elseif not isstring(attachment) then
 				SF.ThrowTypeError("string or number", SF.GetType(attachment), 2)
 			end
-			if attachment < 0 or attachment > 255 then SF.Throw("Invalid bone provided", 2) end
-			
-			ent.sf_parent = "FollowBone"
-			ent:FollowBone(parentent, attachment)
-		else
-			-- Undo FollowBone to clear flags and reset offset
-			if ent.sf_parent == "FollowBone" then ent:FollowBone(nil, 0) end
-			ent.sf_parent = "SetParent"
-			ent:SetParent(parentent)
-			
-			if attachment~=nil then
-				if isnumber(attachment) then
-					local attachments = parentent:GetAttachments()
-					if attachments and attachments[attachment] then
-						attachment = attachments[attachment].name
-					else
-						SF.Throw("Invalid attachment provided", 2)
-					end
-				elseif not isstring(attachment) then
-					SF.ThrowTypeError("string or number", SF.GetType(attachment), 2)
-				end
-				ent:Fire("SetParentAttachmentMaintainOffset", attachment, 0.01)
-			end
+			ent:Fire("SetParentAttachmentMaintainOffset", attachment, 0.01)
 		end
 		
 	else
-		if ent.sf_parent == "FollowBone" then
-			ent:FollowBone(nil, 0)
-		else
-			ent:SetParent()
-		end
-		ent.sf_parent = nil
+		ent:SetParent()
 	end
 end
 
