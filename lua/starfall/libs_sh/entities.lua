@@ -1133,6 +1133,37 @@ function ents_methods:getSequenceName(id)
 	return getent(self):GetSequenceName(id)
 end
 
+--- Gets various information about the specified animation
+-- @param number id The ID of the animation
+-- @return table Animation info
+function ents_methods:getSequenceInfo(id)
+	local ent = getent(self)
+	checkluatype(id, TYPE_NUMBER)
+	if id < 0 or id > ent:GetSequenceCount() - 1 then SF.Throw("Sequence ID out of bounds", 2) end
+	local info = getent(self):GetSequenceInfo(id)
+	info.bbmin = vwrap(info.bbmin)
+	info.bbmax = vwrap(info.bbmax)
+	return info
+end
+
+--- Returns all animations of the entity
+-- @return table List of animations, starts at index 0 where value is the animation's name
+function ents_methods:getSequenceList()
+	return getent(self):GetSequenceList()
+end
+
+--- Gets the number of animations the entity has
+-- @return number Count of entity's animations
+function ents_methods:getSequenceCount()
+	return getent(self):GetSequenceCount()
+end
+
+--- Checks whether the animation is playing
+-- @return boolean True if the animation is currently playing, False otherwise
+function ents_methods:isSequenceFinished()
+	return getent(self):IsSequenceFinished()
+end
+
 --- Get the length of an animation
 -- @param number? id (Optional) The id of the sequence, or will default to the currently playing sequence
 -- @return number Length of the animation in seconds
