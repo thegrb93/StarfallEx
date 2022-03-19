@@ -104,6 +104,16 @@ if SERVER then
 	-- @param Player ply Player that disconnected
 	add("PlayerDisconnected")
 
+	--- Called when a player gets hurt, uses the player_hurt game event clientside.
+	-- @name PlayerHurt
+	-- @class hook
+	-- @shared
+	-- @param Player ply Player being hurt
+	-- @param Entity attacker Entity causing damage to the player
+	-- @param number newHealth New health of the player
+	-- @param number damageTaken On server, Amount of damage the player has taken, nil on client.
+	add("PlayerHurt")
+
 	--- Called when a player spawns for the first time
 	-- @name PlayerInitialSpawn
 	-- @class hook
@@ -283,6 +293,12 @@ else
 	-- @param boolean shouldtransmit Whether it is now transmitting or not
 	add("NotifyShouldTransmit")
 
+	-- Check serverside playerhurt for docs
+	gameevent.Listen("player_hurt")
+	SF.hookAdd("player_hurt", "playerhurt", function(instance, data)
+		return true, {instance.WrapObject(Player(data.userid)), instance.WrapObject(Player(data.attacker)), data.health}
+	end)
+
 	--- Called when a player starts using voice chat.
 	-- @name PlayerStartVoice
 	-- @class hook
@@ -313,16 +329,6 @@ end
 -- Shared hooks
 
 -- Player hooks
-
---- Called when a player gets hurt
--- @name PlayerHurt
--- @class hook
--- @shared
--- @param Player ply Player being hurt
--- @param Entity attacker Entity causing damage to the player
--- @param number newHealth New health of the player
--- @param number damageTaken Amount of damage the player has taken
-add("PlayerHurt")
 
 --- Called when a player toggles noclip
 -- @name PlayerNoClip
@@ -455,6 +461,46 @@ add("StartEntityDriving")
 -- @shared
 add("Tick")
 
+-- Game Events
+
+--- Called when a player changes their Steam name. (Game Event)
+-- @name PlayerChangename
+-- @class hook
+-- @shared
+-- @param Player player Player entity of the player.
+-- @param string oldname Name before change.
+-- @param string newname Name after change.
+gameevent.Listen("player_changename")
+add("player_changename", "playerchangename", function(instance, data)
+	return true, {instance.WrapObject(Player(data.userid)), data.oldname, data.newname}
+end)
+
+--- Called when a player connects to the server. (Game Event)
+-- @name PlayerConnect
+-- @class hook
+-- @shared
+-- @param string networkid The SteamID the player had. Will be "BOT" for bots and "STEAM_0:0:0" in single-player.
+-- @param string name The name the player had.
+-- @param number userid The UserID the player has.
+-- @param boolean isbot False if the player isn't a bot, true if they are.
+gameevent.Listen("player_connect")
+add("player_connect", "playerconnect", function(instance, data)
+	return true, {data.networkid, data.name, data.userid, data.bot == 1}
+end)
+
+--- Called when a player disconnects from the server. (Game Event)
+-- @name PlayerDisconnect
+-- @class hook
+-- @shared
+-- @param string networkid The SteamID the player had. Will be "BOT" for bots and "STEAM_0:0:0" in single-player.
+-- @param string name The name the player had.
+-- @param Player player Player entity the player had.
+-- @param string reason Reason for disconnecting.
+-- @param boolean isbot False if the player isn't a bot, true if they are.
+gameevent.Listen("player_disconnect")
+add("player_disconnect", "playerdisconnect", function(instance, data)
+	return true, {data.networkid, data.name, instance.WrapObject(Player(data.userid)), data.reason, data.bot == 1}
+end)
 
 --- Deals with hooks
 -- @name hook
