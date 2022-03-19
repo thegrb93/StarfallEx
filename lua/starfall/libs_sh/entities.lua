@@ -327,6 +327,13 @@ function ents_methods:setNoDraw(draw)
 	ent:SetNoDraw(draw and true or false)
 end
 
+--- Checks whether the entity should be drawn
+-- @shared
+-- @return boolean True if should draw, False otherwise
+function ents_methods:getNoDraw()
+	return getent(self):GetNoDraw()
+end
+
 --- Sets the material of the entity
 -- @shared
 -- @param string material New material name.

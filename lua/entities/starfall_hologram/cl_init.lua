@@ -37,7 +37,7 @@ function ENT:OnScaleChanged(name, old, scale)
 	end
 end
 
-function ENT:Draw()
+function ENT:Draw(flags)
 	local clipCount = 0
 	local prevClip
 	if next(self.clips) then
@@ -60,10 +60,10 @@ function ENT:Draw()
 	
 	if self:GetSuppressEngineLighting() then
 		render.SuppressEngineLighting(true)
-		self:DrawModel()
+		self:DrawModel(flags)
 		render.SuppressEngineLighting(false)
 	else
-		self:DrawModel()
+		self:DrawModel(flags)
 	end
 	
 	if filter_mag then render.PopFilterMag() end
