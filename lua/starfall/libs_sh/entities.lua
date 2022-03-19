@@ -1140,7 +1140,10 @@ function ents_methods:getSequenceInfo(id)
 	local ent = getent(self)
 	checkluatype(id, TYPE_NUMBER)
 	if id < 0 or id > ent:GetSequenceCount() - 1 then SF.Throw("Sequence ID out of bounds", 2) end
-	return getent(self):GetSequenceInfo(id)
+	local info = getent(self):GetSequenceInfo(id)
+	info.bbmin = vwrap(info.bbmin)
+	info.bbmax = vwrap(info.bbmax)
+	return info
 end
 
 --- Returns all animations of the entity
