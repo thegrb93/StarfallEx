@@ -57,8 +57,7 @@ else
 	function clearParentFix(ent, unparent)
 		if ent.sf_parent and ent.sf_parent:IsValid() then
 			if unparent then
-				local func = ent.sf_parent.sf_children[ent].func
-				func(ent, nil, func == "FollowBone" and 0 or nil)
+				ent.sf_parent.sf_children[ent].func()
 			end
 			
 			ent.sf_parent.sf_children[ent] = nil
@@ -71,7 +70,7 @@ else
 			if child and child:IsValid() then
 				child:SetPos(parent:LocalToWorld(data.pos))
 				child:SetAngles(parent:LocalToWorldAngles(data.ang))
-				child[data.func](child, parent, data.bone)
+				data.func(child, parent, data.bone)
 				
 				if child.sf_children then
 					return reparentChildren(child)
@@ -415,11 +414,19 @@ function hologram_methods:setParent(parent, attachment, bone)
 			ent:SetParent(parent)
 		end
 		local function parentBone(ent, parent, target)
-			ent:FollowBone(parent)
+			if parent then
+				ent:FollowBone(parent, target)
+			else
+				ent:FollowBone()
+			end
 		end
 		local function parentAttachment(ent, parent, target)
-			ent:SetParent(parent)
-			ent:Fire("SetParentAttachmentMaintainOffset", bone, 0.01)
+			if parent then
+				ent:SetParent(parent)
+				ent:Fire("SetParentAttachmentMaintainOffset", bone, 0.01)
+			else
+				ent:SetParent()
+			end
 		end
 
 		local target
@@ -454,7 +461,7 @@ function hologram_methods:setParent(parent, attachment, bone)
 				clearParentFix(holo, true)
 			end
 		end
-		
+
 		setParentFix(holo, parent, target, parentFunc)
 	else
 		clearParentFix(holo, true)
