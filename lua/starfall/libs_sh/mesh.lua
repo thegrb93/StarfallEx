@@ -959,14 +959,11 @@ if CLIENT then
 		end
 
 		instance.canyield = false
-		local ok = instance:runFunction(func)
+		local ok, err = pcall(func)
 		instance.canyield = true
 		mesh.End()
 		meshgenerating = false
-
-		if not ok[1] then
-			error(ok[2])
-		end
+		if not ok then error(err) end
 	end
 
 	--- Sets the vertex color by RGBA values
