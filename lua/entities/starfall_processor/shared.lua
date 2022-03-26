@@ -95,7 +95,7 @@ function ENT:SetupFiles(sfdata)
 
 	self:Compile()
 
-	if SERVER then
+	if SERVER and self.instance then
 		local sfsenddata = {
 			owner = sfdata.owner,
 			files = {},
