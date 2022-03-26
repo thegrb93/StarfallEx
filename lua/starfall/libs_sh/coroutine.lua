@@ -27,6 +27,7 @@ instance:AddHook("deinitialize", function()
 		coroutines[thread] = nil
 	end
 end)
+instance.canyield = true
 
 
 local function createCoroutine(func)
@@ -89,7 +90,7 @@ end
 -- @return ... Any values passed to the coroutine
 function coroutine_library.yield(...)
 	local curthread = coroutine.running()
-	if curthread and coroutines[curthread] then
+	if curthread and coroutines[curthread] and instance.canyield then
 		return coroutine.yield(...)
 	else
 		SF.Throw("attempt to yield across C-call boundary", 2)
