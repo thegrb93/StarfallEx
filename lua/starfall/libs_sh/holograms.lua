@@ -410,12 +410,12 @@ function hologram_methods:setParent(parent, attachment, bone)
 		parent = getent(parent)
 		if parentChainTooLong(parent, holo) then SF.Throw("Parenting chain of entities can't exceed 16 or crash may occur", 2) end
 
-		local function parent(ent, parent)
-			ent:SetParent(parent)
+		local function parent(ent, ...)
+			ent:SetParent(...)
 		end
-		local function parentBone(ent, parent, target)
+		local function parentBone(ent, ...)
 			if parent then
-				ent:FollowBone(parent, target)
+				ent:FollowBone(...)
 			else
 				ent:FollowBone()
 			end
@@ -423,7 +423,7 @@ function hologram_methods:setParent(parent, attachment, bone)
 		local function parentAttachment(ent, parent, target)
 			if parent then
 				ent:SetParent(parent)
-				ent:Fire("SetParentAttachmentMaintainOffset", bone, 0.01)
+				ent:Fire("SetParentAttachmentMaintainOffset", target, 0.01)
 			else
 				ent:SetParent()
 			end
