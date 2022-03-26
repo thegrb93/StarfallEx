@@ -46,7 +46,8 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 
 local function getsnd(self)
 	local snd = unwrap(self)
-	return snd:IsValid() and snd or SF.Throw("Sound is not valid.", 3)
+	local isValid = snd.IsValid
+	return isValid and isValid(snd) and snd or SF.Throw("Sound is not valid.", 3)
 end
 
 
