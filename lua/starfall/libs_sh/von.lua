@@ -776,26 +776,22 @@ local _s_table = _serialize.table
 local _d_table = _deserialize.table
 
 local function deserialize(str, allowIdRewriting)
-	if type(str) == "string" then
-		return _d_table(str, nil, #str, true, { {}, allowIdRewriting })
-	end
-	SF.Throw("vON: You must deserialize a string, not a " .. type(str), 3)
+	return _d_table(str, nil, #str, true, { {}, allowIdRewriting })
 end
 
 local function serialize(data, checkRecursion)
-	if type(data) == "table" then
-		if checkRecursion then
-			local assoc, checked = {}, { ID = 1 }
+	if checkRecursion then
+		local assoc, checked = {}, { ID = 1 }
 
-			checkTableForRecursion(data, checked, assoc)
+		checkTableForRecursion(data, checked, assoc)
 
-			return _s_table(data, nil, nil, nil, nil, true, { assoc, {} })
-		end
-
-		return _s_table(data, nil, nil, nil, nil, true, { false })
+		return _s_table(data, nil, nil, nil, nil, true, { assoc, {} })
 	end
-	SF.Throw("vON: You must serialize a table, not a " .. type(data), 3)
+
+	return _s_table(data, nil, nil, nil, nil, true, { false })
 end
+
+local checkluatype = SF.CheckLuaType
 
 
 --- vON Library
@@ -813,16 +809,20 @@ local von_library = instance.Libraries.von
 -- @param string str String to deserialize
 -- @return table Table
 function von_library.deserialize(str)
+	checkluatype(str, TYPE_STRING)
 	g_instance = instance
 	return deserialize(str)
 end
 
 --- Serialize a table
 -- @param table tbl Table to serialize
+-- @param boolean? checkRecursive Enable checking for table recursion (default: false)
 -- @return string String encoded from the table
-function von_library.serialize(tbl)
+function von_library.serialize(tbl, checkRecursive)
+	checkluatype(tbl, TYPE_TABLE)
+	if checkRecursive~=nil then checkluatype(checkRecursive, TYPE_BOOL) end
 	g_instance = instance
-	return serialize(tbl)
+	return serialize(tbl, checkRecursive)
 end
 
 end
