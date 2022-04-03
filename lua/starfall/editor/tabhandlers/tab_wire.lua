@@ -1421,6 +1421,9 @@ function PANEL:_OnTextChanged()
 	local text = self.TextEntry:GetText()
 	self.TextEntry:SetText("")
 
+	local justUnIndented = self.justUnIndented
+	self.justUnIndented = nil
+
 	if (input.IsKeyDown(KEY_LCONTROL) or input.IsKeyDown(KEY_RCONTROL)) and not (input.IsKeyDown(KEY_LALT) or input.IsKeyDown(KEY_RALT)) then
 		-- ctrl+[shift+]key
 		if input.IsKeyDown(KEY_V) then
@@ -1443,18 +1446,55 @@ function PANEL:_OnTextChanged()
 	if text == "" then return end
 	if not ctrlv then
 		if text == "\n" or text == "`" then return end
-		if text == "}" and TabHandler.AutoIndentConVar then
-			self:SetSelection(text)
+		if TabHandler.AutoIndentConVar:GetBool() then
 			local row = self:GetRowText(self.Caret[1])
-			if string_match("{" .. row, "^%b{}.*$") then
-				local newrow = unindent(row)
-				self:SetRowText(self.Caret[1], newrow)
-				self.Caret[2] = self.Caret[2] + newrow:len()-row:len()
+
+			local function doIndent(shift)
+				local caret = self:Selection()[1]
+				self:Indent(shift)
+				self.Caret = caret
+				self.Caret[2] = #self:GetRowText(caret[1]) + 1
 				self.Start[2] = self.Caret[2]
 			end
-			return
+
+			if text == "}" then
+				-- un-indent on }
+				self:SetSelection(text)
+				if string.match(row,"^%s*$") then
+					doIndent(true)
+				end
+				return
+			else
+				if string.match(row..text, "^%s*end$") then
+					-- un-indent on 'end'
+					self:SetSelection(text)
+					if string.match(row,"^%s*en$") then
+						doIndent(true)
+						self.justUnIndented = {self.Caret[1],self.Caret[2]}
+					end
+					return
+				elseif string.match(row..text,"^%s*until$") then
+					-- un-indent on 'until'
+					self:SetSelection(text)
+					if string.match(row,"^%s*unti$") then
+						doIndent(true)
+						self.justUnIndented = {self.Caret[1],self.Caret[2]}
+					end
+					return
+				elseif justUnIndented then
+					if justUnIndented[1] == self.Caret[1] and 
+					   justUnIndented[2] == self.Caret[2] and 
+					   string.match(text,"%s") == nil then
+						-- re-indent if the user types something else after 'end' or 'until', but not if that's a space character
+						self:SetSelection(text)
+						doIndent(false)
+						return
+					end
+				end
+			end
 		end
 	end
+
 	self:SetSelection(text)
 	if self.OnTextChanged then self:OnTextChanged() end
 end
@@ -2452,6 +2492,25 @@ function PANEL:_OnKeyCodeTyped(code)
 			local row = self:GetRowText(self.Caret[1]):sub(1, self.Caret[2]-1)
 			local diff = (row:find("%S") or (row:len() + 1))-1
 			local tabs = string_rep("    ", math_floor(diff / 4))
+			if TabHandler.AutoIndentConVar:GetBool() then
+				local function countMatches(s,open,close)
+					-- add spaces to string to detect whole word
+					s = " " .. s .. " "
+					local n = 0
+					for i=1,#open do
+						local _, temp = string_gsub(s,open[i],"")
+						n = n + temp
+					end
+					local _, temp = string_gsub(s,close,"")
+					return n - temp
+				end
+				local row = string_gsub(row,'%b""',"") -- erase strings on this line
+				if countMatches(row,{"{"},"}") > 0 or 
+					countMatches(row,{"%sthen%s","%sdo%s"},"%send%s") > 0 or 
+					countMatches(row,{"%srepeat%s"},"%suntil%s") > 0 then 
+						tabs = tabs .. "    "
+				end
+			end
 			self:SetSelection("\n" .. tabs)
 			if self.OnTextChanged then self:OnTextChanged() end
 		elseif code == KEY_UP then
