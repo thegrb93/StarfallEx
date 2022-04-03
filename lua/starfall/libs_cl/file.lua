@@ -9,6 +9,7 @@ registerprivilege("file.exists", "File existence check", "Allows the user to det
 registerprivilege("file.find", "File find", "Allows the user to see what files are in data/sf_filedata", { client = { default = 1 } })
 registerprivilege("file.findInGame", "File find in garrysmod", "Allows the user to see what files are in garrysmod", { client = { default = 1 } })
 registerprivilege("file.open", "Get a file object", "Allows the user to use a file object", { client = { default = 1 } })
+registerprivilege("file.time", "Get time modified", "Allows the user to see the last time a file was modified", { client = { default = 1 } })
 
 file.CreateDir("sf_filedata/")
 file.CreateDir("sf_filedatatemp/")
@@ -351,6 +352,16 @@ function file_library.findInGame(path, sorting)
 	checkluatype (path, TYPE_STRING)
 	if sorting~=nil then checkluatype (sorting, TYPE_STRING) end
 	return file.Find(SF.NormalizePath(path), "GAME", sorting)
+end
+
+--- Returns when the file or folder was last modified in Unix time.
+--- Can then be used with something like os.date for a human-readable date.
+-- @param string path Filepath relative to data/sf_filedata/.
+-- @return number Last modified time in Unix time
+function file_library.time(path)
+	checkpermission (instance, path, "file.time")
+	checkluatype (path, TYPE_STRING)
+	return file.Time("sf_filedata/" .. SF.NormalizePath(path), "DATA")
 end
 
 --- Wait until all changes to the file are complete
