@@ -25,64 +25,10 @@ local cl_hologram_meta = {
 	__tostring = entmeta.__tostring,
 	__eq = entmeta.__eq,
 }
+SF.Cl_Hologram_Meta = cl_hologram_meta
 
-local setParentFix, clearParentFix
-local parentChainTooLong = SF.ParentChainTooLong
 if SERVER then
 	registerprivilege("hologram.setMoveType", "Set MoveType", "Allows the user to set hologram's movetype", { entities = {} })
-
-else
-	registerprivilege("hologram.setParent", "Set Parent", "Allows the user to parent a hologram", { entities = {} })
-	
-	function setParentFix(ent, parent, target, func)
-		if not parent.sf_children then
-			parent.sf_children = {}
-		end
-		
-		if ent.sf_parent and ent.sf_parent ~= parent then
-			ent.sf_parent.sf_children[ent] = nil
-		end
-		
-		ent.sf_parent = parent
-		parent.sf_children[ent] = {
-			func = func,
-			target = target,
-			pos  = parent:WorldToLocal(ent:GetPos()),
-			ang  = parent:WorldToLocalAngles(ent:GetAngles())
-		}
-		
-		func(ent, parent, target)
-	end
-	
-	function clearParentFix(ent, unparent)
-		if ent.sf_parent and ent.sf_parent:IsValid() then
-			if unparent then
-				ent.sf_parent.sf_children[ent].func()
-			end
-			
-			ent.sf_parent.sf_children[ent] = nil
-			ent.sf_parent = nil
-		end
-	end
-	
-	local function reparentChildren(parent)
-		for child, data in pairs(parent.sf_children) do
-			if child and child:IsValid() then
-				child:SetPos(parent:LocalToWorld(data.pos))
-				child:SetAngles(parent:LocalToWorldAngles(data.ang))
-				data.func(child, parent, data.bone)
-				
-				if child.sf_children then
-					return reparentChildren(child)
-				end
-			end
-		end
-	end
-	hook.Add("NotifyShouldTransmit", "StarfallHologramReparent", function(ent)
-		if ent and ent:IsValid() and ent.sf_children then
-			reparentChildren(ent)
-		end
-	end)
 end
 
 
@@ -119,7 +65,6 @@ instance:AddHook("initialize", function()
 end)
 
 local function hologramOnDestroy(holo)
-	if CLIENT then clearParentFix(holo) end
 	holograms[holo] = nil
 	plyCount:free(instance.player, 1)
 end
@@ -306,12 +251,14 @@ else
 		local holo = getholo(self)
 		local pos = SF.clampPos(vunwrap(vec))
 		checkpermission(instance, holo, "hologram.setRenderProperty")
-		
+
 		holo:SetPos(pos)
-		
-		local parent = holo.sf_parent
-		if parent and parent:IsValid() then
-			parent.sf_children[holo].pos = parent:WorldToLocal(pos)
+
+		if CLIENT then
+			local sf_parent = holo.sf_parent
+			if sf_parent and sf_parent.parent:IsValid() then
+				sf_parent:updateTransform()
+			end
 		end
 	end
 
@@ -325,9 +272,11 @@ else
 
 		holo:SetAngles(angle)
 		
-		local parent = holo.sf_parent
-		if parent and parent:IsValid() then
-			parent.sf_children[holo].ang = parent:WorldToLocalAngles(angle)
+		if CLIENT then
+			local sf_parent = holo.sf_parent
+			if sf_parent and sf_parent.parent:IsValid() then
+				sf_parent:updateTransform()
+			end
 		end
 	end
 
@@ -394,77 +343,6 @@ else
 		local holo = getholo(self)
 		holo:SetupBones()
 		holo:DrawModel()
-	end
-end
-
---- Parents a hologram
--- @param Entity? parent Entity parent (nil to unparent)
--- @param number|string? attachment Optional attachment (or bone) name or ID
--- @param boolean? bone True to parent to a bone instead of an attachment (requires the `attachment` parameter to be set)
-function hologram_methods:setParent(parent, attachment, bone)
-	local holo = getholo(self)
-	checkpermission(instance, holo, "hologram.setParent")
-	if attachment~=nil and bone~=nil then SF.Throw("Can't have both attachment and bone args set!", 2) end
-
-	if parent ~= nil then
-		parent = getent(parent)
-		if parentChainTooLong(parent, holo) then SF.Throw("Parenting chain of entities can't exceed 16 or crash may occur", 2) end
-
-		local function parent(ent, ...)
-			ent:SetParent(...)
-		end
-		local function parentBone(ent, ...)
-			if parent then
-				ent:FollowBone(...)
-			else
-				ent:FollowBone()
-			end
-		end
-		local function parentAttachment(ent, parent, target)
-			if parent then
-				ent:SetParent(parent)
-				ent:Fire("SetParentAttachmentMaintainOffset", target, 0.01)
-			else
-				ent:SetParent()
-			end
-		end
-
-		local target
-		if bone~=nil then
-			if isnumber(bone) then
-			elseif isstring(bone) then
-				bone = parent:LookupBone(bone) or -1
-			else
-				SF.ThrowTypeError("string or number", SF.GetType(bone), 2)
-			end
-			if bone < 0 or bone > 255 then SF.Throw("Invalid bone provided", 2) end
-			parentFunc = parentBone
-			target = bone
-		elseif attachment~=nil then
-			if isnumber(attachment) then
-			elseif isstring(attachment) then
-				attachment = parent:LookupAttachment(attachment)
-			else
-				SF.ThrowTypeError("string or number", SF.GetType(attachment), 2)
-			end
-			if attachment < 0 or attachment > 255 then SF.Throw("Invalid attachment provided", 2) end
-			parentFunc = parentAttachment
-			target = attachment
-		else
-			parentFunc = parent
-		end
-		
-		-- FollowBone is ignored when SetParent or FollowBone with a different bone is present, additionally clear flags set by FollowBone before doing SetParent
-		if holo.sf_parent and holo.sf_parent:IsValid() then
-			local prvParentFunc =  holo.sf_parent.sf_children[holo].func
-			if prvParentFunc == parentBone or prvParentFunc ~= parentFunc then
-				clearParentFix(holo, true)
-			end
-		end
-
-		setParentFix(holo, parent, target, parentFunc)
-	else
-		clearParentFix(holo, true)
 	end
 end
 

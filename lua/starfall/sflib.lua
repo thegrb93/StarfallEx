@@ -467,6 +467,116 @@ SF.BlockedList = {
 setmetatable(SF.BlockedList, SF.BlockedList)
 
 
+local SF.Parent = {
+	__index = {
+		updateTransform = function(self)
+			self.pos, self.ang = WorldToLocal(self.ent:GetPos(), self.ent:GetAngles(), self.parent:GetPos(), self.parent:GetAngles())
+		end,
+
+		applyTransform = function(self)
+			local pos, ang = LocalToWorld(self.pos, self.ang, self.parent:GetPos(), self.parent:GetAngles())
+			self.ent:SetPos(pos)
+			self.ent:SetAngles(ang)
+		end,
+		
+		setParents = {
+			entity = {
+				function(self)
+					self.ent:SetParent(self.parent)
+				end,
+				function(self)
+					self.ent:SetParent()
+				end
+			},
+			attachment = {
+				function(self)
+					self.ent:SetParent(self.parent)
+					self.ent:Fire("SetParentAttachmentMaintainOffset", self.param, 0.01)
+				end,
+				function(self)
+					self.ent:SetParent()
+				end
+			},
+			bone = {
+				function(self)
+					self.ent:FollowBone(self.parent, self.param)
+				end,
+				function(self)
+					self.ent:FollowBone()
+				end
+			}
+		},
+
+		setParent = function(self, parent, type, param)
+			if self.parent and self.parent:IsValid() then
+				self.parent.sf_parent.children[self.ent] = nil
+				self:unParentType()
+			end
+			if parent then
+				self.parent = parent
+				self.param = param
+				self.setParentType, self.unParentType = unpack(self.setParents[type])
+
+				local sf_parent = parent.sf_parent
+				if sf_parent then
+					sf_parent.children[self.ent] = self
+				end
+				self:updateTransform()
+				self:setParentType()
+			else
+				self.parent = nil
+				self.param = nil
+				self.setParentType = nil
+				self.unParentType = nil
+			end
+		end,
+
+		fix = function(self)
+			if self.parent and self.parent:IsValid() then
+				self:applyTransform()
+				self:setParentType()
+			end
+			for child, data in pairs(self.children) do	
+				if child:IsValid() then
+					data:applyTransform()
+					data:setParentType()
+				else
+					self.children[child] = nil
+				end
+			end
+		end,
+	},
+	__call = function(meta, parent, child, type, param)
+		if SF.ParentChainTooLong(parent, child) then SF.Throw("Parenting chain of entities can't exceed 16 or crash may occur", 3) end
+		if not parent.sf_parent then
+			parent.sf_parent = setmetatable({
+				ent = parent,
+				children = {}
+			}, meta)
+		end
+
+		local sf_parent = child.sf_parent
+		if not sf_parent then
+			sf_parent = setmetatable({
+				ent = child,
+				children = {}
+			}, meta)
+			child.sf_parent = sf_parent
+		end
+		sf_parent:setParent(parent, type, param)
+	end
+}
+setmetatable(SF.Parent, SF.Parent)
+
+if CLIENT then
+	-- Need to fix the children and parent of any entity retransmitted
+	hook.Add("NotifyShouldTransmit", "SF_HologramReparent", function(ent)
+		local sf_parent = ent.sf_parent
+		if sf_parent then sf_parent:fix() end
+	end)
+end
+
+
 -- Error type containing error info
 SF.Errormeta = {
 	__tostring = function(t) return t.message end,

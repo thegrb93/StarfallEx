@@ -6,8 +6,6 @@ local huge = math.huge
 local abs = math.abs
 
 -- Register privileges
-registerprivilege("entities.parent", "Parent", "Allows the user to parent an entity to another entity", { entities = {} })
-registerprivilege("entities.unparent", "Unparent", "Allows the user to remove the parent of an entity", { entities = {} })
 registerprivilege("entities.applyDamage", "Apply damage", "Allows the user to apply damage to an entity", { entities = {} })
 registerprivilege("entities.applyForce", "Apply force", "Allows the user to apply force to an entity", { entities = {} })
 registerprivilege("entities.setPos", "Set Position", "Allows the user to teleport an entity to another location", { entities = {} })
@@ -64,49 +62,6 @@ instance:AddHook("deinitialize", function()
 end)
 
 -- ------------------------- Methods ------------------------- --
-
-local parentChainTooLong = SF.ParentChainTooLong
---- Parents the entity to another entity
--- @param Entity? parent Entity to parent to. nil to unparent
--- @param number|string? attachment Optional attachment (or bone) name or ID
-function ents_methods:setParent(parent, attachment)
-	local ent = getent(self)
-	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
-	checkpermission(instance, ent, "entities.parent")
-
-	if parent ~= nil then
-		local parentent = getent(parent)
-		if parentent:IsPlayer() then SF.Throw("Target parent is a player", 2) end
-		checkpermission(instance, parentent, "entities.parent")
-		if parentChainTooLong(parentent, ent) then SF.Throw("Parenting chain of entities can't exceed 16 or crash may occur", 2) end
-
-		ent:SetParent(parentent)
-
-		if attachment~=nil then
-			if isnumber(attachment) then
-				local attachments = parentent:GetAttachments()
-				if attachments and attachments[attachment] then
-					attachment = attachments[attachment].name
-				else
-					SF.Throw("Invalid attachment provided", 2)
-				end
-			elseif not isstring(attachment) then
-				SF.ThrowTypeError("string or number", SF.GetType(attachment), 2)
-			end
-			ent:Fire("SetParentAttachmentMaintainOffset", attachment, 0.01)
-		end
-		
-	else
-		ent:SetParent()
-	end
-end
-
---- Unparents the entity from another entity
-function ents_methods:unparent()
-	local ent = getent(self)
-	checkpermission(instance, ent, "entities.unparent")
-	ent:SetParent(nil)
-end
 
 --- Links starfall components to a starfall processor or vehicle. Screen can only connect to processor. HUD can connect to processor and vehicle.
 -- @param Entity? e Entity to link the component to, a vehicle or starfall for huds, or a starfall for screens. nil to clear links.
