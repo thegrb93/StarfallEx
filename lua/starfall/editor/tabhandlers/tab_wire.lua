@@ -1421,7 +1421,7 @@ function PANEL:_OnTextChanged()
 	local text = self.TextEntry:GetText()
 	self.TextEntry:SetText("")
 
-	local justUnIndented = self.justUnIndented
+	local unIndentedLast = self.justUnIndented
 	self.justUnIndented = nil
 
 	if (input.IsKeyDown(KEY_LCONTROL) or input.IsKeyDown(KEY_RCONTROL)) and not (input.IsKeyDown(KEY_LALT) or input.IsKeyDown(KEY_RALT)) then
@@ -1465,31 +1465,25 @@ function PANEL:_OnTextChanged()
 				end
 				return
 			else
-				if string.match(row..text, "^%s*end$") then
-					-- un-indent on 'end'
-					self:SetSelection(text)
-					if string.match(row,"^%s*en$") then
-						doIndent(true)
-						self.justUnIndented = {self.Caret[1],self.Caret[2]}
-					end
-					return
-				elseif string.match(row..text,"^%s*until$") then
-					-- un-indent on 'until'
-					self:SetSelection(text)
-					if string.match(row,"^%s*unti$") then
-						doIndent(true)
-						self.justUnIndented = {self.Caret[1],self.Caret[2]}
-					end
-					return
-				elseif justUnIndented then
-					if justUnIndented[1] == self.Caret[1] and 
-					   justUnIndented[2] == self.Caret[2] and 
-					   string.match(text,"%s") == nil then
-						-- re-indent if the user types something else after 'end' or 'until', but not if that's a space character
+				local unIndentOn = {"end","else","elseif","until"}
+				local rowText = row..text
+				-- un-indent if the user types one of these four things
+				for i=1,#unIndentOn do
+					if string.match(rowText, "^%s*" .. unIndentOn[i] .. "$") then
 						self:SetSelection(text)
-						doIndent(false)
+						doIndent(true)
+						self.justUnIndented = {self.Caret[1],self.Caret[2]}
 						return
 					end
+				end
+				if unIndentedLast and
+				   unIndentedLast[1] == self.Caret[1] and 
+				   unIndentedLast[2] == self.Caret[2] and 
+				   string.match(text,"[%s%(]") == nil then
+					-- re-indent if the user types something else after those four things, but not if that's a space character or a '(' character
+					self:SetSelection(text)
+					doIndent(false)
+					return
 				end
 			end
 		end
@@ -2506,7 +2500,7 @@ function PANEL:_OnKeyCodeTyped(code)
 				end
 				local row = string_gsub(row,'%b""',"") -- erase strings on this line
 				if countMatches(row,{"{"},"}") > 0 or 
-					countMatches(row,{"%sthen%s","%sdo%s"},"%send%s") > 0 or 
+					countMatches(row,{"%sthen%s","%sdo%s","%sfunction[%s%(]"},"%send%s") > 0 or 
 					countMatches(row,{"%srepeat%s"},"%suntil%s") > 0 then 
 						tabs = tabs .. "    "
 				end
