@@ -2,7 +2,7 @@
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 
-registerprivilege("entities.parent", "Parent", "Allows the user to parent an entity to another entity", { entities = {} })
+registerprivilege("entities.setParent", "Parent", "Allows the user to parent an entity to another entity", { entities = {} })
 registerprivilege("entities.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { client = (CLIENT and {} or nil), entities = {} })
 registerprivilege("entities.setPlayerRenderProperty", "PlayerRenderProperty", "Allows the user to change the rendering of themselves", {})
 registerprivilege("entities.setPersistent", "SetPersistent", "Allows the user to change entity's persistent state", { entities = {} })
@@ -305,9 +305,9 @@ end
 -- @param number|string? attachment Optional attachment name or ID
 -- @param number|string? bone Optional bone name or ID. Can't be used at the same time as attachment
 function ents_methods:setParent(parent, attachment, bone)
-	local child = getholo(self)
+	local child = getent(self)
 	if CLIENT and debug.getmetatable(child)~=SF.Cl_Hologram_Meta then SF.Throw("Can only setParent clientside holograms in the clientside!", 2) end
-	checkpermission(instance, child, "hologram.setParent")
+	checkpermission(instance, child, "entities.setParent")
 	if attachment~=nil and bone~=nil then SF.Throw("Can't have both attachment and bone args set!", 2) end
 	if parent ~= nil then
 		parent = getent(parent)
@@ -335,7 +335,7 @@ function ents_methods:setParent(parent, attachment, bone)
 			type = "entity"
 		end
 
-		SF_Parent(parent, child, type, param)
+		SF.Parent(parent, child, type, param)
 	else
 		local sf_parent = child.sf_parent
 		if sf_parent then

@@ -467,7 +467,7 @@ SF.BlockedList = {
 setmetatable(SF.BlockedList, SF.BlockedList)
 
 
-local SF.Parent = {
+SF.Parent = {
 	__index = {
 		updateTransform = function(self)
 			self.pos, self.ang = WorldToLocal(self.ent:GetPos(), self.ent:GetAngles(), self.parent:GetPos(), self.parent:GetAngles())
@@ -532,17 +532,23 @@ local SF.Parent = {
 		end,
 
 		fix = function(self)
+			local empty = true
 			if self.parent and self.parent:IsValid() then
 				self:applyTransform()
 				self:setParentType()
+				empty = false
 			end
-			for child, data in pairs(self.children) do	
+			for child, data in pairs(self.children) do
 				if child:IsValid() then
 					data:applyTransform()
 					data:setParentType()
+					empty = false
 				else
 					self.children[child] = nil
 				end
+			end
+			if empty then
+				self.ent.sf_parent = nil
 			end
 		end,
 	},
