@@ -2500,7 +2500,7 @@ function PANEL:_OnKeyCodeTyped(code)
 				end
 				local row = string_gsub(row,'%b""',"") -- erase strings on this line
 				if countMatches(row,{"{"},"}") > 0 or 
-					countMatches(row,{"%sthen%s","%sdo%s","%sfunction[%s%(]"},"%send%s") > 0 or 
+					countMatches(row,{"%sthen%s","%sdo%s","%sfunction[%s%(]","%selse%s"},"%send%s") > 0 or 
 					countMatches(row,{"%srepeat%s"},"%suntil%s") > 0 then 
 						tabs = tabs .. "    "
 				end
