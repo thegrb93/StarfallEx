@@ -300,11 +300,11 @@ function ents_methods:getLinkedComponents()
 	return list
 end
 
---- Parents or unparents an entity
+--- Parents or unparents an entity. Only holograms can be parented to players and, in clientside, only clientside holograms can be parented.
 -- @param Entity? parent Entity parent (nil to unparent)
 -- @param number|string? attachment Optional attachment name or ID
 -- @param number|string? bone Optional bone name or ID. Can't be used at the same time as attachment
-function hologram_methods:setParent(parent, attachment, bone)
+function ents_methods:setParent(parent, attachment, bone)
 	local child = getholo(self)
 	if CLIENT and debug.getmetatable(child)~=SF.Cl_Hologram_Meta then SF.Throw("Can only setParent clientside holograms in the clientside!", 2) end
 	checkpermission(instance, child, "hologram.setParent")
