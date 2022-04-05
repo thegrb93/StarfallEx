@@ -1257,7 +1257,7 @@ end
 
 function PANEL:Init()
 	self.fontSettings = self:DefaultFontSettings()
-	self:SetSize(math.min(ScrW()*0.9,800),math.min(ScrH(),500))
+	self:SetSize(math.min(ScrW()*0.9,800),math.min(ScrH(),425))
 	self:Center()
 
 	local previewPanel = vgui.Create( "DPanel", self )
