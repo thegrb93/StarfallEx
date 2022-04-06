@@ -1349,6 +1349,7 @@ function PANEL:Init()
 	errorPanel:Dock(FILL)
 	errorPanel:Hide()
 	errorPanel.Paint = function() end
+	errorPanel:DockPadding(4,2,4,2)
 	local lbl = vgui.Create("DLabel",errorPanel)
 	lbl:SetText( "Unable to parse string. Please input a valid string." )
 	lbl:Dock(TOP)
