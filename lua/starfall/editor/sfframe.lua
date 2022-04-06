@@ -1739,7 +1739,10 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
 	FontEditor:Dock(RIGHT)
 	FontEditor:SetText("Font Editor")
 	FontEditor.DoClick = function()
-		if self.fontEditor and self.fontEditor:IsValid() then return end
+		if self.fontEditor and self.fontEditor:IsValid() then 
+			self.fontEditor:MakePopup() -- bring to front
+			return 
+		end
 
 		self.fontEditor = vgui.Create("StarfallFontPicker")
 		self.fontEditor:SetTitle( "Font Editor" )
