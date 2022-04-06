@@ -1257,7 +1257,7 @@ end
 
 function PANEL:Init()
 	self.fontSettings = self:DefaultFontSettings()
-	self:SetSize(math.min(ScrW()*0.9,800),math.min(ScrH(),425))
+	self:SetSize(math.min(ScrW()*0.9,800),math.min(ScrH(),430))
 	self:Center()
 
 	local previewPanel = vgui.Create( "DPanel", self )
@@ -1322,7 +1322,7 @@ function PANEL:Init()
 
 	local fName = GetConVar("sf_editor_wire_fontname"):GetString()
 	local fAA = GetConVar("sf_editor_wire_enable_antialiasing"):GetBool()
-	textbox:SetFont(SF.Editor.editor:GetFont(fName, 21, fAA))
+	textbox:SetFont(SF.Editor.editor:GetFont(fName, 20, fAA))
 
 	textbox:SetValue(self:BuildFontString(self.fontSettings,true))
 
@@ -1336,6 +1336,12 @@ function PANEL:Init()
 	end
 	local function doUpdateText()
 		textbox:SetText(self:BuildFontString(self.fontSettings,true))
+	end
+	local function updatePreviewTextLater(len)
+		timer.Destroy("sf_font_editor_timer_preview")
+		timer.Destroy("sf_font_editor_timer_textbox")
+		timer.Create("sf_font_editor_timer_preview", len or 0.3, 1, doUpdate)
+		timer.Create("sf_font_editor_timer_textbox", 0.1, 1, doUpdateText)
 	end
 
 	------------------- error panel
@@ -1354,7 +1360,10 @@ function PANEL:Init()
 	local controlsList = vgui.Create("DListLayout", LRPanel)
 	controlsList:Dock(FILL)
 	controlsList.Paint = function() end
-	controlsList:DockPadding(4,20,4,0)
+	controlsList:DockPadding(4,0,4,0)
+	local infolbl = vgui.Create("DLabel")
+	infolbl:SetText("You can paste a createFont line into the text box on the left to parse its settings")
+	controlsList:Add(infolbl)
 
 	resetBtn.DoClick = function()
 		self.fontSettings = self:DefaultFontSettings()
@@ -1367,13 +1376,13 @@ function PANEL:Init()
 	local controls = {
 		-- {"setting name", "label", "setting type", optional callback for more settings}
 		{"font","Source Font","s"},
-		{"size","Size","n", function(this) this:SetDecimals(0) this:SetMinMax(1,100) end},
+		{"size","Size","n", function(this) this:SetDecimals(0) this:SetMinMax(4,255) end},
 		{"weight","Weight","n", function(this) this:SetDecimals(0) this:SetMinMax(100,1000) end},
 		{"antialias","Antialias","b"},
 		{"additive","Additive","b"},
 		{"shadow","Shadow","b"},
 		{"outline","Outline","b"},
-		{"blursize","Blursize","n", function(this) this:SetDecimals(2) this:SetMinMax(0,10) end},
+		{"blursize","Blursize","n", function(this) this:SetDecimals(0) this:SetMinMax(0,10) end},
 		{"extended","Extended","b"},
 		{"scanlines","Scanlines","n", function(this) this:SetDecimals(0) this:SetMinMax(0,10) end}
 	}
@@ -1435,9 +1444,7 @@ function PANEL:Init()
 
 			self.fontSettings[settingName] = newvalue
 
-			timer.Destroy("sf_font_editor_timer")
-			timer.Create("sf_font_editor_timer", len, 1, doUpdate)
-			doUpdateText()
+			updatePreviewTextLater(len)
 		end
 		inp.OnValueChanged = inp.OnChange -- some use OnChange and others use OnValueChanged
 	end
@@ -1451,8 +1458,7 @@ function PANEL:Init()
 				self.fontSettings[v[1]] = tab[v[1]]
 				v[5]:SetValue(tab[v[1]])
 			end
-			doUpdateText()
-			doUpdate()
+			updatePreviewTextLater()
 		else
 			errorPanel:Show()
 			controlsList:Hide()
