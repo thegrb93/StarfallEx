@@ -27,7 +27,7 @@ SF.RegisterLibrary("debug")
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
-local haspermission = instance.player ~= SF.Superuser and SF.Permissions.hasAccess or function() end
+local haspermission = instance.player ~= SF.Superuser and SF.Permissions.hasAccess or function() return true end
 
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
