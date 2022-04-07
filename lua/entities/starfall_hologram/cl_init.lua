@@ -8,6 +8,7 @@ ENT.Material = ENT.DefaultMaterial
 function ENT:Initialize()
 	self.clips = {}
 	self.sf_userrenderbounds = false
+	self:SetupBones()
 	self:OnScaleChanged(nil, nil, self:GetScale())
 end
 

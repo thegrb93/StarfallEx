@@ -25,32 +25,10 @@ local cl_hologram_meta = {
 	__tostring = entmeta.__tostring,
 	__eq = entmeta.__eq,
 }
+SF.Cl_Hologram_Meta = cl_hologram_meta
 
 if SERVER then
 	registerprivilege("hologram.setMoveType", "Set MoveType", "Allows the user to set hologram's movetype", { entities = {} })
-
-else
-	registerprivilege("hologram.setParent", "Set Parent", "Allows the user to parent a hologram", { entities = {} })
-
-	local function parentChildren(ent)
-		for child, data in pairs(ent.sf_children) do
-			if child and child:IsValid() then
-				child:SetParent(ent, data[1])
-				child:SetPos(ent:LocalToWorld(data[2]))
-				child:SetAngles(ent:LocalToWorldAngles(data[3]))
-
-				if child.sf_children then
-					return parentChildren(child)
-				end
-			end
-		end
-	end
-
-	hook.Add("NotifyShouldTransmit", "starfall_hologram_parents", function(ent, transmit)
-		if ent and ent:IsValid() and ent.sf_children then
-			parentChildren(ent)
-		end
-	end)
 end
 
 
@@ -271,11 +249,17 @@ else
 	-- @param Vector vec New position
 	function hologram_methods:setPos(vec)
 		local holo = getholo(self)
-		local vec = vunwrap(vec)
-
+		local pos = SF.clampPos(vunwrap(vec))
 		checkpermission(instance, holo, "hologram.setRenderProperty")
 
-		holo:SetPos(SF.clampPos(vec))
+		holo:SetPos(pos)
+
+		if CLIENT then
+			local sf_parent = holo.sf_parent
+			if sf_parent and sf_parent.parent:IsValid() then
+				sf_parent:updateTransform()
+			end
+		end
 	end
 
 	--- Sets the hologram's angles.
@@ -283,11 +267,17 @@ else
 	-- @param Angle ang New angles
 	function hologram_methods:setAngles(ang)
 		local holo = getholo(self)
-		local ang = aunwrap(ang)
-
+		local angle = aunwrap(ang)
 		checkpermission(instance, holo, "hologram.setRenderProperty")
 
-		holo:SetAngles(ang)
+		holo:SetAngles(angle)
+		
+		if CLIENT then
+			local sf_parent = holo.sf_parent
+			if sf_parent and sf_parent.parent:IsValid() then
+				sf_parent:updateTransform()
+			end
+		end
 	end
 
 	--- Sets the texture filtering function when viewing a close texture
@@ -343,47 +333,6 @@ else
 			holo.HoloMatrix = nil
 			holo:DisableMatrix("RenderMultiply")
 		end
-	end
-
-	--- Parents a hologram
-	-- @param Entity? ent Entity parent (nil to unparent)
-	-- @param number? attachment Optional attachment ID
-	function hologram_methods:setParent(ent, attachment)
-
-		local holo = getholo(self)
-
-		checkpermission(instance, holo, "hologram.setParent")
-
-		if ent ~= nil then
-			local parent = getent(ent)
-
-			if attachment == nil then attachment = -1 end
-			checkluatype(attachment, TYPE_NUMBER)
-
-			if not parent.sf_children then
-				parent.sf_children = {}
-			end
-
-			if holo.sf_parent then
-				holo.sf_parent.sf_children[holo] = nil
-			end
-
-			parent.sf_children[holo] = {attachment, parent:WorldToLocal(holo:GetPos()), parent:WorldToLocalAngles(holo:GetAngles())}
-			holo.sf_parent = parent
-
-			holo:SetParent(parent, attachment)
-
-		else
-
-			if holo.sf_parent then
-				holo.sf_parent.sf_children[holo] = nil
-			end
-
-			holo.sf_parent = nil
-			holo:SetParent()
-
-		end
-
 	end
 
 	--- Manually draws a hologram, requires a 3d render context

@@ -2,6 +2,7 @@
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 
+registerprivilege("entities.setParent", "Parent", "Allows the user to parent an entity to another entity", { entities = {} })
 registerprivilege("entities.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { client = (CLIENT and {} or nil), entities = {} })
 registerprivilege("entities.setPlayerRenderProperty", "PlayerRenderProperty", "Allows the user to change the rendering of themselves", {})
 registerprivilege("entities.setPersistent", "SetPersistent", "Allows the user to change entity's persistent state", { entities = {} })
@@ -297,6 +298,50 @@ function ents_methods:getLinkedComponents()
 	end
 
 	return list
+end
+
+--- Parents or unparents an entity. Only holograms can be parented to players and, in clientside, only clientside holograms can be parented.
+-- @param Entity? parent Entity parent (nil to unparent)
+-- @param number|string? attachment Optional attachment name or ID
+-- @param number|string? bone Optional bone name or ID. Can't be used at the same time as attachment
+function ents_methods:setParent(parent, attachment, bone)
+	local child = getent(self)
+	if CLIENT and debug.getmetatable(child)~=SF.Cl_Hologram_Meta then SF.Throw("Can only setParent clientside holograms in the clientside!", 2) end
+	checkpermission(instance, child, "entities.setParent")
+	if attachment~=nil and bone~=nil then SF.Throw("Can't have both attachment and bone args set!", 2) end
+	if parent ~= nil then
+		parent = getent(parent)
+		if parent:IsPlayer() and not child.IsSFHologram then SF.Throw("Can only setParent holograms onto players!", 2) end
+		local param, type
+		if bone~=nil then
+			if isstring(bone) then
+				bone = parent:LookupBone(bone) or -1
+			elseif not isnumber(bone) then
+				SF.ThrowTypeError("string or number", SF.GetType(bone), 2)
+			end
+			if bone < 0 or bone > 255 then SF.Throw("Invalid bone provided", 2) end
+			type = "bone"
+			param = bone
+		elseif attachment~=nil then
+			if isstring(attachment) then
+				attachment = parent:LookupAttachment(attachment)
+			elseif not isnumber(attachment) then
+				SF.ThrowTypeError("string or number", SF.GetType(attachment), 2)
+			end
+			if attachment < 0 or attachment > 255 then SF.Throw("Invalid attachment provided", 2) end
+			type = "attachment"
+			param = attachment
+		else
+			type = "entity"
+		end
+
+		SF.Parent(parent, child, type, param)
+	else
+		local sf_parent = child.sf_parent
+		if sf_parent then
+			sf_parent:setParent()
+		end
+	end
 end
 
 --- Sets the color of the entity

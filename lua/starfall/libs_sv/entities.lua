@@ -6,8 +6,6 @@ local huge = math.huge
 local abs = math.abs
 
 -- Register privileges
-registerprivilege("entities.parent", "Parent", "Allows the user to parent an entity to another entity", { entities = {} })
-registerprivilege("entities.unparent", "Unparent", "Allows the user to remove the parent of an entity", { entities = {} })
 registerprivilege("entities.applyDamage", "Apply damage", "Allows the user to apply damage to an entity", { entities = {} })
 registerprivilege("entities.applyForce", "Apply force", "Allows the user to apply force to an entity", { entities = {} })
 registerprivilege("entities.setPos", "Set Position", "Allows the user to teleport an entity to another location", { entities = {} })
@@ -64,64 +62,6 @@ instance:AddHook("deinitialize", function()
 end)
 
 -- ------------------------- Methods ------------------------- --
-
-local function chainTooLong(parent, child)
-	local index = parent
-	local parentLength = 0
-	while index:IsValid() do
-		parentLength = parentLength + 1
-		index = index:GetParent()
-	end
-
-	local function getChildLength(curchild, count)
-		if count > 16 then return count end
-		local max = 0
-		for k, v in pairs(curchild:GetChildren()) do
-			max = math.max(max, getChildLength(v, count + 1))
-		end
-		return math.max(max, count)
-	end
-	local childLength = getChildLength(child, 1)
-
-	return parentLength + childLength > 16
-end
-
---- Parents the entity to another entity
--- @param Entity? parent Entity to parent to. nil to unparent
--- @param string? attachment Optional string attachment name to parent to
-function ents_methods:setParent(parent, attachment)
-	local ent = getent(self)
-	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
-	checkpermission(instance, ent, "entities.parent")
-
-	if parent ~= nil then
-		local parentent = getent(parent)
-		if parentent:IsPlayer() then
-			if ent:GetClass()~="starfall_hologram" then
-				SF.Throw("Insufficient permissions", 2)
-			end
-		else
-			checkpermission(instance, parentent, "entities.parent")
-		end
-
-		if chainTooLong(parentent, ent) then SF.Throw("Parenting chain of entities can't exceed 16 or crash may occur", 2) end
-		ent:SetParent(parentent)
-
-		if attachment~=nil then
-			checkluatype(attachment, TYPE_STRING)
-			ent:Fire("SetParentAttachmentMaintainOffset", attachment, 0.01)
-		end
-	else
-		ent:SetParent()
-	end
-end
-
---- Unparents the entity from another entity
-function ents_methods:unparent()
-	local ent = getent(self)
-	checkpermission(instance, ent, "entities.unparent")
-	ent:SetParent(nil)
-end
 
 --- Links starfall components to a starfall processor or vehicle. Screen can only connect to processor. HUD can connect to processor and vehicle.
 -- @param Entity? e Entity to link the component to, a vehicle or starfall for huds, or a starfall for screens. nil to clear links.
