@@ -1175,11 +1175,16 @@ function PANEL:DefaultFontSettings()
 	}
 end
 
-function PANEL:BuildFontString(tab, pretty, tips)
+function PANEL:BuildFontString(tab, pretty, tips, prependLocalVariable)
+	local prepend = ""
+	if prependLocalVariable then
+		prepend = string.format("local font%s%s = ", tab.font, tab.size)
+	end
+
 	if pretty then
 		-- pretty-print (maybe with tips)
 		return string.format(
-[=[render.createFont(
+[=[%srender.createFont(
     "%s",%s
     %s,%s
     %s,%s
@@ -1191,6 +1196,7 @@ function PANEL:BuildFontString(tab, pretty, tips)
     %s,%s
     %s%s
 )]=],
+	prepend,
 	tab.font, tips and " -- Font name" or "",
 	tab.size, tips and " -- Size" or "",
 	tab.weight, tips and " -- Weight (how bold)" or "",
@@ -1205,7 +1211,8 @@ function PANEL:BuildFontString(tab, pretty, tips)
 
 	else
 		-- one-liner
-		return string.format("render.createFont(\"%s\",%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+		return string.format("%srender.createFont(\"%s\",%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+			prepend,
 			tab.font,
 			tab.size,
 			tab.weight,
@@ -1282,13 +1289,13 @@ function PANEL:Init()
 	local btns = {
 		-- {"button text", onclick}
 		{"Copy One-Liner", function() 
-			SetClipboardText("local fontId = " .. self:BuildFontString(self.fontSettings)) 
+			SetClipboardText(self:BuildFontString(self.fontSettings,false,false,true)) 
 		end},
 		{"Copy Formatted",function()
-			SetClipboardText("local fontId = " .. self:BuildFontString(self.fontSettings,true))
+			SetClipboardText(self:BuildFontString(self.fontSettings,true,false,true))
 		end},
 		{"Copy Formatted w/ Tips",function() 
-			SetClipboardText("local fontId = " .. self:BuildFontString(self.fontSettings,true,true)) 
+			SetClipboardText(self:BuildFontString(self.fontSettings,true,true,true)) 
 		end}
 	}
 	local btnPanel = vgui.Create( "DPanel", self )
