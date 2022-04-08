@@ -1178,7 +1178,8 @@ end
 function PANEL:BuildFontString(tab, pretty, tips, prependLocalVariable)
 	local prepend = ""
 	if prependLocalVariable then
-		prepend = string.format("local font%s%s = ", tab.font, tab.size)
+		local fontName = string.gsub(tab.font,"[^a-zA-Z]","") -- remove all special characters
+		prepend = string.format("local font%s%s = ", fontName, tab.size)
 	end
 
 	if pretty then
@@ -1443,11 +1444,13 @@ function PANEL:Init()
 		inp.OnChange = function(this, newvalue)
 			local len = 1
 			if inptype == "n" then
-				len = 0.3
+				len = 0.8
 				newvalue = math.Round(newvalue)
 			elseif inptype == "b" then
-				len = 0.1
+				len = 0.5
 				newvalue = tobool(newvalue)
+			elseif inptype == "s" then
+				newvalue = newvalue ~= nil and newvalue or this:GetValue()
 			end
 
 			self.fontSettings[settingName] = newvalue
