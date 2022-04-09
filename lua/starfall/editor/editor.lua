@@ -70,33 +70,21 @@ if CLIENT then
 		['"'] = "",
 	}
 
-	function SF.Editor.init(callback)
+	function SF.Editor.init()
 		if SF.Editor.initialized or SF.Editor.editor then return end
 
-		if not SF.Docs then
-			if not SF.WaitingForDocs then
-				local docfile = file.Open("sf_docs.txt", "rb", "DATA")
-				if docfile then
-					SF.DocsData = docfile:Read(docfile:Size()) or ""
-					docfile:Close()
-				else
-					SF.DocsData = ""
-				end
-				SF.WaitingForDocs = {}
-				net.Start("starfall_docs")
-				net.WriteString(util.CRC(SF.DocsData))
-				net.SendToServer()
-				hook.Add("Think","SF_WaitingForDocs",function()
-					if SF.Docs then
-						SF.Editor.init()
-						for k, v in ipairs(SF.WaitingForDocs) do v() end
-						SF.WaitingForDocs = nil
-						hook.Remove("Think","SF_WaitingForDocs")
-					end
-				end)
+		if not SF.Docs and not SF.WaitingForDocs then
+			SF.WaitingForDocs = true
+			local docfile = file.Open("sf_docs.txt", "rb", "DATA")
+			if docfile then
+				SF.DocsData = docfile:Read(docfile:Size()) or ""
+				docfile:Close()
+			else
+				SF.DocsData = ""
 			end
-			SF.WaitingForDocs[#SF.WaitingForDocs+1] = callback
-			return
+			net.Start("starfall_docs")
+			net.WriteString(util.CRC(SF.DocsData))
+			net.SendToServer()
 		end
 
 		SF.Editor.createEditor()
@@ -107,18 +95,18 @@ if CLIENT then
 	end
 
 	function SF.Editor.open()
-		if not SF.Editor.initialized then SF.Editor.init(function() SF.Editor.open() end) return end
+		if not SF.Editor.initialized then SF.Editor.init() end
 		SF.Editor.editor:Open()
 		RunConsoleCommand("starfall_event", "editor_open")
 	end
 
 	function SF.Editor.openFile(fl, forceNewTab)
-		if not SF.Editor.initialized then SF.Editor.init(function() SF.Editor.openFile(fl, forceNewTab) end) return end
+		if not SF.Editor.initialized then SF.Editor.init() end
 		SF.Editor.editor:Open(fl, nil, forceNewTab)
 	end
 
 	function SF.Editor.openWithCode(name, code, forceNewTab, checkFileExists)
-		if not SF.Editor.initialized then SF.Editor.init(function() SF.Editor.openWithCode(name, code, forceNewTab, checkFileExists) end) return end
+		if not SF.Editor.initialized then SF.Editor.init() end
 		SF.Editor.editor:Open(name, code, forceNewTab, checkFileExists)
 	end
 
@@ -226,7 +214,7 @@ if CLIENT then
 	-- @return True if ok, false if a file was missing
 	-- @return A table with mainfile name and files
 	function SF.Editor.BuildIncludesTable(mainfile, success, err)
-		if not SF.Editor.initialized then SF.Editor.init(function() SF.Editor.BuildIncludesTable(mainfile, success, err) end) return end
+		if not SF.Editor.initialized then SF.Editor.init() end
 
 		local openfiles = SF.Editor.getOpenFiles()
 		if not (mainfile and (openfiles[mainfile] or file.Exists("starfall/" .. mainfile, "DATA"))) then
@@ -816,6 +804,11 @@ if CLIENT then
 		end
 		if ok then
 			SF.Docs = docs
+			-- reinitialize tabhandler to regenerate libmap
+			SF.Editor.TabHandlers.wire:Init()
+			-- clear cache to redraw text
+			SF.Editor.editor:OnThemeChange(SF.Editor.Themes.CurrentTheme)
+			SF.WaitingForDocs = nil
 		else
 			if docs then
 				ErrorNoHalt("There was an error decoding the docs. Rejoin to try again.\n" .. docs .. "\n")

@@ -107,9 +107,11 @@ end
 
 ---------------------
 local function createWireLibraryMap()
-	local libMap = {}
+	local libMap = TabHandler.LibMap or {}
 	libMap.Methods = {}
 	libMap.Environment = {}
+
+	if not SF.Docs then return libMap end
 
 	for typename, tbl in pairs(SF.Docs.Types) do
 		for methodname, val in pairs(tbl.methods) do
@@ -148,7 +150,7 @@ local function createWireLibraryMap()
 end
 
 function TabHandler:Init()
-	TabHandler.LibMap = createWireLibraryMap ()
+	TabHandler.LibMap = createWireLibraryMap()
 
 	TabHandler.Modes.Starfall = include("starfall/editor/syntaxmodes/starfall.lua")
 	colors = SF.Editor.Themes.CurrentTheme
