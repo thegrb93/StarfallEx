@@ -188,6 +188,19 @@ function physobj_methods:setMaterial(material)
 	end
 end
 
+--- Returns the surface area of the object in Hammer units squared.
+-- @return number? Surface area, or nil if a generated sphere or box
+function physobj_methods:getSurfaceArea()
+	return unwrap(self):GetSurfaceArea()
+end
+
+--- Returns whether the entity is able to move.
+-- Inverse of Entity:isFrozen
+-- @return boolean Whether the object is moveable
+function physobj_methods:isMoveable()
+	return unwrap(self):IsMoveable()
+end
+
 if SERVER then
 	--- Sets the position of the physics object. Will cause interpolation of the entity in clientside, use entity.setPos to avoid this.
 	-- @server
@@ -523,7 +536,14 @@ if SERVER then
 	function physobj_methods:getVolume()
 		return unwrap(self):GetVolume()
 	end
-
+	
+	--- Returns the stress of the entity.
+	-- @server
+	-- @return number External stress. Usually about the mass of the object if on the ground, usually 0 if in freefall.
+	-- @return number Internal stress. Usually about the mass of every object resting on top of it combined.
+	function physobj_methods:getStress()
+		return unwrap(self):GetStress()
+	end
 end
 
 end
