@@ -344,6 +344,10 @@ else
 		for k, v in ipairs(ents.FindByClass("starfall_processor")) do
 			if v.ActiveHuds[ply] then
 				SF.EnableHud(ply, v, nil, false)
+
+				if v.instance.permissionOverrides then
+					v.instance.permissionOverrides.enablehud = nil
+				end
 			end
 		end
 		ply:ChatPrint("Disconnected from all Starfall HUDs.")

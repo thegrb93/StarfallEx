@@ -8,6 +8,8 @@ local userdataLimit, printBurst
 if SERVER then
 	userdataLimit = CreateConVar("sf_userdata_max", "1048576", { FCVAR_ARCHIVE }, "The maximum size of userdata (in bytes) that can be stored on a Starfall chip (saved in duplications).")
 	printBurst = SF.BurstObject("print", "print", 3000, 10000, "The print burst regen rate in Bytes/sec.", "The print burst limit in Bytes")
+else
+	SF.Permissions.registerPrivilege("enablehud", "Allow enabling hud", "Allows the starfall to enable hud rendering", { client = { default = 1 } })
 end
 
 
@@ -25,6 +27,7 @@ SF.RegisterLibrary("debug")
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
+local haspermission = instance.player ~= SF.Superuser and SF.Permissions.hasAccess or function() return true end
 
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
@@ -305,7 +308,7 @@ end
 function builtins_library.hasPermission(perm, obj)
 	checkluatype(perm, TYPE_STRING)
 	if not SF.Permissions.permissionchecks[perm] then SF.Throw("Permission doesn't exist", 2) end
-	return SF.Permissions.hasAccess(instance, ounwrap(obj), perm)
+	return haspermission(instance, ounwrap(obj), perm)
 end
 
 if CLIENT then
@@ -1105,7 +1108,7 @@ function builtins_library.enableHud(ply, active)
 	ply = SERVER and getply(ply) or LocalPlayer()
 	checkluatype(active, TYPE_BOOL)
 
-	if ply==instance.player or (instance.player==SF.Superuser) or (not active and SF.IsHUDActive(instance.entity, ply)) then
+	if (SERVER and (ply==instance.player or instance.player==SF.Superuser)) or (CLIENT and haspermission(instance, nil, "enablehud")) or (not active and SF.IsHUDActive(instance.entity, ply)) then
 		SF.EnableHud(ply, instance.entity, nil, active)
 	else
 		local vehicle = ply:GetVehicle()
