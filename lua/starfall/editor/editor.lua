@@ -88,15 +88,24 @@ if CLIENT then
 				net.SendToServer()
 				hook.Add("Think","SF_WaitingForDocs",function()
 					if SF.Docs then
-						SF.Editor.init()
+						if not SF.Editor.init() then
+							-- reinitialize tabhandler to regenerate libmap
+							SF.Editor.TabHandlers.wire:Init()
+							-- clear cache to redraw text
+							SF.Editor.editor:OnThemeChange(SF.Editor.Themes.CurrentTheme)
+						end
 						for k, v in ipairs(SF.WaitingForDocs) do v() end
 						SF.WaitingForDocs = nil
 						hook.Remove("Think","SF_WaitingForDocs")
 					end
 				end)
 			end
-			SF.WaitingForDocs[#SF.WaitingForDocs+1] = callback
-			return
+
+			-- if a callback was specified, wait for docs to be loaded before proceeding
+			if callback then
+				SF.WaitingForDocs[#SF.WaitingForDocs+1] = callback
+				return
+			end
 		end
 
 		SF.Editor.createEditor()
@@ -104,21 +113,22 @@ if CLIENT then
 			SF.Editor.modelViewer = SF.Editor.createModelViewer()
 		end
 		SF.Editor.initialized = true
+		return true
 	end
 
 	function SF.Editor.open()
-		if not SF.Editor.initialized then SF.Editor.init(function() SF.Editor.open() end) return end
+		if not SF.Editor.initialized then SF.Editor.init() end
 		SF.Editor.editor:Open()
 		RunConsoleCommand("starfall_event", "editor_open")
 	end
 
 	function SF.Editor.openFile(fl, forceNewTab)
-		if not SF.Editor.initialized then SF.Editor.init(function() SF.Editor.openFile(fl, forceNewTab) end) return end
+		if not SF.Editor.initialized then SF.Editor.init() end
 		SF.Editor.editor:Open(fl, nil, forceNewTab)
 	end
 
 	function SF.Editor.openWithCode(name, code, forceNewTab, checkFileExists)
-		if not SF.Editor.initialized then SF.Editor.init(function() SF.Editor.openWithCode(name, code, forceNewTab, checkFileExists) end) return end
+		if not SF.Editor.initialized then SF.Editor.init() end
 		SF.Editor.editor:Open(name, code, forceNewTab, checkFileExists)
 	end
 

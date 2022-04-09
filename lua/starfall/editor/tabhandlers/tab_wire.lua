@@ -107,39 +107,41 @@ end
 
 ---------------------
 local function createWireLibraryMap()
-	local libMap = {}
+	local libMap = TabHandler.LibMap or {}
 	libMap.Methods = {}
 	libMap.Environment = {}
 
-	for typename, tbl in pairs(SF.Docs.Types) do
-		for methodname, val in pairs(tbl.methods) do
+	if SF.Docs then
+		for typename, tbl in pairs(SF.Docs.Types) do
+			for methodname, val in pairs(tbl.methods) do
+				libMap.Methods[methodname] = true
+			end
+		end
+		for methodname, val in pairs(SF.Docs.Libraries.string.methods) do
 			libMap.Methods[methodname] = true
 		end
-	end
-	for methodname, val in pairs(SF.Docs.Libraries.string.methods) do
-		libMap.Methods[methodname] = true
-	end
-	for libname, lib in pairs(SF.Docs.Libraries) do
-		local tbl
-		if libname == "builtins" then
-			tbl = libMap.Environment
-		else
-			tbl = {}
-			libMap[libname] = tbl
+		for libname, lib in pairs(SF.Docs.Libraries) do
+			local tbl
+			if libname == "builtins" then
+				tbl = libMap.Environment
+			else
+				tbl = {}
+				libMap[libname] = tbl
+			end
+			for name, val in pairs(lib.methods) do
+				tbl[name] = val.class
+			end
+			for name, val in pairs(lib.fields) do
+				tbl[name] = val.class
+			end
 		end
-		for name, val in pairs(lib.methods) do
-			tbl[name] = val.class
-		end
-		for name, val in pairs(lib.fields) do
-			tbl[name] = val.class
-		end
-	end
-	for name, val in pairs(SF.Docs.Libraries.builtins.tables) do
-		local tbl = {}
-		libMap[name] = tbl
-		if val.fields then
-			for _, fielddata in pairs(val.fields) do
-				tbl[fielddata.name] = "field"
+		for name, val in pairs(SF.Docs.Libraries.builtins.tables) do
+			local tbl = {}
+			libMap[name] = tbl
+			if val.fields then
+				for _, fielddata in pairs(val.fields) do
+					tbl[fielddata.name] = "field"
+				end
 			end
 		end
 	end
