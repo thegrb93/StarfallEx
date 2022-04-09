@@ -419,12 +419,26 @@ function ents_methods:setSubMaterial(index, material)
 	end
 end
 
+-- Invalid bodygroup IDs can cause crashes, so it's necessary to check that they are within range.
+local checkbodygroup
+do
+	local maxid = 2^31-1 -- Maximum signed 32-bit integer ("long") value
+	local minid = -maxid
+	function checkbodygroup(id)
+		if id < minid or id > maxid then
+			SF.Throw("invalid bodygroup id", 3)
+		end
+	end
+	SF.CheckBodygroup = checkbodygroup
+end
+
 --- Sets the bodygroup of the entity
 -- @shared
 -- @param number bodygroup The ID of the bodygroup you're setting.
 -- @param number value The value you're setting the bodygroup to.
 function ents_methods:setBodygroup(bodygroup, value)
 	checkluatype(bodygroup, TYPE_NUMBER)
+	checkbodygroup(bodygroup)
 	checkluatype(value, TYPE_NUMBER)
 
 	local ent = getent(self)
@@ -443,6 +457,7 @@ end
 -- @return number The bodygroup value
 function ents_methods:getBodygroup(id)
 	checkluatype(id, TYPE_NUMBER)
+	checkbodygroup(id)
 	return getent(self):GetBodygroup(id)
 end
 
@@ -468,6 +483,7 @@ end
 -- @return string The bodygroup name
 function ents_methods:getBodygroupName(id)
 	checkluatype(id, TYPE_NUMBER)
+	checkbodygroup(id)
 	return getent(self):GetBodygroupName(id)
 end
 
