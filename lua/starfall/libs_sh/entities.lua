@@ -1700,4 +1700,13 @@ function ents_methods:isDormant()
 	return getent(self):IsDormant()
 end
 
+--- Performs a Ray-Orientated Bounding Box intersection from the given position to the origin of the OBBox with the entity and returns the hit position on the OBBox.
+-- This relies on the entity having a collision mesh (not a physics object) and will be affected by SOLID_NONE
+-- @shared
+-- @param Vector The vector to start the intersection from.
+-- @return Vector The nearest hit point of the entity's bounding box in world coordinates, or Vector(0, 0, 0) for some entities such as worldspawn.
+function ents_methods:getNearestPoint(pos)
+	return vwrap(getent(self):NearestPoint(vunwrap(pos)))
+end
+
 end
