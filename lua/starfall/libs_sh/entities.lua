@@ -1658,4 +1658,11 @@ function ents_methods:getNWVarTable()
 	return instance.Sanitize(getent(self):GetNWVarTable())
 end
 
+--- Returns the distance between the center of the entity's bounding box and whichever corner of the bounding box is farthest away.
+-- @shared
+-- @return number The radius of the bounding box, or 0 for some entities such as worldspawn
+function ents_methods:getBoundingRadius()
+	return getent(self):BoundingRadius()
+end
+
 end
