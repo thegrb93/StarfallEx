@@ -1691,4 +1691,13 @@ function ents_methods:getBoundingRadius()
 	return getent(self):BoundingRadius()
 end
 
+--- Returns whether the entity is dormant or not, i.e. whether or not information about the entity is being sent to your client. Not to be confused with PhysObj:isAsleep
+-- Clientside, this will usually be true if the object is outside of your PVS (potentially visible set).
+-- Serverside, this will almost always be false.
+-- @shared
+-- @return boolean Whether entity is dormant or not.
+function ents_methods:isDormant()
+	return getent(self):IsDormant()
+end
+
 end
