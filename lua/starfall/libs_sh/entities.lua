@@ -423,7 +423,7 @@ end
 local checkbodygroup
 do
 	local maxid = 2^31-1 -- Maximum signed 32-bit integer ("long") value
-	local minid = -maxid
+	local minid = 0 -- One can go lower, but there's no point since the negative indexes are never used.
 	function checkbodygroup(id)
 		if id < minid or id > maxid then
 			SF.Throw("invalid bodygroup id", 3)
