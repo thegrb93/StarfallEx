@@ -1479,7 +1479,7 @@ function PANEL:_OnTextChanged()
 				if unIndentedLast and
 				   unIndentedLast[1] == self.Caret[1] and 
 				   unIndentedLast[2] == self.Caret[2] and 
-				   string.match(text,"[%s%(]") == nil then
+				   string.match(text,"[%s%(%)]") == nil then
 					-- re-indent if the user types something else after those four things, but not if that's a space character or a '(' character
 					self:SetSelection(text)
 					doIndent(false)
