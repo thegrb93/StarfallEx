@@ -1133,61 +1133,33 @@ vgui.Register( "StarfallColorPicker", PANEL, "StarfallFrame" )
 PANEL = {}
 
 local fontCache = {}
-function PANEL:getFont(tab)
-	local font = tab.font or "Arial"
-	local extended = tab.extended and 1 or 0
-	local size = tab.size or 13
-	local weight = tab.weight or 500
-	local blursize = tab.blursize or 0
-	local scanlines = tab.scanlines or 0
-	local antialias = (tab.antialias ~= false) and 1 or 0
-	local underline = tab.underline and 1 or 0
-	local italic = tab.italic and 1 or 0
-	local strikeout = tab.strikeout and 1 or 0
-	local symbol = tab.symbol and 1 or 0
-	local rotary = tab.rotary and 1 or 0
-	local shadow = tab.shadow and 1 or 0
-	local additive = tab.additive and 1 or 0
-	local outline = tab.outline and 1 or 0
-	local fontname = string.format("sf_%s_%f_%f_%f_%f_%f_%f_%f_%f_%f_%f_%f_%f_%f_%f", font, extended, size, weight, blursize, scanlines, antialias, underline, italic, strikeout, symbol, rotary, shadow, additive, outline)
-	if not fontCache[fontname] then
-		surface.CreateFont( fontname, tab )
-		fontCache[fontname] = true
+
+function PANEL:GetFont(tab)
+	local name = string.format("sf_fonteditor_%s_%d_%d_%d_%d%d%d%d%d",
+		tab.font or "Arial",
+		tonumber(tab.size),
+		tonumber(tab.weight),
+		tonumber(tab.blursize),
+		tab.antialias and 1 or 0,
+		tab.additive and 1 or 0,
+		tab.shadow and 1 or 0,
+		tab.outline and 1 or 0,
+		tab.extended and 1 or 0
+	)
+
+	if not fontCache[name] then
+		surface.CreateFont(name, tab)
+		fontCache[name] = true
 	end
-	return fontname
+
+	return name
 end
 
-function PANEL:Init()
-	local preview = vgui.Create( "DPanel", self )
-	preview:Dock(TOP)
-	preview:SetTall(100)
-	preview.Paint = function()
-		draw.SimpleText( "This is font preview", self.Font)
-	end
-	self.preview = preview
-
-	local form = vgui.Create("DForm", self)
-	form:Dock(FILL)
-	form.Header:SetVisible(false)
-	form.Paint = function () end
-	form.PerformLayout = function() end
-	local _old = form.AddItem
-	form.AddItem = function(form, left, right)
-		_old(form,left,right)
-		if left then
-			if left.SetDark then left:SetDark(false) end
-		end
-		if right then
-			if right.SetDark then right:SetDark(false) end
-		end
-
-		return left,right
-	end
-
-	self.FontData = {
+function PANEL:DefaultFontSettings()
+	return {
 		font = "Arial",
 		extended = false,
-		size = 13,
+		size = 16,
 		weight = 500,
 		blursize = 0,
 		scanlines = 0,
@@ -1201,56 +1173,308 @@ function PANEL:Init()
 		additive = false,
 		outline = false,
 	}
+end
 
-	local function setupItem(item, name)
-		item:SetValue(self.FontData[name])
-		item.OnChange = function(_, val)
-			if val ~= nil then
-				self.FontData[name] = val
-			else
-				self.FontData[name] = item:GetValue()
-			end
+function PANEL:BuildFontString(tab, pretty, tips, prependLocalVariable)
+	local prepend = ""
+	if prependLocalVariable then
+		local fontName = string.gsub(tab.font,"[^a-zA-Z]","") -- remove all special characters
+		prepend = string.format("local font%s%s = ", fontName, tab.size)
+	end
+
+	if pretty then
+		-- pretty-print (maybe with tips)
+		return string.format(
+[=[%srender.createFont(
+    "%s",%s
+    %s,%s
+    %s,%s
+    %s,%s
+    %s,%s
+    %s,%s
+    %s,%s
+    %s,%s
+    %s,%s
+    %s%s
+)]=],
+	prepend,
+	tab.font, tips and " -- Font name" or "",
+	tab.size, tips and " -- Size" or "",
+	tab.weight, tips and " -- Weight (how bold)" or "",
+	tab.antialias, tips and " -- Antialias" or "",
+	tab.additive, tips and " -- Additive" or "",
+	tab.shadow, tips and " -- Shadow" or "",
+	tab.outline, tips and " -- Outline" or "",
+	tab.blursize, tips and " -- Blur size" or "",
+	tab.extended, tips and " -- Extended (Allow more UTF8 chars)" or "",
+	tab.scanlines, tips and " -- Scanlines" or ""
+)
+
+	else
+		-- one-liner
+		return string.format("%srender.createFont(\"%s\",%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+			prepend,
+			tab.font,
+			tab.size,
+			tab.weight,
+			tostring(tab.antialias),
+			tostring(tab.additive),
+			tostring(tab.shadow),
+			tostring(tab.outline),
+			tab.blursize,
+			tostring(tab.extended),
+			tab.scanlines
+		)
+	end
+end
+
+function PANEL:ParseFontString(str)
+	local STRING = "%s*\"([a-zA-Z%s]-)\"%s*"
+	local NUMBER = "%s*(%d-)%s*"
+	local BOOLEAN = "%s*([tf][ra][ul][es]e?)%s*"
+
+	local str = string.gsub(str,"%-%-.-\n","") -- erase comments
+
+	local name, size, weight, antialias, 
+		  additive, shadow, outline, blursize, 
+		  extended, scanlines = string.match(str, 
+		  	string.format("render.createFont%%s*%%(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s%%)",
+		  		STRING, NUMBER, NUMBER, BOOLEAN, BOOLEAN, BOOLEAN, BOOLEAN, NUMBER, BOOLEAN, NUMBER
+		  	)
+		  )
+
+	if not name or not size or not weight or not antialias or not additive
+		or not shadow or not outline or not blursize
+		or not extended or not scanlines then
+			return
+	end
+
+	local tab = self:DefaultFontSettings()
+	tab.font = name or "Arial"
+	tab.size = tonumber(size) or 13
+	tab.weight = tonumber(weight) or 500
+	tab.blursize = tonumber(blursize) or 0
+	tab.scanlines = tonumber(scanlines) or 0
+	tab.antialias = antialias == "true"
+	tab.shadow = shadow == "true"
+	tab.additive = additive == "true"
+	tab.extended = extended == "true"
+	tab.outline = outline == "true"
+	return tab 
+end
+
+function PANEL:Init()
+	self.fontSettings = self:DefaultFontSettings()
+	self:SetSize(math.min(ScrW()*0.9,800),math.min(ScrH(),430))
+	self:Center()
+
+	local previewPanel = vgui.Create( "DPanel", self )
+	previewPanel:Dock(TOP)
+	previewPanel:SetTall(100)
+	previewPanel:SetBackgroundColor(Color(30,30,30,255))
+	--previewPanel.Paint = function() end
+	local preview = vgui.Create("DPanel", previewPanel)
+	preview:Dock(FILL)
+	function preview:Paint()
+		local w,h = self:GetSize()
+		draw.SimpleText(
+			"This is a preview of the font", 
+			self.font, w/2, h/2, 
+			Color(255,255,255,255), 
+			TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER
+		)
+	end
+	preview.font = self:GetFont(self.fontSettings)
+
+	------------------- copy buttons
+	local btns = {
+		-- {"button text", onclick}
+		{"Copy One-Liner", function() 
+			SetClipboardText(self:BuildFontString(self.fontSettings,false,false,true)) 
+		end},
+		{"Copy Formatted",function()
+			SetClipboardText(self:BuildFontString(self.fontSettings,true,false,true))
+		end},
+		{"Copy Formatted w/ Tips",function() 
+			SetClipboardText(self:BuildFontString(self.fontSettings,true,true,true)) 
+		end}
+	}
+	local btnPanel = vgui.Create( "DPanel", self )
+	btnPanel:Dock(BOTTOM)
+	btnPanel.Paint = function() end
+	for k, btninfo in pairs(btns) do
+		local btn = vgui.Create( "DButton", btnPanel )
+		btn:SetText(btninfo[1])
+		btn.DoClick = btninfo[2]
+		btns[k][3] = btn
+	end
+	local old = btnPanel.PerformLayout
+	function btnPanel:PerformLayout()
+		old(self)
+		local w,h = self:GetSize()
+		for k, btninfo in pairs(btns) do
+			btninfo[3]:SetWide(w/3,h)
+			btninfo[3]:SetPos((k-1)*(w/3),0)
 		end
 	end
 
-	setupItem(form:TextEntry("Font Name:"), "font")
-	setupItem(form:NumberWang("Size:", nil, 1, 100), "size")
-	setupItem(form:NumberWang("Weight:", nil, 0, 1000), "weight")
-	setupItem(form:NumberWang("Blur size:", nil, 0, 100, 2), "blursize")
-	setupItem(form:NumberWang("Scanlines:", nil, 0, 100, 2), "scanlines")
-	setupItem(form:CheckBox("Extended:"), "extended")
-	setupItem(form:CheckBox("antialias:"), "antialias")
-	setupItem(form:CheckBox("underline:"), "underline")
-	setupItem(form:CheckBox("italic:"), "italic")
-	setupItem(form:CheckBox("strikeout:"), "strikeout")
-	setupItem(form:CheckBox("symbol:"), "symbol")
-	setupItem(form:CheckBox("rotary:"), "rotary")
-	setupItem(form:CheckBox("shadow:"), "shadow")
-	setupItem(form:CheckBox("additive:"), "additive")
-	setupItem(form:CheckBox("outline:"), "outline")
-	form:Button("Preview").DoClick = function()
-		self.Font = self:getFont(self.FontData)
+	local LRPanel = vgui.Create( "DPanel", self )
+	LRPanel:Dock(FILL)
+	LRPanel.Paint = function() end
+
+	------------------- text box
+	local textbox = vgui.Create("DTextEntry", LRPanel)
+	textbox:Dock(LEFT)
+	textbox:SetWide(220)
+	textbox:SetMultiline(true)
+
+	local fName = GetConVar("sf_editor_wire_fontname"):GetString()
+	local fAA = GetConVar("sf_editor_wire_enable_antialiasing"):GetBool()
+	textbox:SetFont(SF.Editor.editor:GetFont(fName, 20, fAA))
+
+	textbox:SetValue(self:BuildFontString(self.fontSettings,true))
+
+	local function doUpdate()
+		preview.font = self:GetFont(self.fontSettings)
+		if self.fontSettings.shadow or self.fontSettings.outline then
+			previewPanel:SetBackgroundColor(Color(240,240,240,255))
+		else
+			previewPanel:SetBackgroundColor(Color(30,30,30,255))
+		end
 	end
-	form:Button("Copy Code").DoClick = function()
-		SetClipboardText("render.createFont("..table.concat({
-			"\""..self.FontData.font.."\"",
-			self.FontData.size,
-			self.FontData.weight,
-			tostring(self.FontData.antialias),
-			-- tostring(self.FontData.underline,
-			-- tostring(self.FontData.italic,
-			-- tostring(self.FontData.strikeout,
-			-- tostring(self.FontData.symbol,
-			-- tostring(self.FontData.rotary,
-			tostring(self.FontData.additive),
-			tostring(self.FontData.shadow),
-			tostring(self.FontData.outline),
-			tostring(self.FontData.blursize),
-			tostring(self.FontData.extended),
-			tostring(self.FontData.scanlines)},",")..")")
+	local function doUpdateText()
+		textbox:SetText(self:BuildFontString(self.fontSettings,true))
 	end
-	self:SetSize(300,600)
-	self:Center()
+	local function updatePreviewTextLater(len)
+		timer.Destroy("sf_font_editor_timer_preview")
+		timer.Destroy("sf_font_editor_timer_textbox")
+		timer.Create("sf_font_editor_timer_preview", len or 0.3, 1, doUpdate)
+		timer.Create("sf_font_editor_timer_textbox", 0.1, 1, doUpdateText)
+	end
+
+	------------------- error panel
+	local errorPanel = vgui.Create("DPanel", LRPanel)
+	errorPanel:Dock(FILL)
+	errorPanel:Hide()
+	errorPanel.Paint = function() end
+	errorPanel:DockPadding(4,2,4,2)
+	local lbl = vgui.Create("DLabel",errorPanel)
+	lbl:SetText( "Unable to parse string. Please input a valid string." )
+	lbl:Dock(TOP)
+	local resetBtn = vgui.Create("DButton", errorPanel)
+	resetBtn:SetText("Reset to default")
+	resetBtn:Dock(TOP)
+
+	------------------- controls panel
+	local controlsList = vgui.Create("DListLayout", LRPanel)
+	controlsList:Dock(FILL)
+	controlsList.Paint = function() end
+	controlsList:DockPadding(4,0,4,0)
+	local infolbl = vgui.Create("DLabel")
+	infolbl:SetText("You can paste a createFont line into the text box on the left to parse its settings")
+	controlsList:Add(infolbl)
+
+	resetBtn.DoClick = function()
+		self.fontSettings = self:DefaultFontSettings()
+		doUpdate()
+		doUpdateText()
+		controlsList:Show()
+		errorPanel:Hide()
+	end
+
+	local controls = {
+		-- {"setting name", "label", "setting type", optional callback for more settings}
+		{"font","Source Font","s"},
+		{"size","Size","n", function(this) this:SetDecimals(0) this:SetMinMax(4,255) end},
+		{"weight","Weight","n", function(this) this:SetDecimals(0) this:SetMinMax(100,1000) end},
+		{"antialias","Antialias","b"},
+		{"additive","Additive","b"},
+		{"shadow","Shadow","b"},
+		{"outline","Outline","b"},
+		{"blursize","Blursize","n", function(this) this:SetDecimals(0) this:SetMinMax(0,10) end},
+		{"extended","Extended","b"},
+		{"scanlines","Scanlines","n", function(this) this:SetDecimals(0) this:SetMinMax(0,10) end}
+	}
+
+	for k, controlinfo in pairs(controls) do
+		local settingName = controlinfo[1]
+		local label = controlinfo[2]
+		local inptype = controlinfo[3]
+		local callback = controlinfo[4]
+
+		local p = vgui.Create( "DPanel" )
+		p.Paint = function() end
+
+		local inp
+		if inptype == "s" then
+			local tempPanel = vgui.Create( "DPanel", p)
+			tempPanel:Dock(FILL)
+			tempPanel.Paint = function() end
+			local lbl = vgui.Create("DLabel", tempPanel)
+			lbl:SetText(label .. ":")
+			lbl:Dock(LEFT)
+			lbl:SizeToContents()
+			lbl:DockMargin(0,0,4,0)
+			inp = vgui.Create("DTextEntry", tempPanel)
+			inp:Dock(FILL)
+			inp:SetTall(18)
+			controlsList:Add(tempPanel)
+		elseif inptype == "n" then
+			inp = vgui.Create("DNumSlider", p)
+			inp:SetText(label .. ":")
+			inp:Dock(FILL)
+			inp:SetTall(18)
+			controlsList:Add(inp)
+		elseif inptype == "b" then
+			local tempPanel = vgui.Create( "DPanel", p)
+			tempPanel:Dock(FILL)
+			tempPanel.Paint = function() end
+			inp = vgui.Create("DCheckBoxLabel", tempPanel)
+			inp:SetText(label)
+			inp:SetTall(18)
+			controlsList:Add(tempPanel)
+		end
+
+		if callback then callback(inp) end
+
+		inp:SetValue(self.fontSettings[settingName])
+		if inp.SetDefaultValue then inp:SetDefaultValue(self.fontSettings[settingName]) end
+		controlinfo[5] = inp
+
+		inp.OnChange = function(this, newvalue)
+			local len = 1
+			if inptype == "n" then
+				len = 0.8
+				newvalue = math.Round(newvalue)
+			elseif inptype == "b" then
+				len = 0.5
+				newvalue = tobool(newvalue)
+			elseif inptype == "s" then
+				newvalue = newvalue ~= nil and newvalue or this:GetValue()
+			end
+
+			self.fontSettings[settingName] = newvalue
+
+			updatePreviewTextLater(len)
+		end
+		inp.OnValueChanged = inp.OnChange -- some use OnChange and others use OnValueChanged
+	end
+
+	textbox.OnChange = function(this,val)
+		local tab = self:ParseFontString(val or textbox:GetValue())
+		if tab then
+			controlsList:Show()
+			errorPanel:Hide()
+			for k,v in pairs(controls) do
+				self.fontSettings[v[1]] = tab[v[1]]
+				v[5]:SetValue(tab[v[1]])
+			end
+			updatePreviewTextLater()
+		else
+			errorPanel:Show()
+			controlsList:Hide()
+		end
+	end
 end
 
 vgui.Register( "StarfallFontPicker", PANEL, "StarfallFrame" )
