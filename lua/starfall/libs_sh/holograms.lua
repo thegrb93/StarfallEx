@@ -256,7 +256,7 @@ else
 
 		if CLIENT then
 			local sf_parent = holo.sf_parent
-			if sf_parent and sf_parent.parent:IsValid() then
+			if sf_parent and sf_parent.parent and sf_parent.parent:IsValid() then
 				sf_parent:updateTransform()
 			end
 		end
@@ -274,7 +274,7 @@ else
 		
 		if CLIENT then
 			local sf_parent = holo.sf_parent
-			if sf_parent and sf_parent.parent:IsValid() then
+			if sf_parent and sf_parent.parent and sf_parent.parent:IsValid() then
 				sf_parent:updateTransform()
 			end
 		end
