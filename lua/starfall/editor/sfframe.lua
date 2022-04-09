@@ -1724,12 +1724,15 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
 
 	--Add "Model Viewer" button
 	local ModelViewer = vgui.Create("StarfallButton", self.C.ButtonHolder)
-	-- ModelViewer:SetSize(85, 20)
 	ModelViewer:DockMargin(2, 0, 0, 0)
 	ModelViewer:Dock(RIGHT)
 	ModelViewer:SetText("Model Viewer")
 	ModelViewer.DoClick = function()
-		 hook.Run( 'StartSearch' ) -- https://github.com/Facepunch/garrysmod/blob/784cd57576d85712fa13a7cea3a9523b4df966b0/garrysmod/gamemodes/sandbox/gamemode/init.lua#L111
+		if SF.Editor.modelViewer:IsVisible() then
+			SF.Editor.modelViewer:Close()
+		else
+			SF.Editor.modelViewer:Open()
+		end
 	end
 	self.C.ModelViewer = ModelViewer
 
