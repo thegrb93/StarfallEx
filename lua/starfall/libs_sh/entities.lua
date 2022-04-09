@@ -487,6 +487,16 @@ function ents_methods:getBodygroupName(id)
 	return getent(self):GetBodygroupName(id)
 end
 
+--- Returns the number of possible values for this bodygroup.
+-- Note that bodygroups are 0-indexed, so this will not return the maximum allowed value.
+-- @param number id The ID of the bodygroup to get the count for.
+-- @return number Number of values of specified bodygroup, or 0 if there are none.
+function ents_methods:getBodygroupCount(id)
+	checkluatype(id, TYPE_NUMBER)
+	checkbodygroup(id)
+	return getent(self):GetBodygroupCount(id)
+end
+
 --- Sets the skin of the entity
 -- @shared
 -- @param number skinIndex Index of the skin to use.
