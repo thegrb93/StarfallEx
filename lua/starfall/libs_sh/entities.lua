@@ -419,12 +419,26 @@ function ents_methods:setSubMaterial(index, material)
 	end
 end
 
+-- Invalid bodygroup IDs can cause crashes, so it's necessary to check that they are within range.
+local checkbodygroup
+do
+	local maxid = 2^31-1 -- Maximum signed 32-bit integer ("long") value
+	local minid = 0 -- One can go lower, but there's no point since the negative indexes are never used.
+	function checkbodygroup(id)
+		if id < minid or id > maxid then
+			SF.Throw("invalid bodygroup id", 3)
+		end
+	end
+	SF.CheckBodygroup = checkbodygroup
+end
+
 --- Sets the bodygroup of the entity
 -- @shared
 -- @param number bodygroup The ID of the bodygroup you're setting.
 -- @param number value The value you're setting the bodygroup to.
 function ents_methods:setBodygroup(bodygroup, value)
 	checkluatype(bodygroup, TYPE_NUMBER)
+	checkbodygroup(bodygroup)
 	checkluatype(value, TYPE_NUMBER)
 
 	local ent = getent(self)
@@ -443,6 +457,7 @@ end
 -- @return number The bodygroup value
 function ents_methods:getBodygroup(id)
 	checkluatype(id, TYPE_NUMBER)
+	checkbodygroup(id)
 	return getent(self):GetBodygroup(id)
 end
 
@@ -468,7 +483,18 @@ end
 -- @return string The bodygroup name
 function ents_methods:getBodygroupName(id)
 	checkluatype(id, TYPE_NUMBER)
+	checkbodygroup(id)
 	return getent(self):GetBodygroupName(id)
+end
+
+--- Returns the number of possible values for this bodygroup.
+-- Note that bodygroups are 0-indexed, so this will not return the maximum allowed value.
+-- @param number id The ID of the bodygroup to get the count for.
+-- @return number Number of values of specified bodygroup, or 0 if there are none.
+function ents_methods:getBodygroupCount(id)
+	checkluatype(id, TYPE_NUMBER)
+	checkbodygroup(id)
+	return getent(self):GetBodygroupCount(id)
 end
 
 --- Sets the skin of the entity
@@ -1656,6 +1682,31 @@ end
 -- @return table The table of networked objects
 function ents_methods:getNWVarTable()
 	return instance.Sanitize(getent(self):GetNWVarTable())
+end
+
+--- Returns the distance between the center of the entity's bounding box and whichever corner of the bounding box is farthest away.
+-- @shared
+-- @return number The radius of the bounding box, or 0 for some entities such as worldspawn
+function ents_methods:getBoundingRadius()
+	return getent(self):BoundingRadius()
+end
+
+--- Returns whether the entity is dormant or not, i.e. whether or not information about the entity is being sent to your client. Not to be confused with PhysObj:isAsleep
+-- Clientside, this will usually be true if the object is outside of your PVS (potentially visible set).
+-- Serverside, this will almost always be false.
+-- @shared
+-- @return boolean Whether entity is dormant or not.
+function ents_methods:isDormant()
+	return getent(self):IsDormant()
+end
+
+--- Performs a Ray-Orientated Bounding Box intersection from the given position to the origin of the OBBox with the entity and returns the hit position on the OBBox.
+-- This relies on the entity having a collision mesh (not a physics object) and will be affected by SOLID_NONE
+-- @shared
+-- @param Vector The vector to start the intersection from.
+-- @return Vector The nearest hit point of the entity's bounding box in world coordinates, or Vector(0, 0, 0) for some entities such as worldspawn.
+function ents_methods:getNearestPoint(pos)
+	return vwrap(getent(self):NearestPoint(vunwrap(pos)))
 end
 
 end
