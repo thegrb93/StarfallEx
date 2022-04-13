@@ -379,7 +379,7 @@ end
 -- @return number The random float value
 function math_library.sharedRandom(uniqueName, Min, Max, additionalSeed)
 	checkluatype(uniqueName, TYPE_STRING)
-	checkluatype(additionalSeed, TYPE_NUMBER)
+	if additionalSeed~=nil then checkluatype(additionalSeed, TYPE_NUMBER) end
 	return util.SharedRandom(uniqueName, Min, Max, additionalSeed)
 end
 
