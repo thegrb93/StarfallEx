@@ -1266,6 +1266,7 @@ function render_library.drawTexturedRectUV(x, y, w, h, startU, startV, endU, end
 
 	makeQuad(x, y, w, h)
 	mesh.Begin(MATERIAL_QUADS, 1)
+	local success, err = pcall(function()
 		mesh.Position( quad_v1 )
 		mesh.Color( r,g,b,a )
 		mesh.TexCoord( 0, startU, startV )
@@ -1282,7 +1283,11 @@ function render_library.drawTexturedRectUV(x, y, w, h, startU, startV, endU, end
 		mesh.Color( r,g,b,a )
 		mesh.TexCoord( 0, startU, endV )
 		mesh.AdvanceVertex()
+	end)
 	mesh.End()
+	if not success then
+		error(err, 2)
+	end
 end
 
 --- Draws a rotated, textured rectangle.
