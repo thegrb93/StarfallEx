@@ -1262,11 +1262,10 @@ function render_library.drawTexturedRectUV(x, y, w, h, startU, startV, endU, end
 	checkluatype (endU, TYPE_NUMBER)
 	checkluatype (endV, TYPE_NUMBER)
 
-	local r,g,b,a = currentcolor.r, currentcolor.g, currentcolor.b, currentcolor.a
-
 	makeQuad(x, y, w, h)
 	mesh.Begin(MATERIAL_QUADS, 1)
-	local success, err = pcall(function()
+	local success, err = pcall(function(startU, startV, endU, endV)
+		local r,g,b,a = currentcolor.r, currentcolor.g, currentcolor.b, currentcolor.a
 		mesh.Position( quad_v1 )
 		mesh.Color( r,g,b,a )
 		mesh.TexCoord( 0, startU, startV )
@@ -1283,7 +1282,7 @@ function render_library.drawTexturedRectUV(x, y, w, h, startU, startV, endU, end
 		mesh.Color( r,g,b,a )
 		mesh.TexCoord( 0, startU, endV )
 		mesh.AdvanceVertex()
-	end)
+	end, startU, startV, endU, endV)
 	mesh.End()
 	if not success then
 		error(err, 2)
