@@ -708,7 +708,7 @@ end
 function builtins_library.require(path)
 	checkluatype(path, TYPE_STRING)
 
-	local curdir = string.match(debug.getinfo(2, "S").short_src, "SF:(.*[/\\])") or ""
+	local curdir = string.match(debug.getinfo(2, "S").short_src, "^SF:(.*[/\\])") or ""
 	path = SF.ChoosePath(path, curdir, function(testpath)
 		return instance.scripts[testpath]
 	end) or path
@@ -725,8 +725,9 @@ function builtins_library.requiredir(path, loadpriority)
 	checkluatype(path, TYPE_STRING)
 	if loadpriority~=nil then checkluatype(loadpriority, TYPE_TABLE) end
 
-	local curdir = string.match(debug.getinfo(2, "S").short_src, "SF:(.*[/\\])") or ""
+	local curdir = string.match(debug.getinfo(2, "S").short_src, "^SF:(.*[/\\])") or ""
 	path = SF.ChoosePath(path, curdir, function(testpath)
+		testpath = string.PatternSafe(testpath)
 		for file in pairs(instance.scripts) do
 			if string.match(file, "^"..testpath.."/[^/]+%.txt$") or string.match(file, "^"..testpath.."/[^/]+%.lua$") then
 				return true
@@ -748,6 +749,7 @@ function builtins_library.requiredir(path, loadpriority)
 		end
 	end
 
+	path = string.PatternSafe(path)
 	for file in pairs(instance.scripts) do
 		if not alreadyRequired[file] and (string.match(file, "^"..path.."/[^/]+%.txt$") or string.match(file, "^"..path.."/[^/]+%.lua$")) then
 			returns[file] = instance:require(file)
@@ -763,7 +765,7 @@ end
 -- @return ... Return value(s) of the script
 function builtins_library.dofile(path)
 	checkluatype(path, TYPE_STRING)
-	local curdir = string.match(debug.getinfo(2, "S").short_src, "SF:(.*[/\\])") or ""
+	local curdir = string.match(debug.getinfo(2, "S").short_src, "^SF:(.*[/\\])") or ""
 	path = SF.ChoosePath(path, curdir, function(testpath)
 		return instance.scripts[testpath]
 	end) or path
@@ -778,8 +780,9 @@ function builtins_library.dodir(path, loadpriority)
 	checkluatype(path, TYPE_STRING)
 	if loadpriority ~= nil then checkluatype(loadpriority, TYPE_TABLE) end
 
-	local curdir = string.match(debug.getinfo(2, "S").short_src, "SF:(.*[/\\])") or ""
+	local curdir = string.match(debug.getinfo(2, "S").short_src, "^SF:(.*[/\\])") or ""
 	path = SF.ChoosePath(path, curdir, function(testpath)
+		testpath = string.PatternSafe(testpath)
 		for file in pairs(instance.scripts) do
 			if string.match(file, "^"..testpath.."/[^/]+%.txt$") or string.match(file, "^"..testpath.."/[^/]+%.lua$") then
 				return true
@@ -801,6 +804,7 @@ function builtins_library.dodir(path, loadpriority)
 		end
 	end
 
+	path = string.PatternSafe(path)
 	for file in pairs(instance.scripts) do
 		if not alreadyRequired[file] and (string.match(file, "^"..path.."/[^/]+%.txt$") or string.match(file, "^"..path.."/[^/]+%.lua$")) then
 			returns[file] = instance.scripts[file]()
