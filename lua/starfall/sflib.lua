@@ -1647,8 +1647,9 @@ do
 
 	local function checkregex(data, pattern)
 		local limits = {[0] = 50000000, 15000, 500, 150, 70, 40} -- Worst case is about 200ms
+		local stripped, nrepl, nrepl2
 		-- strip escaped things
-		local stripped, nrepl = string.gsub(pattern, "%%.", "")
+		stripped, nrepl = string.gsub(pattern, "%%.", "")
 		-- strip bracketed things
 		stripped, nrepl2 = string.gsub(stripped, "%[.-%]", "")
 		-- strip captures
