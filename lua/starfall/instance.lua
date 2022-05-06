@@ -411,7 +411,7 @@ function SF.Instance:BuildEnvironment()
 	
 	for name, meta in pairs(self.Types) do
 		if meta.supertype then
-			local supermeta = self.Types[meta.supertype]
+			local supermeta = self.Types[meta.supertype] or error("Failed to find supertype, "..tostring(meta.supertype))
 			meta.supertype = supermeta
 			setmetatable(meta.Methods, {__index = supermeta.Methods})
 		else
