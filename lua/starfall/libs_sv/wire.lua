@@ -310,8 +310,8 @@ local outputConverters =
 	ARRAY = function(data)
 		local ret = {}
 		for i, v in ipairs(data) do
-			local typ = typeToE2Type[TypeID(obj)]
-			ret[i] = typ and (typ(obj)) or SF.Throw("Invalid type in array at index: " .. i, 3)
+			local typ = typeToE2Type[TypeID(v)]
+			ret[i] = typ and (typ(v)) or SF.Throw("Invalid type in array at index: " .. i, 3)
 		end
 		return ret
 	end
