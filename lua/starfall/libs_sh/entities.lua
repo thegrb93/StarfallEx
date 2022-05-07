@@ -345,6 +345,8 @@ function ents_methods:setParent(parent, attachment, bone)
 		end
 	end
 end
+-- Backward compatability
+ents_methods.unparent = ents_methods.setParent
 
 --- Sets the color of the entity
 -- @shared
