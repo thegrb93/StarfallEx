@@ -214,7 +214,7 @@ function SF.Instance:CreateWrapper(metatable, typedata)
 		if typedata.customwrappers then
 			wrap, unwrap = typedata.customwrappers(self.CheckType, metatable)
 		else
-			return
+			return true
 		end
 	else
 
@@ -226,6 +226,8 @@ function SF.Instance:CreateWrapper(metatable, typedata)
 		if metatable.supertype then
 			local supersensitive2sf = metatable.supertype.sensitive2sf
 			local supersf2sensitive = metatable.supertype.sf2sensitive
+
+			if not supersensitive2sf then return false end --Need to try again since baseclass hasn't been created yet
 
 			function wrap(value)
 				if value == nil then return nil end
@@ -260,6 +262,7 @@ function SF.Instance:CreateWrapper(metatable, typedata)
 
 	metatable.Wrap = wrap
 	metatable.Unwrap = unwrap
+	return true
 end
 
 --- Builds an environment table
@@ -408,23 +411,31 @@ function SF.Instance:BuildEnvironment()
 		local metatable = {__metatable = name, __index = methods, supertype = typedata.supertype, Methods = methods}
 		self.Types[name] = metatable
 	end
-	
+
 	for name, meta in pairs(self.Types) do
 		if meta.supertype then
 			local supermeta = self.Types[meta.supertype] or error("Failed to find supertype, "..tostring(meta.supertype))
 			meta.supertype = supermeta
 			setmetatable(meta.Methods, {__index = supermeta.Methods})
-		else
-			self:CreateWrapper(meta, SF.Types[name])
 		end
 	end
-	
-	for name, meta in pairs(self.Types) do
-		if meta.supertype then
-			self:CreateWrapper(meta, SF.Types[name])
+
+	local typesToCreate = self.Types
+	while true do
+		local numCreated = 0
+		local newTypesToCreate = {}
+		for name, meta in pairs(typesToCreate) do
+			if self:CreateWrapper(meta, SF.Types[name]) then
+				numCreated = numCreated + 1
+			else
+				newTypesToCreate[name] = meta
+			end
 		end
+		if next(newTypesToCreate)==nil then break end
+		if numCreated==0 then error("Failed to create types due to missing subclass: " .. next(newTypesToCreate)) end
+		typesToCreate = newTypesToCreate
 	end
-	
+
 	for name, mod in pairs(SF.Modules) do
 		for filename, data in pairs(mod) do
 			if data.init then
