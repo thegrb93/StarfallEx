@@ -340,6 +340,8 @@ function ents_methods:setParent(parent, attachment, bone)
 		local sf_parent = child.sf_parent
 		if sf_parent then
 			sf_parent:setParent()
+		else
+			child:SetParent()
 		end
 	end
 end
