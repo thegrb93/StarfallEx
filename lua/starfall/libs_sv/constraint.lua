@@ -307,8 +307,9 @@ end
 -- @param number? width Width of the rope. Default 0
 -- @param string? materialName Material of the rope
 -- @param boolean? rigid Whether the rope is rigid. Default false
+-- @param Color? color The color of the rope. Default white
 -- @server
-function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, addlength, force_lim, width, material, rigid)
+function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, addlength, force_lim, width, material, rigid, color)
 	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
@@ -327,6 +328,7 @@ function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, ad
 	force_lim = force_lim or 0
 	width = width or 0
 	rigid = rigid and true or false
+	if color~=nil then color = instance.Types.Color.Unwrap(color) end
 
 	checkluatype(bone1, TYPE_NUMBER)
 	checkluatype(bone2, TYPE_NUMBER)
@@ -338,7 +340,7 @@ function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, ad
 	e1.Ropes = e1.Ropes or {}
 	e2.Ropes = e2.Ropes or {}
 
-	local ent = constraint.Rope(ent1, ent2, bone1, bone2, vec1, vec2, length, addlength, force_lim, math.Clamp(width, 0, 50), material, rigid)
+	local ent = constraint.Rope(ent1, ent2, bone1, bone2, vec1, vec2, length, addlength, force_lim, math.Clamp(width, 0, 50), material, rigid, color)
 	if ent then
 		register(ent, instance)
 
