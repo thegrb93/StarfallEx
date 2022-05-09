@@ -328,7 +328,7 @@ function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, ad
 	force_lim = force_lim or 0
 	width = width or 0
 	rigid = rigid and true or false
-	color = color or color_white
+	if color~=nil then color = instance.Types.Color.Unwrap(color) end
 
 	checkluatype(bone1, TYPE_NUMBER)
 	checkluatype(bone2, TYPE_NUMBER)
