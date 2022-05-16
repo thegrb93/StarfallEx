@@ -1,6 +1,12 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 
+local function checknumber(n)
+	if n<-1e12 or n>1e12 or n~=n then
+		SF.Throw("Input number too large or NAN", 3)
+	end
+end
+
 local function checkvector(v)
 	if v[1]<-1e12 or v[1]>1e12 or v[1]~=v[1] or
 	   v[2]<-1e12 or v[2]>1e12 or v[2]~=v[2] or
@@ -473,6 +479,8 @@ if SERVER then
 	function physobj_methods:setDamping(linear, angular)
 		checkluatype(linear, TYPE_NUMBER)
 		checkluatype(angular, TYPE_NUMBER)
+		checknumber(linear)
+		checknumber(angular)
 		local phys = unwrap(self)
 		checkpermission(instance, phys:GetEntity(), "entities.setDamping")
 		phys:SetDamping(linear, angular)
