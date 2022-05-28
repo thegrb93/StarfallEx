@@ -34,36 +34,31 @@ end
 
 function WebSocket.new(addr, port, secure)
 	return setmetatable({
-		callback = {},
 		address = (secure and "wss" or "ws") .. "://" .. addr .. ":" .. (port or "443"),
 	}, WebSocket)
 end
 
 function WebSocket:connect()
-	local panel = vgui.Create("DFrame", nil, nil)
-	panel:SetSize(0, 0)
-	panel:SetTitle("")
-	panel:SetDeleteOnClose(true)
-	panel.Paint = function() end
-
 	local html = vgui.Create("DHTML", p, nil)
 	html:AddFunction("sf", "on_message", hook_call(self, "Message"))
 	html:AddFunction("sf", "on_open", hook_call(self, "Connected"))
 	html:AddFunction("sf", "on_close", hook_call(self, "Disconnected"))
 	html:AddFunction("sf", "on_status", hook_call(self, "Status"))
-	html:SetAllowLua(false)
 	html:SetHTML(make_html(self.address))
 
 	self.html = html
-	self.panel = panel
 end
 
 function WebSocket:close()
 	local html = assert( self.html, "WebSocket not connected" )
-	html:RunJavascript("sf_websocket.close()")
+	html:RunJavascript("sf_websocket.close();")
+	self.html:Remove()
 
-	self.panel:Clear()
-	self.panel:Remove()
+	-- Calling this manually so we wouldn't need to make a timer to wait for the callback to run on the JS side.
+	-- Also removing the panel halts all js immediately
+	if self["onDisconnected"] then
+		self["onDisconnected"](self)
+	end
 end
 
 function WebSocket:write(msg)
@@ -99,8 +94,8 @@ local websocket_list = {}
 --- Creates a new websocket object.
 -- @name builtins_library.WebSocket
 -- @param string addr Address of the websocket server.
--- @param number? port Port of the websocket server.
--- @param boolean? secure Whether to use secure connection (wss).
+-- @param number? port Port of the websocket server. (Default 443)
+-- @param boolean? secure Whether to use secure connection (wss). (Default false)
 -- @return WebSocket The websocket object. Use WebSocket:connect() to connect.
 function instance.env.WebSocket(addr, port, secure)
 	checkluatype(addr, TYPE_STRING)
