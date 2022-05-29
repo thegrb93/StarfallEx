@@ -24,45 +24,58 @@ local function make_html(address)
 	]]
 end
 
-local function hook_call(self, event)
-	return function(arg)
-		if self["on" .. event] then
-			self["on" .. event](self, arg)
-		end
-	end
-end
+local READYSTATE = {
+	CONNECTING = 0,
+	OPEN = 1,
+	CLOSING = 2,
+	CLOSED = 3
+}
 
 function WebSocket.new(addr, port, secure)
 	return setmetatable({
 		address = (secure and "wss" or "ws") .. "://" .. addr .. ":" .. (port or "443"),
+		state = READYSTATE.CONNECTING
 	}, WebSocket)
 end
 
 function WebSocket:connect()
 	local html = vgui.Create("DHTML", p, nil)
-	html:AddFunction("sf", "on_message", hook_call(self, "Message"))
-	html:AddFunction("sf", "on_open", hook_call(self, "Connected"))
-	html:AddFunction("sf", "on_close", hook_call(self, "Disconnected"))
-	html:AddFunction("sf", "on_status", hook_call(self, "Status"))
+	html:AddFunction("sf", "on_message", function(msg)
+		if self["onMessage"] then self["onMessage"](self, msg) end
+	end)
+
+	html:AddFunction("sf", "on_open", function()
+		self.state = READYSTATE.OPEN
+		if self["onConnected"] then self["onConnected"](self) end
+	end)
+
+	html:AddFunction("sf", "on_close", function(errored)
+		self.state = READYSTATE.CLOSED
+		if self["onDisconnected"] then self["onDisconnected"](self, errored) end
+	end)
+
 	html:SetHTML(make_html(self.address))
 
 	self.html = html
 end
 
 function WebSocket:close()
-	local html = assert( self.html, "WebSocket not connected" )
+	local html = assert( self.state <= READYSTATE.OPEN and self.html, "WebSocket not connected" )
+
+	self.state = READYSTATE.CLOSING
+
 	html:RunJavascript("sf_websocket.close();")
 	self.html:Remove()
 
 	-- Calling this manually so we wouldn't need to make a timer to wait for the callback to run on the JS side.
 	-- Also removing the panel halts all js immediately
 	if self["onDisconnected"] then
-		self["onDisconnected"](self)
+		self["onDisconnected"](self, false)
 	end
 end
 
 function WebSocket:write(msg)
-	local html = assert( self.html, "WebSocket not connected" )
+	local html = assert( self.state == READYSTATE.OPEN and self.html, "WebSocket not connected" )
 	html:RunJavascript([[
 		if (sf_websocket.readyState == 1) {
 			sf_websocket.send("]] .. string.JavascriptSafe(msg) .. [[");
@@ -123,22 +136,45 @@ function websocket_methods:connect()
 	unwrap(self):connect()
 end
 
+--- Returns the current state of the websocket.
+-- https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/readyState
+-- * 0 - CONNECTING
+-- * 1 - OPEN
+-- * 2 - CLOSING
+-- * 3 - CLOSED
+-- @return number The current state of the websocket.
+function websocket_methods:getState()
+	return unwrap(self).state
+end
+
 local Callbacks = {
 	["onMessage"] = true,
 	["onConnected"] = true,
 	["onDisconnected"] = true
 }
 
+--- Sets a callback for the websocket.
+-- Can be used with the following callbacks:
+-- * onMessage - Called when a message is received.
+-- * onConnected - Called when the websocket initially connects.
+-- * onDisconnected - Called when the websocket is disconnected, with the only param being if it was caused by an 'error' event.
+-- @param k string onMessage, onConnected, onDisconnected
+-- @param v function
 function websocket_meta:__newindex(k, v)
 	local cb = Callbacks[k]
 	if cb and type(v) == "function" or v == nil then
-		unwrap(self)[k] = v
+		unwrap(self)[k] = function(_, arg) v(self, arg) end
 	end
+end
+
+--- Returns "WebSocket: " alongside the address of the websocket.
+function websocket_meta:__tostring()
+	return "WebSocket: " .. unwrap(self).address
 end
 
 instance:AddHook("deinitialize", function()
 	for socket in pairs(websocket_list) do
-		if socket.html then
+		if socket.state <= READYSTATE.OPEN and socket.html then
 			socket:close()
 		end
 	end
