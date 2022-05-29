@@ -39,6 +39,8 @@ function WebSocket.new(addr, port, secure)
 end
 
 function WebSocket:connect()
+	assert( self.state == READYSTATE.CONNECTING and self.html == nil, "WebSocket is already connected" )
+
 	local html = vgui.Create("DHTML", p, nil)
 	html:AddFunction("sf", "on_message", function(msg)
 		if self["onMessage"] then self["onMessage"](self, msg) end
@@ -164,9 +166,9 @@ function websocket_meta:__newindex(k, v)
 	local cb = Callbacks[k]
 	if cb then
 		if type(v) == "function" then
-			unwrap(self)[k] = function(_, arg) v(self, arg) end
+			rawset( unwrap(self), k, function(_, arg) v(self, arg) end )
 		elseif v == nil then
-			unwrap(self)[k] = nil
+			rawset( unwrap(self), k, nil )
 		end
 	end
 end
