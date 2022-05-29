@@ -162,8 +162,12 @@ local Callbacks = {
 -- @param v function
 function websocket_meta:__newindex(k, v)
 	local cb = Callbacks[k]
-	if cb and type(v) == "function" or v == nil then
-		unwrap(self)[k] = function(_, arg) v(self, arg) end
+	if cb then
+		if type(v) == "function" then
+			unwrap(self)[k] = function(_, arg) v(self, arg) end
+		elseif v == nil then
+			unwrap(self)[k] = nil
+		end
 	end
 end
 
