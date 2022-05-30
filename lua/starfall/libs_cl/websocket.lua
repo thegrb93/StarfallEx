@@ -163,13 +163,14 @@ local Callbacks = {
 -- @param k string onMessage, onConnected, onDisconnected
 -- @param v function
 function websocket_meta:__newindex(k, v)
-	local cb = Callbacks[k]
-	if cb then
+	if Callbacks[k] then
 		if type(v) == "function" then
 			rawset( unwrap(self), k, function(_, arg) v(self, arg) end )
 		elseif v == nil then
 			rawset( unwrap(self), k, nil )
 		end
+	else
+		rawset(self, k, v)
 	end
 end
 
