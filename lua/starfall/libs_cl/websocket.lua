@@ -149,12 +149,6 @@ function websocket_methods:getState()
 	return unwrap(self).state
 end
 
-local Callbacks = {
-	["onMessage"] = true,
-	["onConnected"] = true,
-	["onDisconnected"] = true
-}
-
 --- Sets a callback for the websocket.
 -- Can be used with the following callbacks:
 -- * onMessage - Called when a message is received.
@@ -163,11 +157,13 @@ local Callbacks = {
 -- @param k string onMessage, onConnected, onDisconnected
 -- @param v function
 function websocket_meta:__newindex(k, v)
-	if Callbacks[k] then
+	if k=="onMessage" or k=="onConnected" or k=="onDisconnected" then
 		if type(v) == "function" then
-			rawset( unwrap(self), k, function(_, arg) v(self, arg) end )
+			unwrap(self)[k] = function(_, arg) v(self, arg) end
 		elseif v == nil then
-			rawset( unwrap(self), k, nil )
+			unwrap(self)[k] = nil
+		else
+			SF.ThrowTypeError("function", SF.GetType(v), 2)
 		end
 	else
 		rawset(self, k, v)
