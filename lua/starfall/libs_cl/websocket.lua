@@ -5,10 +5,9 @@
 local WebSocket = {}
 WebSocket.__index = WebSocket
 
-local function make_html(address)
+local function make_js(address)
 	address = string.JavascriptSafe(address)
 	return [[
-	<script>
 		var sf_websocket = new WebSocket("]] .. address .. [[");
 
 		sf_websocket.onmessage = function(event) { sf.on_message(event.data);             };
@@ -20,7 +19,6 @@ local function make_html(address)
 		sf.send = function(data) { sf_websocket.send(data); };
 
 		console.log("SF: Opened websocket to ]] .. address .. [[");
-	</script>
 	]]
 end
 
@@ -41,22 +39,27 @@ end
 function WebSocket:connect()
 	assert( self.state == READYSTATE.CONNECTING and self.html == nil, "WebSocket is already connected" )
 
-	local html = vgui.Create("DHTML", p, nil)
+	local html = vgui.Create("DHTML")
 	html:AddFunction("sf", "on_message", function(msg)
-		if self["onMessage"] then self["onMessage"](self, msg) end
+		if self.onMessage then self.onMessage(self, msg) end
 	end)
 
 	html:AddFunction("sf", "on_open", function()
 		self.state = READYSTATE.OPEN
-		if self["onConnected"] then self["onConnected"](self) end
+		if self.onConnected then self.onConnected(self) end
 	end)
 
 	html:AddFunction("sf", "on_close", function(errored)
 		self.state = READYSTATE.CLOSED
-		if self["onDisconnected"] then self["onDisconnected"](self, errored) end
+		if self.onDisconnected then self.onDisconnected(self, errored) end
 	end)
 
-	html:SetHTML(make_html(self.address))
+	html.OnDocumentReady = function()
+		html:RunJavascript(make_js(self.address))
+	end
+
+	-- Need this :p
+	html:SetHTML("")
 
 	self.html = html
 end
@@ -91,7 +94,7 @@ end
 
 local checkluatype = SF.CheckLuaType
 
---- Websocket Type. Create a websocket with websocket.new
+--- Websocket Type. Create a websocket with WebSocket(...)
 -- @name WebSocket
 -- @class type
 -- @libtbl websocket_methods
@@ -107,6 +110,8 @@ local websocket_methods, websocket_meta, wrap, unwrap = instance.Types.WebSocket
 local websocket_list = {}
 
 --- Creates a new websocket object.
+--- Add onMessage, onConnected, onDisconnected functions for callbacks.
+--- Also see the websocket example.
 -- @name builtins_library.WebSocket
 -- @param string addr Address of the websocket server.
 -- @param number? port Port of the websocket server. (Default 443)
@@ -154,10 +159,10 @@ end
 -- * onMessage - Called when a message is received.
 -- * onConnected - Called when the websocket initially connects.
 -- * onDisconnected - Called when the websocket is disconnected, with the only param being if it was caused by an 'error' event.
--- @param k string onMessage, onConnected, onDisconnected
--- @param v function
+-- @param string k onMessage, onConnected, onDisconnected
+-- @param function v The callback function, which will be called with the websocket as the first argument.
 function websocket_meta:__newindex(k, v)
-	if k=="onMessage" or k=="onConnected" or k=="onDisconnected" then
+	if k == "onMessage" or k == "onConnected" or k == "onDisconnected" then
 		if type(v) == "function" then
 			unwrap(self)[k] = function(_, arg) v(self, arg) end
 		elseif v == nil then
