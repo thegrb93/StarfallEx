@@ -417,6 +417,7 @@ end)
 
 function instance:prepareRender()
 	currentcolor = COLOR_WHITE
+	circleMeshMatrix:Identity()
 	render.SetColorMaterial()
 	draw.NoTexture()
 	surface.SetDrawColor(255, 255, 255, 255)
