@@ -592,7 +592,13 @@ if CLIENT then
 		local ply = getply(self)
 		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
-		if slot == nil then slot = GESTURE_SLOT_CUSTOM else checkluatype(slot, TYPE_NUMBER) end
+		if slot == nil then
+			slot = GESTURE_SLOT_CUSTOM
+		else
+			checkluatype(slot, TYPE_NUMBER)
+			if slot < 0 or slot > 6 then return end
+		end
+
 		if weight == nil then weight = 1 else checkluatype(weight, TYPE_NUMBER) end
 
 		if isstring(animation) then
