@@ -75,6 +75,55 @@ local defined_fonts = {
 }
 SF.DefinedFonts = defined_fonts
 
+local function buildCircleMesh(vertexCount)
+	local circleMesh = Mesh()
+
+	local vtxX, vtxY = 1, 0
+	local vtxU, vtxV = 1, 0.5
+	local rotX = math.cos(2 * math.pi / vertexCount)
+	local rotY = math.sqrt(1 - rotX * rotX)
+
+	local origin = vector_origin
+	local pos = Vector(vtxX, vtxY, 0)
+
+	mesh.Begin(circleMesh, MATERIAL_TRIANGLES, vertexCount)
+
+	for _ = 1, vertexCount do
+		mesh.Position(origin)
+		mesh.TexCoord(0, 0.5, 0.5)
+		mesh.Color(255, 255, 255, 255)
+		mesh.AdvanceVertex()
+
+		mesh.Position(pos)
+		mesh.TexCoord(0, vtxU, vtxV)
+		mesh.Color(255, 255, 255, 255)
+		mesh.AdvanceVertex()
+
+		vtxX, vtxY = rotX * vtxX - rotY * vtxY, rotY * vtxX + rotX * vtxY
+		vtxU, vtxV = (vtxX + 1) * 0.5, (vtxY + 1) * 0.5
+		pos:SetUnpacked(vtxX, vtxY, 0)
+
+		mesh.Position(pos)
+		mesh.TexCoord(0, vtxU, vtxV)
+		mesh.Color(255, 255, 255, 255)
+		mesh.AdvanceVertex()
+	end
+
+	mesh.End()
+
+	return circleMesh
+end
+
+local circleMesh = buildCircleMesh(32)
+local circleMeshMatrix = Matrix()
+local circleMeshVector = Vector()
+local circleMeshMaterial = CreateMaterial("SF_Circle_Material", "UnlitGeneric", {
+	["$basetexture"] = "color/white",
+	["$model"] = 1,
+	["$vertexalpha"] = 1,
+	["$vertexcolor"] = 1
+})
+
 local currentcolor
 local defaultFont
 local MATRIX_STACK_LIMIT = 8
@@ -1194,6 +1243,35 @@ end
 function render_library.drawCircle(x, y, r)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	surface.DrawCircle(x, y, r, currentcolor)
+end
+
+--- Draws a filled circle
+-- @param number x Center x coordinate
+-- @param number y Center y coordinate
+-- @param number r Radius
+function render_library.drawFilledCircle(x, y, r)
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+
+	circleMeshVector:SetUnpacked(currentcolor.r / 255, currentcolor.g / 255, currentcolor.b / 255)
+
+	circleMeshMaterial:SetVector("$color", circleMeshVector)
+	circleMeshMaterial:SetFloat("$alpha", currentcolor.a / 255)
+
+	render.SetMaterial(circleMeshMaterial)
+
+	if x ~= 0 or y ~= 0 or r ~= 1 then
+		circleMeshVector:SetUnpacked(x, y, 0)
+		circleMeshMatrix:SetTranslation(circleMeshVector)
+
+		circleMeshVector:SetUnpacked(r, r, r)
+		circleMeshMatrix:SetScale(circleMeshVector)
+
+		cam.PushModelMatrix(circleMeshMatrix, true)
+			circleMesh:Draw()
+		cam.PopModelMatrix()
+	else
+		circleMesh:Draw()
+	end
 end
 
 --- Draws a textured rectangle
