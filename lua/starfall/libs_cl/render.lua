@@ -1257,6 +1257,7 @@ function render_library.drawFilledCircle(x, y, r)
 	circleMeshMaterial:SetVector("$color", circleMeshVector)
 	circleMeshMaterial:SetFloat("$alpha", currentcolor.a / 255)
 
+	surface.SetMaterial(circleMeshMaterial)
 	render.SetMaterial(circleMeshMaterial)
 
 	if x ~= 0 or y ~= 0 or r ~= 1 then
