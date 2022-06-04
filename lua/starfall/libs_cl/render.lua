@@ -1727,7 +1727,13 @@ end
 -- @param number? blendFuncAlpha http://wiki.facepunch.com/gmod/Enums/BLENDFUNC
 function render_library.overrideBlend(on, srcBlend, destBlend, blendFunc, srcBlendAlpha, destBlendAlpha, blendFuncAlpha)
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
-	render.OverrideBlend(on, srcBlend, destBlend, blendFunc, srcBlendAlpha, destBlendAlpha, blendFuncAlpha)
+
+	if not srcBlendAlpha then
+		-- Optional parameters have to be "no value"
+		render.OverrideBlend(on, srcBlend, destBlend, blendFunc)
+	else
+		render.OverrideBlend(on, srcBlend, destBlend, blendFunc, srcBlendAlpha, destBlendAlpha, blendFuncAlpha)
+	end
 end
 
 --- Resets the depth buffer

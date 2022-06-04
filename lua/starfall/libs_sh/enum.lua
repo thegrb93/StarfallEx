@@ -815,6 +815,50 @@ env.TEXFILTER = {
 	ANISOTROPIC = TEXFILTER.ANISOTROPIC
 }
 
+--- ENUMs of blend functions
+-- @name builtins_library.BLEND
+-- @class table
+-- @field ZERO
+-- @field ONE
+-- @field DST_COLOR
+-- @field ONE_MINUS_DST_COLOR
+-- @field SRC_ALPHA
+-- @field ONE_MINUS_SRC_ALPHA
+-- @field DST_ALPHA
+-- @field ONE_MINUS_DST_ALPHA
+-- @field SRC_ALPHA_SATURATE
+-- @field SRC_COLOR
+-- @field ONE_MINUS_SRC_COLOR
+env.BLEND = {
+	ZERO = BLEND_ZERO,
+	ONE = BLEND_ONE,
+	DST_COLOR = BLEND_DST_COLOR,
+	ONE_MINUS_DST_COLOR = BLEND_ONE_MINUS_DST_COLOR,
+	SRC_ALPHA = BLEND_SRC_ALPHA,
+	ONE_MINUS_SRC_ALPHA = BLEND_ONE_MINUS_SRC_ALPHA,
+	DST_ALPHA = BLEND_DST_ALPHA,
+	ONE_MINUS_DST_ALPHA = BLEND_ONE_MINUS_DST_ALPHA,
+	SRC_ALPHA_SATURATE = BLEND_SRC_ALPHA_SATURATE,
+	SRC_COLOR = BLEND_SRC_COLOR,
+	ONE_MINUS_SRC_COLOR = BLEND_ONE_MINUS_SRC_COLOR
+}
+
+--- ENUMs of blend modes
+-- @name builtins_library.BLENDFUNC
+-- @class table
+-- @field ADD
+-- @field SUBTRACT
+-- @field REVERSE_SUBTRACT
+-- @field MIN
+-- @field MAX
+env.BLENDFUNC = {
+	ADD = BLENDFUNC_ADD,
+	SUBTRACT = BLENDFUNC_SUBTRACT,
+	REVERSE_SUBTRACT = BLENDFUNC_REVERSE_SUBTRACT,
+	MIN = BLENDFUNC_MIN,
+	MAX = BLENDFUNC_MAX,
+}
+
 --- ENUMs of entity render modes to be used with Entity.setRenderMode
 -- @name builtins_library.RENDERMODE
 -- @class table
