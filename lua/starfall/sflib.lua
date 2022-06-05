@@ -1275,6 +1275,19 @@ function SF.NormalizePath(path)
 	return table.concat(pathtbl, "/")
 end
 
+function SF.GetExecutingPath()
+	local curdir
+	local stackLevel = 3
+	repeat
+		local info = debug.getinfo(stackLevel, "S")
+		if not info then break end
+
+		curdir = string.match(info.short_src, "^SF:(.*[/\\])")
+		stackLevel = stackLevel + 1
+	until curdir
+	return curdir
+end
+
 --- Returns True if parent chain length is going to exceed 16
 function SF.ParentChainTooLong(parent, child)
 	local index = parent

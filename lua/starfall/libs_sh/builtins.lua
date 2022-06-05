@@ -708,18 +708,7 @@ end
 function builtins_library.require(path)
 	checkluatype(path, TYPE_STRING)
 
-	local curdir
-	local stackLevel = 2
-
-	repeat
-		local info = debug.getinfo(stackLevel, "S")
-		if not info then break end
-
-		curdir = string.match(info.short_src, "^SF:(.*[/\\])")
-		stackLevel = stackLevel + 1
-	until curdir
-
-	curdir = curdir or ""
+	local curdir = SF.GetExecutingPath() or ""
 
 	path = SF.ChoosePath(path, curdir, function(testpath)
 		return instance.scripts[testpath]
@@ -737,18 +726,7 @@ function builtins_library.requiredir(path, loadpriority)
 	checkluatype(path, TYPE_STRING)
 	if loadpriority~=nil then checkluatype(loadpriority, TYPE_TABLE) end
 
-	local curdir
-	local stackLevel = 2
-
-	repeat
-		local info = debug.getinfo(stackLevel, "S")
-		if not info then break end
-
-		curdir = string.match(info.short_src, "^SF:(.*[/\\])")
-		stackLevel = stackLevel + 1
-	until curdir
-
-	curdir = curdir or ""
+	local curdir = SF.GetExecutingPath() or ""
 
 	path = SF.ChoosePath(path, curdir, function(testpath)
 		testpath = string.PatternSafe(testpath)
@@ -789,19 +767,8 @@ end
 -- @return ... Return value(s) of the script
 function builtins_library.dofile(path)
 	checkluatype(path, TYPE_STRING)
-	
-	local curdir
-	local stackLevel = 2
 
-	repeat
-		local info = debug.getinfo(stackLevel, "S")
-		if not info then break end
-
-		curdir = string.match(info.short_src, "^SF:(.*[/\\])")
-		stackLevel = stackLevel + 1
-	until curdir
-
-	curdir = curdir or ""
+	local curdir = SF.GetExecutingPath() or ""
 
 	path = SF.ChoosePath(path, curdir, function(testpath)
 		return instance.scripts[testpath]
@@ -817,19 +784,8 @@ function builtins_library.dodir(path, loadpriority)
 	checkluatype(path, TYPE_STRING)
 	if loadpriority ~= nil then checkluatype(loadpriority, TYPE_TABLE) end
 
-	local curdir
-	local stackLevel = 2
+	local curdir = SF.GetExecutingPath() or ""
 
-	repeat
-		local info = debug.getinfo(stackLevel, "S")
-		if not info then break end
-
-		curdir = string.match(info.short_src, "^SF:(.*[/\\])")
-		stackLevel = stackLevel + 1
-	until curdir
-
-	curdir = curdir or ""
-	
 	path = SF.ChoosePath(path, curdir, function(testpath)
 		testpath = string.PatternSafe(testpath)
 		for file in pairs(instance.scripts) do
