@@ -789,7 +789,20 @@ end
 -- @return ... Return value(s) of the script
 function builtins_library.dofile(path)
 	checkluatype(path, TYPE_STRING)
-	local curdir = string.match(debug.getinfo(2, "S").short_src, "^SF:(.*[/\\])") or ""
+	
+	local curdir
+	local stackLevel = 2
+
+	repeat
+		local info = debug.getinfo(stackLevel, "S")
+		if not info then break end
+
+		curdir = string.match(info.short_src, "^SF:(.*[/\\])")
+		stackLevel = stackLevel + 1
+	until curdir
+
+	curdir = curdir or ""
+
 	path = SF.ChoosePath(path, curdir, function(testpath)
 		return instance.scripts[testpath]
 	end) or path
@@ -804,7 +817,19 @@ function builtins_library.dodir(path, loadpriority)
 	checkluatype(path, TYPE_STRING)
 	if loadpriority ~= nil then checkluatype(loadpriority, TYPE_TABLE) end
 
-	local curdir = string.match(debug.getinfo(2, "S").short_src, "^SF:(.*[/\\])") or ""
+	local curdir
+	local stackLevel = 2
+
+	repeat
+		local info = debug.getinfo(stackLevel, "S")
+		if not info then break end
+
+		curdir = string.match(info.short_src, "^SF:(.*[/\\])")
+		stackLevel = stackLevel + 1
+	until curdir
+
+	curdir = curdir or ""
+	
 	path = SF.ChoosePath(path, curdir, function(testpath)
 		testpath = string.PatternSafe(testpath)
 		for file in pairs(instance.scripts) do
