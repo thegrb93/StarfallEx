@@ -1713,4 +1713,13 @@ function ents_methods:getNearestPoint(pos)
 	return vwrap(getent(self):NearestPoint(vunwrap(pos)))
 end
 
+-- Returns a table of save values for an entity.
+-- These tables are not the same between the client and the server, and different entities may have different fields.
+-- @shared
+-- @param boolean showAll If set, shows all variables, not just the ones for save.
+-- @return table A table containing all save values in key/value format. The value may be a sequential table (starting to 1) if the field in question is an array in engine.
+function ents_methods:getSaveTable(showAll)
+	return instance.Sanitize(getent(self):GetSaveTable(showAll and true or false))
+end
+
 end
