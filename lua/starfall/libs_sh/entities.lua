@@ -1722,4 +1722,14 @@ function ents_methods:getSaveTable(showAll)
 	return instance.Sanitize(getent(self):GetSaveTable(showAll and true or false))
 end
 
+--- Returns a variable from the entity's save table.
+-- @shared
+-- @param string variableName Name of the internal save table variable.
+-- @return any The internal variable associated with the name.
+function ents_methods:getInternalVariable(variableName)
+	checkluatype(variableName, TYPE_STRING)
+	local result = getent(self):GetInternalVariable(variableName)
+	return istable(result) and instance.Sanitize(result) or owrap(result)
+end
+
 end
