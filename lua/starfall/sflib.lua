@@ -1070,7 +1070,7 @@ do
 		[TYPE_ENTITY] = function(ss, x) ss:writeInt8(TYPE_ENTITY) ss:writeInt16(x:EntIndex()) end,
 		[TYPE_VECTOR] = function(ss, x) ss:writeInt8(TYPE_VECTOR) for i=1, 3 do ss:writeFloat(x[i]) end end,
 		[TYPE_ANGLE] = function(ss, x) ss:writeInt8(TYPE_ANGLE) for i=1, 3 do ss:writeFloat(x[i]) end end,
-		[TYPE_COLOR] = function(ss, x) ss:writeInt8(TYPE_COLOR) for i=1, 4 do ss:writeInt8(x[i]) end end,
+		[TYPE_COLOR] = function(ss, x) ss:writeInt8(TYPE_COLOR) ss:writeInt8(x.r) ss:writeInt8(x.g) ss:writeInt8(x.b) ss:writeInt8(x.a) end,
 		[TYPE_MATRIX] = function(ss, x) ss:writeInt8(TYPE_MATRIX) for k, v in ipairs{x:Unpack()} do ss:writeFloat(v) end end,
 	}
 	local stringtotypefuncs = {
@@ -1096,7 +1096,7 @@ do
 		local tableLookup = {}
 
 		local function typeToString(val)
-			local func = typetostringfuncs[TypeID(val)]
+			local func = typetostringfuncs[IsColor(val) and TYPE_COLOR or TypeID(val)]
 			if func then func(ss, val) else error("Invalid type " .. SF.GetType(val)) end
 		end
 
