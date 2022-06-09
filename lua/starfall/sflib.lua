@@ -1096,7 +1096,7 @@ do
 		local tableLookup = {}
 
 		local function typeToString(val)
-			local func = typetostringfuncs[IsColor(val) and TYPE_COLOR or TypeID(val)]
+			local func = typetostringfuncs[TypeID(val)]
 			if func then func(ss, val) else error("Invalid type " .. SF.GetType(val)) end
 		end
 
@@ -1108,6 +1108,8 @@ do
 					return
 				end
 			end
+
+			if IsColor(val) then return typetostringfuncs[TYPE_COLOR](ss, val) end
 			
 			ss:writeInt8(TYPE_TABLE)
 			
