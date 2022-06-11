@@ -136,12 +136,15 @@ function holograms_library.create(pos, ang, model, scale)
 	checkluatype(model, TYPE_STRING)
 	model = SF.NormalizePath(model)
 
-	if (SERVER and not util.IsValidModel(model)) or (CLIENT and string.GetExtensionFromFilename(model) ~= "mdl") then SF.Throw("Invalid model", 2) end
-
-	local pos = vunwrap(pos)
-	local ang = aunwrap(ang)
-
 	local ply = instance.player
+	pos = vunwrap(pos)
+	ang = aunwrap(ang)
+
+	if (SERVER and not util.IsValidModel(model)) or
+		string.GetExtensionFromFilename(model) ~= "mdl" or
+		(ply ~= SF.Superuser and gamemode.Call("PlayerSpawnObject", ply, model, 0)==false) then
+		SF.Throw("Invalid model: "..model, 2)
+	end
 
 	plyCount:checkuse(ply, 1)
 
@@ -155,7 +158,6 @@ function holograms_library.create(pos, ang, model, scale)
 			holoent:CallOnRemove("starfall_hologram_delete", hologramOnDestroy)
 			holoent:Spawn()
 
-			if ply ~= SF.Superuser then gamemode.Call("PlayerSpawnedSENT", ply, holoent) end
 
 			holograms[holoent] = true
 

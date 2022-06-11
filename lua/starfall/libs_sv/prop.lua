@@ -289,7 +289,7 @@ function props_library.createComponent(pos, ang, class, model, frozen)
 	if not ply:CheckLimit("starfall_components") then SF.Throw("Limit of components reached!", 2) end
 	plyPropBurst:use(ply, 1)
 	plyCount:checkuse(ply, 1)
-	if ply ~= SF.Superuser and gamemode.Call("PlayerSpawnProp", ply, model)==false then SF.Throw("Another hook prevented the model from spawning", 2) end
+	if ply ~= SF.Superuser and gamemode.Call("PlayerSpawnObject", ply, model, 0)==false then SF.Throw("Another hook prevented the model from spawning", 2) end
 
 	local comp = ents.Create(class)
 	register(comp, instance)
@@ -321,7 +321,6 @@ function props_library.createComponent(pos, ang, class, model, frozen)
 
 		ply:AddCount("starfall_components", comp)
 		ply:AddCleanup("starfall_components", comp)
-		gamemode.Call("PlayerSpawnedSENT", ply, comp)
 	end
 
 	return ewrap(comp)
@@ -645,8 +644,6 @@ function props_library.createSent(pos, ang, class, frozen, data)
 			end
 			SF.Throw("Failed to create entity: " .. errorMsg, 2)
 		end
-
-		hookcall = "PlayerSpawnedSENT"
 	end
 
 	if entity and entity:IsValid() then
@@ -668,7 +665,9 @@ function props_library.createSent(pos, ang, class, frozen, data)
 			end
 
 			ply:AddCleanup("props", entity)
-			gamemode.Call(hookcall, ply, entity)
+			if hookcall then
+				gamemode.Call(hookcall, ply, entity)
+			end
 		end
 
 		return owrap(entity)
