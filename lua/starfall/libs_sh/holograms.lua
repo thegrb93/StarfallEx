@@ -134,15 +134,11 @@ end
 function holograms_library.create(pos, ang, model, scale)
 	checkpermission(instance, nil, "hologram.create")
 	checkluatype(model, TYPE_STRING)
-	model = SF.NormalizePath(model)
+	model = SF.CheckModel(model)
 
 	local ply = instance.player
 	pos = vunwrap(pos)
 	ang = aunwrap(ang)
-
-	if (SERVER and (not util.IsValidModel(model) or (ply ~= SF.Superuser and gamemode.Call("PlayerSpawnObject", ply, model, 0)==false))) or string.GetExtensionFromFilename(model) ~= "mdl" then
-		SF.Throw("Invalid model: "..model, 2)
-	end
 
 	plyCount:checkuse(ply, 1)
 

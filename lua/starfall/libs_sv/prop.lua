@@ -77,7 +77,6 @@ function props_library.create(pos, ang, model, frozen)
 
 	local ply = instance.player
 	model = SF.CheckModel(model, ply)
-	if not model then SF.Throw("Invalid model", 2) end
 
 	plyPropBurst:use(ply, 1)
 	plyCount:checkuse(ply, 1)
@@ -284,12 +283,10 @@ function props_library.createComponent(pos, ang, class, model, frozen)
 
 	local ply = instance.player
 	model = SF.CheckModel(model, ply)
-	if not model then SF.Throw("Invalid model", 2) end
 
 	if not ply:CheckLimit("starfall_components") then SF.Throw("Limit of components reached!", 2) end
 	plyPropBurst:use(ply, 1)
 	plyCount:checkuse(ply, 1)
-	if ply ~= SF.Superuser and gamemode.Call("PlayerSpawnObject", ply, model, 0)==false then SF.Throw("Another hook prevented the model from spawning", 2) end
 
 	local comp = ents.Create(class)
 	register(comp, instance)
@@ -374,7 +371,6 @@ function props_library.createSeat(pos, ang, model, frozen)
 
 	local ply = instance.player
 	model = SF.CheckModel(model, ply)
-	if not model then SF.Throw("Invalid model", 2) end
 
 	plyPropBurst:use(ply, 1)
 	plyCount:checkuse(ply, 1)
@@ -575,7 +571,6 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		if data ~= nil then checkluatype(data, TYPE_TABLE) else data = {} end
 		if data.Model and isstring(data.Model) then
 			data.Model = SF.CheckModel(data.Model, ply)
-			if not data.Model then SF.Throw("Invalid model", 2) end
 		end
 
 		for k, v in pairs(data) do
