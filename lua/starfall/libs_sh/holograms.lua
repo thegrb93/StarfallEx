@@ -140,9 +140,7 @@ function holograms_library.create(pos, ang, model, scale)
 	pos = vunwrap(pos)
 	ang = aunwrap(ang)
 
-	if (SERVER and not util.IsValidModel(model)) or
-		string.GetExtensionFromFilename(model) ~= "mdl" or
-		(ply ~= SF.Superuser and gamemode.Call("PlayerSpawnObject", ply, model, 0)==false) then
+	if (SERVER and not util.IsValidModel(model) or (ply ~= SF.Superuser and gamemode.Call("PlayerSpawnObject", ply, model, 0)==false)) or string.GetExtensionFromFilename(model) ~= "mdl" then
 		SF.Throw("Invalid model: "..model, 2)
 	end
 
