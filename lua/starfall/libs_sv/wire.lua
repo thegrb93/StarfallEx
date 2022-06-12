@@ -632,6 +632,17 @@ function wirelink_methods:isValid()
 	return wlunwrap(self) and true or false
 end
 
+--- Returns current state of the specified input
+-- @param string name Input name
+-- @return any Input value
+function wirelink_methods:inputValue(name)
+	local wl = wlunwrap(self)
+	if not wl then return end
+	local input = wl.Inputs and wl.Inputs[name]
+	if not input or not outputConverters[input.Type] then return end
+	return outputConverters[input.Type](input.Value)
+end
+
 --- Returns the type of input name, or nil if it doesn't exist
 -- @param string name Input name to search for
 -- @return string Type of input
