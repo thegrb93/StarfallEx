@@ -639,7 +639,7 @@ function wirelink_methods:inputValue(name)
 	local wl = wlunwrap(self)
 	if not wl then return end
 	local input = wl.Inputs and wl.Inputs[name]
-	if not input or not outputConverters[input.Type] then return end
+	if not input or not outputConverters[input.Type] then SF.Throw("Input doesn't exist or is invalid", 2) end
 	return outputConverters[input.Type](input.Value)
 end
 
