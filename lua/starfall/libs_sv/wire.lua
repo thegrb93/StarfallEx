@@ -97,6 +97,15 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 local wirelink_meta, wlwrap, wlunwrap = instance.Types.Wirelink, instance.Types.Wirelink.Wrap, instance.Types.Wirelink.Unwrap
 local COLOR_WHITE = Color(255, 255, 255)
 
+local function getwl(self)
+	local wl = wlunwrap(self)
+	if wl:IsValid() then
+		return wl
+	else
+		SF.Throw("Wirelink is not valid", 3)
+	end
+end
+
 --#region Vector2 metaevents
 local table_concat = table.concat
 function vec2_meta.__tostring(a)
@@ -596,7 +605,7 @@ wirelink_meta.__index = function(self, k)
 		return wirelink_methods[k]
 	else
 		local wl = wlunwrap(self)
-		if not wl or not wl:IsValid() or not wl.extended then return end -- TODO: What is wl.extended?
+		if not wl:IsValid() or not wl.extended then return end -- TODO: What is wl.extended?
 
 		if isnumber(k) then
 			return wl.ReadCell and wl:ReadCell(k) or nil
@@ -614,7 +623,7 @@ end
 wirelink_meta.__newindex = function(self, k, v)
 	checkpermission(instance, nil, "wire.wirelink.write")
 	local wl = wlunwrap(self)
-	if not wl or not wl:IsValid() or not wl.extended then return end -- TODO: What is wl.extended?
+	if not wl:IsValid() or not wl.extended then return end -- TODO: What is wl.extended?
 	if isnumber(k) then
 		checkluatype(v, TYPE_NUMBER)
 		if not wl.WriteCell then return
@@ -629,15 +638,24 @@ end
 --- Checks if a wirelink is valid. (ie. doesn't point to an invalid entity)
 -- @return boolean Whether the wirelink is valid
 function wirelink_methods:isValid()
-	return wlunwrap(self) and true or false
+	return wlunwrap(self):IsValid()
+end
+
+--- Returns current state of the specified input
+-- @param string name Input name
+-- @return any Input value
+function wirelink_methods:inputValue(name)
+	local wl = getwl(self)
+	local input = wl.Inputs and wl.Inputs[name]
+	if not input or not outputConverters[input.Type] then SF.Throw("Input doesn't exist or is invalid", 2) end
+	return outputConverters[input.Type](input.Value)
 end
 
 --- Returns the type of input name, or nil if it doesn't exist
 -- @param string name Input name to search for
 -- @return string Type of input
 function wirelink_methods:inputType(name)
-	local wl = wlunwrap(self)
-	if not wl then return end
+	local wl = getwl(self)
 	local input = wl.Inputs[name]
 	return input and input.Type
 end
@@ -646,8 +664,7 @@ end
 -- @param string name Output name to search for
 -- @return string Type of output
 function wirelink_methods:outputType(name)
-	local wl = wlunwrap(self)
-	if not wl then return end
+	local wl = getwl(self)
 	local output = wl.Outputs[name]
 	return output and output.Type
 end
@@ -655,14 +672,13 @@ end
 --- Returns the entity that the wirelink represents
 -- @return Entity Entity the wirelink represents
 function wirelink_methods:entity()
-	return owrap(wlunwrap(self))
+	return owrap(getwl(self))
 end
 
 --- Returns a table of all of the wirelink's inputs
 -- @return table All of the wirelink's inputs
 function wirelink_methods:inputs()
-	local wl = wlunwrap(self)
-	if not wl then return nil end
+	local wl = getwl(self)
 	local Inputs = wl.Inputs
 	if not Inputs then return {} end
 
@@ -682,8 +698,7 @@ end
 --- Returns a table of all of the wirelink's outputs
 -- @return table All of the wirelink's outputs
 function wirelink_methods:outputs()
-	local wl = wlunwrap(self)
-	if not wl then return nil end
+	local wl = getwl(self)
 	local Outputs = wl.Outputs
 	if not Outputs then return {} end
 
@@ -705,8 +720,7 @@ end
 -- @return boolean Whether it is wired
 function wirelink_methods:isWired(name)
 	checkluatype(name, TYPE_STRING)
-	local wl = wlunwrap(self)
-	if not wl then return nil end
+	local wl = getwl(self)
 	local input = wl.Inputs[name]
 	if input and input.Src and input.Src:IsValid() then return true
 	else return false end
@@ -717,8 +731,7 @@ end
 -- @return Entity The entity the wirelink is wired to
 function wirelink_methods:getWiredTo(name)
 	checkluatype(name, TYPE_STRING)
-	local wl = wlunwrap(self)
-	if not wl then return nil end
+	local wl = getwl(self)
 	local input = wl.Inputs[name]
 	if input and input.Src and input.Src:IsValid() then
 		return owrap(input.Src)
@@ -730,8 +743,7 @@ end
 -- @return string String name of the output that the input is wired to.
 function wirelink_methods:getWiredToName(name)
 	checkluatype(name, TYPE_STRING)
-	local wl = wlunwrap(self)
-	if not wl then return nil end
+	local wl = getwl(self)
 	local input = wl.Inputs[name]
 	if input and input.Src and input.Src:IsValid() then
 		return input.SrcId
