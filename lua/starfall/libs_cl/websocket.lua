@@ -164,7 +164,7 @@ end
 function websocket_meta:__newindex(k, v)
 	if k == "onMessage" or k == "onConnected" or k == "onDisconnected" then
 		if type(v) == "function" then
-			unwrap(self)[k] = function(_, arg) v(self, arg) end
+			unwrap(self)[k] = function(_, arg) instance:runFunction(v, self, arg) end
 		elseif v == nil then
 			unwrap(self)[k] = nil
 		else
