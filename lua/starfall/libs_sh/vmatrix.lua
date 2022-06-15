@@ -25,10 +25,26 @@ end
 --- Returns a new VMatrix
 -- @name builtins_library.Matrix
 -- @class function
--- @param table? Optional data to initialize the Matrix with.
+-- @param t table|Angle|nil Optional data or rotation angle to initialize the Matrix with.
+-- @param v Vector? Optional translation to initialize the Matrix with.
 -- @return VMatrix New VMatrix
-function instance.env.Matrix(t)
-	return wrap(Matrix(t))
+function instance.env.Matrix(t, v)
+	local m
+	if t~=nil then
+		checkluatype(t, TYPE_TABLE)
+		if dgetmeta(t)==ang_meta then
+			m = Matrix()
+			m:SetAngles(aunwrap(t))
+		else
+			m = Matrix(t)
+		end
+	else
+		m = Matrix()
+	end
+	if v~=nil then
+		m:SetTranslation(vunwrap(v))
+	end
+	return wrap(m)
 end
 
 --- tostring metamethod
