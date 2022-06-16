@@ -446,10 +446,8 @@ if SERVER then
 	function player_methods:setViewEntity(ent)
 		local ply = getply(self)
 		if ent~=nil then ent = getent(ent) end
-
-		if SF.IsHUDActive(instance.entity, ply) then
-			ply:SetViewEntity(ent)
-		end
+		if not SF.IsHUDActive(instance.entity, ply) then SF.Throw("Player isn't connected to HUD!", 2) end
+		ply:SetViewEntity(ent)
 	end
 
 	--- Returns whether or not the player has godmode
