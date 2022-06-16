@@ -5,7 +5,7 @@ export default function ContributorsCard(props)
 
 	async function fetchData() 
 	{
-		const res = await fetch("https://api.github.com/repos/thegrb93/StarfallEx/contributors?per_page=50");
+		const res = await fetch("https://api.github.com/repos/thegrb93/StarfallEx/contributors?per_page=51");
 		if (!res.ok) return setContributorsData([]);
 		res
 			.json()
@@ -25,7 +25,7 @@ export default function ContributorsCard(props)
 		)
 	}
 
-	let contributors = contributorsData.map(x => (
+	let contributors = contributorsData.filter(x => x.login != "web-flow").map(x => (
 		<li key = {x.id}>
 			<a href = {x.html_url}>
 				<img className = "avatar" src={x.avatar_url+"&s=24"} alt={x.login} />
