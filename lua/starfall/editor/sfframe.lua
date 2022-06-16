@@ -1787,6 +1787,7 @@ function PANEL:UpdatePlayers(players)
 		header:SetSize(0, 32)
 		header:Dock(TOP)
 		header:SetBackgroundColor(Color(0,0,0,20))
+		header:SetTooltip(tbl.name)
 
 		local blocked = SF.BlockedUsers:isBlocked(steamid)
 		local button = vgui.Create("StarfallButton", header)
@@ -1819,27 +1820,27 @@ function PANEL:UpdatePlayers(players)
 		nametext:SetText(tbl.name)
 		nametext:DockMargin(5, 0, 5, 0)
 		nametext:Dock(LEFT)
-		nametext:SizeToContents()
+		nametext:SetSize(80, 13)
 
 		local counters = {}
 		for k, v in pairs(SF.ResourceCounters) do
 			local counter = vgui.Create("StarfallPanel", header)
 			counter:DockMargin(3, 0, 0, 0)
-			counter:SetSize(16, 32)
+			counter:SetSize(20, 32)
 			counter:Dock(LEFT)
 			counter:SetBackgroundColor(Color(0,0,0,20))
 			counter:SetTooltip(k)
 
 			local icon = vgui.Create("DImage", counter)
 			icon:SetImage(v.icon)
-			icon:SetSize(16, 16)
+			icon:SetSize(20, 20)
 			icon:Dock(TOP)
 
 			local count = vgui.Create("DLabel", counter)
 			count:SetFont("DermaDefault")
 			count:SetColor(Color(255, 255, 255))
 			count:Dock(BOTTOM)
-			count:SizeToContents()
+			count:SetSize(20, 13)
 
 			counter.nextThink = 0
 			function counter:Think()
@@ -1852,18 +1853,17 @@ function PANEL:UpdatePlayers(players)
 				else
 					count:SetText(tostring(v.count(ply)))
 				end
-				count:SizeToContents()
 			end
 		end
 
 		local cpuManager = vgui.Create("StarfallPanel", header)
 		cpuManager:DockMargin(15, 0, 0, 0)
-		cpuManager:SetSize(210, 32)
+		cpuManager:SetSize(160, 32)
 		cpuManager:Dock(LEFT)
 		cpuManager:SetBackgroundColor(Color(0,0,0,20))
 
 		local cpuServer = vgui.Create("StarfallPanel", cpuManager)
-		cpuServer:SetSize(200, 16)
+		cpuServer:SetSize(150, 16)
 		cpuServer:Dock(TOP)
 		cpuServer:SetBackgroundColor(Color(0,0,0,20))
 
@@ -1871,8 +1871,8 @@ function PANEL:UpdatePlayers(players)
 		cpuServerText:SetFont("DermaDefault")
 		cpuServerText:SetColor(Color(255, 255, 255))
 		cpuServerText:Dock(LEFT)
-		cpuServerText:SetText("SV CPU Usage: 0.0 us")
-		cpuServerText:SetSize(150,16)
+		cpuServerText:SetText("SV CPU: 0.0 us")
+		cpuServerText:SetSize(100,16)
 
 		if LocalPlayer():IsAdmin() then
 			local killserver = vgui.Create("StarfallButton", cpuServer)
@@ -1890,7 +1890,7 @@ function PANEL:UpdatePlayers(players)
 		end
 
 		local cpuClient = vgui.Create("StarfallPanel", cpuManager)
-		cpuClient:SetSize(200, 16)
+		cpuClient:SetSize(150, 16)
 		cpuClient:Dock(TOP)
 		cpuClient:SetBackgroundColor(Color(0,0,0,20))
 
@@ -1898,8 +1898,8 @@ function PANEL:UpdatePlayers(players)
 		cpuClientText:SetFont("DermaDefault")
 		cpuClientText:SetColor(Color(255, 255, 255))
 		cpuClientText:Dock(LEFT)
-		cpuClientText:SetText("CL CPU Usage: 0.0 us")
-		cpuClientText:SetSize(150,16)
+		cpuClientText:SetText("CL CPU: 0.0 us")
+		cpuClientText:SetSize(100,16)
 
 		local killclient = vgui.Create("StarfallButton", cpuClient)
 		killclient:SetText("Kill all")
@@ -1922,8 +1922,8 @@ function PANEL:UpdatePlayers(players)
 				svtotal = svtotal + instance.entity:GetNWInt("CPUus")
 				cltotal = cltotal + instance.cpu_average
 			end
-			cpuServerText:SetText(string.format("SV CPU Usaage: %3.1f us", svtotal))
-			cpuClientText:SetText(string.format("CL CPU Usaage: %3.1f us", cltotal*1e6))
+			cpuServerText:SetText(string.format("SV CPU: %3.1f us", svtotal))
+			cpuClientText:SetText(string.format("CL CPU: %3.1f us", cltotal*1e6))
 		end
 
 		self.scrollPanel:AddItem(header)
