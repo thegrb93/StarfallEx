@@ -502,7 +502,7 @@ SF.Parent = {
 					self.ent:FollowBone(self.parent, self.param)
 				end,
 				function(self)
-					self.ent:FollowBone()
+					self.ent:FollowBone(NULL, 0)
 				end
 			}
 		},

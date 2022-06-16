@@ -323,6 +323,7 @@ function ents_methods:setParent(parent, attachment, bone)
 			type = "bone"
 			param = bone
 		elseif attachment~=nil then
+			if CLIENT then SF.Throw("Can't use attachment argument in clientside!", 2) end
 			if isstring(attachment) then
 				attachment = parent:LookupAttachment(attachment)
 			elseif not isnumber(attachment) then
