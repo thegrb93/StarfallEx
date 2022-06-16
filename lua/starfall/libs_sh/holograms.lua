@@ -152,7 +152,7 @@ function holograms_library.create(pos, ang, model, scale)
 			holoent:CallOnRemove("starfall_hologram_delete", hologramOnDestroy)
 			holoent:Spawn()
 
-
+			if CPPI then holoent:CPPISetOwner(ply) end
 			holograms[holoent] = true
 
 			if scale~=nil then

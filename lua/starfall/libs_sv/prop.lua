@@ -645,6 +645,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		register(entity, instance)
 
 		entity:SetCreator( ply )
+		if CPPI then entity:CPPISetOwner(ply) end
 
 		local phys = entity:GetPhysicsObject()
 		if phys:IsValid() then
