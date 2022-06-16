@@ -134,11 +134,11 @@ end
 function holograms_library.create(pos, ang, model, scale)
 	checkpermission(instance, nil, "hologram.create")
 	checkluatype(model, TYPE_STRING)
-	model = SF.CheckModel(model)
 
 	local ply = instance.player
 	pos = vunwrap(pos)
 	ang = aunwrap(ang)
+	model = SF.CheckModel(model, ply)
 
 	plyCount:checkuse(ply, 1)
 

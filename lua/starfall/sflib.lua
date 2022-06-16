@@ -1207,10 +1207,10 @@ function SF.CheckMaterial(material)
 end
 
 
-function SF.CheckModel(model, player)
+function SF.CheckModel(model, player, prop)
 	if #model > 260 then return false end
 	model = SF.NormalizePath(string.lower(model))
-	if string.GetExtensionFromFilename(model) == "mdl" and (CLIENT or (util.IsValidModel(model) and util.IsValidProp(model))) then
+	if string.GetExtensionFromFilename(model) == "mdl" and (CLIENT or (util.IsValidModel(model) and (not prop or util.IsValidProp(model)))) then
 		if player and player:IsValid() then
 			if hook.Run("PlayerSpawnObject", player, model)~=false then
 				return model

@@ -76,7 +76,7 @@ function props_library.create(pos, ang, model, frozen)
 	local ang = aunwrap(ang)
 
 	local ply = instance.player
-	model = SF.CheckModel(model, ply)
+	model = SF.CheckModel(model, ply, true)
 
 	plyPropBurst:use(ply, 1)
 	plyCount:checkuse(ply, 1)
@@ -282,7 +282,7 @@ function props_library.createComponent(pos, ang, class, model, frozen)
 	local ang = aunwrap(ang)
 
 	local ply = instance.player
-	model = SF.CheckModel(model, ply)
+	model = SF.CheckModel(model, ply, true)
 
 	if not ply:CheckLimit("starfall_components") then SF.Throw("Limit of components reached!", 2) end
 	plyPropBurst:use(ply, 1)
@@ -370,7 +370,7 @@ function props_library.createSeat(pos, ang, model, frozen)
 	local ang = aunwrap(ang)
 
 	local ply = instance.player
-	model = SF.CheckModel(model, ply)
+	model = SF.CheckModel(model, ply, true)
 
 	plyPropBurst:use(ply, 1)
 	plyCount:checkuse(ply, 1)
@@ -570,7 +570,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		local sentparams = sent2[1]
 		if data ~= nil then checkluatype(data, TYPE_TABLE) else data = {} end
 		if data.Model and isstring(data.Model) then
-			data.Model = SF.CheckModel(data.Model, ply)
+			data.Model = SF.CheckModel(data.Model, ply, true)
 		end
 
 		for k, v in pairs(data) do
