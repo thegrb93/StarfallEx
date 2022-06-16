@@ -22,9 +22,7 @@ export default function HookCard(props)
     const paramList = props.parameters.map(x =>
         <li key={x.name}>
             {getElementsFromType(x.type)} <span className="sf-paramname">{x.name}</span>
-            <ul>
-                <span className="accept-newlines">{x.description}</span>
-            </ul>
+            <div className="accept-newlines pad-left-10">{x.description}</div>
         </li>
     );
     if(paramList.length > 0)
@@ -42,9 +40,7 @@ export default function HookCard(props)
     const returnsList = props.returns.map((x, index)=>
         <li key={index}>
             {getElementsFromType(x.type)}
-            <ul>
-                <span className="accept-newlines">{x.description}</span>
-            </ul>
+            <div className="accept-newlines pad-left-10">{x.description}</div>
         </li>
     );
     let returnsPart = null;

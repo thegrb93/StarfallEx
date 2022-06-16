@@ -34,15 +34,25 @@ code {
 .card
 {
   font-size: 0.9em;
-  border-top: 1px solid $color-border;
+  position: relative;
   .card-children
   {
-    margin-left: 20px;
+    margin-left: 10px;
   }
   .card-title *
   {
     display: inline-block;
   }
+}
+
+.description
+{
+  padding-left: 20px;
+}
+
+.card-children .card
+{
+  border-top: 1px solid $color-border;
 }
 
 .sidebar
@@ -262,6 +272,9 @@ code {
   float: right;
   text-align: right;
   font-size: 15px;
+  top: 10px;
+  right: 10px;
+  position: absolute;
 }
 .sf-reference {
   color: #059de3;
@@ -297,4 +310,9 @@ code {
     width: 24px;
     height: 24px;
   }
+}
+
+.pad-left-10
+{
+  padding-left: 10px;
 }
