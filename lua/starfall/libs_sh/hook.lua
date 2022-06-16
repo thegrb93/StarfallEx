@@ -683,14 +683,14 @@ end
 -- @class hook
 -- @shared
 -- @param Entity ent The hud component entity
--- @param Entity ply The player who disconnected
+-- @param Player ply The player who disconnected
 
 --- Called when the player connects to a HUD component linked to the Starfall Chip
 -- @name hudconnected
 -- @class hook
 -- @shared
 -- @param Entity ent The hud component entity
--- @param Entity ply The player who connected
+-- @param Player ply The player who connected
 
 --- Called when a player uses the screen
 -- @name starfallUsed
