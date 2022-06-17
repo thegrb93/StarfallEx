@@ -12,7 +12,7 @@ export default function LibraryCard(props)
             </h1>
             <a className="sf-src" href={getGitSourceLink(props)}>[src]</a>
 
-            <p className="accept-newlines">
+            <p className="accept-newlines description">
                 {props.description}
             </p>
         </React.Fragment>

@@ -34,9 +34,7 @@ export default function MethodCard(props)
         (
             <li key={x.name}>
                 {getElementsFromType(x.type)} <span className="sf-paramname">{x.name}</span>
-                <ul>
-                    <span className="accept-newlines">{x.description}</span>
-                </ul>
+                <div className="accept-newlines pad-left-10">{x.description}</div>
             </li>
         )
     );
@@ -55,9 +53,9 @@ export default function MethodCard(props)
     const returnsList = props.returns.map((x, index)=>
         <li key={index}>
             {getElementsFromType(x.type)}
-            <ul>
-                <span className="accept-newlines">{x.description}</span>
-            </ul>
+            <div className="accept-newlines pad-left-10">
+                {x.description}
+            </div>
         </li>
     );
     let returnsPart = null;
