@@ -506,7 +506,7 @@ SF.Parent = {
 			}
 		},
 		
-		init = function(self, parent, type, param)
+		setParent = function(self, parent, type, param)
 			if self.parent and self.parent:IsValid() then
 				self:remove()
 				self.parent.sfParent.children[self.ent] = nil
@@ -515,15 +515,15 @@ SF.Parent = {
 			if parent then
 				self.param = param
 				self.parent = parent
-				self.set, self.remove = unpack(self.types[type])
+				self.init, self.remove = unpack(self.types[type])
 				parent.sfParent.children[self.ent] = self
 				
 				self:updateTransform()
-				self:set()
+				self:init()
 			else
 				self.param = nil
 				self.parent = nil
-				self.set, self.remove = nil, nil
+				self.init, self.remove = nil, nil
 			end
 		end,
 		
@@ -532,7 +532,7 @@ SF.Parent = {
 			for child, data in pairs(self.children) do
 				if child:IsValid() then
 					data:applyTransform()
-					data:set()
+					data:init()
 					has_children = true
 					
 					if child.sfParent then
@@ -566,9 +566,9 @@ SF.Parent = {
 				}, meta)
 			end
 			
-			child.sfParent:init(parent, type, param)
+			child.sfParent:setParent(parent, type, param)
 		elseif child.sfParent then
-			child.sfParent:init()
+			child.sfParent:setParent()
 		end
 	end,
 }
