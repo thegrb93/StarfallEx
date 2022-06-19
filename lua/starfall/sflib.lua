@@ -466,26 +466,27 @@ SF.BlockedList = {
 }
 setmetatable(SF.BlockedList, SF.BlockedList)
 
+
 SF.Parent = {
 	__index = {
 		updateTransform = function(self)
 			self.pos, self.ang = WorldToLocal(self.ent:GetPos(), self.ent:GetAngles(), self.parent:GetPos(), self.parent:GetAngles())
 		end,
-		
+
 		applyTransform = function(self)
 			local pos, ang = LocalToWorld(self.pos, self.ang, self.parent:GetPos(), self.parent:GetAngles())
 			self.ent:SetPos(pos)
 			self.ent:SetAngles(ang)
 		end,
 		
-		types = {
+		parentTypes = {
 			entity = {
 				function(self)
 					self.ent:SetParent(self.parent)
 				end,
 				function(self)
 					self.ent:SetParent()
-				end,
+				end
 			},
 			attachment = {
 				function(self)
@@ -494,7 +495,7 @@ SF.Parent = {
 				end,
 				function(self)
 					self.ent:SetParent()
-				end,
+				end
 			},
 			bone = {
 				function(self)
@@ -502,38 +503,41 @@ SF.Parent = {
 				end,
 				function(self)
 					self.ent:FollowBone(NULL, 0)
-				end,
+				end
 			}
 		},
-		
+
 		setParent = function(self, parent, type, param)
 			if self.parent and self.parent:IsValid() then
-				self:remove()
 				self.parent.sfParent.children[self.ent] = nil
+				self:removeParent()
 			end
-			
 			if parent then
-				self.param = param
 				self.parent = parent
-				self.apply, self.remove = unpack(self.types[type])
+				self.param = param
+				self.applyParent, self.removeParent = unpack(self.parentTypes[type])
+
 				parent.sfParent.children[self.ent] = self
-				
 				self:updateTransform()
-				self:apply()
+				self:applyParent()
 			else
-				self.param = nil
 				self.parent = nil
-				self.apply, self.remove = nil, nil
+				self.param = nil
+				self.applyParent = nil
+				self.removeParent = nil
 			end
 		end,
-		
+
 		fix = function(self)
-			local has_children
+			local cleanup = true
+			if self.parent and self.parent:IsValid() then
+				cleanup = false
+			end
 			for child, data in pairs(self.children) do
 				if child:IsValid() then
 					data:applyTransform()
-					data:apply()
-					has_children = true
+					data:applyParent()
+					cleanup = false
 					
 					if child.sfParent then
 						child.sfParent:fix()
@@ -542,37 +546,39 @@ SF.Parent = {
 					self.children[child] = nil
 				end
 			end
-			if not has_children then
+			if cleanup then
 				self.ent.sfParent = nil
 			end
 		end,
 	},
-	
+
 	__call = function(meta, child, parent, type, param)
 		if parent then
 			if SF.ParentChainTooLong(parent, child) then SF.Throw("Parenting chain cannot exceed 16 or crash may occur", 3) end
-			
+
 			if not parent.sfParent then
 				parent.sfParent = setmetatable({
 					ent = parent,
-					children = {},
+					children = {}
 				}, meta)
 			end
-			
-			if not child.sfParent then
-				child.sfParent = setmetatable({
+
+			local sfParent = child.sfParent
+			if not sfParent then
+				sfParent = setmetatable({
 					ent = child,
-					children = {},
+					children = {}
 				}, meta)
+				child.sfParent = sfParent
 			end
-			
-			child.sfParent:setParent(parent, type, param)
+
+			sfParent:setParent(parent, type, param)
 		elseif child.sfParent then
 			child.sfParent:setParent()
 		else
 			child:SetParent()
 		end
-	end,
+	end
 }
 setmetatable(SF.Parent, SF.Parent)
 
@@ -580,9 +586,7 @@ if CLIENT then
 	-- When parent is retransmitted, it loses it's children
 	hook.Add("NotifyShouldTransmit", "SF_HologramParentFix", function(ent)
 		local sfParent = ent.sfParent
-		if sfParent then
-			sfParent:fix()
-		end
+		if sfParent then sfParent:fix() end
 	end)
 end
 

@@ -309,12 +309,10 @@ function ents_methods:setParent(parent, attachment, bone)
 	checkpermission(instance, child, "entities.setParent")
 	if CLIENT and debug.getmetatable(child) ~= SF.Cl_Hologram_Meta then SF.Throw("Only clientside holograms can be parented in the CLIENT realm!", 2) end
 	if attachment ~= nil and bone ~= nil then SF.Throw("Arguments `attachment` and `bone` are mutually exclusive!", 2) end
-	
 	if parent ~= nil then
 		parent = getent(parent)
 		if parent:IsPlayer() and not child.IsSFHologram then SF.Throw("Only holograms can be parented to players!", 2) end
-		
-		local type, param
+		local param, type
 		if bone ~= nil then
 			if isstring(bone) then
 				bone = parent:LookupBone(bone) or -1
@@ -322,29 +320,28 @@ function ents_methods:setParent(parent, attachment, bone)
 				SF.ThrowTypeError("string or number", SF.GetType(bone), 2)
 			end
 			if bone < 0 or bone > 255 then SF.Throw("Invalid bone provided!", 2) end
-			
 			type = "bone"
 			param = bone
 		elseif attachment ~= nil then
 			if CLIENT then SF.Throw("Parenting to an attachment is not supported in clientside!", 2) end
-			if isnumber(attachment) then
+			if isstring(attachment) then
+				if parent:LookupAttachment(attachment) < 1 then SF.Throw("Invalid attachment provided!", 2) end
+			elseif isnumber(attachment) then
 				local attachments = parent:GetAttachments()
 				if attachments and attachments[attachment] then
 					attachment = attachments[attachment].name
 				else
 					SF.Throw("Invalid attachment ID provided!", 2)
 				end
-			elseif not isstring(attachment) then
+			else
 				SF.ThrowTypeError("string or number", SF.GetType(attachment), 2)
 			end
-			if parent:LookupAttachment(attachment) < 1 then SF.Throw("Invalid attachment provided!", 2) end
-			
 			type = "attachment"
 			param = attachment
 		else
 			type = "entity"
 		end
-		
+
 		SF.Parent(child, parent, type, param)
 	else
 		SF.Parent(child)
