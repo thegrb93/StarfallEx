@@ -579,7 +579,6 @@ if CLIENT then
 	hook.Add("NotifyShouldTransmit", "SF_HologramParentFix", function(ent)
 		local sfParent = ent.sfParent
 		if sfParent then
-			print("SF_HologramParentFix", sfParent.ent)
 			sfParent:fix()
 		end
 	end)
