@@ -467,31 +467,45 @@ SF.BlockedList = {
 setmetatable(SF.BlockedList, SF.BlockedList)
 
 SF.Parent = {
-	__call = function(meta, child, parent, type, param)
-		if parent then
-			if SF.ParentChainTooLong(parent, child) then SF.Throw("Parenting chain cannot exceed 16 or crash may occur", 3) end
-			
-			if not parent.sfParent then
-				parent.sfParent = setmetatable({
-					ent = parent,
-					children = {},
-				}, meta)
-			end
-			
-			if not child.sfParent then
-				child.sfParent = setmetatable({
-					ent = child,
-					children = {},
-				}, meta)
-			end
-			
-			child.sfParent:init(parent, type, param)
-		elseif child.sfParent then
-			child.sfParent:init()
-		end
-	end,
-	
 	__index = {
+		updateTransform = function(self)
+			self.pos, self.ang = WorldToLocal(self.ent:GetPos(), self.ent:GetAngles(), self.parent:GetPos(), self.parent:GetAngles())
+		end,
+		
+		applyTransform = function(self)
+			local pos, ang = LocalToWorld(self.pos, self.ang, self.parent:GetPos(), self.parent:GetAngles())
+			self.ent:SetPos(pos)
+			self.ent:SetAngles(ang)
+		end,
+		
+		types = {
+			entity = {
+				function(self)
+					self.ent:SetParent(self.parent)
+				end,
+				function(self)
+					self.ent:SetParent()
+				end,
+			},
+			attachment = {
+				function(self)
+					self.ent:SetParent(self.parent)
+					self.ent:Fire("SetParentAttachmentMaintainOffset", self.param, 0.01)
+				end,
+				function(self)
+					self.ent:SetParent()
+				end,
+			},
+			bone = {
+				function(self)
+					self.ent:FollowBone(self.parent, self.param)
+				end,
+				function(self)
+					self.ent:FollowBone(NULL, 0)
+				end,
+			}
+		},
+		
 		init = function(self, parent, type, param)
 			if self.parent and self.parent:IsValid() then
 				self:remove()
@@ -532,45 +546,31 @@ SF.Parent = {
 				self.ent.sfParent = nil
 			end
 		end,
-		
-		updateTransform = function(self)
-			self.pos, self.ang = WorldToLocal(self.ent:GetPos(), self.ent:GetAngles(), self.parent:GetPos(), self.parent:GetAngles())
-		end,
-		
-		applyTransform = function(self)
-			local pos, ang = LocalToWorld(self.pos, self.ang, self.parent:GetPos(), self.parent:GetAngles())
-			self.ent:SetPos(pos)
-			self.ent:SetAngles(ang)
-		end,
-		
-		types = {
-			entity = {
-				function(self)
-					self.ent:SetParent(self.parent)
-				end,
-				function(self)
-					self.ent:SetParent()
-				end,
-			},
-			attachment = {
-				function(self)
-					self.ent:SetParent(self.parent)
-					self.ent:Fire("SetParentAttachmentMaintainOffset", self.param, 0.01)
-				end,
-				function(self)
-					self.ent:SetParent()
-				end,
-			},
-			bone = {
-				function(self)
-					self.ent:FollowBone(self.parent, self.param)
-				end,
-				function(self)
-					self.ent:FollowBone(NULL, 0)
-				end,
-			}
-		}
-	}
+	},
+	
+	__call = function(meta, child, parent, type, param)
+		if parent then
+			if SF.ParentChainTooLong(parent, child) then SF.Throw("Parenting chain cannot exceed 16 or crash may occur", 3) end
+			
+			if not parent.sfParent then
+				parent.sfParent = setmetatable({
+					ent = parent,
+					children = {},
+				}, meta)
+			end
+			
+			if not child.sfParent then
+				child.sfParent = setmetatable({
+					ent = child,
+					children = {},
+				}, meta)
+			end
+			
+			child.sfParent:init(parent, type, param)
+		elseif child.sfParent then
+			child.sfParent:init()
+		end
+	end,
 }
 setmetatable(SF.Parent, SF.Parent)
 

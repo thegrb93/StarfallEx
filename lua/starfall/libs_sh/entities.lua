@@ -315,7 +315,17 @@ function ents_methods:setParent(parent, attachment, bone)
 		if parent:IsPlayer() and not child.IsSFHologram then SF.Throw("Only holograms can be parented to players!", 2) end
 		
 		local type, param
-		if attachment ~= nil then
+		if bone ~= nil then
+			if isstring(bone) then
+				bone = parent:LookupBone(bone) or -1
+			elseif not isnumber(bone) then
+				SF.ThrowTypeError("string or number", SF.GetType(bone), 2)
+			end
+			if bone < 0 or bone > 255 then SF.Throw("Invalid bone provided!", 2) end
+			
+			type = "bone"
+			param = bone
+		elseif attachment ~= nil then
 			if CLIENT then SF.Throw("Parenting to an attachment is not supported in clientside!", 2) end
 			if isnumber(attachment) then
 				local attachments = parent:GetAttachments()
@@ -331,16 +341,6 @@ function ents_methods:setParent(parent, attachment, bone)
 			
 			type = "attachment"
 			param = attachment
-		elseif bone ~= nil then
-			if isstring(bone) then
-				bone = parent:LookupBone(bone) or -1
-			elseif not isnumber(bone) then
-				SF.ThrowTypeError("string or number", SF.GetType(bone), 2)
-			end
-			if bone < 0 or bone > 255 then SF.Throw("Invalid bone provided!", 2) end
-			
-			type = "bone"
-			param = bone
 		else
 			type = "entity"
 		end
