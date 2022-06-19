@@ -569,6 +569,8 @@ SF.Parent = {
 			child.sfParent:setParent(parent, type, param)
 		elseif child.sfParent then
 			child.sfParent:setParent()
+		else
+			child:SetParent()
 		end
 	end,
 }
