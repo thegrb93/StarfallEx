@@ -390,14 +390,14 @@ function props_library.createSeat(pos, ang, model, frozen)
 
 	register(prop, instance)
 
-	prop:SetCreator( ply )
-
 	local phys = prop:GetPhysicsObject()
 	if phys:IsValid() then
 		phys:EnableMotion(not frozen)
 	end
 
 	if ply ~= SF.Superuser then
+		prop:SetCreator( ply )
+
 		if propUndo then
 			undo.Create("SF")
 				undo.SetPlayer(ply)
@@ -644,7 +644,6 @@ function props_library.createSent(pos, ang, class, frozen, data)
 	if entity and entity:IsValid() then
 		register(entity, instance)
 
-		entity:SetCreator( ply )
 		if CPPI then entity:CPPISetOwner(ply) end
 
 		local phys = entity:GetPhysicsObject()
@@ -653,6 +652,8 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		end
 
 		if ply ~= SF.Superuser then
+			entity:SetCreator( ply )
+
 			if propUndo then
 				undo.Create("SF")
 					undo.SetPlayer(ply)
