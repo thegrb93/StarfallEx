@@ -630,7 +630,8 @@ end
 
 --- Sets the physics of an entity to be a sphere
 -- @param boolean enabled Should the entity be spherical?
-function ents_methods:enableSphere(enabled)
+-- @param number? radius Optional custom radius to use (max 500). Otherwise the prop's obb is used
+function ents_methods:enableSphere(enabled, radius)
 	local ent = getent(self)
 	if ent:GetClass() ~= "prop_physics" then SF.Throw("This function only works for prop_physics", 2) end
 	local phys = ent:GetPhysicsObject()
@@ -642,8 +643,13 @@ function ents_methods:enableSphere(enabled)
 
 	if enabled then
 		if ent:GetMoveType() == MOVETYPE_VPHYSICS then
-			local OBB = ent:OBBMaxs() - ent:OBBMins()
-			local radius = math.max(OBB.x, OBB.y, OBB.z) / 2
+			if radius~=nil then
+				checkluatype(radius, TYPE_NUMBER)
+				radius = math.Clamp(radius, 0.2, 500)
+			else
+				local OBB = ent:OBBMaxs() - ent:OBBMins()
+				radius = math.max(OBB.x, OBB.y, OBB.z) / 2
+			end
 			ent:PhysicsInitSphere(radius, phys:GetMaterial())
 			ent:SetCollisionBounds(Vector(-radius, -radius, -radius) , Vector(radius, radius, radius))
 		end
