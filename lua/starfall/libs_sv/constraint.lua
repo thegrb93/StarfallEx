@@ -438,28 +438,6 @@ function constraint_library.keepupright(e, ang, bone, lim)
 	end
 end
 
---- Sets the length of a rope attached to the entity
--- @param number index Index of the rope constraint
--- @param Entity e Entity that has the constraint
--- @param number length New length of the constraint
--- @server
-function constraint_library.setRopeLength(index, e, length)
-	local ent1 = getent(e)
-
-	checkpermission(instance, ent1, "constraints.rope")
-
-	checkluatype(length, TYPE_NUMBER)
-	length = math.max(length, 0)
-
-
-	if e.Ropes then
-		local con = e.Ropes[index]
-		if (con and con:IsValid()) then
-			con:SetKeyValue("addlength", length)
-		end
-	end
-end
-
 --- Sets the length of an elastic attached to the entity
 -- @param number index Index of the elastic constraint
 -- @param Entity e Entity that has the constraint
