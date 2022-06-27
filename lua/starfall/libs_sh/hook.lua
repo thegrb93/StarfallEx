@@ -437,6 +437,23 @@ add("EntityFireBullets", nil, function(instance, ent, data)
 	return true, { instance.WrapObject(ent), SF.StructWrapper(instance, data, "Bullet") }
 end)
 
+-- Register privileges
+registerprivilege("entities.canTool", "CanTool", "Whether or not the user can use the toolgun on the entity", { entities = {} })
+
+--- Called whenever a sound has been played. This will not be called clientside if the server played the sound without the client also calling Entity:EmitSound.
+-- @name EntityEmitSound
+-- @class hook
+-- @shared
+-- @param table data Information about the played sound. Changes done to this table can be applied by returning true from this hook. See https://wiki.facepunch.com/gmod/Structures/EmitSoundInfo.
+-- @return boolean? Return true to apply all changes done to the data table. Return false to prevent the sound from playing. Return nil or nothing to play the sound without altering it.
+add("EntityEmitSound", nil, function(instance, data)
+	return true, {SF.StructWrapper(instance, data, "Sound")}
+end, function(instance, data)
+	if (instance.player == SF.Superuser or haspermission(instance, data.Entity, "entities.canTool")) then
+		return true
+	end
+end)
+
 -- Other
 
 --- Called when a player stops driving an entity
