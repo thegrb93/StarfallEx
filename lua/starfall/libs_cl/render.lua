@@ -328,8 +328,8 @@ end)
 -- @class hook
 -- @client
 -- @return boolean Return true to not predraw the skybox both 2d and 3d
-SF.hookAdd("PreDrawSkyBox", nil, hudPrepareSafeArgs,
-function(instance, args)
+SF.hookAdd("PreDrawSkyBox", nil, hudPrepareSafeArgs, function(instance, args)
+	instance:cleanupRender()
     if args[1] and args[2]==true then return true end
 end)
 
