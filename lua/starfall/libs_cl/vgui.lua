@@ -1866,12 +1866,14 @@ function vgui_library.createDColorMixer(parent, name)
 end
 
 --- Called when the player changes the color of the DColorMixer.
---@param function callback The function to run when the color is changed. Has one argument which is the new color.
+--@param function callback The function to run when the color is changed. Has one argument which is the new color as a table.
 function dclm_methods:valueChanged(func)
 	checkluatype(func, TYPE_FUNCTION)
 	local uwp = dclmunwrap(self)
 
-	function uwp:OnSelect(clr) instance:runFunction(func, cwrap( Color(clr.r, clr.g, clr.b, clr.a) )) end
+	function uwp:ValueChanged(clr)
+		instance:runFunction(func, {r = clr.r, g = clr.g, b = clr.b, a = clr.a}) 
+	end
 end
 
 --- Show / Hide the colors indicators in DColorMixer.
