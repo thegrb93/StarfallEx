@@ -333,6 +333,12 @@ function(instance, args)
     if args[1] and args[2]==true then return true end
 end)
 
+--- Called after the 3D skybox is drawn. This will not be called if PreDrawSkyBox has prevented rendering of the skybox
+-- @name postdrawskybox
+-- @class hook
+-- @client
+SF.hookAdd("PostDrawSkyBox", nil, hudPrepareSafeArgs, cleanupRender)
+
 --- Called when the engine wants to calculate the player's view. Only works if connected to Starfall HUD
 -- @name calcview
 -- @class hook
