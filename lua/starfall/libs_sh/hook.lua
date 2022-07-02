@@ -442,12 +442,12 @@ end)
 -- @class hook
 -- @shared
 -- @param table data Information about the played sound. Changes done to this table can be applied by returning true from this hook. See https://wiki.facepunch.com/gmod/Structures/EmitSoundInfo.
--- @return boolean? Return true to apply all changes done to the data table. Return false to prevent the sound from playing. Return nil or nothing to play the sound without altering it.
+-- @return boolean? Return false to prevent the sound from playing or nothing to play the sound without altering it.
 add("EntityEmitSound", nil, function(instance, data)
 	return true, {SF.StructWrapper(instance, data, "EmitSoundInfo")}
-end, function(instance, data)
-	if (instance.player == SF.Superuser or haspermission(instance, data.Entity, "entities.canTool")) then
-		return true
+end, function(instance, ret, data)
+	if ret[1] and ret[2]==false and (instance.player == SF.Superuser or haspermission(instance, data.Entity, "entities.canTool")) then
+		return ret[2]
 	end
 end)
 
