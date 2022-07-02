@@ -237,3 +237,14 @@ simple [[i.scdn.co]]
 --- Examples:
 --- https://e-cdns-images.dzcdn.net/images/cover/dfa0fb51f7c872d87309943e17e30e81/1000x1000-000000-80-0-0.jpg
 pattern [[([%w-_]+)%.dzcdn%.net/(.+)]]
+
+-- Keybase.pub (KBFS)
+-- Examples:
+-- https://chris.keybase.pub/photos/you_must_chill.jpg
+-- https://chinodesuuu.keybase.pub/oh_the_misery.mp4
+pattern [[(%w+)%.keybase.pub/(.+)]]
+
+-- DECTalk Online
+-- Examples:
+-- https://tts.cyzon.us/tts?text=test
+pattern [[tts.cyzon.us/(.+)]]
