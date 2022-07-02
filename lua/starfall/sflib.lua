@@ -485,7 +485,9 @@ SF.Parent = {
 					self.ent:SetParent(self.parent)
 				end,
 				function(self)
-					self.ent:SetParent()
+					local ent = self.ent
+					ent:SetParent()
+					ent:SetLocalVelocity(ent.targetLocalVelocity or vector_origin)
 				end
 			},
 			attachment = {
@@ -502,7 +504,9 @@ SF.Parent = {
 					self.ent:FollowBone(self.parent, self.param)
 				end,
 				function(self)
-					self.ent:FollowBone(NULL, 0)
+					local ent = self.ent
+					ent:FollowBone(NULL, 0)
+					ent:SetLocalVelocity(ent.targetLocalVelocity or vector_origin)
 				end
 			}
 		},

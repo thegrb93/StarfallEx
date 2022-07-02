@@ -214,6 +214,7 @@ if SERVER then
 		checkpermission(instance, holo, "hologram.setRenderProperty")
 
 		holo:SetLocalVelocity(vel)
+		holo.targetLocalVelocity = vel ~= vector_origin and vel or nil
 	end
 
 	--- Sets the hologram's angular velocity.
