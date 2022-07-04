@@ -1127,7 +1127,7 @@ end
 function dfb_methods:onSelect(func)
 	local uwp = dfbunwrap(self)
 	
-	function uwp:OnSelect(_, filepath)
+	function uwp:OnSelect(filepath, selpnl)
 		instance:runFunction(func, filepath)
 	end
 end
