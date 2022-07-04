@@ -19,6 +19,13 @@ SF.RegisterType("Panel", false, true, debug.getregistry().Panel)
 -- @libtbl dpnl_meta
 SF.RegisterType("DPanel", false, true, debug.getregistry().DPanel, "Panel")
 
+--- DFileBrowser type
+-- @name DFileBrowser
+-- @class type
+-- @libtbl dfb_methods
+-- @libtbl dfb_meta
+SF.RegisterType("DFileBrowser", false, true, debug.getregistry().DFileBrowser, "DPanel")
+
 --- DNumSlider type
 -- @name DNumSlider
 -- @class type
@@ -39,6 +46,20 @@ SF.RegisterType("DFrame", false, true, debug.getregistry().DFrame, "Panel")
 -- @libtbl dscrl_methods
 -- @libtbl dscrl_meta
 SF.RegisterType("DScrollPanel", false, true, debug.getregistry().DScrollPanel, "DPanel")
+
+--- DMenu type
+-- @name DMenu
+-- @class type
+-- @libtbl dmen_methods
+-- @libtbl dmen_meta
+SF.RegisterType("DMenu", false, true, debug.getregistry().DMenu, "DScrollPanel")
+
+--- DMenuOption type
+-- @name DMenuOption
+-- @class type
+-- @libtbl dmeno_methods
+-- @libtbl dmeno_meta
+SF.RegisterType("DMenuOption", false, true, debug.getregistry().DMenuOption, "Button")
 
 --- DColorMixer type
 -- @name DColorMixer
@@ -103,6 +124,13 @@ SF.RegisterType("DTextEntry", false, true, debug.getregistry().DTextEntry, "Pane
 -- @libtbl dimg_meta
 SF.RegisterType("DImage", false, true, debug.getregistry().DImage, "DPanel")
 
+--- DImageButton type
+-- @name DImageButton
+-- @class type
+-- @libtbl dimgb_methods
+-- @libtbl dimgb_meta
+SF.RegisterType("DImageButton", false, true, debug.getregistry().DImageButton, "DButton")
+
 --- VGUI functions.
 -- @name vgui
 -- @class library
@@ -126,6 +154,7 @@ end)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 local pnl_methods, pnl_meta, pnlwrap, pnlunwrap = instance.Types.Panel.Methods, instance.Types.Panel, instance.Types.Panel.Wrap, instance.Types.Panel.Unwrap
 local dpnl_methods, dpnl_meta, dpnlwrap, dpnlunwrap = instance.Types.DPanel.Methods, instance.Types.DPanel, instance.Types.DPanel.Wrap, instance.Types.DPanel.Unwrap
+local dfb_methods, dfb_meta, dfbwrap, dfbunwrap = instance.Types.DFileBrowser.Methods, instance.Types.DFileBrowser, instance.Types.DFileBrowser.Wrap, instance.Types.DFileBrowser.Unwrap
 local dfrm_methods, dfrm_meta, dfrmwrap, dfrmunwrap = instance.Types.DFrame.Methods, instance.Types.DFrame, instance.Types.DFrame.Wrap, instance.Types.DFrame.Unwrap
 local dscrl_methods, dscrl_meta, dscrlwrap, dscrlunwrap = instance.Types.DScrollPanel.Methods, instance.Types.DScrollPanel, instance.Types.DScrollPanel.Wrap, instance.Types.DScrollPanel.Unwrap
 local dlab_methods, dlab_meta, dlabwrap, dlabunwrap = instance.Types.DLabel.Methods, instance.Types.DLabel, instance.Types.DLabel.Wrap, instance.Types.DLabel.Unwrap
@@ -135,9 +164,12 @@ local aimg_methods, aimg_meta, aimgwrap, aimgunwrap = instance.Types.AvatarImage
 local dprg_methods, dprg_meta, dprgwrap, dprgunwrap = instance.Types.DProgress.Methods, instance.Types.DProgress, instance.Types.DProgress.Wrap, instance.Types.DProgress.Unwrap
 local dtxe_methods, dtxe_meta, dtxewrap, dtxeunwrap = instance.Types.DTextEntry.Methods, instance.Types.DTextEntry, instance.Types.DTextEntry.Wrap, instance.Types.DTextEntry.Unwrap
 local dimg_methods, dimg_meta, dimgwrap, dimgunwrap = instance.Types.DImage.Methods, instance.Types.DImage, instance.Types.DImage.Wrap, instance.Types.DImage.Unwrap
+local dimgb_methods, dimgb_meta, dimgbwrap, dimgbunwrap = instance.Types.DImageButton.Methods, instance.Types.DImageButton, instance.Types.DImageButton.Wrap, instance.Types.DImageButton.Unwrap
 local dnms_methods, dnms_meta, dnmswrap, dnmsunwrap = instance.Types.DNumSlider.Methods, instance.Types.DNumSlider, instance.Types.DNumSlider.Wrap, instance.Types.DNumSlider.Unwrap
 local dcom_methods, dcom_meta, dcomwrap, dcomunwrap = instance.Types.DComboBox.Methods, instance.Types.DComboBox, instance.Types.DComboBox.Wrap, instance.Types.DComboBox.Unwrap
 local dclm_methods, dclm_meta, dclmwrap, dclmunwrap = instance.Types.DColorMixer.Methods, instance.Types.DColorMixer, instance.Types.DColorMixer.Wrap, instance.Types.DColorMixer.Unwrap
+local dmen_methods, dmen_meta, dmenwrap, dmenunwrap = instance.Types.DMenu.Methods, instance.Types.DMenu, instance.Types.DMenu.Wrap, instance.Types.DMenu.Unwrap
+local dmeno_methods, dmeno_meta, dmenowrap, dmenounwrap = instance.Types.DMenuOption.Methods, instance.Types.DMenuOption, instance.Types.DMenuOption.Wrap, instance.Types.DMenuOption.Unwrap
 local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 local plyunwrap = instance.Types.Player.Unwrap
 local vgui_library = instance.Libraries.vgui
@@ -182,6 +214,10 @@ function dimg_meta:__tostring()
 	return "DImage"
 end
 
+function dimgb_meta:__tostring()
+	return "DImageButton"
+end
+
 function dchk_meta:__tostring()
 	return "DCheckBox"
 end
@@ -196,6 +232,18 @@ end
 
 function dclm_meta:__tostring()
 	return "DColorMixer"
+end
+
+function dfb_meta:__tostring()
+	return "DFileBrowser"
+end
+
+function dmen_meta:__tostring()
+	return "DMenu"
+end
+
+function dmeno_meta:__tostring()
+	return "DMenuOption"
 end
 
 local function unwrap(pnl)
@@ -347,13 +395,119 @@ function pnl_methods:clear()
 	uwp:Clear()
 end
 
+--- Returns a table with all the child panels of the panel.
+--@return table Children
+function pnl_methods:getChildren()
+	local uwp = unwrap(self)
+	
+	return instance.Sanitize(uwp:GetChildren())
+end
+
+--- Returns the amount of children of the of panel.
+--@return number The amount of children the panel has.
+function pnl_methods:getChildCount()
+	local uwp = unwrap(self)
+	
+	return uwp:ChildCount()
+end
+
+--- Places the panel above the passed panel with the specified offset.
+--@param Panel panel Panel to position relatively to.
+--@param number? offset The align offset.
+function pnl_methods:moveAbove(pnl, off)
+	if off ~= nil then checkluatype(off, TYPE_NUMBER) end
+	local uwp = unwrap(self)
+	pnl = unwrap(pnl)
+	
+	uwp:MoveAbove(pnl, off)
+end
+
+--- Places the panel below the passed panel with the specified offset.
+--@param Panel panel Panel to position relatively to.
+--@param number? offset The align offset.
+function pnl_methods:moveBelow(pnl, off)
+	if off ~= nil then checkluatype(off, TYPE_NUMBER) end
+	local uwp = unwrap(self)
+	pnl = unwrap(pnl)
+	
+	uwp:MoveBelow(pnl, off)
+end
+
+--- Places the panel left to the passed panel with the specified offset.
+--@param Panel panel Panel to position relatively to.
+--@param number? offset The align offset.
+function pnl_methods:moveLeftOf(pnl, off)
+	if off ~= nil then checkluatype(off, TYPE_NUMBER) end
+	local uwp = unwrap(self)
+	pnl = unwrap(pnl)
+	
+	uwp:MoveLeftOf(pnl, off)
+end
+
+--- Places the panel right to the passed panel with the specified offset.
+--@param Panel panel Panel to position relatively to.
+--@param number? offset The align offset.
+function pnl_methods:moveRightOf(pnl, off)
+	if off ~= nil then checkluatype(off, TYPE_NUMBER) end
+	local uwp = unwrap(self)
+	pnl = unwrap(pnl)
+	
+	uwp:MoveRightOf(pnl, off)
+end
+
+--- Moves this panel object in front of the specified sibling (child of the same parent) in the render order, and shuffles up the Z-positions of siblings now behind.
+--@param Panel sibling The panel to move this one in front of. Must be a child of the same parent panel.
+--@return boolean false if the passed panel is not a sibling, otherwise nil.
+function pnl_methods:moveToAfter(pnl)
+	local uwp = unwrap(self)
+	pnl = unwrap(pnl)
+	
+	return uwp:MoveToAfter(pnl)
+end
+
+--- Moves this panel object behind the specified sibling (child of the same parent) in the render order, and shuffles up the Panel:setZPos of siblings now in front.
+--@param Panel sibling The panel to move this one behind. Must be a child of the same parent panel.
+--@return boolean false if the passed panel is not a sibling, otherwise nil.
+function pnl_methods:moveToBefore(pnl)
+	local uwp = unwrap(self)
+	pnl = unwrap(pnl)
+	
+	return uwp:MoveToBefore(pnl)
+end
+
+--- Sets the panels z position which determines the rendering order.
+--- Panels with lower z positions appear behind panels with higher z positions.
+--- This also controls in which order panels docked with Panel:dock appears.
+--@param number zindex The z position of the panel. Can't be lower than -32768 or higher than 32767.
+function pnl_methods:setZPos(pos)
+	checkluatype(pos, TYPE_NUMBER)
+	local uwp = unwrap(self)
+	
+	uwp:SetZPos(pos)
+end
+
+--- Moves the panel object behind all other panels on screen. If the panel has been made a pop-up with Panel:MakePopup, it will still draw in front of any panels that haven't.
+function pnl_methods:moveToBack()
+	local uwp = unwrap(self)
+	
+	uwp:MoveToBack()
+end
+
+--- Moves the panel in front of all other panels on screen. Unless the panel has been made a pop-up using Panel:makePopup, it will still draw behind any that have.
+function pnl_methods:moveToFront()
+	local uwp = unwrap(self)
+	
+	uwp:MoveToFront()
+end
+
 --- Resizes the panel object's width so that its right edge is aligned with the left of the passed panel. 
 --- An offset greater than zero will reduce the panel's width to leave a gap between it and the passed panel.
 --@param Panel targetPanel The panel to align the bottom of this one with.
 --@param number offset The gap to leave between this and the passed panel. Negative values will cause the panel's height to increase, forming an overlap.
 function pnl_methods:stretchRightTo(target, off)
 	local uwp = unwrap(self)
-	local uwtp = pnlunwrap(target)
+	local uwtp = unwrap(target)
+	checkluatype(off, TYPE_NUMBER)
 
 	uwp:StretchRightTo(uwtp, off)
 end
@@ -364,7 +518,8 @@ end
 --@param number offset The gap to leave between this and the passed panel. Negative values will cause the panel's height to increase, forming an overlap.
 function pnl_methods:stretchBottomTo(target, off)
 	local uwp = unwrap(self)
-	local uwtp = pnlunwrap(target)
+	local uwtp = unwrap(target)
+	checkluatype(off, TYPE_NUMBER)
 
 	uwp:StretchBottomTo(uwtp, off)
 end
@@ -376,11 +531,63 @@ function pnl_methods:makePopup()
 	uwp:MakePopup()
 end
 
+--- Parents the panel to the HUD. Makes it invisible on the escape-menu and disables controls.
+function pnl_methods:parentToHUD()
+	local uwp = unwrap(self)
+	
+	uwp:ParentToHUD()
+end
+
+--- Sets the alignment of the contents. Check https://wiki.facepunch.com/gmod/Panel:SetContentAlignment for directions.
+--@param number align The direction of the content, based on the number pad.
+function pnl_methods:setContentAlignment(align)
+	checkluatype(align, TYPE_NUMBER)
+	local uwp = unwrap(self)
+	
+	uwp:SetContentAlignment(align)
+end
+
+--- Sets whenever all the default border of the panel should be drawn or not.
+--param boolean paint Whenever to draw the border or not.
+function pnl_methods:setPaintBorderEnabled(paint)
+	checkluatype(paint, TYPE_BOOL)
+	local uwp = unwrap(self)
+	
+	uwp:SetPaintBorderEnabled(paint)
+end
+
 --- Centers the panel.
 function pnl_methods:center()
 	local uwp = unwrap(self)
 	
 	uwp:Center()
+end
+
+--- Centers the panel horizontally with specified fraction.
+--@param number frac The center fraction.
+function pnl_methods:centerHorizontal(frac)
+	checkluatype(frac, TYPE_NUMBER)
+	local uwp = unwrap(self)
+	
+	uwp:CenterHorizontal(frac)
+end
+
+--- Centers the panel vertically with specified fraction.
+--@param number frac The center fraction.
+function pnl_methods:centerVertical(frac)
+	checkluatype(frac, TYPE_NUMBER)
+	local uwp = unwrap(self)
+	
+	uwp:CenterVertical(frac)
+end
+
+--- Sets the appearance of the cursor. You can find a list of all available cursors with image previews at https://wiki.facepunch.com/gmod/Cursors.
+--@param string type The cursor to be set. Check the page in the description for valid types.
+function pnl_methods:setCursor(str)
+	checkluatype(str, TYPE_STRING)
+	local uwp = unwrap(self)
+	
+	uwp:SetCursor(str)
 end
 
 --- Removes the panel and all its children.
@@ -616,6 +823,77 @@ function pnl_methods:getKeyboardInputEnabled()
 	return uwp:IsKeyboardInputEnabled()
 end
 
+--- Set a function to run when the panel's size changes
+--@param function callback The function to run when the size changes. Has 2 arguments, which are the new width and height.
+function pnl_methods:setOnSizeChanged(func)
+	local uwp = unwrap(self)
+	checkluatype(func, TYPE_FUNCTION)
+	if !uwp.scf then
+		local oldsc
+		if uwp.OnSizeChanged then
+			oldsc = uwp.OnSizeChanged
+			function uwp:OnSizeChanged(nw, nh)
+				oldsc(self, nw, nh)
+				instance:runFunction(self.scf, nw, nh)
+			end
+		else
+			function uwp:OnSizeChanged(nw, nh)
+				instance:runFunction(self.scf, nw, nh)
+			end
+		end
+	end
+	
+	uwp.scf = func
+end
+
+--- Set a function to run when the panel is pressed while in focus.
+--@param function callback The function to run when the panel is pressed. Has 1 argument which is the keycode of the mouse button pressed. Check the MOUSE enums.
+function pnl_methods:setOnMousePressed(func)
+	local uwp = unwrap(self)
+	checkluatype(func, TYPE_FUNCTION)
+	if !uwp.mcf then
+		local oldmc = uwp.OnMousePressed
+		function uwp:OnMousePressed(mk)
+			oldmc(self, mk)
+			instance:runFunction(self.mcf, mk)
+		end
+	end
+	
+	uwp.mcf = func
+end
+
+--- Set a function to run when a mouse button is released while the panel is in focus.
+--@param function callback The function to run when the mouse is released. Has 1 argument which is the keycode of the mouse button pressed. Check the MOUSE enums.
+function pnl_methods:setOnMouseReleased(func)
+	local uwp = unwrap(self)
+	checkluatype(func, TYPE_FUNCTION)
+	if !uwp.mrf then
+		local oldmr = uwp.OnMouseReleased
+		function uwp:OnMouseReleased(mk)
+			oldmr(self, mk)
+			instance:runFunction(self.mrf, mk)
+		end
+	end
+	
+	uwp.mrf = func
+end
+
+--- Enables or disables painting of the panel manually with Panel:paintManual.
+--@param boolean enable True if the panel should be painted manually.
+function pnl_methods:setPaintedManually(enable)
+	checkluatype(enable, TYPE_BOOL)
+	local uwp = unwrap(self)
+	
+	uwp:SetPaintedManually(enable)
+end
+
+--- Paints the panel at its current position. To use this you must call Panel:setPaintedManually(true).
+function pnl_methods:paintManual()
+	local uwp = unwrap(self)
+	
+	uwp:PaintManual()
+end
+
 --- Creates a DPanel. A simple rectangular box, commonly used for parenting other elements to. Pretty much all elements are based on this. Inherits from Panel
 --@param any parent Panel to parent to.
 --@param string? name Custom name of the created panel for scripting/debugging purposes. Can be retrieved with Panel:getName.
@@ -677,6 +955,203 @@ function dpnl_methods:getDisabled()
 	local uwp = dpnlunwrap(self)
 
 	return uwp:getDisabled()
+end
+
+--- Creates a DFileBrowser. A simple rectangular box, commonly used for parenting other elements to. Pretty much all elements are based on this. Inherits from Panel
+--@param any parent Panel to parent to.
+--@param string? name Custom name of the created panel for scripting/debugging purposes. Can be retrieved with Panel:getName.
+--@return DFileBrowser The new DFileBrowser
+function vgui_library.createDFileBrowser(parent, name)
+	if parent then parent = unwrap(parent) end
+	
+	local new = vgui.Create("DFileBrowser", parent, name)
+	if !parent then panels[new] = true end -- Only insert parent panels as they will have all their children removed anyway.
+	return dfbwrap(new)
+end
+
+--- Clears the file tree and list, and resets all values.
+function dfb_methods:clear()
+	local uwp = dfbunwrap(self)
+	
+	uwp:Clear()
+end
+
+--- Sets the root directory/folder of the file tree. This needs to be set for the file tree to be displayed.
+--@param string baseDir The path to the folder to use as the root.
+function dfb_methods:setBaseFolder(dir)
+	checkluatype(dir, TYPE_STRING)
+	local uwp = dfbunwrap(self)
+	
+	uwp:SetBaseFolder(dir)
+end
+
+--- Returns the root directory/folder of the file tree.
+--@return string The path to the root folder.
+function dfb_methods:getBaseFolder()
+	local uwp = dfbunwrap(self)
+	
+	return uwp:GetBaseFolder()
+end
+
+--- Sets the directory/folder from which to display the file list.
+--@param string currentDir The directory to display files from.
+function dfb_methods:setCurrentFolder(dir)
+	checkluatype(dir, TYPE_STRING)
+	local uwp = dfbunwrap(self)
+	
+	uwp:SetCurrentFolder(dir)
+end
+
+--- Returns the current directory/folder being displayed.
+--@return string The directory the file list is currently displaying.
+function dfb_methods:getCurrentFolder()
+	local uwp = dfbunwrap(self)
+	
+	return uwp:GetCurrentFolder()
+end
+
+--- Sets the file type filter for the file list. This accepts the same file extension wildcards as file.find.
+--@param string fileTypes A list of file types to display, separated by spaces e.g. "*.lua *.txt *.mdl"
+function dfb_methods:setFileTypes(fTypes)
+	checkluatype(fTypes, TYPE_STRING)
+	local uwp = dfbunwrap(self)
+	
+	uwp:SetFileTypes(fTypes)
+end
+
+--- Returns the current file type filter on the file list.
+--@return string The current filter applied to the file list.
+function dfb_methods:getFileTypes()
+	local uwp = dfbunwrap(self)
+	
+	return uwp:GetFileTypes()
+end
+
+--- Enables or disables the model viewer mode. In this mode, files are displayed as SpawnIcons instead of a list.
+--- This should only be used for .mdl files; the spawn icons will display error models for others. See DFileBrowser:setFileTypes
+--@param boolean enable Whether or not to display files using SpawnIcons.
+function dfb_methods:setModels(enable)
+	checkluatype(enable, TYPE_BOOL)
+	local uwp = dfbunwrap(self)
+	
+	uwp:SetModels(enable)
+end
+
+--- Returns whether or not the model viewer mode is enabled. In this mode, files are displayed as SpawnIcons instead of a list.
+--@return boolean Whether or not files will be displayed using SpawnIcons.
+function dfb_methods:getModels()
+	local uwp = dfbunwrap(self)
+	
+	return uwp:GetModels()
+end
+
+--- Sets the name to use for the file tree.
+--@param string treeName The name for the root of the file tree. Passing no value causes this to be the base folder name. See DFileBrowser:setBaseFolder.
+function dfb_methods:setName(name)
+	checkluatype(name, TYPE_STRING)
+	local uwp = dfbunwrap(self)
+	
+	uwp:SetName(name)
+end
+
+--- Returns the name being used for the file tree.
+--@return string The name used for the root of the file tree.
+function dfb_methods:getName()
+	local uwp = dfbunwrap(self)
+	
+	return uwp:SetName()
+end
+
+--- Opens or closes the file tree.
+--@param boolean? open true to open the tree, false to close it.
+--@param boolean? useAnim If true, the DTree's open/close animation is used.
+function dfb_methods:setOpen(open, useAnim)
+	local uwp = dfbunwrap(self)
+	
+	uwp:SetOpen(open, useAnim)
+end
+
+--- Returns whether or not the file tree is open.
+--@return boolean Whether or not the file tree is open.
+function dfb_methods:getOpen()
+	local uwp = dfbunwrap(self)
+	
+	return uwp:GetOpen()
+end
+
+--- Sets the access path for the file tree. This is set to GAME by default.
+--@param string path The access path i.e. "GAME", "LUA", "DATA" etc.
+function dfb_methods:setPath(path)
+	checkluatype(path, TYPE_STRING)
+	local uwp = dfbunwrap(self)
+	
+	uwp:SetPath(path)
+end
+
+--- Returns the access path of the file tree. This is GAME unless changed with DFileBrowser:setPath.
+--@return string The current access path i.e. "GAME", "LUA", "DATA" etc.
+function dfb_methods:getPath()
+	local uwp = dfbunwrap(self)
+	
+	return uwp:GetPath()
+end
+
+--- Sets the search filter for the file tree. This accepts the same wildcards as file.find.
+--@param string filter The filter to use on the file tree.
+function dfb_methods:setSearch(filter)
+	checkluatype(filter, TYPE_STRING)
+	local uwp = dfbunwrap(self)
+	
+	uwp:SetSearch(filter)
+end
+
+--- Returns the current search filter on the file tree.
+--@return string The filter in use on the file tree.
+function dfb_methods:getSearch()
+	local uwp = dfbunwrap(self)
+	
+	return uwp:GetSearch()
+end
+
+--- Sorts the file list.
+--- This is only functional when not using the model viewer. See DFileBrowser:setModels
+--@param boolean? descending The sort order. true for descending (z-a), false for ascending (a-z).
+function dfb_methods:sortFiles(desc)
+	local uwp = dfbunwrap(self)
+	
+	uwp:SortFiles(desc)
+end
+
+--- Set a function to run when a file is selected.
+--@param function callback Function to run. Has 1 argument which is the filepath to the selected file.
+function dfb_methods:onSelect(func)
+	local uwp = dfbunwrap(self)
+	
+	function uwp:OnSelect(_, filepath)
+		instance:runFunction(func, filepath)
+	end
+end
+
+--- Set a function to run when a file is right-clicked.
+--- When not in model viewer mode, DFileBrowser:onSelect will also be called if the file is not already selected.
+--@param function callback Function to run. Has 1 argument which is the filepath to the selected file.
+function dfb_methods:onRightClick(func)
+	local uwp = dfbunwrap(self)
+	
+	function uwp:OnRightClick(filepath)
+		instance:runFunction(func, filepath)
+	end
+end
+
+--- Set a function to run when a file is double-clicked.
+--- Double-clicking a file or icon will trigger both this and DFileBrowser:onSelect.
+--@param function callback Function to run. Has 1 argument which is the filepath to the selected file.
+function dfb_methods:onDoubleClick(func)
+	local uwp = dfbunwrap(self)
+	
+	function uwp:OnDoubleClick(filepath)
+		instance:runFunction(func, filepath)
+	end
 end
 
 --- Creates a DFrame. The DFrame is the momma of basically all VGUI elements. 98% of the time you will parent your element to this.
@@ -763,7 +1238,7 @@ end
 
 --- Gets whether the DFrame can be resized by the user.
 --@return boolean Whether the DFrame can be resized.
-function dfrm_methods:setSizable()
+function dfrm_methods:getSizable()
 	local uwp = unwrap(self)
 	
 	return uwp:GetSizable()
@@ -832,7 +1307,7 @@ end
 
 --- Returns whether the background is being blurred by DFrame:setBackGroundBlur.
 --@return boolean Whether the background is blurred.
-function dfrm_methods:setBackgroundBlur()
+function dfrm_methods:getBackgroundBlur()
 	local uwp = unwrap(self)
 	
 	return uwp:GetBackgroundBlur()
@@ -889,6 +1364,170 @@ function dscrl_methods:clear()
 	local uwp = dscrlunwrap(self)
 	
 	uwp:Clear()
+end
+
+--- Creates a DMenu. A simple menu with sub menu, icon and convar support. Inherits from DScrollPanel.
+--@param any parent Panel to parent to.
+--@param string? name Custom name of the created panel for scripting/debugging purposes. Can be retrieved with Panel:getName.
+--@return DMenu The new DMenu
+function vgui_library.createDMenu(parent, name)
+	if parent then parent = unwrap(parent) end
+	
+	local new = vgui.Create("DMenu", parent, name)
+	if !parent then panels[new] = true end
+	return dmenwrap(new)
+end
+
+--- Add an option to the DMenu
+--@param string name Name of the option.
+--@param function func Function to execute when this option is clicked.
+--@return DMenuOption Returns the created DMenuOption panel.
+function dmen_methods:addOption(name, func)
+	checkluatype(name, TYPE_STRING)
+	checkluatype(func, TYPE_FUNCTION)
+	local uwp = dmenunwrap(self)
+	
+	local dmo = uwp:AddOption(name, function()
+		instance:runFunction(func)
+	end)
+	return dmenowrap(dmo)
+end
+
+--- Adds a panel to the DMenu as if it were an option.
+--@param Panel pnl The panel that you want to add.
+function dmen_methods:addPanel(pnl)
+	local uwp = dmenunwrap(self)
+	local uwp2 = unwrap(pnl)
+	
+	uwp:AddPanel(uwp2)
+end
+
+--- Adds a horizontal line spacer.
+function dmen_methods:addSpacer()
+	local uwp = dmenunwrap(self)
+	
+	uwp:AddSpacer()
+end
+
+--- Add a sub menu to the DMenu.
+--@param string name Name of the sub menu.
+--@param function? func Function to execute when this sub menu is clicked.
+--@return DMenu The created sub DMenu.
+--@return DMenuOption Function to execute when this sub menu is clicked.
+function dmen_methods:addSubMenu(name, func)
+	checkluatype(name, TYPE_STRING)
+	if func != nil then checkluatype(func, TYPE_FUNCTION) end
+	local uwp = dmenunwrap(self)
+	
+	local dm, dmo = uwp:AddSubMenu(name, function()
+		if func then
+			instance:runFunction(func)
+		end
+	end)
+	return dmenwrap(dm), dmenowrap(dm)
+end
+
+--- Returns the number of child elements of the DMenu.
+--@return number The number of child elements.
+function dmen_methods:getChildCount()
+	local uwp = dmenunwrap(self)
+	
+	return uwp:ChildCount()
+end
+
+--- Sets the maximum height the DMenu can have. If the height of all menu items exceed this value, a scroll bar will be automatically added.
+--@param number maxHeight The maximum height of the DMenu to set, in pixels.
+function dmen_methods:setMaxHeight(mh)
+	checkluatype(mh, TYPE_NUMBER)
+	local uwp = dmenunwrap(self)
+	
+	uwp:SetMaxHeight(mh)
+end
+
+--- Returns the maximum height of the DMenu.
+--@return number The maximum height in pixels.
+function dmen_methods:getMaxHeight()
+	local uwp = dmenunwrap(self)
+	
+	return uwp:GetMaxHeight()
+end
+
+--- Sets the minimum width of the DMenu. The menu will be stretched to match the given value.
+--@param number minimumWidth The minimum width of the DMenu in pixels
+function dmen_methods:setMinimumWidth(mh)
+	checkluatype(mh, TYPE_NUMBER)
+	local uwp = dmenunwrap(self)
+	
+	uwp:SetMinimumWidth(mh)
+end
+
+--- Returns the minimum width of the DMenu in pixels
+--@return number The minimum width of the DMenu.
+function dmen_methods:getMinimumWidth()
+	local uwp = dmenunwrap(self)
+	
+	return uwp:GetMinimumWidth()
+end
+
+--- Opens the DMenu at the specified position or cursor position if X and Y are not given.
+--@param number? x Position (X coordinate) to open the menu at.
+--@param number? y Position (Y coordinate) to open the menu at.
+function dmen_methods:open(x, y)
+	local uwp = dmenunwrap(self)
+	
+	uwp:Open(x, y)
+end
+
+--- Creates a sub DMenu and returns it. Has no duplicate call protection.
+--@return DMenu The created DMenu to add options to.
+function dmeno_methods:addSubMenu()
+	local uwp = dmenounwrap(self)
+	
+	return dmenwrap(uwp:AddSubMenu())
+end
+
+--- Sets the checked state of the DMenuOption. Does not invoke DMenuOption:onChecked.
+--@param boolean checked New checked state.
+function dmeno_methods:setChecked(chk)
+	checkluatype(chk, TYPE_BOOL)
+	local uwp = dmenounwrap(self)
+	
+	uwp:SetChecked(chk)
+end
+
+--- Returns the checked state of DMenuOption.
+--@return boolean Are we checked or not.
+function dmeno_methods:getChecked()
+	local uwp = dmenounwrap(self)
+	
+	return uwp:GetChecked()
+end
+
+--- Sets whether the DMenuOption is a checkbox option or a normal button option.
+--@param boolean checkable Checkable?
+function dmeno_methods:setIsCheckable(chk)
+	checkluatype(chk, TYPE_BOOL)
+	local uwp = dmenounwrap(self)
+	
+	uwp:SetIsCheckable(chk)
+end
+
+--- Returns whether the DMenuOption is a checkbox option or a normal button option.
+--@return boolean Is checkable?
+function dmeno_methods:getIsCheckable()
+	local uwp = dmenounwrap(self)
+	
+	return uwp:GetIsCheckable()
+end
+
+--- Set a function to run when the DMenuOption's checked state changes.
+--@param function callback Function to run. Has one argument which is the new checked state.
+function dmeno_methods:onChecked(func)
+	local uwp = dmenunwrap(self)
+	
+	function uwp:OnChecked(new)
+		instance:runFunction(func, new)
+	end
 end
 
 --- Creates a DLabel. A standard Derma text label. A lot of this panels functionality is a base for button elements, such as DButton.
@@ -1483,6 +2122,72 @@ function dimg_methods:getKeepAspect()
 	local uwp = dimgunwrap(self)
 
 	return uwp:GetKeepAspect()
+end
+
+--- Creates a DImageButton. An image button. This panel inherits all methods of DButton, such as DLabel:onClick.
+--@param any parent Panel to parent to.
+--@param string? name Custom name of the created panel for scripting/debugging purposes. Can be retrieved with Panel:getName.
+--@return DImageButton The new DImageButton.
+function vgui_library.createDImageButton(parent, name)
+	if parent then parent = unwrap(parent) end
+	
+	local new = vgui.Create("DImageButton", parent, name)
+	if !parent then panels[new] = true end
+	return dimgbwrap(new)
+end
+
+--- Sets the image to load into the frame. If the first image can't be loaded and strBackup is set, that image will be loaded instead.
+--@param string imagePath The path of the image to load. When no file extension is supplied the VMT file extension is used.
+--@param string? backup The path of the backup image.
+function dimgb_methods:setImage(imagePath, backup)
+	checkluatype(imagePath, TYPE_STRING)
+	local uwp = dimgbunwrap(self)
+
+	uwp:SetImage(imagePath, backup)
+end
+
+--- Returns the image loaded in the image panel.
+--@return string The path to the image that is loaded.
+function dimgb_methods:getImage()
+	local uwp = dimgbunwrap(self)
+
+	return uwp:GetImage()
+end
+
+--- Sets whether the DImageButton should keep the aspect ratio of its image when being resized.
+--- Note that this will not try to fit the image inside the button, but instead it will fill the button with the image.
+--@param boolean keep True to keep the aspect ratio, false not to.
+function dimgb_methods:setKeepAspect(enable)
+	checkluatype(enable, TYPE_BOOL)
+	local uwp = dimgbunwrap(self)
+
+	uwp:SetKeepAspect(enable)
+end
+
+--- Sets the image's color override.
+--@param Color imgColor The color override of the image. Uses the Color.
+function dimgb_methods:setImageColor(clr)
+	local uwp = dimgbunwrap(self)
+	local uwc = cunwrap(clr)
+
+	uwp:SetColor(uwc)
+end
+
+--- Sets whether the image inside the DImageButton should be stretched to fill the entire size of the button, without preserving aspect ratio. If set to false, the image will not be resized at all.
+--@param boolean stretch True to stretch, false to not to stretch.
+function dimgb_methods:setStretchToFit(enable)
+	checkluatype(enable, TYPE_BOOL)
+	local uwp = dimgbunwrap(self)
+	
+	uwp:SetStretchToFit(enable)
+end
+
+--- Returns whether the image inside the button should be stretched to fit it or not.
+--@return boolean Stretch?
+function dimgb_methods:getStretchToFit()
+	local uwp = dimgbunwrap(self)
+	
+	return uwp:GetStretchToFit()
 end
 
 --- Creates a DCheckBox. The DCheckBox is a checkbox. It allows you to get a boolean value from the user. Inherits functions from DButton.
