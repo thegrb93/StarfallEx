@@ -59,7 +59,7 @@ SF.RegisterType("DMenu", false, true, debug.getregistry().DMenu, "DScrollPanel")
 -- @class type
 -- @libtbl dmeno_methods
 -- @libtbl dmeno_meta
-SF.RegisterType("DMenuOption", false, true, debug.getregistry().DMenuOption, "Button")
+SF.RegisterType("DMenuOption", false, true, debug.getregistry().DMenuOption, "DButton")
 
 --- DColorMixer type
 -- @name DColorMixer
