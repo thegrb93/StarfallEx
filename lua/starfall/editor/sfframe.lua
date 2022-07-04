@@ -1440,7 +1440,7 @@ function Editor:ChosenFile(Line, code)
 	if not code then
 		code = Line and file.Read(Line)
 		if code then
-			code = string.gsub(code, "[\r\t]", {["\r"]="", ["\t"]="    "})
+			code = SF.Editor.normalizeCode(code)
 		end
 	end
 	self:GetCurrentTabContent().savedCode = code
@@ -1542,8 +1542,9 @@ function Editor:Open(Line, code, forcenewtab, checkFileExists)
 	self:SetV(true)
 	if code then
 		if not forcenewtab then
+			local normalizedCode = SF.Editor.normalizeCode(code)
 			for i = 1, self:GetNumTabs() do
-				if self:GetTabContent(i):GetCode() == code then
+				if self:GetTabContent(i):GetCode() == normalizedCode then
 					self:SetActiveTab(i)
 					return
 				end
