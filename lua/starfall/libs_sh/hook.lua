@@ -446,7 +446,7 @@ end)
 add("EntityEmitSound", nil, function(instance, data)
 	return true, {SF.StructWrapper(instance, data, "EmitSoundInfo")}
 end, function(instance, ret, data)
-	if ret[1] and ret[2]==false and (instance.player == SF.Superuser or haspermission(instance, data.Entity, "entities.canTool")) then
+	if ret[1] and ret[2]==false and (instance.player == SF.Superuser or haspermission(instance, data.Entity, "entities.emitSound")) then
 		return ret[2]
 	end
 end)
