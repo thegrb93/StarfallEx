@@ -130,6 +130,13 @@ if CLIENT then
 		return path
 	end
 
+	--- Converts given text to LF and tabs to spaces.
+	-- Every code which goes into the editor is normalized first.
+	-- Note: remember to normalize every input file when comparing it to already open files to avoid inconsistencies.
+	function SF.Editor.normalizeCode(code)
+		return string.gsub(code, "[\r\t]", {["\r"]="", ["\t"]="    "})
+	end
+
 	function SF.Editor.renameFile(oldFile, newFile)
 		if file.Exists(newFile, "DATA") then
 			SF.AddNotify(LocalPlayer(), "Failed to rename. File already exists there.", "ERROR", 7, "ERROR1")
