@@ -9,12 +9,6 @@ local checkluatype = SF.CheckLuaType
 -- @libtbl math_library
 SF.RegisterLibrary("math")
 
---- Ease library https://wiki.facepunch.com/gmod/math.ease
--- @name ease
--- @class library
--- @libtbl ease_library
-SF.RegisterLibrary("ease")
-
 return function(instance)
 
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
@@ -389,168 +383,166 @@ function math_library.sharedRandom(uniqueName, Min, Max, additionalSeed)
 	return util.SharedRandom(uniqueName, Min, Max, additionalSeed)
 end
 
-local ease_library = instance.Libraries.ease
-
 --- Eases in by reversing the direction of the ease slightly before returning.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.inBack = math.ease.InBack
+math_library.easeInBack = math.ease.InBack
 
 --- Eases in like a bouncy ball.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.inBounce = math.ease.InBounce
+math_library.easeInBounce = math.ease.InBounce
 
 --- Eases in using a circular function.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.inCirc = math.ease.InCirc
+math_library.easeInCirc = math.ease.InCirc
 
 --- Eases in by cubing the fraction.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.inCubic = math.ease.InCubic
+math_library.easeInCubic = math.ease.InCubic
 
 --- Eases in like a rubber band.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.inElastic = math.ease.InElastic
+math_library.easeInElastic = math.ease.InElastic
 
 --- Eases in using an exponential equation with a base of 2 and where the fraction is used in the exponent.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.inExpo = math.ease.InExpo
+math_library.easeInExpo = math.ease.InExpo
 
 --- Eases in and out by reversing the direction of the ease slightly before returning on both ends.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.inOutBack = math.ease.InOutBack
+math_library.easeInOutBack = math.ease.InOutBack
 
 --- Eases in and out like a bouncy ball.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.inOutBounce = math.ease.InOutBounce
+math_library.easeInOutBounce = math.ease.InOutBounce
 
 --- Eases in and out using a circular function.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.inOutCirc = math.ease.InOutCirc
+math_library.easeInOutCirc = math.ease.InOutCirc
 
 --- Eases in and out by cubing the fraction.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.inOutCubic = math.ease.InOutCubic
+math_library.easeInOutCubic = math.ease.InOutCubic
 
 --- Eases in and out like a rubber band.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.inOutElastic = math.ease.InOutElastic
+math_library.easeInOutElastic = math.ease.InOutElastic
 
 --- Eases in and out using an exponential equation with a base of 2 and where the fraction is used in the exponent.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.inOutExpo = math.ease.InOutExpo
+math_library.easeInOutExpo = math.ease.InOutExpo
 
 --- Eases in and out by squaring the fraction.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.inOutQuad = math.ease.InOutQuad
+math_library.easeInOutQuad = math.ease.InOutQuad
 
 --- Eases in and out by raising the fraction to the power of 5.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.inOutQuint = math.ease.InOutQuint
+math_library.easeInOutQuint = math.ease.InOutQuint
 
 --- Eases in and out using math.sin.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.inOutSine = math.ease.InOutSine
+math_library.easeInOutSine = math.ease.InOutSine
 
 --- Eases in by squaring the fraction.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.inQuad = math.ease.InQuad
+math_library.easeInQuad = math.ease.InQuad
 
 --- Eases in by raising the fraction to the power of 4.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.inQuart = math.ease.InQuart
+math_library.easeInQuart = math.ease.InQuart
 
 --- Eases in by raising the fraction to the power of 5.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.inQuint = math.ease.InQuint
+math_library.easeInQuint = math.ease.InQuint
 
 --- Eases in using math.sin.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.inSine = math.ease.InSine
+math_library.easeInSine = math.ease.InSine
 
 --- Eases out by reversing the direction of the ease slightly before finishing.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.outBack = math.ease.OutBack
+math_library.easeOutBack = math.ease.OutBack
 
 --- Eases out like a bouncy ball.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.outBounce = math.ease.OutBounce
+math_library.easeOutBounce = math.ease.OutBounce
 
 --- Eases out using a circular function.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.outCirc = math.ease.OutCirc
+math_library.easeOutCirc = math.ease.OutCirc
 
 --- Eases out by cubing the fraction.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.outCubic = math.ease.OutCubic
+math_library.easeOutCubic = math.ease.OutCubic
 
 --- Eases out like a rubber band.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.outElastic = math.ease.OutElastic
+math_library.easeOutElastic = math.ease.OutElastic
 
 --- Eases out by raising the fraction to the power of 4.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.outQuart = math.ease.OutQuart
+math_library.easeOutQuart = math.ease.OutQuart
 
 --- Eases out by raising the fraction to the power of 5.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.outQuint = math.ease.OutQuint
+math_library.easeOutQuint = math.ease.OutQuint
 
 --- Eases out using math.sin.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
-ease_library.outSine = math.ease.OutSine
+math_library.easeOutSine = math.ease.OutSine
 
 end
