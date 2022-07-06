@@ -267,6 +267,7 @@ function PANEL:Setup(folder)
 		{"Async", "https://raw.githubusercontent.com/keever50/StarfallLibraries/master/async.txt"},
 		{"Console", "https://raw.githubusercontent.com/Derpius/public-starfalls/master/console/console.txt"},
 		{"CriticalPD", "https://raw.githubusercontent.com/thegrb93/MyStarfallScripts/master/libs/CriticalPD.txt"},
+		{"EaseLib", "https://raw.githubusercontent.com/FadeRax/PublicStarfalls/main/lib/easelib.txt"},
 		{"GifLoader", "https://raw.githubusercontent.com/thegrb93/MyStarfallScripts/master/libs/gifspritesheet.txt"},
 		{"HoloText", "https://raw.githubusercontent.com/Derpius/public-starfalls/master/libs/holotext/main.txt"},
 		{"HttpQueue", "https://raw.githubusercontent.com/ANormalTwig/PublicStarfalls/main/libraries/http_queueing.lua"},
