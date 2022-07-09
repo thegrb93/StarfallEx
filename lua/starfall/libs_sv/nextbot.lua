@@ -93,7 +93,6 @@ end
 -- @param string? model The model the nextbot will use. If nil, uses Kleiner.
 -- @return NextBot The nextbot.
 function nextbot_library.create(pos, mdl)
-
 	checkpermission(instance, nil, "nextbot.create")
 	checkluatype(mdl, TYPE_STRING)
 	local upos = vunwrap(pos)
@@ -108,6 +107,9 @@ function nextbot_library.create(pos, mdl)
 	nb.chip = instance.entity
 	nb:Spawn()
 	nextbots[nb] = true
+
+	if CPPI then nb:CPPISetOwner(ply) end
+
 	return nbwrap(nb)
 end
 	
