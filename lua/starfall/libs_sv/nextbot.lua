@@ -109,7 +109,6 @@ function nextbot_library.create(pos, mdl)
 	nb:SetModel(mdl or "models/kleiner.mdl")
 	nb.chip = instance.entity
 	nb:Spawn()
-	nb:SetOwner(ply)
 	nextbots[nb] = true
 
 	if CPPI then nb:CPPISetOwner(ply) end
