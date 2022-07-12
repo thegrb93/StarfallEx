@@ -52,6 +52,8 @@ registerprivilege("nextbot.jumpAcrossGap", "Nextbot jump across gap", "Allows th
 registerprivilege("nextbot.setClimbAllowed", "Nextbot allow climb", "Allows the user to set whether the nextbot can climb nav ladders.", {entities = {}})
 registerprivilege("nextbot.setAvoidAllowed", "Nextbot allow avoid", "Allows the user to set whether the nextbot can try to avoid obstacles.", {entities = {}})
 registerprivilege("nextbot.setJumpGapsAllowed", "Nextbot allow jump gaps", "Allows the user to set whether the nextbot can jump gaps.", {entities = {}})
+registerprivilege("nextbot.setHealth", "Nextbot allow set health", "Allows the user to set whether the nextbot's health", {entities = {}})
+registerprivilege("nextbot.setMaxHealth", "Nextbot allow set max health", "Allows the user to set whether the nextbot's max health", {entities = {}})
 
 local nbCount = SF.LimitObject("nextbots", "nextbots", 30, "The number of props allowed to spawn via Starfall")
 
@@ -63,6 +65,7 @@ local nextbots = {}
 local nextbot_library, nb_meta, nb_methods = instance.Libraries.nextbot, instance.Types.NextBot, instance.Types.NextBot.Methods
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local navarea_methods, navarea_meta, navwrap, navunwrap = instance.Types.NavArea.Methods, instance.Types.NavArea, instance.Types.NavArea.Wrap, instance.Types.NavArea.Unwrap
+local eunwrap = instance.Types.Entity.Unwrap
 local nbwrap, nbunwrap = instance.Types.NextBot.Wrap, instance.Types.NextBot.Unwrap
 
 local function nextbotOnDestroy(ent)
@@ -106,6 +109,7 @@ function nextbot_library.create(pos, mdl)
 	nb:SetModel(mdl or "models/kleiner.mdl")
 	nb.chip = instance.entity
 	nb:Spawn()
+	nb:SetOwner(ply)
 	nextbots[nb] = true
 
 	if CPPI then nb:CPPISetOwner(ply) end
@@ -120,6 +124,7 @@ function nextbot_library.canSpawn()
 	if not SF.Permissions.hasAccess(instance, nil, "nextbot.create") then return false end
 	return nbCount:check(instance.player) > 0
 end
+	
 
 --- Makes the nextbot try to go to a specified position.
 -- @server
