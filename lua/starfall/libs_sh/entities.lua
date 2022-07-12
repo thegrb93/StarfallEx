@@ -895,8 +895,8 @@ if SERVER then
 	-- @server
 	-- @param number newhealth New health value.
 	function ents_methods:setHealth(val)
-		local ent = instance.UnwrapObject(self)
-		if !checkpermission(instance, ent, "entities.setHealth") then SF.Throw("You don't have permission to set max health on this entity!", 2) end
+		local ent = getent(self)
+		checkpermission(instance, ent, "entities.setHealth")
 		checkluatype(val, TYPE_NUMBER)
 		ent:SetHealth(val)
 	end
@@ -905,8 +905,8 @@ if SERVER then
 	-- @server
 	-- @param number newmaxhealth New max health value.
 	function ents_methods:setMaxHealth(val)
-		local ent = instance.UnwrapObject(self)
-		if !checkpermission(instance, ent, "entities.setMaxHealth") then SF.Throw("You don't have permission to set max health on this entity!", 2) end
+		local ent = getent(self)
+		checkpermission(instance, ent, "entities.setMaxHealth")
 		checkluatype(val, TYPE_NUMBER)
 		ent:SetMaxHealth(val)
 	end
