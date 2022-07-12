@@ -106,6 +106,7 @@ function nextbot_library.create(pos, mdl)
 	nb:SetModel(mdl or "models/kleiner.mdl")
 	nb.chip = instance.entity
 	nb:Spawn()
+	nb:SetOwner(ply)
 	nextbots[nb] = true
 
 	if CPPI then nb:CPPISetOwner(ply) end
@@ -120,6 +121,7 @@ function nextbot_library.canSpawn()
 	if not SF.Permissions.hasAccess(instance, nil, "nextbot.create") then return false end
 	return nbCount:check(instance.player) > 0
 end
+	
 
 --- Makes the nextbot try to go to a specified position.
 -- @server

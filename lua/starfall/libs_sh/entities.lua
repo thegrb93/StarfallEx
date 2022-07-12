@@ -7,6 +7,8 @@ registerprivilege("entities.setRenderProperty", "RenderProperty", "Allows the us
 registerprivilege("entities.setPlayerRenderProperty", "PlayerRenderProperty", "Allows the user to change the rendering of themselves", {})
 registerprivilege("entities.setPersistent", "SetPersistent", "Allows the user to change entity's persistent state", { entities = {} })
 registerprivilege("entities.emitSound", "Emitsound", "Allows the user to play sounds on entities", { client = (CLIENT and {} or nil), entities = {} })
+registerprivilege("entities.setHealth", "SetHealth", "Allows the user to change an entity's health", { entities = {} })
+registerprivilege("entities.setMaxHealth", "SetMaxHealth", "Allows the user to change an entity's max health", { entities = {} })
 
 local manipulations = SF.EntityTable("boneManipulations")
 
@@ -887,6 +889,26 @@ if SERVER then
 		end
 
 		return plys
+	end
+	
+	--- Sets the health of the entity.
+	-- @server
+	-- @param number newhealth New health value.
+	function ents_methods:setHealth(val)
+		local ent = getent(self)
+		checkpermission(instance, ent, "entities.setHealth")
+		checkluatype(val, TYPE_NUMBER)
+		ent:SetHealth(val)
+	end
+		
+	--- Sets the maximum health for entity. Note, that you can still set entity's health above this amount with Entity:setHealth.
+	-- @server
+	-- @param number newmaxhealth New max health value.
+	function ents_methods:setMaxHealth(val)
+		local ent = getent(self)
+		checkpermission(instance, ent, "entities.setMaxHealth")
+		checkluatype(val, TYPE_NUMBER)
+		ent:SetMaxHealth(val)
 	end
 end
 
