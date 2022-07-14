@@ -101,6 +101,8 @@ function ents_methods:getOwner()
 end
 
 if CLIENT then
+	instance.object_wrappers[debug.getregistry().NextBot] = ewrap
+		
 	--- Allows manipulation of an entity's bones' positions
 	-- @client
 	-- @param number bone The bone ID
