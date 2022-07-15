@@ -129,6 +129,15 @@ if SERVER then
 	-- @param Player ply Player who spawned
 	add("PlayerSpawn")
 
+	--- Called when a player has changed team using Player:SetTeam
+	-- @name PlayerChangedTeam
+	-- @class hook
+	-- @server
+	-- @param Player ply Player whose team has changed
+	-- @param number oldTeam Index of the team the player was originally in. See team.getName and the team library
+	-- @param number newTeam Index of the team the player has changed to.
+	add("PlayerChangedTeam")
+
 	--- Called when a players enters a vehicle
 	-- @name PlayerEnteredVehicle
 	-- @class hook
