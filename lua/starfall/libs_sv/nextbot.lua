@@ -90,7 +90,7 @@ end
 --- Creates a customizable NextBot
 -- @server
 -- @param Vector spawnpos The position the nextbot will be spawned at.
--- @param string? model The model the nextbot will use. If nil, uses Kleiner.
+-- @param string model The model the nextbot will use.
 -- @return NextBot The nextbot.
 function nextbot_library.create(pos, mdl)
 	checkpermission(instance, nil, "nextbot.create")
@@ -103,7 +103,7 @@ function nextbot_library.create(pos, mdl)
 	local nb = ents.Create("starfall_cnextbot")
 	register(nb, instance)
 	nb:SetPos(upos)
-	nb:SetModel(mdl or "models/kleiner.mdl")
+	nb:SetModel(mdl)
 	nb.chip = instance.entity
 	nb:Spawn()
 	nb:SetCreator(ply)
