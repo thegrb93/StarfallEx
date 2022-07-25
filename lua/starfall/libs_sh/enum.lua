@@ -611,6 +611,55 @@ env.COLLISION_GROUP = {
 	["WORLD"] = COLLISION_GROUP_WORLD
 }
 
+
+--- ENUMs of solid for use with entity:getSolid
+-- @name builtins_library.SOLID
+-- @class table
+-- @field NONE
+-- @field BSP
+-- @field BBOX
+-- @field OBB
+-- @field OBB_YAW
+-- @field CUSTOM
+-- @field VPHYSICS
+
+env.SOLID = {
+	["NONE"] = SOLID_NONE,
+	["BSP"] = SOLID_BSP,
+	["BBOX"] = SOLID_BBOX,
+	["OBB"] = SOLID_OBB,
+	["OBB_YAW"] = SOLID_OBB_YAW,
+	["CUSTOM"] = SOLID_CUSTOM,
+	["VPHYSICS"] = SOLID_VPHYSICS
+}
+
+--- ENUMs of solid flags for use with entity:getSolidFlags
+-- @name builtins_library.FSOLID
+-- @class table
+-- @field FSOLID_CUSTOMRAYTEST
+-- @field FSOLID_CUSTOMBOXTEST
+-- @field FSOLID_NOT_SOLID
+-- @field FSOLID_TRIGGER
+-- @field FSOLID_NOT_STANDABLE
+-- @field FSOLID_VOLUME_CONTENTS
+-- @field FSOLID_FORCE_WORLD_ALIGNED
+-- @field FSOLID_USE_TRIGGER_BOUNDS
+-- @field FSOLID_ROOT_PARENT_ALIGNED
+-- @field FSOLID_TRIGGER_TOUCH_DEBRIS
+
+env.FSOLID = {
+	["CUSTOMRAYTEST"] = FSOLID_CUSTOMRAYTEST or 1,
+	["CUSTOMBOXTEST"] = FSOLID_CUSTOMBOXTEST or 2,
+	["NOT_SOLID"] = FSOLID_NOT_SOLID or 4,
+	["TRIGGER"] = FSOLID_TRIGGER or 8,
+	["NOT_STANDABLE"] = FSOLID_NOT_STANDABLE or 16,
+	["VOLUME_CONTENTS"] = FSOLID_VOLUME_CONTENTS or 32,
+	["FORCE_WORLD_ALIGNED"] = FSOLID_FORCE_WORLD_ALIGNED or 64,
+	["USE_TRIGGER_BOUNDS"] = FSOLID_USE_TRIGGER_BOUNDS or 128,
+	["ROOT_PARENT_ALIGNED"] = FSOLID_ROOT_PARENT_ALIGNED or 256,
+	["TRIGGER_TOUCH_DEBRIS"] = FSOLID_TRIGGER_TOUCH_DEBRIS or 512
+}
+
 --- ENUMs of mesh types. To be used with mesh.generate.
 -- @name builtins_library.MATERIAL
 -- @class table

@@ -643,6 +643,24 @@ function ents_methods:getCollisionGroup()
 	return getent(self):GetCollisionGroup()
 end
 
+--- Gets the solid enum of the entity
+-- @return number The solid enum of the entity. https://wiki.facepunch.com/gmod/Enums/SOLID
+function ents_methods:getSolid()
+	return getent(self):GetSolid()
+end
+
+--- Gets the solid flag enum of the entity
+-- @return number The solid flag enum of the entity. https://wiki.facepunch.com/gmod/Enums/FSOLID
+function ents_methods:getSolidFlags()
+	return getent(self):GetSolidFlags()
+end
+
+--- Gets whether an entity is solid or not
+-- @return boolean whether an entity is solid or not
+function ents_methods:isSolid()
+	return getent(self):IsSolid()
+end
+
 --- Gets the movetype enum of the entity
 -- @return number The movetype enum of the entity. https://wiki.facepunch.com/gmod/Enums/MOVETYPE
 function ents_methods:getMoveType()
