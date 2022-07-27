@@ -933,14 +933,12 @@ if SERVER then
 		ent:SetMaxHealth(val)
 	end
 		
-	--- If true, stops the entity from being saved on duplication or map save.
+	--- Stops the entity from being saved on duplication or map save.
 	-- @server
-	-- @param boolean dontduplicate True to disallow duplication.
-	function ents_methods:doNotDuplicate(duplicate)
+	function ents_methods:doNotDuplicate()
 		local ent = getent(self)
 		checkpermission(instance, ent, "entities.doNotDuplicate")
-		checkluatype(duplicate, TYPE_BOOL)
-		ent.DoNotDuplicate = duplicate
+		ent.DoNotDuplicate = true
 	end
 end
 
