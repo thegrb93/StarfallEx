@@ -65,8 +65,9 @@ end
 -- @param Angle ang Initial entity angles
 -- @param string model Model path
 -- @param boolean? frozen True to spawn the entity in a frozen state. Default = False
+-- @param boolean? doNotDuplicate True to stop the entity from being saved in dupes or map saves.
 -- @return Entity The prop object
-function props_library.create(pos, ang, model, frozen)
+function props_library.create(pos, ang, model, frozen, duplicate)
 
 	checkpermission(instance, nil, "prop.create")
 	checkluatype(model, TYPE_STRING)
@@ -87,6 +88,7 @@ function props_library.create(pos, ang, model, frozen)
 	propent:SetPos(pos)
 	propent:SetAngles(ang)
 	propent:SetModel(model)
+	propent.DoNotDuplicate = duplicate
 	propent:Spawn()
 
 	if not propent:GetModel() then propent:Remove() SF.Throw("Invalid model", 2) end
