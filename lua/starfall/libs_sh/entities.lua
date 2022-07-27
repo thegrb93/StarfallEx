@@ -9,6 +9,8 @@ registerprivilege("entities.setPersistent", "SetPersistent", "Allows the user to
 registerprivilege("entities.emitSound", "Emitsound", "Allows the user to play sounds on entities", { client = (CLIENT and {} or nil), entities = {} })
 registerprivilege("entities.setHealth", "SetHealth", "Allows the user to change an entity's health", { entities = {} })
 registerprivilege("entities.setMaxHealth", "SetMaxHealth", "Allows the user to change an entity's max health", { entities = {} })
+registerprivilege("entities.doNotDuplicate", "DoNotDuplicate", "Allows the user to set whether an entity will be saved on dupes or map saves", { entities = {} })
+
 
 local manipulations = SF.EntityTable("boneManipulations")
 
@@ -929,6 +931,16 @@ if SERVER then
 		checkpermission(instance, ent, "entities.setMaxHealth")
 		checkluatype(val, TYPE_NUMBER)
 		ent:SetMaxHealth(val)
+	end
+		
+	--- If true, stops the entity from being saved on duplication or map save.
+	-- @server
+	-- @param boolean dontduplicate True to disallow duplication.
+	function ents_methods:doNotDuplicate(duplicate)
+		local ent = getent(self)
+		checkpermission(instance, ent, "entities.doNotDuplicate")
+		checkluatype(duplicate, TYPE_BOOL)
+		ent.DoNotDuplicate = duplicate
 	end
 end
 
