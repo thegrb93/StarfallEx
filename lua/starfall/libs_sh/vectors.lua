@@ -284,10 +284,9 @@ end
 -- @return Vector vector Returns a point along a bezier curve
 function vec_methods:bezier(v2, v3, r)
 	return wrap({
-		(1-r)^2 * self[1] + (2 * (1-r) * r * v2[1]) + r^2 * v3[1],
+	(1-r)^2 * self[1] + (2 * (1-r) * r * v2[1]) + r^2 * v3[1],
         (1-r)^2 * self[2] + (2 * (1-r) * r * v2[2]) + r^2 * v3[2],
-        (1-r)^2 * self[3] + (2 * (1-r) * r * v2[3]) + r^2 * v3[3]
-	})
+        (1-r)^2 * self[3] + (2 * (1-r) * r * v2[3]) + r^2 * v3[3]})
 end
 
 --- Add v to this vector
