@@ -283,11 +283,14 @@ end
 -- @param number num The point along the curve 0-1
 -- @return Vector vector Returns a point along a bezier curve
 function vec_methods:bezier(v2, v3, r)
+	local ri = 1-r
+	local c1 = ri^2
+	local c2 = 2*ri*r
+	local c3 = r^2
 	return wrap({
-		(1-r)^2 * self[1] + (2 * (1-r) * r * v2[1]) + r^2 * v3[1],
-        (1-r)^2 * self[2] + (2 * (1-r) * r * v2[2]) + r^2 * v3[2],
-        (1-r)^2 * self[3] + (2 * (1-r) * r * v2[3]) + r^2 * v3[3]
-	})
+		c1*self[1] + c2*v2[1] + c3*v3[1],
+		c1*self[2] + c2*v2[2] + c3*v3[2],
+		c1*self[3] + c2*v2[3] + c3*v3[3]})
 end
 
 --- Add v to this vector
