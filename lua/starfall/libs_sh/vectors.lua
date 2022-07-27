@@ -277,22 +277,6 @@ function vec_methods:getLength2DSqr()
 	return (self[1]^2 + self[2]^2)
 end
 
---- Returns a point along a bezier curve.
--- @param Vector middle The middle position of the curve.
--- @param Vector end The end position of the curve.
--- @param number ratio Number representing how far along the curve, 0-1.
--- @return Vector Vector representing point along the curve.
-function vec_methods:bezier(v2, v3, r)
-	local ri = 1-r
-	local c1 = ri*ri
-	local c2 = 2*ri*r
-	local c3 = r*r
-	return wrap({
-		c1*self[1] + c2*v2[1] + c3*v3[1],
-		c1*self[2] + c2*v2[2] + c3*v3[2],
-		c1*self[3] + c2*v2[3] + c3*v3[3]})
-end
-
 --- Add v to this vector
 -- Self-Modifies. Does not return anything
 -- @param Vector v Vector to add
