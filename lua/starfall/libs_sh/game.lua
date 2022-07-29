@@ -84,6 +84,17 @@ function game_library.getWorld()
 	return ewrap(game.GetWorld())
 end
 
+--- Returns a table with keys that are condensed model path names and value identifiers of said paths
+-- @shared
+-- @return table List of valid playermodels
+function game_library.getPlayerModels()
+	local ret = {}
+	for k, v in pairs(player_manager.AllValidModels()) do
+		ret[k] = v
+	end
+	return ret
+end
+
 --- Given a 64bit SteamID will return a STEAM_0: style Steam ID
 -- @param string id The 64 bit Steam ID
 -- @return string STEAM_0 style Steam ID
