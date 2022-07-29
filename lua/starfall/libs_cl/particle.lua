@@ -64,7 +64,7 @@ end
 --- Returns number of particle emitters left able to be created
 -- @return number Number of particle emitters left
 function particle_library.particleEmittersLeft()
-	return plyEmitterCount:check()
+	return plyEmitterCount:check(instance.player)
 end
 
 --- Creates a new Particle with the given material and position.
