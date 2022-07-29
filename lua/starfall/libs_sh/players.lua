@@ -236,7 +236,7 @@ function player_methods:getDuckSpeed()
 	return getply(self):GetDuckSpeed()
 end
 
---- Returns a list of valid playermodels and file paths
+--- Returns a list of valid playermodels
 -- @shared
 -- @return table List of valid playermodels
 function player_methods.AllValidModels()
