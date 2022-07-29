@@ -236,13 +236,6 @@ function player_methods:getDuckSpeed()
 	return getply(self):GetDuckSpeed()
 end
 
---- Returns a list of valid playermodels
--- @shared
--- @return table List of valid playermodels
-function player_methods.AllValidModels()
-	return table.Add(nil, player_manager.AllValidModels())
-end
-
 --- Returns the entity the player is currently using, like func_tank mounted turrets or +use prop pickups.
 -- @shared
 -- @return Entity Entity
