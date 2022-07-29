@@ -377,7 +377,7 @@ end
 -- @param Vector middle The middle position of the curve.
 -- @param Vector end The end position of the curve.
 -- @return Vector Vector representing the point along the curve.
-function math_library.bezier(r, v1, v2, v3)
+function math_library.bezierVector(r, v1, v2, v3)
 	local ri = 1-r
 	local c1 = ri^2
 	local c2 = 2*ri*r
