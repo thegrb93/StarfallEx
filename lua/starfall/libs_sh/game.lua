@@ -88,7 +88,11 @@ end
 -- @shared
 -- @return table List of valid playermodels
 function game_library.getPlayerModels()
-	return table.Add(nil, player_manager.AllValidModels())
+	local ret = {}
+	for k, v in pairs(player_manager.AllValidModels()) do
+		ret[k] = v
+	end
+	return ret
 end
 
 --- Given a 64bit SteamID will return a STEAM_0: style Steam ID
