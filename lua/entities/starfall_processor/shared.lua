@@ -139,8 +139,8 @@ function ENT:SetupFiles(sfdata)
 
 		if self.instance and self.instance.ppdata.models and self.instance.mainfile then
 			local model = self.instance.ppdata.models[self.instance.mainfile]
-			if model and SF.CheckModel(model, self.owner, true) then
-				self:SetCustomModel(model)
+			if model then
+				pcall(function() self:SetCustomModel(SF.CheckModel(model, self.owner, true)) end)
 			end
 		end
 

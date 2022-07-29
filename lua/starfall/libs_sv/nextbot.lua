@@ -90,24 +90,28 @@ end
 --- Creates a customizable NextBot
 -- @server
 -- @param Vector spawnpos The position the nextbot will be spawned at.
--- @param string? model The model the nextbot will use. If nil, uses Kleiner.
+-- @param string model The model the nextbot will use.
 -- @return NextBot The nextbot.
 function nextbot_library.create(pos, mdl)
-
 	checkpermission(instance, nil, "nextbot.create")
 	checkluatype(mdl, TYPE_STRING)
 	local upos = vunwrap(pos)
-	
+
 	local ply = instance.player
+	mdl = SF.CheckModel(mdl, ply)
 	nbCount:checkuse(ply, 1)
 
 	local nb = ents.Create("starfall_cnextbot")
 	register(nb, instance)
 	nb:SetPos(upos)
-	nb:SetModel(mdl or "models/kleiner.mdl")
+	nb:SetModel(mdl)
 	nb.chip = instance.entity
 	nb:Spawn()
+	nb:SetCreator(ply)
 	nextbots[nb] = true
+
+	if CPPI then nb:CPPISetOwner(ply) end
+
 	return nbwrap(nb)
 end
 	
@@ -118,6 +122,7 @@ function nextbot_library.canSpawn()
 	if not SF.Permissions.hasAccess(instance, nil, "nextbot.create") then return false end
 	return nbCount:check(instance.player) > 0
 end
+	
 
 --- Makes the nextbot try to go to a specified position.
 -- @server

@@ -163,7 +163,9 @@ instance:AddHook("deinitialize", function()
 	if instance.data.cursorEnabled then
 		gui.EnableScreenClicker(false)
 	end
-	unlockControls(instance)
+	if instance.data.input.controlsLocked then
+		unlockControls(instance)
+	end
 end)
 
 instance:AddHook("starfall_hud_disconnected", function()

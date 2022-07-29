@@ -129,6 +129,15 @@ if SERVER then
 	-- @param Player ply Player who spawned
 	add("PlayerSpawn")
 
+	--- Called when a player has changed team using Player:SetTeam
+	-- @name PlayerChangedTeam
+	-- @class hook
+	-- @server
+	-- @param Player ply Player whose team has changed
+	-- @param number oldTeam Index of the team the player was originally in. See team.getName and the team library
+	-- @param number newTeam Index of the team the player has changed to.
+	add("PlayerChangedTeam")
+
 	--- Called when a players enters a vehicle
 	-- @name PlayerEnteredVehicle
 	-- @class hook
@@ -437,6 +446,20 @@ add("EntityFireBullets", nil, function(instance, ent, data)
 	return true, { instance.WrapObject(ent), SF.StructWrapper(instance, data, "Bullet") }
 end)
 
+--- Called whenever a sound has been played. This will not be called clientside if the server played the sound without the client also calling Entity:EmitSound.
+-- @name EntityEmitSound
+-- @class hook
+-- @shared
+-- @param table data Information about the played sound. Changes done to this table can be applied by returning true from this hook. See https://wiki.facepunch.com/gmod/Structures/EmitSoundInfo.
+-- @return boolean? Return false to prevent the sound from playing or nothing to play the sound without altering it.
+add("EntityEmitSound", nil, function(instance, data)
+	return true, {SF.StructWrapper(instance, data, "EmitSoundInfo")}
+end, function(instance, ret, data)
+	if ret[1] and ret[2]==false and (instance.player == SF.Superuser or haspermission(instance, data.Entity, "entities.emitSound")) then
+		return ret[2]
+	end
+end)
+
 -- Other
 
 --- Called when a player stops driving an entity
@@ -606,7 +629,7 @@ function hook_library.runRemote(recipient, ...)
 		end
 
 		if result[1] and result[2]~=nil then
-			results[#results + 1] = { unpack(result, 2) }
+			results[#results + 1] = instance.Sanitize(k.Unsanitize({unpack(result, 2)}))
 		end
 
 	end

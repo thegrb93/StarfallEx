@@ -7,6 +7,8 @@ registerprivilege("entities.setRenderProperty", "RenderProperty", "Allows the us
 registerprivilege("entities.setPlayerRenderProperty", "PlayerRenderProperty", "Allows the user to change the rendering of themselves", {})
 registerprivilege("entities.setPersistent", "SetPersistent", "Allows the user to change entity's persistent state", { entities = {} })
 registerprivilege("entities.emitSound", "Emitsound", "Allows the user to play sounds on entities", { client = (CLIENT and {} or nil), entities = {} })
+registerprivilege("entities.setHealth", "SetHealth", "Allows the user to change an entity's health", { entities = {} })
+registerprivilege("entities.setMaxHealth", "SetMaxHealth", "Allows the user to change an entity's max health", { entities = {} })
 
 local manipulations = SF.EntityTable("boneManipulations")
 
@@ -99,6 +101,8 @@ function ents_methods:getOwner()
 end
 
 if CLIENT then
+	instance.object_wrappers[debug.getregistry().NextBot] = ewrap
+		
 	--- Allows manipulation of an entity's bones' positions
 	-- @client
 	-- @param number bone The bone ID
@@ -639,6 +643,24 @@ function ents_methods:getCollisionGroup()
 	return getent(self):GetCollisionGroup()
 end
 
+--- Gets the solid enum of the entity
+-- @return number The solid enum of the entity. https://wiki.facepunch.com/gmod/Enums/SOLID
+function ents_methods:getSolid()
+	return getent(self):GetSolid()
+end
+
+--- Gets the solid flag enum of the entity
+-- @return number The solid flag enum of the entity. https://wiki.facepunch.com/gmod/Enums/FSOLID
+function ents_methods:getSolidFlags()
+	return getent(self):GetSolidFlags()
+end
+
+--- Gets whether an entity is solid or not
+-- @return boolean whether an entity is solid or not
+function ents_methods:isSolid()
+	return getent(self):IsSolid()
+end
+
 --- Gets the movetype enum of the entity
 -- @return number The movetype enum of the entity. https://wiki.facepunch.com/gmod/Enums/MOVETYPE
 function ents_methods:getMoveType()
@@ -887,6 +909,26 @@ if SERVER then
 		end
 
 		return plys
+	end
+	
+	--- Sets the health of the entity.
+	-- @server
+	-- @param number newhealth New health value.
+	function ents_methods:setHealth(val)
+		local ent = getent(self)
+		checkpermission(instance, ent, "entities.setHealth")
+		checkluatype(val, TYPE_NUMBER)
+		ent:SetHealth(val)
+	end
+		
+	--- Sets the maximum health for entity. Note, that you can still set entity's health above this amount with Entity:setHealth.
+	-- @server
+	-- @param number newmaxhealth New max health value.
+	function ents_methods:setMaxHealth(val)
+		local ent = getent(self)
+		checkpermission(instance, ent, "entities.setMaxHealth")
+		checkluatype(val, TYPE_NUMBER)
+		ent:SetMaxHealth(val)
 	end
 end
 

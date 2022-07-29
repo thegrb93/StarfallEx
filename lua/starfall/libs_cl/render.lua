@@ -323,6 +323,22 @@ end, function(instance)
 	return true
 end)
 
+--- Called before the 3D skybox is drawn. This will not be called for maps with no 3D skybox, or when the 3d skybox is disabled
+-- @name predrawskybox
+-- @class hook
+-- @client
+-- @return boolean Return true to not predraw the skybox both 2d and 3d
+SF.hookAdd("PreDrawSkyBox", nil, hudPrepareSafeArgs, function(instance, args)
+	instance:cleanupRender()
+    if args[1] and args[2]==true then return true end
+end)
+
+--- Called after the 3D skybox is drawn. This will not be called if PreDrawSkyBox has prevented rendering of the skybox
+-- @name postdrawskybox
+-- @class hook
+-- @client
+SF.hookAdd("PostDrawSkyBox", nil, hudPrepareSafeArgs, cleanupRender)
+
 --- Called when the engine wants to calculate the player's view. Only works if connected to Starfall HUD
 -- @name calcview
 -- @class hook
