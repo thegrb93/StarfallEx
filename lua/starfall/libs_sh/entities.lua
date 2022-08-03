@@ -1338,6 +1338,31 @@ function ents_methods:getFlexes()
 	return flexes
 end
 
+--- Returns the ID of the flex based on given name.
+-- @param string flexname The name of the flex to get the ID of. Case sensitive.
+-- @return number The ID of the flex based on given name.
+function ents_methods:getFlexByName(name)
+	local ent = getent(self)
+	checkluatype(name, TYPE_STRING)
+	return ent:GetFlexIDByName(name)
+end
+
+--- Returns flex name.
+-- @param number flexid The flex id to look up name of.
+-- @return string The flex name
+function ents_methods:getFlexName(id)
+	local ent = getent(self)
+	checkluatype(id, TYPE_NUMBER)
+	return ent:GetFlexName(id)
+end
+
+--- Returns whether or not the the entity has had flex manipulations performed with Entity:setFlexWeight or Entity:setFlexScale.
+-- @return boolean True if the entity has flex manipulations, false otherwise.
+function ents_methods:hasFlexManipulations()
+	local ent = getent(self)
+	return ent:HasFlexManipulator()
+end
+
 --- Gets the weight (value) of a flex.
 -- @param number flexid The id of the flex
 -- @return number The weight of the flex
