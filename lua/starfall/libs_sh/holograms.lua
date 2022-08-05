@@ -331,7 +331,7 @@ else
 			holo:DisableMatrix("RenderMultiply")
 		end
 	end
-
+	
 	--- Manually draws a hologram, requires a 3d render context
 	-- @client
 	function hologram_methods:draw()
@@ -340,6 +340,17 @@ else
 		local holo = getholo(self)
 		holo:SetupBones()
 		holo:DrawModel()
+	end
+	
+	--- Sets the player color on a hologram.
+	-- @client
+	-- @param Vector clr The color RGB as a vector.
+	function hologram_methods:setPlayerColor(clr)
+		local holo = getholo(self)
+		
+		checkpermission(instance, holo, "hologram.setRenderProperty")
+		
+		holo.GetPlayerColor = function() return vunwrap(clr) end
 	end
 end
 
@@ -378,7 +389,6 @@ function hologram_methods:setClip(index, enabled, origin, normal, entity)
 		holo:SetClip(index, false)
 	end
 end
-
 
 --- Sets the hologram scale. Basically the same as setRenderMatrix() with a scaled matrix
 -- @shared
