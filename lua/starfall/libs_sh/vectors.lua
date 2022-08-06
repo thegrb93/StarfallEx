@@ -40,9 +40,9 @@ end)
 --- Creates a Vector struct.
 -- @name builtins_library.Vector
 -- @class function
--- @param number x X value
--- @param number y Y value
--- @param number z Z value
+-- @param number? x X value
+-- @param number? y Y value
+-- @param number? z Z value
 -- @return Vector Vector
 function instance.env.Vector(x, y, z)
 	if x~=nil then checkluatype(x, TYPE_NUMBER) else x = 0 end

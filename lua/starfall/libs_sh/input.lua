@@ -279,7 +279,7 @@ function input_library.getCursorVisible()
 	return vgui.CursorVisible()
 end
 
----Translates position on player's screen to aim vector
+--- Translates position on player's screen to aim vector
 -- @client
 -- @param number x X coordinate on the screen
 -- @param number y Y coordinate on the screen

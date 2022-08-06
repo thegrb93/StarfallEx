@@ -1546,7 +1546,6 @@ end
 -- \- DejaVu Sans Mono
 -- \- Lucida Console
 -- \- Times New Roman
-
 function render_library.createFont(font, size, weight, antialias, additive, shadow, outline, blursize, extended, scanlines)
 	size = tonumber(size) or 16
 	weight = tonumber(weight) or 400

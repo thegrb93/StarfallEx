@@ -206,7 +206,6 @@ end
 -- @shared
 -- @param number n How many characters are in the data
 -- @return string The string that was read
-
 function net_library.readData(n)
 	checkluatype (n, TYPE_NUMBER)
 	n = math.Clamp(n, 0, 64000)

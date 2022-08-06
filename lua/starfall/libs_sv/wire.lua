@@ -26,7 +26,11 @@ SF.RegisterLibrary("wire")
 -- @libtbl wirelink_meta
 SF.RegisterType("Wirelink", false, true)
 
--- Vector2 type for wire xv2
+--- Vector2 type for wire xv2
+-- @name Vector2
+-- @class type
+-- @libtbl 
+-- @libtbl vec2_meta
 SF.RegisterType("Vector2", nil, nil, nil, "Vector", function(checktype, vec2_meta)
 	return function(vec)
 		return setmetatable({vec[1], vec[2], 0}, vec2_meta)
@@ -160,8 +164,8 @@ end
 --- Creates a Vector2 struct for use with wire xv2 type
 -- @name builtins_library.Vector2
 -- @class function
--- @param number x X value
--- @param number y Y value
+-- @param number? x X value
+-- @param number? y Y value
 -- @return Vector2 Vector2
 function instance.env.Vector2(x, y)
 	if x ~= nil then checkluatype(x, TYPE_NUMBER) else x = 0 end

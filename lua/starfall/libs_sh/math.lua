@@ -224,7 +224,7 @@ math_library.normalizeAngle = math.NormalizeAngle
 
 math_library.pi = math.pi
 
----Returns x raised to the power y
+--- Returns x raised to the power y
 -- @class function
 -- @param number base The Base number
 -- @param number exp The Exponent
