@@ -210,7 +210,7 @@ socket_proxy.udp = create_proxy_function(socket.udp)
 -- The setpeername method is used to connect the object.
 -- @name socket_library.udp4
 -- @class function
--- @return table New IPv4 TCP master object, or nil in case of error.
+-- @return table New IPv4 UDP master object, or nil in case of error.
 -- @return string? The error string if errored, else nil
 socket_proxy.udp4 = create_proxy_function(socket.udp4)
 
@@ -220,7 +220,7 @@ socket_proxy.udp4 = create_proxy_function(socket.udp4)
 -- Note: The UDP object returned will have the option "ipv6-v6only" set to true.
 -- @name socket_library.udp6
 -- @class function
--- @return table New IPv4 TCP master object, or nil in case of error.
+-- @return table New IPv6 UDP master object, or nil in case of error.
 -- @return string? The error string if errored, else nil
 socket_proxy.udp6 = create_proxy_function(socket.udp6)
 
