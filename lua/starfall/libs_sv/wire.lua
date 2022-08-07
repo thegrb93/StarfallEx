@@ -29,7 +29,6 @@ SF.RegisterType("Wirelink", false, true)
 --- Vector2 type for wire xv2
 -- @name Vector2
 -- @class type
--- @libtbl 
 -- @libtbl vec2_meta
 SF.RegisterType("Vector2", nil, nil, nil, "Vector", function(checktype, vec2_meta)
 	return function(vec)
