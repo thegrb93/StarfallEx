@@ -1037,7 +1037,7 @@ end
 --- Throws an exception
 -- @param string msg Message string
 -- @param number? level Which level in the stacktrace to blame. Defaults to 1
--- @param boolean uncatchable Makes this exception uncatchable
+-- @param boolean? uncatchable Makes this exception uncatchable
 function builtins_library.throw(msg, level, uncatchable)
 	SF.Throw(msg, 1 + (level or 1), uncatchable)
 end

@@ -249,7 +249,7 @@ string_library.startWith = sfstring.StartWith
 -- @return string Path without the extension
 string_library.stripExtension = sfstring.StripExtension
 
----Returns a sub-string, starting from the character at position startPos of the string (inclusive)
+--- Returns a sub-string, starting from the character at position startPos of the string (inclusive)
 -- and optionally ending at the character at position endPos of the string (also inclusive).
 -- If EndPos is not given, the rest of the string is returned.
 -- @class function

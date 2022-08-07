@@ -272,7 +272,7 @@ return function(instance)
 		return lnavunwrap(self):IsOpenListEmpty()
 	end
 
-	-- Returns whether this NavArea is valid or not.
+	--- Returns whether this NavArea is valid or not.
 	-- @name navarea_methods.isValid
 	-- @return boolean Whether this NavArea is valid or not
 	function lnavarea_methods:isValid()
@@ -480,7 +480,7 @@ return function(instance)
 		return out
 	end
 
-	-- Returns a table of all the CNavAreas that have a one-way connection to this CNavArea from given direction.
+	--- Returns a table of all the CNavAreas that have a one-way connection to this CNavArea from given direction.
 	-- If a CNavArea has a two-way connection to or from this CNavArea then it will not be returned from this function, use CNavArea:getAdjacentAreas to get outgoing ( one and two way ) connections.
 	-- See CNavArea:getIncomingConnections for a function that returns one-way incoming connections from all sides/directions.
 	-- @name navarea_methods.getIncomingConnectionsAtSide
@@ -750,8 +750,8 @@ return function(instance)
 	-- 4 = perfect sniper spot, can see either very far, or a large area, or both
 	-- 8 = exposed, spot in the open, usually on a ledge or cliff
 	-- Values over 255 will be clamped.
-	-- @param pos The position of the hiding spot on the nav area
-	-- @param flags Flags describing what kind of hiding spot this is.
+	-- @param Vector pos The position of the hiding spot on the nav area
+	-- @param Flags flags describing what kind of hiding spot this is.
 	function navarea_methods:addHidingSpot(pos, flags)
 		checkluatype(flags, TYPE_NUMBER)
 		navunwrap(self):AddHidingSpot( vunwrap(pos), flags )

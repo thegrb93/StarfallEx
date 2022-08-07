@@ -30,9 +30,9 @@ end
 --- Creates an Angle struct.
 -- @name builtins_library.Angle
 -- @class function
--- @param number p Pitch
--- @param number y Yaw
--- @param number r Roll
+-- @param number? p Pitch
+-- @param number? y Yaw
+-- @param number? r Roll
 -- @return Angle Angle struct
 instance.env.Angle = function (p, y, r)
 	if p~=nil then checkluatype(p, TYPE_NUMBER) else p = 0 end

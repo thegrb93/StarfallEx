@@ -191,10 +191,10 @@ instance.Types.Quaternion.QuaternionMultiply = getQuatMul
 --- Creates a Quaternion
 -- @name builtins_library.Quaternion
 -- @class function
--- @param number r R (real) component
--- @param number i I component
--- @param number j J component
--- @param number k K component
+-- @param number? r R (real) component
+-- @param number? i I component
+-- @param number? j J component
+-- @param number? k K component
 -- @return Quaternion Quaternion object
 function instance.env.Quaternion(r, i, j, k)
 	if r ~= nil then checkluatype(r, TYPE_NUMBER) else r = 0 end

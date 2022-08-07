@@ -565,7 +565,7 @@ function ents_methods:isPlayerHolding()
 	return ent:IsPlayerHolding()
 end
 
----Returns if the entity is a constraint.
+--- Returns if the entity is a constraint.
 -- @server
 -- @return boolean If the entity is a constraint
 function ents_methods:isConstraint()

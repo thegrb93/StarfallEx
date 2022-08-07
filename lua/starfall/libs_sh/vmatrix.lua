@@ -25,8 +25,8 @@ end
 --- Returns a new VMatrix
 -- @name builtins_library.Matrix
 -- @class function
--- @param t table|Angle|nil Optional data or rotation angle to initialize the Matrix with.
--- @param v Vector? Optional translation to initialize the Matrix with.
+-- @param table|Angle|nil t Optional data or rotation angle to initialize the Matrix with.
+-- @param Vector? v Optional translation to initialize the Matrix with.
 -- @return VMatrix New VMatrix
 function instance.env.Matrix(t, v)
 	local m
