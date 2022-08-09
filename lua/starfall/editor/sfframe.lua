@@ -493,7 +493,7 @@ function Editor:GetActiveTabIndex()
 	return -1
 end
 
---- Gets the index of the tab with the file at `filepath` opened
+---Gets the index of the tab with the file at `filepath` opened
 ---@param filepath string The filepath of the tab to find
 ---@return number index # The index of the tab, if found
 ---@return boolean found # Boolean indicating if we found the tab
@@ -1536,10 +1536,10 @@ function Editor:GetTabContent(n)
 	end
 end
 
---- Returns the associated `DTab` for the tab at index `n`
+---Returns the associated `DTab` for the tab at index `n`
 ---@param n number Tab index
 ---@return DTab # DTab of the associated tab
---- https://wiki.facepunch.com/gmod/DPropertySheet:GetItems
+---https://wiki.facepunch.com/gmod/DPropertySheet:GetItems
 function Editor:GetTab(n)
 	if self.C.TabHolder.Items[n] then
 		return self.C.TabHolder.Items[n].Tab
@@ -1690,7 +1690,7 @@ function Editor:LoadFile(Line, forcenewtab)
 	end
 end
 
---- Returns the value of the settings `ReloadBeforeUpload` of the editor.
+---Returns the value of the settings `ReloadBeforeUpload` of the editor.
 ---@return boolean
 function Editor:SettingShouldReloadBeforeUpload()
     return self.ReloadBeforeUpload:GetBool()
