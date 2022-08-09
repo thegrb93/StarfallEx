@@ -1643,7 +1643,10 @@ function Editor:LoadFile(Line, forcenewtab)
 			for i = 1, self:GetNumTabs() do
 				if self:GetTabContent(i).chosenfile == Line then
 					self:SetActiveTab(i)
-					if forcenewtab ~= nil then self:SetCode(str) end
+					if forcenewtab ~= nil then
+						self:SetCode(str)
+						self:GetCurrentTabContent().savedCode = SF.Editor.normalizeCode(str)
+					end
 					return
 				end
 			end
