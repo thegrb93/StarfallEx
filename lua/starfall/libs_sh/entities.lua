@@ -202,6 +202,26 @@ if CLIENT then
 		end
 	end
 
+	local playerColorWhitelist = {
+		["prop_ragdoll"]       = true,
+		["starfall_cnextbot"]  = true,
+		["starfall_hologram"]  = true,
+		["gmod_wire_hologram"] = true,
+	}
+	--- Sets the sheet color of a player-model
+	-- Can only be used on ragdolls, holograms and Starfall NextBots
+	-- @client
+	-- @param Color clr RGB color to use, alpha channel not supported
+	function ents_methods:setPlayerColor(clr)
+		local ent = getent(self)
+		if not playerColorWhitelist[ent:GetClass()] then SF.Throw("The entity isn't whitelisted", 2) end
+		checkpermission(instance, ent, "entities.setRenderProperty")
+
+		clr = cunwrap(clr)
+		local vec = Vector(clr.r / 255, clr.g / 255, clr.b / 255)
+		ent.GetPlayerColor = function() return vec end
+	end
+
 	--- Sets a hologram or custom_prop's renderbounds
 	-- @client
 	-- @param Vector mins The lower bounding corner coordinate local to the hologram
