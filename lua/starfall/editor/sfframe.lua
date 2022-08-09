@@ -77,6 +77,7 @@ Editor.OpenOldTabsVar = CreateClientConVar("sf_editor_openoldtabs", "1", true, f
 Editor.WorldClickerVar = CreateClientConVar("sf_editor_worldclicker", "0", true, false)
 Editor.LayoutVar = CreateClientConVar("sf_editor_layout", "0", true, false)
 Editor.StartHelperUndocked = CreateClientConVar("sf_helper_startundocked", "0", true, false)
+Editor.ReloadBeforeUpload = CreateClientConVar("sf_reload_before_upload", "0", true, false)
 
 function SF.DefaultCode()
 	if file.Exists("starfall/default.txt", "DATA") then
@@ -1105,6 +1106,11 @@ function Editor:GetSettings()
 	UndockHelper:SetText("Undock helper on open")
 	UndockHelper:SizeToContents()
 
+	local ReloadBeforeUpload = vgui.Create("DCheckBoxLabel")
+	dlist:AddItem(ReloadBeforeUpload)
+	ReloadBeforeUpload:SetConVar("sf_reload_before_upload")
+	ReloadBeforeUpload:SetText("Reload files before uploading")
+	ReloadBeforeUpload:SizeToContents()
 
 	AddCategory(dlist, "Editor", "icon16/application_side_tree.png", "Options for the editor itself.")
 
@@ -1682,6 +1688,12 @@ function Editor:LoadFile(Line, forcenewtab)
 		self:UpdateTabText(tab)
 		self.C.TabHolder:InvalidateLayout()
 	end
+end
+
+--- Returns the value of the settings `ReloadBeforeUpload` of the editor.
+---@return boolean
+function Editor:SettingShouldReloadBeforeUpload()
+    return self.ReloadBeforeUpload:GetBool()
 end
 
 ---Reloads the tab associated to the file at `filepath`, if there is one.
