@@ -331,7 +331,7 @@ else
 			holo:DisableMatrix("RenderMultiply")
 		end
 	end
-	
+
 	--- Manually draws a hologram, requires a 3d render context
 	-- @client
 	function hologram_methods:draw()
