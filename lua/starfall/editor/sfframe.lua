@@ -165,6 +165,7 @@ function Editor:Init()
 	self.SimpleGUI = false
 	self.Location = ""
 	self.closePopups = {}
+	self.reloadPopups = {}
 
 	self.C = {}
 	self.Components = {}
@@ -489,6 +490,19 @@ function Editor:GetActiveTabIndex()
 		end
 	end
 	return -1
+end
+
+--- Gets the index of the tab with the file at `filepath` opened
+---@param filepath string The filepath of the tab to find
+---@return number index # The index of the tab, if found
+---@return boolean found # Boolean indicating if we found the tab
+function Editor:GetTabIndexByFilePath(filepath)
+	for i = 1, self:GetNumTabs() do
+		if self:GetTabContent(i).chosenfile == filepath then
+			return i, true
+		end
+	end
+	return -1, false
 end
 
 function Editor:SetActiveTabIndex(index)
@@ -937,7 +951,7 @@ function Editor:InitComponents()
 	self.C.Reload:SetImage("icon16/page_refresh.png")
 	self.C.Reload:SetToolTip("Refresh file")
 	self.C.Reload.DoClick = function(button)
-		self:LoadFile(self:GetChosenFile(), false)
+		self:ReloadFile(self:GetChosenFile(), true)
 	end
 
 	self.C.Browser.tree.OnNodeSelected = function(tree, node)
@@ -1516,9 +1530,13 @@ function Editor:GetTabContent(n)
 	end
 end
 
+--- Returns the associated `DTab` for the tab at index `n`
+---@param n number Tab index
+---@return DTab # DTab of the associated tab
+--- https://wiki.facepunch.com/gmod/DPropertySheet:GetItems
 function Editor:GetTab(n)
 	if self.C.TabHolder.Items[n] then
-		return self.C.TabHolder.Items[n]
+		return self.C.TabHolder.Items[n].Tab
 	end
 end
 
@@ -1663,6 +1681,55 @@ function Editor:LoadFile(Line, forcenewtab)
 		self:ChosenFile(Line, self:GetCode())
 		self:UpdateTabText(tab)
 		self.C.TabHolder:InvalidateLayout()
+	end
+end
+
+---Reloads the tab associated to the file at `filepath`, if there is one.
+---@param string filepath The filepath of the file to reload
+---@param interactive boolean If the file has unsaved changed and interactive is true
+---then prompt the user to overwrite the current unsaved changes, otherwise dont reload the file.
+function Editor:ReloadFile(filepath, interactive)
+	local activeTabIndex = self:GetActiveTabIndex()
+	local tabIndex, tabFound = self:GetTabIndexByFilePath(filepath)
+	if not tabFound then return end
+
+	local tab = self:GetTab(tabIndex)
+	local tabContent = self:GetTabContent(tabIndex)
+	if not tabContent:GetTabHandler().IsEditor then return end
+
+	local fileContent = file.Read(filepath)
+	if fileContent == nil then
+		ErrorNoHalt("Error while reloading, failed to read file: ", filepath)
+		return
+	end
+
+	local executeReload = function()
+		tabContent:SetCode(fileContent)
+		tabContent.savedCode = SF.Editor.normalizeCode(fileContent)
+		self:UpdateTabText(tab)
+		if tabIndex == activeTabIndex then
+			self:Validate()
+		end
+	end
+
+	if tabContent:IsSaved() then
+		executeReload()
+	elseif interactive then
+		local popup = self.reloadPopups[tab]
+		if not IsValid(popup) then
+			popup = SF.Editor.Query("Unsaved changes!", string.format("Do you want to reload <color=255,30,30>%q</color> ?", tab:GetText()), "Reload", function()
+			executeReload()
+			self.reloadPopups[tab] = nil
+			end, "Cancel", function()
+			self.reloadPopups[tab] = nil
+			end)
+			self.reloadPopups[tab] = popup
+		end
+
+		if IsValid(popup) then
+		popup:Center()
+		popup:MakePopup()
+		end
 	end
 end
 
