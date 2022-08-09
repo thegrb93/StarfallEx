@@ -212,7 +212,7 @@ if CLIENT then
 	-- Can only be used on ragdolls, holograms and Starfall NextBots
 	-- @client
 	-- @param Color clr RGB color to use, alpha channel not supported
-	function ents_methods:setPlayerColor(clr)
+	function ents_methods:setSheetColor(clr)
 		local ent = getent(self)
 		if not playerColorWhitelist[ent:GetClass()] then SF.Throw("The entity isn't whitelisted", 2) end
 		checkpermission(instance, ent, "entities.setRenderProperty")
