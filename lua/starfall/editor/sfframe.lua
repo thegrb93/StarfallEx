@@ -175,8 +175,8 @@ function Editor:Init()
 	-- Controls the auto reload functionality
 	self.autoReloadEnabled = Editor.EditorFileAutoReload:GetBool()
 	self.autoReloadInterval = Editor.EditorFileAutoReloadInterval:GetFloat()
-	cvars.AddChangeCallback(Editor.EditorFileAutoReload:GetName(), function(_, _, newValue) self:setFileAutoReload(newValue) end)
-	cvars.AddChangeCallback(Editor.EditorFileAutoReloadInterval:GetName(), function(_, _, newValue) self:setFileAutoReloadInterval(newValue) end)
+	cvars.AddChangeCallback(Editor.EditorFileAutoReload:GetName(), function() self:setFileAutoReload(Editor.EditorFileAutoReload:GetBool()) end)
+	cvars.AddChangeCallback(Editor.EditorFileAutoReloadInterval:GetName(), function() self:setFileAutoReloadInterval(Editor.EditorFileAutoReloadInterval:GetFloat()) end)
 
 
 	-- Load border colors, position, & size
