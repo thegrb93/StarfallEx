@@ -58,7 +58,7 @@ function ang_meta.__newindex(t, k, v)
 	end
 end
 
---- Gets a value at a key in the color
+--- Gets a value at a key in the angle
 -- Can be indexed with: 1, 2, 3, p, y, r, pitch, yaw, roll. 1,2,3 is most efficient.
 -- @param number|string Key
 -- @return number Value
