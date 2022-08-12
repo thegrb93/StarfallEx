@@ -60,7 +60,6 @@ end
 
 --- Gets a value at a key in the color
 -- Can be indexed with: 1, 2, 3, p, y, r, pitch, yaw, roll. 1,2,3 is most efficient.
--- @param Angle Ang
 -- @param number|string Key
 -- @return number Value
 function ang_meta.__index(t, k)
