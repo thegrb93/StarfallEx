@@ -341,17 +341,6 @@ else
 		holo:SetupBones()
 		holo:DrawModel()
 	end
-	
-	--- Sets the player color on a hologram.
-	-- @client
-	-- @param Vector clr The color RGB as a vector.
-	function hologram_methods:setPlayerColor(clr)
-		local holo = getholo(self)
-		
-		checkpermission(instance, holo, "hologram.setRenderProperty")
-		
-		holo.GetPlayerColor = function() return vunwrap(clr) end
-	end
 end
 
 --- Updates a clip plane
