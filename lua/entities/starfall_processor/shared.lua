@@ -271,14 +271,14 @@ if SERVER then
 	function SF.EnableHud(ply, chip, activator, enabled, dontsync)
 		local huds = chip.ActiveHuds
 		local instance = chip.instance
-		local viewEntity = instance.data.viewEntity
+		local viewEntity = instance and instance.data.viewEntity
 		if activator and activator:IsValid() then
 			local n = "SF_HUD"..ply:EntIndex()..":"..activator:EntIndex()
 			local function disconnect(sync)
 				huds[ply] = nil
 				hook.Remove("EntityRemoved", n)
 				hook.Remove("PlayerLeaveVehicle", n)
-				if ply:GetViewEntity()==viewEntity then ply:SetViewEntity() end
+				if viewEntity and viewEntity==ply:GetViewEntity() then ply:SetViewEntity() end
 				if activator.locksControls and activator.link and activator.link:IsValid() then
 					net.Start("starfall_lock_control")
 						net.WriteEntity(activator.link)
@@ -303,7 +303,7 @@ if SERVER then
 				disconnect(false)
 			end
 		else
-			if not enabled and ply:GetViewEntity()==viewEntity then ply:SetViewEntity() end
+			if not enabled and viewEntity and viewEntity==ply:GetViewEntity() then ply:SetViewEntity() end
 			huds[ply] = enabled or nil
 		end
 		if instance then
