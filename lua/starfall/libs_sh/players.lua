@@ -85,16 +85,6 @@ instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
 end)
 
-if SERVER then
-	instance:AddHook("deinitialize", function()
-		for k, ply in pairs(player.GetAll()) do
-			if SF.IsHUDActive(instance.entity, ply) then
-				ply:SetViewEntity()
-			end
-		end
-	end)
-end
-
 
 local player_methods, player_meta, wrap, unwrap = instance.Types.Player.Methods, instance.Types.Player, instance.Types.Player.Wrap, instance.Types.Player.Unwrap
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
@@ -448,6 +438,7 @@ if SERVER then
 		if ent~=nil then ent = getent(ent) end
 		if not SF.IsHUDActive(instance.entity, ply) then SF.Throw("Player isn't connected to HUD!", 2) end
 		ply:SetViewEntity(ent)
+		instance.data.viewEntity = ent
 	end
 
 	--- Returns whether or not the player has godmode
