@@ -8,6 +8,7 @@ function ENT:Initialize()
 	self.name = "Generic ( No-Name )"
 	self.OverlayFade = 0
 	self.ActiveHuds = {}
+	self.reuploadOnReload = false
 end
 
 function ENT:OnRemove()
@@ -24,6 +25,9 @@ function ENT:OnRemove()
 			end
 		end)
 	end
+
+	-- This should remove the hook if it existed
+	self:SetReuploadOnReload(false)
 end
 
 function ENT:GetOverlayText()
@@ -89,6 +93,31 @@ function ENT:DrawCustomOverlay()
 	end
 end
 
+---Does this processor reupload on file reload
+---@return boolean
+function ENT:GetReuploadOnReload()
+	return self.reuploadOnReload
+end
+
+---Enables/Disables reupload on reload
+---@param enabled boolean
+function ENT:SetReuploadOnReload(enabled)
+	if enabled and not self.reuploadOnReload then
+		hook.Add("StarfallEditorFileReload", self, function(_, mainfile)
+			if not self:DependsOnFile(mainfile) then return end
+
+			SF.Editor.BuildIncludesTable(self.sfdata.mainfile, function(list)
+				SF.PushStarfall(self, {files = list.files, mainfile = list.mainfile})
+			end,
+			function(err)
+				SF.AddNotify(LocalPlayer(), err, "ERROR", 7, "ERROR1")
+			end)
+		end)
+	elseif not enabled and self.reuploadOnReload then
+		hook.Remove("StarfallEditorFileReload", self)
+	end
+	self.reuploadOnReload = enabled
+end
 
 if WireLib then
 	function ENT:DrawTranslucent()

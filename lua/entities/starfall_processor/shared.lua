@@ -148,6 +148,13 @@ function ENT:SetupFiles(sfdata)
 	end
 end
 
+---Does this chip depend on the script with name `filename`
+---@param filename string This is a name like `script1.txt`
+---@return boolean depends Does it depend on `filename`
+function ENT:DependsOnFile(filename)
+	return self.sfdata.files[filename] ~= nil
+end
+
 function ENT:GetGateName()
 	return self.name
 end
@@ -213,6 +220,17 @@ local function MenuOpen( ContextMenu, Option, Entity, Trace )
 	SubMenu:AddOption("Open Global Permissions", function ()
 		SF.Editor.openPermissionsPopup()
 	end)
+
+	if ent:GetReuploadOnReload() then
+		SubMenu:AddOption("Disable reupload on reload", function ()
+			ent:SetReuploadOnReload(false)
+		end)
+	else
+		SubMenu:AddOption("Enable reupload on reload", function ()
+			ent:SetReuploadOnReload(true)
+		end)
+	end
+
 	local instance = ent.instance
 	if instance and instance.player ~= SF.Superuser and (instance.permissionRequest and instance.permissionRequest.overrides and table.Count(instance.permissionRequest.overrides) > 0
 				or instance.permissionOverrides and table.Count(instance.permissionOverrides) > 0) then

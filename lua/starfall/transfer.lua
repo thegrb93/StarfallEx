@@ -79,6 +79,7 @@ end
 
 if SERVER then
 	util.AddNetworkString("starfall_upload")
+	util.AddNetworkString("starfall_upload_push")
 
 	function SF.SendStarfall(msg, sfdata, recipient, callback)
 		net.Start(msg)
@@ -129,12 +130,34 @@ if SERVER then
 		end)
 	end)
 
+	net.Receive("starfall_upload_push", function(len, ply)
+		local sf = net.ReadEntity()
+		net.ReadStarfall(ply, function(ok, sfdata)
+			if not ok then return end
+
+			if not (sf:IsValid() and sf:GetClass() == "starfall_processor" and sf.sfdata) then return end
+			if sf.sfdata.mainfile ~= sfdata.mainfile or sf.sfdata.owner ~= ply then return end
+			sfdata.owner = ply
+			sf:SetupFiles(sfdata)
+		end)
+	end)
+
 else
 
 	-- Sends starfall files to server
 	function SF.SendStarfall(msg, sfdata, callback)
 		net.Start(msg)
 		net.WriteStarfall(sfdata, callback)
+		net.SendToServer()
+	end
+
+	---Push code to a starfall chip owned by this user
+	---@param sf Entity The starfall chip entity
+	---@param sfdata any
+	function SF.PushStarfall(sf, sfdata)
+		net.Start("starfall_upload_push")
+			net.WriteEntity(sf)
+			net.WriteStarfall(sfdata)
 		net.SendToServer()
 	end
 

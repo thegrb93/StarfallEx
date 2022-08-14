@@ -1732,6 +1732,7 @@ function Editor:ReloadTab(tabIndex, interactive)
 		return
 	end
 	local fileLastModified = file.Time(filepath, "DATA")
+	local mainfile = string.match(filepath, "starfall/(.*)")
 
 	-- This `autoReloadLastModified` variable is only assigned and read here, other places in the code should not use
 	-- it since they can just call one of the editor's functions.
@@ -1747,6 +1748,7 @@ function Editor:ReloadTab(tabIndex, interactive)
 		if tabIndex == activeTabIndex then
 			self:Validate()
 		end
+		hook.Run("StarfallEditorFileReload", mainfile)
 	end
 
 	if tabContent:IsSaved() then
