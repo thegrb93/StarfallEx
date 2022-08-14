@@ -1735,14 +1735,14 @@ function Editor:ReloadTab(tabIndex, interactive)
 
 	-- This `autoReloadLastModified` variable is only assigned and read here, other places in the code should not use
 	-- it since they can just call one of the editor's functions.
-	if tabContent.autoReloadLastModified ~= nil and tabContent.autoReloadLastModified >= fileLastModified then
+	if tabContent.autoReloadLastModified ~= nil and tabContent.autoReloadLastModified >= fileLastModified and tabContent:IsSaved() then
 		return
 	end
-	tabContent.autoReloadLastModified = fileLastModified
 
 	local executeReload = function()
 		tabContent:SetCode(fileContent)
 		tabContent.savedCode = SF.Editor.normalizeCode(fileContent)
+		tabContent.autoReloadLastModified = fileLastModified
 		self:UpdateTabText(tab)
 		if tabIndex == activeTabIndex then
 			self:Validate()
