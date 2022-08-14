@@ -1771,7 +1771,7 @@ function Editor:ReloadTab(tabIndex, interactive)
 end
 
 ---Reloads the tab associated to the file at `filepath`, if there is one.
----@param string filepath The filepath of the file to reload
+---@param filepath string The filepath of the file to reload
 ---@param interactive boolean See `Editor:ReloadTab`
 function Editor:ReloadFile(filepath, interactive)
 	local tabIndex, tabFound = self:GetTabIndexByFilePath(filepath)
