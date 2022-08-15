@@ -379,7 +379,6 @@ function hologram_methods:setClip(index, enabled, origin, normal, entity)
 	end
 end
 
-
 --- Sets the hologram scale. Basically the same as setRenderMatrix() with a scaled matrix
 -- @shared
 -- @param Vector scale Vector new scale
