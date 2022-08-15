@@ -1726,13 +1726,8 @@ function Editor:ReloadTab(tabIndex, interactive)
 		return
 	end
 
-	local fileContent = file.Read(filepath)
-	if fileContent == nil then
-		ErrorNoHalt("Error while reloading, failed to read file: ", filepath)
-		return
-	end
 	local fileLastModified = file.Time(filepath, "DATA")
-	local mainfile = string.match(filepath, "starfall/(.*)")
+	if fileLastModified == 0 then return end
 
 	-- This `autoReloadLastModified` variable is only assigned and read here, other places in the code should not use
 	-- it since they can just call one of the editor's functions.
@@ -1741,6 +1736,12 @@ function Editor:ReloadTab(tabIndex, interactive)
 	end
 
 	local executeReload = function()
+		local fileContent = file.Read(filepath)
+		if fileContent == nil then
+			ErrorNoHalt("Error while reloading, failed to read file: ", filepath)
+			return
+		end
+
 		tabContent:SetCode(fileContent)
 		tabContent.savedCode = SF.Editor.normalizeCode(fileContent)
 		tabContent.autoReloadLastModified = fileLastModified
@@ -1748,6 +1749,8 @@ function Editor:ReloadTab(tabIndex, interactive)
 		if tabIndex == activeTabIndex then
 			self:Validate()
 		end
+
+		local mainfile = string.match(filepath, "starfall/(.*)")
 		hook.Run("StarfallEditorFileReload", mainfile)
 	end
 
