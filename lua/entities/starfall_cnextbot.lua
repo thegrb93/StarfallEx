@@ -84,7 +84,6 @@ function ENT:OnInjured(dmginfo)
 	if self.InjuredCallbacks:isEmpty() then return end
 	local inst = self.chip.instance
 	self.InjuredCallbacks:run(inst,
-		inst.Types.NextBot.Wrap(self),
 		dmginfo:GetDamage(),
 		inst.WrapObject(dmginfo:GetAttacker()),
 		inst.WrapObject(dmginfo:GetInflictor()),
@@ -97,7 +96,6 @@ function ENT:OnKilled(dmginfo)
 	if self.DeathCallbacks:isEmpty() then return end
 	local inst = self.chip.instance
 	self.DeathCallbacks:run(inst,
-		inst.Types.NextBot.Wrap(self),
 		dmginfo:GetDamage(),
 		inst.WrapObject(dmginfo:GetAttacker()),
 		inst.WrapObject(dmginfo:GetInflictor()),
@@ -110,26 +108,24 @@ end
 function ENT:OnLandOnGround(groundent)
 	if self.LandCallbacks:isEmpty() then return end
 	local inst = self.chip.instance
-	self.LandCallbacks:run(inst, inst.Types.NextBot.Wrap(self), inst.WrapObject(groundent))
+	self.LandCallbacks:run(inst, inst.WrapObject(groundent))
 end
 
 function ENT:OnLeaveGround(groundent)
 	if self.JumpCallbacks:isEmpty() then return end
 	local inst = self.chip.instance
-	self.JumpCallbacks:run(inst, inst.Types.NextBot.Wrap(self), inst.WrapObject(groundent))
+	self.JumpCallbacks:run(inst, inst.WrapObject(groundent))
 end
 
 function ENT:OnIgnite()
 	if self.IgniteCallbacks:isEmpty() then return end
-	local inst = self.chip.instance
-	self.IgniteCallbacks:run(inst, inst.Types.NextBot.Wrap(self))
+	self.IgniteCallbacks:run(self.chip.instance)
 end
 
 function ENT:OnNavAreaChanged(old, new)
 	if self.NavChangeCallbacks:isEmpty() then return end
 	local inst = self.chip.instance
 	self.NavChangeCallbacks:run(inst,
-		inst.Types.NextBot.Wrap(self),
 		inst.Types.NavArea.Wrap(old),
 		inst.Types.NavArea.Wrap(new))
 end
@@ -137,5 +133,5 @@ end
 function ENT:OnContact(colent)
 	if self.ContactCallbacks:isEmpty() then return end
 	local inst = self.chip.instance
-	self.ContactCallbacks:run(inst, inst.Types.NextBot.Wrap(self), inst.WrapObject(colent))
+	self.ContactCallbacks:run(inst, inst.WrapObject(colent))
 end
