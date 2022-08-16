@@ -235,7 +235,7 @@ end
 --- Adds a callback function that will be run when this nextbot dies.
 -- @server
 -- @param string callbackid The unique ID this callback will use.
--- @param function callback The function to run when the NB dies. The arguments are: (The NextBot, Damage, Attacker, Inflictor, Damage Pos, Damage Force, Damage Type)
+-- @param function callback The function to run when the NB dies. The arguments are: (Damage, Attacker, Inflictor, Damage Pos, Damage Force, Damage Type)
 function nb_methods:addDeathCallback(id, func)
 	checkluatype(id, TYPE_STRING)
 	checkluatype(func, TYPE_FUNCTION)
@@ -257,7 +257,7 @@ end
 --- Adds a callback function that will be run when this nextbot is injured.
 -- @server
 -- @param string callbackid The unique ID this callback will use.
--- @param function callback The function to run when the NB gets injured. The arguments are: (The NextBot, Damage, Attacker, Inflictor, Damage Pos, Damage Force, Damage Type)
+-- @param function callback The function to run when the NB gets injured. The arguments are: (Damage, Attacker, Inflictor, Damage Pos, Damage Force, Damage Type)
 function nb_methods:addInjuredCallback(id, func)
 	checkluatype(id, TYPE_STRING)
 	checkluatype(func, TYPE_FUNCTION)
@@ -279,7 +279,7 @@ end
 --- Adds a callback function that will be run when this nextbot lands on the ground.
 -- @server
 -- @param string callbackid The unique ID this callback will use.
--- @param function callback The function to run when the NB lands on the ground. The arguments are: (The NextBot, The entity the NB landed on.)
+-- @param function callback The function to run when the NB lands on the ground. The arguments are: (The entity the NB landed on.)
 function nb_methods:addLandCallback(id, func)
 	checkluatype(id, TYPE_STRING)
 	checkluatype(func, TYPE_FUNCTION)
@@ -301,7 +301,7 @@ end
 --- Adds a callback function that will be run when this nextbot leaves the ground.
 -- @server
 -- @param string callbackid The unique ID this callback will use.
--- @param function callback The function to run when the NB leaves the ground. The arguments are: (The NextBot, The entity the NB "jumped" from.)
+-- @param function callback The function to run when the NB leaves the ground. The arguments are: (The entity the NB "jumped" from.)
 function nb_methods:addLeaveGroundCallback(id, func)
 	checkluatype(id, TYPE_STRING)
 	checkluatype(func, TYPE_FUNCTION)
@@ -323,7 +323,7 @@ end
 --- Adds a callback function that will be run when this nextbot gets ignited.
 -- @server
 -- @param string callbackid The unique ID this callback will use.
--- @param function callback The function to run when the NB gets ignited. The arguments are: (The NextBot)
+-- @param function callback The function to run when the NB gets ignited.
 function nb_methods:addIgniteCallback(id, func)
 	checkluatype(id, TYPE_STRING)
 	checkluatype(func, TYPE_FUNCTION)
@@ -345,7 +345,7 @@ end
 --- Adds a callback function that will be run when the nextbot enters a new nav area.
 -- @server
 -- @param string callbackid The unique ID this callback will use.
--- @param function callback The function to run when the NB enters a new nav area. The arguments are: (The NextBot, Old Nav Area, New Nav Area)
+-- @param function callback The function to run when the NB enters a new nav area. The arguments are: (Old Nav Area, New Nav Area)
 function nb_methods:addNavChangeCallback(id, func)
 	checkluatype(id, TYPE_STRING)
 	checkluatype(func, TYPE_FUNCTION)
@@ -367,7 +367,7 @@ end
 --- Sets a callback function that will be run when this nextbot touches another entity. Only 1 per NB. Setting a new callback will replace the old one.
 -- @server
 -- @param string callbackid The unique ID this callback will use.
--- @param function callback The function to run when the NB touches another entity. The arguments are: (The NextBot, The entity the NB touched.)
+-- @param function callback The function to run when the NB touches another entity. The arguments are: (The entity the NB touched.)
 function nb_methods:addContactCallback(id, func)
 	checkluatype(id, TYPE_STRING)
 	checkluatype(func, TYPE_FUNCTION)

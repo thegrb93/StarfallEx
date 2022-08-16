@@ -119,7 +119,7 @@ end
 
 function ENT:OnIgnite()
 	if self.IgniteCallbacks:isEmpty() then return end
-	self.IgniteCallbacks:run(inst)
+	self.IgniteCallbacks:run(self.chip.instance)
 end
 
 function ENT:OnNavAreaChanged(old, new)
