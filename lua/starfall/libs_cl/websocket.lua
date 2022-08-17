@@ -31,7 +31,7 @@ local READYSTATE = {
 
 function WebSocket.new(addr, port, path, secure)
 	return setmetatable({
-		address = (secure and "wss" or "ws") .. "://" .. addr .. ":" .. (port or "443") .. (path or ""),
+		address = (secure and "wss" or "ws") .. "://" .. addr .. ":" .. (port or "443") .. (path and ("/" .. path) or ""),
 		state = READYSTATE.CONNECTING
 	}, WebSocket)
 end
