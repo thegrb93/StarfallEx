@@ -116,6 +116,7 @@ local websocket_list = {}
 -- @param string addr Address of the websocket server.
 -- @param number? port Port of the websocket server. (Default 443)
 -- @param boolean? secure Whether to use secure connection (wss). (Default false)
+-- @param string? path Optional path of the websocket.
 -- @return WebSocket The websocket object. Use WebSocket:connect() to connect.
 function instance.env.WebSocket(addr, port, secure, path)
 	checkluatype(addr, TYPE_STRING)
