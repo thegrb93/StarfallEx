@@ -113,7 +113,7 @@ local websocket_list = {}
 --- Add onMessage, onConnected, onDisconnected functions for callbacks.
 --- Also see the websocket example.
 -- @name builtins_library.WebSocket
--- @param string domain Address of the websocket server.
+-- @param string domain Domain of the websocket server.
 -- @param number? port Port of the websocket server. (Default 443)
 -- @param boolean? secure Whether to use secure connection (wss). (Default false)
 -- @param string? path Optional path of the websocket.
