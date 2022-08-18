@@ -161,6 +161,9 @@ if CLIENT then
 			local tab = SF.Editor.editor:GetTabContent(i)
 			local path = tab.chosenfile
 			if path and tab.GetCode then
+				if SF.Editor.editor:ShouldReloadBeforeUpload() then
+					SF.Editor.editor:ReloadTabs(false)
+				end
 				files[path:match("starfall/(.+)") or path] = tab:GetCode()
 			end
 		end

@@ -77,6 +77,8 @@ Editor.OpenOldTabsVar = CreateClientConVar("sf_editor_openoldtabs", "1", true, f
 Editor.WorldClickerVar = CreateClientConVar("sf_editor_worldclicker", "0", true, false)
 Editor.LayoutVar = CreateClientConVar("sf_editor_layout", "0", true, false)
 Editor.StartHelperUndocked = CreateClientConVar("sf_helper_startundocked", "0", true, false)
+Editor.EditorFileAutoReload = CreateClientConVar("sf_editor_file_auto_reload", "0", true, false, "Controls the auto reload functionality of Starfall's Editor")
+Editor.EditorFileAutoReloadInterval = CreateClientConVar("sf_editor_file_auto_reload_interval", "1", true, false, "Controls the polling interval of the auto reload functionality of Starfall's Editor")
 
 function SF.DefaultCode()
 	if file.Exists("starfall/default.txt", "DATA") then
@@ -165,9 +167,17 @@ function Editor:Init()
 	self.SimpleGUI = false
 	self.Location = ""
 	self.closePopups = {}
+	self.reloadPopups = {}
 
 	self.C = {}
 	self.Components = {}
+
+	-- Controls the auto reload functionality
+	self.autoReloadEnabled = Editor.EditorFileAutoReload:GetBool()
+	self.autoReloadInterval = Editor.EditorFileAutoReloadInterval:GetFloat()
+	cvars.AddChangeCallback(Editor.EditorFileAutoReload:GetName(), function() self:setFileAutoReload(Editor.EditorFileAutoReload:GetBool()) end)
+	cvars.AddChangeCallback(Editor.EditorFileAutoReloadInterval:GetName(), function() self:setFileAutoReloadInterval(Editor.EditorFileAutoReloadInterval:GetFloat()) end)
+
 
 	-- Load border colors, position, & size
 	self:LoadEditorSettings()
@@ -191,6 +201,11 @@ function Editor:Init()
 	self:SetV(false)
 
 	self:InitShutdownHook()
+
+	-- This should create the timers
+	if self.EditorFileAutoReload then
+		self:setFileAutoReload(true)
+	end
 end
 
 local size = CreateClientConVar("sf_editor_size", "800_600", true, false)
@@ -489,6 +504,19 @@ function Editor:GetActiveTabIndex()
 		end
 	end
 	return -1
+end
+
+---Gets the index of the tab with the file at `filepath` opened
+---@param filepath string The filepath of the tab to find
+---@return number index # The index of the tab, if found
+---@return boolean found # Boolean indicating if we found the tab
+function Editor:GetTabIndexByFilePath(filepath)
+	for i = 1, self:GetNumTabs() do
+		if self:GetTabContent(i).chosenfile == filepath then
+			return i, true
+		end
+	end
+	return -1, false
 end
 
 function Editor:SetActiveTabIndex(index)
@@ -937,7 +965,7 @@ function Editor:InitComponents()
 	self.C.Reload:SetImage("icon16/page_refresh.png")
 	self.C.Reload:SetToolTip("Refresh file")
 	self.C.Reload.DoClick = function(button)
-		self:LoadFile(self:GetChosenFile(), false)
+		self:ReloadFile(self:GetChosenFile(), true)
 	end
 
 	self.C.Browser.tree.OnNodeSelected = function(tree, node)
@@ -1091,6 +1119,11 @@ function Editor:GetSettings()
 	UndockHelper:SetText("Undock helper on open")
 	UndockHelper:SizeToContents()
 
+	local EditorFileAutoReloadCheckbox = vgui.Create("DCheckBoxLabel")
+	dlist:AddItem(EditorFileAutoReloadCheckbox)
+	EditorFileAutoReloadCheckbox:SetConVar(Editor.EditorFileAutoReload:GetName())
+	EditorFileAutoReloadCheckbox:SetText("Auto reload files")
+	EditorFileAutoReloadCheckbox:SizeToContents()
 
 	AddCategory(dlist, "Editor", "icon16/application_side_tree.png", "Options for the editor itself.")
 
@@ -1516,9 +1549,13 @@ function Editor:GetTabContent(n)
 	end
 end
 
+---Returns the associated `DTab` for the tab at index `n`
+---@param n number Tab index
+---@return DTab # DTab of the associated tab
+---https://wiki.facepunch.com/gmod/DPropertySheet:GetItems
 function Editor:GetTab(n)
 	if self.C.TabHolder.Items[n] then
-		return self.C.TabHolder.Items[n]
+		return self.C.TabHolder.Items[n].Tab
 	end
 end
 
@@ -1643,7 +1680,10 @@ function Editor:LoadFile(Line, forcenewtab)
 			for i = 1, self:GetNumTabs() do
 				if self:GetTabContent(i).chosenfile == Line then
 					self:SetActiveTab(i)
-					if forcenewtab ~= nil then self:SetCode(str) end
+					if forcenewtab ~= nil then
+						self:SetCode(str)
+						self:GetCurrentTabContent().savedCode = SF.Editor.normalizeCode(str)
+					end
 					return
 				end
 			end
@@ -1660,6 +1700,120 @@ function Editor:LoadFile(Line, forcenewtab)
 		self:ChosenFile(Line, self:GetCode())
 		self:UpdateTabText(tab)
 		self.C.TabHolder:InvalidateLayout()
+	end
+end
+
+---Returns the value of the settings `ReloadBeforeUpload` of the editor.
+---@return boolean
+function Editor:ShouldReloadBeforeUpload()
+    return self.autoReloadEnabled
+end
+
+---Reloads the tab associated to the file at `filepath`, if there is one.
+---@param tabIndex number The index of the tab to reload
+---@param interactive boolean If the file has unsaved changed and interactive is true
+---then prompt the user to overwrite the current unsaved changes, otherwise dont reload the file.
+function Editor:ReloadTab(tabIndex, interactive)
+	local activeTabIndex = self:GetActiveTabIndex()
+	local tab = self:GetTab(tabIndex)
+	local tabContent = self:GetTabContent(tabIndex)
+	if not tabContent:GetTabHandler().IsEditor then return end
+
+	local filepath = tabContent.chosenfile
+	if filepath == nil then
+		-- Some tabs can have this field set to nil
+		-- At least the default "Generic" tab seems to have
+		return
+	end
+
+	local fileLastModified = file.Time(filepath, "DATA")
+	if fileLastModified == 0 then return end
+
+	-- This `autoReloadLastModified` variable is only assigned and read here, other places in the code should not use
+	-- it since they can just call one of the editor's functions.
+	if tabContent.autoReloadLastModified ~= nil and tabContent.autoReloadLastModified >= fileLastModified and tabContent:IsSaved() then
+		return
+	end
+
+	local executeReload = function()
+		local fileContent = file.Read(filepath)
+		if fileContent == nil then
+			ErrorNoHalt("Error while reloading, failed to read file: ", filepath)
+			return
+		end
+
+		tabContent:SetCode(fileContent)
+		tabContent.savedCode = SF.Editor.normalizeCode(fileContent)
+		tabContent.autoReloadLastModified = fileLastModified
+		self:UpdateTabText(tab)
+		if tabIndex == activeTabIndex then
+			self:Validate()
+		end
+
+		local mainfile = string.match(filepath, "starfall/(.*)")
+		hook.Run("StarfallEditorFileReload", mainfile)
+	end
+
+	if tabContent:IsSaved() then
+		executeReload()
+	elseif interactive then
+		local popup = self.reloadPopups[tab]
+		if not IsValid(popup) then
+			popup = SF.Editor.Query("Unsaved changes!", string.format("Do you want to reload <color=255,30,30>%q</color> ?", tab:GetText()), "Reload", function()
+			executeReload()
+			self.reloadPopups[tab] = nil
+			end, "Cancel", function()
+			self.reloadPopups[tab] = nil
+			end)
+			self.reloadPopups[tab] = popup
+		end
+
+		if IsValid(popup) then
+			popup:Center()
+			popup:MakePopup()
+		end
+	end
+end
+
+---Reloads the tab associated to the file at `filepath`, if there is one.
+---@param filepath string The filepath of the file to reload
+---@param interactive boolean See `Editor:ReloadTab`
+function Editor:ReloadFile(filepath, interactive)
+	local tabIndex, tabFound = self:GetTabIndexByFilePath(filepath)
+	if not tabFound then return end
+	self:ReloadTab(tabIndex, interactive)
+end
+
+---Reload all tabs in the editor.
+---@param interactive boolean See `Editor:ReloadTab`
+function Editor:ReloadTabs(interactive)
+	for i = 1, self:GetNumTabs() do
+		self:ReloadTab(i, interactive)
+	end
+end
+
+---Enables or disables the auto reload functionality of the editor.
+---This should only be called by EditorFileAutoReload's change callback and the init function.
+---@param enabled boolean Enable/Disable auto reload
+function Editor:setFileAutoReload(enabled)
+	self.autoReloadEnabled = enabled
+	if enabled then
+		timer.Create(Editor.EditorFileAutoReload:GetName(), self.autoReloadInterval, 0, function(_, _, newValue)
+			self:ReloadTabs(false)
+		end)
+	else
+		timer.Remove(Editor.EditorFileAutoReload:GetName())
+	end
+end
+
+---Sets the polling interval of the file auto reload
+---This should only be called by EditorFileAutoReloadInterval's change callback.
+---@param interval number Polling interval in seconds
+function Editor:setFileAutoReloadInterval(interval)
+	self.autoReloadInterval = interval
+	if self.autoReloadEnabled then
+		self:setFileAutoReload(false)
+		self:setFileAutoReload(true)
 	end
 end
 
