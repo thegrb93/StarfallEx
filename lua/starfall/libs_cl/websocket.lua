@@ -29,9 +29,9 @@ local READYSTATE = {
 	CLOSED = 3
 }
 
-function WebSocket.new(addr, port, secure)
+function WebSocket.new(domain, port, path, secure)
 	return setmetatable({
-		address = (secure and "wss" or "ws") .. "://" .. addr .. ":" .. (port or "443"),
+		address = (secure and "wss" or "ws") .. "://" .. domain .. ":" .. (port or "443") .. (path and ("/" .. path) or ""),
 		state = READYSTATE.CONNECTING
 	}, WebSocket)
 end
@@ -113,16 +113,18 @@ local websocket_list = {}
 --- Add onMessage, onConnected, onDisconnected functions for callbacks.
 --- Also see the websocket example.
 -- @name builtins_library.WebSocket
--- @param string addr Address of the websocket server.
+-- @param string domain Domain of the websocket server.
 -- @param number? port Port of the websocket server. (Default 443)
 -- @param boolean? secure Whether to use secure connection (wss). (Default false)
+-- @param string? path Optional path of the websocket.
 -- @return WebSocket The websocket object. Use WebSocket:connect() to connect.
-function instance.env.WebSocket(addr, port, secure)
-	checkluatype(addr, TYPE_STRING)
+function instance.env.WebSocket(domain, port, secure, path)
+	checkluatype(domain, TYPE_STRING)
 	if port ~= nil then checkluatype(port, TYPE_NUMBER) end
 	if secure ~= nil then checkluatype(secure, TYPE_BOOL) end
+	if path ~= nil then checkluatype(path, TYPE_STRING) end
 
-	local websocket =  WebSocket.new(addr, port, secure)
+	local websocket =  WebSocket.new(domain, port, path, secure)
 	websocket_list[websocket] = true
 	return wrap(websocket)
 end
