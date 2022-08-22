@@ -190,7 +190,7 @@ typeToE2Type = {
 local inputConverters
 inputConverters =
 {
-	NORMAL = function(x) return tonumber(x) or 0 end,
+	NORMAL = function(x) return isnumber(x) and x or 0 end,
 	STRING = function(x) return isstring(x) and x or "" end,
 	VECTOR = function(vec) return setmetatable({ vec[1] or vec.x, vec[2] or vec.y, vec[3] or vec.z }, vec_meta) end,
 	VECTOR2 = function(vec) return setmetatable({ vec[1] or vec.x, vec[2] or vec.y }, vec2_meta) end,
