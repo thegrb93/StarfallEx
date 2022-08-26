@@ -1743,6 +1743,7 @@ do
 	end
 	string_library.gfind = string_library.gmatch
 	function string_library.gsub(data, pattern, replacement, max)
+		if debug.getinfo(128) then error("stack overflow") end
 		checkluatype(data, TYPE_STRING)
 		checkluatype(pattern, TYPE_STRING)
 		checkregex(data, pattern)

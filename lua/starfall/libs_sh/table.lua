@@ -175,7 +175,10 @@ table_library.reverse = table.Reverse
 -- @class function
 -- @param table tbl The table to sort
 -- @param function? sorter If specified, the function will be called with 2 parameters each. Return true in this function if you want the first parameter to come first in the sorted array
-table_library.sort = table.sort
+function table_library.sort(tbl, sorter)
+	if debug.getinfo(128) then error("stack overflow") end
+	return table.sort(tbl, sorter)
+end
 
 --- Returns a list of keys sorted based on values of those keys.
 -- @class function
