@@ -896,10 +896,11 @@ end
 local debug_library = instance.Libraries.debug
 
 --- GLua's debug.traceback()
--- Returns a string containing traceback info
--- @param thread? A thread to get the stacktrace of. Otherwise uses current thread and uses this arg as the message.
--- @param string? message A message to be included in the stack trace. Default: ""
--- @return number? stacklevel How far up to start the stack level. Default: 1
+-- Returns a string containing a stack trace of the given thread
+-- @param thread? A thread to get the stack trace of. If nil, this argument will be used as the message and the current thread becomes the target.
+-- @param string? message A message to be included at the beginning of the stack trace. Default: ""
+-- @param number? stacklevel Which position in the execution stack to start the traceback at. Default: 1
+-- @return string A dump of the execution stack.
 function debug_library.traceback(thread, message, stacklevel)
 	local ok, t = pcall(instance.Types.thread.Unwrap, thread)
 	if ok then
