@@ -83,7 +83,7 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 				quotaRun = SF.Instance.runWithoutOps
 			end
 		else
-			if SF.BlockedUsers[player:SteamID()] then
+			if SF.BlockedUsers:isBlocked(player:SteamID()) then
 				return false, { message = "User has blocked this player's starfalls", traceback = "" }
 			end
 
