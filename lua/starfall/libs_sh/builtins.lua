@@ -819,6 +819,12 @@ function builtins_library.dodir(path, loadpriority)
 	return returns
 end
 
+-- Used for compileString, load, setfenv, and getfenv.
+local whitelistedEnvs = setmetatable({
+	[instance.env] = true,
+}, {__mode = 'k'})
+instance.whitelistedEnvs = whitelistedEnvs
+
 -- Like GLua's CompileString, except with an environment parameter instead of a HandleError parameter and, of course, the resulting function is in your instance's environment by default.
 -- @param string code String to compile
 -- @param string? identifier Name of compiled function
@@ -835,12 +841,13 @@ function builtins_library.compileString(str, name, env)
 		env = instance.env
 	else
 		checkluatype(env, TYPE_TABLE)
+		whitelistedEnvs[env] = true
 	end
 	name = "SF:"..name
 	local func = SF.CompileString(str, name, false)
 	-- CompileString returns an error as a string, better check before setfenv
 	if isfunction(func) then
-		return setfenv(func, instance.env)
+		return setfenv(func, env)
 	end
 	return func
 end
@@ -863,7 +870,7 @@ function builtins_library.load(ld, source, mode, env)
 	else
 		checkluatype(ld, TYPE_STRING)
 	end
-	if env == nil then
+	if not isstring(mode) then
 		mode, env = nil, mode
 	end
 	if env == nil then
@@ -872,18 +879,13 @@ function builtins_library.load(ld, source, mode, env)
 		checkluatype(env, TYPE_TABLE)
 	end
 	source = "SF:"..source
-	local retval = SF.CompileString(str, name, false)
+	local retval = SF.CompileString(ld, source, false)
 	if isfunction(retval) then
-		return true, setfenv(retval, env)
+		whitelistedEnvs[env] = true
+		return setfenv(retval, env)
 	end
-	return false, retval
+	return nil, retval
 end
-
--- Used for getfenv and setfenv.
-local whitelistedEnvs = setmetatable({
-	[instance.env] = true
-}, {__mode = 'k'})
-instance.whitelistedEnvs = whitelistedEnvs
 
 --- Lua's setfenv
 -- Sets the environment of either the stack level or the function specified.
