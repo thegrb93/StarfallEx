@@ -819,20 +819,63 @@ function builtins_library.dodir(path, loadpriority)
 	return returns
 end
 
---- GLua's loadstring
--- Works like loadstring, except that it executes by default in the main builtins_library
--- @param string str String to execute
--- @return function Function of str
-function builtins_library.loadstring(str, name)
-	name = "SF:" .. (name or tostring(instance.env))
+-- Like GLua's CompileString, except with an environment parameter instead of a HandleError parameter and, of course, the resulting function is in your instance's environment.
+-- @param string code String to compile
+-- @param string? identifier Name of compiled function
+-- @param table? env Environment of compiled function
+-- @return function|string Compiled function, or error string if failed to compile
+function builtins_library.compileString(str, name, env)
+	checkluatype(str, TYPE_STRING)
+	if name == nil then
+		name = tostring(instance.env)
+	else
+		checkluatype(name, TYPE_STRING)
+	end
+	if env == nil then
+		env = instance.env
+	else
+		checkluatype(env, TYPE_TABLE)
+	end
+	name = "SF:"..name
 	local func = SF.CompileString(str, name, false)
-
 	-- CompileString returns an error as a string, better check before setfenv
 	if isfunction(func) then
 		return setfenv(func, instance.env)
 	end
-
 	return func
+end
+-- In Lua 5.2 and LuaJIT, loadstring is an alias of load. Unfortunately, SfEx
+-- already had a function called loadstring which did not behave like load, so
+-- doing that here would break compatibility.
+builtins_library.loadstring = builtins_library.compileString
+
+--- Like Lua 5.2's load or LuaJIT's load/loadstring, except it has no mode parameter and, of course, the resulting function is in your instance's environment by default.
+-- @param string code String to compile
+-- @param string? identifier Name of compiled function
+-- @param table? env Environment of compiled function
+-- @return function? Compiled function, or nil if failed to compile
+-- @return string? Error string, or nil if successfully compiled
+function builtins_library.load(ld, source, mode, env)
+	checkluatype(ld, TYPE_STRING)
+	if source == nil then
+		source = "=(load)"
+	else
+		checkluatype(ld, TYPE_STRING)
+	end
+	if env == nil then
+		mode, env = nil, mode
+	end
+	if env == nil then
+		env = instance.env
+	else
+		checkluatype(env, TYPE_TABLE)
+	end
+	source = "SF:"..source
+	local retval = SF.CompileString(str, name, false)
+	if isfunction(retval) then
+		return true, setfenv(retval, env)
+	end
+	return false, retval
 end
 
 -- Used for getfenv and setfenv.
