@@ -702,7 +702,7 @@ function builtins_library.shareScripts(enable)
 end
 
 --- Runs an included script and caches the result.
--- Works pretty much like standard Lua require()
+-- This does not behave like vanilla Lua require. This behaves like dofile, except there is an invisible cache.
 -- @param string path The file path to include. Make sure to --@include it
 -- @return ... Return value(s) of the script
 function builtins_library.require(path)
@@ -717,8 +717,8 @@ function builtins_library.require(path)
 	return instance:require(path)
 end
 
---- Runs an included script and caches the result.
--- Works pretty much like standard Lua require()
+--- Runs all included scripts in a directory and caches the results.
+-- This does not behave like vanilla Lua require. This behaves like dofile, except there is an invisible cache.
 -- @param string path The directory to include. Make sure to --@includedir it
 -- @param table loadpriority Table of files that should be loaded before any others in the directory
 -- @return table Table of return values of the scripts
@@ -776,7 +776,7 @@ function builtins_library.dofile(path)
 	return (instance.scripts[path] or SF.Throw("Can't find file '" .. path .. "' (did you forget to --@include it?)", 2))()
 end
 
---- Runs an included directory, but does not cache the result.
+--- Runs all included scripts in directory, but does not cache the result.
 -- @param string path The directory to include. Make sure to --@includedir it
 -- @param table loadpriority Table of files that should be loaded before any others in the directory
 -- @return table Table of return values of the scripts
@@ -819,7 +819,7 @@ function builtins_library.dodir(path, loadpriority)
 	return returns
 end
 
--- Like GLua's CompileString, except with an environment parameter instead of a HandleError parameter and, of course, the resulting function is in your instance's environment.
+-- Like GLua's CompileString, except with an environment parameter instead of a HandleError parameter and, of course, the resulting function is in your instance's environment by default.
 -- @param string code String to compile
 -- @param string? identifier Name of compiled function
 -- @param table? env Environment of compiled function
@@ -850,6 +850,7 @@ end
 builtins_library.loadstring = builtins_library.compileString
 
 --- Like Lua 5.2's load or LuaJIT's load/loadstring, except it has no mode parameter and, of course, the resulting function is in your instance's environment by default.
+-- For compatibility with older versions of Starfall, loadstring is NOT an alias of this function like it is in vanilla Lua 5.2/LuaJIT.
 -- @param string code String to compile
 -- @param string? identifier Name of compiled function
 -- @param table? env Environment of compiled function
