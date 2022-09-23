@@ -957,6 +957,10 @@ local uncatchable = {
 	["stack overflow"] = true
 }
 
+local function get_retvals_vararg(...)
+	return {...}, select('#', ...)
+end
+
 --- Lua's pcall with SF throw implementation
 -- Calls a function and catches an error that can be thrown while the execution of the call.
 -- @param function func Function to be executed and of which the errors should be caught of
@@ -964,11 +968,11 @@ local uncatchable = {
 -- @return boolean If the function had no errors occur within it.
 -- @return ... If an error occurred, this will be a string containing the error message. Otherwise, this will be the return values of the function passed in.
 function builtins_library.pcall(func, ...)
-	local vret = { pcall(func, ...) }
-	local ok, err = vret[1], vret[2]
-
-	if ok then return unpack(vret) end
-
+	local vret, j = get_retvals_vararg(pcall(func, ...))
+	
+	if vret[1] then return unpack(vret, 1, j) end
+	
+	local err = vret[2]
 	if dgetmeta(err)==SF.Errormeta then
 		if err.userdata~=nil then
 			err = err.userdata
@@ -978,7 +982,7 @@ function builtins_library.pcall(func, ...)
 	elseif uncatchable[err] then
 		SF.Throw(err, 2, true)
 	end
-
+	
 	return false, instance.Sanitize({err})[1]
 end
 
@@ -995,11 +999,11 @@ end
 -- @return boolean Status of the execution; true for success, false for failure.
 -- @return ... The returns of the first function if execution succeeded, otherwise the return values of the error callback.
 function builtins_library.xpcall(func, callback, ...)
-	local vret = { xpcall(func, xpcall_Callback, ...) }
-	local ok, errData = vret[1], vret[2]
-
-	if ok then return unpack(vret) end
-
+	local vret, j = get_retvals_vararg(xpcall(func, xpcall_Callback, ...))
+	
+	if vret[1] then return unpack(vret, 1, j) end
+	
+	local errData = vret[2]
 	local err, traceback = errData[1], errData[2]
 	if dgetmeta(err)==SF.Errormeta then
 		if err.userdata~=nil then
