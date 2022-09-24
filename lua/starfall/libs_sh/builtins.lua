@@ -869,7 +869,7 @@ function builtins_library.compileString(str, name, env)
 	if isfunction(func) then
 		return setfenv(func, env)
 	end
-	return func
+	return tostring(func)
 end
 -- In Lua 5.2 and LuaJIT, loadstring is an alias of load. Unfortunately, SfEx
 -- already had a function called loadstring which did not behave like load, so
@@ -904,7 +904,7 @@ function builtins_library.load(ld, source, mode, env)
 		whitelistedEnvs[env] = true
 		return setfenv(retval, env)
 	end
-	return nil, retval
+	return nil, tostring(retval)
 end
 
 --- Lua's setfenv
