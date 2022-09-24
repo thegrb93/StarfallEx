@@ -761,6 +761,26 @@ function builtins_library.requiredir(path, loadpriority)
 	return returns
 end
 
+--- Returns an included script as a function.
+-- Like Lua 5.1's loadfile, but does not support reading from standard input.
+-- @param string path The file path to include. Make sure to --@include it
+-- @return function? Compiled function corresponding to file, or nil if not found.
+-- @return string? Error message, or nil if found
+function builtins_library.loadfile(path)
+	checkluatype(path, TYPE_STRING)
+
+	local curdir = SF.GetExecutingPath() or ""
+
+	path = SF.ChoosePath(path, curdir, function(testpath)
+		return instance.scripts[testpath]
+	end) or path
+	local func = instance.scripts[path]
+	if func == nil then
+		return nil, "Can't find file '" .. path .. "' (did you forget to --@include it?)"
+	end
+	return func
+end
+
 --- Runs an included script, but does not cache the result.
 -- Pretty much like standard Lua dofile()
 -- @param string path The file path to include. Make sure to --@include it
