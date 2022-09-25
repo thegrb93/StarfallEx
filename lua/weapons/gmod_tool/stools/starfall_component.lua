@@ -257,27 +257,30 @@ function TOOL:DrawHUD()
 end
 
 function TOOL:Think()
+	-- Ghost code
+	if (SERVER and game.SinglePlayer()) or (CLIENT and not game.SinglePlayer()) then
+		local model
+		local Type = self:GetClientInfo("Type")
+		if Type=="1" then
+			model = self:GetClientInfo("Model")
+		else
+			model = self:GetClientInfo("ModelHUD")
+		end
 
-	local Type = self:GetClientInfo("Type")
-	local model
+		local ghost = self.GhostEntity
+		if not (ghost and ghost:IsValid() and ghost:GetModel() == model) then
+			self:MakeGhostEntity(model, Vector(0, 0, 0), Angle(0, 0, 0))
+			ghost = self.GhostEntity
+		end
 
-	if Type=="1" then
-		model = self:GetClientInfo("Model")
-	else
-		model = self:GetClientInfo("ModelHUD")
+		if ghost and ghost:IsValid() then
+			local trace = self:GetOwner():GetEyeTrace()
+			if trace.Hit then
+				ghost:SetPos( self:GetPos( ghost, trace, model, Type == "2" ) )
+				ghost:SetAngles( self:GetAngle( trace, model, Type == "2" ) )
+			end
+		end
 	end
-	if not (self.GhostEntity and self.GhostEntity:IsValid()) or self.GhostEntity:GetModel() ~= model then
-		self:MakeGhostEntity(model, Vector(0, 0, 0), Angle(0, 0, 0))
-	end
-
-	local trace = util.TraceLine(util.GetPlayerTrace(self:GetOwner()))
-	if (not trace.Hit) then return end
-	local ent = self.GhostEntity
-
-	if not (ent and ent:IsValid()) then return end
-
-	ent:SetPos( self:GetPos( ent, trace, model, Type == "2" ) )
-	ent:SetAngles( self:GetAngle( trace, model, Type == "2" ) )
 end
 
 if CLIENT then

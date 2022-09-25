@@ -193,50 +193,53 @@ function TOOL:OpenEditor(ply, ent)
 end
 
 function TOOL:Think()
-	if CLIENT then return end
-
-	local model = self:GetClientInfo("ScriptModel")
-	if model=="" then
-		model = self:GetClientInfo("Model")
-	end
-	if not (self.GhostEntity and self.GhostEntity:IsValid()) or self.GhostEntity:GetModel() ~= model then
-		self:MakeGhostEntity(model, Vector(0, 0, 0), Angle(0, 0, 0))
-	end
-	local ghost = self.GhostEntity
-
 	local ply = self:GetOwner()
 	local trace = ply:GetEyeTrace()
 	local ent = trace.Entity
 
-	if ghost and ghost:IsValid() then
-		if (ent:IsValid() and ent:GetClass() == "starfall_processor" or ent:IsPlayer()) then
-			ghost:SetNoDraw(true)
-		elseif trace.Hit then
-			local Ang = trace.HitNormal:Angle()
-			Ang.pitch = Ang.pitch + 90
-
-			local min = ghost:OBBMins()
-			ghost:SetPos(trace.HitPos - trace.HitNormal * min.z)
-			ghost:SetAngles(Ang)
-			ghost:SetNoDraw(false)
+	-- Ghost code
+	if (SERVER and game.SinglePlayer()) or (CLIENT and not game.SinglePlayer()) then
+		local model = self:GetClientInfo("ScriptModel")
+		if model=="" then
+			model = self:GetClientInfo("Model")
 		end
-	end
+		local ghost = self.GhostEntity
+		if not (ghost and ghost:IsValid() and ghost:GetModel() == model) then
+			self:MakeGhostEntity(model, Vector(0, 0, 0), Angle(0, 0, 0))
+			ghost = self.GhostEntity
+		end
 
-	if ply:KeyPressed(IN_ATTACK2) then
-		if not self.OpenedEditor then
-			if ent:IsValid() and ent:GetClass() == "starfall_processor" then
-				if gamemode.Call("CanTool", ply, trace, self.Mode, self, 2)~=false then
-					self:OpenEditor(ply, ent)
-				end
-			else
-				self:OpenEditor(ply)
+		if ghost and ghost:IsValid() then
+			if (ent:IsValid() and ent:GetClass() == "starfall_processor" or ent:IsPlayer()) then
+				ghost:SetNoDraw(true)
+			elseif trace.Hit then
+				local Ang = trace.HitNormal:Angle()
+				Ang.pitch = Ang.pitch + 90
+
+				local min = ghost:OBBMins()
+				ghost:SetPos(trace.HitPos - trace.HitNormal * min.z)
+				ghost:SetAngles(Ang)
+				ghost:SetNoDraw(false)
 			end
-			self.OpenedEditor = true
 		end
-	else
-		self.OpenedEditor = nil
 	end
 
+	if SERVER then
+		if ply:KeyPressed(IN_ATTACK2) then
+			if not self.OpenedEditor then
+				if ent:IsValid() and ent:GetClass() == "starfall_processor" then
+					if gamemode.Call("CanTool", ply, trace, self.Mode, self, 2)~=false then
+						self:OpenEditor(ply, ent)
+					end
+				else
+					self:OpenEditor(ply)
+				end
+				self.OpenedEditor = true
+			end
+		else
+			self.OpenedEditor = nil
+		end
+	end
 end
 
 if CLIENT then
