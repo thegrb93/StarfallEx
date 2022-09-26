@@ -6,9 +6,6 @@ local isentity = isentity
 local owneraccess
 if SERVER then
 	owneraccess = CreateConVar("sf_permissions_entity_owneraccess", "0", { FCVAR_ARCHIVE }, "Allows starfall chip's owner to access their player entity")
-	CreateConVar("sf_permissions_entity_owneraccess_cl", "1", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "Allows starfall chip's owner to access their clientside player entity")
-else
-	owneraccess = CreateConVar("sf_permissions_entity_owneraccess_cl", "1", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "Allows starfall chip's owner to access their clientside player entity")
 end
 
 local P = {}
@@ -71,8 +68,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 			P.checks = {
 				function(instance, target)
 					if isentity(target) and target:IsValid() then
-						if target == instance.player and owneraccess:GetBool() then return true end
-						if instance.player:IsSuperAdmin() then return true end
+						if target==instance.player or LocalPlayer()==instance.player or instance.player:IsSuperAdmin() then return true end
 						if target:CPPIGetOwner()==instance.player then
 							return true
 						else
@@ -84,7 +80,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 				end,
 				function(instance, target)
 					if isentity(target) and target:IsValid() then
-						if target == instance.player and owneraccess:GetBool() then return true end
+						if target==instance.player or LocalPlayer()==instance.player or instance.player:IsSuperAdmin() then return true end
 						if target:CPPICanTool(instance.player, "starfall_ent_lib") then
 							return true
 						else
@@ -96,7 +92,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 				end,
 				function(instance, target)
 					if isentity(target) and target:IsValid() then
-						if target == instance.player and owneraccess:GetBool() then return true end
+						if target==instance.player or LocalPlayer()==instance.player or instance.player:IsSuperAdmin() then return true end
 						if target:CPPICanPhysgun(instance.player) then
 							return true
 						else
@@ -209,7 +205,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 			P.checks = {
 				function(instance, target)
 					if isentity(target) and target:IsValid() then
-						if instance.player == target or LocalPlayer()==instance.player or instance.player:IsSuperAdmin() then return true end
+						if target==instance.player or LocalPlayer()==instance.player or instance.player:IsSuperAdmin() then return true end
 						local owner = target:GetNWEntity("SFPP")
 						if owner ~= NULL then
 							if owner==instance.player then
