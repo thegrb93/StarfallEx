@@ -866,7 +866,7 @@ function builtins_library.loadstring(ld, source, mode, env)
 	if source == nil then
 		source = "=(load)"
 	else
-		checkluatype(ld, TYPE_STRING)
+		checkluatype(source, TYPE_STRING)
 	end
 	if not isstring(mode) then
 		mode, env = nil, mode
