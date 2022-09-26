@@ -848,7 +848,7 @@ function builtins_library.dodir(path, loadpriority)
 	return returns
 end
 
--- Used for compileString, load, setfenv, and getfenv.
+-- Used for loadstring, setfenv, and getfenv.
 local whitelistedEnvs = setmetatable({
 	[instance.env] = true,
 }, {__mode = 'k'})
