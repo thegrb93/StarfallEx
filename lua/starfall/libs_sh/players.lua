@@ -433,13 +433,12 @@ end
 --- Gets the player's death ragdoll
 -- @return Entity? The entity or nil if it doesn't exist
 function player_methods:getDeathRagdoll()
-	local ret = getply(self):GetRagdollEntity()
-	if ret then return owrap(ret) else return nil end
+	return owrap(getply(self):GetRagdollEntity())
 end
 
 if SERVER then
 	--- Lets you change the size of yourself if the server has sf_permissions_entity_owneraccess 1
-    -- @param number scale The scale to apply (min 0.001, max 100)
+	-- @param number scale The scale to apply (min 0.001, max 100)
 	-- @server
 	function player_methods:setModelScale(scale)
 		checkluatype(scale, TYPE_NUMBER)
