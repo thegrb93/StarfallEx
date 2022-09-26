@@ -845,33 +845,6 @@ local whitelistedEnvs = setmetatable({
 }, {__mode = 'k'})
 instance.whitelistedEnvs = whitelistedEnvs
 
--- Like GLua's CompileString, except with an environment parameter instead of a HandleError parameter and, of course, the resulting function is in your instance's environment by default.
--- @param string code String to compile
--- @param string? identifier Name of compiled function
--- @param table? env Environment of compiled function
--- @return function|string Compiled function, or error string if failed to compile
-function builtins_library.compileString(str, name, env)
-	checkluatype(str, TYPE_STRING)
-	if name == nil then
-		name = tostring(instance.env)
-	else
-		checkluatype(name, TYPE_STRING)
-	end
-	if env == nil then
-		env = instance.env
-	else
-		checkluatype(env, TYPE_TABLE)
-		whitelistedEnvs[env] = true
-	end
-	name = "SF:"..name
-	local func = SF.CompileString(str, name, false)
-	-- CompileString returns an error as a string, better check before setfenv
-	if isfunction(func) then
-		return setfenv(func, env)
-	end
-	return tostring(func)
-end
-
 --- Like Lua 5.2's load or LuaJIT's load/loadstring, except it has no mode parameter and, of course, the resulting function is in your instance's environment by default.
 -- For compatibility with older versions of Starfall, loadstring is NOT an alias of this function like it is in vanilla Lua 5.2/LuaJIT.
 -- @param string code String to compile
