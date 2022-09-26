@@ -845,14 +845,14 @@ local whitelistedEnvs = setmetatable({
 }, {__mode = 'k'})
 instance.whitelistedEnvs = whitelistedEnvs
 
---- Like Lua 5.2's load or LuaJIT's load/loadstring, except it has no mode parameter and, of course, the resulting function is in your instance's environment by default.
+--- Like Lua 5.2 or LuaJIT's load/loadstring, except it has no mode parameter and, of course, the resulting function is in your instance's environment by default.
 -- For compatibility with older versions of Starfall, loadstring is NOT an alias of this function like it is in vanilla Lua 5.2/LuaJIT.
 -- @param string code String to compile
 -- @param string? identifier Name of compiled function
 -- @param table? env Environment of compiled function
 -- @return function? Compiled function, or nil if failed to compile
 -- @return string? Error string, or nil if successfully compiled
-function builtins_library.load(ld, source, mode, env)
+function builtins_library.loadstring(ld, source, mode, env)
 	checkluatype(ld, TYPE_STRING)
 	if source == nil then
 		source = "=(load)"
@@ -875,7 +875,7 @@ function builtins_library.load(ld, source, mode, env)
 	end
 	return nil, tostring(retval)
 end
-builtins_library.loadstring = builtins_library.load
+builtins_library.load = builtins_library.loadstring
 
 --- Lua's setfenv
 -- Sets the environment of either the stack level or the function specified.
