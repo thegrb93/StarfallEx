@@ -397,7 +397,7 @@ add("PhysgunDrop")
 -- @param Weapon newweapon New weapon
 add("PlayerSwitchWeapon", nil, nil, returnOnlyOnYourselfFalse)
 
---- Called when player's reserve ammo count changes.
+--- Called when a player's reserve ammo count changes.
 -- @name PlayerAmmoChanged
 -- @class hook
 -- @shared
@@ -406,6 +406,15 @@ add("PlayerSwitchWeapon", nil, nil, returnOnlyOnYourselfFalse)
 -- @param number oldcount Previous ammo count
 -- @param number newcount The new ammo count
 add("PlayerAmmoChanged")
+
+--- Called when a player animation event occurs
+-- @name DoAnimationEvent
+-- @class hook
+-- @shared
+-- @param Player ply The player being animated
+-- @param number event The event id
+-- @param number data The event data
+add("DoAnimationEvent")
 
 -- Entity hooks
 

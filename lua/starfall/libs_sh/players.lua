@@ -5,6 +5,7 @@ local registerprivilege = SF.Permissions.registerPrivilege
 if SERVER then
 	-- Register privileges
 	registerprivilege("player.dropweapon", "DropWeapon", "Drops a weapon from the player", { entities = {} })
+	registerprivilege("player.setammo", "SetAmmo", "Whether a player can set their ammo", { usergroups = { default = 1 }, entities = {} })
 else
 	registerprivilege("player.getFriendStatus", "FriendStatus", "Whether friend status can be retrieved", { client = { default = 1 } })
 end
@@ -429,6 +430,13 @@ function player_methods:isSprinting()
 	return getply(self):IsSprinting()
 end
 
+--- Gets the player's death ragdoll
+-- @return Entity? The entity or nil if it doesn't exist
+function player_methods:getDeathRagdoll()
+	local ret = getply(self):GetRagdollEntity()
+	if ret then return owrap(ret) else return nil end
+end
+
 if SERVER then
 	--- Lets you change the size of yourself if the server has sf_permissions_entity_owneraccess 1
     -- @param number scale The scale to apply (min 0.001, max 100)
@@ -457,7 +465,7 @@ if SERVER then
 		return getply(self):HasGodMode()
 	end
 
-	--- Drops the players' weapon
+	--- Drops the player's weapon
 	-- @server
 	-- @param Weapon|string weapon The weapon instance or class name of the weapon to drop
 	-- @param Vector? target If set, launches the weapon at the given position
@@ -475,6 +483,48 @@ if SERVER then
 			weapon = wunwrap(weapon)
 			ply:DropWeapon(weapon, target, velocity)
 		end
+	end
+
+	--- Strips the player's weapon
+	-- @server
+	-- @param string weapon The weapon class name of the weapon to strip
+	function player_methods:stripWeapon(weapon)
+		local ply = getply(self)
+		checkpermission(instance, ply, "player.dropweapon")
+		checkluatype(weapon, TYPE_STRING)
+		ply:StripWeapon(weapon)
+	end
+
+	--- Strips all the player's weapons
+	-- @server
+	function player_methods:stripWeapons()
+		local ply = getply(self)
+		checkpermission(instance, ply, "player.dropweapon")
+		ply:StripWeapons()
+	end
+
+	--- Sets the player's ammo
+	-- @server
+	-- @param number amount The ammo value
+	-- @param number|string ammoType Ammo type id or name
+	function player_methods:setAmmo(amount, ammoType)
+		local ply = getply(self)
+		checkpermission(instance, ply, "player.setammo")
+
+		checkluatype(amount, TYPE_NUMBER)
+		if not (isstring(ammoType) or isnumber(ammoType)) then
+			SF.ThrowTypeError("number or string", SF.GetType(ammoType), 2)
+		end
+
+		ply:SetAmmo(amount, ammoType)
+	end
+
+	--- Removes all a player's ammo
+	-- @server
+	function player_methods:stripAmmo()
+		local ply = getply(self)
+		checkpermission(instance, ply, "player.setammo")
+		ply:StripAmmo()
 	end
 
 	--- Returns the hitgroup where the player was last hit.
