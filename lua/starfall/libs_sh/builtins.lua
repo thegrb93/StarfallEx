@@ -702,7 +702,7 @@ function builtins_library.shareScripts(enable)
 end
 
 --- Runs an included script and caches the result.
--- This does not behave like vanilla Lua require. This behaves like dofile, except there is an invisible cache.
+-- The path must be an actual path, including the file extension and using slashes for directory separators instead of periods.
 -- @param string path The file path to include. Make sure to --@include it
 -- @return ... Return value(s) of the script
 function builtins_library.require(path)
@@ -718,7 +718,7 @@ function builtins_library.require(path)
 end
 
 --- Runs all included scripts in a directory and caches the results.
--- This does not behave like vanilla Lua require. This behaves like dofile, except there is an invisible cache.
+-- The path must be an actual path, including the file extension and using slashes for directory separators instead of periods.
 -- @param string path The directory to include. Make sure to --@includedir it
 -- @param table loadpriority Table of files that should be loaded before any others in the directory
 -- @return table Table of return values of the scripts
