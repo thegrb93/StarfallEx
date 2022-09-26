@@ -681,18 +681,41 @@ else
 	end
 end
 
---- Returns the table of scripts used by the chip
+--- Returns the source code of and compiled function for specified script.
+-- @param string path Path of file. Can be absolute or relative to calling file. Must be '--@include'-ed.
+-- @return string? Source code, or nil if could not be found
+-- @return function? Compiled function, or nil if could not be found
+function builtins_library.getScript(path)
+	checkluatype(path, TYPE_STRING)
+	local curdir = SF.GetExecutingPath() or ""
+	path = SF.ChoosePath(path, curdir, function(testpath)
+		return instance.scripts[testpath]
+	end) or path
+	return instance.source[path], instance.scripts[path]
+end
+
+--- Returns the source code of and compiled functions for the scripts used by the chip.
 -- @param Entity? ent Optional target entity. Default: chip()
--- @return table Table of scripts used by the chip
+-- @return table Table where keys are paths and values are strings
+-- @return table? Table where keys are paths and values are functions, or nil if another chip was specified
 function builtins_library.getScripts(ent)
-	if ent~=nil then
+	if ent ~= nil then
 		ent = getent(ent)
 		local oinstance = ent.instance
-		if not (ent.Starfall and oinstance and (oinstance.player == instance.player or oinstance.shareScripts)) then SF.Throw("Invalid starfall chip", 2) end
+		if not ent.Starfall or not oinstance then
+			SF.Throw("Invalid starfall chip", 2)
+			return
+		elseif not oinstance.shareScripts and oinstance.player ~= instance.player then
+			SF.Throw("Not allowed", 2)
+			return
+		end
 		return instance.Sanitize(oinstance.source)
-	else
-		return instance.Sanitize(instance.source)
 	end
+	local funcs = {}
+	for path, func in pairs(instance.scripts) do
+		funcs[path] = func
+	end
+	return instance.Sanitize(instance.source), funcs
 end
 
 --- Sets the chip to allow other chips to view its sources
@@ -759,35 +782,6 @@ function builtins_library.requiredir(path, loadpriority)
 	end
 
 	return returns
-end
-
---- Returns an included script as a function.
--- @param string path The file path to include. Can be absolute or relative to calling file. Make sure to --@include it
--- @return function? Compiled function corresponding to file, or nil if not found.
--- @return string? Error message, or nil if found
-function builtins_library.getFunction(path)
-	checkluatype(path, TYPE_STRING)
-
-	local curdir = SF.GetExecutingPath() or ""
-
-	path = SF.ChoosePath(path, curdir, function(testpath)
-		return instance.scripts[testpath]
-	end) or path
-	local func = instance.scripts[path]
-	if func == nil then
-		return nil, "Can't find file '" .. path .. "' (did you forget to --@include it?)"
-	end
-	return func
-end
-
---- Returns included scripts as functions. This does a table copy.
--- @return table Table where keys are paths and values are functions
-function builtins_library.getFunctions()
-	local scripts = {}
-	for path, func in pairs(instance.scripts) do
-		scripts[path] = func
-	end
-	return scripts
 end
 
 --- Runs an included script, but does not cache the result.
