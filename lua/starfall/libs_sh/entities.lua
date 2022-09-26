@@ -399,7 +399,7 @@ function ents_methods:setColor(clr)
 	if SERVER then duplicator.StoreEntityModifier(ent, "colour", { Color = {r = clr[1], g = clr[2], b = clr[3], a = clr[4]}, RenderMode = rendermode }) end
 end
 
---- Sets the whether an entity should be drawn or not
+--- Sets the whether an entity should be drawn or not. If serverside, will also prevent networking the entity to the client. Don't use serverside on a starfall if you want its client code to work.
 -- @shared
 -- @param boolean draw Whether to draw the entity or not.
 function ents_methods:setNoDraw(draw)
