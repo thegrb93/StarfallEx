@@ -25,11 +25,11 @@ local function deleteSound(ply, ent, sound)
 end
 
 
---- Sounds library.
--- @name sounds
+--- Sound library.
+-- @name sound
 -- @class library
--- @libtbl sounds_library
-SF.RegisterLibrary("sounds")
+-- @libtbl sound_library
+SF.RegisterLibrary("sound")
 
 --- Sound type
 -- @name Sound
@@ -53,7 +53,7 @@ instance:AddHook("deinitialize", function()
 	end
 end)
 
-local sounds_library = instance.Libraries.sounds
+local sound_library = instance.Libraries.sound
 local sound_methods, sound_meta, wrap, unwrap = instance.Types.Sound.Methods, instance.Types.Sound, instance.Types.Sound.Wrap, instance.Types.Sound.Unwrap
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 
@@ -63,7 +63,7 @@ local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wr
 -- @param string path Filepath to the sound file.
 -- @param boolean? nofilter (Optional) Boolean Make the sound play for everyone regardless of range or location. Only affects Server-side sounds.
 -- @return Sound Sound Object
-function sounds_library.create(ent, path, nofilter)
+function sound_library.create(ent, path, nofilter)
 	checkluatype(path, TYPE_STRING)
 	if nofilter~=nil then checkluatype(nofilter, TYPE_BOOL) end
 
@@ -95,20 +95,20 @@ end
 
 --- Returns if a sound is able to be created
 -- @return boolean If it is possible to make a sound
-function sounds_library.canCreate()
+function sound_library.canCreate()
 	return plyCount:check(instance.player) > 0 and plySoundBurst:check(instance.player) >= 1
 end
 
 --- Returns the number of sounds left that can be created
 -- @return number The number of sounds left
-function sounds_library.soundsLeft()
+function sound_library.soundsLeft()
 	return math.min(plyCount:check(instance.player), plySoundBurst:check(instance.player))
 end
 
 --- Returns the sound duration in seconds. May not work for all file-types on linux/macos
 -- @param string path String path to the sound file
 -- @return number Number duration in seconds
-function sounds_library.duration(path)
+function sound_library.duration(path)
     checkluatype(path, TYPE_STRING)
     return SoundDuration(path)
 end

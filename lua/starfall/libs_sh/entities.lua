@@ -378,8 +378,6 @@ function ents_methods:setParent(parent, attachment, bone)
 		SF.Parent(child)
 	end
 end
--- Backward compatability
-ents_methods.unparent = ents_methods.setParent
 
 --- Sets the color of the entity
 -- @shared

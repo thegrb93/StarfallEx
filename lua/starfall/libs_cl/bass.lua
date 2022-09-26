@@ -153,7 +153,6 @@ function bass_methods:stop()
 	sensitive2sf[snd] = nil
 	sf2sensitive[self] = nil
 end
-bass_methods.destroy = bass_methods.stop
 
 --- Pauses the sound.
 function bass_methods:pause()

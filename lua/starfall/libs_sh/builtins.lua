@@ -228,14 +228,14 @@ builtins_library.isFirstTimePredicted = IsFirstTimePredicted
 --- Returns the current count for this Think's CPU Time.
 -- This value increases as more executions are done, may not be exactly as you want.
 -- If used on screens, will show 0 if only rendering is done. Operations must be done in the Think loop for them to be counted.
--- @return number Current quota used this Think
-function builtins_library.quotaUsed()
+-- @return number Current cpu time used this Think
+function builtins_library.cpuUsed()
 	return instance.cpu_total
 end
 
 --- Gets the Average CPU Time in the buffer
 -- @return number Average CPU Time of the buffer.
-function builtins_library.quotaAverage()
+function builtins_library.cpuAverage()
 	return instance:movingCPUAverage()
 end
 
@@ -269,7 +269,7 @@ end
 
 --- Returns the total used time for all chips by the player.
 -- @return number Total used CPU time of all your chips.
-function builtins_library.quotaTotalUsed()
+function builtins_library.cpuTotalUsed()
 	local total = 0
 	for instance, _ in pairs(SF.playerInstances[instance.player]) do
 		total = total + instance.cpu_total
@@ -279,7 +279,7 @@ end
 
 --- Returns the total average time for all chips by the player.
 -- @return number Total average CPU Time of all your chips.
-function builtins_library.quotaTotalAverage()
+function builtins_library.cpuTotalAverage()
 	local total = 0
 	for instance, _ in pairs(SF.playerInstances[instance.player]) do
 		total = total + instance:movingCPUAverage()
@@ -288,13 +288,13 @@ function builtins_library.quotaTotalAverage()
 end
 
 --- Gets the CPU Time max.
--- CPU Time is stored in a buffer of N elements, if the average of this exceeds quotaMax, the chip will error.
+-- CPU Time is stored in a buffer of N elements, if the average of this exceeds cpuMax, the chip will error.
 -- @return number Max SysTime allowed to take for execution of the chip in a Think.
-function builtins_library.quotaMax()
+function builtins_library.cpuMax()
 	return instance.cpuQuota
 end
 
---- Sets a CPU soft quota which will trigger a catchable error if the cpu goes over a certain amount.
+--- Sets a soft cpu quota which will trigger a catchable error if the cpu goes over a certain amount.
 -- @param number quota The threshold where the soft error will be thrown. Ratio of current cpu to the max cpu usage. 0.5 is 50%
 function builtins_library.setSoftQuota(quota)
 	checkluatype(quota, TYPE_NUMBER)

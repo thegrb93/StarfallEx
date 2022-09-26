@@ -446,6 +446,34 @@ function SF.Instance:BuildEnvironment()
 	end
 	table.Inherit( self.env, self.Libraries ) 
 	self.env._G = self.env
+	self:DoAliases()
+end
+
+-- Backward compatability
+function SF.Instance:DoAliases()
+	self.env.holograms = self.env.hologram
+	self.env.sounds = self.env.sound
+
+	local trace = self.env.trace
+	if trace then
+		trace.trace = trace.line
+		trace.traceHull = trace.hull
+	end
+
+	local bass_methods = self.Types.Bass and self.Types.Bass.Methods
+	if bass_methods then
+		bass_methods.destroy = bass_methods.stop
+	end
+	local ents_methods = self.Types.Entity and self.Types.Entity.Methods
+	if ents_methods then
+		ents_methods.unparent = ents_methods.setParent
+	end
+
+	self.env.quotaUsed = self.env.cpuUsed
+	self.env.quotaAverage = self.env.cpuAverage
+	self.env.quotaTotalUsed = self.env.cpuTotalUsed
+	self.env.quotaTotalAverage = self.env.cpuTotalAverage
+	self.env.quotaMax = self.env.cpuMax
 end
 
 --- Overridable hook for pcall-based hook systems

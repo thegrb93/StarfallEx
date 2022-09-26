@@ -33,10 +33,10 @@ end
 
 
 --- Library for creating and manipulating physics-less models AKA "Holograms".
--- @name holograms
+-- @name hologram
 -- @class library
--- @libtbl holograms_library
-SF.RegisterLibrary("holograms")
+-- @libtbl hologram_library
+SF.RegisterLibrary("hologram")
 
 --- Hologram type
 -- @name Hologram
@@ -50,7 +50,7 @@ return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 
-local holograms_library = instance.Libraries.holograms
+local hologram_library = instance.Libraries.hologram
 local hologram_methods, hologram_meta, wrap, unwrap = instance.Types.Hologram.Methods, instance.Types.Hologram, instance.Types.Hologram.Wrap, instance.Types.Hologram.Unwrap
 local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
@@ -131,7 +131,7 @@ end
 -- @param string model The model to give the hologram
 -- @param Vector? scale (Optional) The scale to give the hologram
 -- @return Hologram The hologram object
-function holograms_library.create(pos, ang, model, scale)
+function hologram_library.create(pos, ang, model, scale)
 	checkpermission(instance, nil, "hologram.create")
 	checkluatype(model, TYPE_STRING)
 
@@ -191,14 +191,14 @@ end
 
 --- Checks if a user can spawn anymore holograms.
 -- @return boolean True if user can spawn holograms, False if not.
-function holograms_library.canSpawn()
+function hologram_library.canSpawn()
 	if not SF.Permissions.hasAccess(instance,  nil, "hologram.create") then return false end
 	return plyCount:check(instance.player) > 0
 end
 
 --- Checks how many holograms can be spawned
 -- @return number Number of holograms able to be spawned
-function holograms_library.hologramsLeft()
+function hologram_library.hologramsLeft()
 	if not SF.Permissions.hasAccess(instance,  nil, "hologram.create") then return 0 end
 	return plyCount:check(instance.player)
 end
@@ -509,7 +509,7 @@ end
 
 --- Removes all holograms created by the calling chip
 -- @shared
-function holograms_library.removeAll()
+function hologram_library.removeAll()
 	removeAllHolos()
 end
 
