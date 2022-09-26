@@ -871,10 +871,6 @@ function builtins_library.compileString(str, name, env)
 	end
 	return tostring(func)
 end
--- In Lua 5.2 and LuaJIT, loadstring is an alias of load. Unfortunately, SfEx
--- already had a function called loadstring which did not behave like load, so
--- doing that here would break compatibility.
-builtins_library.loadstring = builtins_library.compileString
 
 --- Like Lua 5.2's load or LuaJIT's load/loadstring, except it has no mode parameter and, of course, the resulting function is in your instance's environment by default.
 -- For compatibility with older versions of Starfall, loadstring is NOT an alias of this function like it is in vanilla Lua 5.2/LuaJIT.
@@ -906,6 +902,7 @@ function builtins_library.load(ld, source, mode, env)
 	end
 	return nil, tostring(retval)
 end
+builtins_library.loadstring = builtins_library.load
 
 --- Lua's setfenv
 -- Sets the environment of either the stack level or the function specified.
