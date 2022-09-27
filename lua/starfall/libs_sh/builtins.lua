@@ -681,18 +681,41 @@ else
 	end
 end
 
---- Returns the table of scripts used by the chip
+--- Returns the source code of and compiled function for specified script.
+-- @param string path Path of file. Can be absolute or relative to calling file. Must be '--@include'-ed.
+-- @return string? Source code, or nil if could not be found
+-- @return function? Compiled function, or nil if could not be found
+function builtins_library.getScript(path)
+	checkluatype(path, TYPE_STRING)
+	local curdir = SF.GetExecutingPath() or ""
+	path = SF.ChoosePath(path, curdir, function(testpath)
+		return instance.scripts[testpath]
+	end) or path
+	return instance.source[path], instance.scripts[path]
+end
+
+--- Returns the source code of and compiled functions for the scripts used by the chip.
 -- @param Entity? ent Optional target entity. Default: chip()
--- @return table Table of scripts used by the chip
+-- @return table Table where keys are paths and values are strings
+-- @return table? Table where keys are paths and values are functions, or nil if another chip was specified
 function builtins_library.getScripts(ent)
-	if ent~=nil then
+	if ent ~= nil then
 		ent = getent(ent)
 		local oinstance = ent.instance
-		if not (ent.Starfall and oinstance and (oinstance.player == instance.player or oinstance.shareScripts)) then SF.Throw("Invalid starfall chip", 2) end
+		if not ent.Starfall or not oinstance then
+			SF.Throw("Invalid starfall chip", 2)
+			return
+		elseif not oinstance.shareScripts and oinstance.player ~= instance.player then
+			SF.Throw("Not allowed", 2)
+			return
+		end
 		return instance.Sanitize(oinstance.source)
-	else
-		return instance.Sanitize(instance.source)
 	end
+	local funcs = {}
+	for path, func in pairs(instance.scripts) do
+		funcs[path] = func
+	end
+	return instance.Sanitize(instance.source), funcs
 end
 
 --- Sets the chip to allow other chips to view its sources
@@ -702,7 +725,7 @@ function builtins_library.shareScripts(enable)
 end
 
 --- Runs an included script and caches the result.
--- Works pretty much like standard Lua require()
+-- The path must be an actual path, including the file extension and using slashes for directory separators instead of periods.
 -- @param string path The file path to include. Make sure to --@include it
 -- @return ... Return value(s) of the script
 function builtins_library.require(path)
@@ -717,8 +740,8 @@ function builtins_library.require(path)
 	return instance:require(path)
 end
 
---- Runs an included script and caches the result.
--- Works pretty much like standard Lua require()
+--- Runs all included scripts in a directory and caches the results.
+-- The path must be an actual path, including the file extension and using slashes for directory separators instead of periods.
 -- @param string path The directory to include. Make sure to --@includedir it
 -- @param table loadpriority Table of files that should be loaded before any others in the directory
 -- @return table Table of return values of the scripts
@@ -776,7 +799,7 @@ function builtins_library.dofile(path)
 	return (instance.scripts[path] or SF.Throw("Can't find file '" .. path .. "' (did you forget to --@include it?)", 2))()
 end
 
---- Runs an included directory, but does not cache the result.
+--- Runs all included scripts in directory, but does not cache the result.
 -- @param string path The directory to include. Make sure to --@includedir it
 -- @param table loadpriority Table of files that should be loaded before any others in the directory
 -- @return table Table of return values of the scripts
@@ -819,27 +842,43 @@ function builtins_library.dodir(path, loadpriority)
 	return returns
 end
 
---- GLua's loadstring
--- Works like loadstring, except that it executes by default in the main builtins_library
--- @param string str String to execute
--- @return function Function of str
-function builtins_library.loadstring(str, name)
-	name = "SF:" .. (name or tostring(instance.env))
-	local func = SF.CompileString(str, name, false)
-
-	-- CompileString returns an error as a string, better check before setfenv
-	if isfunction(func) then
-		return setfenv(func, instance.env)
-	end
-
-	return func
-end
-
--- Used for getfenv and setfenv.
+-- Used for loadstring, setfenv, and getfenv.
 local whitelistedEnvs = setmetatable({
-	[instance.env] = true
+	[instance.env] = true,
 }, {__mode = 'k'})
 instance.whitelistedEnvs = whitelistedEnvs
+
+--- Like Lua 5.2 or LuaJIT's load/loadstring, except it has no mode parameter and, of course, the resulting function is in your instance's environment by default.
+-- For compatibility with older versions of Starfall, loadstring is NOT an alias of this function like it is in vanilla Lua 5.2/LuaJIT.
+-- @param string code String to compile
+-- @param string? identifier Name of compiled function
+-- @param table? env Environment of compiled function
+-- @return function? Compiled function, or nil if failed to compile
+-- @return string? Error string, or nil if successfully compiled
+function builtins_library.loadstring(ld, source, mode, env)
+	checkluatype(ld, TYPE_STRING)
+	if source == nil then
+		source = "=(load)"
+	else
+		checkluatype(source, TYPE_STRING)
+	end
+	if not isstring(mode) then
+		mode, env = nil, mode
+	end
+	if env == nil then
+		env = instance.env
+	else
+		checkluatype(env, TYPE_TABLE)
+	end
+	source = "SF:"..source
+	local retval = SF.CompileString(ld, source, false)
+	if isfunction(retval) then
+		whitelistedEnvs[env] = true
+		return setfenv(retval, env)
+	end
+	return nil, tostring(retval)
+end
+builtins_library.load = builtins_library.loadstring
 
 --- Lua's setfenv
 -- Sets the environment of either the stack level or the function specified.
