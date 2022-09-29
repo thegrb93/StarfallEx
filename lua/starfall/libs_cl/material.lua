@@ -164,6 +164,18 @@ local function checkkey(key)
 	if blacklisted_keys[string.lower(key)] then SF.Throw("Blocked material key: "..key, 3) end
 end
 
+local function tex2str(t)
+	for k, v in pairs(t)
+	do
+		if type(v) == "ITexture"
+		then
+			t[k] = v:GetName()
+		end
+	end
+
+	return t
+end
+
 local LoadingTextureQueue = {}
 local Panel
 local function NextInTextureQueue()
@@ -361,7 +373,7 @@ end
 -- @return table The table of keyvalues
 function material_library.getKeyValues(path)
 	checkluatype(path, TYPE_STRING)
-	return instance.Sanitize(Material(path):GetKeyValues())
+	return instance.Sanitize(tex2str(Material(path):GetKeyValues()))
 end
 
 --- Returns a material's engine name
@@ -601,7 +613,7 @@ end
 -- @name material_methods.getKeyValues
 -- @return table The table of keyvalues
 function lmaterial_methods:getKeyValues()
-	return instance.Sanitize(lunwrap(self):GetKeyValues())
+	return instance.Sanitize(tex2str(lunwrap(self):GetKeyValues()))
 end
 
 --- Returns a matrix keyvalue
