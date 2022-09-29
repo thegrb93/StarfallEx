@@ -399,6 +399,15 @@ function player_methods:getWeapon(wep)
 	return wwrap(getply(self):GetWeapon(wep))
 end
 
+--- Returns a player's weapon color
+-- The part of the model that is colored is determined by the model itself, and is different for each model
+-- The format is Vector(r,g,b), and each color should be between 0 and 1
+-- @shared
+-- @return Vector The color
+function player_methods:getWeaponColor()
+	return vwrap(getply(self):GetWeaponColor())
+end
+
 --- Returns the entity that the player is standing on
 -- @shared
 -- @return Entity Ground entity
