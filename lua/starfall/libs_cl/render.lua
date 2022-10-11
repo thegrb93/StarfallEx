@@ -405,6 +405,8 @@ local renderdata = {}
 renderdata.renderedViews = 0
 renderdata.rendertargets = {}
 renderdata.validrendertargets = {}
+renderdata.oldW = ScrW()
+renderdata.oldH = ScrH()
 instance.data.render = renderdata
 
 local render_library = instance.Libraries.render
