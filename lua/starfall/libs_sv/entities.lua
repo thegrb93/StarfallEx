@@ -788,7 +788,7 @@ function ents_methods:setUnbreakable(on)
 	if not (SF.UnbreakableFilter and SF.UnbreakableFilter:IsValid()) then
 		local FilterDamage = ents.FindByName("FilterDamage")[1]
 		if not FilterDamage then
-			local FilterDamage = ents.Create( "filter_activator_name" )
+			FilterDamage = ents.Create( "filter_activator_name" )
 			FilterDamage:SetKeyValue( "TargetName", "FilterDamage" )
 			FilterDamage:SetKeyValue( "negated", "1" )
 			FilterDamage:Spawn()
