@@ -304,7 +304,7 @@ return function(instance)
 	--- Returns whether this NavArea has an outgoing ( one or two way ) connection to given NavArea.
 	-- See NavArea:isConnectedAtSide for a function that only checks for outgoing connections in one direction.
 	-- @name navarea_methods.isConnected
-	-- @param other NavArea The other NavArea to check for connection to.
+	-- @param NavArea other The other NavArea to check for connection to.
 	-- @return boolean Whether this NavArea has an outgoing ( one or two way ) connection to given NavArea.
 	function lnavarea_methods:isConnected(other)
 		return lnavunwrap(self):IsConnected( lnavunwrap(other) )
@@ -751,7 +751,7 @@ return function(instance)
 	-- 8 = exposed, spot in the open, usually on a ledge or cliff
 	-- Values over 255 will be clamped.
 	-- @param Vector pos The position of the hiding spot on the nav area
-	-- @param Flags flags describing what kind of hiding spot this is.
+	-- @param number flags Flags describing what kind of hiding spot this is.
 	function navarea_methods:addHidingSpot(pos, flags)
 		checkluatype(flags, TYPE_NUMBER)
 		navunwrap(self):AddHidingSpot( vunwrap(pos), flags )
