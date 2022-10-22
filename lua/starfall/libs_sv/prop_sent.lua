@@ -1008,12 +1008,10 @@ registerSent("starfall_processor", {
 		self._inputs = {{}, {}}
 		self._outputs = {{}, {}}
 		self._vars = {}
-		self.files = {[""] = ""}
 		self.filepath = "generic_starfall.txt"
 	end,
 	{
 		["Model"] = {TYPE_STRING, "models/spacecode/sfchip_medium.mdl"},
-		["files"] = {TYPE_TABLE, {}},
 	}
 })
 
@@ -1317,7 +1315,6 @@ return function() end
 --
 -- > starfall_processor
 -- string Model = "models/spacecode/sfchip_medium.mdl"
--- string files = {""}
 -- 
 -- > gmod_wire_extbus
 -- string Model = "models/jaanus/wiretool/wiretool_gate.mdl"
