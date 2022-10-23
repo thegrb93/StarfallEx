@@ -1005,13 +1005,42 @@ registerSent("gmod_wire_expression2", {
 
 registerSent("starfall_processor", {
 	_preFactory = function(ply, self)
-		self._inputs = {{}, {}}
-		self._outputs = {{}, {}}
-		self._vars = {}
-		self.filepath = "generic_starfall.txt"
+		--print(self.Code)
+	end,
+
+	--[[
+		{
+			["files"] = {
+				["main"] = "-- Server only\n--@name \n--@author ",
+			},
+			["mainfile"] = "main",
+			["owner"] = {toby}<STEAM_0:0:222057677>,
+			["ownerindex"] = 1,
+			["proc"] = Entity [121][starfall_processor],
+			["procindex"] = 121,
+		}
+		
+	--]]
+
+	_postFactory = function(ply, self, enttbl)
+		local Data = {
+						["files"] = {["main"] = enttbl.Code},
+						["mainfile"] = "main",
+						["owner"] = ply,
+						["ownerindex"] = ply:EntIndex(),
+						["proc"] = self,
+						["procindex"] = self:EntIndex()
+					 }
+		print(self)
+		print(enttbl.Code)
+		print(ply)
+		print(ply:EntIndex())
+		print(self.instance)
+		self:SetupFiles(Data)
 	end,
 	{
 		["Model"] = {TYPE_STRING, "models/spacecode/sfchip_medium.mdl"},
+		["Code"] = {TYPE_STRING, ""},
 	}
 })
 
@@ -1315,6 +1344,7 @@ return function() end
 --
 -- > starfall_processor
 -- string Model = "models/spacecode/sfchip_medium.mdl"
+-- string Code = "\n--@name \n--@author \n--@shared \n--hellooo"
 -- 
 -- > gmod_wire_extbus
 -- string Model = "models/jaanus/wiretool/wiretool_gate.mdl"
