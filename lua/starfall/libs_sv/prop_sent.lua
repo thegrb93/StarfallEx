@@ -1005,37 +1005,17 @@ registerSent("gmod_wire_expression2", {
 
 registerSent("starfall_processor", {
 	_preFactory = function(ply, self)
-		--print(self.Code)
 	end,
-
-	--[[
-		{
-			["files"] = {
-				["main"] = "-- Server only\n--@name \n--@author ",
-			},
-			["mainfile"] = "main",
-			["owner"] = {toby}<STEAM_0:0:222057677>,
-			["ownerindex"] = 1,
-			["proc"] = Entity [121][starfall_processor],
-			["procindex"] = 121,
-		}
-		
-	--]]
 
 	_postFactory = function(ply, self, enttbl)
 		local Data = {
-						["files"] = {["main"] = enttbl.Code},
-						["mainfile"] = "main",
-						["owner"] = ply,
-						["ownerindex"] = ply:EntIndex(),
-						["proc"] = self,
-						["procindex"] = self:EntIndex()
-					 }
-		print(self)
-		print(enttbl.Code)
-		print(ply)
-		print(ply:EntIndex())
-		print(self.instance)
+			["files"] = {["temp.txt"] = enttbl.Code},
+			["mainfile"] = "temp.txt",
+			["owner"] = ply,
+			["ownerindex"] = ply:EntIndex(),
+			["proc"] = self,
+			["procindex"] = self:EntIndex()
+		 }
 		self:SetupFiles(Data)
 	end,
 	{
