@@ -7,6 +7,9 @@ end
 -- Sent registering
 local checkluatype = SF.CheckLuaType
 
+-- Limit starfall spawning
+local sf_sfchip_max = CreateConVar("sf_sfchip_max_active", "3", { FCVAR_ARCHIVE }, "Limit the spawning of starfall chips with starfall")
+
 -- Basic Gmod sents
 registerSent("gmod_balloon", {{
 	["Model"] = {TYPE_STRING, "models/maxofs2d/balloon_classic.mdl"},
@@ -1006,17 +1009,13 @@ registerSent("gmod_wire_expression2", {
 registerSent("starfall_processor", {
 	_preFactory = function(ply, self)
 	end,
-
-	_postFactory = function(ply, self, enttbl)
+	_postFactory = function( ply, self, enttbl )
 		local Data = {
-			["files"] = {["temp.txt"] = enttbl.Code},
-			["mainfile"] = "temp.txt",
-			["owner"] = ply,
-			["ownerindex"] = ply:EntIndex(),
-			["proc"] = self,
-			["procindex"] = self:EntIndex()
-		 }
-		self:SetupFiles(Data)
+			["files"] = {["main"] = enttbl.Code},
+			["mainfile"] = "main",
+			["owner"] = ply
+		}
+		self:SetupFiles( Data )
 	end,
 	{
 		["Model"] = {TYPE_STRING, "models/spacecode/sfchip_medium.mdl"},
