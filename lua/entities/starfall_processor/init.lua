@@ -123,13 +123,13 @@ function ENT:PostEntityPaste(ply, ent, CreatedEntities)
 					-- 4.3 case
 					local files = SF.DecompressFiles(info.starfall.files)
 					self.starfalluserdata = info.starfall.udata
-					self.sfdata = {owner = ply, files = files, mainfile = info.starfall.mainfile}
+					self.sfdata = {owner = ply, files = files, mainfile = info.starfall.mainfile, proc = self}
 				end
 			else
 				-- Legacy duplications
 				local files, mainfile = SF.LegacyDeserializeCode(info.starfall)
 				self.starfalluserdata = info.starfalluserdata
-				self.sfdata = {owner = ply, files = files, mainfile = mainfile}
+				self.sfdata = {owner = ply, files = files, mainfile = mainfile, proc = self}
 			end
 		end
 	end
