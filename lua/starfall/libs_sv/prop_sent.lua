@@ -1038,8 +1038,6 @@ registerSent("starfall_processor", {
 				end
 			end
 		end
-
-		PrintTable(LimitData)
 	end,
 	{
 		["Model"] = {TYPE_STRING, "models/spacecode/sfchip_medium.mdl"},
