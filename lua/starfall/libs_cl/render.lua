@@ -290,6 +290,12 @@ SF.hookAdd("PostDrawHUD", nil, function(instance)
 	end
 end, cleanupRender)
 
+--- Called before drawing the viewmodel rendergroup (3D Context)
+-- @name predrawviewmodels
+-- @class hook
+-- @client
+SF.hookAdd("PreDrawViewModels", nil, hudPrepareSafeArgs, cleanupRender)
+
 --- Called when world fog is drawn.
 -- @name setupworldfog
 -- @class hook

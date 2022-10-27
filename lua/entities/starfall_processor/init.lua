@@ -14,6 +14,7 @@ function ENT:Initialize()
 	self:SetColor(Color(255, 0, 0, self:GetColor().a))
 	self.ErroredPlayers = {}
 	self.ActiveHuds = {}
+	self.spawnbychip = false
 end
 
 function ENT:UpdateTransmitState()
