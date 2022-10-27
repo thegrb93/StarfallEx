@@ -1015,6 +1015,19 @@ registerSent("starfall_processor", {
 			["mainfile"] = "main",
 			["owner"] = ply
 		}
+		self.spawnbychip = true
+		local Tbl = ents.GetAll()
+		local sf_sfchip_max = sf_sfchip_max:GetInt()
+		local current_chipSf = 0 
+		for k, v in pairs(Tbl) do
+			if v:GetClass() == 'starfall_processor' and v.spawnbychip == true then
+				current_chipSf = current_chipSf + 1
+				if current_chipSf == sf_sfchip_max + 1 then
+					error("Reached max starfall chip limit (spawned via chip)")
+					return
+				end
+			end
+		end
 		self:SetupFiles( Data )
 	end,
 	{
