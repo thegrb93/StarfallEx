@@ -627,6 +627,9 @@ function props_library.createSent(pos, ang, class, frozen, data)
 			if entity.PreEntityCopy then
 				entity:PreEntityCopy() -- To build dupe modifiers
 			end
+			if entity.PostEntityCopy then
+				entity:PostEntityCopy()
+			end
 			if entity.PostEntityPaste then
 				entity:PostEntityPaste(ply, entity, {[entity:EntIndex()] = entity})
 			end
