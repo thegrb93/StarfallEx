@@ -270,6 +270,7 @@ function PANEL:Setup(folder)
 		{"GifLoader", "https://raw.githubusercontent.com/thegrb93/MyStarfallScripts/master/libs/gifspritesheet.txt"},
 		{"HoloText", "https://raw.githubusercontent.com/Derpius/public-starfalls/master/libs/holotext/main.txt"},
 		{"HttpQueue", "https://raw.githubusercontent.com/ANormalTwig/PublicStarfalls/main/libraries/http_queueing.lua"},
+		{"ModelLoader", "https://raw.githubusercontent.com/thegrb93/MyStarfallScripts/master/libs/custommodellib.txt"},
 		{"ReadWriteType", "https://raw.githubusercontent.com/Jacbo1/Public-Starfall/main/ReadWriteType/readwritetype.lua"},
 		{"SafeNet", "https://raw.githubusercontent.com/Jacbo1/Public-Starfall/main/SafeNet/safeNet.lua"},
 		{"XInputNet", "https://raw.githubusercontent.com/thegrb93/MyStarfallScripts/master/libs/xinput.txt"},
