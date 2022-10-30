@@ -1015,29 +1015,7 @@ registerSent("starfall_processor", {
 			["mainfile"] = "main",
 			["owner"] = ply
 		}
-		self.spawnbychip = true
-		local Ents_ = ents.GetAll()
-		local Players_ = player.GetAll()
-		local sf_sfchip_max = sf_sfchip_max:GetInt()
-		local LimitData = {}
 		self:SetupFiles( Data )
-		for k, v in pairs(Players_) do
-			table.insert(LimitData, {['data']={v,['chips']={}}})
-		end
-		for k, v in pairs(LimitData) do
-			if LimitData[k]['data'][1] == ply then
-				for _, v_ in pairs(Ents_) do
-					if v_:GetClass() == 'starfall_processor' and v_.spawnbychip == true and v_.owner == LimitData[k]['data'][1] then
-						if table.Count(LimitData[k]['data']['chips']) == sf_sfchip_max then
-							error('Error reached max spawned sf via chip')
-							return
-						else
-							table.insert(LimitData[k]['data']['chips'],v_)
-						end
-					end
-				end
-			end
-		end
 	end,
 	{
 		["Model"] = {TYPE_STRING, "models/spacecode/sfchip_medium.mdl"},
