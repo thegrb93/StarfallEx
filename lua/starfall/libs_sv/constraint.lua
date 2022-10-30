@@ -65,6 +65,14 @@ local vwrap, vunwrap = instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local awrap, aunwrap = instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 
 
+--- Gets the string representation of the constraint
+-- @return string String representation of the constraint
+function constr_meta:__tostring()
+	local ent = cunwrap(self)
+	if not ent then return "(null entity)"
+	else return tostring(ent) end
+end
+
 --- Removes the constraint
 -- @server
 function constr_methods:remove()
