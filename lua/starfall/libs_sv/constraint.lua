@@ -73,14 +73,18 @@ function constr_meta:__tostring()
 	else return tostring(ent) end
 end
 
+local function check_constr_perms(ent)
+	if ent.Ent1 and not ent.Ent1:IsWorld() then checkpermission(instance, ent.Ent1, "entities.remove", 3) end
+	if ent.Ent2 and not ent.Ent2:IsWorld() then checkpermission(instance, ent.Ent2, "entities.remove", 3) end
+	if ent.Ent3 and not ent.Ent3:IsWorld() then checkpermission(instance, ent.Ent3, "entities.remove", 3) end
+	if ent.Ent4 and not ent.Ent4:IsWorld() then checkpermission(instance, ent.Ent4, "entities.remove", 3) end
+end
+
 --- Removes the constraint
 -- @server
 function constr_methods:remove()
 	local ent = cunwrap(self)
-	if ent.Ent1 then checkpermission(instance, ent.Ent1, "entities.remove") end
-	if ent.Ent2 then checkpermission(instance, ent.Ent2, "entities.remove") end
-	if ent.Ent3 then checkpermission(instance, ent.Ent3, "entities.remove") end
-	if ent.Ent4 then checkpermission(instance, ent.Ent4, "entities.remove") end
+	check_constr_perms(ent)
 	ent:Remove()
 end
 
