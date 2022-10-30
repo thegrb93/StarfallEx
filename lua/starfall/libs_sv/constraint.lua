@@ -28,6 +28,11 @@ end
 -- @libtbl constraint_library
 SF.RegisterLibrary("constraint")
 
+--- A constraint entity returned by constraint functions
+-- @name Constraint
+-- @class type
+-- @libtbl constr_methods
+SF.RegisterType("Constraint", true, false)
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
@@ -55,8 +60,36 @@ end)
 local constraint_library = instance.Libraries.constraint
 
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local constr_methods, constr_meta, cwrap, cunwrap = instance.Types.Constraint.Methods, instance.Types.Constraint, instance.Types.Constraint.Wrap, instance.Types.Constraint.Unwrap
 local vwrap, vunwrap = instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local awrap, aunwrap = instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+
+
+--- Gets the string representation of the constraint
+-- @return string String representation of the constraint
+function constr_meta:__tostring()
+	local ent = cunwrap(self)
+	if not ent then return "(null entity)"
+	else return tostring(ent) end
+end
+
+--- Removes the constraint
+-- @server
+function constr_methods:remove()
+	local ent = cunwrap(self)
+	if ent.Ent1 then checkpermission(instance, ent.Ent1, "entities.remove") end
+	if ent.Ent2 then checkpermission(instance, ent.Ent2, "entities.remove") end
+	if ent.Ent3 then checkpermission(instance, ent.Ent3, "entities.remove") end
+	if ent.Ent4 then checkpermission(instance, ent.Ent4, "entities.remove") end
+	ent:Remove()
+end
+
+--- Returns whether the constraint is valid or not
+-- @server
+-- @return boolean True if valid, false if not
+function constr_methods:isValid()
+	return IsValid(cunwrap(self))
+end
 
 local function checkConstraint(e, t)
 	if e then
@@ -88,6 +121,7 @@ end
 -- @param number? bone2 Number bone of the second entity. Default 0
 -- @param number? force_lim Max force the weld can take before breaking. Default 0
 -- @param boolean? nocollide Bool whether or not to nocollide the two entities. Default false
+-- @return Constraint The constraint entity
 -- @server
 function constraint_library.weld(e1, e2, bone1, bone2, force_lim, nocollide)
 	plyCount:checkuse(instance.player, 1)
@@ -110,6 +144,7 @@ function constraint_library.weld(e1, e2, bone1, bone2, force_lim, nocollide)
 	local ent = constraint.Weld(ent1, ent2, bone1, bone2, force_lim, nocollide)
 	if ent then
 		register(ent, instance)
+		return cwrap(ent)
 	end
 end
 
@@ -125,6 +160,7 @@ end
 -- @param number? friction Friction of the constraint. Default 0
 -- @param boolean? nocollide Bool whether or not to nocollide the two entities. Default false
 -- @param Vector? laxis Optional second position of the constraint, same as v2 but local to e1
+-- @return Constraint The constraint entity
 -- @server
 function constraint_library.axis(e1, e2, bone1, bone2, v1, v2, force_lim, torque_lim, friction, nocollide, laxis)
 	plyCount:checkuse(instance.player, 1)
@@ -154,6 +190,7 @@ function constraint_library.axis(e1, e2, bone1, bone2, v1, v2, force_lim, torque
 	local ent = constraint.Axis(ent1, ent2, bone1, bone2, vec1, vec2, force_lim, torque_lim, friction, nocollide, axis)
 	if ent then
 		register(ent, instance)
+		return cwrap(ent)
 	end
 end
 
@@ -166,6 +203,7 @@ end
 -- @param number? force_lim Amount of force until it breaks, 0 = Unbreakable. Default 0
 -- @param number? torque_lim Amount of torque until it breaks, 0 = Unbreakable. Default 0
 -- @param boolean? nocollide Bool whether or not to nocollide the two entities. Default false
+-- @return Constraint The constraint entity
 -- @server
 function constraint_library.ballsocket(e1, e2, bone1, bone2, pos, force_lim, torque_lim, nocollide)
 	plyCount:checkuse(instance.player, 1)
@@ -191,6 +229,7 @@ function constraint_library.ballsocket(e1, e2, bone1, bone2, pos, force_lim, tor
 	local ent = constraint.Ballsocket(ent1, ent2, bone1, bone2, vec1, force_lim, torque_lim, nocollide)
 	if ent then
 		register(ent, instance)
+		return cwrap(ent)
 	end
 end
 
@@ -208,6 +247,7 @@ end
 -- @param Vector? frictionv Vector defining rotational friction, local to the constraint. Default Vec(0)
 -- @param boolean? rotateonly If True, ballsocket will only affect the rotation allowing for free movement, otherwise it will limit both - rotation and movement. Default false
 -- @param boolean? nocollide Bool whether or not to nocollide the two entities. Default false
+-- @return Constraint The constraint entity
 -- @server
 function constraint_library.ballsocketadv(e1, e2, bone1, bone2, v1, v2, force_lim, torque_lim, minv, maxv, frictionv, rotateonly, nocollide)
 	plyCount:checkuse(instance.player, 1)
@@ -238,6 +278,7 @@ function constraint_library.ballsocketadv(e1, e2, bone1, bone2, v1, v2, force_li
 	local ent = constraint.AdvBallsocket(ent1, ent2, bone1, bone2, vec1, vec2, force_lim, torque_lim, mins.x, mins.y, mins.z, maxs.x, maxs.y, maxs.z, frictions.x, frictions.y, frictions.z, rotateonly, nocollide)
 	if ent then
 		register(ent, instance)
+		return cwrap(ent)
 	end
 end
 
@@ -254,6 +295,7 @@ end
 -- @param number? rdamp Rotational damping of the constraint. Default 0
 -- @param number? width Width of the created constraint. Default 0
 -- @param boolean? stretch True to mark as stretch-only. Default false
+-- @return Constraint The constraint entity
 -- @server
 function constraint_library.elastic(index, e1, e2, bone1, bone2, v1, v2, const, damp, rdamp, width, stretch)
 	plyCount:checkuse(instance.player, 1)
@@ -290,6 +332,7 @@ function constraint_library.elastic(index, e1, e2, bone1, bone2, v1, v2, const, 
 
 		e1.Elastics[index] = ent
 		e2.Elastics[index] = ent
+		return cwrap(ent)
 	end
 end
 
@@ -308,6 +351,7 @@ end
 -- @param string? materialName Material of the rope
 -- @param boolean? rigid Whether the rope is rigid. Default false
 -- @param Color? color The color of the rope. Default white
+-- @return Constraint The constraint entity
 -- @server
 function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, addlength, force_lim, width, material, rigid, color)
 	plyCount:checkuse(instance.player, 1)
@@ -346,6 +390,7 @@ function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, ad
 
 		e1.Ropes[index] = ent
 		e2.Ropes[index] = ent
+		return cwrap(ent)
 	end
 end
 
@@ -357,6 +402,7 @@ end
 -- @param Vector v1 Position on the first entity, in its local space coordinates
 -- @param Vector v2 Position on the second entity, in its local space coordinates
 -- @param number? width Width of the slider. Default 0
+-- @return Constraint The constraint entity
 -- @server
 function constraint_library.slider(e1, e2, bone1, bone2, v1, v2, width)
 
@@ -381,6 +427,7 @@ function constraint_library.slider(e1, e2, bone1, bone2, v1, v2, width)
 	local ent = constraint.Slider(ent1, ent2, bone1, bone2, vec1, vec2, math.Clamp(width, 0, 50), "cable/cable2")
 	if ent then
 		register(ent, instance)
+		return cwrap(ent)
 	end
 end
 
@@ -389,6 +436,7 @@ end
 -- @param Entity e2 The second entity
 -- @param number? bone1 Number bone of the first entity. Default 0
 -- @param number? bone2 Number bone of the second entity. Default 0
+-- @return Constraint The constraint entity
 -- @server
 function constraint_library.nocollide(e1, e2, bone1, bone2)
 
@@ -409,6 +457,7 @@ function constraint_library.nocollide(e1, e2, bone1, bone2)
 	local ent = constraint.NoCollide(ent1, ent2, bone1, bone2)
 	if ent then
 		register(ent, instance)
+		return cwrap(ent)
 	end
 end
 
@@ -417,6 +466,7 @@ end
 -- @param Angle ang The upright angle
 -- @param number bone Number bone of the entity. Default 0
 -- @param number lim The strength of the constraint. Default 5000
+-- @return Constraint The constraint entity
 -- @server
 function constraint_library.keepupright(e, ang, bone, lim)
 	plyCount:checkuse(instance.player, 1)
@@ -435,6 +485,7 @@ function constraint_library.keepupright(e, ang, bone, lim)
 	local c = constraint.Keepupright(e, ang, bone, lim)
 	if c then
 		register(c, instance)
+		return cwrap(ent)
 	end
 end
 
@@ -442,6 +493,7 @@ end
 -- @param number index Index of the elastic constraint
 -- @param Entity e Entity that has the constraint
 -- @param number length New length of the constraint
+-- @return Constraint The constraint entity
 -- @server
 function constraint_library.setElasticLength(index, e, length)
 	local ent1 = getent(e)
@@ -463,6 +515,7 @@ end
 -- @param number index Index of the elastic constraint
 -- @param Entity e Entity that has the elastic
 -- @param number damping New Damping value of the elastic
+-- @return Constraint The constraint entity
 -- @server
 function constraint_library.setElasticDamping(index, e, damping)
 	local ent1 = getent(e)
@@ -484,6 +537,7 @@ end
 -- @param number index Index of the elastic constraint
 -- @param Entity e Entity that has the elastic
 -- @param number constant New constant value of the elastic
+-- @return Constraint The constraint entity
 -- @server
 function constraint_library.setElasticConstant(index, e, constant)
 	local ent1 = getent(e)
