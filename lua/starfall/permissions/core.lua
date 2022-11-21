@@ -140,9 +140,38 @@ function P.buildPermissionCheck(privilegeid)
 	end
 end
 
+local invalidators = {
+	[1669008186] = { -- Nov 21, 2022
+		message = "HTTP's URL whitelisting was misconfigured, and set by default to Disabled",
+		realm = CLIENT,
+		invalidate = {"http.get", "http.post"},
+		check = function(settings_table)
+			return (settings_table["http.get"] ~= nil and settings_table["http.get"]["urlwhitelist"] == 2) or
+					(settings_table["http.post"] ~= nil and settings_table["http.post"]["urlwhitelist"] == 2)
+		end
+	}
+}
+
+local printC = function(...) (SERVER and MsgC or chat.AddText)(Color(255, 255, 255), "[", Color(11, 147, 234), "Starfall", Color(255, 255, 255), "]: ", ...) if SERVER then MsgC("\n") end end
+
 -- Load the permission settings for each provider
 function P.loadPermissionOptions()
+	local saveSettings = not file.Exists(P.filename, "DATA")
 	local settings = util.JSONToTable(file.Read(P.filename) or "") or {}
+	local settingsTime = file.Time(P.filename, "DATA") or math.huge
+
+	for issueTime, issue in pairs(invalidators) do
+		if settingsTime < issueTime and issue.realm and (issue.check == nil or issue.check(settings)) then 
+			printC("Your configuration has been modified due to a misconfiguration.")
+			printC("Reason: " .. issue.message)
+			printC("Changes: " .. table.concat(issue.invalidate, ", "))
+			for _, v in ipairs(issue.invalidate) do
+				saveSettings = true
+				settings[v] = nil
+			end
+		end
+	end
+	
 	for privilegeid, privilege in pairs(P.privileges) do
 		if settings[privilegeid] then
 			for permissionid, permission in pairs(privilege[3]) do
@@ -166,6 +195,10 @@ function P.loadPermissionOptions()
 			end
 		end
 		P.buildPermissionCheck(privilegeid)
+	end
+
+	if saveSettings then
+		P.savePermissions()
 	end
 end
 
