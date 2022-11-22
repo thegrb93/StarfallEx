@@ -51,9 +51,12 @@ hook.Add("NetworkEntityCreated","SF_TrackLights",function(e)
 end)
 
 hook.Add("EntityRemoved","SF_TrackLights",function(e)
-	local index = e:EntIndex()
-	gGmodLights[index] = nil
-	gGmodWireLights[index] = nil
+	local EntIndex = e.EntIndex
+	if EntIndex then
+		local index = EntIndex(e)
+		gGmodLights[index] = nil
+		gGmodWireLights[index] = nil
+	end
 end)
 
 local lastProcess
