@@ -4,10 +4,11 @@ local dgetmeta = debug.getmetatable
 
 SF.Permissions.registerPrivilege("console.command", "Console command", "Allows the starfall to run console commands", { client = { default = 4 } })
 
-local userdataLimit, printBurst
+local userdataLimit, printBurst, concmdBurst
 if SERVER then
 	userdataLimit = CreateConVar("sf_userdata_max", "1048576", { FCVAR_ARCHIVE }, "The maximum size of userdata (in bytes) that can be stored on a Starfall chip (saved in duplications).")
 	printBurst = SF.BurstObject("print", "print", 3000, 10000, "The print burst regen rate in Bytes/sec.", "The print burst limit in Bytes")
+	concmdBurst = SF.BurstObject("concmd", "concmd", 1000, 1000, "The concmd burst regen rate in Bytes/sec.", "The concmd burst limit in Bytes")
 else
 	SF.Permissions.registerPrivilege("enablehud", "Allow enabling hud", "Allows the starfall to enable hud rendering", { client = { default = 1 } })
 end
@@ -568,6 +569,7 @@ if SERVER then
 		checkluatype(cmd, TYPE_STRING)
 		if #cmd > 512 then SF.Throw("Console command is too long!", 2) end
 		checkpermission(instance, nil, "console.command")
+		concmdBurst:use(instance.player, #cmd)
 		instance.player:ConCommand(cmd)
 	end
 
