@@ -81,20 +81,23 @@ net.Receive("starfall_custom_prop", function()
 		end
 		self:BuildPhysics(physmesh)
 
-		local convexes = self:GetPhysicsObject():GetMeshConvexes()
-		local rendermesh = convexes[1]
-		for i=2, #convexes do
-			for k, v in ipairs(convexes[i]) do
-				rendermesh[#rendermesh+1] = v
+		local phys = self:GetPhysicsObject()
+		if phys:IsValid() then
+			local convexes = phys:GetMeshConvexes()
+			local rendermesh = convexes[1]
+			for i=2, #convexes do
+				for k, v in ipairs(convexes[i]) do
+					rendermesh[#rendermesh+1] = v
+				end
 			end
-		end
 
-		-- less than 3 can crash
-		if #rendermesh >= 3 then
-			self.rendermesh:BuildFromTriangles(rendermesh)
+			-- less than 3 can crash
+			if #rendermesh >= 3 then
+				self.rendermesh:BuildFromTriangles(rendermesh)
+			end
+			self:SetRenderBounds(mins, maxs)
+			self:SetCollisionBounds(mins, maxs)
 		end
-		self:SetRenderBounds(mins, maxs)
-		self:SetCollisionBounds(mins, maxs)
 		self.rendermeshloaded = true
 	end
 
