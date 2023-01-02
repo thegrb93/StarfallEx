@@ -640,7 +640,12 @@ function props_library.createSent(pos, ang, class, frozen, data)
 			if IsValid(entity) then
 				entity:Remove()
 			end
-			SF.Throw("Failed to create entity: " .. errorMsg, 2)
+
+			if debug.getmetatable(errorMsg) == SF.Errormeta then
+				error(errorMsg, 3)
+			else
+				SF.Throw("Failed to create entity (" .. tostring(errorMsg) .. ")", 2)
+			end
 		end
 	end
 
