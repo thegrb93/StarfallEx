@@ -313,7 +313,12 @@ else
 	-- @class hook
 	-- @client
 	-- @param Player ply Player who started using voice chat
-	add("PlayerStartVoice")
+	-- @return boolean? Return true to hide CHudVoiceStatus (Voice Chat HUD Element).
+	add("PlayerStartVoice", nil, nil, function(instance, args, ply)
+		if args[1] and args[2] == true and SF.IsHUDActive(instance.entity) then
+			return true
+		end
+	end)
 
 	--- Called when a player stops using voice chat.
 	-- @name PlayerEndVoice
