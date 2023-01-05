@@ -1729,11 +1729,11 @@ do
 		end
 		return string.find(data, pattern, start, noPatterns)
 	end
-	function string_library.match(data, pattern)
+	function string_library.match(data, pattern, start)
 		checkluatype(data, TYPE_STRING)
 		checkluatype(pattern, TYPE_STRING)
 		checkregex(data, pattern)
-		return string.match(data, pattern)
+		return string.match(data, pattern, start)
 	end
 	function string_library.gmatch(data, pattern)
 		checkluatype(data, TYPE_STRING)
