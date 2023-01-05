@@ -145,10 +145,19 @@ registerSent("gmod_wire_dhdd", {{
 	["Model"] = {TYPE_STRING},
 }})
 
-registerSent("gmod_wire_friendslist", {{
-	["Model"] = {TYPE_STRING, "models/kobilica/value.mdl"},
-	["save_on_entity"] = {TYPE_BOOL, false},
-}})
+registerSent("gmod_wire_friendslist", {
+	_preFactory = function(ply, self)
+		for k, steamid in pairs(self.steamids) do
+			checkluatype(steamid, TYPE_STRING, 3, "Parameter: steamids[" .. k .. "]")
+		end
+	end,
+
+	{
+		["Model"] = {TYPE_STRING, "models/kobilica/value.mdl"},
+		["save_on_entity"] = {TYPE_BOOL, false},
+		["steamids"] = {TYPE_TABLE, {}}
+	}
+})
 
 registerSent("gmod_wire_nailer", {{
 	["Model"] = {TYPE_STRING, "models/jaanus/wiretool/wiretool_siren.mdl"},
@@ -1328,6 +1337,7 @@ return function() end
 -- > gmod_wire_friendslist
 -- string Model = "models/kobilica/value.mdl"
 -- boolean save_on_entity = false
+-- table steamids = {}
 -- 
 -- > gmod_wire_fx_emitter
 -- number delay = 0.07
