@@ -32,6 +32,7 @@ SF.RegisterLibrary("constraint")
 -- @name Constraint
 -- @class type
 -- @libtbl constr_methods
+-- @libtbl constr_meta
 SF.RegisterType("Constraint", true, false)
 
 return function(instance)
