@@ -469,6 +469,7 @@ function instance:cleanupRender()
 	render.SetScissorRect(0, 0, 0, 0, false)
 	render.CullMode(MATERIAL_CULLMODE_CCW)
 	render.SetLightingMode(0)
+	render.ResetModelLighting(1, 1, 1)
 	pp.colour:SetTexture("$fbtexture", tex_screenEffect)
 	pp.downsample:SetTexture("$fbtexture", tex_screenEffect)
 	for i = #matrix_stack, 1, -1 do
@@ -527,6 +528,34 @@ function render_library.clearStencil()
 	render.ClearStencil()
 end
 
+--- Sets up the ambient lighting for any upcoming render operation. Ambient lighting can be seen as a cube enclosing the object to be drawn, each of its faces representing a directional light source that shines towards the object.
+-- @param number lightDirection The light source to edit.
+-- @param number r The red component of the light color.
+-- @param number g The green component of the light color.
+-- @param number b The blue component of the light color.
+function render_library.setModelLighting(number lightDirection, number r, number g, number b)
+	checkluatype (lightDirection, TYPE_NUMBER)
+	checkluatype (r, TYPE_NUMBER)
+	checkluatype (g, TYPE_NUMBER)
+	checkluatype (b, TYPE_NUMBER)
+
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	render.SetModelLighting(lightDirection, r, g, b)
+end
+
+--- Resets the model lighting to the specified color.
+-- @param number r The red part of the color, 0-1
+-- @param number g The green part of the color, 0-1
+-- @param number b The blue part of the color, 0-1
+function render_library.resetModelLighting(number r, number g, number b)
+	checkluatype (r, TYPE_NUMBER)
+	checkluatype (g, TYPE_NUMBER)
+	checkluatype (b, TYPE_NUMBER)
+
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	render.ResetModelLighting(r, g, b)
+end
+	
 --- Clears the current rendertarget for obeying the current stencil buffer conditions.
 -- @param number r Value of the red channel to clear the current rt with.
 -- @param number g Value of the green channel to clear the current rt with.
