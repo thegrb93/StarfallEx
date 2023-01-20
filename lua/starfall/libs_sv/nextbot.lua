@@ -110,7 +110,7 @@ function nextbot_library.create(pos, mdl)
 	nb:SetCreator(ply)
 	nextbots[nb] = true
 
-	if CPPI then nb:CPPISetOwner(ply) end
+	if CPPI then nb:CPPISetOwner(ply == SF.Superuser and NULL or ply) end
 
 	return nbwrap(nb)
 end

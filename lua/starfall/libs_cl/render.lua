@@ -563,11 +563,6 @@ end
 -- @param number a Value of the alpha channel to clear the current rt with.
 -- @param boolean Clear the depth buffer.
 function render_library.clearBuffersObeyStencil(r, g, b, a, depth)
-	checkluatype (r, TYPE_NUMBER)
-	checkluatype (g, TYPE_NUMBER)
-	checkluatype (b, TYPE_NUMBER)
-	checkluatype (a, TYPE_NUMBER)
-
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
 	render.ClearBuffersObeyStencil(r, g, b, a, depth)
@@ -580,12 +575,6 @@ end
 -- @param number endY The end Y coordinate of the rectangle.
 -- @param number stencilValue Value to set cleared stencil buffer to.
 function render_library.clearStencilBufferRectangle(originX, originY, endX, endY, stencilValue)
-	checkluatype (originX, TYPE_NUMBER)
-	checkluatype (originY, TYPE_NUMBER)
-	checkluatype (endX, TYPE_NUMBER)
-	checkluatype (endY, TYPE_NUMBER)
-	checkluatype (stencilValue, TYPE_NUMBER)
-
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
 	render.ClearStencilBufferRectangle(originX, originY, endX, endY, stencilValue)
@@ -594,18 +583,14 @@ end
 --- Sets the compare function of the stencil. More: https://wiki.facepunch.com/gmod/render.SetStencilCompareFunction
 -- @param number compareFunction
 function render_library.setStencilCompareFunction(compareFunction)
-	checkluatype (compareFunction, TYPE_NUMBER)
-
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
-	render.SetStencilCompareFunction(compareFunction )
+	render.SetStencilCompareFunction(compareFunction)
 end
 
 --- Sets the operation to be performed on the stencil buffer values if the compare function was not successful. More: http://wiki.facepunch.com/gmod/render.SetStencilFailOperation
 -- @param number operation
 function render_library.setStencilFailOperation(operation)
-	checkluatype (operation, TYPE_NUMBER)
-
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
 	render.SetStencilFailOperation(operation)
@@ -614,8 +599,6 @@ end
 --- Sets the operation to be performed on the stencil buffer values if the compare function was successful. More: http://wiki.facepunch.com/gmod/render.SetStencilPassOperation
 -- @param number operation
 function render_library.setStencilPassOperation(operation)
-	checkluatype (operation, TYPE_NUMBER)
-
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
 	render.SetStencilPassOperation(operation)
@@ -624,8 +607,6 @@ end
 --- Sets the operation to be performed on the stencil buffer values if the stencil test is passed but the depth buffer test fails. More: http://wiki.facepunch.com/gmod/render.SetStencilZFailOperation
 -- @param number operation
 function render_library.setStencilZFailOperation(operation)
-	checkluatype (operation, TYPE_NUMBER)
-
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
 	render.SetStencilZFailOperation(operation)
@@ -634,8 +615,6 @@ end
 --- Sets the reference value which will be used for all stencil operations. This is an unsigned integer.
 -- @param number referenceValue Reference value.
 function render_library.setStencilReferenceValue(referenceValue)
-	checkluatype (referenceValue, TYPE_NUMBER)
-
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
 	render.SetStencilReferenceValue(referenceValue)
@@ -644,8 +623,6 @@ end
 --- Sets the unsigned 8-bit test bitflag mask to be used for any stencil testing.
 -- @param number mask The mask bitflag.
 function render_library.setStencilTestMask(mask)
-	checkluatype (mask, TYPE_NUMBER)
-
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
 	render.SetStencilTestMask(mask)
@@ -654,8 +631,6 @@ end
 --- Sets the unsigned 8-bit write bitflag mask to be used for any writes to the stencil buffer.
 -- @param number mask The mask bitflag.
 function render_library.setStencilWriteMask(mask)
-	checkluatype (mask, TYPE_NUMBER)
-
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
 	render.SetStencilWriteMask(mask)
@@ -709,10 +684,6 @@ end
 -- @param number endY Y end coordinate of the scissor rect.
 function render_library.enableScissorRect(startX, startY, endX, endY)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype (startX, TYPE_NUMBER)
-	checkluatype (startY, TYPE_NUMBER)
-	checkluatype (endX, TYPE_NUMBER)
-	checkluatype (endY, TYPE_NUMBER)
 	render.SetScissorRect(startX, startY, endX, endY, true)
 end
 
@@ -841,7 +812,6 @@ end
 -- @param number b Number, blue value
 -- @param number a Number, alpha value
 function render_library.setRGBA(r, g, b, a)
-	checkluatype (r, TYPE_NUMBER) checkluatype (g, TYPE_NUMBER) checkluatype (b, TYPE_NUMBER) checkluatype (a, TYPE_NUMBER)
 	currentcolor = Color(r, g, b, a)
 	surface.SetDrawColor(r, g, b, a)
 	surface.SetTextColor(r, g, b, a)
@@ -938,10 +908,6 @@ function render_library.setMaterialEffectBloom(mat, levelr, levelg, levelb, colo
 	checkpermission(instance, nil, "render.effects")
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	local tex = gettexture(mat)
-	checkluatype(levelr, TYPE_NUMBER)
-	checkluatype(levelg, TYPE_NUMBER)
-	checkluatype(levelb, TYPE_NUMBER)
-	checkluatype(colormul, TYPE_NUMBER)
 	levelr = math.Clamp(levelr, -1024, 1024)
 	levelg = math.Clamp(levelg, -1024, 1024)
 	levelb = math.Clamp(levelb, -1024, 1024)
@@ -966,8 +932,6 @@ function render_library.setMaterialEffectDownsample(mat, darken, multiply)
 	checkpermission(instance, nil, "render.effects")
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	local tex = gettexture(mat)
-	checkluatype(darken, TYPE_NUMBER)
-	checkluatype(multiply, TYPE_NUMBER)
 	darken = math.Clamp(darken, -1, 1)
 	multiply = math.Clamp(multiply, 0, 1024)
 
@@ -1035,9 +999,6 @@ function render_library.drawBlurEffect(blurx, blury, passes)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if not renderdata.usingRT then SF.Throw("Cannot use this function outside of a rendertarget.", 2) end
 
-	checkluatype(blurx, TYPE_NUMBER)
-	checkluatype(blury, TYPE_NUMBER)
-	checkluatype(passes, TYPE_NUMBER)
 	blurx = math.Clamp(blurx, 0, 1024)
 	blury = math.Clamp(blury, 0, 1024)
 	passes = math.Clamp(blurx, 0, 100)
@@ -1623,8 +1584,6 @@ defaultFont = render_library.createFont("Default", 16, 400, false, false, false,
 -- @return number width of the text
 -- @return number height of the text
 function render_library.getTextSize(text)
-	checkluatype (text, TYPE_STRING)
-
 	surface.SetFont(renderdata.font or defaultFont)
 	return surface.GetTextSize(text)
 end
@@ -1673,12 +1632,6 @@ end
 -- @param number alignment Text alignment
 function render_library.drawText(x, y, text, alignment)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype (x, TYPE_NUMBER)
-	checkluatype (y, TYPE_NUMBER)
-	checkluatype (text, TYPE_STRING)
-	if alignment then
-		checkluatype (alignment, TYPE_NUMBER)
-	end
 
 	local font = renderdata.font or defaultFont
 
@@ -1695,11 +1648,6 @@ end
 -- @return number Height of the drawn text. Same as calling render.getTextSize
 function render_library.drawSimpleText(x, y, text, xalign, yalign)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype (x, TYPE_NUMBER)
-	checkluatype (y, TYPE_NUMBER)
-	checkluatype (text, TYPE_STRING)
-	if xalign~=nil then checkluatype (xalign, TYPE_NUMBER) end
-	if yalign~=nil then checkluatype (yalign, TYPE_NUMBER) end
 
 	local font = renderdata.font or defaultFont
 
@@ -1711,9 +1659,6 @@ end
 -- @param number? maxsize The max width of the markup. Default nil
 -- @return Markup The markup object. See https://wiki.facepunch.com/gmod/markup.Parse
 function render_library.parseMarkup(str, maxsize)
-	checkluatype (str, TYPE_STRING)
-	if maxsize~=nil then checkluatype (maxsize, TYPE_NUMBER) end
-
 	return markwrap(markup.Parse(str, maxsize))
 end
 
@@ -1726,12 +1671,6 @@ end
 -- @param number? contentAlign The content alignment TEXT_ALIGN. Default TEXT_ALIGN.LEFT
 function markup_methods:draw(x, y, xAlign, yAlign, alpha, contentAlign)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype(x, TYPE_NUMBER)
-	checkluatype(y, TYPE_NUMBER)
-	if xAlign~=nil then checkluatype(xAlign, TYPE_NUMBER) end
-	if yAlign~=nil then checkluatype(yAlign, TYPE_NUMBER) end
-	if alpha~=nil then checkluatype(alpha, TYPE_NUMBER) end
-	if contentAlign~=nil then checkluatype(contentAlign, TYPE_NUMBER) end
 	markunwrap(self):Draw(x, y, xAlign, yAlign, alpha, contentAlign)
 end
 
@@ -1757,7 +1696,6 @@ end
 --- Draws a polygon.
 -- @param table poly Table of polygon vertices. Texture coordinates are optional. {{x=x1, y=y1, u=u1, v=v1}, ... }
 function render_library.drawPoly(poly)
-	checkluatype (poly, TYPE_TABLE)
 	surface.DrawPoly(poly)
 end
 
@@ -1765,7 +1703,6 @@ end
 -- @param boolean enable True to enable
 function render_library.enableDepth(enable)
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
-	checkluatype (enable, TYPE_BOOL)
 	render.OverrideDepthEnable(enable, enable)
 end
 
@@ -1813,9 +1750,6 @@ end
 -- @param number latitudeSteps The amount of latitude steps. The larger this number is, the smoother the sphere is
 function render_library.draw3DSphere(pos, radius, longitudeSteps, latitudeSteps)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype (radius, TYPE_NUMBER)
-	checkluatype (longitudeSteps, TYPE_NUMBER)
-	checkluatype (latitudeSteps, TYPE_NUMBER)
 	pos = vunwrap(pos)
 	longitudeSteps = math.Clamp(longitudeSteps, 3, 50)
 	latitudeSteps = math.Clamp(latitudeSteps, 3, 50)
@@ -1829,9 +1763,6 @@ end
 -- @param number latitudeSteps The amount of latitude steps. The larger this number is, the smoother the sphere is
 function render_library.draw3DWireframeSphere(pos, radius, longitudeSteps, latitudeSteps)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype (radius, TYPE_NUMBER)
-	checkluatype (longitudeSteps, TYPE_NUMBER)
-	checkluatype (latitudeSteps, TYPE_NUMBER)
 	pos = vunwrap(pos)
 	longitudeSteps = math.Clamp(longitudeSteps, 3, 50)
 	latitudeSteps = math.Clamp(latitudeSteps, 3, 50)
@@ -1887,10 +1818,6 @@ end
 -- @param number textureEnd The end coordinate of the texture used.
 function render_library.draw3DBeam(startPos, endPos, width, textureStart, textureEnd)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype (width, TYPE_NUMBER)
-	checkluatype (textureStart, TYPE_NUMBER)
-	checkluatype (textureEnd, TYPE_NUMBER)
-
 	startPos = vunwrap(startPos)
 	endPos = vunwrap(endPos)
 
@@ -2014,7 +1941,7 @@ end
 -- @param table captureData Parameters of the capture. See https://wiki.facepunch.com/gmod/Structures/RenderCaptureData
 -- @return string Image binary data
 function render_library.captureImage(captureData)
-	checkluatype(captureData, TYPE_TABLE)
+	-- checkluatype(captureData, TYPE_TABLE)
 	checkpermission(instance, nil, "render.captureImage")
 
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
@@ -2070,7 +1997,7 @@ end
 --- Renders the scene with the specified viewData to the current active render target.
 -- @param table tbl view The view data to be used in the rendering. See http://wiki.facepunch.com/gmod/Structures/ViewData. There's an additional key drawviewer used to tell the engine whether the local player model should be rendered.
 function render_library.renderView(tbl)
-	checkluatype(tbl, TYPE_TABLE)
+	-- checkluatype(tbl, TYPE_TABLE)
 
 	local origin, angles, w, h, ortho, offcenter
 	if tbl.origin~=nil then origin = vunwrap(tbl.origin) end
@@ -2220,7 +2147,6 @@ end
 -- @return boolean Previous clipping state.
 function render_library.enableClipping(state)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype(state, TYPE_BOOL)
 
 	local prevState = render.EnableClipping(state)
 
@@ -2240,8 +2166,6 @@ function render_library.pushCustomClipPlane(normal, distance)
 	if pushedClippingPlanes >= MAX_CLIPPING_PLANES then
 		SF.Throw("Pushed too many clipping planes.", 2)
 	end
-
-	checkluatype(distance, TYPE_NUMBER)
 
 	render.PushCustomClipPlane(vunwrap(normal), distance)
 
@@ -2292,7 +2216,6 @@ end
 function render_library.setFogMode(mode)
 	checkpermission(instance, nil, "render.fog")
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype(mode, TYPE_NUMBER)
 
 	render.FogMode(mode)
 end
@@ -2312,7 +2235,6 @@ end
 function render_library.setFogDensity(density)
 	checkpermission(instance, nil, "render.fog")
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype(density, TYPE_NUMBER)
 
 	render.FogMaxDensity(density)
 end
@@ -2322,7 +2244,6 @@ end
 function render_library.setFogStart(distance)
 	checkpermission(instance, nil, "render.fog")
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype(distance, TYPE_NUMBER)
 
 	render.FogStart(distance)
 end
@@ -2332,7 +2253,6 @@ end
 function render_library.setFogEnd(distance)
 	checkpermission(instance, nil, "render.fog")
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype(distance, TYPE_NUMBER)
 
 	render.FogEnd(distance)
 end
@@ -2342,7 +2262,6 @@ end
 function render_library.setFogHeight(height)
 	checkpermission(instance, nil, "render.fog")
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype(height, TYPE_NUMBER)
 
 	render.SetFogZ(height)
 end
@@ -2399,9 +2318,6 @@ end
 -- @param number frequency The frequency of the effect in hertz
 -- @param number duration The duration of the effect in seconds, max 10.
 function render_library.screenShake(amplitude, frequency, duration)
-	checkluatype (amplitude, TYPE_NUMBER)
-	checkluatype (frequency, TYPE_NUMBER)
-	checkluatype (duration, TYPE_NUMBER)
 	if not SF.IsHUDActive(instance.entity) then SF.Throw("Player isn't connected to HUD!", 2) end
 	util.ScreenShake(Vector(0, 0, 0), amplitude, frequency, math.Clamp(duration, 0, 10), 0)
 end
