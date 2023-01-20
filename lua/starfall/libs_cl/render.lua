@@ -533,7 +533,7 @@ end
 -- @param number r The red component of the light color.
 -- @param number g The green component of the light color.
 -- @param number b The blue component of the light color.
-function render_library.setModelLighting(number lightDirection, number r, number g, number b)
+function render_library.setModelLighting(lightDirection, r, g, b)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	render.SetModelLighting(lightDirection, r, g, b)
 end
@@ -542,7 +542,7 @@ end
 -- @param number r The red part of the color, 0-1
 -- @param number g The green part of the color, 0-1
 -- @param number b The blue part of the color, 0-1
-function render_library.resetModelLighting(number r, number g, number b)
+function render_library.resetModelLighting(r, g, b)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	render.ResetModelLighting(r, g, b)
 end
