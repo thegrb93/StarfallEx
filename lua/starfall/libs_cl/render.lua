@@ -1988,7 +1988,7 @@ end
 --- Renders the scene with the specified viewData to the current active render target.
 -- @param table tbl view The view data to be used in the rendering. See http://wiki.facepunch.com/gmod/Structures/ViewData. There's an additional key drawviewer used to tell the engine whether the local player model should be rendered.
 function render_library.renderView(tbl)
-	-- checkluatype(tbl, TYPE_TABLE)
+	checkluatype(tbl, TYPE_TABLE)
 
 	local origin, angles, w, h, ortho, offcenter
 	if tbl.origin~=nil then origin = vunwrap(tbl.origin) end
