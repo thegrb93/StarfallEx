@@ -652,7 +652,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 	if entity and entity:IsValid() then
 		register(entity, instance)
 
-		if CPPI then entity:CPPISetOwner(ply) end
+		if CPPI then entity:CPPISetOwner(ply == SF.Superuser and NULL or ply) end
 
 		local phys = entity:GetPhysicsObject()
 		if phys:IsValid() then
