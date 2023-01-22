@@ -665,21 +665,21 @@ else
 	-- @client
 	-- @return Angle The local player's camera angles
 	function builtins_library.eyeAngles()
-		return awrap(LocalPlayer():EyeAngles())
+		return awrap(EyeAngles())
 	end
 
 	--- Returns the local player's camera position
 	-- @client
 	-- @return Vector The local player's camera position
 	function builtins_library.eyePos()
-		return vwrap(LocalPlayer():EyePos())
+		return vwrap(EyePos())
 	end
 
 	--- Returns the local player's camera forward vector
 	-- @client
 	-- @return Vector The local player's camera forward vector
 	function builtins_library.eyeVector()
-		return vwrap(LocalPlayer():GetAimVector())
+		return vwrap(EyeVector())
 	end
 end
 
