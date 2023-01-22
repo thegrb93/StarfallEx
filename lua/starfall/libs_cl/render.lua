@@ -518,7 +518,7 @@ end
 
 --- Returns the angles of the current render context as calculated by calcview.
 function render_library.getAngles()
-	return vwrap(EyeAngles())
+	return awrap(EyeAngles())
 end
 
 --- Returns the normal vector of the current render context as calculated by calcview, similar to render.getAngles.
