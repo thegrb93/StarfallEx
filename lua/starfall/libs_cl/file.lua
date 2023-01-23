@@ -104,7 +104,7 @@ do
 			end
 		end
 		if check.totalsize >= cv_temp_maxsize:GetFloat()*1e6 then
-			self:Clean(check)
+			self:CleanAll(check)
 			if check.totalsize >= cv_temp_maxsize:GetFloat()*1e6 then
 				return false, "The temp file cache has reached its limit!"
 			end
