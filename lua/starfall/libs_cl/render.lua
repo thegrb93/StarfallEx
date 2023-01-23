@@ -529,7 +529,7 @@ function render_library.clearStencil()
 end
 
 --- Sets up the ambient lighting for any upcoming render operation. Ambient lighting can be seen as a cube enclosing the object to be drawn, each of its faces representing a directional light source that shines towards the object.
--- @param number lightDirection The light source to edit.
+-- @param number lightDirection The light source to edit, builtins.BOX enumeration.
 -- @param number r The red component of the light color.
 -- @param number g The green component of the light color.
 -- @param number b The blue component of the light color.
