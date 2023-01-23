@@ -512,6 +512,20 @@ end
 
 
 -- ------------------------------------------------------------------ --
+--- Returns the origin of the current render context as calculated by calcview.
+function render_library.getOrigin()
+	return vwrap(EyePos())
+end
+
+--- Returns the angles of the current render context as calculated by calcview.
+function render_library.getAngles()
+	return awrap(EyeAngles())
+end
+
+--- Returns the normal vector of the current render context as calculated by calcview, similar to render.getAngles.
+function render_library.getEye()
+	return vwrap(EyeVector())
+end
 
 --- Sets whether stencil tests are carried out for each rendered pixel. Only pixels passing the stencil test are written to the render target.
 -- @param boolean enable True to enable, false to disable
