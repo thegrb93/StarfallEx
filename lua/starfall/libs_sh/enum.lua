@@ -848,6 +848,24 @@ env.STENCIL = {
 	["INCR"] = STENCIL_INCR or 7,
 	["DECR"] = STENCIL_DECR or 8
 }
+	
+--- ENUMs used by render.SetModelLighting
+-- @name builtins_library.BOX
+-- @class table
+-- @field FRONT
+-- @field BACK
+-- @field RIGHT
+-- @field LEFT
+-- @field TOP
+-- @field BOTTOM
+env.BOX = {
+	FRONT = 0,
+	BACK = 1,
+	RIGHT = 2,
+	LEFT = 3,
+	TOP = 4,
+	BOTTOM = 5
+}
 
 --- ENUMs of texture filtering modes
 -- @name builtins_library.TEXFILTER
