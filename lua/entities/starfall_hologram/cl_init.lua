@@ -1,5 +1,5 @@
 include("shared.lua")
-ENT.RenderGroup = RENDERGROUP_BOTH
+ENT.RenderGroup = RENDERGROUP_OPAQUE
 
 ENT.IsHologram = true
 ENT.DefaultMaterial = Material( "hunter/myplastic" )
@@ -39,6 +39,12 @@ function ENT:OnScaleChanged(name, old, scale)
 end
 
 function ENT:Draw(flags)
+	if self:GetColor().a ~= 255 then
+		self.RenderGroup = RENDERGROUP_BOTH
+	else
+		self.RenderGroup = RENDERGROUP_OPAQUE
+	end
+
 	local clipCount = 0
 	local prevClip
 	if next(self.clips) then
