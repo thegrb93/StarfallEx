@@ -176,9 +176,9 @@ local typeToE2Type -- Assign next line since some funcs need it
 typeToE2Type = {
 	[TYPE_NUMBER] = function(x) return x, "n" end,
 	[TYPE_STRING] = function(x) return x, "s" end,
-	[vec_meta] = function(x) return {x[1], x[2], x[3]}, "v" end,
-	[vec2_meta] = function(v) return {v[1], v[2]}, "xv2" end,
-	[ang_meta] = function(x) return {x[1], x[2], x[3]}, "a" end,
+	[vec_meta] = function(x) return vunwrap(x), "v" end,
+	[vec2_meta] = function(v) return v2unwrap(v), "xv2" end,
+	[ang_meta] = function(x) return aunwrap(x), "a" end,
 	[TYPE_TABLE] = function(x)
 		local meta = debug_getmetatable(x)
 		if typeToE2Type[meta] then return typeToE2Type[meta](x) end
