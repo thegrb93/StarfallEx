@@ -1,5 +1,5 @@
 include("shared.lua")
-ENT.RenderGroup = RENDERGROUP_BOTH
+ENT.RenderGroup = RENDERGROUP_OPAQUE
 
 ENT.DefaultMaterial = Material( "models/wireframe" )
 ENT.Material = ENT.DefaultMaterial
@@ -29,6 +29,12 @@ function ENT:Think()
 end
 
 function ENT:Draw()
+	if self:GetColor().a ~= 255 then
+		self.RenderGroup = RENDERGROUP_BOTH
+	else
+		self.RenderGroup = RENDERGROUP_OPAQUE
+	end
+	
 	self:DrawModel()
 end
 
