@@ -28,10 +28,10 @@ hook.add("renderscene", "render_view", function()
         local clipNormal = screenEnt:getUp()
         render.pushCustomClipPlane(clipNormal, (screenEnt:getPos() + clipNormal):dot(clipNormal))
         
-        local localOrigin = screenEnt:worldToLocal(eyePos())
+        local localOrigin = screenEnt:worldToLocal(render.getOrigin())
         local reflectedOrigin = screenEnt:localToWorld(localOrigin * Vector(1, 1, -1))  
         
-        local localAng = screenEnt:worldToLocalAngles(eyeAngles())
+        local localAng = screenEnt:worldToLocalAngles(render.getAngles())
         local reflectedAngle = screenEnt:localToWorldAngles(Angle(-localAng.p, localAng.y, -localAng.r + 180))
         
         render.renderView({
