@@ -50,7 +50,7 @@ else
 		init()
 	end)
 
-	http.get("https://dl.dropboxusercontent.com/s/vdcb9ujr7qslg51/sphere.obj",function(data)
+	http.get("http://thegrb93.github.io/StarfallEx/example_files/sphere.obj",function(data)
 		sphere = mesh.createFromObj(data).Sphere
 		init()
 	end)

@@ -40,10 +40,10 @@ local function renderScreen()
 	render.drawTexturedRect(0,0,512,512)
 end
 
-texture:setTextureURL("$basetexture", "https://dl.dropboxusercontent.com/s/79nhlngkvydv85f/renamon.png")
+texture:setTextureURL("$basetexture", "http://thegrb93.github.io/StarfallEx/example_files/renamon.png")
 screentexture:setTexture("$basetexture", texture:getTexture("$basetexture"))
 
-http.get("https://dl.dropboxusercontent.com/s/cwob1j0nka0ko2e/renamon.obj",function(objdata)
+http.get("http://thegrb93.github.io/StarfallEx/example_files/renamon.obj",function(objdata)
 	local triangles = mesh.trianglesLeft()
 
 	local function doneLoadingMesh()
