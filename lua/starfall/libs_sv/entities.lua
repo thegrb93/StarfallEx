@@ -375,7 +375,7 @@ function ents_methods:setAngles(ang)
 	ent:SetAngles(ang)
 end
 
---- Sets the entity's linear velocity
+--- Sets the entity's linear velocity. Physics entities, use physobj:setVelocity
 -- @param Vector vel New velocity
 function ents_methods:setVelocity(vel)
 	local ent = getent(self)
