@@ -470,6 +470,7 @@ function instance:cleanupRender()
 	render.CullMode(MATERIAL_CULLMODE_CCW)
 	render.SetLightingMode(0)
 	render.ResetModelLighting(1, 1, 1)
+	render.DepthRange(0, 1)
 	pp.colour:SetTexture("$fbtexture", tex_screenEffect)
 	pp.downsample:SetTexture("$fbtexture", tex_screenEffect)
 	for i = #matrix_stack, 1, -1 do
@@ -2327,6 +2328,13 @@ function render_library.screenShake(amplitude, frequency, duration)
 	util.ScreenShake(Vector(0, 0, 0), amplitude, frequency, math.Clamp(duration, 0, 10), 0)
 end
 
+--- Set's the depth range of the upcoming render.
+-- @param number min The minimum depth of the upcoming render. 0.0 = render normally; 1.0 = render nothing.
+-- @param number max The maximum depth of the upcoming render. 0.0 = render everything (through walls); 1.0 = render normally.
+function render_library.depthRange(min, max)
+	checkluatype(min, TYPE_NUMBER)
+	checkluatype(max, TYPE_NUMBER)
+	render.DepthRange(min, max)
 end
 
 ---
