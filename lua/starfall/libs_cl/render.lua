@@ -2332,8 +2332,7 @@ end
 -- @param number min The minimum depth of the upcoming render. 0.0 = render normally; 1.0 = render nothing.
 -- @param number max The maximum depth of the upcoming render. 0.0 = render everything (through walls); 1.0 = render normally.
 function render_library.depthRange(min, max)
-	checkluatype(min, TYPE_NUMBER)
-	checkluatype(max, TYPE_NUMBER)
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	render.DepthRange(min, max)
 end
 
