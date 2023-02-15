@@ -2336,6 +2336,8 @@ function render_library.depthRange(min, max)
 	render.DepthRange(min, max)
 end
 
+end
+
 ---
 -- @name render_library.Screen information table
 -- @class table
