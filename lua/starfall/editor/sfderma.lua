@@ -286,8 +286,10 @@ function PANEL:Setup(folder)
 				local data = util.JSONToTable( body )
 				self.Examples = self.RootNode:AddNode("Examples","icon16/help.png")
 				for k,v in pairs(data) do
-					local node = self.Examples:AddNode(v.name,"icon16/page_white.png")
-					node.FileURL = v.download_url
+					if v.name ~= "resources" and v.type ~= "dir" then
+						local node = self.Examples:AddNode(v.name,"icon16/page_white.png")
+						node.FileURL = v.download_url
+					end
 				end
 			end
 		end,
