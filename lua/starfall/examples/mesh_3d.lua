@@ -40,10 +40,10 @@ local function renderScreen()
 	render.drawTexturedRect(0,0,512,512)
 end
 
-texture:setTextureURL("$basetexture", "https://raw.githubusercontent.com/thegrb93/StarfallEx/example-resources/lua/starfall/examples/resources/renamon.png")
+texture:setTextureURL("$basetexture", "https://raw.githubusercontent.com/thegrb93/StarfallEx/master/lua/starfall/examples/resources/renamon.png")
 screentexture:setTexture("$basetexture", texture:getTexture("$basetexture"))
 
-http.get("https://raw.githubusercontent.com/thegrb93/StarfallEx/example-resources/lua/starfall/examples/resources/renamon.obj",function(objdata)
+http.get("https://raw.githubusercontent.com/thegrb93/StarfallEx/master/lua/starfall/examples/resources/renamon.obj",function(objdata)
 	local triangles = mesh.trianglesLeft()
 
 	local function doneLoadingMesh()
