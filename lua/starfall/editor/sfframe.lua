@@ -1637,15 +1637,25 @@ function Editor:SaveFile(Line, close, SaveAs, Func)
 				str = nil
 			end
 		end
+		
 		Derma_StringRequestNoBlur("Save to New File", "", (str ~= nil and str .. "/" or "") .. self.savefilefn,
 			function(strTextOut)
 				strTextOut = self.Location .. "/" .. string.gsub(strTextOut, ".", invalid_filename_chars) .. ".txt"
-				if Func then
-					Func(strTextOut)
+				local function save()
+					if Func then
+						Func(strTextOut)
+					else
+						self:SaveFile(strTextOut, close)
+					end
+				end
+				
+				if file.Exists(strTextOut, "DATA") then
+					Derma_QueryNoBlur("File " .. strTextOut .. " already exists!", "File exists!", "Override", save, "Cancel")
 				else
-					self:SaveFile(strTextOut, close)
+					save()
 				end
 			end)
+			
 		return
 	end
 
