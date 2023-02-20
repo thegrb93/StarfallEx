@@ -200,6 +200,15 @@ function file_library.read(path)
 	return file.Read("sf_filedata/" .. SF.NormalizePath(path), "DATA")
 end
 
+--- Reads a file from path relative to base GMod directory
+-- @param string path Filepath relative to GarrysMod/garrysmod/.
+-- @return string? Contents or nil if error
+function file_library.readInGame(path)
+	if instance.player ~= LocalPlayer() then SF.Throw("Only chip owner can read game files") end
+	checkluatype (path, TYPE_STRING)
+	return file.Read(SF.NormalizePath(path), "GAME")
+end
+
 --- Reads a file asynchronously. Can only read 'sf_file_asyncmax' files at a time
 -- @param string path Filepath relative to data/sf_filedata/.
 -- @param function callback A callback function for when the read operation finishes. It has 3 arguments: `filename` string, `status` number and `data` string
