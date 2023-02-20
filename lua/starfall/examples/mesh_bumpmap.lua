@@ -50,7 +50,7 @@ else
 		init()
 	end)
 
-	http.get("http://thegrb93.github.io/StarfallEx/example_files/sphere.obj",function(data)
+	http.get("https://raw.githubusercontent.com/thegrb93/StarfallEx/master/lua/starfall/examples/resources/sphere.obj",function(data)
 		sphere = mesh.createFromObj(data).Sphere
 		init()
 	end)
