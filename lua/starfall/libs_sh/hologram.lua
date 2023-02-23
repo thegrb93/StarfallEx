@@ -70,9 +70,11 @@ local function hologramOnDestroy(holo)
 end
 
 local function removeHoloInternal(holo)
-	holo:RemoveCallOnRemove("starfall_hologram_delete")
-	hologramOnDestroy(holo)
-	holo:Remove()
+	if holo:IsValid() then
+		holo:RemoveCallOnRemove("starfall_hologram_delete")
+		hologramOnDestroy(holo)
+		holo:Remove()
+	end
 end
 
 local function removeHolo(holo)
