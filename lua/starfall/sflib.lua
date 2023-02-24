@@ -147,14 +147,18 @@ setmetatable(SF.StructWrapper, SF.StructWrapper)
 --- Returns a class that can manage burst objects
 SF.BurstObject = {
 	__index = {
+		calc = function(self, obj)
+			local ret = math.min(obj.val + (CurTime() - obj.lasttick) * self.rate, self.max)
+			obj.lasttick = CurTime()
+			return ret
+		end,
 		use = function(self, ply, amount)
 			if ply:IsValid() or ply==SF.Superuser then
 				local obj = self:get(ply)
-				local new = math.min(obj.val + (CurTime() - obj.lasttick) * self.rate, self.max) - amount
+				local new = self:calc(obj) - amount
 				if new < 0 and ply~=SF.Superuser then
 					SF.Throw("The ".. self.name .." burst limit has been exceeded.", 3)
 				end
-				obj.lasttick = CurTime()
 				obj.val = new
 			else
 				SF.Throw("Invalid starfall user", 3)
@@ -163,8 +167,7 @@ SF.BurstObject = {
 		check = function(self, ply)
 			if ply:IsValid() or ply==SF.Superuser then
 				local obj = self:get(ply)
-				obj.val = math.min(obj.val + (CurTime() - obj.lasttick) * self.rate, self.max)
-				obj.lasttick = CurTime()
+				obj.val = self:calc(obj)
 				return obj.val
 			else
 				SF.Throw("Invalid starfall user", 3)
