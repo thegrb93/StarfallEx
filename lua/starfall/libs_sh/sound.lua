@@ -194,7 +194,7 @@ function sound_methods:setSoundLevel(level)
 end
 
 --- Returns the current sound level in dB.
--- @return number level dB level
+-- @return number Level in dB
 function sound_methods:getSoundLevel()
 	return unwrap(self):GetSoundLevel()
 end
