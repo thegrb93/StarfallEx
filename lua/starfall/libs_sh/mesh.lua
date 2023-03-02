@@ -710,7 +710,6 @@ return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 local mesh_library = instance.Libraries.mesh
-local mesh_methods, mesh_meta, wrap, unwrap = instance.Types.Mesh.Methods, instance.Types.Mesh, instance.Types.Mesh.Wrap, instance.Types.Mesh.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 local mwrap = instance.Types.VMatrix.Wrap
@@ -777,7 +776,8 @@ end
 --- Finds the convex hull of provided vertices table.
 -- @param table vertices The table of vertices (vectors) or vertex data (http://wiki.facepunch.com/gmod/Structures/MeshVertex)
 -- @param boolean? threaded Optional bool, use threading object that can be used to run algorithm over time to prevent hitting quota limit
--- @return table The table of vertices forming the convex hull
+-- @return table The mesh table which can be passed to mesh.createFromTable
+-- @return table The table of vertices which can be passed to prop.createCustom
 function mesh_library.findConvexHull(vertices, threaded)
 	checkluatype(vertices, TYPE_TABLE)
 	if threaded ~= nil then
@@ -797,18 +797,33 @@ function mesh_library.findConvexHull(vertices, threaded)
 		else
 			newVertices[i] = vertices[i].pos
 		end
+		
 		if i % 100 == 0 and threaded then thread_yield() end
 	end
 
 	local faces, points = SF.QuickHull(newVertices, threaded and thread_yield)
-	for i = 1, #points do
-		points[i] = points[i].vec
+	local triangles = { }
+	for i = 1, #faces do
+		local first_edge = faces[i].edge
+		local cur_edge = first_edge
+		repeat
+			table.insert(triangles, { pos = cur_edge.vert.vec })
+			cur_edge = cur_edge.next
+		until cur_edge == first_edge
+
 		if i % 100 == 0 and threaded then thread_yield() end
 	end
-	return points
+	for i = 1, #points do
+		points[i] = points[i].vec
+
+		if i % 100 == 0 and threaded then thread_yield() end
+	end
+	return triangles, points
 end
 
 if CLIENT then
+	local mesh_methods, mesh_meta, wrap, unwrap = instance.Types.Mesh.Methods, instance.Types.Mesh, instance.Types.Mesh.Wrap, instance.Types.Mesh.Unwrap
+
 	local meshData = {}
 	instance.data.meshes = meshData
 
