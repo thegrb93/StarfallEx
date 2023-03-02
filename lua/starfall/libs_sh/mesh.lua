@@ -316,7 +316,7 @@ do
 		return unpack(vertices)
 	end
 
-	function create_initial_simplex3(points, thread_yield)
+	function create_initial_simplex4(points, thread_yield)
 		-- Find base line
 		local point1 = points[1]
 		local point2 = points[1]
@@ -465,7 +465,7 @@ do
 
 	function quickhull(points, thread_yield)
 		local points = wrap_points(points, thread_yield)
-		local faces = create_initial_simplex3(points, thread_yield)
+		local faces = create_initial_simplex4(points, thread_yield)
 
 		-- Assign points to faces
 		for i, point in ipairs(points) do
@@ -648,34 +648,6 @@ do
 		end
 
 		return ret_faces, ret_points
-	end
-
-	local function findUV(point, textureVecs, texSizeX, texSizeY)
-		local x,y,z = point.x, point.y, point.z
-		local u = textureVecs[1].x * x + textureVecs[1].y * y + textureVecs[1].z * z + textureVecs[1].offset
-		local v = textureVecs[2].x * x + textureVecs[2].y * y + textureVecs[2].z * z + textureVecs[2].offset
-		return u/texSizeX, v/texSizeY
-	end
-
-	COLOR_WHITE = Color(255,255,255)
-	function face_to_mesh_vertex(face, color, offset)
-		local norm = face.plane.n
-
-		local tv1 = ( norm:cross( math.abs( norm:dot( Vector(0,0,1) ) ) == 1 and Vector(0,1,0) or Vector(0,0,-1) ) ):cross( norm )
-		local tv2 = norm:cross( tv1 )
-		local textureVecs = {{x=tv2.x,y=tv2.y,z=tv2.z,offset=0},
-							{x=tv1.x,y=tv1.y,z=tv1.z,offset=0}}-- texinfo.textureVecs
-
-		local p1, p2, p3 = face_vertices(face)
-
-
-		local u1,v1 = findUV(p1.vec, textureVecs, 32, 32)
-		local u2,v2 = findUV(p2.vec, textureVecs, 32, 32)
-		local u3,v3 = findUV(p3.vec, textureVecs, 32, 32)
-
-		return  {pos=p1.vec-offset,color=color or COLOR_WHITE,normal=norm,u=u1,v=v1},
-				{pos=p2.vec-offset,color=color or COLOR_WHITE,normal=norm,u=u2,v=v2},
-				{pos=p3.vec-offset,color=color or COLOR_WHITE,normal=norm,u=u3,v=v3}
 	end
 end
 
