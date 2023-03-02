@@ -186,7 +186,7 @@ function sound_methods:isPlaying()
 	return unwrap(self):IsPlaying()
 end
 
---- Sets the sound level in dB. Won't work unless the sound is playing.
+--- Sets the sound level in dB. Won't work if the sound is already playing.
 -- @param number level dB level, for information on the value to use see https://developer.valvesoftware.com/wiki/Soundscripts#SoundLevel
 function sound_methods:setSoundLevel(level)
 	checkluatype(level, TYPE_NUMBER)
@@ -199,15 +199,15 @@ function sound_methods:getSoundLevel()
 	return unwrap(self):GetSoundLevel()
 end
 
---- Sets the sound dsp
+--- Sets the sound dsp value
 -- @param number dsp (0 - 133) DSP values. List can be found here https://developer.valvesoftware.com/wiki/Dsp_presets
 function sound_methods:setDSP(dsp)
 	checkluatype(dsp, TYPE_NUMBER)
 	unwrap(self):SetDSP(math.Clamp(dsp, 0, 133))
 end
 
---- Gets the sound dsp
--- @return number dsp (0 - 133) DSP value.
+--- Gets the sound dsp value
+-- @return number (0 - 133) DSP value.
 function sound_methods:getDSP()
 	return unwrap(self):GetDSP()
 end
