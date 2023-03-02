@@ -331,8 +331,8 @@ do
 
 			if i % 100 == 0 and thread_yield then thread_yield() end
 		end
-		if point1.vec:getDistance(point2.vec) < 5e-5 then
-			SF.Throw("degenerate case", 2) -- All vertices are too close to each other
+		if point1.vec:getDistance(point2.vec) < 5e-5 then -- degenerate case
+			SF.Throw("All vertices are too close to each other", 2)
 		end
 
 		-- Find 3rd point of base triangle
@@ -350,8 +350,8 @@ do
 
 			if i % 100 == 0 and thread_yield then thread_yield() end
 		end
-		if point3_dist < 5e-5 then
-			SF.Throw("degenerate case", 2) -- All vertices share a line
+		if point3_dist < 5e-5 then -- degenerate case
+			SF.Throw("All vertices share a line in space", 2)
 		end
 
 		-- Find 4th point of base tetrahedron
@@ -370,8 +370,8 @@ do
 
 			if i % 100 == 0 and thread_yield then thread_yield() end
 		end
-		if math.abs(point4_dist) < 5e-5 then
-			SF.Throw("degenerate case", 2) -- All vertices share a plane
+		if math.abs(point4_dist) < 5e-5 then -- degenerate case
+			SF.Throw("All vertices share a plane in space", 2)
 		end
 
 		-- Fix orientation of tetrahedron
@@ -822,8 +822,6 @@ function mesh_library.findConvexHull(vertices, threaded)
 end
 
 if CLIENT then
-	local mesh_methods, mesh_meta, wrap, unwrap = instance.Types.Mesh.Methods, instance.Types.Mesh, instance.Types.Mesh.Wrap, instance.Types.Mesh.Unwrap
-
 	local meshData = {}
 	instance.data.meshes = meshData
 
@@ -839,6 +837,8 @@ if CLIENT then
 			destroyMesh(instance.player, mesh)
 		end
 	end)
+
+	local mesh_methods, mesh_meta, wrap, unwrap = instance.Types.Mesh.Methods, instance.Types.Mesh, instance.Types.Mesh.Wrap, instance.Types.Mesh.Unwrap
 
 	local vertexCheck = {
 		color = function(v) return dgetmeta(v) == col_meta end,
