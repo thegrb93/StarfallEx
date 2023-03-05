@@ -83,6 +83,8 @@ Editor.EditorFileAutoReloadInterval = CreateClientConVar("sf_editor_file_auto_re
 function SF.DefaultCode()
 	if file.Exists("starfall/default.txt", "DATA") then
 		return file.Read("starfall/default.txt", "DATA")
+	elseif file.Exists("starfall/default.lua", "DATA") then
+		return file.Read("starfall/default.lua", "DATA")
 	else
 		local code = [=[--@name
 --@author
