@@ -798,6 +798,7 @@ if CLIENT then
 		SF.Editor.initialized = false
 		SF.Editor.editor:Remove()
 		SF.Editor.editor = nil
+		timer.Remove("sf_editor_file_auto_reload")
 
 	end
 
