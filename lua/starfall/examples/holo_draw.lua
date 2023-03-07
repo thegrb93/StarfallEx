@@ -1,14 +1,15 @@
---@name Holodraw
+--@name Holodraw Example
 --@author Name
 --@shared
 
--- Certain hologram models may interfere with depth / alpha channel when drawn to a RenderTarget, rendering transparent
+-- Certain hologram models may interfere with depth / alpha channel when drawn to a RenderTarget, rendering them transparent
+-- Holograms drawn directly to HUD or a screen do not show these symptomps and the workaround is not necessary
 -- One way of fixing this is to set the lighting mode, or if that doesn't work, exposing the hologram to env_projectedtexture
 
 if CLIENT then
     local holo1 = holograms.create(chip():getPos() + Vector(0,8,40), Angle(), "models/spacecode/sfchip.mdl", Vector(1.4))
     local holo2 = holograms.create(chip():getPos() + Vector(0,-8,37), Angle(), "models/Lamarr.mdl", Vector(0.45))
-    -- We can hide the holograms, but 'holo2' needs to render in order to work with the second method
+    -- The first hologram can be completely hidden, but for the second method to work, the other hologram needs to render
     --holo1:setNoDraw(true)
     --holo2:setColor(Color(0,0,0,1))
     
@@ -56,6 +57,7 @@ else
         brightness = 0,
         Model = "models/maxofs2d/lamp_flashlight.mdl",
     })
+    -- Lamp can be entirely consealed, including disabling the collisions
     --lamp:setColor(Color(0,0,0,0))
     --lamp:setCollisionGroup(COLLISION_GROUP.IN_VEHICLE)
 end
