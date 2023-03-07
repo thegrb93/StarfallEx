@@ -267,12 +267,12 @@ do
 	local next_horizon_edge
 	local face_to_mesh_vertex
 
-	function update_points( points )
+	function update_points(points)
 		local changed = false
-		for k, point in pairs( points ) do
+		for k, point in ipairs(points) do
 			if not isValid(point.ent) then continue end
 			local cur_pos = point.ent:getPos()
-			if not changed and ( not point.vec or point.vec ~= cur_pos ) then changed = true end
+			if not changed and (not point.vec or point.vec ~= cur_pos) then changed = true end
 
 			point.vec = cur_pos
 			point.x = point.vec.x
@@ -283,7 +283,7 @@ do
 		return changed
 	end
 
-	function dist_to_line( point, line_p1, line_p2 )
+	function dist_to_line(point, line_p1, line_p2)
 		local d = (line_p2.vec - line_p1.vec) / line_p2.vec:getDistance(line_p1.vec)
 		local v = point.vec - line_p1.vec
 		local t = v:dot(d)
@@ -291,23 +291,23 @@ do
 		return p:getDistance(point.vec);
 	end
 
-	function dist_to_plane( point, plane )
+	function dist_to_plane(point, plane)
 		local d = point.vec:dot(plane.n) - plane.d
 		if math.abs(d) < 5e-5 then return 0 end
 		return d
 	end
 
-	function find_plane( p1, p2, p3 )
+	function find_plane(p1, p2, p3)
 		local normal = (p3.vec - p1.vec):cross(p2.vec - p1.vec):getNormalized()
-		local dist = normal:dot( p1.vec )
-		return {a=normal.x,b=normal.y,c=normal.z,d=dist,n=normal}
+		local dist = normal:dot(p1.vec)
+		return { a = normal.x, b = normal.y, c = normal.z, d = dist, n = normal } 
 	end
 
-	function face_vertices( face )
+	function face_vertices(face)
 		local first_edge = face.edge
 		local cur_edge = first_edge
 
-		local vertices = {}
+		local vertices = { }
 		repeat
 			vertices[#vertices + 1] = cur_edge.vert
 			cur_edge = cur_edge.next
@@ -316,28 +316,29 @@ do
 		return unpack(vertices)
 	end
 
-	function create_initial_simplex3( points )
+	function create_initial_simplex4(points, thread_yield)
 		-- Find base line
-		local base_line_dist = 0
-		local point1 = nil
-		local point2 = nil
-		for i=1,#points do
-			local p1 = points[i]
-			for j=i+1,#points do
-				local p2 = points[j]
-				local tmp_dist = p1.vec:getDistanceSqr(p2.vec)
-				if tmp_dist > base_line_dist then
-					base_line_dist = tmp_dist
-					point1 = p1
-					point2 = p2
-				end
+		local point1 = points[1]
+		local point2 = points[1]
+		for i = 2, #points do
+			local p, p1, p2 = points[i].vec, point1.vec, point2.vec
+			if p.x < p1.x or (p.x == p1.x and p.y < p1.y or (p.y == p1.y and p.z < p1.z)) then
+				point1 = points[i]
 			end
+			if p.x > p2.x or (p.x == p2.x and p.y > p2.y or (p.y == p2.y and p.z > p2.z)) then
+				point2 = points[i]
+			end
+
+			if i % 100 == 0 and thread_yield then thread_yield() end
+		end
+		if point1.vec:getDistance(point2.vec) < 5e-5 then -- degenerate case
+			SF.Throw("All vertices are too close to each other", 2)
 		end
 
 		-- Find 3rd point of base triangle
 		local point3_dist = 0
 		local point3 = nil
-		for i=1,#points do
+		for i = 1, #points do
 			local p = points[i]
 			if p == point1 or p == point2 then continue end
 
@@ -346,83 +347,115 @@ do
 				point3_dist = tmp_dist
 				point3 = p
 			end
+
+			if i % 100 == 0 and thread_yield then thread_yield() end
+		end
+		if point3_dist < 5e-5 then -- degenerate case
+			SF.Throw("All vertices share a line in space", 2)
 		end
 
-		-- First face
-		local he_face1 = {plane = find_plane( point1, point2, point3 ), points = {}}
-		local he_f1_edge1 = {face = he_face1}
-		local he_f1_edge2 = {face = he_face1}
-		local he_f1_edge3 = {face = he_face1}
-		he_f1_edge1.vert = {vec=point1.vec, point=point1}
-		he_f1_edge2.vert = {vec=point2.vec, point=point2}
-		he_f1_edge3.vert = {vec=point3.vec, point=point3}
-		he_f1_edge1.next = he_f1_edge2
-		he_f1_edge2.next = he_f1_edge3
-		he_f1_edge3.next = he_f1_edge1
-		he_f1_edge1.vert.edge = he_f1_edge1
-		he_f1_edge2.vert.edge = he_f1_edge2
-		he_f1_edge3.vert.edge = he_f1_edge3
-		he_face1.edge = he_f1_edge1
+		-- Find 4th point of base tetrahedron
+		local base_plane = find_plane(point1, point2, point3)
+		local point4_dist = 0
+		local point4 = nil
+		for i = 1, #points do
+			local p = points[i]
+			if p == point1 or p == point2 or p == point3 then continue end
 
-		-- Second face
-		local he_face2 = {plane = find_plane( point2, point1, point3 ), points = {}}
-		local he_f2_edge1 = {face = he_face2}
-		local he_f2_edge2 = {face = he_face2}
-		local he_f2_edge3 = {face = he_face2}
-		he_f2_edge1.vert = {vec=point2.vec, point=point2}
-		he_f2_edge2.vert = {vec=point1.vec, point=point1}
-		he_f2_edge3.vert = {vec=point3.vec, point=point3}
-		he_f2_edge1.next = he_f2_edge2
-		he_f2_edge2.next = he_f2_edge3
-		he_f2_edge3.next = he_f2_edge1
-		he_f2_edge1.vert.edge = he_f2_edge1
-		he_f2_edge2.vert.edge = he_f2_edge2
-		he_f2_edge3.vert.edge = he_f2_edge3
-		he_face2.edge = he_f2_edge1
+			local tmp_dist = dist_to_plane(p, base_plane)
+			if math.abs(tmp_dist) > math.abs(point4_dist) then
+				point4_dist = tmp_dist
+				point4 = p
+			end
+
+			if i % 100 == 0 and thread_yield then thread_yield() end
+		end
+		if math.abs(point4_dist) < 5e-5 then -- degenerate case
+			SF.Throw("All vertices share a plane in space", 2)
+		end
+
+		-- Fix orientation of tetrahedron
+		if point4_dist > 0 then
+			point1, point2 = point2, point1
+		end
+
+		-- Construct faces (order is important!)
+		local he_faces = { }
+		local face_verts = {
+			{ point1, point2, point3 },
+			{ point2, point1, point4 },
+			{ point4, point3, point2 },
+			{ point3, point4, point1 },
+		}
+		for i, verts in ipairs(face_verts) do
+			local he_face = { plane = find_plane(verts[1], verts[2], verts[3]), points = { } } 
+			local he_f_edges = { }
+			for j = 1, 3 do
+				local he_f_edge = { face = he_face }
+				he_f_edge.vert = { vec = verts[j].vec, point = verts[j], edge = he_f_edge }
+				he_f_edges[j] = he_f_edge
+			end
+			for j = 1, 3 do
+				he_f_edges[j].next = he_f_edges[j % 3 + 1]
+			end
+			he_face.edge = he_f_edges[1]
+			he_faces[i] = he_face
+		end
 
 		-- Join faces
-		he_f1_edge1.twin = he_f2_edge1
-		he_f1_edge2.twin = he_f2_edge3
-		he_f1_edge3.twin = he_f2_edge2
-		he_f2_edge1.twin = he_f1_edge1
-		he_f2_edge2.twin = he_f1_edge3
-		he_f2_edge3.twin = he_f1_edge2
+		he_faces[1].edge.twin = he_faces[2].edge
+		he_faces[2].edge.twin = he_faces[1].edge
+		he_faces[3].edge.twin = he_faces[4].edge
+		he_faces[4].edge.twin = he_faces[3].edge
+		he_faces[1].edge.next.twin = he_faces[3].edge.next
+		he_faces[3].edge.next.twin = he_faces[1].edge.next
+		he_faces[2].edge.next.twin = he_faces[4].edge.next
+		he_faces[4].edge.next.twin = he_faces[2].edge.next
+		he_faces[1].edge.next.next.twin = he_faces[4].edge.next.next
+		he_faces[4].edge.next.next.twin = he_faces[1].edge.next.next
+		he_faces[2].edge.next.next.twin = he_faces[3].edge.next.next
+		he_faces[3].edge.next.next.twin = he_faces[2].edge.next.next
 
 		point1.ignore = true
 		point2.ignore = true
 		point3.ignore = true
-		return {he_face1,he_face2}
+		point4.ignore = true
+
+		if thread_yield then thread_yield() end
+
+		return he_faces
 	end
 
-	function wrap_points( points )
-		local ret = {}
-		for k, p in pairs( points ) do
-			ret[#ret + 1] = {
+	function wrap_points(points, thread_yield)
+		local ret = { }
+		for i, p in ipairs(points) do
+			ret[i] = {
 				vec = p,
 				face = nil
 			}
+			if i % 100 == 0 and thread_yield then thread_yield() end
 		end
 		return ret
 	end
 
-	function find_lightfaces( point, face, ret )
-		if not ret then ret = {} end
+	function find_lightfaces(point, face, ret)
+		if not ret then ret = { } end
 
-		if face.lightface or dist_to_plane( point, face.plane ) <= 0 then
+		if face.lightface or dist_to_plane(point, face.plane) <= 0 then
 			return ret
 		end
 
 		face.lightface = true
 		ret[#ret + 1] = face
-
-		find_lightfaces( point, face.edge.twin.face, ret )
-		find_lightfaces( point, face.edge.next.twin.face, ret )
-		find_lightfaces( point, face.edge.next.next.twin.face, ret )
-
+	
+		find_lightfaces(point, face.edge.twin.face, ret)
+		find_lightfaces(point, face.edge.next.twin.face, ret)
+		find_lightfaces(point, face.edge.next.next.twin.face, ret)
+	
 		return ret
 	end
 
-	function next_horizon_edge( horizon_edge )
+	function next_horizon_edge(horizon_edge)
 		local cur_edge = horizon_edge.next
 		while cur_edge.twin.face.lightface do
 			cur_edge = cur_edge.twin.next
@@ -430,31 +463,34 @@ do
 		return cur_edge
 	end
 
-	function quickhull( points )
-		local points = wrap_points( points )
-		local faces = create_initial_simplex3( points )
+	function quickhull(points, thread_yield)
+		local points = wrap_points(points, thread_yield)
+		local faces = create_initial_simplex4(points, thread_yield)
 
 		-- Assign points to faces
-		for k, point in pairs(points) do
+		for i, point in ipairs(points) do
 			if point.ignore then continue end
-			for k1, face in pairs(faces) do
-				face.points = face.points or {}
-				if dist_to_plane( point, face.plane ) > 0 then
+			for j, face in ipairs(faces) do
+				face.points = face.points or { } 
+				if dist_to_plane(point, face.plane) > 0 then
 					face.points[#face.points + 1] = point
 					point.face = face
 					break
 				end
 			end
+
+			if i % 100 == 0 and thread_yield then thread_yield() end
 		end
 
-		local face_list = {}  -- (linked list) Faces that been processed (although they can still be removed from list)
-		local face_stack = {} -- Faces to be processed
+		local face_list = { }   -- (linked list) Faces that been processed (although they can still be removed from list)
+    	local face_stack = { }  -- Faces to be processed
 
 		-- Push faces onto stack
-		for k1, face in pairs(faces) do
+		for k1, face in ipairs(faces) do
 			face_stack[#face_stack + 1] = face
 		end
 
+		local iter = 0
 		while #face_stack > 0 do
 			-- Pop face from stack
 			local curface = face_stack[#face_stack]
@@ -466,7 +502,7 @@ do
 			-- If no points, the face is processed
 			if #curface.points == 0 then
 				curface.list_parent = face_list
-				face_list = {next=face_list, value=curface}
+				face_list = { next = face_list, value = curface } 
 
 				continue
 			end
@@ -475,20 +511,24 @@ do
 			local point_dist = 0
 			local point = nil
 
-			for _, p in pairs(curface.points) do
+			for i, p in ipairs(curface.points) do
 				local tmp_dist = dist_to_plane(p, curface.plane)
 				if tmp_dist > point_dist then
 					point_dist = tmp_dist
 					point = p
 				end
+
+				if i % 100 == 0 and thread_yield then thread_yield() end
 			end
 
 			-- Find all faces visible to point
-			local light_faces = find_lightfaces( point, curface )
+			local light_faces = find_lightfaces(point, curface)
 
 			-- Find first horizon edge
 			local first_horizon_edge = nil
-			for k, face in pairs(light_faces) do
+			for i, face in ipairs(light_faces) do
+				if i % 100 == 0 and thread_yield then thread_yield() end
+
 				if not face.edge.twin.face.lightface then
 					first_horizon_edge = face.edge
 				elseif not face.edge.next.twin.face.lightface then
@@ -500,26 +540,29 @@ do
 			end
 
 			-- Find all horizon edges
-			local horizon_edges = {}
+			local horizon_edges = { }
 			local current_horizon_edge = first_horizon_edge
 			repeat
-				current_horizon_edge = next_horizon_edge( current_horizon_edge )
+				current_horizon_edge = next_horizon_edge(current_horizon_edge)
 				horizon_edges[#horizon_edges + 1] = current_horizon_edge
+
+				if #horizon_edges % 100 == 0 and thread_yield then thread_yield() end
 			until current_horizon_edge == first_horizon_edge
 
 			-- Assign new faces
-			for i=1, #horizon_edges do
+			local iter2 = 0
+			for i = 1, #horizon_edges do
 				local cur_edge = horizon_edges[i]
 
-				local he_face = {edge=cur_edge}
+				local he_face = { edge = cur_edge }
 
-				local he_vert1 = {vec=cur_edge.vert.vec     , point=cur_edge.vert.point}
-				local he_vert2 = {vec=cur_edge.next.vert.vec, point=cur_edge.next.vert.point}
-				local he_vert3 = {vec=point.vec             , point=point}
+				local he_vert1 = { vec = cur_edge.vert.vec     , point = cur_edge.vert.point }
+				local he_vert2 = { vec = cur_edge.next.vert.vec, point = cur_edge.next.vert.point }
+				local he_vert3 = { vec = point.vec             , point = point }
 
 				local he_edge1 = cur_edge
-				local he_edge2 = {}
-				local he_edge3 = {}
+				local he_edge2 = { }
+				local he_edge3 = { }
 
 				he_edge1.next = he_edge2
 				he_edge2.next = he_edge3
@@ -537,25 +580,30 @@ do
 				he_vert2.edge = he_edge2
 				he_vert3.edge = he_edge3
 
-				he_face.plane = find_plane( he_vert1, he_vert2, he_vert3 )
-				he_face.points = {}
+				he_face.plane = find_plane(he_vert1, he_vert2, he_vert3)
+				he_face.points = { }
 
 				-- Assign points to new faces
-				for k, lface in pairs(light_faces) do
+				for k, lface in ipairs(light_faces) do
 					for k1, p in pairs(lface.points) do
-						if dist_to_plane( p, he_face.plane ) > 0 then
-							he_face.points[#he_face.points+1] = p
+						if dist_to_plane(p, he_face.plane) > 0 then
+							he_face.points[#he_face.points + 1] = p
 							p.face = he_face
 							lface.points[k1] = nil -- This is ok since we are not adding new keys
+						end
+
+						if thread_yield then 
+							iter2 = iter2 + 1
+							if iter2 % 100 == 0 then thread_yield() end
 						end
 					end
 				end
 			end
 
 			-- Connect new faces
-			for i=1, #horizon_edges do
-				local prev_i = (i-1-1)%#horizon_edges + 1
-				local next_i = (i-1+1)%#horizon_edges + 1
+			for i = 1, #horizon_edges do
+				local prev_i = (i - 1 - 1) % #horizon_edges + 1
+				local next_i = (i - 1 + 1) % #horizon_edges + 1
 				local prev_edge1 = horizon_edges[prev_i]
 				local cur_edge1 = horizon_edges[i]
 				local next_edge1 = horizon_edges[next_i]
@@ -570,57 +618,36 @@ do
 				cur_edge2.twin = next_edge3
 				cur_edge3.twin = prev_edge2
 				face_stack[#face_stack + 1] = cur_edge1.face
+
+				if i % 100 == 0 and thread_yield then thread_yield() end
 			end
+
+			iter = iter + 1
+			if iter % 10 == 0 and thread_yield then thread_yield() end
 		end
 
 		-- Convert linked list into array
-		local ret_points_added = {}
-		local ret_points = {}
-		local ret_faces = {}
+		local ret_points_added = { }
+		local ret_points = { }
+		local ret_faces = { }
 		local l = face_list
 		while l.value do
 			local face = l.value
 			l = l.next
 			if face.lightface then continue end -- Filter out invalid faces
 
-			for k,vert in pairs({face_vertices(face)}) do
+			for k, vert in ipairs({ face_vertices(face) }) do
 				local point = vert.point
 				if ret_points_added[point] then continue end
 				ret_points_added[point] = true
 				ret_points[#ret_points + 1] = vert.point
 			end
-			ret_faces[#ret_faces+1] = face
+			ret_faces[#ret_faces + 1] = face
+			
+			if #ret_faces % 100 == 0 and thread_yield then thread_yield() end
 		end
 
 		return ret_faces, ret_points
-	end
-
-	local function findUV(point, textureVecs, texSizeX, texSizeY)
-		local x,y,z = point.x, point.y, point.z
-		local u = textureVecs[1].x * x + textureVecs[1].y * y + textureVecs[1].z * z + textureVecs[1].offset
-		local v = textureVecs[2].x * x + textureVecs[2].y * y + textureVecs[2].z * z + textureVecs[2].offset
-		return u/texSizeX, v/texSizeY
-	end
-
-	COLOR_WHITE = Color(255,255,255)
-	function face_to_mesh_vertex(face, color, offset)
-		local norm = face.plane.n
-
-		local tv1 = ( norm:cross( math.abs( norm:dot( Vector(0,0,1) ) ) == 1 and Vector(0,1,0) or Vector(0,0,-1) ) ):cross( norm )
-		local tv2 = norm:cross( tv1 )
-		local textureVecs = {{x=tv2.x,y=tv2.y,z=tv2.z,offset=0},
-							{x=tv1.x,y=tv1.y,z=tv1.z,offset=0}}-- texinfo.textureVecs
-
-		local p1, p2, p3 = face_vertices(face)
-
-
-		local u1,v1 = findUV(p1.vec, textureVecs, 32, 32)
-		local u2,v2 = findUV(p2.vec, textureVecs, 32, 32)
-		local u3,v3 = findUV(p3.vec, textureVecs, 32, 32)
-
-		return  {pos=p1.vec-offset,color=color or COLOR_WHITE,normal=norm,u=u1,v=v1},
-				{pos=p2.vec-offset,color=color or COLOR_WHITE,normal=norm,u=u2,v=v2},
-				{pos=p3.vec-offset,color=color or COLOR_WHITE,normal=norm,u=u3,v=v3}
 	end
 end
 
@@ -661,8 +688,11 @@ end
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
-
 local mesh_library = instance.Libraries.mesh
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
+local mwrap = instance.Types.VMatrix.Wrap
+
 local thread_yield
 local vector, angle, worldtolocal
 instance:AddHook("initialize", function()
@@ -722,6 +752,54 @@ function mesh_library.generateTangents(vertices)
 	SF.GenerateTangents(vertices, nil, vector)
 end
 
+--- Finds the convex hull of provided vertices table.
+-- @param table vertices The table of vertices (vectors) or vertex data (http://wiki.facepunch.com/gmod/Structures/MeshVertex)
+-- @param boolean? threaded Optional bool, use threading object that can be used to run algorithm over time to prevent hitting quota limit
+-- @return table The mesh table which can be passed to mesh.createFromTable
+-- @return table The table of vertices which can be passed to prop.createCustom
+function mesh_library.findConvexHull(vertices, threaded)
+	checkluatype(vertices, TYPE_TABLE)
+	if threaded ~= nil then
+		checkluatype(threaded, TYPE_BOOL)
+		if threaded and not coroutine.running() then
+			SF.Throw("Tried to use threading while not in a thread!", 2)
+		end
+	end
+	local nvertices = #vertices
+	if nvertices < 4 then SF.Throw("Expected at least 4 vertices.", 2) end
+	
+	local newVertices = { }
+	for i = 1, nvertices do
+		checkluatype(vertices[i], TYPE_TABLE)
+		if dgetmeta(vertices[i]) == vec_meta then
+			newVertices[i] = vertices[i]
+		else
+			newVertices[i] = vertices[i].pos
+		end
+		
+		if i % 100 == 0 and threaded then thread_yield() end
+	end
+
+	local faces, points = SF.QuickHull(newVertices, threaded and thread_yield)
+	local triangles = { }
+	for i = 1, #faces do
+		local first_edge = faces[i].edge
+		local cur_edge = first_edge
+		repeat
+			table.insert(triangles, { pos = cur_edge.vert.vec })
+			cur_edge = cur_edge.next
+		until cur_edge == first_edge
+
+		if i % 100 == 0 and threaded then thread_yield() end
+	end
+	for i = 1, #points do
+		points[i] = points[i].vec
+
+		if i % 100 == 0 and threaded then thread_yield() end
+	end
+	return triangles, points
+end
+
 if CLIENT then
 	local meshData = {}
 	instance.data.meshes = meshData
@@ -740,9 +818,6 @@ if CLIENT then
 	end)
 
 	local mesh_methods, mesh_meta, wrap, unwrap = instance.Types.Mesh.Methods, instance.Types.Mesh, instance.Types.Mesh.Wrap, instance.Types.Mesh.Unwrap
-	local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
-	local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
-	local mwrap = instance.Types.VMatrix.Wrap
 
 	local vertexCheck = {
 		color = function(v) return dgetmeta(v) == col_meta end,
