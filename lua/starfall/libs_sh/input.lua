@@ -140,6 +140,18 @@ SF.hookAdd("StartCommand", "mousewheeled", function(instance, ply, cmd)
 	return false
 end)
 
+local wpanel = vgui.GetWorldPanel()
+local oldOnMouseWheeled = wpanel.OnMouseWheeled
+function wpanel:OnMouseWheeled(delta)
+	if oldOnMouseWheeled then oldOnMouseWheeled(self, delta) end
+	if SF.cursorEnabled then
+		for inst, _ in pairs(SF.allInstances) do
+			if haspermission(inst, nil, "input") then
+				inst:runScriptHook("mousewheeled", delta)
+			end
+		end
+	end
+end
 
 --- Input library.
 -- @name input
@@ -304,6 +316,7 @@ function input_library.enableCursor(enabled)
 
 	instance.data.cursorEnabled = enabled
 	gui.EnableScreenClicker(enabled)
+	SF.cursorEnabled = enabled
 end
 
 --- Makes the local player select a weapon
