@@ -1,44 +1,37 @@
---@name Holodraw
+--@name Holodraw Example
 --@author Name
 --@shared
 
--- This code explains how to correctly use Hologram.draw method on a randertarget with transparent background
--- Steps shown in here are not required if you're drawing it directly to a screen or a HUD
--- Two methods are shown here, but they cannot be combined, therefore the appropriate one has to be chosen depending on the model
-
-local origin = chip():getPos()
+-- Certain hologram models may interfere with depth / alpha channel when drawn to a RenderTarget, rendering them transparent
+-- Holograms drawn directly to HUD or a screen do not show these symptomps and the workaround is not necessary
+-- One way of fixing this is to set the lighting mode, or if that doesn't work, exposing the hologram to env_projectedtexture
 
 if CLIENT then
-    
-    local holo1 = holograms.create(origin + Vector(0,8,40), Angle(), "models/spacecode/sfchip.mdl", Vector(1.4))
-    local holo2 = holograms.create(origin + Vector(0,-8,37), Angle(), "models/Lamarr.mdl", Vector(0.45))
-    -- We can hide the holograms, but 'holo2' needs to render in order to work with the second method
+    local holo1 = holograms.create(chip():getPos() + Vector(0,8,40), Angle(), "models/spacecode/sfchip.mdl", Vector(1.4))
+    local holo2 = holograms.create(chip():getPos() + Vector(0,-8,37), Angle(), "models/Lamarr.mdl", Vector(0.45))
+    -- The first hologram can be completely hidden, but for the second method to work, the other hologram needs to render
     --holo1:setNoDraw(true)
     --holo2:setColor(Color(0,0,0,1))
     
     render.createRenderTarget("canvas")
-    
     hook.add("drawhud", "drawstuff", function()
         holo1:setAngles(Angle(45, timer.curtime() * 100, 0))
         holo2:setAngles(Angle(0, -timer.curtime() * 100, 0))
         
         render.selectRenderTarget("canvas")
             render.clear(Color(0,0,0,0), true)
-            
             render.setColor(Color(0,255,255))
-            render.drawRectOutline(1, 1, 1022, 1022)
+            render.drawRectOutline(0, 0, 1024, 1024, 8)
             
             render.pushViewMatrix({
-                type = "3D",
-                origin = origin + Vector(-30, 0, 40),
+                type   = "3D",
+                origin = chip():getPos() + Vector(-30, 0, 40),
                 angles = Angle(),
-                fov = 60,
+                fov    = 60,
                 aspect = 1,
             })
             
-            -- This is the simplest way of combating weird lighting issues
-            -- It doesn't work for all models though, ragdolls in particular
-            -- Value for this function can be 1 (total fullbright) or 2 (increased fullbright), depending on the needs
+            -- FIRST METHOD: Render in fullbright or increased fullbright. May not work with all models, ragdolls in particular
             render.setLightingMode(1)
                 holo1:draw()
             render.setLightingMode(0)
@@ -50,23 +43,21 @@ if CLIENT then
         
         render.setColor(Color(255,255,255))
         render.setRenderTargetTexture("canvas")
-        render.drawTexturedRect(16, 256, 512, 512)
+        render.drawTexturedRect(256, 256, 512, 512)
     end)
     
     if player() == owner() then
         enableHud(nil, true)
     end
 else
-    
-    -- To combat the lighting on this hologram, we have to expose it to env_projectedtexture
-    -- This special entity can be created by gmod_lamp (player's flashlight works too!)
-    -- The lamp itself can have a brightness of 0 and can be made non-intrusive by making it invisible and disabling the collisions
-    local lamp = prop.createSent(origin + Vector(0,-8,75), Angle(90,0,0), "gmod_lamp", true, {
-        starton = true,
-        brightness = 0,
+    -- SECOND METHOD: Expose the hologram to env_projectedtexture, eg. player's flashlight or gmod_lamp
+    local lamp = prop.createSent(chip():getPos() + Vector(0,-8,75), Angle(90,0,0), "gmod_lamp", true, {
+        on = true,
         fov = 10,
-        model = "models/maxofs2d/lamp_flashlight.mdl",
+        brightness = 0,
+        Model = "models/maxofs2d/lamp_flashlight.mdl",
     })
+    -- Lamp can be entirely consealed, including disabling the collisions
     --lamp:setColor(Color(0,0,0,0))
-    --lamp:setCollisionGroup(10) -- COLLISION_GROUP_IN_VEHICLE
+    --lamp:setCollisionGroup(COLLISION_GROUP.IN_VEHICLE)
 end
