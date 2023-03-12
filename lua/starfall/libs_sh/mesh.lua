@@ -1018,7 +1018,7 @@ if CLIENT then
 		local prim_trifunc = prim_triangles[prim_type]
 		if not prim_trifunc then SF.Throw("Invalid Primitive.", 2) end
 
-		if prim_count<1 then SF.Throw("Can't generate with less than 1 primitive", 2) end
+		if prim_count<1 or prim_count~=prim_count then SF.Throw("Can't generate with less than 1 primitive", 2) end
 		-- Additional check to prevent crash with MATERIAL_POLYGON primitive count set to 1
 		if prim_type==MATERIAL_POLYGON and prim_count<2 then SF.Throw("Can't generate polygon with less than 2 primitive", 2) end
 		if prim_count>8192 then SF.Throw("Can't generate more than 8192 primitives", 2) end
