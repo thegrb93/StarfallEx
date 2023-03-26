@@ -446,6 +446,12 @@ function ss_methods:writeInt8(x)
 	self:write(string.char(x%0x100))
 end
 
+--- Writes a unsigned byte to the buffer and advances the buffer pointer.
+-- @name ss_methods.writeUInt8
+-- @class function
+-- @param number x UInt8 to write
+ss_methods.writeUInt8 = ss_methods.writeInt8
+
 --- Writes a short to the buffer and advances the buffer pointer.
 -- @param number x Int16 to write
 function ss_methods:writeInt16(x)
@@ -459,6 +465,12 @@ function ss_methods_big:writeInt16(x)
 	self:write(string.char(bit_rshift(x, 8)%0x100, x%0x100))
 end
 
+--- Writes a unsigned short to the buffer and advances the buffer pointer.
+-- @name ss_methods.writeUInt16
+-- @class function
+-- @param number x UInt16 to write
+ss_methods.writeUInt16 = ss_methods.writeInt16
+
 --- Writes an int to the buffer and advances the buffer pointer.
 -- @param number x Int32 to write
 function ss_methods:writeInt32(x)
@@ -471,6 +483,12 @@ function ss_methods_big:writeInt32(x)
 	if x < 0 then x = x + 0x100000000 end
 	self:write(string.char(bit_rshift(x, 24)%0x100, bit_rshift(x, 16)%0x100, bit_rshift(x, 8)%0x100, x%0x100))
 end
+
+--- Writes a unsigned long to the buffer and advances the buffer pointer.
+-- @name ss_methods.writeUInt32
+-- @class function
+-- @param number x UInt32 to write
+ss_methods.writeUInt32 = ss_methods.writeInt32
 
 --- Writes a 4 byte IEEE754 float to the byte stream and advances the buffer pointer.
 -- @param number x The float to write
