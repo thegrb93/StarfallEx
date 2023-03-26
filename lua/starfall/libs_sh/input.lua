@@ -140,6 +140,16 @@ SF.hookAdd("StartCommand", "mousewheeled", function(instance, ply, cmd)
 	return false
 end)
 
+local wpanel = vgui.GetWorldPanel()
+local oldOnMouseWheeled = wpanel.OnMouseWheeled or function() end
+function wpanel:OnMouseWheeled(delta)
+	oldOnMouseWheeled(self, delta)
+	for inst, _ in pairs(SF.allInstances) do
+		if haspermission(inst, nil, "input") then
+			inst:runScriptHook("mousewheeled", delta)
+		end
+	end
+end
 
 --- Input library.
 -- @name input
