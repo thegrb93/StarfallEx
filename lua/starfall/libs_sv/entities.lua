@@ -652,13 +652,25 @@ function ents_methods:enableSphere(enabled, radius)
 			end
 			ent:PhysicsInitSphere(radius, phys:GetMaterial())
 			ent:SetCollisionBounds(Vector(-radius, -radius, -radius) , Vector(radius, radius, radius))
+	
+			-- https://github.com/daveth/makespherical/blob/80b702ba04ba4b64d6c378df8d405b2c113dec53/lua/weapons/gmod_tool/stools/makespherical.lua#L117
+			local info = {
+				obbcenter = ent.obbcenter,							
+				noradius = radius,
+				radius = radius,
+				mass = mass,
+				enabled = enabled,
+				isrenderoffset = 0
+			}
+			
+			duplicator.StoreEntityModifier(ent, "MakeSphericalCollisions", info)
 		end
 	else
-		if ent:GetMoveType() ~= MOVETYPE_VPHYSICS then
-			ent:PhysicsInit(SOLID_VPHYSICS)
-			ent:SetMoveType(MOVETYPE_VPHYSICS)
-			ent:SetSolid(SOLID_VPHYSICS)
-		end
+		ent:PhysicsInit(SOLID_VPHYSICS)
+		ent:SetMoveType(MOVETYPE_VPHYSICS)
+		ent:SetSolid(SOLID_VPHYSICS)
+
+		duplicator.ClearEntityModifier(ent, "MakeSphericalCollisions")
 	end
 
 	-- New physobject after applying spherical collisions
