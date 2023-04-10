@@ -1305,22 +1305,24 @@ function SF.GetExecutingPath()
 	return curdir
 end
 
---- Returns True if parent chain length is going to exceed 16
+--- Returns True if parent chain length is going to exceed 16. Also check for cyclic parenting
 function SF.ParentChainTooLong(parent, child)
 	local index = parent
 	local parentLength = 0
 	while index:IsValid() do
+		if index == child then return true end
 		parentLength = parentLength + 1
 		index = index:GetParent()
 	end
 
 	local function getChildLength(curchild, count)
 		if count > 16 then return count end
-		local max = 0
+		local max = count
 		for k, v in pairs(curchild:GetChildren()) do
+			if v == parent then return 17 end
 			max = math.max(max, getChildLength(v, count + 1))
 		end
-		return math.max(max, count)
+		return max
 	end
 	local childLength = getChildLength(child, 1)
 
