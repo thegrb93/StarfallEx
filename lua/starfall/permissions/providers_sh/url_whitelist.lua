@@ -175,10 +175,12 @@ blacklist [[steamcommunity.com/linkfilter]]
 -- Discord
 --- Examples:
 ---  https://cdn.discordapp.com/attachments/269175189382758400/421572398689550338/unknown.png
----  https://images-ext-2.discordapp.net/external/UVPTeOLUWSiDXGwwtZ68cofxU1uaA2vMb2ZCjRY8XXU/https/i.imgur.com/j0QGfKN.jpg?width=1202&height=677
+---  https://images-ext-2.discordapp.net/external/UVPTeOLUWSiDXGwwtZ68cofxU1uaA2vMb2ZCjRY8XXU/https/i.imgur.com/j0QGfKN.jpg?width=1202&height=67
+---  https://media.discordapp.net/attachments/695591357158391879/1096409191792508958/image.png?width=1432&height=88
 
 pattern [[cdn[%w-_]*.discordapp%.com/(.+)]]
 pattern [[images-([%w%-]+)%.discordapp%.net/external/(.+)]]
+pattern [[media%.discordapp%.net/attachments/(.+)]]
 
 -- Reddit
 --- Examples:
