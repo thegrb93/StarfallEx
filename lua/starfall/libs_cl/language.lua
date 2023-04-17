@@ -22,7 +22,7 @@ function language_lib.add(placeholder,fulltext)
 	checkpermission(instance, placeholder, "language.add")
 	checkluatype(placeholder, TYPE_STRING)
 	checkluatype(fulltext, TYPE_STRING)
-    language.Add(placeholder,fulltext)
+	language.Add(placeholder,fulltext)
 end
 
 --- Retrieves the translated version of inputted string. Useful for concentrating multiple translated strings.
@@ -31,7 +31,7 @@ end
 -- @return string Matched phrase
 function language_lib.getPhrase(id)
 	checkluatype(id, TYPE_STRING)
-    return language.GetPhrase(id)
+	return language.GetPhrase(id)
 end
 
 end
