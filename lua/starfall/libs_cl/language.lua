@@ -8,7 +8,7 @@ local registerprivilege = SF.Permissions.registerPrivilege
 -- @libtbl language_lib
 SF.RegisterLibrary("language")
 
-registerprivilege("language.add", "Add language query", "Allows the user to add languages query", { client = {} })
+registerprivilege("language.add", "Add language query", "Allows the user to add languages query", { client = { default = 1 } })
 
 return function(instance)
 local language_lib = instance.Libraries.language
