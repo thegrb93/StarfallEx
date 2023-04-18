@@ -48,10 +48,10 @@ local function runCallback(callback)
 end
 
 --- Checks if a new http request can be started
+-- @class function
 -- @return boolean If an HTTP get/post request can be made
-function http_library.canRequest()
-	return canRequest()
-end
+http_library.canRequest = canRequest
+
 --- Gets how many get/post operations are currently in progress
 -- @return number The current amount of active HTTP get/post requests
 function http_library.getActiveRequests()
