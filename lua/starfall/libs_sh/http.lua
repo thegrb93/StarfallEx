@@ -23,33 +23,34 @@ local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check
 
 local http_library = instance.Libraries.http
 
-local function confirmPlayerHasRequests(player)
-	if not requests[player] then
-		requests[player] = 0
+local function confirmPlayerHasRequests()
+	if not requests[instance.player] then
+		requests[instance.player] = 0
 	end
 end
-local function addToPlayerRequests(player, val)
-	confirmPlayerHasRequests(player)
-	requests[player] = math.Clamp(requests[player] + val, 0, http_max_active:GetInt())
+local function addToPlayerRequests(val)
+	confirmPlayerHasRequests()
+	requests[instance.player] = math.Clamp(requests[instance.player] + val, 0, http_max_active:GetInt())
 end
+local function canRequest()
+	confirmPlayerHasRequests()
+	return requests[instance.player] < http_max_active:GetInt()
+end
+
 -- Runs the appropriate callback after a http request
 local function runCallback(callback)
 	return function(...)
-		addToPlayerRequests(instance.player, -1)
+		addToPlayerRequests(-1)
 		if callback then
 			instance:runFunction(callback, ...)
 		end
 	end
 end
-local function canRequest(player)
-	confirmPlayerHasRequests(player)
-	return requests[player] < http_max_active:GetInt()
-end
 
 --- Checks if a new http request can be started
 -- @return boolean If an HTTP get/post request can be made
 function http_library.canRequest()
-	return canRequest(instance.player)
+	return canRequest()
 end
 --- Gets how many get/post operations are currently in progress
 -- @return number The current amount of active HTTP get/post requests
@@ -86,8 +87,8 @@ function http_library.get(url, callbackSuccess, callbackFail, headers)
 		end
 	end
 
-	if not canRequest(instance.player) then tooManyConcurrentRequestsError() end
-	addToPlayerRequests(instance.player, 1)
+	if not canRequest() then tooManyConcurrentRequestsError() end
+	addToPlayerRequests(1)
 
 	if CLIENT then SF.HTTPNotify(instance.player, url) end
 	http.Fetch(url, runCallback(callbackSuccess), runCallback(callbackFail), headers)
@@ -151,8 +152,8 @@ function http_library.post(url, payload, callbackSuccess, callbackFail, headers)
 	end
 	request.failed = runCallback(callbackFail)
 
-	if not canRequest(instance.player) then tooManyConcurrentRequestsError() end
-	addToPlayerRequests(instance.player, 1)
+	if not canRequest() then tooManyConcurrentRequestsError() end
+	addToPlayerRequests(1)
 
 	if CLIENT then SF.HTTPNotify(instance.player, url) end
 	HTTP(request)
