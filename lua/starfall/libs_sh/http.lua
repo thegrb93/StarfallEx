@@ -35,8 +35,8 @@ end
 -- Runs the appropriate callback after a http request
 local function runCallback(callback)
 	return function(...)
+		addToPlayerRequests(instance.player, -1)
 		if callback then
-			addToPlayerRequests(instance.player, -1)
 			instance:runFunction(callback, ...)
 		end
 	end
