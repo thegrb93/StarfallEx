@@ -62,6 +62,10 @@ function http_library.getMaximumRequests()
 	return http_max_active:GetInt()
 end
 
+local function tooManyConcurrentRequestsError()
+	SF.Throw("You have hit the maximum amount of concurrent HTTP requests (" .. http_max_active:GetInt() .. ")", 2)
+end
+
 --- Runs a new http GET request
 -- @param string url Http target url
 -- @param function callbackSuccess The function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)
@@ -82,7 +86,7 @@ function http_library.get(url, callbackSuccess, callbackFail, headers)
 		end
 	end
 
-	if not canRequest(instance.player) then SF.Throw(string.format("You have hit the maximum amount of concurrent HTTP requests (%d)", http_max_active:GetInt()), 2) end
+	if not canRequest(instance.player) then tooManyConcurrentRequestsError() end
 	addToPlayerRequests(instance.player, 1)
 
 	if CLIENT then SF.HTTPNotify(instance.player, url) end
@@ -147,7 +151,7 @@ function http_library.post(url, payload, callbackSuccess, callbackFail, headers)
 	end
 	request.failed = runCallback(callbackFail)
 
-	if not canRequest(instance.player) then SF.Throw(string.format("You have hit the maximum amount of concurrent HTTP requests (%d)", http_max_active:GetInt()), 2) end
+	if not canRequest(instance.player) then tooManyConcurrentRequestsError() end
 	addToPlayerRequests(instance.player, 1)
 
 	if CLIENT then SF.HTTPNotify(instance.player, url) end
