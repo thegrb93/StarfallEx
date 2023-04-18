@@ -3,8 +3,8 @@ local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 
 
-local http_interval = CreateConVar("sf_http_interval", "0.5", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "Interval in seconds in which one http request can be made")
-local http_max_active = CreateConVar("sf_http_max_active", "3", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "The maximum amount of active http requests at the same time")
+--local http_interval = CreateConVar("sf_http_interval", "0.5", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "Interval in seconds in which one http request can be made")
+local http_max_active = CreateConVar("sf_http_max_active", "3", { FCVAR_ARCHIVE }, "The maximum amount of active http requests at the same time")
 
 local permission_level = SERVER and 1 or 3
 registerprivilege("http.get", "HTTP Get method", "Allows the user to request html data", { client = {}, urlwhitelist = { default = permission_level } })
