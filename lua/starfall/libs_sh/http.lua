@@ -41,18 +41,20 @@ local function runCallback(callback)
 		end
 	end
 end
+local function canRequest(player)
+	confirmPlayerHasRequests(player)
+	return requests[player] < http_max_active:GetInt()
+end
 
 --- Checks if a new http request can be started
 -- @return boolean If an HTTP get/post request can be made
 function http_library.canRequest()
-	confirmPlayerHasRequests(instance.player)
-	return requests[instance.player] < http_max_active:GetInt()
+	return canRequest(instance.player)
 end
 --- Gets how many get/post operations are currently in progress
 -- @return number The current amount of active HTTP get/post requests
 function http_library.getActiveRequests()
-	confirmPlayerHasRequests(instance.player)
-	return requests[instance.player]
+	return requests[instance.player] or 0
 end
 --- Gets how many get/post operations can be in progress at the same time
 -- @return number Maximum amount of concurrent active HTTP get/post requests 
@@ -80,7 +82,7 @@ function http_library.get(url, callbackSuccess, callbackFail, headers)
 		end
 	end
 
-	if not http_library.canRequest() then SF.Throw(string.format("You have hit the maximum amount of concurrent HTTP requests (%d)", http_max_active:GetInt()), 2) end
+	if not canRequest(instance.player) then SF.Throw(string.format("You have hit the maximum amount of concurrent HTTP requests (%d)", http_max_active:GetInt()), 2) end
 	addToPlayerRequests(instance.player, 1)
 
 	if CLIENT then SF.HTTPNotify(instance.player, url) end
@@ -145,7 +147,7 @@ function http_library.post(url, payload, callbackSuccess, callbackFail, headers)
 	end
 	request.failed = runCallback(callbackFail)
 
-	if not http_library.canRequest() then SF.Throw(string.format("You have hit the maximum amount of concurrent HTTP requests (%d)", http_max_active:GetInt()), 2) end
+	if not canRequest(instance.player) then SF.Throw(string.format("You have hit the maximum amount of concurrent HTTP requests (%d)", http_max_active:GetInt()), 2) end
 	addToPlayerRequests(instance.player, 1)
 
 	if CLIENT then SF.HTTPNotify(instance.player, url) end
