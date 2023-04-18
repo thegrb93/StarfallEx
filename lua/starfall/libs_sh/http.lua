@@ -2,13 +2,11 @@
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 
-local http_max_active = CreateConVar("sf_http_max_active", "3", { FCVAR_ARCHIVE }, "The maximum amount of active http requests at the same time")
-
 local permission_level = SERVER and 1 or 3
 registerprivilege("http.get", "HTTP Get method", "Allows the user to request html data", { client = {}, urlwhitelist = { default = permission_level } })
 registerprivilege("http.post", "HTTP Post method", "Allows the user to post html data", { client = { default = 1 }, urlwhitelist = { default = permission_level } })
 
-local requests = SF.EntityTable("playerHTTPRequests")
+local requests = SF.LimitObject("http_requests", "http request", 3, "The number of concurrent http requests via Starfall")
 
 --- Http library. Requests content from urls.
 -- @name http
@@ -21,24 +19,10 @@ local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check
 
 local http_library = instance.Libraries.http
 
-local function confirmPlayerHasRequests()
-	if not requests[instance.player] then
-		requests[instance.player] = 0
-	end
-end
-local function addToPlayerRequests(val)
-	confirmPlayerHasRequests()
-	requests[instance.player] = math.Clamp(requests[instance.player] + val, 0, http_max_active:GetInt())
-end
-local function canRequest()
-	confirmPlayerHasRequests()
-	return requests[instance.player] < http_max_active:GetInt()
-end
-
 -- Runs the appropriate callback after a http request
 local function runCallback(callback)
 	return function(...)
-		addToPlayerRequests(-1)
+		requests:free(instance.player, 1)
 		if callback then
 			instance:runFunction(callback, ...)
 		end
@@ -46,23 +30,21 @@ local function runCallback(callback)
 end
 
 --- Checks if a new http request can be started
--- @class function
 -- @return boolean If an HTTP get/post request can be made
-http_library.canRequest = canRequest
+function http_library.canRequest()
+	return requests:check(instance.player) > 0
+end
 
 --- Gets how many get/post operations are currently in progress
 -- @return number The current amount of active HTTP get/post requests
 function http_library.getActiveRequests()
-	return requests[instance.player] or 0
+	return requests.max-requests:check(instance.player)
 end
+
 --- Gets how many get/post operations can be in progress at the same time
 -- @return number Maximum amount of concurrent active HTTP get/post requests 
 function http_library.getMaximumRequests()
-	return http_max_active:GetInt()
-end
-
-local function tooManyConcurrentRequestsError()
-	SF.Throw("You have hit the maximum amount of concurrent HTTP requests (" .. http_max_active:GetInt() .. ")", 2)
+	return requests.max
 end
 
 --- Runs a new http GET request
@@ -85,8 +67,7 @@ function http_library.get(url, callbackSuccess, callbackFail, headers)
 		end
 	end
 
-	if not canRequest() then tooManyConcurrentRequestsError() end
-	addToPlayerRequests(1)
+	requests:use(instance.player, 1)
 
 	if CLIENT then SF.HTTPNotify(instance.player, url) end
 	http.Fetch(url, runCallback(callbackSuccess), runCallback(callbackFail), headers)
@@ -127,7 +108,7 @@ function http_library.post(url, payload, callbackSuccess, callbackFail, headers)
 
 	if headers~=nil then
 		checkluatype(headers, TYPE_TABLE)
-		
+
 		for k, v in pairs(headers) do
 			if not isstring(k) or not isstring(v) then
 				SF.Throw("Headers can only contain string keys and string values", 2)
@@ -137,7 +118,7 @@ function http_library.post(url, payload, callbackSuccess, callbackFail, headers)
 				request.type = v
 			end
 		end
-		
+
 		request.headers = headers
 	end
 
@@ -150,8 +131,7 @@ function http_library.post(url, payload, callbackSuccess, callbackFail, headers)
 	end
 	request.failed = runCallback(callbackFail)
 
-	if not canRequest() then tooManyConcurrentRequestsError() end
-	addToPlayerRequests(1)
+	requests:use(instance.player, 1)
 
 	if CLIENT then SF.HTTPNotify(instance.player, url) end
 	HTTP(request)
