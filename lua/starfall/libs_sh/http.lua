@@ -2,9 +2,7 @@
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 
-
-local http_interval = CreateConVar("sf_http_interval", "0.5", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "Interval in seconds in which one http request can be made")
-local http_max_active = CreateConVar("sf_http_max_active", "3", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "The maximum amount of active http requests at the same time")
+local http_max_active = CreateConVar("sf_http_max_active", "3", { FCVAR_ARCHIVE }, "The maximum amount of active http requests at the same time")
 
 local permission_level = SERVER and 1 or 3
 registerprivilege("http.get", "HTTP Get method", "Allows the user to request html data", { client = {}, urlwhitelist = { default = permission_level } })
@@ -23,19 +21,48 @@ local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check
 
 local http_library = instance.Libraries.http
 
+local function confirmPlayerHasRequests()
+	if not requests[instance.player] then
+		requests[instance.player] = 0
+	end
+end
+local function addToPlayerRequests(val)
+	confirmPlayerHasRequests()
+	requests[instance.player] = math.Clamp(requests[instance.player] + val, 0, http_max_active:GetInt())
+end
+local function canRequest()
+	confirmPlayerHasRequests()
+	return requests[instance.player] < http_max_active:GetInt()
+end
+
 -- Runs the appropriate callback after a http request
 local function runCallback(callback)
 	return function(...)
+		addToPlayerRequests(-1)
 		if callback then
 			instance:runFunction(callback, ...)
 		end
-		requests[instance.player] = nil
 	end
 end
 
 --- Checks if a new http request can be started
-function http_library.canRequest()
-	return not requests[instance.player]
+-- @class function
+-- @return boolean If an HTTP get/post request can be made
+http_library.canRequest = canRequest
+
+--- Gets how many get/post operations are currently in progress
+-- @return number The current amount of active HTTP get/post requests
+function http_library.getActiveRequests()
+	return requests[instance.player] or 0
+end
+--- Gets how many get/post operations can be in progress at the same time
+-- @return number Maximum amount of concurrent active HTTP get/post requests 
+function http_library.getMaximumRequests()
+	return http_max_active:GetInt()
+end
+
+local function tooManyConcurrentRequestsError()
+	SF.Throw("You have hit the maximum amount of concurrent HTTP requests (" .. http_max_active:GetInt() .. ")", 2)
 end
 
 --- Runs a new http GET request
@@ -58,8 +85,8 @@ function http_library.get(url, callbackSuccess, callbackFail, headers)
 		end
 	end
 
-	if requests[instance.player] then SF.Throw("You can't run a new http request yet", 2) end
-	requests[instance.player] = true
+	if not canRequest() then tooManyConcurrentRequestsError() end
+	addToPlayerRequests(1)
 
 	if CLIENT then SF.HTTPNotify(instance.player, url) end
 	http.Fetch(url, runCallback(callbackSuccess), runCallback(callbackFail), headers)
@@ -123,8 +150,8 @@ function http_library.post(url, payload, callbackSuccess, callbackFail, headers)
 	end
 	request.failed = runCallback(callbackFail)
 
-	if requests[instance.player] then SF.Throw("You can't run a new http request yet", 2) end
-	requests[instance.player] = true
+	if not canRequest() then tooManyConcurrentRequestsError() end
+	addToPlayerRequests(1)
 
 	if CLIENT then SF.HTTPNotify(instance.player, url) end
 	HTTP(request)
