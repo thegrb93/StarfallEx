@@ -23,19 +23,41 @@ local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check
 
 local http_library = instance.Libraries.http
 
+local function confirmPlayerHasRequests(player)
+	if not requests[player] then
+		requests[player] = 0
+	end
+end
+local function addToPlayerRequests(player, val)
+	confirmPlayerHasRequests(player)
+	requests[player] = math.Clamp(requests[player] + val, 0, http_max_active:GetInt())
+end
 -- Runs the appropriate callback after a http request
 local function runCallback(callback)
 	return function(...)
 		if callback then
+			addToPlayerRequests(instance.player, -1)
 			instance:runFunction(callback, ...)
 		end
-		requests[instance.player] = nil
 	end
 end
 
 --- Checks if a new http request can be started
+-- @return boolean If an HTTP get/post request can be made
 function http_library.canRequest()
-	return not requests[instance.player]
+	confirmPlayerHasRequests(instance.player)
+	return requests[instance.player] < http_max_active:GetInt()
+end
+--- Gets how many get/post operations are currently in progress
+-- @return number The current amount of active HTTP get/post requests
+function http_library.getActiveRequests()
+	confirmPlayerHasRequests(instance.player)
+	return requests[instance.player]
+end
+--- Gets how many get/post operations can be in progress at the same time
+-- @return number Maximum amount of concurrent active HTTP get/post requests 
+function http_library.getMaximumRequests()
+	return http_max_active:GetInt()
 end
 
 --- Runs a new http GET request
@@ -58,8 +80,8 @@ function http_library.get(url, callbackSuccess, callbackFail, headers)
 		end
 	end
 
-	if requests[instance.player] then SF.Throw("You can't run a new http request yet", 2) end
-	requests[instance.player] = true
+	if not http_library.canRequest() then SF.Throw(string.format("You have hit the maximum amount of concurrent HTTP requests (%d)", http_max_active:GetInt()), 2) end
+	addToPlayerRequests(instance.player, 1)
 
 	if CLIENT then SF.HTTPNotify(instance.player, url) end
 	http.Fetch(url, runCallback(callbackSuccess), runCallback(callbackFail), headers)
@@ -123,8 +145,8 @@ function http_library.post(url, payload, callbackSuccess, callbackFail, headers)
 	end
 	request.failed = runCallback(callbackFail)
 
-	if requests[instance.player] then SF.Throw("You can't run a new http request yet", 2) end
-	requests[instance.player] = true
+	if not http_library.canRequest() then SF.Throw(string.format("You have hit the maximum amount of concurrent HTTP requests (%d)", http_max_active:GetInt()), 2) end
+	addToPlayerRequests(instance.player, 1)
 
 	if CLIENT then SF.HTTPNotify(instance.player, url) end
 	HTTP(request)
