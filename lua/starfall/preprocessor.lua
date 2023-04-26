@@ -20,7 +20,7 @@ end
 function SF.Preprocessor.ParseDirectives(filename, source, data)
 	if data.includesdata and data.includesdata[filename] then return end
 
-	for directive, args in string.gmatch(source, "--@(%w+)([^\r\n]*)") do
+	for directive, args in string.gmatch(source, "%-%-@(%w+)([^\r\n]*)") do
 		local func = SF.Preprocessor.directives[directive]
 		if func then
 			func(string.Trim(args), filename, data)
