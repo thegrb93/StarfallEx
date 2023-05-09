@@ -559,6 +559,10 @@ if SERVER then
 	-- @param table tbl Table to print
 	function builtins_library.printTable(tbl)
 		checkluatype(tbl, TYPE_TABLE)
+		if tbl.__printtable then
+			tbl:__printtable()
+			return
+		end
 		printTableX(tbl, 0, { tbl = true })
 	end
 

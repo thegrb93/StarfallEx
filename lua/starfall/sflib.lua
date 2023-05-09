@@ -139,6 +139,14 @@ SF.StructWrapper = {
 			end,
 			__metatable = name,
 			__tostring = function() return name end,
+			__printtable = function()
+				for k, v in pairs(data) do
+					if not cache[k] then
+						cache[k] = instance.WrapObject(v)
+					end
+				end
+				instance.env.printTable(cache)
+			end,
 		})
 	end
 }
