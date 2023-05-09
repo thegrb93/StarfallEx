@@ -444,8 +444,9 @@ end
 local function printTableX(t, indent, alreadyprinted)
 	local meta = debug.getmetatable(t)
 	if meta and meta.__printtable then
-		printTableX(meta.__printtable(t), indent, alreadyprinted)
-	elseif next(t) then
+		t = meta.__printtable(t)
+	end
+	if next(t) then
 		for k, v in builtins_library.pairs(t) do
 			if SF.GetType(v) == "table" and not alreadyprinted[v] then
 				alreadyprinted[v] = true
