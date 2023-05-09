@@ -145,7 +145,7 @@ SF.StructWrapper = {
 						cache[k] = instance.WrapObject(v)
 					end
 				end
-				instance.env.printTable(cache)
+				return cache
 			end,
 		})
 	end
