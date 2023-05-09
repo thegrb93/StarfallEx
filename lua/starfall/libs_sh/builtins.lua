@@ -442,7 +442,10 @@ function builtins_library.rawget(table, key, value)
 end
 
 local function printTableX(t, indent, alreadyprinted)
-	local ply = instance.player
+	local meta = debug.getmetatable(t)
+	if meta and meta.__printtable then
+		t = meta.__printtable()
+	end
 	if next(t) then
 		for k, v in builtins_library.pairs(t) do
 			if SF.GetType(v) == "table" and not alreadyprinted[v] then
