@@ -153,6 +153,7 @@ simple [[puu.sh]]
 simple [[images.akamai.steamusercontent.com]]
 simple [[steamuserimages-a.akamaihd.net]]
 simple [[steamcdn-a.akamaihd.net]]
+simple [[avatars.akamai.steamstatic.com]]
 blacklist [[steamcommunity.com/linkfilter]]
 
 
