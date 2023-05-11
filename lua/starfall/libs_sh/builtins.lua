@@ -562,7 +562,7 @@ if SERVER then
 	-- @param table tbl Table to print
 	function builtins_library.printTable(tbl)
 		checkluatype(tbl, TYPE_TABLE)
-		printTableX(tbl, 0, { tbl = true })
+		printTableX(tbl, 0, { [tbl] = true })
 	end
 
 	--- Execute a console command
