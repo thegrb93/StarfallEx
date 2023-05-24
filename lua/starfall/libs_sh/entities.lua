@@ -707,7 +707,7 @@ function ents_methods:translatePhysBoneToBone(boneid)
 end
 
 --- Gets the number of physicsobjects of an entity
--- @return PhysObj The number of physics objects on the entity
+-- @return number The number of physics objects on the entity
 function ents_methods:getPhysicsObjectCount()
 	return getent(self):GetPhysicsObjectCount()
 end
@@ -868,7 +868,7 @@ end
 
 --- Gets the author of the specified starfall.
 -- @shared
--- @return Entity The author of the starfall chip.
+-- @return string The author of the starfall chip.
 function ents_methods:getChipAuthor()
 	local ent = getent(self)
 	if not ent.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
