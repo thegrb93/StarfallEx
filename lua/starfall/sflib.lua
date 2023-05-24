@@ -376,7 +376,7 @@ SF.BlockedList = {
 			self.list[steamid] = true
 
 			if self.filename then
-				local f = file.Open("sf_blockedusers.txt","a","DATA")
+				local f = file.Open(self.filename,"a","DATA")
 				f:Write(steamid.."\n")
 				f:Close()
 			end
