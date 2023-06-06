@@ -73,9 +73,72 @@ function ENT:Think()
 	end
 end
 
+function ENT:GetSendData(toowner)
+	if not self.instance then return end
+
+	local senddata = {
+		owner = self.sfdata.owner,
+		files = {},
+		mainfile = self.sfdata.mainfile,
+		proc = self
+	}
+
+	for k, v in pairs(self.sfdata.files) do senddata.files[k] = v end
+
+	local ppdata = self.instance and self.instance.ppdata
+	if ppdata then
+		if ppdata.serverorclient or (not toowner and ppdata.owneronly) then
+			for filename, code in pairs(senddata.files) do
+				local isserver, isowneronly = ppdata.serverorclient and ppdata.serverorclient[filename] == "server", ppdata.owneronly and ppdata.owneronly[filename]
+				if isserver or (not toowner and isowneronly) then
+					local infodata = {}
+					if isserver then
+						infodata[#infodata + 1] = "-- Server only"
+					end
+					if ppdata.scriptnames and ppdata.scriptnames[filename] then
+						infodata[#infodata + 1] = "--@name " .. ppdata.scriptnames[filename]
+					end
+					if ppdata.scriptauthors and ppdata.scriptauthors[filename] then
+						infodata[#infodata + 1] = "--@author " .. ppdata.scriptauthors[filename]
+					end
+					if isowneronly then
+						infodata[#infodata + 1] = "--@owneronly"
+					end
+					senddata.files[filename] = table.concat(infodata, "\n")
+				end
+			end
+		end
+		local clientmain = ppdata.clientmain and ppdata.clientmain[self.sfdata.mainfile]
+		if clientmain then
+			if senddata.files[clientmain] then
+				senddata.mainfile = clientmain
+			else
+				clientmain = SF.NormalizePath(string.GetPathFromFilename(self.sfdata.mainfile) .. clientmain)
+				if senddata.files[clientmain] then
+					senddata.mainfile = clientmain
+				end
+			end
+		end
+	end
+	senddata.compressed = SF.CompressFiles(senddata.files)
+
+	return senddata
+end
+
 function ENT:SendCode(recipient)
 	if not self.sfsenddata then return end
-	SF.SendStarfall("starfall_processor_download", self.sfsenddata, recipient)
+	local plys = recipient and { recipient } or player.GetHumans()
+	if self.sfownerdata and self.owner:IsValid() then -- Send specific data for owner if there are owner-only files
+		for k, v in ipairs(plys) do
+			if v == self.owner then
+				SF.SendStarfall("starfall_processor_download", self.sfownerdata, table.remove(plys, k))
+				break
+			end
+		end
+	end
+	if #plys > 0 then
+		SF.SendStarfall("starfall_processor_download", self.sfsenddata, plys)
+	end
 end
 
 function ENT:PreEntityCopy()
