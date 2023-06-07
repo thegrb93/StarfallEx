@@ -599,10 +599,12 @@ function SF.Instance:initialize()
 	self:RunHook("initialize")
 
 	local func = self.scripts[self.mainfile]
-	local tbl = self:run(func)
-	if not tbl[1] then
-		self:Error(tbl[2])
-		return false, tbl[2]
+	if func then
+		local tbl = self:run(func)
+		if not tbl[1] then
+			self:Error(tbl[2])
+			return false, tbl[2]
+		end
 	end
 
 	return true
