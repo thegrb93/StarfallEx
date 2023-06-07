@@ -5,6 +5,8 @@ local registerprivilege = SF.Permissions.registerPrivilege
 if SERVER then
 	-- Register privileges
 	registerprivilege("player.dropweapon", "DropWeapon", "Drops a weapon from the player", { entities = {} })
+	registerprivilege("player.setArmor", "SetArmor", "Allows changing a player's armor", { entities = {} })
+	registerprivilege("player.setMaxArmor", "SetMaxArmor", "Allows changing a player's max armor", { entities = {} })
 	registerprivilege("player.setammo", "SetAmmo", "Whether a player can set their ammo", { usergroups = { default = 1 }, entities = {} })
 else
 	registerprivilege("player.getFriendStatus", "FriendStatus", "Whether friend status can be retrieved", { client = { default = 1 } })
@@ -146,6 +148,26 @@ function player_methods:getMaxArmor()
 	return getply(self):GetMaxArmor()
 end
 
+--- Sets the armor of the player.
+-- @server
+-- @param number newarmor New armor value.
+function player_methods:setArmor(val)
+	local ent = getply(self)
+	checkpermission(instance, ent, "player.setArmor")
+	checkluatype(val, TYPE_NUMBER)
+	ent:SetArmor(val)
+end
+	
+--- Sets the maximum armor for player. Note, that you can still set a player's armor above this amount with Player:setArmor.
+-- @server
+-- @param number newmaxarmor New max armor value.
+function player_methods:setMaxArmor(val)
+	local ent = getply(self)
+	checkpermission(instance, ent, "player.setMaxArmor")
+	checkluatype(val, TYPE_NUMBER)
+	ent:SetMaxArmor(val)
+end
+	
 --- Returns whether the player is crouching
 -- @shared
 -- @return boolean True if player crouching
