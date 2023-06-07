@@ -133,16 +133,13 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 		if doNotRun[filename] then continue end -- Don't compile data files
 		if CLIENT and owneronlypp[filename] and LocalPlayer() ~= player then continue end -- Don't compile owner-only files if not owner
 		local serverorclient = serverorclientpp[filename]
-		if (serverorclient == "server" and CLIENT) or (serverorclient == "client" and SERVER) then
-			instance.scripts[filename] = function() end
-		else
-			local func = SF.CompileString(source, "SF:"..filename, false)
-			if isstring(func) then
-				return false, { message = func, traceback = "" }
-			end
-			debug.setfenv(func, instance.env)
-			instance.scripts[filename] = func
+		if (serverorclient == "server" and CLIENT) or (serverorclient == "client" and SERVER) then continue end -- Don't compile files for other realm
+		local func = SF.CompileString(source, "SF:"..filename, false)
+		if isstring(func) then
+			return false, { message = func, traceback = "" }
 		end
+		debug.setfenv(func, instance.env)
+		instance.scripts[filename] = func
 	end
 
 	instance.startram = collectgarbage("count")

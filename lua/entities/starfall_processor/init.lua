@@ -92,18 +92,13 @@ function ENT:GetSendData(toowner)
 				local isserver, isowneronly = ppdata.serverorclient and ppdata.serverorclient[filename] == "server", ppdata.owneronly and ppdata.owneronly[filename]
 				if isserver or (not toowner and isowneronly) then
 					local infodata = {}
-					if isserver then
-						infodata[#infodata + 1] = "-- Server only"
-					end
 					if ppdata.scriptnames and ppdata.scriptnames[filename] then
 						infodata[#infodata + 1] = "--@name " .. ppdata.scriptnames[filename]
 					end
 					if ppdata.scriptauthors and ppdata.scriptauthors[filename] then
 						infodata[#infodata + 1] = "--@author " .. ppdata.scriptauthors[filename]
 					end
-					if isowneronly then
-						infodata[#infodata + 1] = "--@owneronly"
-					end
+					infodata[#infodata + 1] = isserver and "--@server" or "--@owneronly"
 					senddata.files[filename] = table.concat(infodata, "\n")
 				end
 			end
@@ -127,17 +122,20 @@ end
 
 function ENT:SendCode(recipient)
 	if not self.sfsenddata then return end
-	local plys = recipient and { recipient } or player.GetHumans()
-	if self.sfownerdata and self.owner:IsValid() then -- Send specific data for owner if there are owner-only files
-		for k, v in ipairs(plys) do
-			if v == self.owner then
-				SF.SendStarfall("starfall_processor_download", self.sfownerdata, table.remove(plys, k))
-				break
+	if self.sfownerdata then -- Send specific data for owner if there are owner-only files
+		local others = {}
+		for _, ply in ipairs(recipient and (istable(recipient) and recipient or { recipient }) or player.GetHumans()) do
+			if ply==self.owner then
+				SF.SendStarfall("starfall_processor_download", self.sfownerdata, self.owner)
+			else
+				others[#others+1] = ply
 			end
 		end
-	end
-	if #plys > 0 then
-		SF.SendStarfall("starfall_processor_download", self.sfsenddata, plys)
+		if #others > 0 then
+			SF.SendStarfall("starfall_processor_download", self.sfsenddata, others)
+		end
+	else
+		SF.SendStarfall("starfall_processor_download", self.sfsenddata, recipient)
 	end
 end
 
