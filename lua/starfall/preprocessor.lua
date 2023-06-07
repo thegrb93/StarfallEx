@@ -111,3 +111,8 @@ SF.Preprocessor.SetGlobalDirective("superuser", function(args, filename, data)
 	if not data.superuser then data.superuser = {} end
 	data.superuser[filename] = true
 end)
+
+SF.Preprocessor.SetGlobalDirective("owneronly", function(args, filename, data)
+	if not data.owneronly then data.owneronly = {} end
+	data.owneronly[filename] = true
+end)
