@@ -63,6 +63,20 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 		end
 	end
 
+	local includes = instance.ppdata.includes
+	if includes then
+		local serverorclient = instance.ppdata.serverorclient
+		if serverorclient then
+			for filename, files in pairs(includes) do
+				for _, t in ipairs(files) do
+					if serverorclient[t] and serverorclient[filename] ~= serverorclient[t] then
+						return false, { message = "Can't include a file that doesn't exist in the same realm!", traceback = "" }
+					end
+				end
+			end
+		end
+	end
+
 	if player:IsWorld() then
 		player = SF.Superuser
 	elseif instance.ppdata.superuser and instance.ppdata.superuser[mainfile] then
@@ -599,10 +613,12 @@ function SF.Instance:initialize()
 	self:RunHook("initialize")
 
 	local func = self.scripts[self.mainfile]
-	local tbl = self:run(func)
-	if not tbl[1] then
-		self:Error(tbl[2])
-		return false, tbl[2]
+	if func then
+		local tbl = self:run(func)
+		if not tbl[1] then
+			self:Error(tbl[2])
+			return false, tbl[2]
+		end
 	end
 
 	return true
