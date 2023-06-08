@@ -147,26 +147,6 @@ end
 function player_methods:getMaxArmor()
 	return getply(self):GetMaxArmor()
 end
-
---- Sets the armor of the player.
--- @server
--- @param number newarmor New armor value.
-function player_methods:setArmor(val)
-	local ent = getply(self)
-	checkpermission(instance, ent, "player.setArmor")
-	checkluatype(val, TYPE_NUMBER)
-	ent:SetArmor(val)
-end
-	
---- Sets the maximum armor for player. Note, that you can still set a player's armor above this amount with Player:setArmor.
--- @server
--- @param number newmaxarmor New max armor value.
-function player_methods:setMaxArmor(val)
-	local ent = getply(self)
-	checkpermission(instance, ent, "player.setMaxArmor")
-	checkluatype(val, TYPE_NUMBER)
-	ent:SetMaxArmor(val)
-end
 	
 --- Returns whether the player is crouching
 -- @shared
@@ -617,6 +597,26 @@ if SERVER then
 		if CurTime() < (ply.sf_say_cd or 0) then SF.Throw("Player say must wait 0.5s between calls!", 2) end
 		ply.sf_say_cd = CurTime() + 0.5
 		ply:Say(text, teamOnly)
+	end
+	
+	--- Sets the armor of the player.
+	-- @server
+	-- @param number newarmor New armor value.
+	function player_methods:setArmor(val)
+		local ent = getply(self)
+		checkpermission(instance, ent, "player.setArmor")
+		checkluatype(val, TYPE_NUMBER)
+		ent:SetArmor(val)
+	end
+		
+	--- Sets the maximum armor for player. Note, that you can still set a player's armor above this amount with Player:setArmor.
+	-- @server
+	-- @param number newmaxarmor New max armor value.
+	function player_methods:setMaxArmor(val)
+		local ent = getply(self)
+		checkpermission(instance, ent, "player.setMaxArmor")
+		checkluatype(val, TYPE_NUMBER)
+		ent:SetMaxArmor(val)
 	end
 end
 
