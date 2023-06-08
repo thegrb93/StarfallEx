@@ -1246,3 +1246,7 @@ end
 --- Lets the chip run with no restrictions and the chip owner becomes SF.Superuser. Can only be used in the main file. --@superuser
 -- @name superuser
 -- @class directive
+
+--- Set the current file to only be sent to the owner. --@owneronly
+-- @name owneronly
+-- @class directive
