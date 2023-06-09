@@ -207,8 +207,9 @@ function physobj_methods:isMoveable()
 	return unwrap(self):IsMoveable()
 end
 
--- Returns whether the entity is affected by gravity.
--- @return boolean Whether the object is affect gravity.
+--- Returns whether the entity is affected by gravity.
+-- @shared
+-- @return boolean Whether the object is affect gravity
 function physobj_methods:isGravityEnabled()
 	return unwrap(self):IsGravityEnabled()
 end
