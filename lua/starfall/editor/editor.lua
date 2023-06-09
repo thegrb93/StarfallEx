@@ -311,17 +311,29 @@ if CLIENT then
 			recursiveLoad(codepath, codedir, code)
 		end)
 
-		if ok then
-			local clientmain = ppdata.clientmain and ppdata.clientmain[tbl.mainfile]
-			if clientmain and not tbl.files[clientmain] then
-				err("Clientmain not found: " .. clientmain) return
-			end
-
-			SF.Editor.HandlePostProcessing(tbl, ppdata, success, err)
-		else
+		if not ok then
 			local file = string.match(msg, "(Bad include%: .*)")
-			err(file or msg)
+			return err(file or msg)
 		end
+
+		local clientmain = ppdata.clientmain and ppdata.clientmain[tbl.mainfile]
+		if clientmain and not tbl.files[clientmain] then
+			return err("Clientmain not found: " .. clientmain)
+		end
+
+		local includes = ppdata.includes
+		local serverorclient = ppdata.serverorclient
+		if includes and serverorclient then
+			for filename, files in pairs(includes) do
+				for _, inc in ipairs(files) do
+					if serverorclient[inc] and serverorclient[filename] and serverorclient[filename] ~= serverorclient[inc] then
+						return err("Incompatible client/server realm: \""..filename.."\" trying to include \""..inc.."\"")
+					end
+				end
+			end
+		end
+
+		SF.Editor.HandlePostProcessing(tbl, ppdata, success, err)
 	end
 
 	--- Handles post-processing (as part of BuildIncludesTable)
