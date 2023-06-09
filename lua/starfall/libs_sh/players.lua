@@ -5,8 +5,8 @@ local registerprivilege = SF.Permissions.registerPrivilege
 if SERVER then
 	-- Register privileges
 	registerprivilege("player.dropweapon", "DropWeapon", "Drops a weapon from the player", { entities = {} })
-	registerprivilege("player.setArmor", "SetArmor", "Allows changing a player's armor", { entities = {} })
-	registerprivilege("player.setMaxArmor", "SetMaxArmor", "Allows changing a player's max armor", { entities = {} })
+	registerprivilege("player.setArmor", "SetArmor", "Allows changing a player's armor", { usergroups = { default = 1 }, entities = {} })
+	registerprivilege("player.setMaxArmor", "SetMaxArmor", "Allows changing a player's max armor", { usergroups = { default = 1 }, entities = {} })
 	registerprivilege("player.setammo", "SetAmmo", "Whether a player can set their ammo", { usergroups = { default = 1 }, entities = {} })
 else
 	registerprivilege("player.getFriendStatus", "FriendStatus", "Whether friend status can be retrieved", { client = { default = 1 } })
