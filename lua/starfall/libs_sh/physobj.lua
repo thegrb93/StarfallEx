@@ -207,6 +207,13 @@ function physobj_methods:isMoveable()
 	return unwrap(self):IsMoveable()
 end
 
+--- Returns whether the entity is affected by gravity.
+-- @shared
+-- @return boolean Whether the object is affect gravity
+function physobj_methods:isGravityEnabled()
+	return unwrap(self):IsGravityEnabled()
+end
+
 if SERVER then
 	--- Sets the position of the physics object. Will cause interpolation of the entity in clientside, use entity.setPos to avoid this.
 	-- @server
