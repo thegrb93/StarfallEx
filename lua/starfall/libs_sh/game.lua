@@ -71,6 +71,12 @@ game_library.getTimeScale = game.GetTimeScale
 -- @return number Interval
 game_library.getTickInterval = engine.TickInterval
 
+--- Returns the number of ticks since the game started
+-- @name game_library.getTickCount
+-- @class function
+-- @return number Ticks
+game_library.getTickCount = engine.TickCount
+
 --- Returns AmmoData for given id
 -- @param number id See https://wiki.facepunch.com/gmod/Default_Ammo_Types
 -- @return table AmmoData, see https://wiki.facepunch.com/gmod/Structures/AmmoData
