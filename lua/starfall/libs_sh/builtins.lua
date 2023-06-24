@@ -2,7 +2,7 @@
 local checkluatype = SF.CheckLuaType
 local dgetmeta = debug.getmetatable
 
-SF.Permissions.registerPrivilege("console.command", "Console command", "Allows the starfall to run console commands", { client = { default = 4 } })
+SF.Permissions.registerPrivilege("console.command", "Console command", "Allows the starfall to run console commands")
 
 local userdataLimit, printBurst, concmdBurst
 if SERVER then
@@ -660,7 +660,7 @@ else
 
 	function builtins_library.concmd(cmd)
 		checkluatype(cmd, TYPE_STRING)
-		checkpermission(instance, nil, "console.command")
+		if instance.player ~= LocalPlayer() then SF.Throw("Can't run concmd on other players!", 2) end
 		LocalPlayer():ConCommand(cmd)
 	end
 
