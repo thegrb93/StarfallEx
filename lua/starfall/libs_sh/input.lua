@@ -45,6 +45,7 @@ if SERVER then
 end
 
 registerprivilege("input", "Input", "Allows the user to see what buttons you're pressing.", { client = {} })
+registerprivilege("input.chat", "Input", "Allows the user to see your chat keypresses.", { client = { default = 1 } })
 registerprivilege("input.bindings", "Input", "Allows the user to see your bindings.", { client = { default = 1 } })
 registerprivilege("input.emulate", "Input", "Allows starfall to emulate user input.", { client = { default = 1 } })
 

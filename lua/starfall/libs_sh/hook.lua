@@ -279,7 +279,7 @@ else
 	-- @client
 	-- @param string txt Text it was changed to
 	add("ChatTextChanged", nil, function(instance, txt)
-		if instance.player == SF.Superuser or haspermission(instance, nil, "input") then
+		if instance.player == SF.Superuser or haspermission(instance, nil, "input.chat") then
 			return true, { txt }
 		end
 		return false
