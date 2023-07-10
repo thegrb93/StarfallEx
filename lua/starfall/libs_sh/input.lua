@@ -86,9 +86,13 @@ net.Receive("starfall_lock_control", function()
 	end
 end)
 
+local isChatOpen = false
+hook.Add("StartChat","SF_StartChat",function() isChatOpen=true end)
+hook.Add("FinishChat","SF_StartChat",function() isChatOpen=false end)
+
 
 local function CheckButtonPerms(instance, ply, button)
-	if (IsFirstTimePredicted() or game.SinglePlayer()) and haspermission(instance, nil, "input") then
+	if (IsFirstTimePredicted() or game.SinglePlayer()) and haspermission(instance, nil, "input") and (not isChatOpen or haspermission(instance, nil, "input.chat")) then
 		return true, { button }
 	end
 	return false
@@ -225,6 +229,7 @@ function input_library.isKeyDown(key)
 	checkluatype(key, TYPE_NUMBER)
 
 	checkpermission(instance, nil, "input")
+	if isChatOpen and not haspermission(instance, nil, "input.chat") then return false end
 
 	return input.IsKeyDown(key)
 end
