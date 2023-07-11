@@ -92,10 +92,11 @@ hook.Add("FinishChat","SF_StartChat",function() isChatOpen=false end)
 
 
 local function CheckButtonPerms(instance, ply, button)
-	if (IsFirstTimePredicted() or game.SinglePlayer()) and haspermission(instance, nil, "input") and (not isChatOpen or haspermission(instance, nil, "input.chat")) then
-		return true, { button }
-	end
-	return false
+	if not IsFirstTimePredicted() and not game.SinglePlayer() then return false end
+	if not haspermission(instance, nil, "input") then return false end
+	if isChatOpen and not haspermission(instance, nil, "input.chat") then return false end
+
+	return true, { button }
 end
 
 --- Called when a button is pressed
