@@ -92,10 +92,15 @@ hook.Add("FinishChat","SF_StartChat",function() isChatOpen=false end)
 
 
 local function CheckButtonPerms(instance, ply, button)
-	if (IsFirstTimePredicted() or game.SinglePlayer()) and haspermission(instance, nil, "input") and (not isChatOpen or haspermission(instance, nil, "input.chat")) then
-		return true, { button }
+	if not IsFirstTimePredicted() and not game.SinglePlayer() then return false end
+	if not haspermission(instance, nil, "input") then return false end
+	if isChatOpen and not haspermission(instance, nil, "input.chat") then
+		local notMouseButton = button < MOUSE_FIRST and button > MOUSE_LAST
+		local notJoystick = button < JOYSTICK_FIRST and button > JOYSTICK_LAST
+		if notMouseButton and notJoystick then return false end -- Mouse and joystick are allowed, they don't put text into the chat
 	end
-	return false
+
+	return true, { button }
 end
 
 --- Called when a button is pressed
