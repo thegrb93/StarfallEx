@@ -107,22 +107,34 @@ end
 
 --- Applies damage to an entity
 -- @param number amt Damage amount
--- @param Entity attacker Damage attacker
--- @param Entity inflictor Damage inflictor
-function ents_methods:applyDamage(amt, attacker, inflictor)
+-- @param Entity? attacker Damage attacker
+-- @param Entity? inflictor Damage inflictor
+-- @param number? dmgtype The damage type number enum
+-- @param Vector? pos The position of the damage
+function ents_methods:applyDamage(amt, attacker, inflictor, dmgtype, pos)
 	local ent = getent(self)
-	checkluatype(amt, TYPE_NUMBER)
 
+	checkluatype(amt, TYPE_NUMBER)
 	checkpermission(instance, ent, "entities.applyDamage")
 
-	if attacker then
-		attacker = getent(attacker)
+	local dmg = DamageInfo()
+	dmg:SetDamage(amt)
+	if attacker~=nil then
+		dmg:SetAttacker(getent(attacker))
 	end
-	if inflictor then
-		inflictor = getent(inflictor)
+	if inflictor~=nil then
+		dmg:SetInflictor(getent(inflictor))
 	end
-
-	ent:TakeDamage(amt, attacker, inflictor)
+	if dmgtype~=nil then
+		checkluatype(dmgtype, TYPE_NUMBER)
+		dmg:SetDamageType(dmgtype)
+	end
+	if pos~=nil then
+		pos = vunwrap(pos)
+		checkvector(pos)
+		dmg:SetDamagePosition(pos)
+	end
+	ent:TakeDamageInfo(dmg)
 end
 
 --- Sets a custom prop's physics simulation forces. Thrusters and balloons use this.
