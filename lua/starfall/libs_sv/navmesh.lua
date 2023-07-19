@@ -210,6 +210,7 @@ return function(instance)
 		for idx, navarea in ipairs( navmesh.Find( vunwrap(pos), radius, stepdown, stepup ) ) do
 			out[idx] = lnavwrap(navarea)
 		end
+		return out
 	end
 
 	--- Returns the highest ID of all nav areas on the map.
