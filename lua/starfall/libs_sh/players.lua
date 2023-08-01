@@ -550,9 +550,9 @@ if SERVER then
 	function player_methods:setEyeAngles(ang)
 		local ent = getent(self)
 		local ang = aunwrap(ang)
-
-		checkpermission(instance, ent, "entities.setEyeAngles")
-
+		if instance.player != ent then
+			checkpermission(instance, ent, "entities.setEyeAngles")
+		end
 		ent:SetEyeAngles(ang)
 	end
 
