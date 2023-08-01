@@ -479,6 +479,12 @@ math_library.easeInOutExpo = math.ease.InOutExpo
 -- @return number "Eased" Value
 math_library.easeInOutQuad = math.ease.InOutQuad
 
+--- Eases in and out by raising the fraction to the power of 4.
+-- @class function
+-- @param number fraction Fraction of the progress to ease, from 0 to 1
+-- @return number "Eased" Value
+math_library.easeInOutQuart = math.ease.InOutQuart
+	
 --- Eases in and out by raising the fraction to the power of 5.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
