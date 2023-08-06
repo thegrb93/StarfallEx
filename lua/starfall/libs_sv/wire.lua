@@ -32,11 +32,11 @@ SF.RegisterType("Wirelink", false, true)
 -- @libtbl vec2_meta
 SF.RegisterType("Vector2", nil, nil, nil, "Vector", function(checktype, vec2_meta)
 	return function(vec)
-		return setmetatable({vec[1], vec[2], 0}, vec2_meta)
+		return setmetatable({tonumber(vec[1]) or 0 , tonumber(vec[2]) or 0 , 0}, vec2_meta)
 	end,
 	function(obj)
 		checktype(obj, vec2_meta, 2)
-		return {obj[1], obj[2]}
+		return {tonumber(obj[1]) or 0, tonumber(obj[2]) or 0}
 	end
 end)
 
