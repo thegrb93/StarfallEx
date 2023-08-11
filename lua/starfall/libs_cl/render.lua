@@ -770,6 +770,9 @@ function render_library.popViewMatrix()
 
 	cam[view_matrix_stack[i]]()
 	view_matrix_stack[i] = nil
+
+	cam.Start3D()
+	cam.End3D() -- This fixes Vector:toScreen() breaking if you've pushed a viewmatrix beforehand. Yeah, it's stupid.
 end
 
 --- Sets background color of screen
