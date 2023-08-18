@@ -86,7 +86,7 @@ end
 
 --- Returns the real maximum amount of ammo of given ammo ID, regardless of the setting of gmod_maxammo convar
 -- @param number id See https://wiki.facepunch.com/gmod/Default_Ammo_Types
--- @return The maximum amount of reserve ammo a player can hold of this ammo type
+-- @return number The maximum amount of reserve ammo a player can hold of this ammo type
 function game_library.getAmmoMax(id)
 	return game.GetAmmoMax(id)
 end
