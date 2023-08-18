@@ -90,7 +90,7 @@ end
 function game_library.getAmmoMax(id)
 	return game.GetAmmoMax(id)
 end
-	
+
 --- Returns the worldspawn entity
 -- @return Entity Worldspawn
 function game_library.getWorld()
