@@ -251,3 +251,8 @@ pattern [[(%w+)%.keybase.pub/(.+)]]
 -- Examples:
 -- https://tts.cyzon.us/tts?text=test
 pattern [[tts.cyzon.us/(.+)]]
+
+-- Nerdaxic GLaDOS Online TTS 
+-- Examples:
+-- https://argnode.asuscomm.com:31415/synthesize/?message=test
+pattern [[argnode.asuscomm.com:31415/synthesize/(.+)]]
