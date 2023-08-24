@@ -120,10 +120,6 @@ simple [[cloud.githubusercontent.com]]
 simple [[user-images.githubusercontent.com]]
 pattern [[avatars(%d*)%.githubusercontent%.com/(.+)]]
 
--- teknik
-simple [[u.teknik.io]]
-simple [[p.teknik.io]]
-
 -- TinyPic
 --- Examples:
 ---  http://i68.tinypic.com/24b3was.gif
