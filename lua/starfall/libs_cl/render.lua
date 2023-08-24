@@ -544,6 +544,8 @@ function render_library.clearStencil()
 	render.ClearStencil()
 end
 
+--- Suppresses or enables any engine lighting for any upcoming render operation.
+-- @param boolean suppress True to suppress false to enable.
 function render_library.suppressEngineLighting(enable)
 	enable = (enable == true)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
