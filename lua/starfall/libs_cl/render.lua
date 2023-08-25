@@ -532,7 +532,6 @@ end
 --- Sets whether stencil tests are carried out for each rendered pixel. Only pixels passing the stencil test are written to the render target.
 -- @param boolean enable True to enable, false to disable
 function render_library.setStencilEnable(enable)
-	enable = (enable == true) -- Make sure it's a boolean
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 	render.SetStencilEnable(enable)
@@ -547,7 +546,6 @@ end
 --- Suppresses or enables any engine lighting for any upcoming render operation.
 -- @param boolean suppress True to suppress false to enable.
 function render_library.suppressEngineLighting(enable)
-	enable = (enable == true)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	render.SuppressEngineLighting(enable)
 end
