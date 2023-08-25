@@ -8,7 +8,7 @@ registerprivilege("prop.createRagdoll", "Create a ragdoll", "Allows the user to 
 registerprivilege("prop.createCustom", "Create custom prop", "Allows the user to create custom props")
 
 
-local plyCount = SF.LimitObject("props", "props", -1, "The number of props allowed to spawn via Starfall")
+local entList = SF.EntManager("props", "props", -1, "The number of props allowed to spawn via Starfall")
 local plyPropBurst = SF.BurstObject("props", "props", 4, 4, "Rate props can be spawned per second.", "Number of props that can be spawned in a short time.")
 
 local maxCustomSize = CreateConVar("sf_props_custom_maxsize", "2048", FCVAR_ARCHIVE, "The max hull size of a custom prop")
@@ -28,36 +28,18 @@ SF.RegisterLibrary("prop")
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
-local props = {}
 local propClean = true
 local propUndo = false
 
 instance:AddHook("deinitialize", function()
-	if propClean then
-		for prop, _ in pairs(props) do
-			prop:Remove()
-		end
-	end
+	entList:deinitialize(instance, propClean)
 end)
-
 
 local props_library = instance.Libraries.prop
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
-
-local function propOnDestroy(ent)
-	local ply = instance.player
-	plyCount:free(ply, 1)
-	props[ent] = nil
-end
-
-local function register(ent)
-	ent:CallOnRemove("starfall_prop_delete", propOnDestroy)
-	plyCount:free(instance.player, -1)
-	props[ent] = true
-end
 
 --- Creates a prop
 -- @server
@@ -79,15 +61,15 @@ function props_library.create(pos, ang, model, frozen)
 	model = SF.CheckModel(model, ply, true)
 
 	plyPropBurst:use(ply, 1)
-	plyCount:checkuse(ply, 1)
+	entList:checkuse(ply, 1)
 	if ply ~= SF.Superuser and gamemode.Call("PlayerSpawnProp", ply, model)==false then SF.Throw("Another hook prevented the prop from spawning", 2) end
 
 	local propent = ents.Create("prop_physics")
-	register(propent, instance)
 	propent:SetPos(pos)
 	propent:SetAngles(ang)
 	propent:SetModel(model)
 	propent:Spawn()
+	entList:register(instance, propent)
 
 	if not propent:GetModel() then propent:Remove() SF.Throw("Invalid model", 2) end
 
@@ -129,13 +111,13 @@ function props_library.createRagdoll(model, frozen)
 	if not model then SF.Throw("Invalid model", 2) end
 
 	plyPropBurst:use(ply, 1)
-	plyCount:checkuse(ply, 1)
+	entList:checkuse(ply, 1)
 	if ply ~= SF.Superuser and gamemode.Call("PlayerSpawnRagdoll", ply, model)==false then SF.Throw("Another hook prevented the ragdoll from spawning", 2) end
 
 	local ent = ents.Create("prop_ragdoll")
-	register(ent, instance)
 	ent:SetModel(model)
 	ent:Spawn()
+	entList:register(instance, ent)
 
 	if not ent:GetModel() then ent:Remove() SF.Throw("Invalid model", 2) end
 
@@ -181,7 +163,7 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	local ply = instance.player
 
 	plyPropBurst:use(ply, 1)
-	plyCount:checkuse(ply, 1)
+	entList:checkuse(ply, 1)
 	if instance.player ~= SF.Superuser and gamemode.Call("PlayerSpawnProp", ply, "starfall_prop")==false then SF.Throw("Another hook prevented the prop from spawning", 2) end
 
 	local uwVertices = {}
@@ -222,12 +204,12 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	plyVertexCount:free(-totalVertices)
 
 	local propent = ents.Create("starfall_prop")
-	register(propent, instance)
 	propent.streamdata = streamdata
 	propent:SetPos(pos)
 	propent:SetAngles(ang)
 	propent.Mesh = uwVertices
 	propent:Spawn()
+	entList:register(instance, propent)
 
 	local physobj = propent:GetPhysicsObject()
 	if not physobj:IsValid() then
@@ -286,14 +268,14 @@ function props_library.createComponent(pos, ang, class, model, frozen)
 
 	if not ply:CheckLimit("starfall_components") then SF.Throw("Limit of components reached!", 2) end
 	plyPropBurst:use(ply, 1)
-	plyCount:checkuse(ply, 1)
+	entList:checkuse(ply, 1)
 
 	local comp = ents.Create(class)
-	register(comp, instance)
 	comp:SetPos(pos)
 	comp:SetAngles(ang)
 	comp:SetModel(model)
 	comp:Spawn()
+	entList:register(instance, comp)
 
 	local mdl = comp:GetModel()
 	if not mdl or mdl == "models/error.mdl" then
@@ -373,7 +355,7 @@ function props_library.createSeat(pos, ang, model, frozen)
 	model = SF.CheckModel(model, ply, true)
 
 	plyPropBurst:use(ply, 1)
-	plyCount:checkuse(ply, 1)
+	entList:checkuse(ply, 1)
 
 	local class = "prop_vehicle_prisoner_pod"
 
@@ -388,7 +370,7 @@ function props_library.createSeat(pos, ang, model, frozen)
 	prop:SetKeyValue( "limitview", 0 )
 	prop:Activate()
 
-	register(prop, instance)
+	entList:register(instance, prop)
 
 	local phys = prop:GetPhysicsObject()
 	if phys:IsValid() then
@@ -431,7 +413,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 
 	local ply = instance.player
 	plyPropBurst:use(ply, 1)
-	plyCount:checkuse(ply, 1)
+	entList:checkuse(ply, 1)
 
 	local swep = list.GetForEdit("Weapon")[class]
 	local sent = list.GetForEdit("SpawnableEntities")[class]
@@ -650,7 +632,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 	end
 
 	if entity and entity:IsValid() then
-		register(entity, instance)
+		entList:register(instance, entity)
 
 		if CPPI then entity:CPPISetOwner(ply == SF.Superuser and NULL or ply) end
 
@@ -684,7 +666,7 @@ end
 -- @return boolean True if user can spawn props, False if not.
 function props_library.canSpawn()
 	if not SF.Permissions.hasAccess(instance, nil, "prop.create") then return false end
-	return plyCount:check(instance.player) > 0 and plyPropBurst:check(instance.player) >= 1
+	return entList:check(instance.player) > 0 and plyPropBurst:check(instance.player) >= 1
 end
 
 --- Checks how many props can be spawned
@@ -692,7 +674,7 @@ end
 -- @return number Number of props able to be spawned
 function props_library.propsLeft()
 	if not SF.Permissions.hasAccess(instance,  nil, "prop.create") then return 0 end
-	return math.min(plyCount:check(instance.player), plyPropBurst:check(instance.player))
+	return math.min(entList:check(instance.player), plyPropBurst:check(instance.player))
 end
 
 --- Returns how many props per second the user can spawn
