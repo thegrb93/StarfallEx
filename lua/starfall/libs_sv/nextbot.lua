@@ -190,6 +190,8 @@ function nb_methods:setRunAct(act)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setRunAct")
 	nb.RUNACT = act
+	if !nb.goTo or !nb.approachPos then return end
+	nb:StartActivity(act)
 end
 
 --- Gets the activity the nextbot uses for running.
@@ -208,6 +210,8 @@ function nb_methods:setIdleAct(act)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setIdleAct")
 	nb.IDLEACT = act
+	if nb.goTo or nb.approachPos then return end
+	nb:StartActivity(act)
 end
 
 --- Gets the activity the nextbot uses for idling.
@@ -437,6 +441,7 @@ function nb_methods:setMoveSpeed(val)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setMoveSpeed")
 	nb.MoveSpeed = val
+	nb.loco:SetDesiredSpeed(val)
 end
 
 --- Gets the move speed of the NextBot.
