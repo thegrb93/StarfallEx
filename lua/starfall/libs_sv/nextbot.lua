@@ -17,6 +17,7 @@ SF.RegisterType("NextBot", false, true, debug.getregistry().NextBot, "Entity")
 SF.RegisterLibrary("nextbot")
 
 registerprivilege("nextbot.create", "Create nextbot", "Allows the user to create nextbots.")
+registerprivilege("nextbot.remove", "Remove a nextbot", "Allows the user to remove a nextbot.", {entites = {}})
 registerprivilege("nextbot.setGotoPos", "Set nextbot goto pos", "Allows the user to set a vector pos for the nextbot to try and go to.", {entites = {}})
 registerprivilege("nextbot.setApproachPos", "Nextbot approach goal", "Allows the user to make a nextbot approach a specified Vector.", {entites = {}})
 registerprivilege("nextbot.removeApproachPos", "Nextbot approach goal", "Allows the user to remove the approach pos from a nextbot.", {entites = {}})
@@ -57,34 +58,19 @@ registerprivilege("nextbot.setClimbAllowed", "Nextbot allow climb", "Allows the 
 registerprivilege("nextbot.setAvoidAllowed", "Nextbot allow avoid", "Allows the user to set whether the nextbot can try to avoid obstacles.", {entities = {}})
 registerprivilege("nextbot.setJumpGapsAllowed", "Nextbot allow jump gaps", "Allows the user to set whether the nextbot can jump gaps.", {entities = {}})
 
-local nbCount = SF.LimitObject("nextbots", "nextbots", 30, "The number of props allowed to spawn via Starfall")
+local entList = SF.EntManager("nextbots", "nextbots", 30, "The number of props allowed to spawn via Starfall")
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
-
-local nextbots = {}
 
 local nextbot_library, nb_meta, nb_methods = instance.Libraries.nextbot, instance.Types.NextBot, instance.Types.NextBot.Methods
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local navarea_methods, navarea_meta, navwrap, navunwrap = instance.Types.NavArea.Methods, instance.Types.NavArea, instance.Types.NavArea.Wrap, instance.Types.NavArea.Unwrap
 local nbwrap, nbunwrap = instance.Types.NextBot.Wrap, instance.Types.NextBot.Unwrap
 
-local function nextbotOnDestroy(ent)
-	local ply = instance.player
-	nbCount:free(ply, 1)
-	nextbots[ent] = nil
-end
-
-local function register(ent)
-	ent:CallOnRemove("starfall_nextbot_delete", nextbotOnDestroy)
-	nbCount:free(instance.player, -1)
-	nextbots[ent] = true
-end
 
 instance:AddHook("deinitialize", function()
-	for nextbot in pairs(nextbots) do
-		nextbot:Remove()
-	end
+	entList:deinitialize(instance, true)
 end)
 
 function nb_meta:__tostring()
@@ -103,7 +89,7 @@ function nextbot_library.create(pos, mdl)
 
 	local ply = instance.player
 	mdl = SF.CheckModel(mdl, ply)
-	nbCount:checkuse(ply, 1)
+	entList:checkuse(ply, 1)
 
 	local nb = ents.Create("starfall_cnextbot")
 	register(nb, instance)
@@ -112,19 +98,26 @@ function nextbot_library.create(pos, mdl)
 	nb.chip = instance.entity
 	nb:Spawn()
 	nb:SetCreator(ply)
-	nextbots[nb] = true
+	entList:register(instance, nb)
 
 	if CPPI then nb:CPPISetOwner(ply == SF.Superuser and NULL or ply) end
 
 	return nbwrap(nb)
 end
-	
+
+--- Removes the given nextbot.
+function nextbot_library:remove()
+	local nb = nbunwrap(self)
+	checkpermission(instance, nb, "nextbot.remove")
+	entList:remove(instance, nb)
+end
+
 --- Checks if a user can spawn anymore nextbots.
 -- @server
 -- @return boolean True if user can spawn nextbots, False if not.
 function nextbot_library.canSpawn()
 	if not SF.Permissions.hasAccess(instance, nil, "nextbot.create") then return false end
-	return nbCount:check(instance.player) > 0
+	return entList:check(instance.player) > 0
 end
 
 --- Makes the nextbot try to go to a specified position without using navmesh pathfinding (in a straight line).

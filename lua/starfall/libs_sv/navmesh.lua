@@ -28,7 +28,7 @@ SF.RegisterLibrary("navmesh")
 SF.RegisterType("NavArea", true, false, nil, "LockedNavArea")
 SF.RegisterType("LockedNavArea", true, false) -- NavArea that can't be modified.
 
-local plyCount = SF.LimitObject("navareas", "navareas", 40, "The number of CNavAreas allowed to spawn via Starfall")
+local entList = SF.EntManager("navareas", "navareas", 40, "The number of CNavAreas allowed to spawn via Starfall")
 
 return function(instance)
 	local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
@@ -43,23 +43,6 @@ return function(instance)
 	local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 	local cunwrap = instance.Types.Color.Unwrap
 
-	local navareas = {}
-
-	local function register(navarea)
-		plyCount:free(instance.player, -1)
-		navareas[navarea] = true
-	end
-
-	local function destroy(navarea)
-		plyCount:free(instance.player, 1)
-
-		if navarea and navarea:IsValid() then
-			navarea:Remove()
-		end
-
-
-		navareas[navarea] = nil
-	end
 
 	local getent
 	instance:AddHook("initialize", function()
@@ -67,9 +50,7 @@ return function(instance)
 	end)
 
 	instance:AddHook("deinitialize", function()
-		for navarea in pairs(navareas) do
-			destroy(navarea)
-		end
+		entList:deinitialize(instance, true)
 	end)
 
 	function lnavarea_meta:__tostring()
@@ -165,11 +146,11 @@ return function(instance)
 	-- @return NavArea? The new NavArea or nil if we failed for some reason
 	function navmesh_library.createNavArea(corner, opposite_corner)
 		checkpermission(instance, nil, "navarea.create")
-		plyCount:checkuse(instance.player, 1)
+		entList:checkuse(instance.player, 1)
 
 		local area = navmesh.CreateNavArea( vunwrap(corner), vunwrap(opposite_corner) )
 		if area then
-			register(area)
+			entList:register(instance, area)
 			return navwrap(area)
 		end
 	end
@@ -659,7 +640,6 @@ return function(instance)
 		return lnavunwrap(self):PlaceOnGround(corner)
 	end
 
-
 	--- Removes a CNavArea from the Open List with the lowest cost to traverse to from the starting node, and returns it.
 	-- Requires the `navarea.openlist` permission
 	-- @return NavArea The CNavArea from the Open List with the lowest cost to traverse to from the starting node.
@@ -669,12 +649,10 @@ return function(instance)
 		return lnavwrap( lnavunwrap(self):PopOpenList() )
 	end
 
-
 	--- Removes the given NavArea.
 	function navarea_methods:remove()
 		local nav = navunwrap(self)
-
-		destroy(nav)
+		entList:remove(instance, nav)
 
 		local sensitive2sf, sf2sensitive = navarea_meta.sensitive2sf, navarea_meta.sf2sensitive
 		sensitive2sf[nav] = nil

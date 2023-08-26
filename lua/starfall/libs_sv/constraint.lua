@@ -14,13 +14,7 @@ registerprivilege("constraints.elastic", "Elastic", "Allows the user to elastic 
 registerprivilege("constraints.nocollide", "Nocollide", "Allows the user to nocollide two entities", { entities = {} })
 registerprivilege("constraints.any", "Any", "General constraint functions", { entities = {} })
 
-local plyCount = SF.LimitObject("constraints", "constraints", 600, "The number of constraints allowed to spawn via Starfall")
-
-local function constraintOnDestroy(ent, constraints, ply)
-	plyCount:free(ply, 1)
-	constraints[ent] = nil
-end
-
+local entList = SF.EntManager("constraints", "constraints", 600, "The number of constraints allowed to spawn via Starfall")
 
 --- Library for creating and manipulating constraints.
 -- @name constraint
@@ -38,24 +32,15 @@ SF.RegisterType("Constraint", true, false)
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
-
 local getent
-local constraints = {}
-local constraintsClean = true
 instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
 end)
 
+local constraintsClean = true
+
 instance:AddHook("deinitialize", function()
-	if constraintsClean then
-		for ent, _ in pairs(constraints) do
-			if (ent and ent:IsValid()) then
-				ent:RemoveCallOnRemove("starfall_constraint_delete")
-				constraintOnDestroy(ent, constraints, instance.player)
-				ent:Remove()
-			end
-		end
-	end
+	entList:deinitialize(instance, constraintsClean)
 end)
 
 local constraint_library = instance.Libraries.constraint
@@ -86,7 +71,13 @@ end
 function constr_methods:remove()
 	local ent = cunwrap(self)
 	check_constr_perms(ent)
-	ent:Remove()
+	entList:remove(instance, ent)
+end
+
+--- Removes all constraints created by the calling chip
+-- @server
+function constraint_library.removeAll()
+	entList:clear(instance)
 end
 
 --- Returns whether the constraint is valid or not
@@ -112,13 +103,6 @@ local function checkConstraint(e, t)
 	end
 end
 
-local function register(ent, instance)
-	local ply = instance.player
-	ent:CallOnRemove("starfall_constraint_delete", constraintOnDestroy, constraints, ply)
-	plyCount:free(ply, -1)
-	constraints[ent] = true
-end
-
 --- Welds two entities
 -- @param Entity e1 The first entity
 -- @param Entity e2 The second entity
@@ -129,7 +113,7 @@ end
 -- @return Constraint The constraint entity
 -- @server
 function constraint_library.weld(e1, e2, bone1, bone2, force_lim, nocollide)
-	plyCount:checkuse(instance.player, 1)
+	entList:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -148,7 +132,7 @@ function constraint_library.weld(e1, e2, bone1, bone2, force_lim, nocollide)
 
 	local ent = constraint.Weld(ent1, ent2, bone1, bone2, force_lim, nocollide)
 	if ent then
-		register(ent, instance)
+		entList:register(instance, ent)
 		return cwrap(ent)
 	end
 end
@@ -168,7 +152,7 @@ end
 -- @return Constraint The constraint entity
 -- @server
 function constraint_library.axis(e1, e2, bone1, bone2, v1, v2, force_lim, torque_lim, friction, nocollide, laxis)
-	plyCount:checkuse(instance.player, 1)
+	entList:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -194,7 +178,7 @@ function constraint_library.axis(e1, e2, bone1, bone2, v1, v2, force_lim, torque
 
 	local ent = constraint.Axis(ent1, ent2, bone1, bone2, vec1, vec2, force_lim, torque_lim, friction, nocollide, axis)
 	if ent then
-		register(ent, instance)
+		entList:register(instance, ent)
 		return cwrap(ent)
 	end
 end
@@ -211,7 +195,7 @@ end
 -- @return Constraint The constraint entity
 -- @server
 function constraint_library.ballsocket(e1, e2, bone1, bone2, pos, force_lim, torque_lim, nocollide)
-	plyCount:checkuse(instance.player, 1)
+	entList:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -233,7 +217,7 @@ function constraint_library.ballsocket(e1, e2, bone1, bone2, pos, force_lim, tor
 
 	local ent = constraint.Ballsocket(ent1, ent2, bone1, bone2, vec1, force_lim, torque_lim, nocollide)
 	if ent then
-		register(ent, instance)
+		entList:register(instance, ent)
 		return cwrap(ent)
 	end
 end
@@ -255,7 +239,7 @@ end
 -- @return Constraint The constraint entity
 -- @server
 function constraint_library.ballsocketadv(e1, e2, bone1, bone2, v1, v2, force_lim, torque_lim, minv, maxv, frictionv, rotateonly, nocollide)
-	plyCount:checkuse(instance.player, 1)
+	entList:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -282,7 +266,7 @@ function constraint_library.ballsocketadv(e1, e2, bone1, bone2, v1, v2, force_li
 
 	local ent = constraint.AdvBallsocket(ent1, ent2, bone1, bone2, vec1, vec2, force_lim, torque_lim, mins.x, mins.y, mins.z, maxs.x, maxs.y, maxs.z, frictions.x, frictions.y, frictions.z, rotateonly, nocollide)
 	if ent then
-		register(ent, instance)
+		entList:register(instance, ent)
 		return cwrap(ent)
 	end
 end
@@ -303,7 +287,7 @@ end
 -- @return Constraint The constraint entity
 -- @server
 function constraint_library.elastic(index, e1, e2, bone1, bone2, v1, v2, const, damp, rdamp, width, stretch)
-	plyCount:checkuse(instance.player, 1)
+	entList:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -333,7 +317,7 @@ function constraint_library.elastic(index, e1, e2, bone1, bone2, v1, v2, const, 
 
 	local ent = constraint.Elastic(ent1, ent2, bone1, bone2, vec1, vec2, const, damp, rdamp, "cable/cable2", math.Clamp(width, 0, 50), stretch)
 	if ent then
-		register(ent, instance)
+		entList:register(instance, ent)
 
 		e1.Elastics[index] = ent
 		e2.Elastics[index] = ent
@@ -359,7 +343,7 @@ end
 -- @return Constraint The constraint entity
 -- @server
 function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, addlength, force_lim, width, material, rigid, color)
-	plyCount:checkuse(instance.player, 1)
+	entList:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -391,7 +375,7 @@ function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, ad
 
 	local ent = constraint.Rope(ent1, ent2, bone1, bone2, vec1, vec2, length, addlength, force_lim, math.Clamp(width, 0, 50), material, rigid, color)
 	if ent then
-		register(ent, instance)
+		entList:register(instance, ent)
 
 		e1.Ropes[index] = ent
 		e2.Ropes[index] = ent
@@ -411,7 +395,7 @@ end
 -- @server
 function constraint_library.slider(e1, e2, bone1, bone2, v1, v2, width)
 
-	plyCount:checkuse(instance.player, 1)
+	entList:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -431,7 +415,7 @@ function constraint_library.slider(e1, e2, bone1, bone2, v1, v2, width)
 
 	local ent = constraint.Slider(ent1, ent2, bone1, bone2, vec1, vec2, math.Clamp(width, 0, 50), "cable/cable2")
 	if ent then
-		register(ent, instance)
+		entList:register(instance, ent)
 		return cwrap(ent)
 	end
 end
@@ -445,7 +429,7 @@ end
 -- @server
 function constraint_library.nocollide(e1, e2, bone1, bone2)
 
-	plyCount:checkuse(instance.player, 1)
+	entList:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -461,7 +445,7 @@ function constraint_library.nocollide(e1, e2, bone1, bone2)
 
 	local ent = constraint.NoCollide(ent1, ent2, bone1, bone2)
 	if ent then
-		register(ent, instance)
+		entList:register(instance, ent)
 		return cwrap(ent)
 	end
 end
@@ -474,7 +458,7 @@ end
 -- @return Constraint The constraint entity
 -- @server
 function constraint_library.keepupright(e, ang, bone, lim)
-	plyCount:checkuse(instance.player, 1)
+	entList:checkuse(instance.player, 1)
 
 	e = eunwrap(e)
 	ang = aunwrap(ang)
@@ -487,9 +471,9 @@ function constraint_library.keepupright(e, ang, bone, lim)
 	checkluatype(bone, TYPE_NUMBER)
 	checkluatype(lim, TYPE_NUMBER)
 
-	local c = constraint.Keepupright(e, ang, bone, lim)
-	if c then
-		register(c, instance)
+	local ent = constraint.Keepupright(e, ang, bone, lim)
+	if ent then
+		entList:register(instance, ent)
 		return cwrap(ent)
 	end
 end
@@ -602,7 +586,7 @@ end
 -- @server
 -- @return number Number of constraints able to be spawned
 function constraint_library.constraintsLeft()
-	return plyCount:check(instance.player)
+	return entList:check(instance.player)
 end
 
 end

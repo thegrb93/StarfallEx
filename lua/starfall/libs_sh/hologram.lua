@@ -6,10 +6,10 @@ registerprivilege("hologram.modify", "Modify holograms", "Allows the user to mod
 registerprivilege("hologram.create", "Create hologram", "Allows the user to create holograms", CLIENT and { client = {} } or nil)
 registerprivilege("hologram.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { entities = {} })
 
-local plyCount = SF.LimitObject("holograms", "holograms", 200, "The number of holograms allowed to spawn via Starfall scripts for a single player")
+local entList = SF.EntManager("holograms", "holograms", 200, "The number of holograms allowed to spawn via Starfall scripts for a single player")
 local maxclips = CreateConVar("sf_holograms_maxclips", "8", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "The max number of clips per hologram entity")
 
-SF.ResourceCounters.Holograms = {icon = "icon16/bricks.png", count = function(ply) return plyCount:get(ply).val end}
+SF.ResourceCounters.Holograms = {icon = "icon16/bricks.png", count = function(ply) return entList:get(ply).val end}
 
 local entmeta = FindMetaTable("Entity")
 local cl_hologram_meta = {
@@ -58,53 +58,19 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
 
 local getent
-local holograms = {}
 instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
 	hologram_meta.__tostring = ent_meta.__tostring
 end)
 
-local function hologramOnDestroy(holo)
-	holograms[holo] = nil
-	plyCount:free(instance.player, 1)
-end
-
-local function removeHoloInternal(holo)
-	if holo:IsValid() then
-		holo:RemoveCallOnRemove("starfall_hologram_delete")
-		hologramOnDestroy(holo)
-		holo:Remove()
-	end
-end
-
-local function removeHolo(holo)
-	if CLIENT and instance.data.render.isRendering then SF.Throw("Cannot remove while in rendering hook!", 3) end
-	if not holo:IsValid() or not holo.IsSFHologram then SF.Throw("Invalid hologram!", 3) end
-	return removeHoloInternal(holo)
-end
-
-local function removeAllHolosInternal()
-	for holoent, _ in pairs(holograms) do 
-		removeHoloInternal(holoent) 
-	end
-end
-
-local function removeAllHolos()
-	for holoent, _ in pairs(holograms) do 
-		removeHolo(holoent) 
-	end
-end
-
 instance:AddHook("deinitialize", function()
-	if SERVER then
-		removeAllHolosInternal()
+	if SERVER or not instance.data.render.isRendering then
+		entList:deinitialize(instance, true)
 	else
-		if instance.data.render.isRendering then
-			-- Removing hologram in render hook = crash
-			timer.Simple(0, removeAllHolosInternal)
-		else
-			removeAllHolosInternal()
-		end
+		-- Removing hologram in render hook = crash
+		timer.Simple(0, function()
+			entList:deinitialize(instance, true)
+		end)
 	end
 end)
 
@@ -142,7 +108,7 @@ function hologram_library.create(pos, ang, model, scale)
 	ang = aunwrap(ang)
 	model = SF.CheckModel(model, ply)
 
-	plyCount:checkuse(ply, 1)
+	entList:checkuse(ply, 1)
 
 	local holoent
 	if SERVER then
@@ -151,16 +117,14 @@ function hologram_library.create(pos, ang, model, scale)
 			holoent:SetPos(SF.clampPos(pos))
 			holoent:SetAngles(ang)
 			holoent:SetModel(model)
-			holoent:CallOnRemove("starfall_hologram_delete", hologramOnDestroy)
 			holoent:Spawn()
 
 			if CPPI then holoent:CPPISetOwner(ply == SF.Superuser and NULL or ply) end
-			holograms[holoent] = true
 
 			if scale~=nil then
 				holoent:SetScale(vunwrap(scale))
 			end
-			plyCount:free(ply, -1)
+			entList:register(instance, holoent)
 			return wrap(holoent)
 		end
 	else
@@ -172,12 +136,10 @@ function hologram_library.create(pos, ang, model, scale)
 			holoent:SetAngles(ang)
 			holoent:SetModel(model)
 			holoent:SetRenderMode(RENDERGROUP_TRANSLUCENT)
-			holoent:CallOnRemove("starfall_hologram_delete", hologramOnDestroy)
 			
 			debug.setmetatable(holoent, cl_hologram_meta)
 
 			holoent:Spawn()
-			holograms[holoent] = true
 
 			if scale~=nil then
 				holoent:SetScale(vunwrap(scale))
@@ -185,7 +147,7 @@ function hologram_library.create(pos, ang, model, scale)
 				holoent:SetScale(Vector(1,1,1))
 			end
 
-			plyCount:free(ply, -1)
+			entList:register(instance, holoent)
 			return wrap(holoent)
 		end
 	end
@@ -195,14 +157,14 @@ end
 -- @return boolean True if user can spawn holograms, False if not.
 function hologram_library.canSpawn()
 	if not SF.Permissions.hasAccess(instance,  nil, "hologram.create") then return false end
-	return plyCount:check(instance.player) > 0
+	return entList:check(instance.player) > 0
 end
 
 --- Checks how many holograms can be spawned
 -- @return number Number of holograms able to be spawned
 function hologram_library.hologramsLeft()
 	if not SF.Permissions.hasAccess(instance,  nil, "hologram.create") then return 0 end
-	return plyCount:check(instance.player)
+	return entList:check(instance.player)
 end
 
 if SERVER then
@@ -504,15 +466,19 @@ end
 --- Removes a hologram
 -- @shared
 function hologram_methods:remove()
+	if CLIENT and instance.data.render.isRendering then SF.Throw("Cannot remove while in rendering hook!", 2) end
+
 	local holo = getholo(self)
+	if not (holo:IsValid() and holo.IsSFHologram) then SF.Throw("Invalid hologram!", 2) end
 	checkpermission(instance, holo, "hologram.create")
-	removeHolo(holo)
+	entList:remove(instance, holo)
 end
 
 --- Removes all holograms created by the calling chip
 -- @shared
 function hologram_library.removeAll()
-	removeAllHolos()
+	if CLIENT and instance.data.render.isRendering then SF.Throw("Cannot remove while in rendering hook!", 2) end
+	entList:clear(instance)
 end
 
 

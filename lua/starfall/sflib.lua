@@ -286,6 +286,48 @@ SF.LimitObject = {
 }
 setmetatable(SF.LimitObject, SF.LimitObject)
 
+--- Returns a class that handles entities spawned by an instance
+SF.EntManager = {
+	__index = {
+		register = function(self, instance, ent)
+			ent:CallOnRemove("starfall_entity_onremove", self.onremove, self, instance)
+			self.entsByInstance[instance][ent] = true
+			self:free(instance.player, -1)
+		end,
+		remove = function(self, instance, ent)
+			if ent:IsValid() then
+				-- The die function is called the next frame after 'Remove' which is too slow so call it ourself
+				local diefunc = ent.OnDieFunctions.starfall_entity_onremove
+				diefunc.Function(ent, unpack(diefunc.Args))
+				ent:RemoveCallOnRemove("starfall_entity_onremove")
+				ent:Remove()
+			end
+		end,
+		onremove = function(ent, self, instance)
+			self.entsByInstance[instance][ent] = nil
+			self:free(instance.player, 1)
+		end,
+		clear = function(self, instance)
+			for ent in pairs(self.entsByInstance[instance]) do
+				self:remove(instance, ent)
+			end
+		end,
+		deinitialize = function(self, instance, shouldclear)
+			if shouldclear then
+				self:clear(instance)
+			end
+			self.entsByInstance[instance] = nil
+		end
+	},
+	__call = function(p, ...)
+		local t = SF.LimitObject(...)
+		t.entsByInstance = setmetatable({},{__index = function(t,k) local r = {} t[k]=r return r end})
+		return setmetatable(t, p)
+	end
+}
+setmetatable(SF.EntManager, SF.EntManager)
+setmetatable(SF.EntManager.__index, SF.LimitObject)
+
 --- Returns a class that can limit per player and recycle a indestructable resource
 SF.ResourceHandler = {
 	__index = {
