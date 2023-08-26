@@ -30,6 +30,7 @@ function ENT:Initialize()
 	self.IgniteCallbacks = SF.HookTable()
 	self.NavChangeCallbacks = SF.HookTable()
 	self.ContactCallbacks = SF.HookTable()
+	self.ReachCallbacks = SF.HookTable()
 end
 
 function ENT:ChasePos(options)
@@ -74,6 +75,17 @@ function ENT:RunBehaviour()
 			self:ChasePos()
 			self:StartActivity(self.IDLEACT)
 			self.goTo = nil
+			self.ReachCallbacks:run(self.chip.instance)
+		elseif self.approachPos then
+			self.loco:SetDesiredSpeed(self.MoveSpeed)
+			self:StartActivity(self.RUNACT)
+			while self:GetPos():DistToSqr(self.approachPos) > 500 do
+				self.loco:Approach(self.approachPos, 1)
+				coroutine.yield()
+			end
+			self:StartActivity(self.IDLEACT)
+			self.approachPos = nil
+			self.ReachCallbacks:run(self.chip.instance)
 		end
 		coroutine.wait( 1 )
 		coroutine.yield()

@@ -18,6 +18,8 @@ SF.RegisterLibrary("nextbot")
 
 registerprivilege("nextbot.create", "Create nextbot", "Allows the user to create nextbots.")
 registerprivilege("nextbot.setGotoPos", "Set nextbot goto pos", "Allows the user to set a vector pos for the nextbot to try and go to.", {entites = {}})
+registerprivilege("nextbot.setApproachPos", "Nextbot approach goal", "Allows the user to make a nextbot approach a specified Vector.", {entites = {}})
+registerprivilege("nextbot.removeApproachPos", "Nextbot approach goal", "Allows the user to remove the approach pos from a nextbot.", {entites = {}})
 registerprivilege("nextbot.removeGotoPos", "Remove nextbot goto pos", "Allows the user to remove the goto pos from a nextbot.", {entites = {}})
 registerprivilege("nextbot.playSequence", "Play nextbot sequence", "Allows the user to set an animation for the nextbot to play.", {entites = {}})
 registerprivilege("nextbot.faceTowards", "Face nextbot towards", "Allows the user to make a nextbot face a position.", {entities = {}})
@@ -25,6 +27,8 @@ registerprivilege("nextbot.setRunAct", "Set nextbot run activity", "Allows the u
 registerprivilege("nextbot.setIdleAct", "Set nextbot idle activity", "Allows the user to set nextbot's idle animation.", {entities = {}})
 registerprivilege("nextbot.setVelocity", "Set nextbot velocity", "Allows the user to set nextbot's velocity.", {entities = {}})
 registerprivilege("nextbot.jump", "Nextbot jump", "Allows the user to force a nextbot to jump.", {entities = {}})
+registerprivilege("nextbot.addReachCallback", "Add nextbot approach callback", "Allows the user to add a callback function to run when the nextbot reaches its destination set by setApproachPos.", {entities = {}})
+registerprivilege("nextbot.removeReachCallback", "Remove nextbot approach callback", "Allows the user to remove an approach callback function from the nextbot.", {entities = {}})
 registerprivilege("nextbot.addDeathCallback", "Add nextbot death callback", "Allows the user to add a callback function to run when the nextbot dies.", {entities = {}})
 registerprivilege("nextbot.removeDeathCallback", "Remove nextbot death callback", "Allows the user to remove a death callback function from the nextbot.", {entities = {}})
 registerprivilege("nextbot.addInjuredCallback", "Add nextbot injured callback", "Allows the user to add a callback function to run when the nextbot is injured.", {entities = {}})
@@ -122,9 +126,25 @@ function nextbot_library.canSpawn()
 	if not SF.Permissions.hasAccess(instance, nil, "nextbot.create") then return false end
 	return nbCount:check(instance.player) > 0
 end
-	
 
---- Makes the nextbot try to go to a specified position.
+--- Makes the nextbot try to go to a specified position without using navmesh pathfinding (in a straight line).
+--- setGotoPos takes priority.
+-- @server
+-- @param Vector goal The vector we want to get to.
+function nb_methods:setApproachPos(goal, goalweight)
+	checkpermission(instance, nb, "nextbot.setApproachPos")
+	nbunwrap(self).approachPos = vunwrap(goal)
+end
+
+--- Removes the "approach" position from the NextBot.
+-- @server
+function nb_methods:removeApproachPos()
+	local nb = nbunwrap(self)
+	checkpermission(instance, nb, "nextbot.removeApproachPos")
+	nb.approachPos = nil
+end	
+
+--- Makes the nextbot try to go to a specified position using navmesh pathfinding.
 -- @server
 -- @param Vector gotopos The position the nextbot will continuosly try to go to.
 function nb_methods:setGotoPos(pos)
@@ -179,6 +199,8 @@ function nb_methods:setRunAct(act)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setRunAct")
 	nb.RUNACT = act
+	if !nb.goTo or !nb.approachPos then return end
+	nb:StartActivity(act)
 end
 
 --- Gets the activity the nextbot uses for running.
@@ -197,6 +219,8 @@ function nb_methods:setIdleAct(act)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setIdleAct")
 	nb.IDLEACT = act
+	if nb.goTo or nb.approachPos then return end
+	nb:StartActivity(act)
 end
 
 --- Gets the activity the nextbot uses for idling.
@@ -230,6 +254,28 @@ function nb_methods:jump()
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.jump")
 	nb.loco:Jump()
+end
+
+--- Adds a callback function that will be run when this nextbot reaches a destination set by setApproachPos or setGotoPos.
+-- @server
+-- @param string callbackid The unique ID this callback will use.
+-- @param function callback The function to run when the NB reaches its destination.
+function nb_methods:addReachCallback(id, func)
+	checkluatype(id, TYPE_STRING)
+	checkluatype(func, TYPE_FUNCTION)
+	local nb = nbunwrap(self)
+	checkpermission(instance, nb, "nextbot.addReachCallback")
+	nb.ReachCallbacks:add(id, func)
+end
+
+--- Removes a reach callback function from the NextBot.
+-- @server
+-- @param string callbackid The unique ID of the callback to remove.
+function nb_methods:removeReachCallback(id)
+	checkluatype(id, TYPE_STRING)
+	local nb = nbunwrap(self)
+	checkpermission(instance, nb, "nextbot.removeReachCallback")
+	nb.ReachCallbacks:remove(id)
 end
 
 --- Adds a callback function that will be run when this nextbot dies.
@@ -404,6 +450,7 @@ function nb_methods:setMoveSpeed(val)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setMoveSpeed")
 	nb.MoveSpeed = val
+	nb.loco:SetDesiredSpeed(val)
 end
 
 --- Gets the move speed of the NextBot.
