@@ -463,7 +463,7 @@ function hologram_methods:removeEffects(effect)
 	holo:RemoveEffects(effect)
 end
 
---- Removes all holograms created by the calling chip
+--- Removes a hologram
 -- @shared
 function hologram_methods:remove()
 	if CLIENT and instance.data.render.isRendering then SF.Throw("Cannot remove while in rendering hook!", 2) end

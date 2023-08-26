@@ -639,7 +639,6 @@ return function(instance)
 		return lnavunwrap(self):PlaceOnGround(corner)
 	end
 
-
 	--- Removes a CNavArea from the Open List with the lowest cost to traverse to from the starting node, and returns it.
 	-- Requires the `navarea.openlist` permission
 	-- @return NavArea The CNavArea from the Open List with the lowest cost to traverse to from the starting node.
@@ -648,7 +647,6 @@ return function(instance)
 
 		return lnavwrap( lnavunwrap(self):PopOpenList() )
 	end
-
 
 	--- Removes the given NavArea.
 	function navarea_methods:remove()

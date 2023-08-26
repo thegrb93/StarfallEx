@@ -292,7 +292,7 @@ SF.EntManager = {
 		register = function(self, instance, ent)
 			ent:CallOnRemove("starfall_entity_onremove", self.onremove, self, instance)
 			self.entsByInstance[instance][ent] = true
-			self.limit:free(instance.player, -1)
+			self:free(instance.player, -1)
 		end,
 		remove = function(self, instance, ent)
 			if ent:IsValid() then
@@ -305,7 +305,7 @@ SF.EntManager = {
 		end,
 		onremove = function(ent, self, instance)
 			self.entsByInstance[instance][ent] = nil
-			self.limit:free(instance.player, 1)
+			self:free(instance.player, 1)
 		end,
 		clear = function(self, instance)
 			for ent in pairs(self.entsByInstance[instance]) do
