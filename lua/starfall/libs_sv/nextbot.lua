@@ -19,6 +19,7 @@ SF.RegisterLibrary("nextbot")
 registerprivilege("nextbot.create", "Create nextbot", "Allows the user to create nextbots.")
 registerprivilege("nextbot.setGotoPos", "Set nextbot goto pos", "Allows the user to set a vector pos for the nextbot to try and go to.", {entites = {}})
 registerprivilege("nextbot.setApproachPos", "Nextbot approach goal", "Allows the user to make a nextbot approach a specified Vector.", {entites = {}})
+registerprivilege("nextbot.removeApproachPos", "Nextbot approach goal", "Allows the user to remove the approach pos from a nextbot.", {entites = {}})
 registerprivilege("nextbot.removeGotoPos", "Remove nextbot goto pos", "Allows the user to remove the goto pos from a nextbot.", {entites = {}})
 registerprivilege("nextbot.playSequence", "Play nextbot sequence", "Allows the user to set an animation for the nextbot to play.", {entites = {}})
 registerprivilege("nextbot.faceTowards", "Face nextbot towards", "Allows the user to make a nextbot face a position.", {entities = {}})
@@ -134,6 +135,14 @@ function nb_methods:setApproachPos(goal, goalweight)
 	checkpermission(instance, nb, "nextbot.setApproachPos")
 	nbunwrap(self).approachPos = vunwrap(goal)
 end
+
+--- Removes the "approach" position from the NextBot.
+-- @server
+function nb_methods:removeApproachPos()
+	local nb = nbunwrap(self)
+	checkpermission(instance, nb, "nextbot.removeApproachPos")
+	nb.approachPos = nil
+end	
 
 --- Makes the nextbot try to go to a specified position using navmesh pathfinding.
 -- @server
