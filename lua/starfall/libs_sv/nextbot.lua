@@ -134,7 +134,18 @@ function nb_methods:removeApproachPos()
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.removeApproachPos")
 	nb.approachPos = nil
-end	
+end
+
+--- Returns the Vector the nextbot is trying to go to, set by setApproachPos
+-- @server
+-- @return Vector? Where the nextbot is trying to go to if it exists, else returns nil.
+function nb_methods:getApproachPos()
+	local nb = nbunwrap(self)
+	if nb.approachPos then
+		return vwrap(nb.approachPos)
+	else return nil 
+	end
+end
 
 --- Makes the nextbot try to go to a specified position using navmesh pathfinding.
 -- @server
