@@ -28,7 +28,7 @@ SF.RegisterLibrary("navmesh")
 SF.RegisterType("NavArea", true, false, nil, "LockedNavArea")
 SF.RegisterType("LockedNavArea", true, false) -- NavArea that can't be modified.
 
-local entList = SF.EntManager("navareas", "navareas", 40, "The number of CNavAreas allowed to spawn via Starfall")
+local entList = SF.EntManager("navareas", "navareas", 40, "The number of CNavAreas allowed to spawn via Starfall", 1, true)
 
 return function(instance)
 	local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end

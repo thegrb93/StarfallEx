@@ -290,12 +290,10 @@ setmetatable(SF.LimitObject, SF.LimitObject)
 SF.EntManager = {
 	__index = {
 		register = function(self, instance, ent)
-			local function sf_on_remove() self:onremove(instance, ent) end
-			ent.sf_on_remove = sf_on_remove
-
-			local callOnRemove = ent.CallOnRemove
-			if callOnRemove then
-				callOnRemove(ent, "starfall_entity_onremove", sf_on_remove)
+			if not self.nocallonremove then
+				local function sf_on_remove() self:onremove(instance, ent) end
+				ent.sf_on_remove = sf_on_remove
+				ent:CallOnRemove("starfall_entity_onremove", sf_on_remove)
 			end
 
 			self.entsByInstance[instance][ent] = true
@@ -303,13 +301,13 @@ SF.EntManager = {
 		end,
 		remove = function(self, instance, ent)
 			if ent:IsValid() then
-				-- The die function is called the next frame after 'Remove' which is too slow so call it ourself
-				local removeCallOnRemove = ent.RemoveCallOnRemove
-				if removeCallOnRemove then
-					removeCallOnRemove(ent, "starfall_entity_onremove")
+				if self.nocallonremove then
+					self:onremove(instance, ent)
+				else
+					-- The die function is called the next frame after 'Remove' which is too slow so call it ourself
+					ent:RemoveCallOnRemove("starfall_entity_onremove")
+					ent.sf_on_remove()
 				end
-				ent.sf_on_remove()
-
 				ent:Remove()
 			end
 		end,
@@ -329,8 +327,9 @@ SF.EntManager = {
 			self.entsByInstance[instance] = nil
 		end
 	},
-	__call = function(p, ...)
-		local t = SF.LimitObject(...)
+	__call = function(p, cvarname, limitname, max, maxhelp, scale, nocallonremove)
+		local t = SF.LimitObject(cvarname, limitname, max, maxhelp, scale)
+		t.nocallonremove = nocallonremove or false
 		t.entsByInstance = setmetatable({},{__index = function(t,k) local r = {} t[k]=r return r end})
 		return setmetatable(t, p)
 	end
