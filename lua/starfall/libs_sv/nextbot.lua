@@ -92,7 +92,6 @@ function nextbot_library.create(pos, mdl)
 	entList:checkuse(ply, 1)
 
 	local nb = ents.Create("starfall_cnextbot")
-	register(nb, instance)
 	nb:SetPos(upos)
 	nb:SetModel(mdl)
 	nb.chip = instance.entity

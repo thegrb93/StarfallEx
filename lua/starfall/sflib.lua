@@ -290,20 +290,30 @@ setmetatable(SF.LimitObject, SF.LimitObject)
 SF.EntManager = {
 	__index = {
 		register = function(self, instance, ent)
-			ent:CallOnRemove("starfall_entity_onremove", self.onremove, self, instance)
+			local function sf_on_remove() self:onremove(instance, ent) end
+			ent.sf_on_remove = sf_on_remove
+
+			local callOnRemove = ent.CallOnRemove
+			if callOnRemove then
+				callOnRemove(ent, "starfall_entity_onremove", sf_on_remove)
+			end
+
 			self.entsByInstance[instance][ent] = true
 			self:free(instance.player, -1)
 		end,
 		remove = function(self, instance, ent)
 			if ent:IsValid() then
 				-- The die function is called the next frame after 'Remove' which is too slow so call it ourself
-				local diefunc = ent.OnDieFunctions.starfall_entity_onremove
-				diefunc.Function(ent, unpack(diefunc.Args))
-				ent:RemoveCallOnRemove("starfall_entity_onremove")
+				local removeCallOnRemove = ent.RemoveCallOnRemove
+				if removeCallOnRemove then
+					removeCallOnRemove(ent, "starfall_entity_onremove")
+				end
+				ent.sf_on_remove()
+
 				ent:Remove()
 			end
 		end,
-		onremove = function(ent, self, instance)
+		onremove = function(self, instance, ent)
 			self.entsByInstance[instance][ent] = nil
 			self:free(instance.player, 1)
 		end,
