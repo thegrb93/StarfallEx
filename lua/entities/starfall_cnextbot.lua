@@ -79,7 +79,7 @@ function ENT:RunBehaviour()
 		elseif self.approachPos then
 			self.loco:SetDesiredSpeed(self.MoveSpeed)
 			self:StartActivity(self.RUNACT)
-			while self:GetPos():DistToSqr(self.approachPos) > 500 do
+			while self.approachPos and self:GetPos():DistToSqr(self.approachPos) > 500 do
 				self.loco:Approach(self.approachPos, 1)
 				coroutine.yield()
 			end
