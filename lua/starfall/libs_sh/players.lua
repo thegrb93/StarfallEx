@@ -5,12 +5,13 @@ local registerprivilege = SF.Permissions.registerPrivilege
 if SERVER then
 	-- Register privileges
 	registerprivilege("player.dropweapon", "DropWeapon", "Drops a weapon from the player", { entities = {} })
-	registerprivilege("player.setArmor", "SetArmor", "Allows changing a player's armor", { usergroups = { default = 1 }, entities = {} })
-	registerprivilege("player.setMaxArmor", "SetMaxArmor", "Allows changing a player's max armor", { usergroups = { default = 1 }, entities = {} })
 	registerprivilege("player.setammo", "SetAmmo", "Whether a player can set their ammo", { usergroups = { default = 1 }, entities = {} })
 else
 	registerprivilege("player.getFriendStatus", "FriendStatus", "Whether friend status can be retrieved", { client = { default = 1 } })
 end
+registerprivilege("player.setArmor", "SetArmor", "Allows changing a player's armor", { usergroups = { default = 1 }, entities = {} })
+registerprivilege("player.setMaxArmor", "SetMaxArmor", "Allows changing a player's max armor", { usergroups = { default = 1 }, entities = {} })
+registerprivilege("player.modifyMovementProperties", "ModifyMovementProperties", "Allows various changes to a player's movement", { usergroups = { default = 1 }, entities = {} })
 
 -- Player animation
 local playerAnimAdd
@@ -141,13 +142,83 @@ function player_methods:getArmor()
 	return getply(self):Armor()
 end
 
---- Returns maximum armor capacity
+--- Returns the players maximum armor capacity
 -- @shared
 -- @return number Armor limit
 function player_methods:getMaxArmor()
 	return getply(self):GetMaxArmor()
 end
-	
+
+--- Returns the players Crouched Walk Speed
+-- @shared
+-- @return number Crouch Walk Speed value
+function player_methods:getCrouchedWalkSpeed()
+	return getply(self):GetCrouchedWalkSpeed()
+end
+
+--- Returns the players Duck Speed, a rate from 0-1 for how quickly they can crouch
+-- @shared
+-- @return number Duck Speed value
+function player_methods:getDuckSpeed()
+	return getply(self):GetDuckSpeed()
+end
+
+--- Returns the players UnDuck Speed, a rate from 0-1 for how quickly they can uncrouch
+-- @shared
+-- @return number UnDuck Speed value
+function player_methods:getUnDuckSpeed()
+	return getply(self):GetUnDuckSpeed()
+end
+
+--- Returns the players Ladder Climb Speed, probably unstable
+-- @shared
+-- @return number Ladder Climb Speed value
+function player_methods:getLadderClimbSpeed()
+	return getply(self):GetLadderClimbSpeed()
+end
+
+--- Returns the players Max Speed, probably unstable
+-- @shared
+-- @return number Max Speed value
+function player_methods:getMaxSpeed()
+	return getply(self):GetMaxSpeed()
+end
+
+--- Returns the players Run Speed, which is +speed
+-- @shared
+-- @return number Run Speed value
+function player_methods:getRunSpeed()
+	return getply(self):GetRunSpeed()
+end
+
+--- Returns the players Slow Walk, which is +walk
+-- @shared
+-- @return number Slow Walk Speed value
+function player_methods:getSlowWalkSpeed()
+	return getply(self):GetSlowWalkSpeed()
+end
+
+--- Returns the players Walk
+-- @shared
+-- @return number Walk Speed value
+function player_methods:getWalkSpeed()
+	return getply(self):GetWalkSpeed()
+end
+
+--- Returns the players Jump Power
+-- @shared
+-- @return number Jump Power value
+function player_methods:getJumpPower()
+	return getply(self):GetJumpPower()
+end
+
+--- Returns the players Friction
+-- @shared
+-- @return number Friction value
+function player_methods:getFriction()
+	return getply(self):GetFriction()
+end
+
 --- Returns whether the player is crouching
 -- @shared
 -- @return boolean True if player crouching
@@ -204,39 +275,11 @@ function player_methods:getFOV()
 	return getply(self):GetFOV()
 end
 
---- Returns the player's jump power
--- @shared
--- @return number Jump power
-function player_methods:getJumpPower()
-	return getply(self):GetJumpPower()
-end
-
---- Returns the player's maximum speed
--- @shared
--- @return number Maximum speed
-function player_methods:getMaxSpeed()
-	return getply(self):GetMaxSpeed()
-end
-
 --- Returns the player's name
 -- @shared
 -- @return string Name
 function player_methods:getName()
 	return getply(self):GetName()
-end
-
---- Returns the player's running speed
--- @shared
--- @return number Running speed
-function player_methods:getRunSpeed()
-	return getply(self):GetRunSpeed()
-end
-
---- Returns the player's duck speed
--- @shared
--- @return number Duck speed in seconds
-function player_methods:getDuckSpeed()
-	return getply(self):GetDuckSpeed()
 end
 
 --- Returns the entity the player is currently using, like func_tank mounted turrets or +use prop pickups.
@@ -609,7 +652,7 @@ if SERVER then
 		ent:SetArmor(val)
 	end
 		
-	--- Sets the maximum armor for player. Note, that you can still set a player's armor above this amount with Player:setArmor.
+	--- Sets the maximum armor for player. You can still set a player's armor above this amount with Player:setArmor.
 	-- @server
 	-- @param number newmaxarmor New max armor value.
 	function player_methods:setMaxArmor(val)
@@ -617,6 +660,106 @@ if SERVER then
 		checkpermission(instance, ent, "player.setMaxArmor")
 		checkluatype(val, TYPE_NUMBER)
 		ent:SetMaxArmor(val)
+	end
+	
+	--- Sets Crouched Walk Speed
+	-- @server
+	-- @param number newcwalkspeed New Crouch Walk speed.
+	function player_methods:setCrouchedWalkSpeed(val)
+		local ent = getply(self)
+		checkpermission(instance, ent, "player.modifyMovementProperties")
+		checkluatype(val, TYPE_NUMBER)
+		ent:SetCrouchedWalkSpeed(val)
+	end
+	
+	--- Sets Duck Speed
+	-- @server
+	-- @param number newduckspeed New Duck speed.
+	function player_methods:setDuckSpeed(val)
+		local ent = getply(self)
+		checkpermission(instance, ent, "player.modifyMovementProperties")
+		checkluatype(val, TYPE_NUMBER)
+		ent:SetDuckSpeed(math.clamp(val,0.005,0.995)
+	end
+	
+	--- Sets UnDuck Speed
+	-- @server
+	-- @param number newunduckspeed New UnDuck speed.
+	function player_methods:setUnDuckSpeed(val)
+		local ent = getply(self)
+		checkpermission(instance, ent, "player.modifyMovementProperties")
+		checkluatype(val, TYPE_NUMBER)
+		ent:SetUnDuckSpeed(math.clamp(val,0.005,0.995)
+	end
+	
+	--- Sets Ladder Climb Speed, probably unstable
+	-- @server
+	-- @param number newladderclimbspeed New Ladder Climb speed.
+	function player_methods:setLadderClimbSpeed(val)
+		local ent = getply(self)
+		checkpermission(instance, ent, "player.modifyMovementProperties")
+		checkluatype(val, TYPE_NUMBER)
+		ent:SetLadderClimbSpeed(val)
+	end
+	
+	--- Sets Max Speed
+	-- @server
+	-- @param number newmaxspeed New Max speed.
+	function player_methods:setMaxSpeed(val)
+		local ent = getply(self)
+		checkpermission(instance, ent, "player.modifyMovementProperties")
+		checkluatype(val, TYPE_NUMBER)
+		ent:SetMaxSpeed(val)
+	end
+	
+	--- Sets Run Speed ( +speed )
+	-- @server
+	-- @param number newrunspeed New Run speed.
+	function player_methods:setRunSpeed(val)
+		local ent = getply(self)
+		checkpermission(instance, ent, "player.modifyMovementProperties")
+		checkluatype(val, TYPE_NUMBER)
+		ent:SetRunSpeed(val)
+	end
+	
+	--- Sets Slow Walk Speed ( +walk )
+	-- @server
+	-- @param number newslowwalkspeed New Slow Walk speed.
+	function player_methods:setSlowWalkSpeed(val)
+		local ent = getply(self)
+		checkpermission(instance, ent, "player.modifyMovementProperties")
+		checkluatype(val, TYPE_NUMBER)
+		ent:SetSlowWalkSpeed(val)
+	end
+	
+	--- Sets Walk Speed
+	-- @server
+	-- @param number newwalkspeed New Walk speed.
+	function player_methods:setWalkSpeed(val)
+		local ent = getply(self)
+		checkpermission(instance, ent, "player.modifyMovementProperties")
+		checkluatype(val, TYPE_NUMBER)
+		ent:SetWalkSpeed(val)
+	end
+	
+	--- Sets Jump Power
+	-- @server
+	-- @param number newjumppower New Jump Power.
+	function player_methods:setJumpPower(val)
+		local ent = getply(self)
+		checkpermission(instance, ent, "player.modifyMovementProperties")
+		checkluatype(val, TYPE_NUMBER)
+		ent:SetJumpPower(val)
+	end
+	
+	--- Sets Friction
+	-- @server
+	-- @param number newfriction New Friction.
+	function player_methods:setFriction(val)
+		local ent = getply(self)
+		checkpermission(instance, ent, "player.modifyMovementProperties")
+		checkluatype(val, TYPE_NUMBER)
+		ent:SetFriction(math.clamp(val,0,10))
 	end
 end
 
