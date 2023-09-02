@@ -676,7 +676,7 @@ if SERVER then
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.modifyMovementProperties")
 		checkluatype(val, TYPE_NUMBER)
-		ent:SetCrouchedWalkSpeed(val)
+		ent:SetCrouchedWalkSpeed(math.Clamp(val,0,1))
 	end
 	
 	--- Sets Duck Speed
@@ -706,7 +706,7 @@ if SERVER then
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.modifyMovementProperties")
 		checkluatype(val, TYPE_NUMBER)
-		ent:SetLadderClimbSpeed(val)
+		ent:SetLadderClimbSpeed(math.max(val,0))
 	end
 	
 	--- Sets Max Speed
@@ -716,7 +716,7 @@ if SERVER then
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.modifyMovementProperties")
 		checkluatype(val, TYPE_NUMBER)
-		ent:SetMaxSpeed(val)
+		ent:SetMaxSpeed(math.max(val,0))
 	end
 	
 	--- Sets Run Speed ( +speed )
@@ -726,7 +726,7 @@ if SERVER then
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.modifyMovementProperties")
 		checkluatype(val, TYPE_NUMBER)
-		ent:SetRunSpeed(val)
+		ent:SetRunSpeed(math.max(val,0))
 	end
 	
 	--- Sets Slow Walk Speed ( +walk )
@@ -736,7 +736,7 @@ if SERVER then
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.modifyMovementProperties")
 		checkluatype(val, TYPE_NUMBER)
-		ent:SetSlowWalkSpeed(val)
+		ent:SetSlowWalkSpeed(math.max(val,0))
 	end
 	
 	--- Sets Walk Speed
@@ -746,7 +746,7 @@ if SERVER then
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.modifyMovementProperties")
 		checkluatype(val, TYPE_NUMBER)
-		ent:SetWalkSpeed(val)
+		ent:SetWalkSpeed(math.max(val,0))
 	end
 	
 	--- Sets Jump Power
@@ -756,7 +756,7 @@ if SERVER then
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.modifyMovementProperties")
 		checkluatype(val, TYPE_NUMBER)
-		ent:SetJumpPower(val)
+		ent:SetJumpPower(math.max(val,0))
 	end
 	
 	--- Sets Step Size
@@ -766,7 +766,7 @@ if SERVER then
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.modifyMovementProperties")
 		checkluatype(val, TYPE_NUMBER)
-		ent:SetStepSize(val)
+		ent:SetStepSize(math.max(val,0))
 	end
 	
 	--- Sets Friction
