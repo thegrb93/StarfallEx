@@ -679,7 +679,7 @@ if SERVER then
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.modifyMovementProperties")
 		checkluatype(val, TYPE_NUMBER)
-		ent:SetDuckSpeed(math.clamp(val,0.005,0.995))
+		ent:SetDuckSpeed(math.Clamp(val,0.005,0.995))
 	end
 	
 	--- Sets UnDuck Speed
@@ -689,7 +689,7 @@ if SERVER then
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.modifyMovementProperties")
 		checkluatype(val, TYPE_NUMBER)
-		ent:SetUnDuckSpeed(math.clamp(val,0.005,0.995))
+		ent:SetUnDuckSpeed(math.Clamp(val,0.005,0.995))
 	end
 	
 	--- Sets Ladder Climb Speed, probably unstable
@@ -759,7 +759,7 @@ if SERVER then
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.modifyMovementProperties")
 		checkluatype(val, TYPE_NUMBER)
-		ent:SetFriction(math.clamp(val,0,10))
+		ent:SetFriction(math.Clamp(val,0,10))
 	end
 end
 
