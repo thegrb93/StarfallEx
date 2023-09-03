@@ -472,6 +472,7 @@ function instance:cleanupRender()
 	render.ResetModelLighting(1, 1, 1)
 	render.DepthRange(0, 1)
 	render.SuppressEngineLighting(false)
+	render.SetWriteDepthToDestAlpha(true)
 	pp.colour:SetTexture("$fbtexture", tex_screenEffect)
 	pp.downsample:SetTexture("$fbtexture", tex_screenEffect)
 	for i = #matrix_stack, 1, -1 do
@@ -548,6 +549,14 @@ end
 function render_library.suppressEngineLighting(enable)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	render.SuppressEngineLighting(enable)
+end
+
+--- Sets the internal parameter INT_RENDERPARM_WRITE_DEPTH_TO_DESTALPHA. Allows creation of RTs with alpha masks.
+--- Check https://wiki.facepunch.com/gmod/render.SetWriteDepthToDestAlpha for example.
+-- @param boolean enable True to write depth to destination alpha.
+function render_library.setWriteDepthToDestAlpha(enable)
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	render.SetWriteDepthToDestAlpha(enable)
 end
 	
 --- Sets up the ambient lighting for any upcoming render operation. Ambient lighting can be seen as a cube enclosing the object to be drawn, each of its faces representing a directional light source that shines towards the object.
