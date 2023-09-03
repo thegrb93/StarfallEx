@@ -1296,4 +1296,76 @@ env.NAV_TRAVERSE_TYPE = {
 	GO_ELEVATOR_DOWN = 8
 }
 
+-- ENUMs used for anything that returns a damage type.
+-- @name builtins_library.DAMAGE
+-- @class table
+-- @field GENERIC
+-- @field CRUSH
+-- @field BULLET
+-- @field SPLASH
+-- @field BURN
+-- @field VEHICLE
+-- @field FALL
+-- @field BLAST
+-- @field CLUB
+-- @field SHOCK
+-- @field SONIC
+-- @field ENERGYBEAM
+-- @field PREVENTPHYSICSFORCE
+-- @field NEVERGIB
+-- @field ALWAYSGIB
+-- @field DROWN
+-- @field PARALYZE
+-- @field NERVEGAS
+-- @field POISON
+-- @field RADIATION
+-- @field DROWNRECOVER
+-- @field ACID
+-- @field SLOWBURN
+-- @field REMOVENORAGDOLL
+-- @field PHYSGUN
+-- @field PLASMA
+-- @field AIRBOAT
+-- @field DISSOLVE
+-- @field BLASTSURFACE
+-- @field DIRECT
+-- @field BUCKSHOT
+-- @field SNIPER
+-- @field MISSILEDEFENSE
+env.DAMAGE = {
+	["GENERIC"] = 0,
+	["CRUSH"] = 1,
+	["BULLET"] = 2,
+	["SLASH"] = 4,
+	["BURN"] = 8,
+	["VEHICLE"] = 16,
+	["FALL"] = 32,
+	["BLAST"] = 64,
+	["CLUB"] = 128,
+	["SHOCK"] = 256,
+	["SONIC"] = 512,
+	["ENERGYBEAM"] = 1024,
+	["PREVENTPHYSICSFORCE"] = 2048,
+	["NEVERGIB"] = 4096,
+	["ALWAYSGIB"] = 8192,
+	["DROWN"] = 16384,
+	["PARALYZE"] = 32768,
+	["NERVEGAS"] = 65536,
+	["POISON"] = 131072,
+	["RADIATION"] = 262144,
+	["DROWNRECOVER"] = 524288,
+	["ACID"] = 1048576,
+	["SLOWBURN"] = 2097152,
+	["REMOVENORAGDOLL"] = 4194304,
+	["PHYSGUN"] = 8388608,
+	["PLASMA"] = 16777216,
+	["AIRBOAT"] = 33554432,
+	["DISSOLVE"] = 67108864,
+	["BLASTSURFACE"] = 134217728,
+	["DIRECT"] = 268435456,
+	["BUCKSHOT"] = 536870912,
+	["SNIPER"] = 1073741824,
+	["MISSILEDEFENSE"] = 2147483648
+}
+
 end
