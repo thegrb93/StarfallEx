@@ -759,10 +759,8 @@ do
 		__index = {
 			add = function(self, index, func)
 				if not (self.hooks[index] or self.hookstoadd[index]) then
+					if self.n>=128 then SF.Throw("Max hooks limit reached", 3) end
 					self.n = self.n + 1
-					if self.n>128 then
-						SF.Throw("Max hooks limit reached", 3)
-					end
 				end
 				self.hookstoadd[index] = func
 			end,
@@ -774,7 +772,7 @@ do
 				self.hookstoadd[index] = nil
 			end,
 			isEmpty = function(self)
-				return next(self.hooks)==nil and next(self.hookstoadd)==nil
+				return self.n==0
 			end,
 			pairs = function(self)
 				for k, v in pairs(self.hookstoadd) do
