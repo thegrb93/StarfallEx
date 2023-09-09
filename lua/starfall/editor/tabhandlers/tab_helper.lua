@@ -71,6 +71,7 @@ end
 -----------------------
 function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate for each tab
 	local html = vgui.Create("DHTML", self)
+	self.html = html
 
 	local backButton = vgui.Create("StarfallButton", html)
 	backButton:SetText("")
@@ -101,7 +102,6 @@ function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate
 	html:SetMouseInputEnabled(true)
 	if TabHandler.htmldata then html:SetHTML(TabHandler.htmldata) end
 	htmlSetup(nil, self)
-	self.html = html
 end
 
 function PANEL:RefreshHelper()
