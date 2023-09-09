@@ -8,10 +8,23 @@ local PANEL = {} -- It's our VGUI
 -- Handler part (Tab Handler)
 -------------------------------
 
-function TabHandler:Init() -- It's caled when editor is initalized, you can create library map there etc
+function TabHandler:Init() -- It's called when editor is initalized, you can create library map there etc
 	http.Fetch(SF.Editor.HelperURL:GetString(), function(data)
 		self.htmldata = data
+		self:RefreshHelper()
 	end)
+end
+
+function TabHandler:RefreshHelper()
+	if self.htmldata and SF.Docs then
+		local editor = SF.Editor.editor
+		for i = 1, editor:GetNumTabs() do
+			local tab = editor:GetTabContent(i)
+			if tab.RefreshHelper then
+				tab:RefreshHelper(theme)
+			end
+		end
+	end
 end
 
 function TabHandler:RegisterSettings() -- Setting panels should be registered there
@@ -38,7 +51,7 @@ local function htmlSetup(old, new)
 		if not (new and new:IsValid()) then return end
 		_.loaded = true
 		new.url = url
-		html:RunJavascript([[SF_DOC.BuildPages(]]..util.TableToJSON(SF.Docs)..[[);]])
+		if SF.Docs then html:RunJavascript([[SF_DOC.BuildPages(]]..util.TableToJSON(SF.Docs)..[[);]]) end
 	end
 end
 
@@ -58,6 +71,7 @@ end
 -----------------------
 function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate for each tab
 	local html = vgui.Create("DHTML", self)
+	self.html = html
 
 	local backButton = vgui.Create("StarfallButton", html)
 	backButton:SetText("")
@@ -86,9 +100,14 @@ function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate
 	html:DockPadding(0, 0, 0, 0)
 	html:SetKeyboardInputEnabled(true)
 	html:SetMouseInputEnabled(true)
-	html:SetHTML(TabHandler.htmldata)
-	self.html = html
+	if TabHandler.htmldata then html:SetHTML(TabHandler.htmldata) end
 	htmlSetup(nil, self)
+end
+
+function PANEL:RefreshHelper()
+	if self.html then
+		self.html:SetHTML(TabHandler.htmldata)
+	end
 end
 
 function PANEL:Undock()

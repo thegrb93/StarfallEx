@@ -829,6 +829,7 @@ if CLIENT then
 			SF.Docs = docs
 			-- reinitialize tabhandler to regenerate libmap
 			SF.Editor.TabHandlers.wire:Init()
+			SF.Editor.TabHandlers.helper:RefreshHelper()
 			-- clear cache to redraw text
 			SF.Editor.editor:OnThemeChange(SF.Editor.Themes.CurrentTheme)
 			SF.WaitingForDocs = nil
