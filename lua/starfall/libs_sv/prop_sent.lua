@@ -1012,6 +1012,23 @@ registerSent("gmod_wire_expression2", {
 	}
 })
 
+registerSent("starfall_processor", {
+	_preFactory = function(ply, self)
+	end,
+	_postFactory = function( ply, self, enttbl )
+		local Data = {
+			["files"] = {["main"] = enttbl.Code},
+			["mainfile"] = "main",
+			["owner"] = ply
+		}
+		self:SetupFiles( Data )
+	end,
+	{
+		["Model"] = {TYPE_STRING, "models/spacecode/sfchip_medium.mdl"},
+		["Code"] = {TYPE_STRING, ""},
+	}
+})
+
 end
 end)
 
@@ -1309,6 +1326,10 @@ return function() end
 -- string _original = "print("Hello World!")"
 -- table inc_files = {}
 -- string Model = "models/beer/wiremod/gate_e2.mdl"
+--
+-- > starfall_processor
+-- string Model = "models/spacecode/sfchip_medium.mdl"
+-- string Code
 -- 
 -- > gmod_wire_extbus
 -- string Model = "models/jaanus/wiretool/wiretool_gate.mdl"
