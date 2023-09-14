@@ -41,6 +41,7 @@ local Privilege = {
 			elseif anyBlock then
 				self.check = function() return false, "This function's permission is blocked!" end
 			elseif #checks==0 then
+				allAllow = true
 				self.check = function() return true end
 			elseif #checks==1 then
 				self.check = checks[1]
@@ -54,7 +55,7 @@ local Privilege = {
 				end
 			end
 
-			if overridable then
+			if overridable and not allAllow then
 				local check = self.check
 				self.check = function(instance, target)
 					if instance.permissionOverrides[self.id] then return true end
