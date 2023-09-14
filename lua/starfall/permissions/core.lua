@@ -17,9 +17,12 @@ local Privilege = {
 			local checks = {}
 			local allAllow = true
 			local anyBlock = false
+			local overridable = false
 			for providerid in pairs(self.providerconfig) do
-				local check = P.providers[providerid].checks[P.settings[self.id][providerid]]
-				if check == "block" then
+				local provider = P.providers[providerid]
+				local check = provider.checks[P.settings[self.id][providerid]]
+				if provider.overridable then overridable = true end
+				if check == "block" and not overridable then
 					allAllow = false
 					anyBlock = true
 					break
@@ -28,6 +31,7 @@ local Privilege = {
 					checks[#checks+1] = check
 				end
 			end
+
 			if allAllow then
 				self.check = function() return true end
 			elseif anyBlock then
@@ -45,6 +49,16 @@ local Privilege = {
 					return true
 				end
 			end
+
+			if overridable then
+				local check = self.check
+				self.check = function(instance, target)
+					if instance.permissionOverrides[self.id] then return true end
+					return check(instance, target)
+				end
+			end
+			self.overridable = overridable
+
 		end,
 		applySetting = function(self, providerid, setting)
 			P.settings[self.id][providerid] = setting
@@ -89,18 +103,12 @@ function P.registerPrivilege(id, name, description, providerconfig)
 end
 
 function P.check(instance, target, key)
-	if not instance.permissionOverrides[key] then
-		local ok, reason = P.privileges[key].check(instance, target)
-		if not ok then SF.Throw("Permission " .. key .. ": " .. reason, 3) end
-	end
+	local ok, reason = P.privileges[key].check(instance, target)
+	if not ok then SF.Throw("Permission " .. key .. ": " .. reason, 3) end
 end
 
 function P.hasAccess(instance, target, key)
-	if instance.permissionOverrides[key] then
-		return true
-	else
-		return P.privileges[key].check(instance, target)
-	end
+	return P.privileges[key].check(instance, target)
 end
 
 function P.refreshSettingsCache()
