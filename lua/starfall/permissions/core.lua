@@ -193,7 +193,7 @@ local function changePermission(ply, arg)
 	if arg[1] then
 		local privilege = P.privileges[arg[1]]
 		if privilege then
-			if arg[2] and P.providers[arg[2]] then
+			if arg[2] and privilege.providerconfig[arg[2]] then
 				local val = tonumber(arg[3])
 				if val and val>=1 and val<=#P.providers[arg[2]].settingsoptions then
 					privilege:applySetting(arg[2], math.floor(val))
@@ -202,7 +202,7 @@ local function changePermission(ply, arg)
 				end
 			else
 				ply:PrintMessage(HUD_PRINTCONSOLE, "Permission, " .. tostring(arg[2]) .. ", couldn't be found.\nHere's a list of permissions.\n")
-				for id, _ in pairs(privilege.providers) do ply:PrintMessage(HUD_PRINTCONSOLE, id.."\n") end
+				for id, _ in pairs(privilege.providerconfig) do ply:PrintMessage(HUD_PRINTCONSOLE, id.."\n") end
 			end
 		else
 			ply:PrintMessage(HUD_PRINTCONSOLE, "Privilege, " .. tostring(arg[1]) .. ", couldn't be found.\nHere's a list of privileges.\n")
