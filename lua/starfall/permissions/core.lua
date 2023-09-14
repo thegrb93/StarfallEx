@@ -48,8 +48,8 @@ local Privilege = {
 		end,
 		applySetting = function(self, providerid, setting)
 			P.settings[self.id][providerid] = setting
-			self:buildcheck()
 			P.savePermissions()
+			self:buildcheck()
 		end,
 		initSettings = function(self)
 			for providerid, config in pairs(self.providerconfig) do
@@ -267,12 +267,10 @@ else
 		if not instance.permissionRequest then
 			SF.Throw( 'There is no permission request' )
 		end
-		if instance.permissionOverrides then
-			for id, _ in pairs( instance.permissionRequest.overrides ) do
-				if not instance.permissionOverrides[ id ] then return false end
-			end
-			return true
-		else return table.Count( instance.permissionRequest.overrides ) == 0 end
+		for id, _ in pairs( instance.permissionRequest.overrides ) do
+			if not instance.permissionOverrides[ id ] then return false end
+		end
+		return true
 	end
 	net.Receive("sf_permissionsettings", function()
 		if reqCallback then
