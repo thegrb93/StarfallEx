@@ -339,8 +339,8 @@ if CLIENT then
 				if not privileges[v] then
 					SF.Throw("Invalid permission name: "..v)
 				end
-				if not privileges[v][3].client then
-					SF.Throw("Permission isn't requestable: "..v)
+				if not privileges[v].providerconfig.client then
+					SF.Throw("Only client controlled permissions are requestable: "..v)
 				end
 				overrides[v] = true
 			end
