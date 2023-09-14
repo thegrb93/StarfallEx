@@ -22,10 +22,14 @@ local Privilege = {
 				local provider = P.providers[providerid]
 				local check = provider.checks[P.settings[self.id][providerid]]
 				if provider.overridable then overridable = true end
-				if check == "block" and not overridable then
-					allAllow = false
-					anyBlock = true
-					break
+				if check == "block" then
+					if overridable then
+						checks[#checks+1] = function() return false, "This function's permission is blocked!" end
+					else
+						allAllow = false
+						anyBlock = true
+						break
+					end
 				elseif check ~= "allow" then
 					allAllow = false
 					checks[#checks+1] = check
