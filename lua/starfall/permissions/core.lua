@@ -120,7 +120,7 @@ function P.refreshSettingsCache()
 	for providerid, provider in pairs(P.providers) do
 		local settings = {}
 		for privilegeid, privilege in pairs(P.privileges) do
-			if privilege.providers[providerid] then -- Check if this current provider manages privilege
+			if privilege.providerconfig[providerid] then -- Check if this current provider manages privilege
 				settings[privilegeid] = { privilege.name, privilege.description, P.settings[privilegeid][providerid] }
 			end
 		end
