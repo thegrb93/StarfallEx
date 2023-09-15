@@ -5,6 +5,7 @@ P.id = "client"
 P.name = "Client Permissions"
 P.settingsoptions = { "Only You", "Friends Only", "Anyone", "No one" }
 P.defaultsetting = 3
+P.overridable = true
 
 P.checks = {
 	function(instance, target, key)

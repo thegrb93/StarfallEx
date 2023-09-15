@@ -1917,7 +1917,7 @@ do
 	loadModules("starfall/libs_sh/", SERVER or CLIENT)
 	loadModules("starfall/libs_sv/", SERVER)
 	loadModules("starfall/libs_cl/", CLIENT)
-	SF.Permissions.loadPermissionOptions()
+	SF.Permissions.loadPermissions()
 
 	if SERVER then
 		util.AddNetworkString("sf_receivelibrary")

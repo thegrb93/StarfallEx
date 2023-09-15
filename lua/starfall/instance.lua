@@ -54,6 +54,7 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 	instance.source = code
 	instance.mainfile = mainfile
 	instance.requires = {}
+	instance.permissionOverrides = {}
 
 	instance.ppdata = {}
 	for filename, source in pairs(code) do
