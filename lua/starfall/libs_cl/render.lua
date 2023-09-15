@@ -273,6 +273,12 @@ SF.hookAdd("PreDrawTranslucentRenderables", nil, hudPrepareSafeArgs, cleanupRend
 -- @param boolean skybox Whether the current draw is drawing the skybox
 SF.hookAdd("PostDrawTranslucentRenderables", nil, hudPrepareSafeArgs, cleanupRender)
 
+--- Called right after the 2D skybox has been drawn - allowing you to draw over it.
+-- @name postdraw2dskybox
+-- @class hook
+-- @client
+SF.hookAdd("PostDraw2DSkyBox", "draw2d", hudPrepareSafeArgs, cleanupRender)
+
 --- Called before drawing HUD (2D Context)
 -- @name predrawhud
 -- @class hook

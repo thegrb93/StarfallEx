@@ -338,11 +338,6 @@ else
 	-- @class hook
 	-- @client
 	add("OnContextMenuClose")
-
-	--- Called right after the 2D skybox has been drawn - allowing you to draw over it.
-	-- @name PostDraw2DSkyBox
-	-- @class hook
-	-- @client
 end
 
 -- Shared hooks
