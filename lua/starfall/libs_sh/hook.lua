@@ -343,7 +343,7 @@ else
 	-- @name postdraw2dskybox
 	-- @class hook
 	-- @client
-	hookAdd("PostDraw2DSkyBox")
+	add("PostDraw2DSkyBox")
 end
 
 -- Shared hooks
