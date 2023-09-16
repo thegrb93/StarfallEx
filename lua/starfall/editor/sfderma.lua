@@ -561,8 +561,8 @@ local function CreatePermissionsPanel( parent )
 		for id, _ in SortedPairs( set ) do
 			local permission = SF.Permissions.privileges[ id ]
 
-			local name = permission[ 1 ]
-			local description = permission[ 2 ]
+			local name = permission.name
+			local description = permission.description
 
 			local perm = vgui.Create( 'DLabel' )
 			perm:Dock( TOP )
