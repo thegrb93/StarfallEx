@@ -339,6 +339,12 @@ SF.hookAdd("PreDrawSkyBox", nil, hudPrepareSafeArgs, function(instance, args)
     if args[1] and args[2]==true then return true end
 end)
 
+--- Called right after the 2D skybox has been drawn - allowing you to draw over it.
+-- @name postdraw2dskybox
+-- @class hook
+-- @client
+SF.hookAdd("PostDraw2DSkyBox", nil, hudPrepareSafeArgs, cleanupRender)
+
 --- Called after the 3D skybox is drawn. This will not be called if PreDrawSkyBox has prevented rendering of the skybox
 -- @name postdrawskybox
 -- @class hook
