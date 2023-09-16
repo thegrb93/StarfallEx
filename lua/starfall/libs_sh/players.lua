@@ -1,16 +1,18 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
+local checkvalidnumber = SF.CheckValidNumber
 local registerprivilege = SF.Permissions.registerPrivilege
 
 if SERVER then
 	-- Register privileges
 	registerprivilege("player.dropweapon", "DropWeapon", "Drops a weapon from the player", { entities = {} })
-	registerprivilege("player.setArmor", "SetArmor", "Allows changing a player's armor", { usergroups = { default = 1 }, entities = {} })
-	registerprivilege("player.setMaxArmor", "SetMaxArmor", "Allows changing a player's max armor", { usergroups = { default = 1 }, entities = {} })
 	registerprivilege("player.setammo", "SetAmmo", "Whether a player can set their ammo", { usergroups = { default = 1 }, entities = {} })
 else
 	registerprivilege("player.getFriendStatus", "FriendStatus", "Whether friend status can be retrieved", { client = { default = 1 } })
 end
+registerprivilege("player.setArmor", "SetArmor", "Allows changing a player's armor", { usergroups = { default = 1 }, entities = {} })
+registerprivilege("player.setMaxArmor", "SetMaxArmor", "Allows changing a player's max armor", { usergroups = { default = 1 }, entities = {} })
+registerprivilege("player.modifyMovementProperties", "ModifyMovementProperties", "Allows various changes to a player's movement", { usergroups = { default = 1 }, entities = {} })
 
 -- Player animation
 local playerAnimAdd
@@ -141,13 +143,90 @@ function player_methods:getArmor()
 	return getply(self):Armor()
 end
 
---- Returns maximum armor capacity
+--- Returns the players maximum armor capacity
 -- @shared
 -- @return number Armor limit
 function player_methods:getMaxArmor()
 	return getply(self):GetMaxArmor()
 end
-	
+
+--- Returns the players Crouched Walk Speed
+-- @shared
+-- @return number Crouch Walk Speed value
+function player_methods:getCrouchedWalkSpeed()
+	return getply(self):GetCrouchedWalkSpeed()
+end
+
+--- Returns the players Duck Speed, a rate from 0-1 for how quickly they can crouch
+-- @shared
+-- @return number Duck Speed value
+function player_methods:getDuckSpeed()
+	return getply(self):GetDuckSpeed()
+end
+
+--- Returns the players UnDuck Speed, a rate from 0-1 for how quickly they can uncrouch
+-- @shared
+-- @return number UnDuck Speed value
+function player_methods:getUnDuckSpeed()
+	return getply(self):GetUnDuckSpeed()
+end
+
+--- Returns the players Ladder Climb Speed, probably unstable
+-- @shared
+-- @return number Ladder Climb Speed value
+function player_methods:getLadderClimbSpeed()
+	return getply(self):GetLadderClimbSpeed()
+end
+
+--- Returns the players Max Speed, probably unstable
+-- @shared
+-- @return number Max Speed value
+function player_methods:getMaxSpeed()
+	return getply(self):GetMaxSpeed()
+end
+
+--- Returns the players Run Speed, which is +speed
+-- @shared
+-- @return number Run Speed value
+function player_methods:getRunSpeed()
+	return getply(self):GetRunSpeed()
+end
+
+--- Returns the players Slow Walk Speed, which is +walk
+-- @shared
+-- @return number Slow Walk Speed value
+function player_methods:getSlowWalkSpeed()
+	return getply(self):GetSlowWalkSpeed()
+end
+
+--- Returns the players Walk Speed
+-- @shared
+-- @return number Walk Speed value
+function player_methods:getWalkSpeed()
+	return getply(self):GetWalkSpeed()
+end
+
+--- Returns the players Jump Power
+-- @shared
+-- @return number Jump Power value
+function player_methods:getJumpPower()
+	return getply(self):GetJumpPower()
+end
+
+--- Returns the players Friction
+-- @shared
+-- @return number Friction value
+function player_methods:getFriction()
+	return getply(self):GetFriction() * cvars.Number("sv_friction")
+end
+
+--- Returns the players Step Size
+-- @shared
+-- @return number Step Size Value
+function player_methods:getStepSize()
+	return getply(self):GetStepSize()
+end
+
 --- Returns whether the player is crouching
 -- @shared
 -- @return boolean True if player crouching
@@ -204,39 +283,11 @@ function player_methods:getFOV()
 	return getply(self):GetFOV()
 end
 
---- Returns the player's jump power
--- @shared
--- @return number Jump power
-function player_methods:getJumpPower()
-	return getply(self):GetJumpPower()
-end
-
---- Returns the player's maximum speed
--- @shared
--- @return number Maximum speed
-function player_methods:getMaxSpeed()
-	return getply(self):GetMaxSpeed()
-end
-
 --- Returns the player's name
 -- @shared
 -- @return string Name
 function player_methods:getName()
 	return getply(self):GetName()
-end
-
---- Returns the player's running speed
--- @shared
--- @return number Running speed
-function player_methods:getRunSpeed()
-	return getply(self):GetRunSpeed()
-end
-
---- Returns the player's duck speed
--- @shared
--- @return number Duck speed in seconds
-function player_methods:getDuckSpeed()
-	return getply(self):GetDuckSpeed()
 end
 
 --- Returns the entity the player is currently using, like func_tank mounted turrets or +use prop pickups.
@@ -452,7 +503,7 @@ if SERVER then
 	-- @param number scale The scale to apply (min 0.001, max 100)
 	-- @server
 	function player_methods:setModelScale(scale)
-		checkluatype(scale, TYPE_NUMBER)
+		checkvalidnumber(scale)
 		local ply = getply(self)
 		checkpermission(instance, ply, "entities.setRenderProperty")
 		ply:SetModelScale(math.Clamp(scale, 0.001, 100))
@@ -521,7 +572,7 @@ if SERVER then
 		local ply = getply(self)
 		checkpermission(instance, ply, "player.setammo")
 
-		checkluatype(amount, TYPE_NUMBER)
+		checkvalidnumber(amount)
 		if not (isstring(ammoType) or isnumber(ammoType)) then
 			SF.ThrowTypeError("number or string", SF.GetType(ammoType), 2)
 		end
@@ -605,18 +656,128 @@ if SERVER then
 	function player_methods:setArmor(val)
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.setArmor")
-		checkluatype(val, TYPE_NUMBER)
+		checkvalidnumber(val)
 		ent:SetArmor(val)
 	end
 		
-	--- Sets the maximum armor for player. Note, that you can still set a player's armor above this amount with Player:setArmor.
+	--- Sets the maximum armor for player. You can still set a player's armor above this amount with Player:setArmor.
 	-- @server
 	-- @param number newmaxarmor New max armor value.
 	function player_methods:setMaxArmor(val)
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.setMaxArmor")
-		checkluatype(val, TYPE_NUMBER)
+		checkvalidnumber(val)
 		ent:SetMaxArmor(val)
+	end
+	
+	--- Sets Crouched Walk Speed
+	-- @server
+	-- @param number newcwalkspeed New Crouch Walk speed, This is a multiplier from 0 to 1.
+	function player_methods:setCrouchedWalkSpeed(val)
+		local ent = getply(self)
+		checkpermission(instance, ent, "player.modifyMovementProperties")
+		checkvalidnumber(val)
+		ent:SetCrouchedWalkSpeed(math.Clamp(val,0,1))
+	end
+	
+	--- Sets Duck Speed
+	-- @server
+	-- @param number newduckspeed New Duck speed, This is a multiplier from 0 to 1.
+	function player_methods:setDuckSpeed(val)
+		local ent = getply(self)
+		checkpermission(instance, ent, "player.modifyMovementProperties")
+		checkvalidnumber(val)
+		ent:SetDuckSpeed(math.Clamp(val,0.005,0.995))
+	end
+	
+	--- Sets UnDuck Speed
+	-- @server
+	-- @param number newunduckspeed New UnDuck speed, This is a multiplier from 0 to 1.
+	function player_methods:setUnDuckSpeed(val)
+		local ent = getply(self)
+		checkpermission(instance, ent, "player.modifyMovementProperties")
+		checkvalidnumber(val)
+		ent:SetUnDuckSpeed(math.Clamp(val,0.005,0.995))
+	end
+	
+	--- Sets Ladder Climb Speed, probably unstable
+	-- @server
+	-- @param number newladderclimbspeed New Ladder Climb speed.
+	function player_methods:setLadderClimbSpeed(val)
+		local ent = getply(self)
+		checkpermission(instance, ent, "player.modifyMovementProperties")
+		checkvalidnumber(val)
+		ent:SetLadderClimbSpeed(math.max(val,0))
+	end
+	
+	--- Sets Max Speed
+	-- @server
+	-- @param number newmaxspeed New Max speed.
+	function player_methods:setMaxSpeed(val)
+		local ent = getply(self)
+		checkpermission(instance, ent, "player.modifyMovementProperties")
+		checkvalidnumber(val)
+		ent:SetMaxSpeed(math.max(val,0))
+	end
+	
+	--- Sets Run Speed ( +speed )
+	-- @server
+	-- @param number newrunspeed New Run speed.
+	function player_methods:setRunSpeed(val)
+		local ent = getply(self)
+		checkpermission(instance, ent, "player.modifyMovementProperties")
+		checkvalidnumber(val)
+		ent:SetRunSpeed(math.max(val,0))
+	end
+	
+	--- Sets Slow Walk Speed ( +walk )
+	-- @server
+	-- @param number newslowwalkspeed New Slow Walk speed.
+	function player_methods:setSlowWalkSpeed(val)
+		local ent = getply(self)
+		checkpermission(instance, ent, "player.modifyMovementProperties")
+		checkvalidnumber(val)
+		ent:SetSlowWalkSpeed(math.max(val,0))
+	end
+	
+	--- Sets Walk Speed
+	-- @server
+	-- @param number newwalkspeed New Walk speed.
+	function player_methods:setWalkSpeed(val)
+		local ent = getply(self)
+		checkpermission(instance, ent, "player.modifyMovementProperties")
+		checkvalidnumber(val)
+		ent:SetWalkSpeed(math.max(val,0))
+	end
+	
+	--- Sets Jump Power
+	-- @server
+	-- @param number newjumppower New Jump Power.
+	function player_methods:setJumpPower(val)
+		local ent = getply(self)
+		checkpermission(instance, ent, "player.modifyMovementProperties")
+		checkvalidnumber(val)
+		ent:SetJumpPower(math.max(val,0))
+	end
+	
+	--- Sets Step Size
+	-- @server
+	-- @param number newstepsize New Step Size.
+	function player_methods:setStepSize(val)
+		local ent = getply(self)
+		checkpermission(instance, ent, "player.modifyMovementProperties")
+		checkvalidnumber(val)
+		ent:SetStepSize(math.max(val,0))
+	end
+	
+	--- Sets Friction
+	-- @server
+	-- @param number newfriction New Friction.
+	function player_methods:setFriction(val)
+		local ent = getply(self)
+		checkpermission(instance, ent, "player.modifyMovementProperties")
+		checkvalidnumber(val)
+		ent:SetFriction(math.Clamp(val/cvars.Number("sv_friction"),0,10))
 	end
 end
 
@@ -625,7 +786,7 @@ end
 -- @param number key Key to check. IN_KEY table values
 -- @return boolean Whether they key is down
 function player_methods:keyDown(key)
-	checkluatype(key, TYPE_NUMBER)
+	checkvalidnumber(key)
 
 	return getply(self):KeyDown(key)
 end
@@ -673,11 +834,11 @@ if CLIENT then
 		if slot == nil then
 			slot = GESTURE_SLOT_CUSTOM
 		else
-			checkluatype(slot, TYPE_NUMBER)
+			checkvalidnumber(slot)
 			if slot < 0 or slot > 6 then return end
 		end
 
-		if weight == nil then weight = 1 else checkluatype(weight, TYPE_NUMBER) end
+		if weight == nil then weight = 1 else checkvalidnumber(weight) end
 
 		if isstring(animation) then
 			animation = ply:GetSequenceActivity(ply:LookupSequence(animation))
@@ -697,7 +858,7 @@ if CLIENT then
 		local ply = getply(self)
 		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
-		if slot == nil then slot = GESTURE_SLOT_CUSTOM else checkluatype(slot, TYPE_NUMBER) end
+		if slot == nil then slot = GESTURE_SLOT_CUSTOM else checkvalidnumber(slot) end
 
 		ply:AnimResetGestureSlot(slot)
 	end
@@ -710,8 +871,8 @@ if CLIENT then
 		local ply = getply(self)
 		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
-		if slot == nil then slot = GESTURE_SLOT_CUSTOM else checkluatype(slot, TYPE_NUMBER) end
-		if weight == nil then weight = 1 else checkluatype(weight, TYPE_NUMBER) end
+		if slot == nil then slot = GESTURE_SLOT_CUSTOM else checkvalidnumber(slot) end
+		if weight == nil then weight = 1 else checkvalidnumber(weight) end
 
 		ply:AnimSetGestureWeight(slot, weight)
 	end
@@ -734,8 +895,8 @@ if CLIENT then
 			SF.ThrowTypeError("number or string", SF.GetType(seq), 2)
 		end
 
-		if progress == nil then progress = 0 else checkluatype(progress, TYPE_NUMBER) end
-		if rate == nil then rate = 1 else checkluatype(rate, TYPE_NUMBER) end
+		if progress == nil then progress = 0 else checkvalidnumber(progress) end
+		if rate == nil then rate = 1 else checkvalidnumber(rate) end
 		if loop == nil then loop = false else checkluatype(loop, TYPE_BOOL) end
 		if auto_advance == nil then auto_advance = true else checkluatype(auto_advance, TYPE_BOOL) end
 
@@ -802,7 +963,7 @@ if CLIENT then
 		local anim = playerAnimGet(ply)
 		if not anim then SF.Throw("No animation is playing.", 2) end
 
-		checkluatype(progress, TYPE_NUMBER)
+		checkvalidnumber(progress)
 
 		anim.progress = progress
 	end
@@ -817,7 +978,7 @@ if CLIENT then
 		local anim = playerAnimGet(ply)
 		if not anim then SF.Throw("No animation is playing.", 2) end
 
-		checkluatype(time, TYPE_NUMBER)
+		checkvalidnumber(time)
 
 		anim.progress = (time / anim.duration - anim.min) * (1 / anim.range)
 	end
@@ -832,7 +993,7 @@ if CLIENT then
 		local anim = playerAnimGet(ply)
 		if not anim then SF.Throw("No animation is playing.", 2) end
 
-		checkluatype(rate, TYPE_NUMBER)
+		checkvalidnumber(rate)
 
 		anim.rate = rate
 	end
@@ -893,8 +1054,8 @@ if CLIENT then
 		local anim = playerAnimGet(ply)
 		if not anim then SF.Throw("No animation is playing.", 2) end
 
-		checkluatype(min, TYPE_NUMBER)
-		checkluatype(max, TYPE_NUMBER)
+		checkvalidnumber(min)
+		checkvalidnumber(max)
 
 		anim.min = math.max(min, 0)
 		anim.max = math.min(max, 1)
