@@ -1,5 +1,6 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
+local checkvalidnumber = SF.CheckValidNumber
 local registerprivilege = SF.Permissions.registerPrivilege
 
 if SERVER then
@@ -502,7 +503,7 @@ if SERVER then
 	-- @param number scale The scale to apply (min 0.001, max 100)
 	-- @server
 	function player_methods:setModelScale(scale)
-		checkluatype(scale, TYPE_NUMBER)
+		checkvalidnumber(scale)
 		local ply = getply(self)
 		checkpermission(instance, ply, "entities.setRenderProperty")
 		ply:SetModelScale(math.Clamp(scale, 0.001, 100))
@@ -571,7 +572,7 @@ if SERVER then
 		local ply = getply(self)
 		checkpermission(instance, ply, "player.setammo")
 
-		checkluatype(amount, TYPE_NUMBER)
+		checkvalidnumber(amount)
 		if not (isstring(ammoType) or isnumber(ammoType)) then
 			SF.ThrowTypeError("number or string", SF.GetType(ammoType), 2)
 		end
@@ -655,7 +656,7 @@ if SERVER then
 	function player_methods:setArmor(val)
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.setArmor")
-		checkluatype(val, TYPE_NUMBER)
+		checkvalidnumber(val)
 		ent:SetArmor(val)
 	end
 		
@@ -665,7 +666,7 @@ if SERVER then
 	function player_methods:setMaxArmor(val)
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.setMaxArmor")
-		checkluatype(val, TYPE_NUMBER)
+		checkvalidnumber(val)
 		ent:SetMaxArmor(val)
 	end
 	
@@ -675,7 +676,7 @@ if SERVER then
 	function player_methods:setCrouchedWalkSpeed(val)
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.modifyMovementProperties")
-		checkluatype(val, TYPE_NUMBER)
+		checkvalidnumber(val)
 		ent:SetCrouchedWalkSpeed(math.Clamp(val,0,1))
 	end
 	
@@ -685,7 +686,7 @@ if SERVER then
 	function player_methods:setDuckSpeed(val)
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.modifyMovementProperties")
-		checkluatype(val, TYPE_NUMBER)
+		checkvalidnumber(val)
 		ent:SetDuckSpeed(math.Clamp(val,0.005,0.995))
 	end
 	
@@ -695,7 +696,7 @@ if SERVER then
 	function player_methods:setUnDuckSpeed(val)
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.modifyMovementProperties")
-		checkluatype(val, TYPE_NUMBER)
+		checkvalidnumber(val)
 		ent:SetUnDuckSpeed(math.Clamp(val,0.005,0.995))
 	end
 	
@@ -705,7 +706,7 @@ if SERVER then
 	function player_methods:setLadderClimbSpeed(val)
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.modifyMovementProperties")
-		checkluatype(val, TYPE_NUMBER)
+		checkvalidnumber(val)
 		ent:SetLadderClimbSpeed(math.max(val,0))
 	end
 	
@@ -715,7 +716,7 @@ if SERVER then
 	function player_methods:setMaxSpeed(val)
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.modifyMovementProperties")
-		checkluatype(val, TYPE_NUMBER)
+		checkvalidnumber(val)
 		ent:SetMaxSpeed(math.max(val,0))
 	end
 	
@@ -725,7 +726,7 @@ if SERVER then
 	function player_methods:setRunSpeed(val)
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.modifyMovementProperties")
-		checkluatype(val, TYPE_NUMBER)
+		checkvalidnumber(val)
 		ent:SetRunSpeed(math.max(val,0))
 	end
 	
@@ -735,7 +736,7 @@ if SERVER then
 	function player_methods:setSlowWalkSpeed(val)
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.modifyMovementProperties")
-		checkluatype(val, TYPE_NUMBER)
+		checkvalidnumber(val)
 		ent:SetSlowWalkSpeed(math.max(val,0))
 	end
 	
@@ -745,7 +746,7 @@ if SERVER then
 	function player_methods:setWalkSpeed(val)
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.modifyMovementProperties")
-		checkluatype(val, TYPE_NUMBER)
+		checkvalidnumber(val)
 		ent:SetWalkSpeed(math.max(val,0))
 	end
 	
@@ -755,7 +756,7 @@ if SERVER then
 	function player_methods:setJumpPower(val)
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.modifyMovementProperties")
-		checkluatype(val, TYPE_NUMBER)
+		checkvalidnumber(val)
 		ent:SetJumpPower(math.max(val,0))
 	end
 	
@@ -765,7 +766,7 @@ if SERVER then
 	function player_methods:setStepSize(val)
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.modifyMovementProperties")
-		checkluatype(val, TYPE_NUMBER)
+		checkvalidnumber(val)
 		ent:SetStepSize(math.max(val,0))
 	end
 	
@@ -775,7 +776,7 @@ if SERVER then
 	function player_methods:setFriction(val)
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.modifyMovementProperties")
-		checkluatype(val, TYPE_NUMBER)
+		checkvalidnumber(val)
 		ent:SetFriction(math.Clamp(val/cvars.Number("sv_friction"),0,10))
 	end
 end
@@ -785,7 +786,7 @@ end
 -- @param number key Key to check. IN_KEY table values
 -- @return boolean Whether they key is down
 function player_methods:keyDown(key)
-	checkluatype(key, TYPE_NUMBER)
+	checkvalidnumber(key)
 
 	return getply(self):KeyDown(key)
 end
@@ -833,11 +834,11 @@ if CLIENT then
 		if slot == nil then
 			slot = GESTURE_SLOT_CUSTOM
 		else
-			checkluatype(slot, TYPE_NUMBER)
+			checkvalidnumber(slot)
 			if slot < 0 or slot > 6 then return end
 		end
 
-		if weight == nil then weight = 1 else checkluatype(weight, TYPE_NUMBER) end
+		if weight == nil then weight = 1 else checkvalidnumber(weight) end
 
 		if isstring(animation) then
 			animation = ply:GetSequenceActivity(ply:LookupSequence(animation))
@@ -857,7 +858,7 @@ if CLIENT then
 		local ply = getply(self)
 		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
-		if slot == nil then slot = GESTURE_SLOT_CUSTOM else checkluatype(slot, TYPE_NUMBER) end
+		if slot == nil then slot = GESTURE_SLOT_CUSTOM else checkvalidnumber(slot) end
 
 		ply:AnimResetGestureSlot(slot)
 	end
@@ -870,8 +871,8 @@ if CLIENT then
 		local ply = getply(self)
 		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
-		if slot == nil then slot = GESTURE_SLOT_CUSTOM else checkluatype(slot, TYPE_NUMBER) end
-		if weight == nil then weight = 1 else checkluatype(weight, TYPE_NUMBER) end
+		if slot == nil then slot = GESTURE_SLOT_CUSTOM else checkvalidnumber(slot) end
+		if weight == nil then weight = 1 else checkvalidnumber(weight) end
 
 		ply:AnimSetGestureWeight(slot, weight)
 	end
@@ -894,8 +895,8 @@ if CLIENT then
 			SF.ThrowTypeError("number or string", SF.GetType(seq), 2)
 		end
 
-		if progress == nil then progress = 0 else checkluatype(progress, TYPE_NUMBER) end
-		if rate == nil then rate = 1 else checkluatype(rate, TYPE_NUMBER) end
+		if progress == nil then progress = 0 else checkvalidnumber(progress) end
+		if rate == nil then rate = 1 else checkvalidnumber(rate) end
 		if loop == nil then loop = false else checkluatype(loop, TYPE_BOOL) end
 		if auto_advance == nil then auto_advance = true else checkluatype(auto_advance, TYPE_BOOL) end
 
@@ -962,7 +963,7 @@ if CLIENT then
 		local anim = playerAnimGet(ply)
 		if not anim then SF.Throw("No animation is playing.", 2) end
 
-		checkluatype(progress, TYPE_NUMBER)
+		checkvalidnumber(progress)
 
 		anim.progress = progress
 	end
@@ -977,7 +978,7 @@ if CLIENT then
 		local anim = playerAnimGet(ply)
 		if not anim then SF.Throw("No animation is playing.", 2) end
 
-		checkluatype(time, TYPE_NUMBER)
+		checkvalidnumber(time)
 
 		anim.progress = (time / anim.duration - anim.min) * (1 / anim.range)
 	end
@@ -992,7 +993,7 @@ if CLIENT then
 		local anim = playerAnimGet(ply)
 		if not anim then SF.Throw("No animation is playing.", 2) end
 
-		checkluatype(rate, TYPE_NUMBER)
+		checkvalidnumber(rate)
 
 		anim.rate = rate
 	end
@@ -1053,8 +1054,8 @@ if CLIENT then
 		local anim = playerAnimGet(ply)
 		if not anim then SF.Throw("No animation is playing.", 2) end
 
-		checkluatype(min, TYPE_NUMBER)
-		checkluatype(max, TYPE_NUMBER)
+		checkvalidnumber(min)
+		checkvalidnumber(max)
 
 		anim.min = math.max(min, 0)
 		anim.max = math.min(max, 1)
