@@ -568,11 +568,12 @@ function props_library.createSent(pos, ang, class, frozen, data)
 
 				if org[1]==TYPE_COLOR then
 					if not IsColor(value) then SF.ThrowTypeError("Color", SF.GetType(value), 2, "Parameter: " .. param) end
-					enttbl[param] = value
+				elseif org[1]==TYPE_NUMBER then
+					SF.CheckValidNumber(value, nil, "Parameter: " .. param)
 				else
 					checkluatype(value, org[1], nil, "Parameter: " .. param)
-					enttbl[param] = value
 				end
+				enttbl[param] = value
 
 			elseif org[2]~=nil then
 				enttbl[param] = org[2]

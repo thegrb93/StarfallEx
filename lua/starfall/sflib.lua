@@ -1063,9 +1063,10 @@ end
 --- Checks that the value is a non-nan number
 -- @param val The value to be checked.
 -- @param level Level at which to error at. 2 is added to this value. Default is 1.
-function SF.CheckValidNumber(val, level)
+-- @param msg Optional error message
+function SF.CheckValidNumber(val, level, msg)
 	if TypeID(val) ~= TYPE_NUMBER then SF.ThrowTypeError(SF.TypeName(TYPE_NUMBER), SF.GetType(val), (level or 1) + 2, msg) end
-	if val ~= val then SF.Throw("Input number is nan!", (level or 1) + 2) end
+	if val ~= val then SF.Throw((msg and #msg>0 and (msg .. " ") or "") .. "Input number is nan!", (level or 1) + 2) end
 end
 
 function SF.EntIsReady(ent)

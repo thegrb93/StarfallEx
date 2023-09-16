@@ -1025,7 +1025,7 @@ registerSent("starfall_processor", {
 	end,
 	{
 		["Model"] = {TYPE_STRING, "models/spacecode/sfchip_medium.mdl"},
-		["Code"] = {TYPE_STRING, ""},
+		["Code"] = {TYPE_STRING},
 	}
 })
 
