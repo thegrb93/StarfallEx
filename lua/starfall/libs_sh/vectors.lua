@@ -6,6 +6,9 @@ local dgetmeta = debug.getmetatable
 --- Vector type
 -- @name Vector
 -- @class type
+-- @field x The x value of the vector. Can also be indexed with [1]
+-- @field y The y value of the vector. Can also be indexed with [2]
+-- @field z The z value of the vector. Can also be indexed with [3]
 -- @libtbl vec_methods
 -- @libtbl vec_meta
 SF.RegisterType("Vector", nil, nil, debug.getregistry().Vector, nil, function(checktype, vec_meta)

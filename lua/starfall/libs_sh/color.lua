@@ -36,6 +36,10 @@ local hex_to_rgb = {
 --- Color type
 -- @name Color
 -- @class type
+-- @field r The 0-255 red value of the color. Can also be indexed with [1]
+-- @field g The 0-255 green value of the color. Can also be indexed with [2]
+-- @field b The 0-255 blue value of the color. Can also be indexed with [3]
+-- @field a The 0-255 alpha value of the color. Can also be indexed with [4]
 -- @libtbl color_methods
 -- @libtbl color_meta
 SF.RegisterType("Color", nil, nil, debug.getregistry().Color, nil, function(checktype, color_meta)

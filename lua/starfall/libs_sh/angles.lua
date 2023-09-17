@@ -5,6 +5,9 @@ local dgetmeta = debug.getmetatable
 --- Angle Type
 -- @name Angle
 -- @class type
+-- @field p The -90 to 90 pitch value of the euler angle. Can also be indexed with [1]
+-- @field y The -180 to 180 yaw value of the euler angle. Can also be indexed with [2]
+-- @field r The -180 to 180 roll value of the euler angle. Can also be indexed with [3]
 -- @libtbl ang_methods
 -- @libtbl ang_meta
 SF.RegisterType("Angle", nil, nil, debug.getregistry().Angle, nil, function(checktype, ang_meta)
