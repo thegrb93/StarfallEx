@@ -39,17 +39,18 @@ function ENT:OnScaleChanged(name, old, scale)
 end
 
 function ENT:Draw(flags)
+	local selfTbl = self:GetTable()
 	if self:GetColor().a ~= 255 then
-		self.RenderGroup = RENDERGROUP_BOTH
+		selfTbl.RenderGroup = RENDERGROUP_BOTH
 	else
-		self.RenderGroup = RENDERGROUP_OPAQUE
+		selfTbl.RenderGroup = RENDERGROUP_OPAQUE
 	end
 
 	local clipCount = 0
 	local prevClip
-	if next(self.clips) then
+	if next(selfTbl.clips) then
 		prevClip = render.EnableClipping(true)
-		for _, clip in pairs(self.clips) do
+		for _, clip in pairs(selfTbl.clips) do
 			local clipent = clip.entity
 			if clipent and clipent:IsValid() then
 				local norm = clipent:LocalToWorld(clip.normal) - clipent:GetPos()
@@ -61,7 +62,7 @@ function ENT:Draw(flags)
 		end
 	end
 
-	local filter_mag, filter_min = self.filter_mag, self.filter_min
+	local filter_mag, filter_min = selfTbl.filter_mag, selfTbl.filter_min
 	if filter_mag then render.PushFilterMag(filter_mag) end
 	if filter_min then render.PushFilterMin(filter_min) end
 	
@@ -76,24 +77,25 @@ function ENT:Draw(flags)
 	if filter_mag then render.PopFilterMag() end
 	if filter_min then render.PopFilterMin() end
 
-	if next(self.clips) then
+	if next(selfTbl.clips) then
 		for i=1, clipCount do
 			render.PopCustomClipPlane()
 		end
 		render.EnableClipping(prevClip)
 	end
 	
-	if self.AutomaticFrameAdvance then
+	if selfTbl.AutomaticFrameAdvance then
 		self:FrameAdvance(0)
 	end
 end
 
 function ENT:GetRenderMesh()
-	if self.custom_mesh then
-		if self.custom_mesh_data[self.custom_mesh] then
-			return { Mesh = self.custom_mesh, Material = self.Material--[[, Matrix = self.HoloMatrix]] }
+	local selfTbl = self:GetTable()
+	if selfTbl.custom_mesh then
+		if selfTbl.custom_mesh_data[selfTbl.custom_mesh] then
+			return { Mesh = selfTbl.custom_mesh, Material = selfTbl.Material--[[, Matrix = self.HoloMatrix]] }
 		else
-			self.custom_mesh = nil
+			selfTbl.custom_mesh = nil
 		end
 	end
 end
