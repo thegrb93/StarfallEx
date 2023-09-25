@@ -521,17 +521,24 @@ end
 
 
 -- ------------------------------------------------------------------ --
---- Returns the origin of the current render context as calculated by calcview.
-function render_library.getOrigin()
+--- Call EyePos()
+-- @return Vector The origin of the current render context as calculated by calcview.
+function render_library.getEyePos()
 	return vwrap(EyePos())
 end
 
---- Returns the angles of the current render context as calculated by calcview.
+--- Alias render.getEyePos(). Call EyePos()
+-- @return Vector The origin of the current render context as calculated by calcview.
+render_library.getOrigin = render_library.getEyePos
+
+--- Call EyeAngles()
+-- @return Angle The angles of the current render context as calculated by calcview.
 function render_library.getAngles()
 	return awrap(EyeAngles())
 end
 
---- Returns the normal vector of the current render context as calculated by calcview, similar to render.getAngles.
+--- Call EyeVector()
+-- @return Vector The normal vector of the current render context as calculated by calcview, similar to render.getAngles.
 function render_library.getEye()
 	return vwrap(EyeVector())
 end
