@@ -1012,6 +1012,20 @@ function ents_methods:getBoneMatrix(bone)
 	return mwrap(getent(self):GetBoneMatrix(bone))
 end
 
+--- Sets the bone matrix of given bone to given matrix. See also Entity:getBoneMatrix.
+-- @shared
+-- @param number bone The bone ID
+-- @param VMatrix matrix The matrix to set
+function ents_methods:setBoneMatrix(bone, matrix)
+	local matrix = munwrap(matrix)
+	local ent = getent(self)
+
+	checkluatype(bone, TYPE_NUMBER)
+	checkpermission(instance, ent, "entities.setRenderProperty")
+
+	ent:SetBoneMatrix(bone, matrix)
+end
+
 --- Returns the world transform matrix of the entity
 -- @shared
 -- @return VMatrix The matrix
