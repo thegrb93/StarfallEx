@@ -647,7 +647,7 @@ end
 --- Returns a vector keyvalue
 -- @name material_methods.getVector
 -- @param string key The key to get the vector from
--- @return string? The string id of the texture or nil if it doesn't exist
+-- @return Vector? The vector value or nil if it doesn't exist
 function lmaterial_methods:getVector(key)
 	checkluatype(key, TYPE_STRING)
 	return vwrap(lunwrap(self):GetVector(key))
