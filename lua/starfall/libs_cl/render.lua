@@ -527,8 +527,6 @@ function render_library.getEyePos()
 	return vwrap(EyePos())
 end
 
---- Alias render.getEyePos(). Call EyePos()
--- @return Vector The origin of the current render context as calculated by calcview.
 render_library.getOrigin = render_library.getEyePos
 
 --- Call EyeAngles()
@@ -539,9 +537,11 @@ end
 
 --- Call EyeVector()
 -- @return Vector The normal vector of the current render context as calculated by calcview, similar to render.getAngles.
-function render_library.getEye()
+function render_library.getEyeVector()
 	return vwrap(EyeVector())
 end
+
+render_library.getEye = render_library.getEyeVector
 
 --- Sets whether stencil tests are carried out for each rendered pixel. Only pixels passing the stencil test are written to the render target.
 -- @param boolean enable True to enable, false to disable
@@ -687,7 +687,7 @@ end
 
 -- ------------------------------------------------------------------ --
 
---- Pushes a matrix onto the matrix stack.
+--- Pushes a matrix onto the model matrix stack.
 -- @param VMatrix m The matrix
 -- @param boolean? world Should the transformation be relative to the screen or world?
 function render_library.pushMatrix(m, world)
@@ -728,7 +728,7 @@ function render_library.disableScissorRect()
 	render.SetScissorRect(0 , 0 , 0 , 0, false)
 end
 
---- Pops a matrix from the matrix stack.
+--- Pops a matrix from the model matrix stack.
 function render_library.popMatrix()
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if #matrix_stack <= 0 then SF.Throw("Popped too many matrices", 2) end
@@ -736,6 +736,12 @@ function render_library.popMatrix()
 	cam.PopModelMatrix()
 end
 
+--- Returns a copy of the model matrix that is at the top of the stack.
+-- @return VMatrix The currently active matrix.
+function render_library.getMatrix()
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	return mwrap(cam.GetModelMatrix())
+end
 
 local viewmatrix_checktypes =
 {
