@@ -71,12 +71,16 @@ local Privilege = {
 			self:buildcheck()
 		end,
 		initSettings = function(self)
+			local saveSettings = false
 			for providerid, config in pairs(self.providerconfig) do
-				if not P.settings[self.id][providerid] then
+				local setting = P.settings[self.id][providerid]
+				if not setting or not P.providers[providerid].checks[setting] then
 					P.settings[self.id][providerid] = config.default or P.providers[providerid].defaultsetting
+					saveSettings = true
 				end
 			end
 			self:buildcheck()
+			return saveSettings
 		end,
 	},
 	__call = function(p, id, name, description, providerconfig)
@@ -164,7 +168,7 @@ function P.loadPermissions()
 	end
 
 	for k, v in pairs(P.privileges) do
-		v:initSettings()
+		if v:initSettings() then saveSettings = true end
 	end
 
 	if saveSettings then
