@@ -527,8 +527,6 @@ function render_library.getEyePos()
 	return vwrap(EyePos())
 end
 
---- Alias render.getEyePos(). Call EyePos()
--- @return Vector The origin of the current render context as calculated by calcview.
 render_library.getOrigin = render_library.getEyePos
 
 --- Call EyeAngles()
@@ -543,8 +541,6 @@ function render_library.getEyeVector()
 	return vwrap(EyeVector())
 end
 
---- Alias render.getEyeVector(). Call EyeVector()
--- @return Vector The normal vector of the current render context as calculated by calcview, similar to render.getAngles.
 render_library.getEye = render_library.getEyeVector
 
 --- Sets whether stencil tests are carried out for each rendered pixel. Only pixels passing the stencil test are written to the render target.
