@@ -195,11 +195,13 @@ builtins_library.isbool = isbool
 -- @return boolean If the object is a function or not
 builtins_library.isfunction = isfunction
 
---- Returns the metatable of an object. Doesn't work on most internal metatables
--- @param table tbl Table to get metatable of
--- @return table The metatable of tbl
+--- Returns the metatable of an object or nil.
+-- Doesn't work on most internal metatables.
+-- For any types other than table, nil will be returned.
+-- @param any tbl Table to get metatable of
+-- @return table? The metatable of tbl
 builtins_library.getmetatable = function(tbl)
-	checkluatype(tbl, TYPE_TABLE)
+	if TypeID(tbl) ~= TYPE_TABLE then return end
 	return getmetatable(tbl)
 end
 
