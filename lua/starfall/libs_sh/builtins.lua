@@ -734,7 +734,7 @@ end
 --- Runs an included script and caches the result.
 -- The path must be an actual path, including the file extension and using slashes for directory separators instead of periods.
 -- @param string path The file path to include. Make sure to --@include it
--- @return ... Return value(s) of the script
+-- @return any Return value of the script
 function builtins_library.require(path)
 	checkluatype(path, TYPE_STRING)
 
