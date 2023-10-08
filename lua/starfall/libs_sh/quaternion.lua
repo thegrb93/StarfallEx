@@ -581,9 +581,15 @@ end
 
 -------------------------------------
 
---- Returns absolute value of the quaternion
--- @return Vector Absolute value
-function quat_methods:getAbsolute()
+--- Returns norm of the quaternion
+-- @return number norm value
+function quat_methods:getNorm()
+	return getQuatLen(self)
+end
+
+--- Returns squared norm of the quaternion
+-- @return number squared norm/absolute value
+function quat_methods:getNormSqr()
 	return getQuatLenSqr(self)
 end
 
