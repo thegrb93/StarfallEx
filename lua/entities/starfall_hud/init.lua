@@ -41,16 +41,15 @@ function ENT:LinkVehicle(ent)
 end
 
 local function vehicleEnableHud(ply, vehicle, enabled)
-	for k, huds in pairs(vehiclelinks) do
-		if vehicle == k then
-			for v in pairs(huds) do
-				if v:IsValid() then
-					if v.link and v.link:IsValid() then
-						SF.EnableHud(ply, v.link, vehicle, enabled)
-					end
-				else
-					huds[v] = nil
+	local huds = vehiclelinks[vehicle]
+	if huds then
+		for v in pairs(huds) do
+			if v:IsValid() then
+				if v.link and v.link:IsValid() then
+					SF.EnableHud(ply, v.link, vehicle, enabled)
 				end
+			else
+				huds[v] = nil
 			end
 		end
 	end
