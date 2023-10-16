@@ -320,7 +320,7 @@ function ents_methods:getLinkedComponents()
 		end
 	elseif ent:GetClass() == "starfall_hud" then
 		if SERVER then
-			for k, v in pairs(SF.HudVehicleLinks) do if v == ent then list[#list+1] = owrap(k) end end
+			for k, huds in pairs(SF.HudVehicleLinks) do if huds[ent] then list[#list+1] = owrap(k) end end
 		else
 			SF.Throw("You may only get starfall_hud links through the server", 2)
 		end

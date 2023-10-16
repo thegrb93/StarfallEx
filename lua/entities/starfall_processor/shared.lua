@@ -263,7 +263,6 @@ if SERVER then
 			local function disconnect(sync)
 				huds[ply] = nil
 				hook.Remove("EntityRemoved", n)
-				hook.Remove("PlayerLeaveVehicle", n)
 				ply:SetViewEntity()
 				if activator.locksControls and activator.link and activator.link:IsValid() then
 					net.Start("starfall_lock_control")
@@ -279,9 +278,6 @@ if SERVER then
 			if enabled then
 				huds[ply] = true
 				hook.Add("EntityRemoved",n,function(e) if e==ply or e==activator then disconnect(true) end end)
-				if activator:IsVehicle() then
-					hook.Add("PlayerLeaveVehicle",n,function(p,v) if p==ply or v==activator then disconnect(true) end end)
-				end
 				if activator.locksControls and activator.link and activator.link:IsValid() then
 					net.Start("starfall_lock_control")
 						net.WriteEntity(activator.link)

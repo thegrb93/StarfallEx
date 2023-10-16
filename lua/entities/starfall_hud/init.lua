@@ -31,25 +31,33 @@ end
 
 function ENT:LinkVehicle(ent)
 	if ent then
-		vehiclelinks[ent] = self
+		if not vehiclelinks[ent] then vehiclelinks[ent] = {} end
+		vehiclelinks[ent][self] = true
 	else
-		for k, v in pairs(vehiclelinks) do
-			if self == v then
-				vehiclelinks[k] = nil
+		for k, huds in pairs(vehiclelinks) do
+			huds[self] = nil
+		end
+	end
+end
+
+local function vehicleEnableHud(ply, vehicle, enabled)
+	for k, huds in pairs(vehiclelinks) do
+		if vehicle == k then
+			for v in pairs(huds) do
+				if v:IsValid() then
+					if v.link and v.link:IsValid() then
+						SF.EnableHud(ply, v.link, vehicle, enabled)
+					end
+				else
+					huds[v] = nil
+				end
 			end
 		end
 	end
 end
 
-hook.Add("PlayerEnteredVehicle", "Starfall_HUD_PlayerEnteredVehicle", function(ply, vehicle)
-	for k, v in pairs(vehiclelinks) do
-		if vehicle == k and v:IsValid() then
-			if v.link and v.link:IsValid() then
-				SF.EnableHud(ply, v.link, vehicle, true)
-			end
-		end
-	end
-end)
+hook.Add("PlayerEnteredVehicle", "Starfall_HUD", function(ply, vehicle) vehicleEnableHud(ply, vehicle, true) end)
+hook.Add("PlayerLeaveVehicle", "Starfall_HUD", function(ply, vehicle) vehicleEnableHud(ply, vehicle, false) end)
 
 function ENT:PreEntityCopy()
 	if self.EntityMods then self.EntityMods.SFLink = nil end
@@ -58,8 +66,8 @@ function ENT:PreEntityCopy()
 		info.link = self.link:EntIndex()
 	end
 	local linkedvehicles = {}
-	for k, v in pairs(vehiclelinks) do
-		if v == self and k:IsValid() then
+	for k, huds in pairs(vehiclelinks) do
+		if huds[self] and k:IsValid() then
 			linkedvehicles[#linkedvehicles + 1] = k:EntIndex()
 		end
 	end
