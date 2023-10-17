@@ -378,7 +378,15 @@ end
 -- @param Vector end The end position of the curve.
 -- @return Vector Vector representing the point along the curve.
 function math_library.bezierVector(r, v1, v2, v3)
-	return math.QuadraticBezier(r, v1, v2, v3)
+	local ri = 1-r
+	local c1 = ri^2
+	local c2 = 2*ri*r
+	local c3 = r^2
+	return setmetatable({
+		c1*v1[1] + c2*v2[1] + c3*v3[1],
+		c1*v1[2] + c2*v2[2] + c3*v3[2],
+		c1*v1[3] + c2*v2[3] + c3*v3[3]}
+	, instance.Types.Vector)
 end
 
 --- Returns a point along a cubic bezier curve.
