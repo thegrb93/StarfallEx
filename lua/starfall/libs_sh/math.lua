@@ -396,9 +396,7 @@ end
 -- @param Vector tangent2 Second tangent
 -- @param Vector end The end position of the curve.
 -- @return Vector Vector representing the point along the curve.
-function math_library.bezierVectorCubic(r, v1, v2, v3, v4)
-	return math.CubicBezier(r, v1, v2, v3, v4)
-end
+math_library.bezierVectorCubic = math.CubicBezier
 
 --- Generates a random float value that should be the same on client and server
 -- @param string uniqueName The seed for the random value
