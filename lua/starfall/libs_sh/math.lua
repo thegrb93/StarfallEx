@@ -390,20 +390,22 @@ function math_library.bezierVector(r, v1, v2, v3)
 end
 
 --- Lerp point between 3 control points with quadratic bezier.
+-- See math.cubicBezier for a function which works with 4 control points.
 -- @param number ratio Number representing how far along the curve, 0-1.
--- @param Vector start The start position of the curve.
--- @param Vector middle The middle position of the curve.
--- @param Vector end The end position of the curve.
+-- @param Vector p1 The start position of the curve.
+-- @param Vector p2 Tangent
+-- @param Vector p3 The end position of the curve.
 -- @return Vector Vector representing the point along the curve.
 function math_library.quadraticBezier(r, v1, v2, v3)
 	return math.QuadraticBezier(r, v1, v2, v3)
 end
 
 --- Lerp point between 4 control points with cubic bezier.
+-- See math.quadraticBezier for a function which works with 3 control points.
 -- @param number ratio Number representing how far along the curve, 0-1.
 -- @param Vector p1 The start position of the curve.
--- @param Vector p2 First tangent.
--- @param Vector p3 Second tangent.
+-- @param Vector p2 First tangent
+-- @param Vector p3 Second tangent
 -- @param Vector p4 The end position of the curve.
 -- @return Vector Vector representing the point along the curve.
 function math_library.cubicBezier(r, v1, v2, v3, v4)
