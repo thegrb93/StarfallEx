@@ -389,6 +389,27 @@ function math_library.bezierVector(r, v1, v2, v3)
 	, instance.Types.Vector)
 end
 
+--- Lerp point between 3 control points with quadratic bezier.
+-- @param number ratio Number representing how far along the curve, 0-1.
+-- @param Vector start The start position of the curve.
+-- @param Vector middle The middle position of the curve.
+-- @param Vector end The end position of the curve.
+-- @return Vector Vector representing the point along the curve.
+function math_library.quadraticBezier(r, v1, v2, v3)
+	return math.QuadraticBezier(r, v1, v2, v3)
+end
+
+--- Lerp point between 4 control points with cubic bezier.
+-- @param number ratio Number representing how far along the curve, 0-1.
+-- @param Vector p1 The start position of the curve.
+-- @param Vector p2 First tangent.
+-- @param Vector p3 Second tangent.
+-- @param Vector p4 The end position of the curve.
+-- @return Vector Vector representing the point along the curve.
+function math_library.cubicBezier(r, v1, v2, v3, v4)
+	return math.CubicBezier(r, v1, v2, v3, v4)
+end
+
 --- Generates a random float value that should be the same on client and server
 -- @param string uniqueName The seed for the random value
 -- @param number Min The minimum value of the random range
