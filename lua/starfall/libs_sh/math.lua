@@ -389,6 +389,30 @@ function math_library.bezierVector(r, v1, v2, v3)
 	, instance.Types.Vector)
 end
 
+--- Returns a point along a cubic bezier curve.
+-- @param number ratio Number representing how far along the curve, 0-1.
+-- @param Vector start The start position of the curve.
+-- @param Vector tangent1 First tangent
+-- @param Vector tangent2 Second tangent
+-- @param Vector end The end position of the curve.
+-- @return Vector Vector representing the point along the curve.
+function math_library.bezierVectorCubic(r, v1, v2, v3, v4)
+	local r2 = r * r
+	local ri = 1 - r
+	local ri2 = ri * ri
+	
+	local c1 = ri2 * ri
+	local c2 = 3 * ri2 * r
+	local c3 = 3 * ri * r2
+	local c4 = r2 * r
+	
+	return setmetatable({
+	  c1*v1[1] + c2*v2[1] + c3*v3[1] + c4*v4[1],
+	  c1*v1[2] + c2*v2[2] + c3*v3[2] + c4*v4[2],
+	  c1*v1[3] + c2*v2[3] + c3*v3[3] + c4*v4[3]}
+	, instance.Types.Vector)
+end
+
 --- Generates a random float value that should be the same on client and server
 -- @param string uniqueName The seed for the random value
 -- @param number Min The minimum value of the random range
