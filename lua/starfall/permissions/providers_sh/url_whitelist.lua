@@ -77,8 +77,8 @@ simple [[onedrive.live.com/redir]]
 --- Examples:
 ---  https://docs.google.com/uc?export=download&confirm=UYyi&id=0BxUpZqVaDxVPeENDM1RtZDRvaTA
 
-simple [[docs.google.com/uc]]
-simple [[drive.google.com/uc]]
+pattern [[docs%.google%.com/uc.+]]
+pattern [[drive%.google%.com/uc.+]]
 
 -- Backblaze B2
 --- Examples:
