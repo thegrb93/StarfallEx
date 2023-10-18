@@ -68,7 +68,9 @@ function effect_methods:play(eff)
 	checkpermission(instance, nil, "effect.play")
 	plyEffectBurst:use(instance.player, 1)
 
+	eff = eff:lower()
 	if effect_blacklist[eff] then SF.Throw("Effect ("..eff..") is blacklisted", 2) end
+	if hook.Run( "Starfall_CanEffect", eff, instance ) == false then SF.Throw("Effect ("..eff..") has been blocked from running", 2) end
 
 	util.Effect(eff,unwrap(self))
 end
