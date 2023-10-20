@@ -2089,7 +2089,7 @@ end
 --@param function callback The function to run when the value is changed. Has one argument which is the new value that was set.
 function dnms_methods:onValueChange(func)
 	checkluatype(func, TYPE_FUNCTION)
-	unwrap(self).OnValueChanged = function(val) instance:runFunction(func, val) end
+	unwrap(self).OnValueChanged = function(panel, val) instance:runFunction(func, val) end
 end
 
 --- Creates a UIComboBox. A field with multiple selectable values. Inherits functions from DButton.
