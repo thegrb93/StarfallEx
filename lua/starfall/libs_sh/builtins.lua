@@ -608,6 +608,17 @@ else
 		end
 	end
 
+	--- Sets the chip's display author
+	-- @client
+	-- @param string author Author to set the chip's author to
+	function builtins_library.setAuthor(author)
+		checkluatype(author, TYPE_STRING)
+		local e = instance.entity
+		if (e and e:IsValid()) then
+			e.author = string.sub(author, 1, 256)
+		end
+	end
+
 	--- Sets clipboard text. Only works on the owner of the chip.
 	-- @client
 	-- @param string txt Text to set to the clipboard
