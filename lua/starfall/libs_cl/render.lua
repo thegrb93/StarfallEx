@@ -247,6 +247,7 @@ end)
 -- @client
 -- @param boolean depth Whether the current draw is writing depth
 -- @param boolean skybox Whether the current draw is drawing the skybox
+-- @param boolean skybox3d Whether the current draw is drawing the 3D skybox
 SF.hookAdd("PreDrawOpaqueRenderables", nil, hudPrepareSafeArgs, cleanupRender)
 
 --- Called after opaque entities are drawn. (Only works with HUD) (3D context)
@@ -255,6 +256,7 @@ SF.hookAdd("PreDrawOpaqueRenderables", nil, hudPrepareSafeArgs, cleanupRender)
 -- @client
 -- @param boolean depth Whether the current draw is writing depth
 -- @param boolean skybox Whether the current draw is drawing the skybox
+-- @param boolean skybox3d Whether the current draw is drawing the 3D skybox
 SF.hookAdd("PostDrawOpaqueRenderables", nil, hudPrepareSafeArgs, cleanupRender)
 
 --- Called before translucent entities are drawn. (Only works with HUD) (3D context)
@@ -263,6 +265,7 @@ SF.hookAdd("PostDrawOpaqueRenderables", nil, hudPrepareSafeArgs, cleanupRender)
 -- @client
 -- @param boolean depth Whether the current draw is writing depth
 -- @param boolean skybox Whether the current draw is drawing the skybox
+-- @param boolean skybox3d Whether the current draw is drawing the 3D skybox
 SF.hookAdd("PreDrawTranslucentRenderables", nil, hudPrepareSafeArgs, cleanupRender)
 
 --- Called after translucent entities are drawn. (Only works with HUD) (3D context)
@@ -271,6 +274,7 @@ SF.hookAdd("PreDrawTranslucentRenderables", nil, hudPrepareSafeArgs, cleanupRend
 -- @client
 -- @param boolean depth Whether the current draw is writing depth
 -- @param boolean skybox Whether the current draw is drawing the skybox
+-- @param boolean skybox3d Whether the current draw is drawing the 3D skybox
 SF.hookAdd("PostDrawTranslucentRenderables", nil, hudPrepareSafeArgs, cleanupRender)
 
 --- Called before drawing HUD (2D Context)
@@ -571,7 +575,7 @@ function render_library.setWriteDepthToDestAlpha(enable)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	render.SetWriteDepthToDestAlpha(enable)
 end
-	
+
 --- Sets up the ambient lighting for any upcoming render operation. Ambient lighting can be seen as a cube enclosing the object to be drawn, each of its faces representing a directional light source that shines towards the object.
 -- @param number lightDirection The light source to edit, builtins.BOX enumeration.
 -- @param number r The red component of the light color.
@@ -590,7 +594,7 @@ function render_library.resetModelLighting(r, g, b)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	render.ResetModelLighting(r, g, b)
 end
-	
+
 --- Clears the current rendertarget for obeying the current stencil buffer conditions.
 -- @param number r Value of the red channel to clear the current rt with.
 -- @param number g Value of the green channel to clear the current rt with.
