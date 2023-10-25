@@ -209,7 +209,8 @@ end
 local function terminateAutoComplete( cmd, stringargs )
 	local examples = {}
 	for _, ply in pairs( player.GetHumans() ) do
-		table.insert( examples, cmd .. " " .. "\"" .. ply:SteamID() .. "\"" )
+		--table.insert( examples, cmd .. " " .. "\"" .. ply:SteamID() .. "\"" )
+		table.insert( examples, cmd .. " " .. "\"" .. ply:SteamID() .. "\" " .. "\"" .. ply:Nick() .. "\"" )
 	end
 
 	return examples
