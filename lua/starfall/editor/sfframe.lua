@@ -2044,7 +2044,9 @@ function PANEL:UpdatePlayers(players)
 		if LocalPlayer():IsAdmin() then
 			local killserver = vgui.Create("StarfallButton", cpuServer)
 			killserver:SetText("Admin Kill")
-			killserver.DoClick = RunConsoleCommand( "sf_user_terminate", steamid )
+			killserver.DoClick = function()
+				RunConsoleCommand( "sf_user_terminate", steamid )
+			end
 			killserver:Dock(LEFT)
 		end
 
@@ -2062,7 +2064,9 @@ function PANEL:UpdatePlayers(players)
 
 		local killclient = vgui.Create("StarfallButton", cpuClient)
 		killclient:SetText("Kill all")
-		killclient.DoClick = RunConsoleCommand( "sf_user_terminate_client", steamid )
+		killclient.DoClick = function()
+			RunConsoleCommand( "sf_user_terminate_client", steamid )
+		end
 		killclient:Dock(LEFT)
 
 		header.nextThink = 0
