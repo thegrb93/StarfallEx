@@ -217,7 +217,8 @@ local function terminateAutoComplete( cmd, stringargs )
 end
 
 -- TODO: documentation?
--- Terminates a user's starfall chips clientside
+---Terminates a user's starfall chips clientside
+---Supports SteamID and SteamID64
 concommand.Add( "sf_user_terminate_client", function( executor, cmd, args )
 	local id = getId( args[1] )
 	if not id or id == "" then return end
@@ -234,8 +235,8 @@ concommand.Add( "sf_user_terminate_client", function( executor, cmd, args )
 end, terminateAutoComplete( cmd, stringargs ), "Terminates a user's starfall chips clientside." )
 
 -- TODO: documentation?
--- Terminate a user's starfall chips
--- This command is admin only
+---Terminates a user's starfall chips
+---This command is admin only
 concommand.Add( "sf_user_terminate", function( executor, cmd, args )
 	if not executor:IsSuperAdmin() then return end
 
