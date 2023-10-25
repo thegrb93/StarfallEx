@@ -187,6 +187,7 @@ end)
 
 -- TODO: documentation? Probably want to extrapolate this
 -- Modified Helper function pulled from entities/starfall_processor/cl_init.lua
+--[[
 local function getId( arg )
 	if not arg then
 		LocalPlayer():PrintMessage( HUD_PRINTCONSOLE, "Missing SteamID" )
@@ -202,12 +203,31 @@ local function getId( arg )
 
 	return arg
 end
+]]
+
+local function getId( arg )
+	if not arg then
+		LocalPlayer():PrintMessage( HUD_PRINTCONSOLE, "Missing SteamID" )
+		return
+	end
+
+	-- Check if SteamID64
+	if tonumber( arg ) then
+		return util.SteamIDFrom64( arg ) or "" end
+	-- Check if SteamID
+	elseif string.sub( arg, 1, 6 ) == 'STEAM_' then
+		return arg
+	else
+		LocalPlayer():PrintMessage( HUD_PRINTCONSOLE, "Invalid SteamID" )
+		return
+	end
+end
 
 -- TODO: documentation?
 -- Terminates a user's starfall chips clientside
 concommand.Add( "sf_user_terminate_client", function( executor, cmd, args )
 	local id = getId( args[1] )
-	if not id then return end
+	if not id or id == "" then return end
 
 	local ply = player.GetBySteamID( id )
 	if not ply or not ply:IsValid() then
@@ -227,7 +247,7 @@ concommand.Add( "sf_user_terminate", function( executor, cmd, args )
 	if not executor:IsSuperAdmin() then return end
 
 	local id = getId( args[1] )
-	if not id then return end
+	if not id or id == "" then return end
 
 	local ply = player.GetBySteamID( id )
 	if not ply or not ply:IsValid() then
