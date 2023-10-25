@@ -205,7 +205,6 @@ local function getId( arg )
 	end
 end
 
--- TODO: documentation?
 -- Local function to handle autocomplete for the terminate commands
 local function terminateAutoComplete( cmd, stringargs )
 	local examples = {}
