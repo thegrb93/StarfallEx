@@ -215,7 +215,8 @@ local function getId( arg )
 	if tonumber( arg ) then
 		return util.SteamIDFrom64( arg ) or ""
 	-- Check if SteamID
-	elseif string.sub( arg, 1, 6 ) == 'STEAM_' then
+	-- Hotfix
+	elseif string.match( arg, "^STEAM_%d:%d:%d+$" ) then
 		return arg
 	else
 		LocalPlayer():PrintMessage( HUD_PRINTCONSOLE, "Invalid SteamID" )
