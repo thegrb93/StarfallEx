@@ -213,7 +213,7 @@ local function getId( arg )
 
 	-- Check if SteamID64
 	if tonumber( arg ) then
-		return util.SteamIDFrom64( arg ) or "" end
+		return util.SteamIDFrom64( arg ) or ""
 	-- Check if SteamID
 	elseif string.sub( arg, 1, 6 ) == 'STEAM_' then
 		return arg
