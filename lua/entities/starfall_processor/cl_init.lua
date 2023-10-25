@@ -48,9 +48,9 @@ function ENT:GetOverlayText()
 	else
 		serverstr = "None"
 	end
-	
+
 	local authorstr =  self.author and self.author:Trim() ~= "" and "\nAuthor: " .. self.author or ""
-	
+
 	return "- Starfall Processor -\n[ " .. self.name .. " ]"..authorstr.."\nServer CPU: " .. serverstr .. "\nClient CPU: " .. clientstr
 end
 
@@ -185,3 +185,61 @@ net.Receive("starfall_processor_used", function(len)
 	end
 end)
 
+-- TODO: documentation? Probably want to extrapolate this
+-- Modified Helper function pulled from entities/starfall_processor/cl_init.lua
+local function getId( arg )
+	if not arg then
+		LocalPlayer():PrintMessage( HUD_PRINTCONSOLE, "Missing SteamID" )
+		return
+	end
+
+	if not string.find( arg, '[^%d]' ) then arg = util.SteamIDFrom64( arg ) or "" end
+
+	if string.sub( arg, 1, 6 ) ~= 'STEAM_' then
+		LocalPlayer():PrintMessage( HUD_PRINTCONSOLE, "Invalid SteamID" )
+		return
+	end
+
+	return arg
+end
+
+-- TODO: documentation?
+-- Terminates a user's starfall chips clientside
+concommand.Add( "sf_user_terminate_client", function( executor, cmd, args ), "Terminates a user's starfall chips clientside."
+	local id = getId( args[1] )
+	if not id then return end
+
+	local ply = player.GetBySteamID( id )
+	if not ply or not ply:IsValid() then
+		LocalPlayer():PrintMessage( HUD_PRINTCONSOLE, "Player not found" )
+		return
+	end
+
+	for instance, _ in pairs( SF.playerInstances[ply] ) do
+		instance:Error( { message = "Killed by user", traceback = "" } )
+	end
+end )
+
+-- TODO: documentation?
+-- Terminate a user's starfall chips
+-- This command is admin only
+concommand.Add( "sf_user_terminate", function( executor, cmd, args ), "SuperAdmin Only. Terminate a user's starfall chips."
+	if not executor:IsSuperAdmin() then return end
+
+	local id = getId( args[1] )
+	if not id then return end
+
+	local ply = player.GetBySteamID( id )
+	if not ply or not ply:IsValid() then
+		LocalPlayer():PrintMessage( HUD_PRINTCONSOLE, "Player not found" )
+		return
+	end
+
+	if SF.playerInstances[ply] then
+		for instance, _ in pairs( SF.playerInstances[ply] ) do
+			net.Start( "starfall_processor_kill" )
+			net.WriteEntity( instance.entity )
+			net.SendToServer()
+		end
+	end
+end )
