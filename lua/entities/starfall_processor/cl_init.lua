@@ -205,7 +205,7 @@ end
 
 -- TODO: documentation?
 -- Terminates a user's starfall chips clientside
-concommand.Add( "sf_user_terminate_client", function( executor, cmd, args ), "Terminates a user's starfall chips clientside."
+concommand.Add( "sf_user_terminate_client", function( executor, cmd, args )
 	local id = getId( args[1] )
 	if not id then return end
 
@@ -218,12 +218,12 @@ concommand.Add( "sf_user_terminate_client", function( executor, cmd, args ), "Te
 	for instance, _ in pairs( SF.playerInstances[ply] ) do
 		instance:Error( { message = "Killed by user", traceback = "" } )
 	end
-end )
+end, "Terminates a user's starfall chips clientside." )
 
 -- TODO: documentation?
 -- Terminate a user's starfall chips
 -- This command is admin only
-concommand.Add( "sf_user_terminate", function( executor, cmd, args ), "SuperAdmin Only. Terminate a user's starfall chips."
+concommand.Add( "sf_user_terminate", function( executor, cmd, args )
 	if not executor:IsSuperAdmin() then return end
 
 	local id = getId( args[1] )
@@ -242,4 +242,4 @@ concommand.Add( "sf_user_terminate", function( executor, cmd, args ), "SuperAdmi
 			net.SendToServer()
 		end
 	end
-end )
+end, "SuperAdmin Only. Terminate a user's starfall chips." )
