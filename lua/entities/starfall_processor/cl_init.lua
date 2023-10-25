@@ -206,6 +206,17 @@ local function getId( arg )
 end
 
 -- TODO: documentation?
+-- Local function to handle autocomplete for the terminate commands
+local function terminateAutoComplete( cmd, stringargs )
+	local examples = {}
+	for _, ply in pairs( player.GetHumans() ) do
+		table.insert( examples, cmd .. " " .. ply:SteamID() )
+	end
+
+	return examples
+end
+
+-- TODO: documentation?
 -- Terminates a user's starfall chips clientside
 concommand.Add( "sf_user_terminate_client", function( executor, cmd, args )
 	local id = getId( args[1] )
@@ -220,7 +231,7 @@ concommand.Add( "sf_user_terminate_client", function( executor, cmd, args )
 	for instance, _ in pairs( SF.playerInstances[ply] ) do
 		instance:Error( { message = "Killed by user", traceback = "" } )
 	end
-end, _, "Terminates a user's starfall chips clientside." )
+end, terminateAutoComplete( cmd, stringargs ), "Terminates a user's starfall chips clientside." )
 
 -- TODO: documentation?
 -- Terminate a user's starfall chips
@@ -244,4 +255,4 @@ concommand.Add( "sf_user_terminate", function( executor, cmd, args )
 			net.SendToServer()
 		end
 	end
-end, _, "SuperAdmin Only. Terminate a user's starfall chips." )
+end, terminateAutoComplete( cmd, stringargs ), "SuperAdmin Only. Terminate a user's starfall chips." )
