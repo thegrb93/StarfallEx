@@ -231,7 +231,7 @@ concommand.Add( "sf_user_terminate_client", function( executor, cmd, args )
 	for instance, _ in pairs( SF.playerInstances[ply] ) do
 		instance:Error( { message = "Killed by user", traceback = "" } )
 	end
-end, terminateAutoComplete( cmd, stringargs ), "Terminates a user's starfall chips clientside." )
+end, terminateAutoComplete, "Terminates a user's starfall chips clientside." )
 
 -- TODO: documentation?
 ---Terminates a user's starfall chips
@@ -255,4 +255,4 @@ concommand.Add( "sf_user_terminate", function( executor, cmd, args )
 			net.SendToServer()
 		end
 	end
-end, terminateAutoComplete( cmd, stringargs ), "SuperAdmin Only. Terminate a user's starfall chips." )
+end, terminateAutoComplete, "SuperAdmin Only. Terminate a user's starfall chips." )
