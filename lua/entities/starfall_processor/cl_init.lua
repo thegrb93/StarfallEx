@@ -187,7 +187,7 @@ end)
 
 local function getId( arg )
 	if not arg then
-		LocalPlayer():PrintMessage( HUD_PRINTCONSOLE, "Missing SteamID" )
+		LocalPlayer():PrintMessage( HUD_PRINTCONSOLE, "Missing SteamID\n" )
 		return
 	end
 
@@ -200,7 +200,7 @@ local function getId( arg )
 		-- TODO: Check if valid SteamID somehow
 		return arg
 	else
-		LocalPlayer():PrintMessage( HUD_PRINTCONSOLE, "Invalid SteamID" )
+		LocalPlayer():PrintMessage( HUD_PRINTCONSOLE, "Invalid SteamID\n" )
 		return
 	end
 end
@@ -213,7 +213,7 @@ concommand.Add( "sf_user_terminate_client", function( executor, cmd, args )
 
 	local ply = player.GetBySteamID( id )
 	if not ply or not ply:IsValid() then
-		LocalPlayer():PrintMessage( HUD_PRINTCONSOLE, "Player not found" )
+		LocalPlayer():PrintMessage( HUD_PRINTCONSOLE, "Player not found\n" )
 		return
 	end
 
@@ -233,7 +233,7 @@ concommand.Add( "sf_user_terminate", function( executor, cmd, args )
 
 	local ply = player.GetBySteamID( id )
 	if not ply or not ply:IsValid() then
-		LocalPlayer():PrintMessage( HUD_PRINTCONSOLE, "Player not found" )
+		LocalPlayer():PrintMessage( HUD_PRINTCONSOLE, "Player not found\n" )
 		return
 	end
 
