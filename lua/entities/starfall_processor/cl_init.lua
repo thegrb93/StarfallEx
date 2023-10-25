@@ -185,26 +185,6 @@ net.Receive("starfall_processor_used", function(len)
 	end
 end)
 
--- TODO: documentation? Probably want to extrapolate this
--- Modified Helper function pulled from entities/starfall_processor/cl_init.lua
---[[
-local function getId( arg )
-	if not arg then
-		LocalPlayer():PrintMessage( HUD_PRINTCONSOLE, "Missing SteamID" )
-		return
-	end
-
-	if not string.find( arg, '[^%d]' ) then arg = util.SteamIDFrom64( arg ) or "" end
-
-	if string.sub( arg, 1, 6 ) ~= 'STEAM_' then
-		LocalPlayer():PrintMessage( HUD_PRINTCONSOLE, "Invalid SteamID" )
-		return
-	end
-
-	return arg
-end
-]]
-
 local function getId( arg )
 	if not arg then
 		LocalPlayer():PrintMessage( HUD_PRINTCONSOLE, "Missing SteamID" )
