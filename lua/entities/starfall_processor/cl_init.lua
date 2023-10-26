@@ -185,22 +185,24 @@ net.Receive("starfall_processor_used", function(len)
 	end
 end)
 
-local function getId( arg )
-	if not arg then
+-- Returns ply or nil
+local function getPlayerBySteamID( idStr )
+	if not idStr then
 		LocalPlayer():PrintMessage( HUD_PRINTCONSOLE, "Missing SteamID\n" )
 		return
 	end
 
 	-- Check if SteamID64
-	if tonumber( arg ) then
-		return util.SteamIDFrom64( arg ) or ""
-	-- Check if SteamID
-	elseif string.StartsWith( arg, "STEAM_" ) then
-		-- TODO: Check if valid SteamID somehow
-		return arg
+	if tonumber( idStr ) then
+		idStr = util.SteamIDFrom64( idStr )
+	end
+
+	local ply = player.GetBySteamID( idStr )
+	if ply then
+		return ply
 	else
-		LocalPlayer():PrintMessage( HUD_PRINTCONSOLE, "Invalid SteamID\n" )
-		return
+		LocalPlayer():PrintMessage( HUD_PRINTCONSOLE, "Player Not Found\n" )
+		return nil
 	end
 end
 
@@ -217,14 +219,8 @@ end
 ---Terminates a user's starfall chips clientside
 ---Supports SteamID and SteamID64
 concommand.Add( "sf_kill_cl", function( executor, cmd, args )
-	local id = getId( args[1] )
-	if not id or id == "" then return end
-
-	local ply = player.GetBySteamID( id )
-	if not ply or not ply:IsValid() then
-		LocalPlayer():PrintMessage( HUD_PRINTCONSOLE, "Player not found\n" )
-		return
-	end
+	local ply = getPlayerBySteamID()
+	if not ply then return end
 
 	for instance, _ in pairs( SF.playerInstances[ply] ) do
 		instance:Error( { message = "Killed by user", traceback = "" } )
@@ -236,14 +232,8 @@ end, terminateAutoComplete, "Terminates a user's starfall chips clientside." )
 concommand.Add( "sf_kill", function( executor, cmd, args )
 	if not executor:IsAdmin() then return end
 
-	local id = getId( args[1] )
-	if not id or id == "" then return end
-
-	local ply = player.GetBySteamID( id )
-	if not ply or not ply:IsValid() then
-		LocalPlayer():PrintMessage( HUD_PRINTCONSOLE, "Player not found\n" )
-		return
-	end
+	local ply = getPlayerBySteamID( args[1] )
+	if not ply then return end
 
 	if SF.playerInstances[ply] then
 		for instance, _ in pairs( SF.playerInstances[ply] ) do
