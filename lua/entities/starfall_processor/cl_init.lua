@@ -219,7 +219,7 @@ end
 -- TODO: documentation?
 ---Terminates a user's starfall chips clientside
 ---Supports SteamID and SteamID64
-concommand.Add( "sf_user_terminate_client", function( executor, cmd, args )
+concommand.Add( "sf_kill_cl", function( executor, cmd, args )
 	local id = getId( args[1] )
 	if not id or id == "" then return end
 
@@ -237,8 +237,8 @@ end, terminateAutoComplete, "Terminates a user's starfall chips clientside." )
 -- TODO: documentation?
 ---Terminates a user's starfall chips
 ---This command is admin only
-concommand.Add( "sf_user_terminate", function( executor, cmd, args )
-	if not executor:IsSuperAdmin() then return end
+concommand.Add( "sf_kill", function( executor, cmd, args )
+	if not executor:IsAdmin() then return end
 
 	local id = getId( args[1] )
 	if not id or id == "" then return end
