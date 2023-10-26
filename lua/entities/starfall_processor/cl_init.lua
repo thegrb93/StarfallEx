@@ -195,7 +195,6 @@ local function getId( arg )
 	if tonumber( arg ) then
 		return util.SteamIDFrom64( arg ) or ""
 	-- Check if SteamID
-	--elseif string.match( arg, "^STEAM_%d:%d:%d+$" ) then
 	elseif string.StartsWith( arg, "STEAM_" ) then
 		-- TODO: Check if valid SteamID somehow
 		return arg
@@ -209,7 +208,6 @@ end
 local function terminateAutoComplete( cmd, stringargs )
 	local examples = {}
 	for _, ply in pairs( player.GetHumans() ) do
-		--table.insert( examples, cmd .. " " .. "\"" .. ply:SteamID() .. "\"" )
 		table.insert( examples, cmd .. " " .. "\"" .. ply:SteamID() .. "\" " .. "\"" .. ply:Nick() .. "\"" )
 	end
 
