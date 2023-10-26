@@ -207,7 +207,7 @@ local function getPlayerBySteamID( idStr )
 end
 
 -- Local function to handle autocomplete for the terminate commands
-local function terminateAutoComplete( cmd, stringargs )
+local function terminateAutoComplete( cmd, stringArgs )
 	local examples = {}
 	for _, ply in pairs( player.GetHumans() ) do
 		table.insert( examples, cmd .. " " .. "\"" .. ply:SteamID() .. "\" " .. "\"" .. ply:Nick() .. "\"" )
