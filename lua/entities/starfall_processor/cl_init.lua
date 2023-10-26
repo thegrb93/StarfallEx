@@ -216,7 +216,6 @@ local function terminateAutoComplete( cmd, stringargs )
 	return examples
 end
 
--- TODO: documentation?
 ---Terminates a user's starfall chips clientside
 ---Supports SteamID and SteamID64
 concommand.Add( "sf_kill_cl", function( executor, cmd, args )
@@ -234,7 +233,6 @@ concommand.Add( "sf_kill_cl", function( executor, cmd, args )
 	end
 end, terminateAutoComplete, "Terminates a user's starfall chips clientside." )
 
--- TODO: documentation?
 ---Terminates a user's starfall chips
 ---This command is admin only
 concommand.Add( "sf_kill", function( executor, cmd, args )
