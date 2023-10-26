@@ -242,4 +242,4 @@ concommand.Add( "sf_kill", function( executor, cmd, args )
 			net.SendToServer()
 		end
 	end
-end, terminateAutoComplete, "SuperAdmin Only. Terminate a user's starfall chips." )
+end, terminateAutoComplete, "Admin Only. Terminate a user's starfall chips." )
