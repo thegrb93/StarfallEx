@@ -219,7 +219,7 @@ end
 ---Terminates a user's starfall chips clientside
 ---Supports SteamID and SteamID64
 concommand.Add( "sf_kill_cl", function( executor, cmd, args )
-	local ply = getPlayerBySteamID()
+	local ply = getPlayerBySteamID( args[1] )
 	if not ply then return end
 
 	for instance, _ in pairs( SF.playerInstances[ply] ) do
