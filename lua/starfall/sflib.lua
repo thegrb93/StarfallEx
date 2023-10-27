@@ -418,17 +418,25 @@ SF.StringRestrictor = {
 }
 setmetatable(SF.StringRestrictor, SF.StringRestrictor)
 
+local function steamIdToConsoleSafeName(steamid)
+	local ply = player.GetBySteamID(steamid)
+	return IsValid(ply) and string.gsub(ply:Nick(), '[%z\x01-\x1f\x7f;"\']', "") or ""
+end
 
 --- Returns a class that can keep a list of blocked users
 SF.BlockedList = {
 	__index = {
+		toline = function(self, steamid, name)
+			return steamid..","..name.."\n"
+		end
 		block = function(self, steamid)
 			if self.list[steamid] then return end
-			self.list[steamid] = true
+			local name = steamIdToConsoleSafeName(steamid)
+			self.list[steamid] = name
 
 			if self.filename then
 				local f = file.Open(self.filename,"a","DATA")
-				f:Write(steamid.."\n")
+				f:Write(self:toline(steamid, name))
 				f:Close()
 			end
 
@@ -442,8 +450,8 @@ SF.BlockedList = {
 
 			if self.filename then
 				local f = file.Open(self.filename,"w","DATA")
-				for id in pairs(self.list) do
-					f:Write(id.."\n")
+				for steamid, name in pairs(self.list) do
+					f:Write(self:toline(steamid, name))
 				end
 				f:Close()
 			end
@@ -459,7 +467,10 @@ SF.BlockedList = {
 			local f = file.Open(self.filename,"r","DATA")
 			if f then
 				while not f:EndOfFile() do
-					self.list[f:ReadLine()] = true
+					local steamid, name = string.match(f:ReadLine(), "([^,%s]+),?(.*)")
+					if steamid then
+						self.list[steamid] = name
+					end
 				end
 				f:Close()
 			end
@@ -477,48 +488,26 @@ SF.BlockedList = {
 			blocked:readFile()
 		end
 
-		local function getCompletion(cmd, ply, steamid)
-			if IsValid(ply) then
-				return cmd.." \""..steamid.."\" // "..string.gsub(ply:GetName(), '[%z\x01-\x1f\x7f;"\']', "")
-			else
-				return cmd.." \""..steamid.."\""
-			end
-		end
-		local function getId(arg)
-			if not arg then print("missing steamid") return end
-			if not string.find(arg, '[^%d]') then arg = util.SteamIDFrom64(arg) or "" end
-			if string.sub(arg, 1, 6) ~= 'STEAM_' then return print("invalid steamid") end
-			return arg
-		end
-		concommand.Add("sf_"..prefix.."_block", function(executor, cmd, args)
-			local id = getId(args[1])
-			if id then
-				blocked:block(id)
-			end
-		end, function(cmd)
+		SF.SteamIDConcommand("sf_"..prefix.."_block", function(executor, id)
+			blocked:block(id)
+		end, "Block a user from " .. desc, false)
+
+		SF.SteamIDConcommand("sf_"..prefix.."_unblock", function(executor, id)
+			blocked:unblock(id)
+		end, "Unblock a user from " .. desc, false,
+		function(cmd)
 			local tbl = {}
-			for _, ply in pairs(player.GetHumans()) do
-				table.insert(tbl, getCompletion(cmd, ply, ply:SteamID()))
+			for steamid, name in pairs(blocked.list) do
+				table.insert(tbl, cmd.." \""..steamid.."\" // \""..name.."\"")
 			end
 			return tbl
-		end, "Block a user from " .. desc)
-		concommand.Add("sf_"..prefix.."_unblock", function(executor, cmd, args)
-			local id = getId(args[1])
-			if id then
-				blocked:unblock(id)
-			end
-		end, function(cmd)
-			local tbl = {}
-			for steamid in pairs(blocked.list) do
-				table.insert(tbl, getCompletion(cmd, player.GetBySteamID(steamid), steamid))
-			end
-			return tbl
-		end, "Unblock a user from " .. desc)
+		end)
+
 		concommand.Add("sf_"..prefix.."_blocklist", function(executor, cmd, args)
 			local n = 0
-			for steamid in pairs(blocked.list) do
-				print(getCompletion("", player.GetBySteamID(steamid), steamid))
-				n = n+1
+			for steamid, name in pairs(blocked.list) do
+				print("\""..steamid.."\" // \""..name.."\"")
+				n = n + 1
 			end
 			print("You have blocked "..n.." players from "..desc)
 		end, nil, "List players you have blocked from " .. desc)
@@ -889,6 +878,40 @@ end
 -------------------------------------------------------------------------------
 -- Utility functions
 -------------------------------------------------------------------------------
+
+function SF.SteamIDConcommand(name, callback, helptext, findplayer, completionlist)
+	concommand.Add(name, function(executor, cmd, arg)
+		local retval = arg[1]
+		if not retval then
+			executor:PrintMessage( HUD_PRINTCONSOLE, "Missing steam id\n" )
+			return
+		end
+		if not string.match(retval, "%D") then
+			retval = util.SteamIDFrom64(retval) or ""
+		end
+		if not string.match(retval, "^STEAM_") then
+			executor:PrintMessage( HUD_PRINTCONSOLE, "Invalid steam id\n" )
+			return
+		end
+		if findplayer then
+			retval = player.GetBySteamID( retval )
+			if not retval then
+				executor:PrintMessage( HUD_PRINTCONSOLE, "Player not found\n" )
+				return
+			end
+		end
+
+		callback(executor, retval)
+
+	end, completionlist or function(cmd)
+		local tbl = {}
+		for _, ply in pairs(player.GetHumans()) do
+			local steamid = ply:SteamID()
+			table.insert(tbl, cmd.." \""..steamid.."\" // \""..steamIdToConsoleSafeName(steamid).."\"")
+		end
+		return tbl
+	end, helptext)
+end
 
 SF.BlockedUsers = SF.BlockedList("user", "running clientside starfall code", "sf_blockedusers.txt",
 	function(steamid)
