@@ -185,56 +185,36 @@ net.Receive("starfall_processor_used", function(len)
 	end
 end)
 
--- Returns ply or nil
-local function getPlayerBySteamID( idStr )
-	if not idStr then
-		LocalPlayer():PrintMessage( HUD_PRINTCONSOLE, "Missing SteamID\n" )
-		return
+SF.BlockedUsers = SF.BlockedList("user", "running clientside starfall code", "sf_blockedusers.txt",
+	function(steamid)
+		local ply = player.GetBySteamID(steamid)
+		if not ply then return end
+		for k, v in pairs(ents.FindByClass("starfall_processor")) do
+			if v.owner == ply and v.instance then
+				v:Error({message = "Blocked by user", traceback = ""})
+			end
+		end
+	end,
+	function(steamid)
+		local ply = player.GetBySteamID(steamid)
+		if not ply then return end
+		for k, v in pairs(ents.FindByClass("starfall_processor")) do
+			if v.owner == ply then
+				v:Compile()
+			end
+		end
 	end
+)
 
-	-- Check if SteamID64
-	if tonumber( idStr ) then
-		idStr = util.SteamIDFrom64( idStr )
-	end
-
-	local ply = player.GetBySteamID( idStr )
-	if ply then
-		return ply
-	else
-		LocalPlayer():PrintMessage( HUD_PRINTCONSOLE, "Player Not Found\n" )
-		return nil
-	end
-end
-
--- Local function to handle autocomplete for the terminate commands
-local function terminateAutoComplete( cmd, stringArgs )
-	local examples = {}
-	for _, ply in pairs( player.GetHumans() ) do
-		table.insert( examples, cmd .. " " .. "\"" .. ply:SteamID() .. "\" " .. "\"" .. ply:Nick() .. "\"" )
-	end
-
-	return examples
-end
-
----Terminates a user's starfall chips clientside
----Supports SteamID and SteamID64
-concommand.Add( "sf_kill_cl", function( executor, cmd, args )
-	local ply = getPlayerBySteamID( args[1] )
-	if not ply then return end
-
+SF.SteamIDConcommand("sf_kill_cl", function( executor, ply )
 	for instance, _ in pairs( SF.playerInstances[ply] ) do
 		instance:Error( { message = "Killed by user", traceback = "" } )
 	end
-end, terminateAutoComplete, "Terminates a user's starfall chips clientside." )
+end, "Terminates a user's starfall chips clientside.", true)
 
----Terminates a user's starfall chips
----This command is admin only
-concommand.Add( "sf_kill", function( executor, cmd, args )
+---Terminates a user's starfall chips. Admin only
+SF.SteamIDConcommand("sf_kill", function( executor, ply )
 	if not executor:IsAdmin() then return end
-
-	local ply = getPlayerBySteamID( args[1] )
-	if not ply then return end
-
 	if SF.playerInstances[ply] then
 		for instance, _ in pairs( SF.playerInstances[ply] ) do
 			net.Start( "starfall_processor_kill" )
@@ -242,4 +222,4 @@ concommand.Add( "sf_kill", function( executor, cmd, args )
 			net.SendToServer()
 		end
 	end
-end, terminateAutoComplete, "Admin Only. Terminate a user's starfall chips." )
+end, "Admin Only. Terminate a user's starfall chips.", true )
