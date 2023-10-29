@@ -2000,7 +2000,7 @@ function render_library.captureImage(captureData)
 	return render.Capture(captureData)
 end
 
---- Captures a part of the current render target and returns the data as a binary string in the given format.
+--- Changes the view port position and size.
 -- @param number x Pixel x-coordinate.
 -- @param number y Pixel y-coordinate.
 -- @param number w Width of the viewport.
