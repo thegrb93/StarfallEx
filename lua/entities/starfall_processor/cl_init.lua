@@ -185,6 +185,27 @@ net.Receive("starfall_processor_used", function(len)
 	end
 end)
 
+SF.BlockedUsers = SF.BlockedList("user", "running clientside starfall code", "sf_blockedusers.txt",
+	function(steamid)
+		local ply = player.GetBySteamID(steamid)
+		if not ply then return end
+		for k, v in pairs(ents.FindByClass("starfall_processor")) do
+			if v.owner == ply and v.instance then
+				v:Error({message = "Blocked by user", traceback = ""})
+			end
+		end
+	end,
+	function(steamid)
+		local ply = player.GetBySteamID(steamid)
+		if not ply then return end
+		for k, v in pairs(ents.FindByClass("starfall_processor")) do
+			if v.owner == ply then
+				v:Compile()
+			end
+		end
+	end
+)
+
 SF.SteamIDConcommand("sf_kill_cl", function( executor, ply )
 	for instance, _ in pairs( SF.playerInstances[ply] ) do
 		instance:Error( { message = "Killed by user", traceback = "" } )

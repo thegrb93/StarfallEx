@@ -4,7 +4,6 @@
 SF.Modules = {}
 SF.Types = {}
 SF.Libraries = {}
-SF.BlockedUsers = {}
 SF.ResourceCounters = {}
 SF.Superuser = {IsValid = function() return false end}
 local dgetmeta = debug.getmetatable
@@ -428,7 +427,7 @@ SF.BlockedList = {
 	__index = {
 		toline = function(self, steamid, name)
 			return steamid..","..name.."\n"
-		end
+		end,
 		block = function(self, steamid)
 			if self.list[steamid] then return end
 			local name = steamIdToConsoleSafeName(steamid)
@@ -467,7 +466,7 @@ SF.BlockedList = {
 			local f = file.Open(self.filename,"r","DATA")
 			if f then
 				while not f:EndOfFile() do
-					local steamid, name = string.match(f:ReadLine(), "([^,%s]+),?(.*)")
+					local steamid, name = string.match(f:ReadLine(), "([^,%s]+),?([^\n]*)")
 					if steamid then
 						self.list[steamid] = name
 					end
@@ -912,27 +911,6 @@ function SF.SteamIDConcommand(name, callback, helptext, findplayer, completionli
 		return tbl
 	end, helptext)
 end
-
-SF.BlockedUsers = SF.BlockedList("user", "running clientside starfall code", "sf_blockedusers.txt",
-	function(steamid)
-		local ply = player.GetBySteamID(steamid)
-		if not ply then return end
-		for k, v in pairs(ents.FindByClass("starfall_processor")) do
-			if v.owner == ply and v.instance then
-				v:Error({message = "Blocked by user", traceback = ""})
-			end
-		end
-	end,
-	function(steamid)
-		local ply = player.GetBySteamID(steamid)
-		if not ply then return end
-		for k, v in pairs(ents.FindByClass("starfall_processor")) do
-			if v.owner == ply then
-				v:Compile()
-			end
-		end
-	end
-)
 
 --- Require .dll but doesn't throw an error. Returns true if success or false if fail.
 function SF.Require(moduleName)
