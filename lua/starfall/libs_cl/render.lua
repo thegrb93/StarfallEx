@@ -17,6 +17,7 @@ registerprivilege("render.renderscene", "Render Scene", "Allows the user to rend
 registerprivilege("render.effects", "Render Effects", "Allows the user to render special effects such as screen blur, color modification, and bloom", { client = {} })
 registerprivilege("render.calcview", "Render CalcView", "Allows the use of the CalcView hook", { client = {} })
 registerprivilege("render.captureImage", "Render Capture Image", "Allows capturing a rendertarget into an image format", { client = { default = 1 } })
+registerprivilege("render.setViewPort", "Set View Port", "Allows setting the view port position and size.", { client = { default = 1 } })
 registerprivilege("render.fog", "Render Fog", "Allows the user to control fog", { client = {} })
 
 local cv_max_fonts = CreateConVar("sf_render_maxfonts", "30", { FCVAR_ARCHIVE })
@@ -483,6 +484,7 @@ function instance:cleanupRender()
 	render.DepthRange(0, 1)
 	render.SuppressEngineLighting(false)
 	render.SetWriteDepthToDestAlpha(true)
+	render.SetViewPort(0, 0, renderdata.oldW, renderdata.oldH)
 	pp.colour:SetTexture("$fbtexture", tex_screenEffect)
 	pp.downsample:SetTexture("$fbtexture", tex_screenEffect)
 	for i = #matrix_stack, 1, -1 do
@@ -1996,6 +1998,18 @@ function render_library.captureImage(captureData)
 	if not renderdata.usingRT then SF.Throw("Not in rendertarget context.", 2) end
 
 	return render.Capture(captureData)
+end
+
+--- Captures a part of the current render target and returns the data as a binary string in the given format.
+-- @param number x Pixel x-coordinate.
+-- @param number y Pixel y-coordinate.
+-- @param number w Width of the viewport.
+-- @param number h Height of the viewport.
+function render_library.setViewPort(x, y, w, h)
+	checkpermission(instance, nil, "render.setViewPort")
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+
+	render.SetViewPort(x, y, w, h)
 end
 
 --- Reads the color of the specified pixel.
