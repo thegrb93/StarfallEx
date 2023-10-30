@@ -195,8 +195,11 @@ local rad2deg = 180 / math.pi
 --- Get the vector's angle.
 -- @return Angle Angle representing the vector
 function vec_methods:getAngle()
+	local n = math_sqrt(self[1]^2 + self[2]^2 + self[3]^2)
+	if n == 0 then return setmetatable({0, 0, 0}, ang_meta) end
+
 	return setmetatable({
-		rad2deg * math_asin(-self[3] / math_sqrt(self[1]^2 + self[2]^2 + self[3]^2)) % 360,
+		rad2deg * math_asin(-self[3] / n) % 360,
 		rad2deg * math_atan2(self[2], self[1]) % 360,
 		0
 	}, ang_meta)
