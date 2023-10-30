@@ -189,10 +189,17 @@ function vec_meta.__eq(a, b)
 	return a[1]==b[1] and a[2]==b[2] and a[3]==b[3]
 end
 
+local math_asin, math_atan2, math_sqrt = math.asin, math.atan2, math.sqrt
+local rad2deg = 180 / math.pi
+
 --- Get the vector's angle.
 -- @return Angle Angle representing the vector
 function vec_methods:getAngle()
-	return awrap(unwrap(self):Angle())
+	return setmetatable({
+		rad2deg * math_asin(-self[3] / math_sqrt(self[1]^2 + self[2]^2 + self[3]^2)) % 360,
+		rad2deg * math_atan2(self[2], self[1]) % 360,
+		0
+	}, ang_meta)
 end
 
 --- Returns the vector's euler angle with respect to the other vector as if it were the new vertical axis.
@@ -208,8 +215,6 @@ end
 function vec_methods:cross(v)
 	return wrap({ self[2] * v[3] - self[3] * v[2], self[3] * v[1] - self[1] * v[3], self[1] * v[2] - self[2] * v[1] })
 end
-
-local math_sqrt = math.sqrt
 
 --- Returns the pythagorean distance between the vector and the other vector.
 -- @param Vector v Second Vector
