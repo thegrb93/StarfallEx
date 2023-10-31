@@ -111,9 +111,20 @@ function P.registerPrivilege(id, name, description, providerconfig)
 	P.privileges[id] = Privilege(id, name, description, providerconfig)
 end
 
+local permNCache = {}
+
 function P.check(instance, target, key)
+	if target == nil then
+		local cached = permNCache[key]
+		if cached then return cached end
+	end
+
 	local ok, reason = P.privileges[key].check(instance, target)
 	if not ok then SF.Throw("Permission " .. key .. ": " .. reason, 3) end
+
+	if target == nil then
+		permNCache[key] = true
+	end
 end
 
 function P.hasAccess(instance, target, key)
@@ -121,6 +132,8 @@ function P.hasAccess(instance, target, key)
 end
 
 function P.refreshSettingsCache()
+	permNCache = {}
+
 	for providerid, provider in pairs(P.providers) do
 		local settings = {}
 		for privilegeid, privilege in pairs(P.privileges) do
