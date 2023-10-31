@@ -112,14 +112,13 @@ function P.registerPrivilege(id, name, description, providerconfig)
 end
 
 function P.check(instance, target, key)
-	local nilTarget = target == nil
-	if nilTarget then
-		local permCache = instance.permissionCache
-		if not permCache then
-			instance.permissionCache = {}
-			permCache = instance.permissionCache
-		end
+	local permCache = instance.permissionCache
+	if not permCache then
+		instance.permissionCache = {}
+		permCache = instance.permissionCache
+	end
 
+	if target == nil then
 		local cached = permCache[key]
 		if cached then return cached end
 	end
@@ -127,7 +126,7 @@ function P.check(instance, target, key)
 	local ok, reason = P.privileges[key].check(instance, target)
 	if not ok then SF.Throw("Permission " .. key .. ": " .. reason, 3) end
 
-	if nilTarget then
+	if target == nil then
 		permCache[key] = true
 	end
 end
