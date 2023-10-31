@@ -7,6 +7,7 @@ SF.Libraries = {}
 SF.ResourceCounters = {}
 SF.Superuser = {IsValid = function() return false end}
 local dgetmeta = debug.getmetatable
+local TypeID = TypeID
 
 -- Make sure this is done after metatables have been set
 hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
