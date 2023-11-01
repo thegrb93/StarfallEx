@@ -11,7 +11,7 @@ registerprivilege("entities.setHealth", "SetHealth", "Allows the user to change 
 registerprivilege("entities.setMaxHealth", "SetMaxHealth", "Allows the user to change an entity's max health", { entities = {} })
 registerprivilege("entities.doNotDuplicate", "DoNotDuplicate", "Allows the user to set whether an entity will be saved on dupes or map saves", { entities = {} })
 
-
+local emitSoundBurst = SF.BurstObject("emitSound", "emitsound", 180, 200, " sounds can be emitted per second", "Number of sounds that can be emitted in a short time")
 local manipulations = SF.EntityTable("boneManipulations")
 
 hook.Add("PAC3ResetBones","SF_BoneManipulations",function(ent)
@@ -273,6 +273,20 @@ local soundsByEntity = SF.EntityTable("emitSoundsByEntity", function(e, t)
 	end
 end, true)
 
+local sound_library = instance.Libraries.sound
+
+--- Returns if a sound is able to be emitted from an entity
+-- @return boolean If it is possible to emit a sound
+function sound_library.canEmitSound()
+	return emitSoundBurst:check(instance.player) >= 1
+end
+
+--- Returns the number of sound emits left
+-- @return number The number of sounds left
+function sound_library:emitSoundsLeft()
+	return emitSoundBurst:check(instance.player)
+end
+
 --- Plays a sound on the entity
 -- @param string snd Sound path
 -- @param number soundLevel Default 75
@@ -281,6 +295,7 @@ end, true)
 -- @param number channel Default CHAN_AUTO or CHAN_WEAPON for weapons
 function ents_methods:emitSound(snd, lvl, pitch, volume, channel)
 	checkluatype(snd, TYPE_STRING)
+	emitSoundBurst:use(instance.player, 1)
 
 	local ent = getent(self)
 	checkpermission(instance, ent, "entities.emitSound")
