@@ -295,9 +295,9 @@ end
 -- @param number channel Default CHAN_AUTO or CHAN_WEAPON for weapons
 function ents_methods:emitSound(snd, lvl, pitch, volume, channel)
 	checkluatype(snd, TYPE_STRING)
+	emitSoundBurst:use(instance.player, 1)
 
 	local ent = getent(self)
-	emitSoundBurst:use(instance.player, 1)
 	checkpermission(instance, ent, "entities.emitSound")
 
 	local snds = soundsByEntity[ent]
