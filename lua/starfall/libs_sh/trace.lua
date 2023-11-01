@@ -7,25 +7,15 @@ SF.Permissions.registerPrivilege("trace.decal", "Decal Trace", "Allows the user 
 
 local plyDecalBurst = SF.BurstObject("decals", "decals", 50, 50, "Rate decals can be created per second.", "Number of decals that can be created in a short time.")
 
-local math_huge = math.huge
-local function checkvector(pos)
-	local pos1 = pos[1]
-	if pos1 ~= pos1 or pos1 == math_huge or pos1 == -math_huge then SF.Throw("Inf or nan vector in trace position", 3) end
-	local pos2 = pos[2]
-	if pos2 ~= pos2 or pos2 == math_huge or pos2 == -math_huge then SF.Throw("Inf or nan vector in trace position", 3) end
-	local pos3 = pos[3]
-	if pos3 ~= pos3 or pos3 == math_huge or pos3 == -math_huge then SF.Throw("Inf or nan vector in trace position", 3) end
-end
-
-
 --- Provides functions for doing line/AABB traces
 -- @name trace
 -- @class library
 -- @libtbl trace_library
 SF.RegisterLibrary("trace")
 
+local structWrapper = SF.StructWrapper
+
 return function(instance)
-local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 local trace_library = instance.Libraries.trace
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
@@ -65,10 +55,6 @@ end
 -- @param boolean? ignworld Whether the trace should ignore world
 -- @return table Result of the trace https://wiki.facepunch.com/gmod/Structures/TraceResult
 function trace_library.line(start, endpos, filter, mask, colgroup, ignworld)
-	checkpermission(instance, nil, "trace")
-	checkvector(start)
-	checkvector(endpos)
-
 	local start, endpos = vunwrap(start), vunwrap(endpos)
 
 	filter = convertFilter(filter)
@@ -85,7 +71,7 @@ function trace_library.line(start, endpos, filter, mask, colgroup, ignworld)
 		ignoreworld = ignworld,
 	}
 
-	return SF.StructWrapper(instance, util.TraceLine(trace), "TraceResult")
+	return structWrapper(instance, util.TraceLine(trace), "TraceResult")
 end
 
 --- Does a swept-AABB trace
@@ -99,12 +85,6 @@ end
 -- @param boolean? ignworld Whether the trace should ignore world
 -- @return table Result of the trace https://wiki.facepunch.com/gmod/Structures/TraceResult
 function trace_library.hull(start, endpos, minbox, maxbox, filter, mask, colgroup, ignworld)
-	checkpermission(instance, nil, "trace")
-	checkvector(start)
-	checkvector(endpos)
-	checkvector(minbox)
-	checkvector(maxbox)
-
 	local start, endpos, minbox, maxbox = vunwrap(start), vunwrap(endpos), vunwrap(minbox), vunwrap(maxbox)
 
 	filter = convertFilter(filter)
@@ -123,7 +103,7 @@ function trace_library.hull(start, endpos, minbox, maxbox, filter, mask, colgrou
 		maxs = maxbox
 	}
 
-	return SF.StructWrapper(instance, util.TraceHull(trace), "TraceResult")
+	return structWrapper(instance, util.TraceHull(trace), "TraceResult")
 end
 
 --- Does a ray box intersection returning the position hit, normal, and trace fraction, or nil if not hit.
@@ -158,11 +138,6 @@ end
 -- @param Vector endpos End position
 -- @param Entity|table|nil filter (Optional) Entity/array of entities to filter
 function trace_library.decal(name, start, endpos, filter)
-	checkpermission(instance, nil, "trace.decal")
-	checkluatype(name, TYPE_STRING)
-	checkvector(start)
-	checkvector(endpos)
-
 	local start, endpos = vunwrap(start), vunwrap(endpos)
 
 	if filter ~= nil then checkluatype(filter, TYPE_TABLE) filter = convertFilter(filter) end
