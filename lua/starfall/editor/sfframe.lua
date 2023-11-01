@@ -242,13 +242,14 @@ function Editor:LoadEditorSettings()
 end
 
 function Editor:SaveEditorSettings()
-
 	-- Position & Size
-	local w, h = self:GetSize()
-	RunConsoleCommand("sf_editor_size", w .. "_" .. h)
+	if not self.fs then
+		local w, h = self:GetSize()
+		RunConsoleCommand("sf_editor_size", w .. "_" .. h)
 
-	local x, y = self:GetPos()
-	RunConsoleCommand("sf_editor_pos", x .. "_" .. y)
+		local x, y = self:GetPos()
+		RunConsoleCommand("sf_editor_pos", x .. "_" .. y)
+	end
 end
 function Editor:Paint(w, h)
 	draw.RoundedBox(0, 0, 0, w, h, SF.Editor.colors.dark)
@@ -296,7 +297,7 @@ function Editor:OnMousePressed(mousecode)
 		self.p_my = gui.MouseY()
 		self.p_mode = self:GetMode()
 		if self.p_mode == "drag" then
-			if self.GuiClick > CurTime() - 0.2 then
+			if self.GuiClick > CurTime() - 0.4 then
 				self:Fullscreen()
 				self.pressed = false
 				self.GuiClick = 0
