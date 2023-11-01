@@ -274,8 +274,17 @@ local soundsByEntity = SF.EntityTable("emitSoundsByEntity", function(e, t)
 end, true)
 
 local sound_library = instance.Libraries.sound
+
+--- Returns if a sound is able to be emitted from an entity
+-- @return boolean If it is possible to emit a sound
 function sound_library.canEmitSound()
 	return emitSoundBurst:check(instance.player) >= 1
+end
+
+--- Returns the number of sound emits left
+-- @return number The number of sounds left
+function sound_library:emitSoundsLeft()
+    return emitSoundBurst:check(instance.player)
 end
 
 --- Plays a sound on the entity
