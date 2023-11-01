@@ -11,7 +11,7 @@ registerprivilege("entities.setHealth", "SetHealth", "Allows the user to change 
 registerprivilege("entities.setMaxHealth", "SetMaxHealth", "Allows the user to change an entity's max health", { entities = {} })
 registerprivilege("entities.doNotDuplicate", "DoNotDuplicate", "Allows the user to set whether an entity will be saved on dupes or map saves", { entities = {} })
 
-local emitSoundBurst = SF.BurstObject("emitSound", "emitsound", 50, 1000, " sounds can be emitted per second", "Number of sounds that can be emtited in a short time")
+local emitSoundBurst = SF.BurstObject("emitSound", "emitsound", 50, 200, " sounds can be emitted per second", "Number of sounds that can be emtited in a short time")
 local manipulations = SF.EntityTable("boneManipulations")
 
 hook.Add("PAC3ResetBones","SF_BoneManipulations",function(ent)
