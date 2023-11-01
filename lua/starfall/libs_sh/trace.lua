@@ -84,9 +84,9 @@ function trace_library.hull(start, endpos, minbox, maxbox, filter, mask, colgrou
 	local start, endpos, minbox, maxbox = vunwrap(start), vunwrap(endpos), vunwrap(minbox), vunwrap(maxbox)
 
 	filter = convertFilter(filter)
-	if mask ~= nil then checkluatype (mask, TYPE_NUMBER) end
-	if colgroup ~= nil then checkluatype (colgroup, TYPE_NUMBER) end
-	if ignworld ~= nil then checkluatype (ignworld, TYPE_BOOL) end
+	if mask ~= nil then checkluatype(mask, TYPE_NUMBER) end
+	if colgroup ~= nil then checkluatype(colgroup, TYPE_NUMBER) end
+	if ignworld ~= nil then checkluatype(ignworld, TYPE_BOOL) end
 
 	local trace = {
 		start = start,
@@ -139,7 +139,7 @@ function trace_library.decal(name, start, endpos, filter)
 	if filter ~= nil then checkluatype(filter, TYPE_TABLE) filter = convertFilter(filter) end
 
 	plyDecalBurst:use(instance.player, 1)
-	util.Decal( name, start, endpos, filter )
+	util.Decal(name, start, endpos, filter)
 end
 
 --- Returns the contents of the position specified.
