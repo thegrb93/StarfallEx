@@ -1,10 +1,6 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 
--- Register privileges
-SF.Permissions.registerPrivilege("trace", "Trace", "Allows the user to start traces")
-SF.Permissions.registerPrivilege("trace.decal", "Decal Trace", "Allows the user to apply decals with traces")
-
 local plyDecalBurst = SF.BurstObject("decals", "decals", 50, 50, "Rate decals can be created per second.", "Number of decals that can be created in a short time.")
 
 --- Provides functions for doing line/AABB traces
