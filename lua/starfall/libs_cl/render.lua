@@ -17,7 +17,6 @@ registerprivilege("render.renderscene", "Render Scene", "Allows the user to rend
 registerprivilege("render.effects", "Render Effects", "Allows the user to render special effects such as screen blur, color modification, and bloom", { client = {} })
 registerprivilege("render.calcview", "Render CalcView", "Allows the use of the CalcView hook", { client = {} })
 registerprivilege("render.captureImage", "Render Capture Image", "Allows capturing a rendertarget into an image format", { client = { default = 1 } })
-registerprivilege("render.setViewPort", "Set View Port", "Allows setting the view port position and size.", { client = { default = 1 } })
 registerprivilege("render.fog", "Render Fog", "Allows the user to control fog", { client = {} })
 
 local cv_max_fonts = CreateConVar("sf_render_maxfonts", "30", { FCVAR_ARCHIVE })
@@ -2006,7 +2005,6 @@ end
 -- @param number w Width of the viewport.
 -- @param number h Height of the viewport.
 function render_library.setViewPort(x, y, w, h)
-	checkpermission(instance, nil, "render.setViewPort")
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
 	render.SetViewPort(x, y, w, h)
