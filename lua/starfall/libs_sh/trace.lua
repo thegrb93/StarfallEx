@@ -1,6 +1,8 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 
+local util_TraceLine, util_TraceHull = util.TraceLine, util.TraceHull
+
 SF.Permissions.registerPrivilege("trace.decal", "Decal Trace", "Allows the user to apply decals with traces")
 local plyDecalBurst = SF.BurstObject("decals", "decals", 50, 50, "Rate decals can be created per second.", "Number of decals that can be created in a short time.")
 
@@ -80,7 +82,7 @@ function trace_library.line(start, endpos, filter, mask, colgroup, ignworld)
 		ignoreworld = ignworld,
 	}
 
-	return structWrapper(instance, util.TraceLine(trace), "TraceResult")
+	return structWrapper(instance, util_TraceLine(trace), "TraceResult")
 end
 
 --- Does a swept-AABB trace
@@ -112,7 +114,7 @@ function trace_library.hull(start, endpos, minbox, maxbox, filter, mask, colgrou
 		maxs = maxbox
 	}
 
-	return structWrapper(instance, util.TraceHull(trace), "TraceResult")
+	return structWrapper(instance, util_TraceHull(trace), "TraceResult")
 end
 
 --- Does a ray box intersection returning the position hit, normal, and trace fraction, or nil if not hit.
