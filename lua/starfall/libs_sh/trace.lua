@@ -1,9 +1,9 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 
-local util_TraceLine, util_TraceHull = util.TraceLine, util.TraceHull
-
+-- Register privileges
 SF.Permissions.registerPrivilege("trace.decal", "Decal Trace", "Allows the user to apply decals with traces")
+
 local plyDecalBurst = SF.BurstObject("decals", "decals", 50, 50, "Rate decals can be created per second.", "Number of decals that can be created in a short time.")
 
 local math_huge = math.huge
@@ -22,7 +22,7 @@ end
 -- @libtbl trace_library
 SF.RegisterLibrary("trace")
 
-local structWrapper = SF.StructWrapper
+local structWrapper, util_TraceLine, util_TraceHull = SF.StructWrapper, util.TraceLine, util.TraceHull
 
 return function(instance)
 
