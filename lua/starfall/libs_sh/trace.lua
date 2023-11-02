@@ -1,6 +1,7 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 
+SF.Permissions.registerPrivilege("trace.decal", "Decal Trace", "Allows the user to apply decals with traces")
 local plyDecalBurst = SF.BurstObject("decals", "decals", 50, 50, "Rate decals can be created per second.", "Number of decals that can be created in a short time.")
 
 --- Provides functions for doing line/AABB traces
@@ -12,6 +13,8 @@ SF.RegisterLibrary("trace")
 local structWrapper = SF.StructWrapper
 
 return function(instance)
+
+local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 local trace_library = instance.Libraries.trace
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
@@ -134,6 +137,11 @@ end
 -- @param Vector endpos End position
 -- @param Entity|table|nil filter (Optional) Entity/array of entities to filter
 function trace_library.decal(name, start, endpos, filter)
+	checkpermission(instance, nil, "trace.decal")
+	checkluatype(name, TYPE_STRING)
+	checkvector(start)
+	checkvector(endpos)
+
 	local start, endpos = vunwrap(start), vunwrap(endpos)
 
 	if filter ~= nil then checkluatype(filter, TYPE_TABLE) filter = convertFilter(filter) end
