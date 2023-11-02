@@ -2,7 +2,6 @@
 local checkluatype = SF.CheckLuaType
 
 -- Register privileges
-SF.Permissions.registerPrivilege("trace", "Trace", "Allows the user to start traces")
 SF.Permissions.registerPrivilege("trace.decal", "Decal Trace", "Allows the user to apply decals with traces")
 
 local plyDecalBurst = SF.BurstObject("decals", "decals", 50, 50, "Rate decals can be created per second.", "Number of decals that can be created in a short time.")
@@ -17,14 +16,16 @@ local function checkvector(pos)
 	if pos3 ~= pos3 or pos3 == math_huge or pos3 == -math_huge then SF.Throw("Inf or nan vector in trace position", 3) end
 end
 
-
 --- Provides functions for doing line/AABB traces
 -- @name trace
 -- @class library
 -- @libtbl trace_library
 SF.RegisterLibrary("trace")
 
+local structWrapper, util_TraceLine, util_TraceHull, util_IntersectRayWithOBB, util_IntersectRayWithPlane, util_Decal, util_PointContents, util_AimVector = SF.StructWrapper, util.TraceLine, util.TraceHull, util.IntersectRayWithOBB, util.IntersectRayWithPlane, util.Decal, util.PointContents, util.AimVector
+
 return function(instance)
+
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 local trace_library = instance.Libraries.trace
@@ -65,27 +66,14 @@ end
 -- @param boolean? ignworld Whether the trace should ignore world
 -- @return table Result of the trace https://wiki.facepunch.com/gmod/Structures/TraceResult
 function trace_library.line(start, endpos, filter, mask, colgroup, ignworld)
-	checkpermission(instance, nil, "trace")
-	checkvector(start)
-	checkvector(endpos)
-
-	local start, endpos = vunwrap(start), vunwrap(endpos)
-
-	filter = convertFilter(filter)
-	if mask ~= nil then checkluatype (mask, TYPE_NUMBER) end
-	if colgroup ~= nil then checkluatype (colgroup, TYPE_NUMBER) end
-	if ignworld ~= nil then checkluatype (ignworld, TYPE_BOOL) end
-
-	local trace = {
-		start = start,
-		endpos = endpos,
-		filter = filter,
+	return structWrapper(instance, util_TraceLine({
+		start = vunwrap(start),
+		endpos = vunwrap(endpos),
+		filter = convertFilter(filter),
 		mask = mask,
 		collisiongroup = colgroup,
 		ignoreworld = ignworld,
-	}
-
-	return SF.StructWrapper(instance, util.TraceLine(trace), "TraceResult")
+	}), "TraceResult")
 end
 
 --- Does a swept-AABB trace
@@ -99,31 +87,16 @@ end
 -- @param boolean? ignworld Whether the trace should ignore world
 -- @return table Result of the trace https://wiki.facepunch.com/gmod/Structures/TraceResult
 function trace_library.hull(start, endpos, minbox, maxbox, filter, mask, colgroup, ignworld)
-	checkpermission(instance, nil, "trace")
-	checkvector(start)
-	checkvector(endpos)
-	checkvector(minbox)
-	checkvector(maxbox)
-
-	local start, endpos, minbox, maxbox = vunwrap(start), vunwrap(endpos), vunwrap(minbox), vunwrap(maxbox)
-
-	filter = convertFilter(filter)
-	if mask ~= nil then checkluatype (mask, TYPE_NUMBER) end
-	if colgroup ~= nil then checkluatype (colgroup, TYPE_NUMBER) end
-	if ignworld ~= nil then checkluatype (ignworld, TYPE_BOOL) end
-
-	local trace = {
-		start = start,
-		endpos = endpos,
-		filter = filter,
+	return structWrapper(instance, util_TraceHull({
+		start = vunwrap(start),
+		endpos = vunwrap(endpos),
+		filter = convertFilter(filter),
 		mask = mask,
 		collisiongroup = colgroup,
 		ignoreworld = ignworld,
-		mins = minbox,
-		maxs = maxbox
-	}
-
-	return SF.StructWrapper(instance, util.TraceHull(trace), "TraceResult")
+		mins = vunwrap(minbox),
+		maxs = vunwrap(maxbox),
+	}), "TraceResult")
 end
 
 --- Does a ray box intersection returning the position hit, normal, and trace fraction, or nil if not hit.
@@ -137,7 +110,7 @@ end
 -- @return Vector? Hit normal or nil if not hit
 -- @return number? Hit fraction or nil if not hit
 function trace_library.intersectRayWithOBB(rayStart, rayDelta, boxOrigin, boxAngles, boxMins, boxMaxs)
-	local pos, normal, fraction = util.IntersectRayWithOBB(vunwrap(rayStart), vunwrap(rayDelta), vunwrap(boxOrigin), aunwrap(boxAngles), vunwrap(boxMins), vunwrap(boxMaxs))
+	local pos, normal, fraction = util_IntersectRayWithOBB(vunwrap(rayStart), vunwrap(rayDelta), vunwrap(boxOrigin), aunwrap(boxAngles), vunwrap(boxMins), vunwrap(boxMaxs))
 	if pos then return vwrap(pos), vwrap(normal), fraction end
 end
 
@@ -148,7 +121,7 @@ end
 -- @param Vector planeNormal The normal of the plane
 -- @return Vector? Hit position or nil if not hit
 function trace_library.intersectRayWithPlane(rayStart, rayDelta, planeOrigin, planeNormal)
-	local pos = util.IntersectRayWithPlane(vunwrap(rayStart), vunwrap(rayDelta), vunwrap(planeOrigin), vunwrap(planeNormal))
+	local pos = util_IntersectRayWithPlane(vunwrap(rayStart), vunwrap(rayDelta), vunwrap(planeOrigin), vunwrap(planeNormal))
 	if pos then return vwrap(pos) end
 end
 
@@ -163,19 +136,17 @@ function trace_library.decal(name, start, endpos, filter)
 	checkvector(start)
 	checkvector(endpos)
 
-	local start, endpos = vunwrap(start), vunwrap(endpos)
-
 	if filter ~= nil then checkluatype(filter, TYPE_TABLE) filter = convertFilter(filter) end
 
 	plyDecalBurst:use(instance.player, 1)
-	util.Decal( name, start, endpos, filter )
+	util_Decal(name, vunwrap(start), vunwrap(endpos), filter)
 end
 
 --- Returns the contents of the position specified.
 -- @param Vector position The position to get the CONTENTS of
 -- @return number Contents bitflag, see the CONTENTS enums
 function trace_library.pointContents(position)
-	return util.PointContents(vunwrap(position))
+	return util_PointContents(vunwrap(position))
 end
 
 --- Calculates the aim vector from a 2D screen position. This is essentially a generic version of input.screenToVector, where you can define the view angles and screen size manually.
@@ -192,7 +163,7 @@ function trace_library.aimVector(viewAngles, viewFOV, x, y, screenWidth, screenH
 	checkluatype(y, TYPE_NUMBER)
 	checkluatype(screenWidth, TYPE_NUMBER)
 	checkluatype(screenHeight, TYPE_NUMBER)
-	return vwrap(util.AimVector(aunwrap(viewAngles), viewFOV, x, y, screenWidth, screenHeight))
+	return vwrap(util_AimVector(aunwrap(viewAngles), viewFOV, x, y, screenWidth, screenHeight))
 end
 
 end
