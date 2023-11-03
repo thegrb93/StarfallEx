@@ -410,8 +410,6 @@ end
 -- @shared
 -- @return table Trace data https://wiki.facepunch.com/gmod/Structures/TraceResult
 function player_methods:getEyeTrace()
-	checkpermission(instance, nil, "trace")
-
 	return SF.StructWrapper(instance, getply(self):GetEyeTrace(), "TraceResult")
 end
 
