@@ -261,12 +261,14 @@ function nb_methods:getVelocity()
 	return vwrap(nb.loco:GetVelocity())
 end
 
---- Forces the nextbot to jump. Requires the model to have an ACT_JUMP for proper animation.
+--- Forces the nextbot to jump.
 -- @server
-function nb_methods:jump()
+-- @param number? jumpAct The activity ID of the anim to play when jumping.
+function nb_methods:jump(jact)
+	if jact ~= nil then checkluatype(jact, TYPE_NUMBER) end
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.jump")
-	nb.loco:Jump()
+	nb.loco:Jump(jact)
 end
 
 --- Adds a callback function that will be run when this nextbot reaches a destination set by setApproachPos or setGotoPos.
