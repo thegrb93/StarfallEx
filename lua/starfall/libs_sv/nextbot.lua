@@ -263,9 +263,9 @@ end
 
 --- Forces the nextbot to jump.
 -- @server
--- @param number jumpAct The activity ID of the anim to play when jumping.
+-- @param number? jumpAct The activity ID of the anim to play when jumping.
 function nb_methods:jump(jact)
-	checkluatype(jact, TYPE_NUMBER)
+	if jact ~= nil then checkluatype(jact, TYPE_NUMBER) end
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.jump")
 	nb.loco:Jump(jact)
