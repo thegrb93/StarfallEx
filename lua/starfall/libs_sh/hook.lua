@@ -461,7 +461,9 @@ add("EntityFireBullets", nil, function(instance, ent, data)
 	return true, { instance.WrapObject(ent), SF.StructWrapper(instance, data, "Bullet") }
 end, function(instance, ret, ent, data)
 	if ret[1] and isfunction(ret[2]) then
+		local prevCallback = data.Callback
 		data.Callback = function(attacker, tr, dmginfo)
+			if isfunction(prevCallback) then prevCallback(attacker, tr, dmginfo) end
 			ret[2](instance.WrapObject(attacker), SF.StructWrapper(instance, tr, "TraceResult"))
 		end
 		return true
