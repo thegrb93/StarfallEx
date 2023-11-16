@@ -464,11 +464,11 @@ end, function(instance, ret, ent, data)
 		local prevCallback = data.Callback
 		data.Callback = function(attacker, tr, dmginfo)
 			if isfunction(prevCallback) then prevCallback(attacker, tr, dmginfo) end
-			ret[2](instance.WrapObject(attacker), SF.StructWrapper(instance, tr, "TraceResult"))
+			instance:runFunction(ret[2], instance.WrapObject(attacker), SF.StructWrapper(instance, tr, "TraceResult"))
 		end
 		return true
 	end
-end)
+end, true)
 
 --- Called whenever a sound has been played. This will not be called clientside if the server played the sound without the client also calling Entity:EmitSound.
 -- @name EntityEmitSound
