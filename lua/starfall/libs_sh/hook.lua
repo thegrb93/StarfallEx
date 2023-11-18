@@ -62,7 +62,7 @@ if SERVER then
 	-- @param Player ply Player freezing the entity
 	add("OnPhysgunFreeze")
 
-	--- Called when a player reloads his physgun
+	--- Called when a player reloads their physgun
 	-- @name OnPhysgunReload
 	-- @class hook
 	-- @server
@@ -166,7 +166,7 @@ if SERVER then
 	-- @return string? New text. "" to stop from displaying. Nil to keep original.
 	add("PlayerSay", nil, nil, returnOnlyOnYourself, true)
 
-	--- Called when a players sprays his logo
+	--- Called when a players sprays their logo
 	-- @name PlayerSpray
 	-- @class hook
 	-- @server
