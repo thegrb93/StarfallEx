@@ -280,9 +280,11 @@ local function NextInTextureQueue()
 			end
 		end
 		local function errorTexture()
-			if not requestTbl.Instance.error and requestTbl.Callback then requestTbl.Callback() end
-			table.remove(LoadingTextureQueue, 1)
-			timer.Simple(0, NextInTextureQueue)
+			timer.Simple(0, function()
+				if not requestTbl.Instance.error and requestTbl.Callback then requestTbl.Callback() end
+				table.remove(LoadingTextureQueue, 1)
+				NextInTextureQueue()
+			end)
 		end
 
 		Panel:AddFunction("sf", "imageLoaded", applyTexture)
