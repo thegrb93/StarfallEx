@@ -109,7 +109,7 @@ end
 
 --- Manually renders all particles the emitter has created.
 function particleem_methods:draw()
-	if not instance.render.data.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	peunwrap(self):Draw()
 end
 
