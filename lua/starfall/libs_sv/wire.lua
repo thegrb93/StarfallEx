@@ -650,7 +650,7 @@ function wirelink_methods:inputValue(name)
 	local wl = getwl(self)
 	local input = wl.Inputs and wl.Inputs[name]
 	if not input or not outputConverters[input.Type] then SF.Throw("Input doesn't exist or is invalid", 2) end
-	return outputConverters[input.Type](input.Value)
+	return inputConverters[input.Type](input.Value)
 end
 
 --- Returns the type of input name, or nil if it doesn't exist
