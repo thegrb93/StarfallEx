@@ -1962,7 +1962,6 @@ do
 					files[name..":"..path] = file.Read(path, "LUA")
 				end
 				net.Start("sf_receivelibrary")
-				net.WriteBool(false)
 				net.WriteStarfall({files = files, mainfile = name, proc = Entity(0), owner = Entity(0)})
 				net.Broadcast()
 			end
@@ -1970,13 +1969,10 @@ do
 
 	else
 		net.Receive("sf_receivelibrary", function(len)
-			local init = net.ReadBool()
 			net.ReadStarfall(nil, function(ok, data)
 				if ok then
-					if not init then
-						SF.Modules[data.mainfile] = {}
-						print("Reloaded library: " .. data.mainfile)
-					end
+					SF.Modules[data.mainfile] = {}
+					print("Reloaded library: " .. data.mainfile)
 					for k, code in pairs(data.files) do
 						local modname, path = string.match(k, "(.+):(.+)")
 						local t = SF.Modules[modname]
