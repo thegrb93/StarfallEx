@@ -258,15 +258,16 @@ local function NextInTextureQueue()
 				if requestTbl.Usedlayout then
 					imageDone()
 				else
-					local function layout(x,y,w,h)
+					local function layout(x,y,w,h,pixelated)
 						if requestTbl.Usedlayout then SF.Throw("You can only use layout once", 2) end
 						checkluatype(x, TYPE_NUMBER)
 						checkluatype(y, TYPE_NUMBER)
 						checkluatype(w, TYPE_NUMBER)
 						checkluatype(h, TYPE_NUMBER)
+						if pixelated~=nil then checkluatype(pixelated, TYPE_BOOL) end
 						requestTbl.Usedlayout = true
 						Panel:RunJavascript([[
-							img.style.left=']]..x..[[px';img.style.top=']]..y..[[px';img.width=]]..w..[[;img.height=]]..h..[[;
+							img.style.left=']]..x..[[px';img.style.top=']]..y..[[px';img.width=]]..w..[[;img.height=]]..h..[[;img.style.imageRendering=']]..(pixelated and "pixelated" or "auto")..[[';
 							renderImage();
 						]])
 					end
@@ -718,7 +719,7 @@ end
 -- If the texture in key is not set to a rendertarget, a rendertarget will be created and used.
 -- @param string key The key name to set. $basetexture is the key name for most purposes.
 -- @param string url The url or base64 data
--- @param function? cb An optional callback called when image is loaded. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture
+-- @param function? cb An optional callback called when image is loaded. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h, pixelated to reposition the image in the texture. Setting the optional 'pixelated' argument to True tells the image to use nearest-neighbor interpolation
 -- @param function? done An optional callback called when the image is done loading. Passes the material, url
 function material_methods:setTextureURL(key, url, cb, done)
 	checkkey(key)
