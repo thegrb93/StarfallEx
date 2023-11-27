@@ -1950,6 +1950,7 @@ do
 				if file.Exists(sv_filename, "LUA") then
 					addModule(name, sv_filename, true)
 				end
+				SF.Permissions.loadPermissions()
 			end
 			if file.Exists(cl_filename, "LUA") then
 				addModule(name, cl_filename, false)
@@ -1993,6 +1994,7 @@ do
 						t2.source = code
 						if shouldrun then
 							t2.init = compileModule(code, path)
+							SF.Permissions.loadPermissions()
 						end
 					end
 				end
