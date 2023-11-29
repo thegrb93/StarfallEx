@@ -2,7 +2,7 @@
 local checkluatype = SF.CheckLuaType
 local timer = timer
 
-local max_timers = CreateConVar("sf_maxtimers", "200", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "The max number of timers that can be created")
+local timer_count = SF.LimitObject("timer", "timer", 200, "The number of concurrent starfall timers")
 
 
 --- Deals with time and timers.
@@ -15,11 +15,11 @@ SF.RegisterLibrary("timer")
 return function(instance)
 
 local timers = {}
-local timer_count = 0
 
 instance:AddHook("deinitialize", function()
 	for name, _ in pairs(timers) do
 		timer.Remove(name)
+		timer_count:free(instance.player, 1)
 	end
 end)
 
@@ -67,9 +67,6 @@ local function mangle_simpletimer_name()
 end
 
 local function createTimer(name, delay, reps, func, simple)
-	if timer_count > max_timers:GetInt() then SF.Throw("Max timers exceeded!", 2) end
-	timer_count = timer_count + 1
-
 	local timername
 	if simple then
 		timername = mangle_simpletimer_name()
@@ -77,13 +74,17 @@ local function createTimer(name, delay, reps, func, simple)
 		timername = mangle_timer_name(name)
 	end
 
+	if not timers[timername] then
+		timer_count:use(instance.player, 1)
+	end
+
 	local timerdata = {reps = reps, func = func}
 	local function timerCallback()
 		if timerdata.reps ~= 0 then
 			timerdata.reps = timerdata.reps - 1
 			if timerdata.reps<=0 then
-				timer_count = timer_count - 1
 				timers[timername] = nil
+				timer_count:free(instance.player, 1)
 			end
 		end
 		instance:runFunction(timerdata.func)
@@ -124,7 +125,7 @@ function timer_library.remove(name)
 
 	local timername = mangle_timer_name(name)
 	if timers[timername] then
-		timer_count = timer_count - 1
+		timer_count:free(instance.player, 1)
 		timers[timername] = nil
 		timer.Remove(timername)
 	end
@@ -225,7 +226,7 @@ end
 --- Returns number of available timers
 -- @return number Number of available timers
 function timer_library.getTimersLeft()
-	return max_timers:GetInt() - timer_count
+	return timer_count:check(instance.player)
 end
 
 end
