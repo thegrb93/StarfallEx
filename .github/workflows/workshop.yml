@@ -1,0 +1,21 @@
+name: Deploy to Workshop
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@master
+
+      - uses: vurv78/gmod-upload@v0.1.4
+        with:
+          id: 2273610511
+          changelog: ${{ github.event.head_commit.message }}
+        env:
+          STEAM_USERNAME: ${{ secrets.WORKSHOP_USERNAME }}
+          STEAM_PASSWORD: ${{ secrets.WORKSHOP_PASSWORD }}
