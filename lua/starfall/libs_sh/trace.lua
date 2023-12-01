@@ -142,6 +142,18 @@ function trace_library.decal(name, start, endpos, filter)
 	util_Decal(name, vunwrap(start), vunwrap(endpos), filter)
 end
 
+--- Returns True if player is allowed to use trace.decal
+-- @return boolean Whether the decal trace can be used
+function trace_library.canCreateDecal()
+	return plyDecalBurst:check(instance.player) > 0
+end
+
+--- Returns the number of decals player is allowed to use
+-- @return number The number of decals left
+function trace_library.decalsLeft()
+	return plyDecalBurst:check(instance.player)
+end
+
 --- Returns the contents of the position specified.
 -- @param Vector position The position to get the CONTENTS of
 -- @return number Contents bitflag, see the CONTENTS enums
