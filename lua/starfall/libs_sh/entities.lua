@@ -1379,6 +1379,39 @@ function ents_methods:getPose(pose)
 	return getent(self):GetPoseParameter(pose)
 end
 
+--- Returns the amount of pose parameters the entity has
+-- @return number Amount of poses
+function ents_methods:getPoseCount()
+	return getent(self):GetNumPoseParameters()
+end
+
+--- Returns pose index corresponding to the given name
+-- @param string pose Pose name
+-- @return number Pose index or -1 if not found
+function ents_methods:getPoseIndex(pose)
+	return getent(self):LookupPoseParameter(pose)
+end
+
+--- Returns pose name corresponding to the given index
+-- @param number id Pose index (starting from 0)
+-- @return string Pose name or empty string if not found
+function ents_methods:getPoseName(id)
+	return getent(self):GetPoseParameterName(id)
+end
+
+--- Returns pose value range
+-- @param number|string id Pose name or pose index (starting from 0)
+-- @return number? Minimum pose value or nil if pose not found
+-- @return number? Maximum pose value or nil if pose not found
+function ents_methods:getPoseRange(pose)
+	local ent = getent(self)
+	if type(pose) == "number" then
+		return ent:GetPoseParameterRange(pose)
+	else
+		return ent:GetPoseParameterRange(ent:LookupPoseParameter(pose))
+	end
+end
+
 --- Returns a table of flexname -> flexid pairs for use in flex functions.
 -- @return table Table of flexes
 function ents_methods:getFlexes()
