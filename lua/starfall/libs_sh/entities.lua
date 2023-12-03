@@ -1400,11 +1400,11 @@ function ents_methods:getPoseName(id)
 end
 
 --- Returns pose value range
--- @param number Pose index (starting from 0)
+-- @param number id Pose index (starting from 0)
 -- @return number? Minimum pose value or nil if pose not found
 -- @return number? Maximum pose value or nil if pose not found
-function ents_methods:getPoseRange(pose)
-	return getent(self):GetPoseParameterRange(pose)
+function ents_methods:getPoseRange(id)
+	return getent(self):GetPoseParameterRange(id)
 end
 
 --- Returns a table of flexname -> flexid pairs for use in flex functions.
