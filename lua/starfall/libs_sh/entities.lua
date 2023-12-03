@@ -1412,7 +1412,7 @@ end
 -- @return boolean True if the entity has flex manipulations, false otherwise.
 function ents_methods:hasFlexManipulations()
 	local ent = getent(self)
-	return ent:HasFlexManipulator()
+	return ent:HasFlexManipulatior()
 end
 
 --- Gets the weight (value) of a flex.
