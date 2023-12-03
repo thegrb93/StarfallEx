@@ -1400,7 +1400,7 @@ function ents_methods:getPoseName(id)
 end
 
 --- Returns pose value range
--- @param number|string id Pose name or pose index (starting from 0)
+-- @param number|string pose Pose name or pose index (starting from 0)
 -- @return number? Minimum pose value or nil if pose not found
 -- @return number? Maximum pose value or nil if pose not found
 function ents_methods:getPoseRange(pose)
