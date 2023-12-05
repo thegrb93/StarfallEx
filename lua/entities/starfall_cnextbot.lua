@@ -105,15 +105,16 @@ function ENT:OnInjured(dmginfo)
 end
 
 function ENT:OnKilled(dmginfo)
-	if self.DeathCallbacks:isEmpty() then return end
-	local inst = self.chip.instance
-	self.DeathCallbacks:run(inst,
-		dmginfo:GetDamage(),
-		inst.WrapObject(dmginfo:GetAttacker()),
-		inst.WrapObject(dmginfo:GetInflictor()),
-		inst.Types.Vector.Wrap(dmginfo:GetDamagePosition()),
-		inst.Types.Vector.Wrap(dmginfo:GetDamageForce()),
-		dmginfo:GetDamageType())
+	if not self.DeathCallbacks:isEmpty() then
+		local inst = self.chip.instance
+		self.DeathCallbacks:run(inst,
+			dmginfo:GetDamage(),
+			inst.WrapObject(dmginfo:GetAttacker()),
+			inst.WrapObject(dmginfo:GetInflictor()),
+			inst.Types.Vector.Wrap(dmginfo:GetDamagePosition()),
+			inst.Types.Vector.Wrap(dmginfo:GetDamageForce()),
+			dmginfo:GetDamageType())
+	end
 	if self.RagdollOnDeath then self:BecomeRagdoll(dmginfo) end
 end
 
