@@ -460,6 +460,26 @@ add("EntityFireBullets", nil, function(instance, ent, data)
 	return true, { instance.WrapObject(ent), SF.StructWrapper(instance, data, "Bullet") }
 end)
 
+--- Called after a bullet is fired and it's trace has been calculated
+-- @name PostEntityFireBullets
+-- @class hook
+-- @shared
+-- @param Entity ent The entity that fired the bullet
+-- @param table data A table containing Trace (See http://wiki.facepunch.com/gmod/Structures/TraceResult) and AmmoType, Tracer, Damage, Force, Attacker, TracerName (see http://wiki.facepunch.com/gmod/Structures/Bullet)
+add("PostEntityFireBullets", nil, function(instance, ent, data)
+	return true, {
+		instance.WrapObject(ent), {
+			["Trace"] = SF.StructWrapper(instance, data["Trace"], "TraceResult"),
+			["AmmoType"] = data["AmmoType"],
+			["Tracer"] = data["Tracer"],
+			["Damage"] = data["Damage"],
+			["Force"] = data["Force"],
+			["Attacker"] = instance.WrapObject(data["Attacker"]),
+			["TracerName"] = data["TracerName"]
+		}
+	}
+end)
+
 --- Called whenever a sound has been played. This will not be called clientside if the server played the sound without the client also calling Entity:EmitSound.
 -- @name EntityEmitSound
 -- @class hook
