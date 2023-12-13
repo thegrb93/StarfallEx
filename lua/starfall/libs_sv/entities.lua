@@ -848,5 +848,38 @@ function ents_methods:getCreationID()
 	return ent:GetCreationID()
 end
 
+local physUpdateWhitelist = {
+	["starfall_prop"] = true,
+	["starfall_processor"] = true,
+}
+
+--- Set the function to run whenever the physics of the entity are updated.
+--- This won't be called if the physics object goes asleep.
+---
+--- You can only use this function on these classes:
+--- - starfall_prop
+--- - starfall_processor
+-- @param function|nil func The callback function. Use nil to remove an existing callback.
+function ents_methods:setPhysicsUpdateListener(func)
+	local ent = getent(self)
+
+	checkpermission(instance, ent, "entities.canTool")
+
+	local class = ent:GetClass()
+
+	if not physUpdateWhitelist[class] then
+		SF.Throw("Cannot use physics update listener on " .. class, 2)
+	end
+
+	if func then
+		checkluatype(func, TYPE_FUNCTION)
+
+		ent.PhysicsUpdate = function()
+			instance:runFunction(func)
+		end
+	else
+		ent.PhysicsUpdate = nil
+	end
+end
 
 end

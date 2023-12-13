@@ -559,12 +559,6 @@ return function(instance)
 local getent
 instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
-
-	if SERVER then
-		instance.entity.PhysicsUpdate = function()
-			instance:runScriptHook("starfallphysicsupdate")
-		end
-	end
 end)
 
 instance:AddHook("deinitialize", function()
@@ -748,11 +742,6 @@ end
 -- @class hook
 -- @param Player activator Player who used the screen or chip
 -- @param Entity used The screen or chip entity that was used
-
---- Called when the Starfall chip's physics is updated. This won't be called if the physics object goes asleep.
--- @name starfallPhysicsUpdate
--- @class hook
--- @server
 
 --- Called when a frame is requested to be drawn on screen. (2D/3D Context)
 -- @name render
