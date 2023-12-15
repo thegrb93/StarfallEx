@@ -752,19 +752,21 @@ do
 					self.n = self.n + 1
 				end
 				self.hookstoadd[index] = func
-				-- self.hookstoremove[index] = true -- Unneeded since hooks are removed before adding anyway
+				self.hookstoremove[index] = nil
+				self.pairs = self.dirtyPairs
 			end,
 			remove = function(self, index)
-				if self.hooks[index] or self.hookstoadd[index] then
+				if (self.hooks[index] or self.hookstoadd[index]) and not self.hookstoremove[index] then
 					self.n = self.n - 1
 				end
 				self.hookstoadd[index] = nil
 				self.hookstoremove[index] = true
+				self.pairs = self.dirtyPairs
 			end,
 			isEmpty = function(self)
 				return self.n==0
 			end,
-			pairs = function(self)
+			dirtyPairs = function(self)
 				for k, v in pairs(self.hookstoremove) do
 					self.hooks[k] = nil
 					self.hookstoremove[k] = nil
@@ -773,6 +775,10 @@ do
 					self.hooks[k] = v
 					self.hookstoadd[k] = nil
 				end
+				self.pairs = self.cleanPairs
+				return self:pairs()
+			end,
+			cleanPairs = function(self)
 				return pairs(self.hooks)
 			end,
 			run = function(self, instance, ...)
@@ -786,7 +792,8 @@ do
 				hooks = {},
 				hookstoadd = {},
 				hookstoremove = {},
-				n = 0
+				n = 0,
+				pairs = p.cleanPairs
 			}, p)
 		end
 	}
