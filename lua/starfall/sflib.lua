@@ -747,7 +747,7 @@ do
 	SF.HookTable = {
 		__index = {
 			add = function(self, index, func)
-				if not (self.hooks[index] or self.hookstoadd[index]) then
+				if not (self.hooks[index] or self.hookstoadd[index]) or self.hookstoremove[index] then
 					if self.n>=128 then SF.Throw("Max hooks limit reached", 3) end
 					self.n = self.n + 1
 				end
@@ -776,7 +776,7 @@ do
 					self.hookstoadd[k] = nil
 				end
 				self.pairs = self.cleanPairs
-				return self:pairs()
+				return pairs(self.hooks)
 			end,
 			cleanPairs = function(self)
 				return pairs(self.hooks)
