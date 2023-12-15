@@ -1272,6 +1272,7 @@ local shaderBlacklist = {
 }
 local materialBlacklist = {
 	["pp/copy"] = true,
+	["debug/debugluxels"] = true,
 	["effects/ar2_altfire1"] = true,
 }
 --- Checks that the material isn't malicious
