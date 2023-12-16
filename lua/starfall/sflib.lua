@@ -750,18 +750,18 @@ do
 				if not (self.hooks[index] or self.hookstoadd[index]) or self.hookstoremove[index] then
 					if self.n>=128 then SF.Throw("Max hooks limit reached", 3) end
 					self.n = self.n + 1
+					self.hookstoremove[index] = nil
 				end
 				self.hookstoadd[index] = func
-				self.hookstoremove[index] = nil
 				self.pairs = self.dirtyPairs
 			end,
 			remove = function(self, index)
 				if (self.hooks[index] or self.hookstoadd[index]) and not self.hookstoremove[index] then
 					self.n = self.n - 1
+					self.hookstoadd[index] = nil
+					self.hookstoremove[index] = true
+					self.pairs = self.dirtyPairs
 				end
-				self.hookstoadd[index] = nil
-				self.hookstoremove[index] = true
-				self.pairs = self.dirtyPairs
 			end,
 			isEmpty = function(self)
 				return self.n==0
