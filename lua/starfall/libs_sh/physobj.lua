@@ -559,6 +559,47 @@ if SERVER then
 	function physobj_methods:getStress()
 		return unwrap(self):GetStress()
 	end
+
+	--- Calculates the linear and angular impulse on the object's center of mass for an offset impulse.
+	--- The outputs can be used with PhysObj:applyForceCenter and PhysObj:applyTorque, respectively.
+	---
+	--- Be careful to convert the angular impulse to world frame (PhysObj:localToWorldVector)
+	--- if you are going to use it with applyTorque.
+	-- @server
+	-- @param Vector impulse The impulse acting on the object in world coordinates (kg*source_unit/s)
+	-- @param Vector position The location of the impulse in world coordinates
+	-- @return Vector The calculated linear impulse on the physics object's center of mass in kg*source_unit/s. (World frame)
+	-- @return Vector The calculated angular impulse on the physics object's center of mass in kg*m^2*degrees/s. (Local frame)
+	function physobj_methods:calculateForceOffset(impulse, position)
+		impulse = vunwrap(impulse)
+		position = vunwrap(position)
+
+		checkvector(impulse)
+		checkvector(position)
+
+		local linearImpulse, angularImpulse = unwrap(self):CalculateForceOffset(impulse, position)
+
+		return vwrap(linearImpulse), vwrap(angularImpulse)
+	end
+
+	--- Calculates the linear and angular velocities on the center of mass for an offset impulse.
+	--- The outputs can be directly passed to PhysObj:addVelocity and PhysObj:addAngleVelocity, respectively.
+	-- @server
+	-- @param Vector impulse The impulse acting on the object in world coordinates (kg*source_unit/s)
+	-- @param Vector position The location of the impulse in world coordinates
+	-- @return Vector The calculated linear velocity from the impulse on the physics object's center of mass in source_unit/s. (World frame)
+	-- @return Vector The calculated angular velocity from the impulse on the physics object's center of mass in degrees/s. (Local frame)
+	function physobj_methods:calculateVelocityOffset(impulse, position)
+		impulse = vunwrap(impulse)
+		position = vunwrap(position)
+
+		checkvector(impulse)
+		checkvector(position)
+
+		local linearVelocity, angularVelocity = unwrap(self):CalculateVelocityOffset(impulse, position)
+
+		return vwrap(linearVelocity), vwrap(angularVelocity)
+	end
 end
 
 end
