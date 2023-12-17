@@ -215,11 +215,9 @@ else
 
 		holo:SetPos(pos)
 
-		if CLIENT then
-			local sfParent = holo.sfParent
-			if sfParent and sfParent.parent and sfParent.parent:IsValid() then
-				sfParent:updateTransform()
-			end
+		local sfParent = holo.sfParent
+		if sfParent and sfParent.parent and sfParent.parent:IsValid() then
+			sfParent:updateTransform()
 		end
 	end
 
@@ -233,11 +231,9 @@ else
 
 		holo:SetAngles(angle)
 		
-		if CLIENT then
-			local sfParent = holo.sfParent
-			if sfParent and sfParent.parent and sfParent.parent:IsValid() then
-				sfParent:updateTransform()
-			end
+		local sfParent = holo.sfParent
+		if sfParent and sfParent.parent and sfParent.parent:IsValid() then
+			sfParent:updateTransform()
 		end
 	end
 

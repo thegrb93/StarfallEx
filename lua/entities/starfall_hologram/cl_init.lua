@@ -10,6 +10,10 @@ function ENT:Initialize()
 	self.sf_userrenderbounds = false
 	self:SetupBones()
 	self:OnScaleChanged(nil, nil, self:GetScale())
+
+	-- Fixes future SetParent calls not keeping offset from the parent
+	self:SetParent(Entity(0))
+	self:SetParent()
 end
 
 function ENT:SetClip(index, enabled, normal, origin, entity)
