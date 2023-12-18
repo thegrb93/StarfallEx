@@ -196,7 +196,7 @@ function ents_methods:setCustomPropShadowForce(data)
 		checkluatype(data.secondstoarrive, TYPE_NUMBER)
 		if data.secondstoarrive < 1e-3 then SF.Throw("Shadow force property 'secondstoarrive' cannot be lower than 0.001") end
 		checkluatype(data.dampfactor, TYPE_NUMBER)
-		if data.dampfactor > 1 or data.dampfactor < 0 then SF.Throw("Shadow force property 'dampfactor' cannot be higher than 2 or lower than -1") end
+		if data.dampfactor > 1 or data.dampfactor < 0 then SF.Throw("Shadow force property 'dampfactor' cannot be higher than 1 or lower than 0") end
 		checkluatype(data.maxangular, TYPE_NUMBER)
 		checkluatype(data.maxangulardamp, TYPE_NUMBER)
 		checkluatype(data.maxspeed, TYPE_NUMBER)
