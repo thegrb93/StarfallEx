@@ -487,6 +487,22 @@ env.MOVETYPE = {
 	CUSTOM = MOVETYPE_CUSTOM,
 }
 
+--- ENUMs used by Entity.setCustomPropForces (Entity.PhysicsSimulate internally)
+-- @name builtins_library.SIM
+-- @class table
+-- @field NOTHING
+-- @field LOCAL_ACCELERATION
+-- @field LOCAL_FORCE
+-- @field GLOBAL_ACCELERATION
+-- @field GLOBAL_FORCE
+env.SIM = {
+	NOTHING = SIM_NOTHING,
+	LOCAL_ACCELERATION = SIM_LOCAL_ACCELERATION,
+	LOCAL_FORCE = SIM_LOCAL_FORCE,
+	GLOBAL_ACCELERATION = SIM_GLOBAL_ACCELERATION,
+	GLOBAL_FORCE = SIM_GLOBAL_FORCE,
+}
+
 --- ENUMs of in_keys for use with player:keyDown
 -- @name builtins_library.IN_KEY
 -- @class table

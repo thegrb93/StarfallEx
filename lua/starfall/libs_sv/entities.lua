@@ -147,16 +147,13 @@ function ents_methods:setCustomPropForces(ang, lin, mode)
 
 	checkpermission(instance, ent, "entities.applyForce")
 
-	checkluatype(mode, TYPE_NUMBER)
-	if mode ~= 0 and mode ~= 1 and mode ~= 2 and mode ~= 3 and mode ~= 4 then SF.Throw("Invalid mode", 2) end
-
 	if mode == 0 then
 		ent.customForceMode = nil
 		if self.hasMotionController then
 			ent:StopMotionController()
 			ent.hasMotionController = false
 		end
-	else
+	elseif mode == 1 or mode == 2 or mode == 3 then
 		ang = vunwrap(ang)
 		checkvector(ang)
 		lin = vunwrap(lin)
@@ -170,6 +167,8 @@ function ents_methods:setCustomPropForces(ang, lin, mode)
 			ent:StartMotionController()
 			ent.hasMotionController = true
 		end
+	else
+		SF.Throw("Invalid mode, see the SIM enum", 2)
 	end
 end
 
