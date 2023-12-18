@@ -15,9 +15,14 @@ function ENT:Initialize()
 	self:AddEFlags( EFL_FORCE_CHECK_TRANSMIT )
 end
 
-function ENT:PhysicsSimulate()
+function ENT:PhysicsSimulate(physObj, dt)
 	if self.customForceMode then
-		return ent.customForceAngular, ent.customForceLinear, self.customForceMode
+		return self.customForceAngular, self.customForceLinear, self.customForceMode
+	elseif self.customShadowForce then
+		physObj:Wake()
+		self.customShadowForce.deltatime = dt
+		physObj:ComputeShadowControl(self.customShadowForce)
+		return SIM_NOTHING
 	else
 		return SIM_NOTHING
 	end

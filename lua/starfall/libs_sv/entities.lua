@@ -173,6 +173,54 @@ function ents_methods:setCustomPropForces(ang, lin, mode)
 	end
 end
 
+--- Sets a custom prop's shadow forces, moving the entity to the desired position and angles
+-- @param data table Shadow physics data, excluding 'teleportdistance' and 'deltatime'. See: https://wiki.facepunch.com/gmod/PhysObj:ComputeShadowControl
+function ents_methods:setCustomPropShadowForce(data)
+	local ent = getent(self)
+	if ent:GetClass()~="starfall_prop" then SF.Throw("The entity isn't a custom prop", 2) end
+
+	checkpermission(instance, ent, "entities.applyForce")
+
+	if not data then
+		ent.shadowForce = nil
+		if ent.hasMotionController then
+			ent:StopMotionController()
+			ent.hasMotionController = false
+		end
+	else
+		local pos = vunwrap(data.pos)
+		checkvector(pos)
+		local ang = aunwrap(data.angle)
+		checkvector(ang)
+
+		checkluatype(data.secondstoarrive, TYPE_NUMBER)
+		if data.secondstoarrive < 1e-3 then SF.Throw("Shadow force property 'secondstoarrive' cannot be lower than 0.001") end
+		checkluatype(data.dampfactor, TYPE_NUMBER)
+		if data.dampfactor > 1 or data.dampfactor < 0 then SF.Throw("Shadow force property 'dampfactor' cannot be higher than 2 or lower than -1") end
+		checkluatype(data.maxangular, TYPE_NUMBER)
+		checkluatype(data.maxangulardamp, TYPE_NUMBER)
+		checkluatype(data.maxspeed, TYPE_NUMBER)
+		checkluatype(data.maxspeeddamp, TYPE_NUMBER)
+
+		ent.customShadowForce = {
+			pos = pos,
+			angle = ang,
+			secondstoarrive = data.secondstoarrive,
+			dampfactor = data.dampfactor,
+			maxangular = data.maxangular,
+			maxangulardamp = data.maxangulardamp,
+			maxspeed = data.maxspeed,
+			maxspeeddamp = data.maxspeeddamp,
+			teleportdistance = 0,
+		}
+
+		if not ent.hasMotionController then
+			ent:StartMotionController()
+			ent.hasMotionController = true
+		end
+	end
+end
+
 --- Set the angular velocity of an object
 -- @param Vector angvel The local angvel vector to set
 function ents_methods:setAngleVelocity(angvel)
