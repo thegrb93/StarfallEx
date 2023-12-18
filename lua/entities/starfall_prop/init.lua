@@ -15,6 +15,14 @@ function ENT:Initialize()
 	self:AddEFlags( EFL_FORCE_CHECK_TRANSMIT )
 end
 
+function ENT:PhysicsSimulate()
+	if self.customForceMode then
+		return ent.customForceAngular, ent.customForceLinear, self.customForceMode
+	else
+		return SIM_NOTHING
+	end
+end
+
 function ENT:UpdateTransmitState()
 	return TRANSMIT_ALWAYS
 end

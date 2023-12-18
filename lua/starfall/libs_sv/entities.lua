@@ -147,18 +147,30 @@ function ents_methods:setCustomPropForces(ang, lin, mode)
 
 	checkpermission(instance, ent, "entities.applyForce")
 
-	ang = vunwrap(ang)
-	checkvector(ang)
-	lin = vunwrap(lin)
-	checkvector(lin)
-
 	checkluatype(mode, TYPE_NUMBER)
 	if mode ~= 0 and mode ~= 1 and mode ~= 2 and mode ~= 3 and mode ~= 4 then SF.Throw("Invalid mode", 2) end
 
-	function ent:PhysicsSimulate()
-		return ang, lin, mode
+	if mode == 0 then
+		ent.customForceMode = nil
+		if self.hasMotionController then
+			ent:StopMotionController()
+			ent.hasMotionController = false
+		end
+	else
+		ang = vunwrap(ang)
+		checkvector(ang)
+		lin = vunwrap(lin)
+		checkvector(lin)
+
+		ent.customForceMode = mode
+		ent.customForceLinear = lin
+		ent.customForceAngular = ang
+
+		if not ent.hasMotionController then
+			ent:StartMotionController()
+			ent.hasMotionController = true
+		end
 	end
-	ent:StartMotionController()
 end
 
 --- Set the angular velocity of an object
