@@ -138,6 +138,7 @@ function ents_methods:applyDamage(amt, attacker, inflictor, dmgtype, pos)
 end
 
 --- Sets a custom prop's physics simulation forces. Thrusters and balloons use this.
+-- This takes precedence over Entity.setCustomPropShadowForce and cannot be used together
 -- @param Vector ang Angular Force (Torque)
 -- @param Vector lin Linear Force
 -- @param number mode The physics mode to use. 0 = Off, 1 = Local acceleration, 2 = Local force, 3 = Global Acceleration, 4 = Global force
@@ -173,6 +174,7 @@ function ents_methods:setCustomPropForces(ang, lin, mode)
 end
 
 --- Sets a custom prop's shadow forces, moving the entity to the desired position and angles
+-- This gets overriden by Entity.setCustomPropForces and cannot be used together
 -- @param data table Shadow physics data, excluding 'teleportdistance' and 'deltatime'. See: https://wiki.facepunch.com/gmod/PhysObj:ComputeShadowControl
 function ents_methods:setCustomPropShadowForce(data)
 	local ent = getent(self)
