@@ -19,7 +19,6 @@ function ENT:PhysicsSimulate(physObj, dt)
 	if self.customForceMode then
 		return self.customForceAngular, self.customForceLinear, self.customForceMode
 	elseif self.customShadowForce then
-		physObj:Wake()
 		self.customShadowForce.deltatime = dt
 		physObj:ComputeShadowControl(self.customShadowForce)
 		return SIM_NOTHING
