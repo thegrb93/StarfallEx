@@ -470,12 +470,6 @@ function vec_methods:set(v)
 	self[3] = v[3]
 end
 
---- Translates the vectors position into 2D user screen coordinates.
--- @return table A table {x=screenx,y=screeny,visible=visible}
-function vec_methods:toScreen()
-	return unwrap(self):ToScreen()
-end
-
 --- Converts vector to color
 -- @return Color New color object
 function vec_methods:getColor()
@@ -500,6 +494,13 @@ if SERVER then
 	-- @return boolean True/False.
 	function vec_methods:isInWorld()
 		return util.IsInWorld(unwrap(self))
+	end
+else
+	--- Translates the vectors position into 2D user screen coordinates.
+	-- @client
+	-- @return table A table {x=screenx,y=screeny,visible=visible}
+	function vec_methods:toScreen()
+		return unwrap(self):ToScreen()
 	end
 end
 
