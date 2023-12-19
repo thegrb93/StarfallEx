@@ -292,8 +292,6 @@ function props_library.createComponent(pos, ang, class, model, frozen)
 	end
 
 	if ply ~= SF.Superuser then
-		gamemode.Call("PlayerSpawnedSENT", ply, comp)
-
 		if propUndo then
 			undo.Create(class)
 				undo.SetPlayer(ply)
