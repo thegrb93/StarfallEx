@@ -1,6 +1,7 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
+local haspermission = SF.Permissions.hasAccess
 
 local huge = math.huge
 local abs = math.abs
@@ -141,7 +142,7 @@ end
 -- This takes precedence over Entity.setCustomPropShadowForce and cannot be used together
 -- @param Vector ang Angular Force (Torque)
 -- @param Vector lin Linear Force
--- @param number mode The physics mode to use. 0 = Off, 1 = Local acceleration, 2 = Local force, 3 = Global Acceleration, 4 = Global force
+-- @param number mode The physics mode to use. 0 = Off (disables custom physics entirely), 1 = Local acceleration, 2 = Local force, 3 = Global Acceleration, 4 = Global force
 function ents_methods:setCustomPropForces(ang, lin, mode)
 	local ent = getent(self)
 	if ent:GetClass()~="starfall_prop" then SF.Throw("The entity isn't a custom prop", 2) end
@@ -175,7 +176,8 @@ end
 
 --- Sets a custom prop's shadow forces, moving the entity to the desired position and angles
 -- This gets overriden by Entity.setCustomPropForces and cannot be used together
--- @param data table Shadow physics data, excluding 'teleportdistance' and 'deltatime'. See: https://wiki.facepunch.com/gmod/PhysObj:ComputeShadowControl
+-- See available parameters here: https://wiki.facepunch.com/gmod/PhysObj:ComputeShadowControl
+-- @param data table|false Shadow physics data, excluding 'deltatime'. 'teleportdistance' higher than 0 requires 'entities.setPos'. Pass a falsy value to disable custom physics entirely
 function ents_methods:setCustomPropShadowForce(data)
 	local ent = getent(self)
 	if ent:GetClass()~="starfall_prop" then SF.Throw("The entity isn't a custom prop", 2) end
@@ -194,10 +196,15 @@ function ents_methods:setCustomPropShadowForce(data)
 		local ang = aunwrap(data.angle)
 		checkvector(ang)
 
+		checkluatype(data.teleportdistance, TYPE_NUMBER)
+		if data.teleportdistance > 0 and not haspermission(instance, ent, "entities.setPos") then
+			SF.Throw("Shadow force property 'teleportdistance' higher than 0 requires 'entities.setPos' permission access", 2)
+		end
+
 		checkluatype(data.secondstoarrive, TYPE_NUMBER)
-		if data.secondstoarrive < 1e-3 then SF.Throw("Shadow force property 'secondstoarrive' cannot be lower than 0.001") end
+		if data.secondstoarrive < 1e-3 then SF.Throw("Shadow force property 'secondstoarrive' cannot be lower than 0.001", 2) end
 		checkluatype(data.dampfactor, TYPE_NUMBER)
-		if data.dampfactor > 1 or data.dampfactor < 0 then SF.Throw("Shadow force property 'dampfactor' cannot be higher than 1 or lower than 0") end
+		if data.dampfactor > 1 or data.dampfactor < 0 then SF.Throw("Shadow force property 'dampfactor' cannot be higher than 1 or lower than 0", 2) end
 		checkluatype(data.maxangular, TYPE_NUMBER)
 		checkluatype(data.maxangulardamp, TYPE_NUMBER)
 		checkluatype(data.maxspeed, TYPE_NUMBER)
@@ -212,7 +219,7 @@ function ents_methods:setCustomPropShadowForce(data)
 			maxangulardamp = data.maxangulardamp,
 			maxspeed = data.maxspeed,
 			maxspeeddamp = data.maxspeeddamp,
-			teleportdistance = 0,
+			teleportdistance = data.teleportdistance,
 		}
 
 		if not ent.hasMotionController then
