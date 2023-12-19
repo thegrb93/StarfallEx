@@ -41,14 +41,21 @@ function vehicle_meta:__tostring()
 	else return tostring(ent) end
 end
 
-if SERVER then
-	--- Returns the driver of the vehicle
-	-- @server
-	-- @return Player Driver of vehicle
-	function vehicle_methods:getDriver()
-		return pwrap(getveh(self):GetDriver())
-	end
+--- Returns the driver of the vehicle
+-- @return Player Driver of vehicle
+function vehicle_methods:getDriver()
+	return pwrap(getveh(self):GetDriver())
+end
 
+--- Returns a passenger of a vehicle
+-- @param number n The index of the passenger to get
+-- @return Player The passenger or NULL if empty
+function vehicle_methods:getPassenger(n)
+	checkluatype(n, TYPE_NUMBER)
+	return pwrap(getveh(self):GetPassenger(n))
+end
+
+if SERVER then
 	--- Ejects the driver of the vehicle
 	-- @server
 	function vehicle_methods:ejectDriver()
@@ -56,15 +63,6 @@ if SERVER then
 		if driver:IsValid() then
 			driver:ExitVehicle()
 		end
-	end
-
-	--- Returns a passenger of a vehicle
-	-- @server
-	-- @param number n The index of the passenger to get
-	-- @return Player The passenger or NULL if empty
-	function vehicle_methods:getPassenger(n)
-		checkluatype(n, TYPE_NUMBER)
-		return pwrap(getveh(self):GetPassenger(n))
 	end
 
 	--- Kills the driver of the vehicle
