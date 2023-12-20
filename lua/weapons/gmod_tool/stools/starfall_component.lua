@@ -284,6 +284,25 @@ function TOOL:Think()
 end
 
 if CLIENT then
+
+	local custom_toolscreen_convar = GetConVar("starfall_toolscreen")
+	if custom_toolscreen_convar and custom_toolscreen_convar:GetBool() then
+		function TOOL:DrawToolScreen(w, h)
+			if self:GetClientInfo("Type") == "1" then
+				local models = scripted_ents.GetStored("starfall_screen").t.Monitor_Offsets
+				local mdl = self:GetClientInfo("Model")
+				if models[mdl] then
+					mdl = models[mdl].Name
+				else
+					mdl = string.match(self:GetClientInfo("Model"), "^.*/(.*)$")
+				end
+				SF.DrawToolgunScreen(w, h, "SCREEN", mdl)
+			else
+				SF.DrawToolgunScreen(w, h, "HUD")
+			end
+		end
+	end
+
 	function TOOL.BuildCPanel(panel)
 		panel:AddControl("Header", { Text = "#Tool.starfall_component.name", Description = "#Tool.starfall_component.desc" })
 		panel:AddControl("CheckBox", { Label = "#Tool.starfall_component.parent", Command = "starfall_component_parent" } )
