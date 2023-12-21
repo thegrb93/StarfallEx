@@ -69,7 +69,7 @@ else
 	end
 
 	local overlay_material = Material("radon/starfall_tool_overlay.png", "smooth")
-	overlay_material:SetInt("$flags", 0x8000 + 0x0020 + 0x0010)
+	overlay_material:SetInt("$flags", 0x8000 + 0x0020)
 
 	local star_material = Material("radon/starfall_tool_star.png", "smooth")
 	star_material:SetInt("$flags", 0x8000 + 0x0080 + 0x0020 + 0x0010)
