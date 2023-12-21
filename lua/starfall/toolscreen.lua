@@ -21,7 +21,7 @@ else
 	surface.CreateFont("StarfallToolSmall", { font = "Roboto-LightItalic.ttf", size = 32 })
 
 	CreateClientConVar("starfall_toolscreen", "1", true, false, "Enable Starfall custom toolgun screen animation. Requires reconnect!", 0, 1)
-	local simulation_fps = CreateClientConVar("starfall_toolscreen_fps", "144", true, false, "Maximum FPS of the stars animation", 30, 200):GetInt()
+	local simulation_fps = CreateClientConVar("starfall_toolscreen_fps", "120", true, false, "Maximum FPS of the stars animation", 30, 300):GetInt()
 	cvars.AddChangeCallback("starfall_toolscreen_fps", function(_, _, value)
 		simulation_fps = value
 	end)
