@@ -15,7 +15,7 @@ else
 	local math_rand, math_random = math.Rand, math.random
 	local math_cos, math_sin = math.cos, math.sin
 	local math_abs, math_clamp = math.abs, math.Clamp
-	local math_normalize_angle = math.normalizeAngle
+	local math_normalize_angle = math.NormalizeAngle
 
 	surface.CreateFont("StarfallToolBig", { font = "Roboto-Condensed.ttf", size = 42 })
 	surface.CreateFont("StarfallToolSmall", { font = "Roboto-LightItalic.ttf", size = 32 })
