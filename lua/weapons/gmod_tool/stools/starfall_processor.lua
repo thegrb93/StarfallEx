@@ -250,7 +250,13 @@ if CLIENT then
 			local ent = LocalPlayer():GetEyeTrace().Entity
 			local script_name
 			if ent and ent:IsValid() and ent:GetClass() == "starfall_processor" then
-				script_name = ent.name or "Generic"
+				if ent.error then
+					script_name = "< clientside errored >"
+				elseif ent:GetNWInt("State", 1) == 2 then
+					script_name = "< serverside errored >"
+				else
+					script_name = ent.name or "Generic"
+				end
 			elseif SF.Editor.editor then
 				script_name = SF.Editor.editor:GetActiveTab():GetText()
 			end
