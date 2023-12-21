@@ -45,7 +45,7 @@ else
 		return
 			HSVToColor(math_rand(190, 220), math_rand(0.6, 1), 0.9),  -- Color
 			math_rand(40, 120),                                       -- Size
-			math_rand(200, 800),                                      -- Gravity
+			math_rand(200, 600),                                      -- Gravity
 			math_rand(0.3, 1) * (math_random() > 0.5 and 1 or -1)     -- Rotation direction
 	end
 
@@ -55,10 +55,10 @@ else
 	for _ = 1, star_count do
 		local color, size, gravity, ang_dir = get_random_star_properties()
 		stars[#stars+1] = {
-			x       = 0,--math_rand(-128, 128),
-			y       = 0,--math_rand(-128, 128),
-			x_vel   = 0,
-			y_vel   = 0,
+			x       = math_rand(-128, 128),
+			y       = math_rand(-128, 128),
+			x_vel   = math_rand(-star_velocity_max, star_velocity_max),
+			y_vel   = star_velocity_max,
 			ang     = 0,
 			ang_vel = 0,
 			ang_dir = ang_dir,
