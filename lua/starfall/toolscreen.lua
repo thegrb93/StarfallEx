@@ -18,7 +18,7 @@ else
 	local math_normalize_angle = math.NormalizeAngle
 
 	surface.CreateFont("StarfallToolBig", { font = "Roboto-Condensed.ttf", size = 42 })
-	surface.CreateFont("StarfallToolSmall", { font = "Roboto-LightItalic.ttf", size = 32 })
+	surface.CreateFont("StarfallToolSmall", { font = "Roboto-LightItalic.ttf", size = 36 })
 
 	CreateClientConVar("starfall_toolscreen", "1", true, false, "Enable Starfall custom toolgun screen animation. Requires reconnect!", 0, 1)
 	local simulation_fps = CreateClientConVar("starfall_toolscreen_fps", "120", true, false, "Maximum FPS of the stars animation", 30, 300):GetInt()
