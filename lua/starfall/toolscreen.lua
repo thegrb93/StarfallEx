@@ -17,8 +17,8 @@ else
 	local math_abs, math_clamp = math.abs, math.Clamp
 	local math_normalize_angle = math.NormalizeAngle
 
-	surface.CreateFont("StarfallToolBig", { font = "Roboto-Condensed.ttf", size = 42 })
-	surface.CreateFont("StarfallToolSmall", { font = "Roboto-LightItalic.ttf", size = 36 })
+	surface.CreateFont("StarfallToolBig", { font = "Roboto-Bold.ttf", size = 36 })
+	surface.CreateFont("StarfallToolSmall", { font = "Roboto-Italic.ttf", size = 32, shadow = true })
 
 	CreateClientConVar("starfall_toolscreen", "1", true, false, "Enable Starfall custom toolgun screen animation. Requires reconnect!", 0, 1)
 	local simulation_fps = CreateClientConVar("starfall_toolscreen_fps", "120", true, false, "Maximum FPS of the stars animation", 30, 300):GetInt()
@@ -26,10 +26,10 @@ else
 		simulation_fps = value
 	end)
 
-	local color_text             = Color(240, 240, 253, 255)          -- Text color for subtitle and scrolling text
-	local color_text_outline     = Color(0, 0, 0, 155)                -- Outline text color for subtitle and scrolling text
 	local color_background       = Color(33, 33, 40, 30)              -- Background color, alpha controls how fast the stars fade out
 	local color_background_solid = ColorAlpha(color_background, 255)  -- Solid version of the background color for the Linux fix
+	local color_text             = Color(240, 240, 253, 255)          -- Text color for subtitle and scrolling text
+	local color_text_outline     = ColorAlpha(color_background, 80)   -- Outline text color for subtitle and scrolling text
 	local star_count             = 8                                  -- Amount of stars to render
 	local star_deceleration      = 0.35                               -- How much velocity to retain
 	local star_velocity_bump     = 300                                -- Random velocity towards the center when resetting star
