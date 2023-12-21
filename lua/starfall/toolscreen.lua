@@ -11,6 +11,12 @@ if SERVER then
 
 else
 
+	local draw, surface = draw, surface
+	local math_rand, math_random = math.Rand, math.random
+	local math_cos, math_sin = math.cos, math.sin
+	local math_abs, math_clamp = math.abs, math.Clamp
+	local math_normalize_angle = math.normalizeAngle
+
 	surface.CreateFont("StarfallToolBig", { font = "Roboto-Condensed.ttf", size = 42 })
 	surface.CreateFont("StarfallToolSmall", { font = "Roboto-LightItalic.ttf", size = 32 })
 
@@ -20,11 +26,10 @@ else
 		simulation_fps = value
 	end)
 
-	local color_text             = Color(240, 240, 253)               -- Text color for subtitle and scrolling text
+	local color_text             = Color(240, 240, 253, 255)          -- Text color for subtitle and scrolling text
 	local color_text_outline     = Color(0, 0, 0, 155)                -- Outline text color for subtitle and scrolling text
-	local text_scroll_speed      = 100                                -- Scrolling text speed
 	local color_background       = Color(33, 33, 40, 30)              -- Background color, alpha controls how fast the stars fade out
-	local color_background_solid = ColorAlpha(Color(33, 33, 40), 255) -- Solid version of the background color for the Linux fix
+	local color_background_solid = ColorAlpha(color_background, 255)  -- Solid version of the background color for the Linux fix
 	local star_count             = 8                                  -- Amount of stars to render
 	local star_deceleration      = 0.35                               -- How much velocity to retain
 	local star_velocity_bump     = 300                                -- Random velocity towards the center when resetting star
@@ -38,10 +43,10 @@ else
 	local star_random_offset     = math.pi / 8                        -- Random angle offset to set when flipping the star
 	local function get_random_star_properties()
 		return
-			HSVToColor(math.Rand(190, 220), math.Rand(0.6, 1), 0.9),  -- Color
-			math.Rand(40, 120),                                       -- Size
-			math.Rand(200, 800),                                      -- Gravity
-			math.Rand(0.3, 1) * (math.random() > 0.5 and 1 or -1)     -- Rotation direction
+			HSVToColor(math_rand(190, 220), math_rand(0.6, 1), 0.9),  -- Color
+			math_rand(40, 120),                                       -- Size
+			math_rand(200, 800),                                      -- Gravity
+			math_rand(0.3, 1) * (math_random() > 0.5 and 1 or -1)     -- Rotation direction
 	end
 
 	-------------------------------------------
@@ -50,8 +55,8 @@ else
 	for _ = 1, star_count do
 		local color, size, gravity, ang_dir = get_random_star_properties()
 		stars[#stars+1] = {
-			x       = 0,--math.Rand(-128, 128),
-			y       = 0,--math.Rand(-128, 128),
+			x       = 0,--math_rand(-128, 128),
+			y       = 0,--math_rand(-128, 128),
 			x_vel   = 0,
 			y_vel   = 0,
 			ang     = 0,
@@ -83,7 +88,7 @@ else
 	local function starfall_chip_errored()
 		if stars_errored_delay <= 0 then
 			for _, star in ipairs(stars) do
-				star.color = HSVToColor(350 + math.random() * 20, 0.7, 0.85)
+				star.color = HSVToColor(350 + math_random() * 20, 0.7, 0.85)
 			end
 		end
 		stars_errored_delay = 3 -- How long should the stars remain red after an error
@@ -106,6 +111,7 @@ else
 		if dt > 1 / simulation_fps then
 			last_frame = curtime
 			stars_errored_delay = stars_errored_delay - dt
+			local deceleration = star_deceleration ^ dt
 
 			local ply = LocalPlayer()
 			local ply_world_vel = ply:GetVelocity()
@@ -113,16 +119,16 @@ else
 
 			local ply_eye_ang = ply:EyeAngles()
 			local ply_eye_ang_delta = ply_eye_ang - ply_eye_ang_prev
-			local ply_eye_pitch = math.NormalizeAngle(ply_eye_ang_delta[1]) * star_ply_angle_mul
-			local ply_eye_yaw = math.NormalizeAngle(ply_eye_ang_delta[2]) * star_ply_angle_mul
+			local ply_eye_pitch = math_normalize_angle(ply_eye_ang_delta[1]) * star_ply_angle_mul
+			local ply_eye_yaw = math_normalize_angle(ply_eye_ang_delta[2]) * star_ply_angle_mul
 			ply_eye_ang_prev = ply_eye_ang
 
 			render.PushRenderTarget(star_canvas)
-			local blur = math.Clamp(8 + 600 * dt, 12, 30)
+			local blur = math_clamp(8 + 600 * dt, 12, 30)
 			render.BlurRenderTarget(star_canvas, blur, blur, 1)
 
 			surface.SetMaterial(star_canvas_material)
-			surface.SetDrawColor(color_background.r, color_background.g, color_background.b, math.Clamp(3000 * dt + 20, 40, 120))
+			surface.SetDrawColor(color_background.r, color_background.g, color_background.b, math_clamp(3000 * dt + 20, 40, 120))
 			surface.DrawTexturedRect(0, 0, w, h)
 
 			surface.SetMaterial(star_material)
@@ -134,12 +140,12 @@ else
 				local color, gravity = star.color, star.gravity
 
 				if x ^ 2 + y ^ 2 > star_reset_radius_sqr then
-					local offset_ang = math.atan2(-star.y, -star.x) + math.Rand(-star_random_offset, star_random_offset)
-					local offset_x, offset_y = math.cos(offset_ang), math.sin(offset_ang)
+					local offset_ang = math.atan2(-star.y, -star.x) + math_rand(-star_random_offset, star_random_offset)
+					local offset_x, offset_y = math_cos(offset_ang), math_sin(offset_ang)
 					x = offset_x * star_reset_radius
 					y = offset_y * star_reset_radius
 
-					local towards_center = math.Rand(-star_velocity_bump, star_velocity_bump)
+					local towards_center = math_rand(-star_velocity_bump, star_velocity_bump)
 					x_vel = x_vel - offset_x * towards_center * 2
 					y_vel = y_vel - offset_y * towards_center
 
@@ -152,19 +158,19 @@ else
 				end
 
 				x_vel = x_vel + ((ply_local_vel.y) * star_ply_movement_mul * dt) + ply_eye_yaw
-				x_vel = math.Clamp(x_vel * star_deceleration ^ dt, -star_velocity_max, star_velocity_max)
+				x_vel = math_clamp(x_vel * deceleration, -star_velocity_max, star_velocity_max)
 
-				y_vel = y_vel + ((ply_local_vel.x + ply_world_vel.z) * star_ply_movement_mul * dt) - ply_eye_pitch + (gravity * dt)
-				y_vel = math.Clamp(y_vel * star_deceleration ^ dt, -star_velocity_max, star_velocity_max)
+				y_vel = y_vel + ((ply_local_vel.x + ply_world_vel.z) * star_ply_movement_mul * dt) - ply_eye_pitch + gravity * dt
+				y_vel = math_clamp(y_vel * deceleration, -star_velocity_max, star_velocity_max)
 
-				ang_vel = ang_vel + (math.abs(x_vel) * 2 + math.abs(y_vel) / 2) * dt
-				ang_vel = math.Clamp(ang_vel * star_deceleration ^ dt, star_ang_velocity_min, star_ang_velocity_max)
+				ang_vel = ang_vel + (math_abs(x_vel) * 2 + math_abs(y_vel) / 2) * dt
+				ang_vel = math_clamp(ang_vel * deceleration, star_ang_velocity_min, star_ang_velocity_max)
 
 				-------------------------------------------
 
 				x = x + x_vel * dt
 				y = y + y_vel * dt
-				ang = ang + (ang_dir * ang_vel) * dt
+				ang = ang + ang_dir * ang_vel * dt
 
 				surface.SetDrawColor(color.r, color.g, color.b, 230)
 				surface.DrawTexturedRectRotated(128 + x, 128 + y, size, size, ang)
@@ -195,7 +201,7 @@ else
 		if scroll_text then
 			surface.SetFont("StarfallToolSmall")
 			local text_width = surface.GetTextSize(scroll_text) + 60
-			local x = RealTime() * text_scroll_speed % text_width * -1
+			local x = RealTime() * 100 % text_width * -1
 			while x < 256 do
 				draw.SimpleTextOutlined(scroll_text, "StarfallToolSmall", x, 226, color_text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 2, color_text_outline)
 				x = x + text_width
