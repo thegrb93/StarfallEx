@@ -107,6 +107,7 @@ function hologram_library.create(pos, ang, model, scale)
 	pos = vunwrap(pos)
 	ang = aunwrap(ang)
 	model = SF.CheckModel(model, ply)
+	if scale~=nil then scale = vunwrap(scale) end
 
 	entList:checkuse(ply, 1)
 
@@ -122,7 +123,7 @@ function hologram_library.create(pos, ang, model, scale)
 			if CPPI then holoent:CPPISetOwner(ply == SF.Superuser and NULL or ply) end
 
 			if scale~=nil then
-				holoent:SetScale(vunwrap(scale))
+				holoent:SetScale(scale)
 			end
 			entList:register(instance, holoent)
 			return wrap(holoent)
@@ -142,7 +143,7 @@ function hologram_library.create(pos, ang, model, scale)
 			holoent:Spawn()
 
 			if scale~=nil then
-				holoent:SetScale(vunwrap(scale))
+				holoent:SetScale(scale)
 			else
 				holoent:SetScale(Vector(1,1,1))
 			end
