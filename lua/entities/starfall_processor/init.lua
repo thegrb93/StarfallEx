@@ -219,7 +219,8 @@ util.AddNetworkString("starfall_processor_used")
 util.AddNetworkString("starfall_processor_link")
 util.AddNetworkString("starfall_processor_kill")
 util.AddNetworkString("starfall_processor_clinit")
-util.AddNetworkString("starfall_report_error")
+util.AddNetworkString("starfall_processor_error")
+-- util.AddNetworkString("starfall_report_error")
 
 -- Request code from the chip. If the chip doesn't have code yet add player to list to send when there is code.
 net.Receive("starfall_processor_download", function(len, ply)
@@ -257,14 +258,14 @@ net.Receive("starfall_processor_clinit", function(len, ply)
 	end
 end)
 
-net.Receive("starfall_report_error", function(len, ply)
-	local chip = net.ReadEntity()
-	if chip:IsValid() and IsValid(chip.owner) and chip.ErroredPlayers and not chip.ErroredPlayers[ply] and chip.owner ~= ply then
-		chip.ErroredPlayers[ply] = true
-		SF.AddNotify(chip.owner, "Starfall: ("..chip.sfdata.mainfile..") errored for player: ("..ply:Nick()..")", "ERROR", 7, "SILENT")
-		SF.Print(chip.owner, string.sub(net.ReadString(), 1, 2048))
-	end
-end)
+-- net.Receive("starfall_report_error", function(len, ply)
+-- 	local chip = net.ReadEntity()
+-- 	if chip:IsValid() and IsValid(chip.owner) and chip.ErroredPlayers and not chip.ErroredPlayers[ply] and chip.owner ~= ply then
+-- 		chip.ErroredPlayers[ply] = true
+-- 		SF.AddNotify(chip.owner, "Starfall: ("..chip.sfdata.mainfile..") errored for player: ("..ply:Nick()..")", "ERROR", 7, "SILENT")
+-- 		SF.Print(chip.owner, string.sub(net.ReadString(), 1, 2048))
+-- 	end
+-- end)
 
 SF.WaitForPlayerInit(function(ply)
 	for k, v in ipairs(ents.FindByClass("starfall_processor")) do
