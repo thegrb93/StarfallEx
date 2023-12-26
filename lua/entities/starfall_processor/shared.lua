@@ -121,6 +121,101 @@ function ENT:GetGateName()
 	return self.name
 end
 
+local write_error
+if SERVER then
+	function write_error(chip, message, traceback)
+		net.Start("starfall_processor_error")
+			net.WriteBool(false) -- is_clientside?
+			net.WriteEntity(chip)
+			net.WritePlayer(chip.owner)
+			net.WriteString(chip.sfdata.mainfile)
+			net.WriteString(message)
+			net.WriteString(traceback)
+		net.Broadcast()
+	end
+	local function relay_error(chip, message, traceback, client, should_notify)
+		net.Start("starfall_processor_error")
+			net.WriteBool(true) -- is_clientside?
+			net.WritePlayer(client)
+			net.WriteEntity(chip)
+			net.WritePlayer(chip.owner)
+			net.WriteString(chip.sfdata.mainfile)
+			net.WriteString(message)
+			net.WriteString(traceback)
+			net.WriteBool(should_notify)
+		net.SendOmit(client)
+	end
+	local function read_error()
+		local chip = net.ReadEntity()
+		if chip:IsValid() then
+			return chip, net.ReadString(), net.ReadString(), net.ReadBool()
+		end
+	end
+
+	net.Receive("starfall_processor_error", function(_, ply)
+		if ply and ply:IsValid() then
+			local chip, message, traceback, should_notify = read_error()
+			if chip then
+				chip.ErroredPlayers[ply] = true
+				hook.Run("StarfallError", chip, chip.owner, ply, chip.sfdata.mainfile, message, traceback, should_notify)
+				relay_error(chip, message, traceback, ply, should_notify)
+			end
+		end
+	end)
+
+else
+
+	function write_error(chip, message, traceback)
+		local owner, is_blocked = chip.owner, false
+		if owner and owner:IsValid() then
+			is_blocked = SF.BlockedUsers:isBlocked(owner:SteamID())
+		end
+		net.Start("starfall_processor_error")
+			net.WriteEntity(chip)
+			net.WriteString(message)
+			net.WriteString(traceback)
+			net.WriteBool(GetConVarNumber("sf_timebuffer_cl") > 0 and not is_blocked)
+		net.SendToServer()
+	end
+	local function read_error()
+		local client = net.ReadBool() and net.ReadPlayer()
+		if not client or (client and client:IsValid()) then
+			local chip = net.ReadEntity()
+			local owner = net.ReadPlayer()
+			if chip:IsValid() and owner:IsValid() then
+				return chip, owner, client, net.ReadString(), net.ReadString(), net.ReadString(), net.ReadBool()
+			end
+		end
+	end
+
+	net.Receive("starfall_processor_error", function()
+		local chip, owner, client, main_file, message, traceback, should_notify = read_error()
+		if chip then
+			hook.Run("StarfallError", chip, owner, client, main_file, message, traceback, should_notify)
+		end
+	end)
+
+	hook.Add("StarfallError", "StarfallErrorNotify", function(chip, owner, client, main_file, message, traceback, should_notify)
+		if owner == LocalPlayer() then
+			if not client or client == owner then
+				SF.AddNotify(owner, message, "ERROR", 7, "ERROR1")
+			elseif client then
+				if should_notify then
+					SF.AddNotify(owner, string.format("Starfall '%s' errored for player %s", main_file, client:Nick()), "ERROR", 7, "SILENT")
+				else
+					print(string.format("Starfall '%s' errored for player %s: %s", main_file, client:Nick(), message))
+				end
+			end
+
+			if #traceback > 0 then
+				print(traceback)
+			end
+		elseif client == LocalPlayer() then
+			print(string.format("Starfall '%s' owned by %s has errored: %s", main_file, owner:Nick(), message))
+		end
+	end)
+end
+
 function ENT:Error(err)
 	self.error = err
 
@@ -138,25 +233,8 @@ function ENT:Error(err)
 		msg = string.sub(msg, 1, newline - 1)
 	end
 
-	local main_file = self.sfdata.mainfile
-	if SERVER then
-		hook.Run("StarfallError", self, self.owner, false, main_file, msg, traceback)
-		net.Start("starfall_processor_error")
-		net.WriteBool(false)
-		net.WriteEntity(self)
-		net.WriteEntity(self.owner)
-		net.WriteString(main_file)
-		net.WriteString(msg)
-		net.WriteString(traceback)
-		net.Broadcast()
-	elseif GetConVarNumber("sf_timebuffer_cl") > 0 then
-		hook.Run("StarfallError", self, self.owner, LocalPlayer(), main_file, msg, traceback)
-		net.Start("starfall_processor_error")
-		net.WriteEntity(self)
-		net.WriteString(msg)
-		net.WriteString(traceback)
-		net.SendToServer()
-	end
+	hook.Run("StarfallError", self, self.owner, CLIENT and LocalPlayer() or false, self.sfdata.mainfile, msg, traceback)
+	write_error(self, msg, traceback)
 
 	if self.instance then
 		self.instance:deinitialize()
@@ -166,58 +244,6 @@ function ENT:Error(err)
 	for inst, _ in pairs(SF.allInstances) do
 		inst:runScriptHook("starfallerror", inst.Types.Entity.Wrap(self), inst.Types.Player.Wrap(SERVER and self.owner or LocalPlayer()), msg)
 	end
-end
-
-if SERVER then
-	net.Receive("starfall_processor_error", function(_, ply)
-		local chip = net.ReadEntity()
-		local owner = chip.owner
-		if chip:IsValid() and owner and owner:IsValid() and ply:IsValid() then
-			local msg = net.ReadString()
-			local traceback = net.ReadString()
-			local main_file = chip.sfdata.mainfile
-			hook.Run("StarfallError", chip, owner, ply, main_file, msg, traceback)
-			net.Start("starfall_processor_error")
-			net.WriteBool(true)
-			net.WriteEntity(ply)
-			net.WriteEntity(chip)
-			net.WriteEntity(owner)
-			net.WriteString(main_file)
-			net.WriteString(msg)
-			net.WriteString(traceback)
-			net.SendOmit(ply)
-
-			chip.ErroredPlayers[ply] = true
-		end
-	end)
-else
-	net.Receive("starfall_processor_error", function()
-		local client = net.ReadBool() and net.ReadEntity()
-		local chip = net.ReadEntity()
-		local owner = net.ReadEntity()
-		if chip:IsValid() and owner:IsValid() then
-			if client then
-				if client:IsValid() then
-					hook.Run("StarfallError", chip, owner, client, net.ReadString(), net.ReadString(), net.ReadString())
-				end
-			else
-				hook.Run("StarfallError", chip, owner, false, net.ReadString(), net.ReadString(), net.ReadString())
-			end
-		end
-	end)
-
-	hook.Add("StarfallError", "StarfallNotifyError", function(_, owner, client, main_file, msg, traceback)
-		print(_, owner, client, main_file, msg, traceback)
-		if owner == LocalPlayer() then
-			if not client or owner == client then
-				SF.AddNotify(owner, msg, "ERROR", 7, "ERROR1")
-			else
-				SF.AddNotify(owner, string.format("Starfall (%s) errored for player: %s", main_file, client:Nick()), "ERROR", 7, "SILENT")
-			end
-			print(msg)
-			print(traceback)
-		end
-	end)
 end
 
 local function MenuOpen( ContextMenu, Option, Entity, Trace )

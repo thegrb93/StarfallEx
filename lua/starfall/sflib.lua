@@ -1513,8 +1513,11 @@ else
 		if ply == LocalPlayer() then
 			print(msg)
 			GAMEMODE:AddNotify(msg, notificationsMap[type], duration)
-			if soundsMap[sound] and soundsMap[soundsMap[sound]] then
-				surface.PlaySound(soundsMap[soundsMap[sound]])
+			if soundsMap[sound] then
+				local path = soundsMap[soundsMap[sound]]
+				if path then
+					surface.PlaySound(path)
+				end
 			end
 		end
 	end
@@ -1524,7 +1527,10 @@ else
 		print(msg)
 		GAMEMODE:AddNotify(msg, type, duration)
 		if soundsMap[sound] then
-			surface.PlaySound(soundsMap[sound])
+			local path = soundsMap[soundsMap[sound]]
+			if path then
+				surface.PlaySound(path)
+			end
 		end
 	end)
 
