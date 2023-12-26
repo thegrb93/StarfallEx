@@ -202,6 +202,7 @@ else
 			elseif client then
 				if should_notify then
 					SF.AddNotify(owner, string.format("Starfall '%s' errored for player %s", main_file, client:Nick()), "ERROR", 7, "SILENT")
+					print(message)
 				else
 					print(string.format("Starfall '%s' errored for player %s: %s", main_file, client:Nick(), message))
 				end
