@@ -195,8 +195,9 @@ else
 		end
 	end)
 
-	hook.Add("StarfallError", "StarfallErrorNotify", function(chip, owner, client, main_file, message, traceback, should_notify)
-		if owner == LocalPlayer() then
+	hook.Add("StarfallError", "StarfallErrorReport", function(chip, owner, client, main_file, message, traceback, should_notify)
+		local local_player = LocalPlayer()
+		if owner == local_player then
 			if not client or client == owner then
 				SF.AddNotify(owner, message, "ERROR", 7, "ERROR1")
 			elseif client then
@@ -211,7 +212,7 @@ else
 			if #traceback > 0 then
 				print(traceback)
 			end
-		elseif client == LocalPlayer() then
+		elseif client == local_player then
 			print(string.format("Starfall '%s' owned by %s has errored: %s", main_file, owner:Nick(), message))
 		end
 	end)
