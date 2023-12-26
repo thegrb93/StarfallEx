@@ -195,7 +195,7 @@ else
 		end
 	end)
 
-	hook.Add("StarfallError", "StarfallErrorReport", function(chip, owner, client, main_file, message, traceback, should_notify)
+	hook.Add("StarfallError", "StarfallErrorReport", function(_, owner, client, main_file, message, traceback, should_notify)
 		local local_player = LocalPlayer()
 		if owner == local_player then
 			if not client or client == owner then
