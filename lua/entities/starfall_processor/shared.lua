@@ -127,7 +127,7 @@ if SERVER then
 		net.Start("starfall_processor_error")
 			net.WriteBool(false) -- is_clientside?
 			net.WriteEntity(chip)
-			net.WritePlayer(chip.owner)
+			net.WriteEntity(chip.owner)
 			net.WriteString(chip.sfdata.mainfile)
 			net.WriteString(message)
 			net.WriteString(traceback)
@@ -136,9 +136,9 @@ if SERVER then
 	local function relay_error(chip, message, traceback, client, should_notify)
 		net.Start("starfall_processor_error")
 			net.WriteBool(true) -- is_clientside?
-			net.WritePlayer(client)
+			net.WriteEntity(client)
 			net.WriteEntity(chip)
-			net.WritePlayer(chip.owner)
+			net.WriteEntity(chip.owner)
 			net.WriteString(chip.sfdata.mainfile)
 			net.WriteString(message)
 			net.WriteString(traceback)
@@ -178,10 +178,10 @@ else
 		net.SendToServer()
 	end
 	local function read_error()
-		local client = net.ReadBool() and net.ReadPlayer()
+		local client = net.ReadBool() and net.ReadEntity()
 		if not client or (client and client:IsValid()) then
 			local chip = net.ReadEntity()
-			local owner = net.ReadPlayer()
+			local owner = net.ReadEntity()
 			if chip:IsValid() and owner:IsValid() then
 				return chip, owner, client, net.ReadString(), net.ReadString(), net.ReadString(), net.ReadBool()
 			end
