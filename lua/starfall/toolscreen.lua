@@ -104,7 +104,7 @@ else
 	local last_frame = 0
 	local is_linux = system.IsLinux()
 	local ply_eye_ang_prev = Angle()
-	local function draw_stars(w, h)
+	function SF.DrawToolgunScreen(w, h, title, scroll_text)
 		local curtime = RealTime()
 		local dt = curtime - last_frame
 		if dt > 1 / simulation_fps then
@@ -189,9 +189,8 @@ else
 		surface.SetDrawColor(255, 255, 255, 255)
 		surface.SetMaterial(star_canvas_material)
 		surface.DrawTexturedRect(0, 0, w, h)
-	end
 
-	local function draw_overlay(w, h, title, scroll_text)
+		-- Overlay
 		surface.SetDrawColor(255, 255, 255, 255)
 		surface.SetMaterial(overlay_material)
 		surface.DrawTexturedRect(0, 0, w, h)
@@ -206,11 +205,6 @@ else
 				x = x + text_width
 			end
 		end
-	end
-
-	function SF.DrawToolgunScreen(w, h, subtitle, scroll_text)
-		draw_stars(w, h)
-		draw_overlay(w, h, subtitle, scroll_text)
 	end
 
 	local function toggle_toolscreen(enabled)
