@@ -285,22 +285,23 @@ end
 
 if CLIENT then
 
+	function TOOL:DrawStarfallToolScreen(w, h)
+		if self:GetClientInfo("Type") == "1" then
+			local models = scripted_ents.GetStored("starfall_screen").t.Monitor_Offsets
+			local mdl = self:GetClientInfo("Model")
+			if models[mdl] then
+				mdl = models[mdl].Name
+			else
+				mdl = string.match(self:GetClientInfo("Model"), "^.*/(.*)$")
+			end
+			SF.DrawToolgunScreen(w, h, "SCREEN", mdl)
+		else
+			SF.DrawToolgunScreen(w, h, "HUD")
+		end
+	end
 	local custom_toolscreen_convar = GetConVar("starfall_toolscreen")
 	if custom_toolscreen_convar and custom_toolscreen_convar:GetBool() then
-		function TOOL:DrawToolScreen(w, h)
-			if self:GetClientInfo("Type") == "1" then
-				local models = scripted_ents.GetStored("starfall_screen").t.Monitor_Offsets
-				local mdl = self:GetClientInfo("Model")
-				if models[mdl] then
-					mdl = models[mdl].Name
-				else
-					mdl = string.match(self:GetClientInfo("Model"), "^.*/(.*)$")
-				end
-				SF.DrawToolgunScreen(w, h, "SCREEN", mdl)
-			else
-				SF.DrawToolgunScreen(w, h, "HUD")
-			end
-		end
+		TOOL.DrawToolScreen = TOOL.DrawStarfallToolScreen
 	end
 
 	function TOOL.BuildCPanel(panel)

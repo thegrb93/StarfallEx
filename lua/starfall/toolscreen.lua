@@ -20,10 +20,9 @@ else
 	surface.CreateFont("StarfallToolBig", { font = "Roboto-Bold.ttf", size = 36 })
 	surface.CreateFont("StarfallToolSmall", { font = "Roboto-Italic.ttf", size = 32, shadow = true })
 
-	CreateClientConVar("starfall_toolscreen", "1", true, false, "Enable Starfall custom toolgun screen animation. Requires reconnect!", 0, 1)
 	local simulation_fps = CreateClientConVar("starfall_toolscreen_fps", "120", true, false, "Maximum FPS of the stars animation", 30, 300):GetInt()
 	cvars.AddChangeCallback("starfall_toolscreen_fps", function(_, _, value)
-		simulation_fps = value
+		simulation_fps = tonumber(value) or 120
 	end)
 
 	local color_background       = Color(33, 33, 40, 30)              -- Background color, alpha controls how fast the stars fade out
@@ -213,5 +212,22 @@ else
 		draw_stars(w, h)
 		draw_overlay(w, h, subtitle, scroll_text)
 	end
+
+	local function toggle_toolscreen(enabled)
+		for _, tool_name in pairs({ "starfall_processor", "starfall_component" }) do
+			local stored_tool = weapons.GetStored("gmod_tool").Tool[tool_name]
+			stored_tool.DrawToolScreen = enabled and stored_tool.DrawStarfallToolScreen or nil
+
+			local carried = LocalPlayer():GetWeapon("gmod_tool")
+			if carried:IsValid() then
+				local carried_tool = carried.Tool[tool_name]
+				carried_tool.DrawToolScreen = enabled and carried_tool.DrawStarfallToolScreen or nil
+			end
+		end
+	end
+	CreateClientConVar("starfall_toolscreen", "1", true, false, "Enable Starfall custom toolgun screen animation", 0, 1)
+	cvars.AddChangeCallback("starfall_toolscreen", function(_, _, value)
+		toggle_toolscreen(value == "1")
+	end)
 
 end

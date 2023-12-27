@@ -244,24 +244,25 @@ end
 
 if CLIENT then
 
+	function TOOL:DrawStarfallToolScreen(w, h)
+		local ent = LocalPlayer():GetEyeTrace().Entity
+		local script_name
+		if ent and ent:IsValid() and ent:GetClass() == "starfall_processor" then
+			if ent.error then
+				script_name = "< clientside errored >"
+			elseif ent:GetNWInt("State", 1) == 2 then
+				script_name = "< serverside errored >"
+			else
+				script_name = ent.name or "Generic"
+			end
+		elseif SF.Editor.editor then
+			script_name = SF.Editor.editor:GetActiveTab():GetText()
+		end
+		SF.DrawToolgunScreen(w, h, "PROCESSOR", script_name)
+	end
 	local custom_toolscreen_convar = GetConVar("starfall_toolscreen")
 	if custom_toolscreen_convar and custom_toolscreen_convar:GetBool() then
-		function TOOL:DrawToolScreen(w, h)
-			local ent = LocalPlayer():GetEyeTrace().Entity
-			local script_name
-			if ent and ent:IsValid() and ent:GetClass() == "starfall_processor" then
-				if ent.error then
-					script_name = "< clientside errored >"
-				elseif ent:GetNWInt("State", 1) == 2 then
-					script_name = "< serverside errored >"
-				else
-					script_name = ent.name or "Generic"
-				end
-			elseif SF.Editor.editor then
-				script_name = SF.Editor.editor:GetActiveTab():GetText()
-			end
-			SF.DrawToolgunScreen(w, h, "PROCESSOR", script_name)
-		end
+		TOOL.DrawToolScreen = TOOL.DrawStarfallToolScreen
 	end
 
 	local function GotoDocs(button)
