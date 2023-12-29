@@ -353,16 +353,11 @@ end
 
 --- Sets whether an entity's shadow should be drawn
 -- @param boolean draw Whether the shadow should draw
--- @param Player? ply Optional player argument to set only for that player. Can also be table of players.
-function ents_methods:setDrawShadow(draw, ply)
+function ents_methods:setDrawShadow(draw)
 	local ent = getent(self)
 	checkpermission(instance, ent, "entities.setRenderProperty")
-
-	if ply then
-		sendRenderPropertyToClient(ply, ent, 9, draw and true or false)
-	else
-		ent:DrawShadow(draw and true or false)
-	end
+	checkluatype(draw, TYPE_BOOL)
+	ent:DrawShadow(draw)
 end
 
 --- Sets the entity's position. No interpolation will occur clientside, use physobj.setPos to have interpolation.
