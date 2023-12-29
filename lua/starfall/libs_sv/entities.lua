@@ -217,7 +217,7 @@ end
 -- @param Vector vec The force vector
 function ents_methods:applyForceCenter(vec)
 	local ent = getent(self)
-	local vec = vunwrap(vec)
+	vec = vunwrap(vec)
 	checkvector(vec)
 
 	local phys = ent:GetPhysicsObject()
@@ -234,10 +234,9 @@ end
 function ents_methods:applyForceOffset(force, position)
 	local ent = getent(self)
 
-	local force = vunwrap(force)
-	local position = vunwrap(position)
-
+	force = vunwrap(force)
 	checkvector(force)
+	position = vunwrap(position)
 	checkvector(position)
 
 	local phys = ent:GetPhysicsObject()
@@ -253,7 +252,7 @@ end
 function ents_methods:applyAngForce(ang)
 	local ent = getent(self)
 
-	local ang = aunwrap(ang)
+	ang = aunwrap(ang)
 	checkvector(ang)
 
 	local phys = ent:GetPhysicsObject()
@@ -293,7 +292,7 @@ end
 function ents_methods:applyTorque(torque)
 	local ent = getent(self)
 
-	local torque = vunwrap(torque)
+	torque = vunwrap(torque)
 	checkvector(torque)
 
 	local phys = ent:GetPhysicsObject()
@@ -370,7 +369,7 @@ end
 function ents_methods:setPos(vec)
 	local ent = getent(self)
 
-	local vec = vunwrap(vec)
+	vec = vunwrap(vec)
 	checkpermission(instance, ent, "entities.setPos")
 
 	ent:SetPos(SF.clampPos(vec))
@@ -381,7 +380,7 @@ end
 function ents_methods:setAngles(ang)
 	local ent = getent(self)
 
-	local ang = aunwrap(ang)
+	ang = aunwrap(ang)
 	checkpermission(instance, ent, "entities.setAngles")
 
 	ent:SetAngles(ang)
@@ -392,7 +391,7 @@ end
 function ents_methods:setVelocity(vel)
 	local ent = getent(self)
 
-	local vel = vunwrap(vel)
+	vel = vunwrap(vel)
 	checkvector(vel)
 
 	checkpermission(instance, ent, "entities.setVelocity")
@@ -528,7 +527,7 @@ function ents_methods:setInertia(vec)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
-	local vec = vunwrap(vec)
+	vec = vunwrap(vec)
 	checkvector(vec)
 	vec[1] = math.Clamp(vec[1], 1, 100000)
 	vec[2] = math.Clamp(vec[2], 1, 100000)
@@ -667,7 +666,7 @@ function ents_methods:enableSphere(enabled, radius)
 	
 			-- https://github.com/daveth/makespherical/blob/80b702ba04ba4b64d6c378df8d405b2c113dec53/lua/weapons/gmod_tool/stools/makespherical.lua#L117
 			local info = {
-				obbcenter = ent.obbcenter,							
+				obbcenter = ent.obbcenter,
 				noradius = radius,
 				radius = radius,
 				mass = mass,
@@ -686,7 +685,7 @@ function ents_methods:enableSphere(enabled, radius)
 	end
 
 	-- New physobject after applying spherical collisions
-	local phys = ent:GetPhysicsObject()
+	phys = ent:GetPhysicsObject()
 	phys:SetMass(mass)
 	phys:EnableMotion(ismove)
 	phys:Wake()
@@ -711,7 +710,6 @@ end
 --- Gets a table of all constrained entities to each other
 -- @param table? filter Optional constraint type filter table where keys are the type name and values are 'true'. "Wire" and "Parent" are used for wires and parents.
 function ents_methods:getAllConstrained(filter)
-	local ent = getent(self)
 	if filter ~= nil then checkluatype(filter, TYPE_TABLE) end
 
 	local entity_lookup = {}
@@ -722,7 +720,7 @@ function ents_methods:getAllConstrained(filter)
 		if ent:IsValid() then
 			entity_table[#entity_table + 1] = owrap(ent)
 			local constraints = constraint.GetTable(ent)
-			for k, v in pairs(constraints) do
+			for _, v in pairs(constraints) do
 				if not filter or filter[v.Type] then
 					if v.Ent1 then recursive_find(v.Ent1) end
 					if v.Ent2 then recursive_find(v.Ent2) end
@@ -731,24 +729,24 @@ function ents_methods:getAllConstrained(filter)
 			if not filter or filter.Parent then
 				local parent = ent:GetParent()
 				if parent then recursive_find(parent) end
-				for k, child in pairs(ent:GetChildren()) do
+				for _, child in pairs(ent:GetChildren()) do
 					recursive_find(child)
 				end
 			end
 			if not filter or filter.Wire then
 				if istable(ent.Inputs) then
-					for k, v in pairs(ent.Inputs) do
+					for _, v in pairs(ent.Inputs) do
 						if isentity(v.Src) and v.Src:IsValid() then
 							recursive_find(v.Src)
 						end
 					end
 				end
 				if istable(ent.Outputs) then
-					for k, v in pairs(ent.Outputs) do
+					for _, v in pairs(ent.Outputs) do
 						if istable(v.Connected) then
-							for k, v in pairs(v.Connected) do
-								if isentity(v.Entity) and v.Entity:IsValid() then
-									recursive_find(v.Entity)
+							for _, v2 in pairs(v.Connected) do
+								if isentity(v2.Entity) and v2.Entity:IsValid() then
+									recursive_find(v2.Entity)
 								end
 							end
 						end
@@ -757,7 +755,7 @@ function ents_methods:getAllConstrained(filter)
 			end
 		end
 	end
-	recursive_find(eunwrap(self))
+	recursive_find(getent(self))
 
 	return entity_table
 end
