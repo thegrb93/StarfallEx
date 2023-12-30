@@ -744,9 +744,9 @@ function ents_methods:getAllConstrained(filter)
 				if istable(ent.Outputs) then
 					for _, v in pairs(ent.Outputs) do
 						if istable(v.Connected) then
-							for _, v2 in pairs(v.Connected) do
-								if isentity(v2.Entity) and v2.Entity:IsValid() then
-									recursive_find(v2.Entity)
+							for _, v in pairs(v.Connected) do
+								if isentity(v.Entity) and v.Entity:IsValid() then
+									recursive_find(v.Entity)
 								end
 							end
 						end
