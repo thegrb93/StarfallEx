@@ -110,9 +110,9 @@ if SERVER then
 	function SF.SendError(chip, message, traceback, client, should_notify)
 		net.Start("starfall_error")
 			net.WriteEntity(chip)
-			net.WriteString(string.sub(chip.sfdata.mainfile, 1, 1024)
-			net.WriteString(string.sub(message, 1, 1024)
-			net.WriteString(string.sub(traceback, 1, 1024)
+			net.WriteString(string.sub(chip.sfdata.mainfile, 1, 1024))
+			net.WriteString(string.sub(message, 1, 1024))
+			net.WriteString(string.sub(traceback, 1, 1024))
 		if client~=nil and should_notify~=nil then
 			net.WriteBool(true)
 			net.WriteEntity(client)
