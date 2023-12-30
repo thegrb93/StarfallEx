@@ -131,6 +131,7 @@ else
 end
 
 hook.Add("StarfallError", "StarfallErrorReport", function(_, owner, client, main_file, message, traceback, should_notify)
+	if not (owner and owner:IsValid()) then return end
 	local local_player = LocalPlayer()
 	if owner == local_player then
 		if not client or client == owner then
