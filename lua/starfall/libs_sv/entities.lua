@@ -1,6 +1,7 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
+local haspermission = SF.Permissions.hasAccess
 
 local huge = math.huge
 local abs = math.abs
@@ -138,27 +139,78 @@ function ents_methods:applyDamage(amt, attacker, inflictor, dmgtype, pos)
 end
 
 --- Sets a custom prop's physics simulation forces. Thrusters and balloons use this.
+-- This takes precedence over Entity.setCustomPropShadowForce and cannot be used together
 -- @param Vector ang Angular Force (Torque)
 -- @param Vector lin Linear Force
--- @param number mode The physics mode to use. 0 = Off, 1 = Local acceleration, 2 = Local force, 3 = Global Acceleration, 4 = Global force
+-- @param number mode The physics mode to use. 0 = Off (disables custom physics entirely), 1 = Local acceleration, 2 = Local force, 3 = Global Acceleration, 4 = Global force
 function ents_methods:setCustomPropForces(ang, lin, mode)
 	local ent = getent(self)
 	if ent:GetClass()~="starfall_prop" then SF.Throw("The entity isn't a custom prop", 2) end
 
 	checkpermission(instance, ent, "entities.applyForce")
 
-	ang = vunwrap(ang)
-	checkvector(ang)
-	lin = vunwrap(lin)
-	checkvector(lin)
+	if mode == 0 then
+		ent:EnableCustomPhysics(false)
+	elseif mode == 1 or mode == 2 or mode == 3 or mode == 4 then
+		ang = vunwrap(ang)
+		checkvector(ang)
+		lin = vunwrap(lin)
+		checkvector(lin)
 
-	checkluatype(mode, TYPE_NUMBER)
-	if mode ~= 0 and mode ~= 1 and mode ~= 2 and mode ~= 3 and mode ~= 4 then SF.Throw("Invalid mode", 2) end
-
-	function ent:PhysicsSimulate()
-		return ang, lin, mode
+		ent.customForceMode = mode
+		ent.customForceLinear = lin
+		ent.customForceAngular = ang
+		ent:EnableCustomPhysics(1)
+	else
+		SF.Throw("Invalid mode, see the SIM enum", 2)
 	end
-	ent:StartMotionController()
+end
+
+--- Sets a custom prop's shadow forces, moving the entity to the desired position and angles
+-- This gets overriden by Entity.setCustomPropForces and cannot be used together
+-- See available parameters here: https://wiki.facepunch.com/gmod/PhysObj:ComputeShadowControl
+-- @param data table|false Shadow physics data, excluding 'deltatime'. 'teleportdistance' higher than 0 requires 'entities.setPos'. Pass a falsy value to disable custom physics entirely
+function ents_methods:setCustomPropShadowForce(data)
+	local ent = getent(self)
+	if ent:GetClass()~="starfall_prop" then SF.Throw("The entity isn't a custom prop", 2) end
+
+	checkpermission(instance, ent, "entities.applyForce")
+
+	if not data then
+		ent:EnableCustomPhysics(false)
+	else
+		local pos = vunwrap(data.pos)
+		checkvector(pos)
+		local ang = aunwrap(data.angle)
+		checkvector(ang)
+
+		checkluatype(data.teleportdistance, TYPE_NUMBER)
+		if data.teleportdistance > 0 and not haspermission(instance, ent, "entities.setPos") then
+			SF.Throw("Shadow force property 'teleportdistance' higher than 0 requires 'entities.setPos' permission access", 2)
+		end
+
+		checkluatype(data.secondstoarrive, TYPE_NUMBER)
+		if data.secondstoarrive < 1e-3 then SF.Throw("Shadow force property 'secondstoarrive' cannot be lower than 0.001", 2) end
+		checkluatype(data.dampfactor, TYPE_NUMBER)
+		if data.dampfactor > 1 or data.dampfactor < 0 then SF.Throw("Shadow force property 'dampfactor' cannot be higher than 1 or lower than 0", 2) end
+		checkluatype(data.maxangular, TYPE_NUMBER)
+		checkluatype(data.maxangulardamp, TYPE_NUMBER)
+		checkluatype(data.maxspeed, TYPE_NUMBER)
+		checkluatype(data.maxspeeddamp, TYPE_NUMBER)
+
+		ent.customShadowForce = {
+			pos = pos,
+			angle = ang,
+			secondstoarrive = data.secondstoarrive,
+			dampfactor = data.dampfactor,
+			maxangular = data.maxangular,
+			maxangulardamp = data.maxangulardamp,
+			maxspeed = data.maxspeed,
+			maxspeeddamp = data.maxspeeddamp,
+			teleportdistance = data.teleportdistance,
+		}
+		ent:EnableCustomPhysics(2)
+	end
 end
 
 --- Set the angular velocity of an object

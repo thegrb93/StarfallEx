@@ -15,6 +15,39 @@ function ENT:Initialize()
 	self:AddEFlags( EFL_FORCE_CHECK_TRANSMIT )
 end
 
+function ENT:EnableCustomPhysics(mode)
+	if mode then
+		self.customPhysicsMode = mode
+		if not self.hasMotionController then
+			self:StartMotionController()
+			self.hasMotionController = true
+		end
+	else
+		self.customPhysicsMode = nil
+		self.customForceMode = nil
+		self.customForceLinear = nil
+		self.customForceAngular = nil
+		self.customShadowForce = nil
+		if self.hasMotionController then
+			self:StopMotionController()
+			self.hasMotionController = false
+		end
+	end
+end
+
+function ENT:PhysicsSimulate(physObj, dt)
+	local mode = self.customPhysicsMode
+	if mode == 1 then
+		return self.customForceAngular, self.customForceLinear, self.customForceMode
+	elseif mode == 2 then
+		self.customShadowForce.deltatime = dt
+		physObj:ComputeShadowControl(self.customShadowForce)
+		return SIM_NOTHING
+	else
+		return SIM_NOTHING
+	end
+end
+
 function ENT:UpdateTransmitState()
 	return TRANSMIT_ALWAYS
 end
