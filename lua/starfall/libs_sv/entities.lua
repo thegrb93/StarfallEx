@@ -150,11 +150,7 @@ function ents_methods:setCustomPropForces(ang, lin, mode)
 	checkpermission(instance, ent, "entities.applyForce")
 
 	if mode == 0 then
-		ent.customForceMode = nil
-		if self.hasMotionController then
-			ent:StopMotionController()
-			ent.hasMotionController = false
-		end
+		ent:EnableCustomPhysics(false)
 	elseif mode == 1 or mode == 2 or mode == 3 then
 		ang = vunwrap(ang)
 		checkvector(ang)
@@ -164,11 +160,7 @@ function ents_methods:setCustomPropForces(ang, lin, mode)
 		ent.customForceMode = mode
 		ent.customForceLinear = lin
 		ent.customForceAngular = ang
-
-		if not ent.hasMotionController then
-			ent:StartMotionController()
-			ent.hasMotionController = true
-		end
+		ent:EnableCustomPhysics(1)
 	else
 		SF.Throw("Invalid mode, see the SIM enum", 2)
 	end
@@ -185,11 +177,7 @@ function ents_methods:setCustomPropShadowForce(data)
 	checkpermission(instance, ent, "entities.applyForce")
 
 	if not data then
-		ent.shadowForce = nil
-		if ent.hasMotionController then
-			ent:StopMotionController()
-			ent.hasMotionController = false
-		end
+		ent:EnableCustomPhysics(false)
 	else
 		local pos = vunwrap(data.pos)
 		checkvector(pos)
@@ -221,11 +209,7 @@ function ents_methods:setCustomPropShadowForce(data)
 			maxspeeddamp = data.maxspeeddamp,
 			teleportdistance = data.teleportdistance,
 		}
-
-		if not ent.hasMotionController then
-			ent:StartMotionController()
-			ent.hasMotionController = true
-		end
+		ent:EnableCustomPhysics(2)
 	end
 end
 
