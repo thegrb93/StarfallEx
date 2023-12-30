@@ -216,7 +216,7 @@ else
 		if net.ReadBool() then
 			client = net.ReadEntity()
 			if not client:IsValid() then return end
-			should_notify = new.ReadBool()
+			should_notify = net.ReadBool()
 		end
 		hook.Run("StarfallError", chip, owner, client, mainfile, message, traceback, should_notify)
 	end)
