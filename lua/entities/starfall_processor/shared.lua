@@ -123,27 +123,22 @@ end
 
 local write_error
 if SERVER then
-	function write_error(chip, message, traceback)
+	function write_error(chip, message, traceback, client, should_notify)
 		net.Start("starfall_processor_error")
-			net.WriteBool(false) -- is_clientside?
 			net.WriteEntity(chip)
 			net.WriteEntity(chip.owner)
 			net.WriteString(chip.sfdata.mainfile)
 			net.WriteString(message)
 			net.WriteString(traceback)
-		net.Broadcast()
-	end
-	local function relay_error(chip, message, traceback, client, should_notify)
-		net.Start("starfall_processor_error")
-			net.WriteBool(true) -- is_clientside?
+		if client~=nil and should_notify~=nil then
+			net.WriteBool(true)
 			net.WriteEntity(client)
-			net.WriteEntity(chip)
-			net.WriteEntity(chip.owner)
-			net.WriteString(chip.sfdata.mainfile)
-			net.WriteString(message)
-			net.WriteString(traceback)
 			net.WriteBool(should_notify)
-		net.SendOmit(client)
+			net.SendOmit(client)
+		else
+			net.WriteBool(false)
+			net.Broadcast()
+		end
 	end
 	local function read_error()
 		local chip = net.ReadEntity()
@@ -158,7 +153,7 @@ if SERVER then
 			if chip then
 				chip.ErroredPlayers[ply] = true
 				hook.Run("StarfallError", chip, chip.owner, ply, chip.sfdata.mainfile, message, traceback, should_notify)
-				relay_error(chip, message, traceback, ply, should_notify)
+				write_error(chip, message, traceback, ply, should_notify)
 			end
 		end
 	end)
@@ -177,15 +172,21 @@ else
 			net.WriteBool(GetConVarNumber("sf_timebuffer_cl") > 0 and not is_blocked)
 		net.SendToServer()
 	end
+
 	local function read_error()
-		local client = net.ReadBool() and net.ReadEntity()
-		if not client or (client and client:IsValid()) then
-			local chip = net.ReadEntity()
-			local owner = net.ReadEntity()
-			if chip:IsValid() and owner:IsValid() then
-				return chip, owner, client, net.ReadString(), net.ReadString(), net.ReadString(), net.ReadBool()
-			end
+		local chip = net.ReadEntity()
+		local owner = net.ReadEntity()
+		if not chip:IsValid() or not owner:IsValid() then return end
+		local mainfile = net.ReadString()
+		local message = net.ReadString()
+		local traceback = net.ReadString()
+		local client, should_notify
+		if net.ReadBool() then
+			client = net.ReadEntity()
+			if not client:IsValid() then return end
+			should_notify = new.ReadBool()
 		end
+		return chip, owner, client, mainfile, message, traceback, should_notify
 	end
 
 	net.Receive("starfall_processor_error", function()
