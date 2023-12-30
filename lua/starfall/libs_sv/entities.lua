@@ -151,7 +151,7 @@ function ents_methods:setCustomPropForces(ang, lin, mode)
 
 	if mode == 0 then
 		ent:EnableCustomPhysics(false)
-	elseif mode == 1 or mode == 2 or mode == 3 then
+	elseif mode == 1 or mode == 2 or mode == 3 or mode == 4 then
 		ang = vunwrap(ang)
 		checkvector(ang)
 		lin = vunwrap(lin)
