@@ -340,9 +340,9 @@ end
 --- Calculates point between first and second angle using given fraction and linear interpolation.
 -- @class function
 -- @param number ratio Ratio of progress through values
--- @param number from Angle to begin from
--- @param number to Angle to end at
--- @return number The interpolated angle
+-- @param Angle from Angle to begin from
+-- @param Angle to Angle to end at
+-- @return Angle The interpolated angle
 function math_library.lerpAngle(ratio, from, to)
 	checkluatype(ratio, TYPE_NUMBER)
 	return awrap(LerpAngle(ratio, aunwrap(from), aunwrap(to)))
