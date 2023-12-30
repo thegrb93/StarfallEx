@@ -1284,6 +1284,7 @@ local shaderBlacklist = {
 	["LightmappedGeneric"] = true,
 }
 local materialBlacklist = {
+	["pp/copy"] = true,
 	["debug/debugluxels"] = true,
 	["effects/ar2_altfire1"] = true,
 }
