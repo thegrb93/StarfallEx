@@ -1488,7 +1488,7 @@ if SERVER then
 		if not (ply and ply:IsValid()) then return end
 
 		net.Start("starfall_addnotify")
-		net.WriteString(msg)
+		net.WriteString(string.sub(msg, 1, 1024))
 		net.WriteUInt(notificationsMap[notifyType], 8)
 		net.WriteFloat(duration)
 		net.WriteUInt(soundsMap[sound], 8)

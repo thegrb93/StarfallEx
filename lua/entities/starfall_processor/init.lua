@@ -219,7 +219,6 @@ util.AddNetworkString("starfall_processor_used")
 util.AddNetworkString("starfall_processor_link")
 util.AddNetworkString("starfall_processor_kill")
 util.AddNetworkString("starfall_processor_clinit")
-util.AddNetworkString("starfall_processor_error")
 
 -- Request code from the chip. If the chip doesn't have code yet add player to list to send when there is code.
 net.Receive("starfall_processor_download", function(len, ply)
