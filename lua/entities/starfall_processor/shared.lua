@@ -121,30 +121,6 @@ function ENT:GetGateName()
 	return self.name
 end
 
-if CLIENT then
-	hook.Add("StarfallError", "StarfallErrorReport", function(_, owner, client, main_file, message, traceback, should_notify)
-		local local_player = LocalPlayer()
-		if owner == local_player then
-			if not client or client == owner then
-				SF.AddNotify(owner, message, "ERROR", 7, "ERROR1")
-			elseif client then
-				if should_notify then
-					SF.AddNotify(owner, string.format("Starfall '%s' errored for player %s", main_file, client:Nick()), "ERROR", 7, "SILENT")
-					print(message)
-				else
-					print(string.format("Starfall '%s' errored for player %s: %s", main_file, client:Nick(), message))
-				end
-			end
-
-			if #traceback > 0 then
-				print(traceback)
-			end
-		elseif client == local_player then
-			print(string.format("Starfall '%s' owned by %s has errored: %s", main_file, owner:Nick(), message))
-		end
-	end)
-end
-
 function ENT:Error(err)
 	self.error = err
 
