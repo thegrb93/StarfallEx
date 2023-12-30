@@ -110,7 +110,6 @@ if SERVER then
 	function SF.SendError(chip, message, traceback, client, should_notify)
 		net.Start("starfall_error")
 			net.WriteEntity(chip)
-			net.WriteEntity(chip.owner)
 			net.WriteString(string.sub(chip.sfdata.mainfile, 1, 1024)
 			net.WriteString(string.sub(message, 1, 1024)
 			net.WriteString(string.sub(traceback, 1, 1024)
@@ -207,8 +206,9 @@ else
 
 	net.Receive("starfall_error", function()
 		local chip = net.ReadEntity()
-		local owner = net.ReadEntity()
-		if not chip:IsValid() or not owner:IsValid() then return end
+		if not chip:IsValid() then return end
+		local owner = chip.owner
+		if not owner:IsValid() then return end
 		local mainfile = net.ReadString()
 		local message = net.ReadString()
 		local traceback = net.ReadString()
