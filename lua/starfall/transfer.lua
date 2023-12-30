@@ -218,7 +218,7 @@ else
 			if not client:IsValid() then return end
 			should_notify = new.ReadBool()
 		end
-		hook.Run("StarfallError", chip, owner, client, main_file, message, traceback, should_notify)
+		hook.Run("StarfallError", chip, owner, client, mainfile, message, traceback, should_notify)
 	end)
 
 	net.Receive("starfall_upload", function()
