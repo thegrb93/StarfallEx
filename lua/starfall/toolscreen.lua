@@ -96,17 +96,17 @@ function SF.DrawToolgunScreen(w, h, title, scroll_text)
 	if dt > 1 / simulation_fps then
 		last_frame = curtime
 		stars_errored_delay = stars_errored_delay - dt
-		local deceleration = star_deceleration ^ dt
 
+		local deceleration = star_deceleration ^ dt
 		local ply = LocalPlayer()
-		local ply_world_vel = ply:GetVelocity():GetNormalized()
-		local ply_local_vel = ply:WorldToLocal(ply:GetPos() + Vector(ply_world_vel.x, ply_world_vel.y, 0))
 
 		local ply_eye_ang = ply:EyeAngles()
 		local ply_eye_ang_delta = ply_eye_ang - ply_eye_ang_prev
 		local ply_eye_pitch = math_normalize_angle(ply_eye_ang_delta[1]) * star_ply_angle_mul
 		local ply_eye_yaw = math_normalize_angle(ply_eye_ang_delta[2]) * star_ply_angle_mul
 		ply_eye_ang_prev = ply_eye_ang
+
+		local ply_local_vel = WorldToLocal(ply:GetVelocity():GetNormalized(), angle_zero, vector_origin, Angle(0, ply_eye_ang.y, 0))
 
 		render.PushRenderTarget(star_canvas)
 		local blur = math_clamp(8 + 600 * dt, 12, 30)
@@ -145,7 +145,7 @@ function SF.DrawToolgunScreen(w, h, title, scroll_text)
 			x_vel = x_vel + ((ply_local_vel.y) * star_ply_movement_mul * dt) + ply_eye_yaw
 			x_vel = math_clamp(x_vel * deceleration, -star_velocity_max, star_velocity_max)
 
-			y_vel = y_vel + ((ply_local_vel.x + ply_world_vel.z) * star_ply_movement_mul * dt) - ply_eye_pitch + gravity * dt
+			y_vel = y_vel + ((ply_local_vel.x + ply_local_vel.z) * star_ply_movement_mul * dt) - ply_eye_pitch + gravity * dt
 			y_vel = math_clamp(y_vel * deceleration, -star_velocity_max, star_velocity_max)
 
 			ang_vel = ang_vel + (math_abs(x_vel) * 2 + math_abs(y_vel) / 2) * dt
