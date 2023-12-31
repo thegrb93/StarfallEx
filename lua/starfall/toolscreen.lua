@@ -20,10 +20,10 @@ local color_text_outline     = ColorAlpha(color_background, 80)   -- Outline tex
 local star_count             = 8                                  -- Amount of stars to render
 local star_deceleration      = 0.35                               -- How much velocity to retain
 local star_velocity_bump     = 300                                -- Random velocity towards the center when resetting star
-local star_velocity_max      = 1000                               -- Maximum velocity of a star
+local star_velocity_max      = 800                                -- Maximum velocity of a star
 local star_ang_velocity_min  = 100                                -- Minimum angle velocity of a star
 local star_ang_velocity_max  = 350                                -- Maximum angle velocity of a star
-local star_ply_movement_mul  = 10                                 -- Player movement influence multiplier
+local star_ply_movement_mul  = 2000                               -- Player movement influence multiplier
 local star_ply_angle_mul     = 25                                 -- Player eye angle influence multiplier
 local star_reset_radius      = 200                                -- Distance to which teleport the star when flipping
 local star_reset_radius_sqr  = star_reset_radius ^ 2 + 10         -- Distance squared and offset at which to teleport the star
@@ -99,7 +99,7 @@ function SF.DrawToolgunScreen(w, h, title, scroll_text)
 		local deceleration = star_deceleration ^ dt
 
 		local ply = LocalPlayer()
-		local ply_world_vel = ply:GetVelocity()
+		local ply_world_vel = ply:GetVelocity():GetNormalized()
 		local ply_local_vel = ply:WorldToLocal(ply:GetPos() + Vector(ply_world_vel.x, ply_world_vel.y, 0))
 
 		local ply_eye_ang = ply:EyeAngles()
