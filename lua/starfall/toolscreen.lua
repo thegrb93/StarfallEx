@@ -72,7 +72,7 @@ hook.Add("PreRender", "StarfallToolscreenPrepare", function()
 end)
 
 local stars_errored_delay = 0
-hook.Add("StarfallChipError", "StarfallToolscreenError", function(_, owner, client)
+hook.Add("StarfallError", "StarfallToolscreenError", function(_, owner, client)
 	local local_player = LocalPlayer()
 	if owner ~= local_player then return end
 	if client and client ~= local_player then return end
