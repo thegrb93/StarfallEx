@@ -1489,7 +1489,7 @@ if SERVER then
 		if not (ply and ply:IsValid()) then return end
 
 		net.Start("starfall_addnotify")
-		net.WriteString(msg)
+		net.WriteString(string.sub(msg, 1, 1024))
 		net.WriteUInt(notificationsMap[notifyType], 8)
 		net.WriteFloat(duration)
 		net.WriteUInt(soundsMap[sound], 8)
@@ -1515,7 +1515,10 @@ else
 			print(msg)
 			GAMEMODE:AddNotify(msg, notificationsMap[type], duration)
 			if soundsMap[sound] then
-				surface.PlaySound(soundsMap[soundsMap[sound]])
+				local path = soundsMap[soundsMap[sound]]
+				if path then
+					surface.PlaySound(path)
+				end
 			end
 		end
 	end
@@ -1525,7 +1528,10 @@ else
 		print(msg)
 		GAMEMODE:AddNotify(msg, type, duration)
 		if soundsMap[sound] then
-			surface.PlaySound(soundsMap[sound])
+			local path = soundsMap[soundsMap[sound]]
+			if path then
+				surface.PlaySound(path)
+			end
 		end
 	end)
 

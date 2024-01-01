@@ -137,30 +137,15 @@ function ENT:Error(err)
 	if newline then
 		msg = string.sub(msg, 1, newline - 1)
 	end
-	if self.owner:IsValid() then
-		SF.AddNotify(self.owner, msg, "ERROR", 7, "ERROR1")
-	end
+
+	hook.Run("StarfallError", self, self.owner, CLIENT and LocalPlayer() or false, self.sfdata.mainfile, msg, traceback)
+	SF.SendError(self, msg, traceback)
 
 	if self.instance then
 		self.instance:deinitialize()
 		self.instance = nil
 	end
 
-	if SERVER then
-		if self.owner:IsValid() then
-			SF.Print(self.owner, traceback)
-		end
-	else
-		print(traceback)
-
-		if self.owner ~= LocalPlayer() and self.owner:IsValid() and GetConVarNumber("sf_timebuffer_cl")>0 then
-			net.Start("starfall_report_error")
-			net.WriteEntity(self)
-			net.WriteString(msg.."\n"..traceback)
-			net.SendToServer()
-		end
-	end
-	
 	for inst, _ in pairs(SF.allInstances) do
 		inst:runScriptHook("starfallerror", inst.Types.Entity.Wrap(self), inst.Types.Player.Wrap(SERVER and self.owner or LocalPlayer()), msg)
 	end

@@ -80,6 +80,7 @@ end
 if SERVER then
 	util.AddNetworkString("starfall_upload")
 	util.AddNetworkString("starfall_upload_push")
+	util.AddNetworkString("starfall_error")
 
 	function SF.SendStarfall(msg, sfdata, recipient, callback)
 		net.Start(msg)
@@ -105,6 +106,35 @@ if SERVER then
 		}
 		return true
 	end
+
+	function SF.SendError(chip, message, traceback, client, should_notify)
+		net.Start("starfall_error")
+			net.WriteEntity(chip)
+			net.WriteEntity(chip.owner)
+			net.WriteString(string.sub(chip.sfdata.mainfile, 1, 1024))
+			net.WriteString(string.sub(message, 1, 1024))
+			net.WriteString(string.sub(traceback, 1, 1024))
+		if client~=nil and should_notify~=nil then
+			net.WriteBool(true)
+			net.WriteEntity(client)
+			net.WriteBool(should_notify)
+			net.SendOmit(client)
+		else
+			net.WriteBool(false)
+			net.Broadcast()
+		end
+	end
+
+	net.Receive("starfall_error", function(_, ply)
+		local chip = net.ReadEntity()
+		if not (chip and chip:IsValid()) then return end
+		if chip.ErroredPlayers[ply] then return end
+		chip.ErroredPlayers[ply] = true
+
+		local message, traceback, should_notify = net.ReadString(), net.ReadString(), net.ReadBool()
+		hook.Run("StarfallError", chip, chip.owner, ply, chip.sfdata.mainfile, message, traceback, should_notify)
+		SF.SendError(chip, message, traceback, ply, should_notify)
+	end)
 
 	net.Receive("starfall_upload", function(len, ply)
 		local updata = uploaddata[ply]
@@ -160,6 +190,37 @@ else
 			net.WriteStarfall(sfdata)
 		net.SendToServer()
 	end
+
+	
+	function SF.SendError(chip, message, traceback)
+		local owner, is_blocked = chip.owner, false
+		if owner and owner:IsValid() then
+			is_blocked = SF.BlockedUsers:isBlocked(owner:SteamID())
+		end
+		net.Start("starfall_error")
+			net.WriteEntity(chip)
+			net.WriteString(string.sub(message, 1, 1024))
+			net.WriteString(string.sub(traceback, 1, 1024))
+			net.WriteBool(GetConVarNumber("sf_timebuffer_cl") > 0 and not is_blocked)
+		net.SendToServer()
+	end
+
+	net.Receive("starfall_error", function()
+		local chip = net.ReadEntity()
+		if not chip:IsValid() then return end
+		local owner = net.ReadEntity()
+		if not owner:IsValid() then return end
+		local mainfile = net.ReadString()
+		local message = net.ReadString()
+		local traceback = net.ReadString()
+		local client, should_notify
+		if net.ReadBool() then
+			client = net.ReadEntity()
+			if not client:IsValid() then return end
+			should_notify = net.ReadBool()
+		end
+		hook.Run("StarfallError", chip, owner, client, mainfile, message, traceback, should_notify)
+	end)
 
 	net.Receive("starfall_upload", function()
 		local mainfile = net.ReadString()
