@@ -44,30 +44,24 @@ local curtime = 0
 local dt = 0
 local ply_local_vel, ply_eye_yaw, ply_eye_pitch, deceleration
 
-local function get_random_star_properties()
-	return
-		math_rand(40, 120),                                       -- Size
-		math_rand(200, 600),                                      -- Gravity
-		math_rand(0.3, 1) * (math_random() > 0.5 and 1 or -1),    -- Rotation direction
-		math_rand(190, 220),                                      -- Hue
-		math_rand(0.6, 1)                                         -- Sat
+local function star_randomize(star)
+	star.gravity = math_rand(200, 600)
+	star.ang_dir = math.random() < 0.5 and 1 or -1
+	star.size = math_rand(40, 120)
+	star.hue = math_rand(190, 220)
+	star.sat = math_rand(0.6, 1)
+	return star
 end
 
 local function star_init(star)
-	local size, gravity, ang_dir, hue, sat = get_random_star_properties()
-	return {
-		x       = math_rand(-128, 128),
-		y       = math_rand(-128, 128),
-		x_vel   = math_rand(-star_velocity_max, star_velocity_max),
-		y_vel   = star_velocity_max,
-		ang     = 0,
+	return star_randomize({
+		x = math_rand(-128, 128),
+		y = math_rand(-128, 128),
+		x_vel = math_rand(-star_velocity_max, star_velocity_max),
+		y_vel = star_velocity_max,
+		ang = 0,
 		ang_vel = 0,
-		ang_dir = ang_dir,
-		size    = size,
-		gravity = gravity,
-		hue     = hue,
-		sat     = sat
-	}
+	})
 end
 
 local function star_reset(star)
@@ -80,7 +74,7 @@ local function star_reset(star)
 	star.x_vel = star.x_vel - offset_x * towards_center * 2
 	star.y_vel = star.y_vel - offset_y * towards_center
 
-	star.size, star.gravity, star.ang_dir, star.hue, star.sat = get_random_star_properties()
+	star_randomize(star)
 end
 
 local function star_update_and_draw(star)
