@@ -53,7 +53,7 @@ local function star_randomize(star)
 	return star
 end
 
-local function star_init(star)
+local function star_init()
 	return star_randomize({
 		x = math_rand(-128, 128),
 		y = math_rand(-128, 128),
