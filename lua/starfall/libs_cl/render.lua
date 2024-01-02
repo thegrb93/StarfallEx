@@ -481,6 +481,7 @@ function instance:cleanupRender()
 	render.SetLightingMode(0)
 	render.ResetModelLighting(1, 1, 1)
 	render.DepthRange(0, 1)
+	render.SetBlend(1)
 	render.SuppressEngineLighting(false)
 	render.SetWriteDepthToDestAlpha(true)
 	render.SetViewPort(0, 0, renderdata.oldW, renderdata.oldH)
@@ -1772,6 +1773,13 @@ function render_library.overrideBlend(on, srcBlend, destBlend, blendFunc, srcBle
 	else
 		render.OverrideBlend(on, srcBlend, destBlend, blendFunc, srcBlendAlpha, destBlendAlpha, blendFuncAlpha)
 	end
+end
+
+--- Changes alpha blending for the upcoming model drawing operations
+-- @param alpha number Blending in the range 0 to 1
+function render_library.setBlend(alpha)
+	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
+	render.SetBlend(alpha)
 end
 
 --- Resets the depth buffer
