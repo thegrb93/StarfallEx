@@ -29,7 +29,7 @@ local star_ply_angle_mul     = 25                                 -- Player eye 
 local star_reset_radius      = 200                                -- Distance to which teleport the star when flipping
 local star_reset_radius_sqr  = star_reset_radius ^ 2 + 10         -- Distance squared and offset at which to teleport the star
 local star_random_offset     = math.pi / 8                        -- Random angle offset to set when flipping the star
-local star_error_color_time  = 7                                  -- How long for stars to be error color
+local star_error_color_time  = 6                                  -- How long for stars to be error color
 
 -- Globals
 local last_error_time = 0
