@@ -157,7 +157,7 @@ end
 
 ENT.Monitor_Offsets = {
 	["models/cheeze/pcb/pcb4.mdl"] = {
-		Name	=	"pcb4.mdl",
+		Name	=	"PCB 4 (1:1)",
 		RS	=	0.0625,
 		RatioX	=	1,
 		offset	=	Vector(0, 0, 0.5),
@@ -169,7 +169,7 @@ ENT.Monitor_Offsets = {
 		z	=	0.5,
 	},
 	["models/cheeze/pcb/pcb5.mdl"] = {
-		Name	=	"pcb5.mdl",
+		Name	=	"PCB 5 (2:1)",
 		RS	=	0.0625,
 		RatioX	=	0.508,
 		offset	=	Vector(0, -0.5, 0.5),
@@ -181,7 +181,7 @@ ENT.Monitor_Offsets = {
 		z	=	0.5,
 	},
 	["models/cheeze/pcb/pcb6.mdl"] = {
-		Name	=	"pcb6.mdl",
+		Name	=	"PCB 6 (3:2)",
 		RS	=	0.09375,
 		RatioX	=	0.762,
 		offset	=	Vector(8, -0.5, 0.5),
@@ -193,7 +193,7 @@ ENT.Monitor_Offsets = {
 		z	=	0.5,
 	},
 	["models/cheeze/pcb/pcb7.mdl"] = {
-		Name	=	"pcb7.mdl",
+		Name	=	"PCB 7 (1:1)",
 		RS	=	0.125,
 		RatioX	=	1,
 		offset	=	Vector(0, 0, 0.5),
@@ -205,7 +205,7 @@ ENT.Monitor_Offsets = {
 		z	=	0.5,
 	},
 	["models/cheeze/pcb/pcb8.mdl"] = {
-		Name	=	"pcb8.mdl",
+		Name	=	"PCB 8 (3:2)",
 		RS	=	0.125,
 		RatioX	=	0.668,
 		offset	=	Vector(0, 15.885, 0.5),
@@ -217,7 +217,7 @@ ENT.Monitor_Offsets = {
 		z	=	0.5,
 	},
 	["models/cheeze/pcb2/pcb8.mdl"] = {
-		Name	=	"pcb8.mdl",
+		Name	=	"PCB 8 (1:1)",
 		RS	=	0.2475,
 		RatioX	=	0.99,
 		offset	=	Vector(0, 0, 0.3),
@@ -241,7 +241,7 @@ ENT.Monitor_Offsets = {
 		z	=	0.1,
 	},
 	["models/hunter/blocks/cube1x1x1.mdl"] = {
-		Name	=	"Cube 1x1x1",
+		Name	=	"Cube 1 (1:1)",
 		RS	=	0.09,
 		RatioX	=	1,
 		offset	=	Vector(24, 0, 0),
@@ -253,7 +253,7 @@ ENT.Monitor_Offsets = {
 		z	=	24,
 	},
 	["models/hunter/plates/plate05x05.mdl"] = {
-		Name	=	"Panel 0.5x0.5",
+		Name	=	"Panel 0.5 (1:1)",
 		RS	=	0.045,
 		RatioX	=	1,
 		offset	=	Vector(0, 0, 1.7),
@@ -265,7 +265,7 @@ ENT.Monitor_Offsets = {
 		z	=	0,
 	},
 	["models/hunter/plates/plate1x1.mdl"] = {
-		Name	=	"Panel 1x1",
+		Name	=	"Panel 1 (1:1)",
 		RS	=	0.09,
 		RatioX	=	1,
 		offset	=	Vector(0, 0, 2),
@@ -277,7 +277,7 @@ ENT.Monitor_Offsets = {
 		z	=	0,
 	},
 	["models/hunter/plates/plate2x2.mdl"] = {
-		Name	=	"Panel 2x2",
+		Name	=	"Panel 2 (1:1)",
 		RS	=	0.182,
 		RatioX	=	1,
 		offset	=	Vector(0, 0, 2),
@@ -289,7 +289,7 @@ ENT.Monitor_Offsets = {
 		z	=	0,
 	},
 	["models/hunter/plates/plate4x4.mdl"] = {
-		Name	=	"plate4x4.mdl",
+		Name	=	"Panel 4 (1:1)",
 		RS	=	0.3707,
 		RatioX	=	1,
 		offset	=	Vector(0, 0, 2),
@@ -301,7 +301,7 @@ ENT.Monitor_Offsets = {
 		z	=	1.7,
 	},
 	["models/hunter/plates/plate8x8.mdl"] = {
-		Name	=	"plate8x8.mdl",
+		Name	=	"Panel 8 (1:1)",
 		RS	=	0.741,
 		RatioX	=	1,
 		offset	=	Vector(0, 0, 2),
@@ -313,7 +313,7 @@ ENT.Monitor_Offsets = {
 		z	=	1.7,
 	},
 	["models/hunter/plates/plate16x16.mdl"] = {
-		Name	=	"plate16x16.mdl",
+		Name	=	"Panel 16 (1:1)",
 		RS	=	1.482,
 		RatioX	=	1,
 		offset	=	Vector(0, 0, 2),
@@ -325,7 +325,7 @@ ENT.Monitor_Offsets = {
 		z	=	1.7,
 	},
 	["models/hunter/plates/plate24x24.mdl"] = {
-		Name	=	"plate24x24.mdl",
+		Name	=	"Panel 24 (1:1)",
 		RS	=	2.223,
 		RatioX	=	1,
 		offset	=	Vector(0, 0, 2),
@@ -337,7 +337,7 @@ ENT.Monitor_Offsets = {
 		z	=	1.7,
 	},
 	["models/hunter/plates/plate32x32.mdl"] = {
-		Name	=	"plate32x32.mdl",
+		Name	=	"Panel 32 (1:1)",
 		RS	=	2.964,
 		RatioX	=	1,
 		offset	=	Vector(0, 0, 2),
@@ -349,7 +349,7 @@ ENT.Monitor_Offsets = {
 		z	=	1.7,
 	},
 	["models/kobilica/wiremonitorbig.mdl"] = {
-		Name	=	"Monitor Big",
+		Name	=	"Monitor Big (1:1)",
 		RS	=	0.045,
 		RatioX	=	0.991,
 		offset	=	Vector(0.2, 0, 13),
@@ -361,7 +361,7 @@ ENT.Monitor_Offsets = {
 		z	=	0.2,
 	},
 	["models/kobilica/wiremonitorsmall.mdl"] = {
-		Name	=	"Monitor Small",
+		Name	=	"Monitor Small (1:1)",
 		RS	=	0.0175,
 		RatioX	=	1,
 		offset	=	Vector(0.2, 0, 5),
@@ -409,7 +409,7 @@ ENT.Monitor_Offsets = {
 		z	=	6.1,
 	},
 	["models/props_lab/monitor01b.mdl"] = {
-		Name	=	"Small TV",
+		Name	=	"Small TV (1:1)",
 		RS	=	0.0185,
 		RatioX	=	1.0173,
 		offset	=	Vector(6.53, -1, 0.45),
@@ -421,7 +421,7 @@ ENT.Monitor_Offsets = {
 		z	=	6.53,
 	},
 	["models/props_lab/workspace002.mdl"] = {
-		Name	=	"Workspace 002",
+		Name	=	"Workspace (1:1)",
 		RS	=	0.06836,
 		RatioX	=	0.9669,
 		offset	=	Vector(-42.133224, -42.372322, 42.110897),
@@ -433,7 +433,7 @@ ENT.Monitor_Offsets = {
 		z	=	42.1109,
 	},
 	["models/props_mining/billboard001.mdl"] = {
-		Name	=	"TF2 Red billboard",
+		Name	=	"TF2 Red billboard (7:4)",
 		RS	=	0.375,
 		RatioX	=	0.5714,
 		offset	=	Vector(3.5, 0, 96),
@@ -445,7 +445,7 @@ ENT.Monitor_Offsets = {
 		z	=	96,
 	},
 	["models/props_mining/billboard002.mdl"] = {
-		Name	=	"TF2 Red vs Blue billboard",
+		Name	=	"TF2 Red vs Blue billboard (51:16)",
 		RS	=	0.375,
 		RatioX	=	0.3137,
 		offset	=	Vector(3.5, 0, 192),

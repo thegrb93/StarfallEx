@@ -243,144 +243,26 @@ function TOOL:Think()
 end
 
 if CLIENT then
-	
-	surface.CreateFont("StarfallToolTitle", {
-		font = "Arial",
-		extended = false,
-		size = 64,
-		weight = 500,
-		antialias = true,
-	})
-	
-	surface.CreateFont("StarfallToolSmall", {
-		font = "Arial",
-		extended = false,
-		size = 35,
-		weight = 500,
-		antialias = true,
-	})
-	
-	local bgcolor = Color(33,33,33,50)
-	local bgcolor_solid = ColorAlpha(bgcolor, 255)
-	local is_linux = system.IsLinux()
-	
-	local function setRandomStar(star, frac, prvVel, y)
-		star.y = math.random(y-15,y+15)
-		--star.x = 235/self.starCount*id
-		star.x = 255 * frac
-		star.xvel = prvVel * 0.3 + math.Rand(-0.1,0.1)
-		star.yvel = math.Rand(0.5,1) * (fromBottom and -1 or 1)
-		star.ang = math.Rand(0.5, 1)
-		star.angvel = math.Rand(0.5, 1)
-		star.size = math.random(50,80)
-		star.color = Color(math.random(0,40), math.random(120,190), math.random(200,255))
+
+	function TOOL:DrawStarfallToolScreen(w, h)
+		local ent = LocalPlayer():GetEyeTrace().Entity
+		local script_name
+		if ent and ent:IsValid() and ent:GetClass() == "starfall_processor" then
+			if ent.error then
+				script_name = "< clientside errored >"
+			elseif ent:GetNWInt("State", 1) == 2 then
+				script_name = "< serverside errored >"
+			else
+				script_name = ent.name or "Generic"
+			end
+		elseif SF.Editor.editor then
+			script_name = SF.Editor.editor:GetActiveTab():GetText()
+		end
+		SF.DrawToolgunScreen(w, h, "PROCESSOR", script_name)
 	end
-	
-	function TOOL:Deploy()
-		self.starCount = 8
-		self.stars = {}
-		
-		for i = 1, self.starCount do
-			local star = {}
-			setRandomStar(star, i / self.starCount, 0, math.random(0, 255))
-			self.stars[i] = star
-		end
-		
-		self.prvEyeYaw = 0
-		self.deployed = true
-	end
-	
-	local starMat, sfToolMat, sfToolRt
-	function TOOL:DrawToolScreen(w, h)
-		-- In singleplayer clientside deploy doesn't work
-		if not self.deployed then self:Deploy() end
-		if not sfToolMat then
-			starMat = Material("radon/starfall2.png", "smooth")
-			starMat:SetInt("$flags",32816)
-
-			sfToolRt = GetRenderTarget( "sf_tool_rt", w, h) 
-			sfToolMat = CreateMaterial( "sf_tool_mat", "UnlitGeneric", {
-				["$basetexture"] = sfToolRt:GetName()
-			} )
-			sfToolMat:SetInt("$flags",32816)
-		end
-
-		render.PushRenderTarget(sfToolRt)
-			-- SF.Editor not valid at start of the game
-			--local filename = SF.Editor.getOpenFile() or "main"
-			
-			local ply = self:GetOwner()
-			
-			-- shake particles based on view yaw rotation
-			local eyeAng = ply:EyeAngles().y
-			local eyeYawVel = (((eyeAng - self.prvEyeYaw) % 360 ) + 360 ) % 360
-			if eyeYawVel > 180 then eyeYawVel = eyeYawVel - 360 end
-			self.prvEyeYaw = eyeAng
-			
-			-- shake particles based on left/right velocity
-			self.velY = self.velY or 0
-			local vel = ply:WorldToLocal(ply:GetPos() + ply:GetVelocity())
-			local velY = vel.y
-			local velX = vel.x / 10000
-			
-			-- cover the default texture
-			surface.SetDrawColor(bgcolor)
-			surface.DrawRect(0,0,w,h)
-			
-			-- render the particles
-			surface.SetMaterial(starMat)
-			for i, star in ipairs(self.stars) do
-				star.yvel = star.yvel + velX
-				star.xvel = star.xvel + eyeYawVel/30 + velY/6000
-				
-				star.x = star.x + star.xvel
-				star.y = star.y + star.yvel
-				star.ang = star.ang + star.angvel
-				
-				star.angvel = star.angvel + star.xvel / 1000
-
-				local starAlpha = 255+60-star.y
-				
-				if starAlpha <= 0 or star.y < -60 then
-					setRandomStar(self.stars[i], i / #self.stars, star.xvel, star.y < -60 and 271 or -15)
-				elseif star.x < -30 then
-					star.x = w + 30
-				elseif star.x > w + 30 then
-					star.x = -30
-				end
-				
-				surface.SetDrawColor(star.color.r, star.color.g, star.color.b, starAlpha)
-				surface.DrawTexturedRectRotated(star.x, star.y, star.size, star.size, star.ang)
-			end
-			
-			draw.SimpleTextOutlined("Starfall", "StarfallToolTitle", w/2, 60, Color(255,255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 4, bgcolor)
-			
-			local ent = ply:GetEyeTrace().Entity
-			local mainfile, size
-			if ent and ent:IsValid() and ent:GetClass() == "starfall_processor" and ent.instance and ent.instance.mainfile then
-				mainfile = ent.instance.mainfile
-				size = #ent.instance.source[mainfile]
-			elseif SF.Editor.editor then
-				mainfile = SF.Editor.getOpenFile() or "<unsaved file>"
-				size = #SF.Editor.getCode()
-			end
-			if mainfile then
-				draw.SimpleTextOutlined(mainfile, "StarfallToolSmall", 10, 180, Color(255,255,255), TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM, 4, bgcolor)
-				draw.SimpleTextOutlined(math.Round(size/1000, 1).."kB", "StarfallToolSmall", 10, 185, Color(255,255,255), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 4, bgcolor)
-			end
-
-		render.PopRenderTarget()
-		
-		-- On Linux the original tool background is still visible
-		if is_linux then
-			surface.SetDrawColor(bgcolor_solid)
-			surface.DrawRect(0, 0, w, h)
-		end
-		
-		surface.SetDrawColor( 255, 255, 255, 255 )
-		surface.SetMaterial( sfToolMat )
-		surface.DrawTexturedRect( 0, 0, w, h )
-	
+	local custom_toolscreen_convar = GetConVar("starfall_toolscreen")
+	if custom_toolscreen_convar and custom_toolscreen_convar:GetBool() then
+		TOOL.DrawToolScreen = TOOL.DrawStarfallToolScreen
 	end
 
 	local function GotoDocs(button)

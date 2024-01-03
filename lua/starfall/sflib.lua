@@ -1900,6 +1900,9 @@ include("preprocessor.lua")
 include("permissions/core.lua")
 include("editor/editor.lua")
 include("transfer.lua")
+if CLIENT then
+	include("toolscreen.lua")
+end
 
 do
 	local function compileModule(source, path)
