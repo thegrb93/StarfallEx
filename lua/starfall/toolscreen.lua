@@ -5,11 +5,6 @@ local math_cos, math_sin = math.cos, math.sin
 local math_abs, math_clamp = math.abs, math.Clamp
 local math_normalize_angle = math.NormalizeAngle
 
-local function smooth_step(x, edge0, edge1)
-	local t = math_clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0)
-    return t * t * (3.0 - 2.0 * t)
-end
-
 surface.CreateFont("StarfallToolBig", { font = "Roboto-Bold.ttf", size = 36 })
 surface.CreateFont("StarfallToolSmall", { font = "Roboto-Italic.ttf", size = 32, shadow = true })
 
@@ -38,18 +33,22 @@ local star_error_color_time  = 7                                  -- How long fo
 
 -- Globals
 local last_error_time = 0
-local last_error_frac = 0
 local last_frame = 0
 local curtime = 0
 local dt = 0
 local ply_local_vel, ply_eye_yaw, ply_eye_pitch, deceleration
 
 local function star_randomize(star)
+	star.size = math_rand(40, 120)
 	star.gravity = math_rand(200, 600)
 	star.ang_dir = math.random() < 0.5 and 1 or -1
-	star.size = math_rand(40, 120)
-	star.hue = math_rand(190, 220)
-	star.sat = math_rand(0.6, 1)
+
+	if last_error_time < RealTime() then
+		star.color = HSVToColor(190 + math.random() * 30, math_rand(0.6, 1), 0.9)
+	else
+		star.color = HSVToColor(350 + math_random() * 20, math_rand(0.6, 1), 0.9)
+	end
+
 	return star
 end
 
@@ -95,8 +94,7 @@ local function star_update_and_draw(star)
 	star.y = star.y + star.y_vel * dt
 	star.ang = star.ang + star.ang_dir * star.ang_vel * dt
 
-	local color = HSVToColor(star.hue+last_error_frac*160, star.sat, 0.9)
-	surface.SetDrawColor(color.r, color.g, color.b, 230)
+	surface.SetDrawColor(star.color.r, star.color.g, star.color.b, 230)
 	surface.DrawTexturedRectRotated(128 + star.x, 128 + star.y, star.size, star.size, star.ang)
 end
 
@@ -158,14 +156,6 @@ function SF.DrawToolgunScreen(w, h, title, scroll_text)
 		surface.SetMaterial(star_canvas_material)
 		surface.SetDrawColor(color_background.r, color_background.g, color_background.b, math_clamp(3000 * dt + 20, 40, 120))
 		surface.DrawTexturedRect(0, 0, w, h)
-
-		if curtime > last_error_time then
-			last_error_frac = 0
-		elseif curtime > last_error_time-star_error_color_time*0.5 then
-			last_error_frac = 1-smooth_step(curtime, last_error_time-0.4, last_error_time)
-		else
-			last_error_frac = smooth_step(curtime, last_error_time-star_error_color_time, last_error_time-star_error_color_time+0.4)
-		end
 
 		surface.SetMaterial(star_material)
 		for _, star in ipairs(stars) do
