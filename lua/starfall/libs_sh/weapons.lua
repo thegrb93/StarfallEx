@@ -7,7 +7,7 @@ local checkluatype = SF.CheckLuaType
 -- @class type
 -- @libtbl weapon_methods
 -- @libtbl weapon_meta
-SF.RegisterType("Weapon", false, true, debug.getregistry().Weapon, "Entity")
+SF.RegisterType("Weapon", false, true, FindMetaTable("Weapon"), "Entity")
 
 
 return function(instance)
