@@ -78,7 +78,7 @@ end
 -- @name Player
 -- @class type
 -- @libtbl player_methods
-SF.RegisterType("Player", false, true, debug.getregistry().Player, "Entity")
+SF.RegisterType("Player", false, true, FindMetaTable("Player"), "Entity")
 
 
 return function(instance)

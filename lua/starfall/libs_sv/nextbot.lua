@@ -7,7 +7,7 @@ local checkluatype = SF.CheckLuaType
 -- @server
 -- @libtbl nb_methods
 -- @libtbl nb_meta
-SF.RegisterType("NextBot", false, true, debug.getregistry().NextBot, "Entity")
+SF.RegisterType("NextBot", false, true, FindMetaTable("NextBot"), "Entity")
 
 --- Library for spawning NextBots.
 -- @name nextbot

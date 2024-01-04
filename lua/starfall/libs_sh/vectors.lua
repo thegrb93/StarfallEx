@@ -11,7 +11,7 @@ local dgetmeta = debug.getmetatable
 -- @field z The z value of the vector. Can also be indexed with [3]
 -- @libtbl vec_methods
 -- @libtbl vec_meta
-SF.RegisterType("Vector", nil, nil, debug.getregistry().Vector, nil, function(checktype, vec_meta)
+SF.RegisterType("Vector", nil, nil, FindMetaTable("Vector"), nil, function(checktype, vec_meta)
 	return function(vec)
 		return setmetatable({ vec:Unpack() }, vec_meta)
 	end,

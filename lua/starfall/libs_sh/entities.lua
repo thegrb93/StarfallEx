@@ -56,7 +56,7 @@ end
 -- @class type
 -- @libtbl ents_methods
 -- @libtbl ent_meta
-SF.RegisterType("Entity", false, true, debug.getregistry().Entity)
+SF.RegisterType("Entity", false, true, FindMetaTable("Entity"))
 
 
 return function(instance)
@@ -103,7 +103,7 @@ function ents_methods:getOwner()
 end
 
 if CLIENT then
-	instance.object_wrappers[debug.getregistry().NextBot] = ewrap
+	instance.object_wrappers[FindMetaTable("NextBot")] = ewrap
 		
 	--- Allows manipulation of an entity's bones' positions
 	-- @client

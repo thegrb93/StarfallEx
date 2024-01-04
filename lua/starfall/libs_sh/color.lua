@@ -42,7 +42,7 @@ local hex_to_rgb = {
 -- @field a The 0-255 alpha value of the color. Can also be indexed with [4]
 -- @libtbl color_methods
 -- @libtbl color_meta
-SF.RegisterType("Color", nil, nil, debug.getregistry().Color, nil, function(checktype, color_meta)
+SF.RegisterType("Color", nil, nil, FindMetaTable("Color"), nil, function(checktype, color_meta)
 	return function(clr)
 		return setmetatable({ clr.r, clr.g, clr.b, clr.a }, color_meta)
 	end,

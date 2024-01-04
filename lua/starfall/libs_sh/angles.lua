@@ -10,7 +10,7 @@ local dgetmeta = debug.getmetatable
 -- @field r The -180 to 180 roll value of the euler angle. Can also be indexed with [3]
 -- @libtbl ang_methods
 -- @libtbl ang_meta
-SF.RegisterType("Angle", nil, nil, debug.getregistry().Angle, nil, function(checktype, ang_meta)
+SF.RegisterType("Angle", nil, nil, FindMetaTable("Angle"), nil, function(checktype, ang_meta)
 	return function(ang)
 		return setmetatable({ ang:Unpack() }, ang_meta)
 	end,

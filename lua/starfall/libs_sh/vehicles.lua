@@ -16,7 +16,7 @@ end
 -- @class type
 -- @libtbl vehicle_methods
 -- @libtbl vehicle_meta
-SF.RegisterType("Vehicle", false, true, debug.getregistry().Vehicle, "Entity")
+SF.RegisterType("Vehicle", false, true, FindMetaTable("Vehicle"), "Entity")
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
