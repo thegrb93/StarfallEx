@@ -291,6 +291,24 @@ function input_library.getCursorPos()
 	return input.GetCursorPos()
 end
 
+--- Sets position of the mouse, relative to the top left corner of the game window, starting from 0, 0
+-- @client
+function input_library.setCursorPos(x, y)
+	checkpermission(instance, nil, "input.emulate")
+	checkluatype(x, TYPE_NUMBER)
+	checkluatype(y, TYPE_NUMBER)
+
+	if not SF.IsHUDActive(instance.entity) then
+		SF.Throw("No HUD component connected", 2)
+	elseif not vgui.CursorVisible() then
+		SF.Throw("Cursor must be visible in order to set its position", 2)
+	end
+
+	x = math.Clamp(x, 0, ScrW() - 1)
+	y = math.Clamp(y, 0, ScrH() - 1)
+	input.SetCursorPos(x, y)
+end
+
 --- Gets whether the cursor is visible on the screen
 -- @client
 -- @return boolean The cursor's visibility
