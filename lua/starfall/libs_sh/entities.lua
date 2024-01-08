@@ -295,10 +295,12 @@ end
 -- @param number channel Default CHAN_AUTO or CHAN_WEAPON for weapons
 function ents_methods:emitSound(snd, lvl, pitch, volume, channel)
 	checkluatype(snd, TYPE_STRING)
-	emitSoundBurst:use(instance.player, 1)
+	if #snd>260 then SF.Throw("Sound path too long!") end
+	if string.match(snd, "[\"?]") then SF.Throw("Sound path contains invalid characters!") end
 
 	local ent = getent(self)
 	checkpermission(instance, ent, "entities.emitSound")
+	emitSoundBurst:use(instance.player, 1)
 
 	local snds = soundsByEntity[ent]
 	if not snds then snds = {} soundsByEntity[ent] = snds end

@@ -67,11 +67,10 @@ function sound_library.create(ent, path, nofilter)
 	checkluatype(path, TYPE_STRING)
 	if nofilter~=nil then checkluatype(nofilter, TYPE_BOOL) end
 
-	checkpermission(instance, { ent, path }, "sound.create")
+	if #path>260 then SF.Throw("Sound path too long!") end
+	if string.match(path, "[\"?]") then SF.Throw("Sound path contains invalid characters!") end
 
-	if path:match('["?]') then
-		SF.Throw("Invalid sound path: " .. path, 2)
-	end
+	checkpermission(instance, { ent, path }, "sound.create")
 
 	local e = getent(ent)
 

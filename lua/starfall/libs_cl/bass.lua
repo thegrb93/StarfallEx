@@ -68,9 +68,8 @@ function bass_library.loadFile(path, flags, callback)
 	checkluatype(flags, TYPE_STRING)
 	checkluatype(callback, TYPE_FUNCTION)
 
-	if path:match('["?]') then
-		SF.Throw("Invalid sound path: " .. path, 2)
-	end
+	if #path>260 then SF.Throw("Sound path too long!") end
+	if string.match(path, "[\"?]") then SF.Throw("Sound path contains invalid characters!") end
 
 	if not3D(flags) then
 		checkpermission(instance, nil, "bass.play2D")
