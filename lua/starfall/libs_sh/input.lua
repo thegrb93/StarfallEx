@@ -123,9 +123,8 @@ SF.hookAdd("PlayerButtonUp", "inputreleased", CheckButtonPerms)
 -- @class hook
 -- @param number x X coordinate moved
 -- @param number y Y coordinate moved
-SF.hookAdd("StartCommand", "mousemoved", function(instance, ply, cmd)
+SF.hookAdd("InputMouseApply", "mousemoved", function(instance, _, x, y)
 	if haspermission(instance, nil, "input") then
-		local x, y = cmd:GetMouseX(), cmd:GetMouseY()
 		if x~=0 or y~=0 then
 			return true, { x, y }
 		end
