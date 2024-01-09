@@ -2056,8 +2056,8 @@ function render_library.traceSurfaceColor(vec1, vec2)
 	return cwrap(render.GetSurfaceColor(vunwrap(vec1), vunwrap(vec2)):ToColor())
 end
 
---- Checks if a hud component is connected to the Starfall Chip
--- @return boolean Whether a hud component is connected to the SF Chip and active
+--- Checks if the client is connected to a HUD component that's linked to this chip
+-- @return boolean True if a HUD component is connected and active, nil otherwise
 function render_library.isHUDActive()
 	return SF.IsHUDActive(instance.entity)
 end
