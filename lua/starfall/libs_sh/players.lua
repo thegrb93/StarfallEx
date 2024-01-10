@@ -3,10 +3,13 @@ local checkluatype = SF.CheckLuaType
 local checkvalidnumber = SF.CheckValidNumber
 local registerprivilege = SF.Permissions.registerPrivilege
 
+local playerMaxScale
 if SERVER then
 	-- Register privileges
 	registerprivilege("player.dropweapon", "DropWeapon", "Drops a weapon from the player", { entities = {} })
 	registerprivilege("player.setammo", "SetAmmo", "Whether a player can set their ammo", { usergroups = { default = 1 }, entities = {} })
+
+	playerMaxScale = CreateConVar("sf_player_model_scale_max", "10", { FCVAR_ARCHIVE }, "Maximum player model scale the user is allowed to set using Player.setModelScale", 1, 100)
 else
 	registerprivilege("player.getFriendStatus", "FriendStatus", "Whether friend status can be retrieved", { client = { default = 1 } })
 end
@@ -504,7 +507,7 @@ if SERVER then
 		checkvalidnumber(scale)
 		local ply = getply(self)
 		checkpermission(instance, ply, "entities.setRenderProperty")
-		ply:SetModelScale(math.Clamp(math.Truncate(scale, 2), 0.01, 100))
+		ply:SetModelScale(math.Clamp(math.Truncate(scale, 2), 0.01, playerMaxScale:GetFloat()))
 	end
 
 	--- Sets the view entity of the player. Only works if they are linked to a hud.
