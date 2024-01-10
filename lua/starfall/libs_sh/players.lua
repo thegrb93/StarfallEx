@@ -498,13 +498,13 @@ end
 
 if SERVER then
 	--- Lets you change the size of yourself if the server has sf_permissions_entity_owneraccess 1
-	-- @param number scale The scale to apply (min 0.001, max 100)
+	-- @param number scale The scale to apply, will be truncated to the first two decimal places (min 0.01, max 100)
 	-- @server
 	function player_methods:setModelScale(scale)
 		checkvalidnumber(scale)
 		local ply = getply(self)
 		checkpermission(instance, ply, "entities.setRenderProperty")
-		ply:SetModelScale(math.Clamp(scale, 0.001, 100))
+		ply:SetModelScale(math.Clamp(math.Truncate(scale, 2), 0.01, 100))
 	end
 
 	--- Sets the view entity of the player. Only works if they are linked to a hud.
