@@ -256,3 +256,8 @@ pattern [[tts.cyzon.us/(.+)]]
 
 simple [[static.revolt.chat]]
 simple [[autumn.revolt.chat]]
+
+-- OpenAI API
+--- Examples:
+--- https://api.openai.com/v1/chat/completions
+simple [[api.openai.com]]
