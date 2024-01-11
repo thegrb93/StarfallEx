@@ -510,6 +510,13 @@ if SERVER then
 		ply:SetModelScale(math.Clamp(math.Truncate(scale, 2), 0.01, playerMaxScale:GetFloat()))
 	end
 
+	--- Checks if the player is connected to a HUD component that's linked to this chip
+	-- @server
+	-- @return boolean True if a HUD component is connected and active for the player, nil otherwise
+	function player_methods:isHUDActive()
+		return SF.IsHUDActive(instance.entity, getply(self))
+	end
+
 	--- Sets the view entity of the player. Only works if they are linked to a hud.
 	-- @server
 	-- @param Entity ent Entity to set the player's view entity to, or nothing to reset it
