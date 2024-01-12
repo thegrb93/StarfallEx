@@ -20,14 +20,19 @@ local thread_meta, wrap, unwrap = instance.Types.thread, instance.Types.thread.W
 
 local coroutines = {}
 local coroutineStackLevels = {}
+
+local function cleanupThread(thread)
+	local unwrapped = unwrap(coroutines[thread])
+	coroutineStackLevels[unwrapped.thread] = nil
+	coroutineStackLevels[unwrapped.func] = nil
+	unwrapped.thread = nil
+	unwrapped.func = nil
+	coroutines[thread] = nil
+end
+
 instance:AddHook("deinitialize", function()
-	for k, wrapped in pairs(coroutines) do
-		local unwrapped = unwrap(wrapped)
-		coroutineStackLevels[unwrapped.thread] = nil
-		coroutineStackLevels[unwrapped.func] = nil
-		unwrapped.thread = nil
-		unwrapped.func = nil
-		coroutines[k] = nil
+	for thread in pairs(coroutines) do
+		cleanupThread(thread)
 	end
 end)
 instance.canyield = true
@@ -46,8 +51,8 @@ local function createCoroutine(func)
 	-- Hack to get the coroutine from a wrapped function. Necessary because coroutine.create is not available
 	local wrappedFunc = coroutine.wrap(function()
 		local thread = coroutine.running()
-		local function cleanupThread(...) coroutines[thread] = nil return ... end
-		return cleanupThread(func(coroutine.yield(thread)))
+		local function cleanup(...) cleanupThread(thread) return ... end
+		return cleanup(func(coroutine.yield(thread)))
 	end)
 
 	local thread = wrappedFunc()
