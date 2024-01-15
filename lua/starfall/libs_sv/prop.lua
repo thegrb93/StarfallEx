@@ -602,7 +602,11 @@ function props_library.createSent(pos, ang, class, frozen, data)
 				sent2._preFactory(ply, enttbl)
 			end
 
-			entity = duplicator.CreateEntityFromTable(ply, enttbl) or error("Factory func returned false")
+			entity = duplicator.CreateEntityFromTable(ply, enttbl)
+			if not isentity(entity) then
+				entity = nil
+				error("Factory func returned invalid value")
+			end
 
 			if sent2._postFactory then
 				sent2._postFactory(ply, entity, enttbl)
