@@ -474,6 +474,7 @@ end
 
 function instance:cleanupRender()
 	render.SetStencilEnable(false)
+	render.OverrideBlend(true, 0, 0, 0)
 	render.OverrideBlend(false)
 	render.OverrideDepthEnable(false, false)
 	render.SetScissorRect(0, 0, 0, 0, false)
