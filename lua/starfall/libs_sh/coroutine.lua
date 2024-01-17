@@ -90,7 +90,7 @@ end
 -- @return ... Any values the coroutine is returning to the main thread
 function coroutine_library.resume(thread, ...)
 	local func = unwrap(thread).func
-	if not func then SF.Throw("cannot resume dead coroutine", 2) end
+	if func == nil then SF.Throw("cannot resume dead coroutine", 2) end
 	return func(...)
 end
 
