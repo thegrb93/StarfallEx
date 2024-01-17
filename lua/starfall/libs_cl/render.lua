@@ -857,6 +857,17 @@ function render_library.setColor(clr)
 	surface.SetTextColor(clr)
 end
 
+--- Sets the draw color modulation. Note that, unlike the equivalent GLua function, this function takes numbers in a 0-255 range.
+-- @param number|Color clr Color type, or red channel
+-- @param number? g Optional green channel, if you wish to use r, g, b as arguments instead of a Color
+-- @param number? b Optional blue channel, read above
+function render_library.setColorModulation(clr, g, b)
+	if g == nil or b == nil then
+		return render.SetColorModulation(clr.r / 255, clr.g / 255, clr.b / 255)
+	end
+	render.SetColorModulation(clr / 255, g / 255, b / 255)
+end
+
 --- Sets the draw color by RGBA values
 -- @param number r Number, red value
 -- @param number g Number, green value
