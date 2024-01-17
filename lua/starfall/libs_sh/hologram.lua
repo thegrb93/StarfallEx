@@ -304,12 +304,12 @@ else
 		local holo = getholo(self)
 		holo:SetupBones()
 
-		local color = holo:GetColor()
+		local cr, cg, cb, ca = holo:GetColor4Part()
 		local ocr, ocg, ocb = render_GetColorModulation()
 		local oca = render_GetBlend()
 
-		render_SetColorModulation(color.r / 255, color.g / 255, color.b / 255)
-		render_SetBlend(color.a / 255)
+		render_SetColorModulation(cr / 255, cg / 255, cb / 255)
+		render_SetBlend(ca / 255)
 
 		holo:DrawModel()
 
