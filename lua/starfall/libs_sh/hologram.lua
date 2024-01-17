@@ -293,6 +293,9 @@ else
 		end
 	end
 
+	local render_GetColorModulation, render_GetBlend = render.GetColorModulation, render.GetBlend
+	local render_SetColorModulation, render_SetBlend = render.SetColorModulation, render.SetBlend
+
 	--- Manually draws a hologram, requires a 3d render context
 	-- @client
 	function hologram_methods:draw()
@@ -300,7 +303,18 @@ else
 
 		local holo = getholo(self)
 		holo:SetupBones()
+
+		local color = holo:GetColor()
+		local ocr, ocg, ocb = render_GetColorModulation()
+		local oca = render_GetBlend()
+
+		render_SetColorModulation(color.r / 255, color.g / 255, color.b / 255)
+		render_SetBlend(color.a / 255)
+
 		holo:DrawModel()
+
+		render_SetColorModulation(ocr, ocg, ocb)
+		render_SetBlend(oca)
 	end
 end
 
