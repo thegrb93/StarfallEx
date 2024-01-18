@@ -90,6 +90,7 @@ end
 -- @return ... Any values the coroutine is returning to the main thread
 function coroutine_library.resume(thread, ...)
 	local func = unwrap(thread).func
+	if func == nil then SF.Throw("cannot resume dead coroutine", 2) end
 	return func(...)
 end
 
@@ -110,6 +111,7 @@ end
 -- @return string Either "suspended", "running", "normal" or "dead"
 function coroutine_library.status(thread)
 	local thread = unwrap(thread).thread
+	if thread == nil then return "dead" end
 	return coroutine.status(thread)
 end
 
