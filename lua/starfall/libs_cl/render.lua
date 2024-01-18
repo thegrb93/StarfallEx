@@ -1803,7 +1803,7 @@ end
 
 --- Returns the current alpha blending
 --return number Blending in the range 0 to 1
-function render_library.setBlend(alpha)
+function render_library.getBlend(alpha)
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 
 	return render.GetBlend()
