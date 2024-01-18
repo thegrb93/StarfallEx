@@ -857,14 +857,28 @@ function render_library.setColor(clr)
 	surface.SetTextColor(clr)
 end
 
+--- Gets the draw color modulation. Note that, unlike the equivalent GLua function, this function returns numbers in a 0-255 range.
+-- @return number Red channel
+-- @return number Green channel
+-- @return number Blue channel
+function render_library.getColorModulation()
+	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
+		
+	local r, g, b = render.GetColorModulation()
+	return r * 255, g * 255, b * 255
+end
+	
 --- Sets the draw color modulation. Note that, unlike the equivalent GLua function, this function takes numbers in a 0-255 range.
 -- @param number|Color clr Color type, or red channel
 -- @param number? g Optional green channel, if you wish to use r, g, b as arguments instead of a Color
 -- @param number? b Optional blue channel, read above
 function render_library.setColorModulation(clr, g, b)
+	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
+		
 	if g == nil or b == nil then
 		return render.SetColorModulation(clr.r / 255, clr.g / 255, clr.b / 255)
 	end
+		
 	render.SetColorModulation(clr / 255, g / 255, b / 255)
 end
 
@@ -1785,6 +1799,14 @@ function render_library.overrideBlend(on, srcBlend, destBlend, blendFunc, srcBle
 	else
 		render.OverrideBlend(on, srcBlend, destBlend, blendFunc, srcBlendAlpha, destBlendAlpha, blendFuncAlpha)
 	end
+end
+
+--- Returns the current alpha blending
+--return number Blending in the range 0 to 1
+function render_library.setBlend(alpha)
+	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
+
+	return render.GetBlend()
 end
 
 --- Changes alpha blending for the upcoming model drawing operations
