@@ -482,6 +482,7 @@ function instance:cleanupRender()
 	render.SetLightingMode(0)
 	render.ResetModelLighting(1, 1, 1)
 	render.DepthRange(0, 1)
+	render.SetColorModulation(1, 1, 1)
 	render.SetBlend(1)
 	render.SuppressEngineLighting(false)
 	render.SetWriteDepthToDestAlpha(true)
@@ -857,29 +858,22 @@ function render_library.setColor(clr)
 	surface.SetTextColor(clr)
 end
 
---- Gets the draw color modulation. Note that, unlike the equivalent GLua function, this function returns numbers in a 0-255 range.
+--- Gets the draw color modulation.
 -- @return number Red channel
 -- @return number Green channel
 -- @return number Blue channel
 function render_library.getColorModulation()
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
-		
-	local r, g, b = render.GetColorModulation()
-	return r * 255, g * 255, b * 255
+	return render.GetColorModulation()
 end
 	
---- Sets the draw color modulation. Note that, unlike the equivalent GLua function, this function takes numbers in a 0-255 range.
--- @param number|Color clr Color type, or red channel
--- @param number? g Optional green channel, if you wish to use r, g, b as arguments instead of a Color
--- @param number? b Optional blue channel, read above
-function render_library.setColorModulation(clr, g, b)
-	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
-		
-	if g == nil or b == nil then
-		return render.SetColorModulation(clr.r / 255, clr.g / 255, clr.b / 255)
-	end
-		
-	render.SetColorModulation(clr / 255, g / 255, b / 255)
+--- Sets the draw color modulation.
+-- @param number Red channel
+-- @param number Green channel
+-- @param number Blue channel
+function render_library.setColorModulation(r, g, b)
+	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end		
+	render.SetColorModulation(r, g, b)
 end
 
 --- Sets the draw color by RGBA values
@@ -891,6 +885,17 @@ function render_library.setRGBA(r, g, b, a)
 	currentcolor = Color(r, g, b, a)
 	surface.SetDrawColor(r, g, b, a)
 	surface.SetTextColor(r, g, b, a)
+end
+
+function render_library.getTint()
+	local r, g, b = render.GetColorModulation()
+	local a = render.GetBlend()
+	local c = Color(r * 255, g * 255, b * 255, a * 255)
+end
+
+function render_library.setTint(c)
+	render.SetColorModulation(c.r / 255, c.g / 255, c.b / 255)
+	render.SetBlend(c.a / 255)
 end
 
 --- Looks up a texture by file name and creates an UnlitGeneric material with it.
