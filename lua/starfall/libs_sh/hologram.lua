@@ -298,23 +298,29 @@ else
 
 	--- Manually draws a hologram, requires a 3d render context
 	-- @client
-	function hologram_methods:draw()
+	-- @param bool? tint If true, renders the hologram with it's color and opacity. This is the default behavior.
+	function hologram_methods:draw(tint)
 		if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
-
+		tint = tint == nil and true or tint
+			
 		local holo = getholo(self)
 		holo:SetupBones()
 
-		local cr, cg, cb, ca = holo:GetColor4Part()
-		local ocr, ocg, ocb = render_GetColorModulation()
-		local oca = render_GetBlend()
-
-		render_SetColorModulation(cr / 255, cg / 255, cb / 255)
-		render_SetBlend(ca / 255)
-
-		holo:DrawModel()
-
-		render_SetColorModulation(ocr, ocg, ocb)
-		render_SetBlend(oca)
+		if tint then
+			local cr, cg, cb, ca = holo:GetColor4Part()
+			local ocr, ocg, ocb = render_GetColorModulation()
+			local oca = render_GetBlend()
+	
+			render_SetColorModulation(cr / 255, cg / 255, cb / 255)
+			render_SetBlend(ca / 255)
+				
+			holo:DrawModel()
+				
+			render_SetColorModulation(ocr, ocg, ocb)
+			render_SetBlend(oca)
+		else
+			holo:DrawModel()
+		end
 	end
 end
 
