@@ -4,9 +4,14 @@ Starfall Scripting Environment
 
 #### Method 1
 
-`git clone https://github.com/thegrb93/StarfallEx "C:\path\to\Steam\steamapps\common\GarrysMod\garrysmod\addons\starfallex"`
+Subscribe on workshop
+https://steamcommunity.com/sharedfiles/filedetails/?id=2273610511
 
 #### Method 2
+
+`git clone https://github.com/thegrb93/StarfallEx "C:\path\to\Steam\steamapps\common\GarrysMod\garrysmod\addons\starfallex"`
+
+#### Method 3
 1. Download source code `Code > Download Zip`
 2. Extract zip contents `StarfallEx-master` to Garry's Mod addons
 
