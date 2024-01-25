@@ -887,17 +887,17 @@ function render_library.setRGBA(r, g, b, a)
 	surface.SetTextColor(r, g, b, a)
 end
 
---- Gets the drawing tint.
--- @return Color Color (in 0-255 range)
+--- Gets the drawing tint. Internally, calls render.getColorModulation and render.getBlend, multiplies the values by 255, then returns a color object.
+-- @return Color The current color & blend modulation as a color
 function render_library.getTint()
 	local r, g, b = render.GetColorModulation()
 	local a = render.GetBlend()
 		
-	return Color(r * 255, g * 255, b * 255, a * 255)
+	return cwrap{r * 255, g * 255, b * 255, a * 255}
 end
 
---- Sets the drawing tint.
--- @param Color c Color (in 0-255 range)
+--- Sets the drawing tint. Internally, calls render.setColorModulation and render.setBlend with the color parameters divided by 255.
+-- @param Color c A color
 function render_library.setTint(c)
 	render.SetColorModulation(c.r / 255, c.g / 255, c.b / 255)
 	render.SetBlend(c.a / 255)
@@ -1815,7 +1815,6 @@ end
 --return number Blending in the range 0 to 1
 function render_library.getBlend(alpha)
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
-
 	return render.GetBlend()
 end
 
