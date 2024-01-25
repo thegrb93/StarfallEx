@@ -868,9 +868,9 @@ function render_library.getColorModulation()
 end
 	
 --- Sets the draw color modulation.
--- @param number Red channel
--- @param number Green channel
--- @param number Blue channel
+-- @param number r Red channel
+-- @param number g Green channel
+-- @param number b Blue channel
 function render_library.setColorModulation(r, g, b)
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end		
 	render.SetColorModulation(r, g, b)
@@ -887,12 +887,17 @@ function render_library.setRGBA(r, g, b, a)
 	surface.SetTextColor(r, g, b, a)
 end
 
+--- Gets the drawing tint.
+-- @return Color Color (in 0-255 range)
 function render_library.getTint()
 	local r, g, b = render.GetColorModulation()
 	local a = render.GetBlend()
-	local c = Color(r * 255, g * 255, b * 255, a * 255)
+		
+	return Color(r * 255, g * 255, b * 255, a * 255)
 end
 
+--- Sets the drawing tint.
+-- @param Color c Color (in 0-255 range)
 function render_library.setTint(c)
 	render.SetColorModulation(c.r / 255, c.g / 255, c.b / 255)
 	render.SetBlend(c.a / 255)
