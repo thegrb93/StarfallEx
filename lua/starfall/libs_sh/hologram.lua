@@ -301,12 +301,11 @@ else
 	-- @param bool? tint If true, renders the hologram with it's color and opacity. This is the default behavior.
 	function hologram_methods:draw(tint)
 		if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
-		tint = tint == nil and true or tint
 			
 		local holo = getholo(self)
 		holo:SetupBones()
 
-		if tint then
+		if tint ~= false then
 			local cr, cg, cb, ca = holo:GetColor4Part()
 			local ocr, ocg, ocb = render_GetColorModulation()
 			local oca = render_GetBlend()
