@@ -899,8 +899,8 @@ end
 --- Sets the drawing tint. Internally, calls render.setColorModulation and render.setBlend with the color parameters divided by 255.
 -- @param Color c A color
 function render_library.setTint(c)
-	render.SetColorModulation(c.r / 255, c.g / 255, c.b / 255)
-	render.SetBlend(c.a / 255)
+	render.SetColorModulation(c[1] / 255, c[2] / 255, c[3] / 255)
+	render.SetBlend(c[4] / 255)
 end
 
 --- Looks up a texture by file name and creates an UnlitGeneric material with it.
