@@ -462,6 +462,15 @@ function player_methods:getWeaponColor()
 	return vwrap(getply(self):GetWeaponColor())
 end
 
+--- Returns a player's color
+-- The part of the model that is colored is determined by the model itself, and is different for each model
+-- The format is Vector(r,g,b), and each color should be between 0 and 1
+-- @shared
+-- @return Vector The color
+function player_methods:getPlayerColor()
+	return vwrap(getply(self):GetPlayerColor())
+end
+
 --- Returns the entity that the player is standing on
 -- @shared
 -- @return Entity Ground entity
@@ -657,7 +666,7 @@ if SERVER then
 		ply.sf_say_cd = CurTime() + 0.5
 		ply:Say(text, teamOnly)
 	end
-	
+
 	--- Sets the armor of the player.
 	-- @server
 	-- @param number newarmor New armor value.
@@ -667,7 +676,7 @@ if SERVER then
 		checkvalidnumber(val)
 		ent:SetArmor(val)
 	end
-		
+
 	--- Sets the maximum armor for player. You can still set a player's armor above this amount with Player:setArmor.
 	-- @server
 	-- @param number newmaxarmor New max armor value.
@@ -677,7 +686,7 @@ if SERVER then
 		checkvalidnumber(val)
 		ent:SetMaxArmor(val)
 	end
-	
+
 	--- Sets Crouched Walk Speed
 	-- @server
 	-- @param number newcwalkspeed New Crouch Walk speed, This is a multiplier from 0 to 1.
@@ -687,7 +696,7 @@ if SERVER then
 		checkvalidnumber(val)
 		ent:SetCrouchedWalkSpeed(math.Clamp(val,0,1))
 	end
-	
+
 	--- Sets Duck Speed
 	-- @server
 	-- @param number newduckspeed New Duck speed, This is a multiplier from 0 to 1.
@@ -697,7 +706,7 @@ if SERVER then
 		checkvalidnumber(val)
 		ent:SetDuckSpeed(math.Clamp(val,0.005,0.995))
 	end
-	
+
 	--- Sets UnDuck Speed
 	-- @server
 	-- @param number newunduckspeed New UnDuck speed, This is a multiplier from 0 to 1.
@@ -707,7 +716,7 @@ if SERVER then
 		checkvalidnumber(val)
 		ent:SetUnDuckSpeed(math.Clamp(val,0.005,0.995))
 	end
-	
+
 	--- Sets Ladder Climb Speed, probably unstable
 	-- @server
 	-- @param number newladderclimbspeed New Ladder Climb speed.
@@ -717,7 +726,7 @@ if SERVER then
 		checkvalidnumber(val)
 		ent:SetLadderClimbSpeed(math.max(val,0))
 	end
-	
+
 	--- Sets Max Speed
 	-- @server
 	-- @param number newmaxspeed New Max speed.
@@ -727,7 +736,7 @@ if SERVER then
 		checkvalidnumber(val)
 		ent:SetMaxSpeed(math.max(val,0))
 	end
-	
+
 	--- Sets Run Speed ( +speed )
 	-- @server
 	-- @param number newrunspeed New Run speed.
@@ -737,7 +746,7 @@ if SERVER then
 		checkvalidnumber(val)
 		ent:SetRunSpeed(math.max(val,0))
 	end
-	
+
 	--- Sets Slow Walk Speed ( +walk )
 	-- @server
 	-- @param number newslowwalkspeed New Slow Walk speed.
@@ -747,7 +756,7 @@ if SERVER then
 		checkvalidnumber(val)
 		ent:SetSlowWalkSpeed(math.max(val,0))
 	end
-	
+
 	--- Sets Walk Speed
 	-- @server
 	-- @param number newwalkspeed New Walk speed.
@@ -757,7 +766,7 @@ if SERVER then
 		checkvalidnumber(val)
 		ent:SetWalkSpeed(math.max(val,0))
 	end
-	
+
 	--- Sets Jump Power
 	-- @server
 	-- @param number newjumppower New Jump Power.
@@ -767,7 +776,7 @@ if SERVER then
 		checkvalidnumber(val)
 		ent:SetJumpPower(math.max(val,0))
 	end
-	
+
 	--- Sets Step Size
 	-- @server
 	-- @param number newstepsize New Step Size.
@@ -777,7 +786,7 @@ if SERVER then
 		checkvalidnumber(val)
 		ent:SetStepSize(math.max(val,0))
 	end
-	
+
 	--- Sets Friction
 	-- @server
 	-- @param number newfriction New Friction.
