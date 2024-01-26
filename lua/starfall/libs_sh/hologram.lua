@@ -314,8 +314,7 @@ function hologram_methods:setPlayerColor(color)
 
 	checkpermission(instance, holo, "hologram.setRenderProperty")
 
-	local enabled = color ~= nil
-	color = enabled and vunwrap(color)
+	color = color ~= nil and vunwrap(color) or nil
 
 	holo:SetPlayerColor(color)
 end
