@@ -104,6 +104,20 @@ function ENT:GetRenderMesh()
 	end
 end
 
+function ENT:SetPlayerColor(color)
+	self.playerColor = color
+
+	if color then
+		-- Having this function is what causes player color to actually be applied.
+		-- https://github.com/garrynewman/garrysmod/blob/master/garrysmod/lua/matproxy/player_color.lua
+		function self:GetPlayerColor()
+			return self.playerColor
+		end
+	else
+		self.GetPlayerColor = nil -- The material proxy will break if this is not removed when disabling player color.
+	end
+end
+
 net.Receive("starfall_hologram_clips", function()
 	local index = net.ReadUInt(16)
 	local clipdata = SF.StringStream(net.ReadData(net.ReadUInt(32)))
@@ -124,6 +138,28 @@ net.Receive("starfall_hologram_clips", function()
 				clips[index] = clip
 			end
 			self.clips = clips
+		end
+	end
+
+	SF.WaitForEntity(index, applyHologram)
+end)
+
+net.Receive("starfall_hologram_playercolor", function()
+	local index = net.ReadUInt(16)
+	local playerColorData = SF.StringStream(net.ReadData(net.ReadUInt(32)))
+
+	local function applyHologram(self)
+		if self and self.IsSFHologram then
+			local playerColorEnabled = playerColorData:readUInt8()
+
+			if playerColorEnabled == 0 then
+				self:SetPlayerColor(nil) -- Disable player color.
+				return
+			end
+
+			local playerColor = Vector(playerColorData:readUInt8(), playerColorData:readUInt8(), playerColorData:readUInt8())
+
+			self:SetPlayerColor(playerColor)
 		end
 	end
 

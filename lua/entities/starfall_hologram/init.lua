@@ -12,6 +12,8 @@ function ENT:Initialize()
 
 	self.clips = {}
 	self.clipdata = ""
+	self.playerColor = nil
+	self.playerColorData = ""
 
 	self:SetScale(Vector(1,1,1))
 	self:SetSuppressEngineLighting(false)
@@ -25,6 +27,7 @@ function ENT:UpdateTransmitState()
 end
 
 util.AddNetworkString("starfall_hologram_clips")
+util.AddNetworkString("starfall_hologram_playercolor")
 
 function ENT:Think()
 	if self.updateClip then
@@ -45,6 +48,26 @@ function ENT:Think()
 		
 		self:TransmitClips()
 	end
+
+	if self.updatePlayerColor then
+		self.updatePlayerColor = false
+
+		local playerColor = self.playerColor
+
+		local playerColorData = SF.StringStream()
+		if playerColor then
+			playerColorData:writeUInt8(1)
+			playerColorData:writeUInt8(playerColor[1])
+			playerColorData:writeUInt8(playerColor[2])
+			playerColorData:writeUInt8(playerColor[3])
+		else
+			playerColorData:writeUInt8(0)
+		end
+		self.playerColorData = playerColorData:getString()
+
+		self:TransmitPlayerColor()
+	end
+
 	if self.AutomaticFrameAdvance then
 		self:NextThink(CurTime())
 		return true
@@ -60,11 +83,24 @@ function ENT:SetClip(index, enabled, normal, origin, entity)
 	end
 end
 
+function ENT:SetPlayerColor(color)
+	self.updatePlayerColor = true
+	self.playerColor = color
+end
+
 function ENT:TransmitClips(recip)
 	net.Start("starfall_hologram_clips")
 	net.WriteUInt(self:EntIndex(), 16)
 	net.WriteUInt(#self.clipdata, 32)
 	net.WriteData(self.clipdata, #self.clipdata)
+	if recip then net.Send(recip) else net.Broadcast() end
+end
+
+function ENT:TransmitPlayerColor(recip)
+	net.Start("starfall_hologram_playercolor")
+	net.WriteUInt(self:EntIndex(), 16)
+	net.WriteUInt(#self.playerColorData, 32)
+	net.WriteData(self.playerColorData, #self.playerColorData)
 	if recip then net.Send(recip) else net.Broadcast() end
 end
 

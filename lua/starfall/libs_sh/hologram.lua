@@ -304,6 +304,36 @@ else
 	end
 end
 
+--- Sets the player color of a hologram
+-- The part of the model that is colored is determined by the model itself, and is different for each model
+-- The format is Vector(r,g,b), and each color should be between 0 and 1
+-- @shared
+-- @param Vector? color The player color to use, or nil to disable
+function hologram_methods:setPlayerColor(color)
+	local holo = getholo(self)
+
+	checkpermission(instance, holo, "hologram.setRenderProperty")
+
+	local enabled = color ~= nil
+	color = enabled and vunwrap(color)
+
+	holo:SetPlayerColor(color)
+end
+
+--- Gets the player color of a hologram
+-- The part of the model that is colored is determined by the model itself, and is different for each model
+-- The format is Vector(r,g,b), and each color should be between 0 and 1
+-- @shared
+-- @return Vector? color The player color to use, or nil if disabled
+function hologram_methods:getPlayerColor()
+	local holo = getholo(self)
+	local color = holo.playerColor
+
+	if color == nil then return nil end
+
+	return vwrap(color)
+end
+
 --- Updates a clip plane
 -- @shared
 -- @param number index Whatever number you want the clip to be
