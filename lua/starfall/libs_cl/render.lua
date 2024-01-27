@@ -2413,6 +2413,9 @@ end
 -- @param pixelvis_handle_t PixVis. Use render.getPixelVisibleHandle()
 -- @return number Percentage visible, from 0-1
 function render_library.pixelVisible(position,radius,PixVis)
+	checkluatype(radius, TYPE_NUMBER)
+	checkluatype(PixVis, TYPE_PIXELVISHANDLE)
+	
 	return util.PixelVisible(vunwrap(position),radius,PixVis)
 end
 
