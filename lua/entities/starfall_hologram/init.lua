@@ -45,7 +45,7 @@ function ENT:Think()
 			clipdata:writeInt16(v.entity and v.entity:EntIndex() or 0)
 		end
 		self.clipdata = clipdata:getString()
-		
+
 		self:TransmitClips()
 	end
 
