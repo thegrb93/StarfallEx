@@ -2399,6 +2399,23 @@ function render_library.depthRange(min, max)
 	render.DepthRange(min, max)
 end
 
+--- Creates a new PixVis handle. See render.pixelVisible.
+-- @client
+-- @return pixelvis_handle_t PixVis
+function render_library.getPixelVisibleHandle()
+	return util.GetPixelVisibleHandle()
+end
+
+--- Returns the visibility of a sphere in the world.
+-- @client
+-- @param Vector position
+-- @param number radius
+-- @param pixelvis_handle_t PixVis. Use render.getPixelVisibleHandle()
+-- @return number Percentage visible, from 0-1
+function render_library.pixelVisible(position,radius,PixVis)
+	return util.PixelVisible(vunwrap(position),radius,PixVis)
+end
+
 end
 
 ---
