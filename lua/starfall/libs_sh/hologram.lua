@@ -298,7 +298,7 @@ else
 
 	--- Manually draws a hologram, requires a 3d render context
 	-- @client
-	-- @param bool? noTint If true, renders the hologram with it's color and opacity. This is the default behavior.
+	-- @param bool? noTint If true, renders the hologram with its color and opacity. The default is for holograms to render with no color or opacity, so use this argument if you need that behavior.
 	function hologram_methods:draw(noTint)
 		if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
