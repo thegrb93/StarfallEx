@@ -2,6 +2,8 @@ AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include("shared.lua")
 
+local VECTOR_PLAYER_COLOR_DISABLED = Vector(-1, -1, -1)
+
 function ENT:Initialize()
 	self.BaseClass.Initialize()
 	self:SetSolid(SOLID_NONE)
@@ -14,6 +16,7 @@ function ENT:Initialize()
 	self.clipdata = ""
 
 	self:SetScale(Vector(1,1,1))
+	self:SetPlayerColorInternal(VECTOR_PLAYER_COLOR_DISABLED)
 	self:SetSuppressEngineLighting(false)
 
 	self.updateClip = false
@@ -42,9 +45,10 @@ function ENT:Think()
 			clipdata:writeInt16(v.entity and v.entity:EntIndex() or 0)
 		end
 		self.clipdata = clipdata:getString()
-		
+
 		self:TransmitClips()
 	end
+
 	if self.AutomaticFrameAdvance then
 		self:NextThink(CurTime())
 		return true

@@ -57,6 +57,8 @@ local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
 
+local VECTOR_PLAYER_COLOR_DISABLED = Vector(-1, -1, -1)
+
 local getent
 instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
@@ -302,6 +304,35 @@ else
 		holo:SetupBones()
 		holo:DrawModel()
 	end
+end
+
+--- Sets the player color of a hologram
+-- The part of the model that is colored is determined by the model itself, and is different for each model
+-- The format is Vector(r,g,b), and each color should be between 0 and 1
+-- @shared
+-- @param Vector? color The player color to use, or nil to disable
+function hologram_methods:setPlayerColor(color)
+	local holo = getholo(self)
+
+	checkpermission(instance, holo, "hologram.setRenderProperty")
+
+	color = color ~= nil and vunwrap(color) or VECTOR_PLAYER_COLOR_DISABLED
+
+	holo:SetPlayerColorInternal(color)
+end
+
+--- Gets the player color of a hologram
+-- The part of the model that is colored is determined by the model itself, and is different for each model
+-- The format is Vector(r,g,b), and each color should be between 0 and 1
+-- @shared
+-- @return Vector? color The player color to use, or nil if disabled
+function hologram_methods:getPlayerColor()
+	local holo = getholo(self)
+	local color = holo:GetPlayerColorInternal()
+
+	if color == VECTOR_PLAYER_COLOR_DISABLED then return nil end
+
+	return vwrap(color)
 end
 
 --- Updates a clip plane

@@ -5,11 +5,19 @@ ENT.IsHologram = true
 ENT.DefaultMaterial = Material( "hunter/myplastic" )
 ENT.Material = ENT.DefaultMaterial
 
+local VECTOR_PLAYER_COLOR_DISABLED = Vector(-1, -1, -1)
+
 function ENT:Initialize()
 	self.clips = {}
 	self.sf_userrenderbounds = false
 	self:SetupBones()
 	self:OnScaleChanged(nil, nil, self:GetScale())
+
+	if self:EntIndex() == -1 then
+		self:SetPlayerColorInternal(VECTOR_PLAYER_COLOR_DISABLED)
+	else
+		self:OnPlayerColorChanged(nil, nil, self:GetPlayerColorInternal())
+	end
 
 	-- Fixes future SetParent calls not keeping offset from the parent
 	self:SetParent(Entity(0))
@@ -38,6 +46,18 @@ function ENT:OnScaleChanged(name, old, scale)
 		local mins, maxs = self:GetModelBounds()
 		if mins then
 			self:SetRenderBounds(mins * scale, maxs * scale)
+		end
+	end
+end
+
+function ENT:OnPlayerColorChanged(name, old, color)
+	if color == VECTOR_PLAYER_COLOR_DISABLED then
+		self.GetPlayerColor = nil -- The material proxy will break if this is not removed when disabling player color.
+	else
+		-- Having this function is what causes player color to actually be applied.
+		-- https://github.com/garrynewman/garrysmod/blob/master/garrysmod/lua/matproxy/player_color.lua
+		function self:GetPlayerColor()
+			return color
 		end
 	end
 end
