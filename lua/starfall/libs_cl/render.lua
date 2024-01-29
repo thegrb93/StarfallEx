@@ -22,6 +22,7 @@ registerprivilege("render.fog", "Render Fog", "Allows the user to control fog", 
 local cv_max_fonts = CreateConVar("sf_render_maxfonts", "30", { FCVAR_ARCHIVE })
 local cv_max_rendertargets = CreateConVar("sf_render_maxrendertargets", "20", { FCVAR_ARCHIVE })
 local cv_max_maxrenderviewsperframe = CreateConVar("sf_render_maxrenderviewsperframe", "2", { FCVAR_ARCHIVE })
+local cv_max_pixelhandles = CreateConVar("sf_render_maxrenderviewsperframe", "50", { FCVAR_ARCHIVE })
 
 
 hook.Add("PreRender", "SF_PreRender_ResetRenderedViews", function()
@@ -155,6 +156,12 @@ local rt_bank = SF.ResourceHandler(cv_max_rendertargets:GetInt(),
 		render.SetRenderTarget( oldRt )
 	end,
 	function() return "RT" end
+)
+
+local pixhandle_bank = SF.ResourceHandler(cv_max_pixelhandles:GetInt(),
+	function()
+		return util.GetPixelVisibleHandle()
+	end, nil, function() return 1 end
 )
 
 cvars.AddChangeCallback( "sf_render_maxrendertargets", function()
@@ -524,6 +531,14 @@ function instance:cleanupRender()
 		render.EnableClipping(renderdata.prevClippingState)
 		renderdata.prevClippingState = nil
 	end
+end
+
+local usedPixelVis = {}
+local function freePixelVis()
+    for _, v in ipairs(usedPixelVis) do
+        pixhandle_bank:free(instance.player, v)
+    end
+    hook.Remove("PostRender","SF_FreePixelVis")
 end
 
 
@@ -2399,23 +2414,19 @@ function render_library.depthRange(min, max)
 	render.DepthRange(min, max)
 end
 
---- Creates a new PixVis handle. See render.pixelVisible.
--- @client
--- @return pixelvis_handle_t PixVis
-function render_library.getPixelVisibleHandle()
-	return util.GetPixelVisibleHandle()
-end
-
 --- Returns the visibility of a sphere in the world.
 -- @client
 -- @param Vector position
 -- @param number radius
--- @param pixelvis_handle_t PixVis. Use render.getPixelVisibleHandle()
 -- @return number Percentage visible, from 0-1
 function render_library.pixelVisible(position,radius,PixVis)
 	checkluatype(radius, TYPE_NUMBER)
-	checkluatype(PixVis, TYPE_PIXELVISHANDLE)
 	
+	local PixVis = pixhandle_bank:use(instance.player, 1)
+	if #usedPixelVis==0 then
+		hook.Add("PostRender","SF_FreePixelVis",freePixelVis)
+	end
+	usedPixelVis[#usedPixelVis + 1] = PixVis
 	return util.PixelVisible(vunwrap(position),radius,PixVis)
 end
 
