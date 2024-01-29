@@ -22,7 +22,7 @@ registerprivilege("render.fog", "Render Fog", "Allows the user to control fog", 
 local cv_max_fonts = CreateConVar("sf_render_maxfonts", "30", { FCVAR_ARCHIVE })
 local cv_max_rendertargets = CreateConVar("sf_render_maxrendertargets", "20", { FCVAR_ARCHIVE })
 local cv_max_maxrenderviewsperframe = CreateConVar("sf_render_maxrenderviewsperframe", "2", { FCVAR_ARCHIVE })
-local cv_max_pixelhandles = CreateConVar("sf_render_maxrenderviewsperframe", "50", { FCVAR_ARCHIVE })
+local cv_max_pixelhandles = CreateConVar("sf_render_maxpixvishandlesperframe", "50", { FCVAR_ARCHIVE })
 
 
 hook.Add("PreRender", "SF_PreRender_ResetRenderedViews", function()
