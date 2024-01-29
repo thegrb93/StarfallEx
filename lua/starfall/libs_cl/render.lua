@@ -482,6 +482,7 @@ function instance:cleanupRender()
 	render.SetLightingMode(0)
 	render.ResetModelLighting(1, 1, 1)
 	render.DepthRange(0, 1)
+	render.SetColorModulation(1, 1, 1)
 	render.SetBlend(1)
 	render.SuppressEngineLighting(false)
 	render.SetWriteDepthToDestAlpha(true)
@@ -857,6 +858,24 @@ function render_library.setColor(clr)
 	surface.SetTextColor(clr)
 end
 
+--- Gets the draw color modulation.
+-- @return number Red channel
+-- @return number Green channel
+-- @return number Blue channel
+function render_library.getColorModulation()
+	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
+	return render.GetColorModulation()
+end
+
+--- Sets the draw color modulation.
+-- @param number r Red channel
+-- @param number g Green channel
+-- @param number b Blue channel
+function render_library.setColorModulation(r, g, b)
+	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
+	render.SetColorModulation(r, g, b)
+end
+
 --- Sets the draw color by RGBA values
 -- @param number r Number, red value
 -- @param number g Number, green value
@@ -866,6 +885,22 @@ function render_library.setRGBA(r, g, b, a)
 	currentcolor = Color(r, g, b, a)
 	surface.SetDrawColor(r, g, b, a)
 	surface.SetTextColor(r, g, b, a)
+end
+
+--- Gets the drawing tint. Internally, calls render.getColorModulation and render.getBlend, multiplies the values by 255, then returns a color object.
+-- @return Color The current color & blend modulation as a color
+function render_library.getTint()
+	local r, g, b = render.GetColorModulation()
+	local a = render.GetBlend()
+
+	return setmetatable({ r * 255, g * 255, b * 255, a * 255 }, col_meta)
+end
+
+--- Sets the drawing tint. Internally, calls render.setColorModulation and render.setBlend with the color parameters divided by 255.
+-- @param Color c A color
+function render_library.setTint(c)
+	render.SetColorModulation(c[1] / 255, c[2] / 255, c[3] / 255)
+	render.SetBlend(c[4] / 255)
 end
 
 --- Looks up a texture by file name and creates an UnlitGeneric material with it.
@@ -1774,6 +1809,13 @@ function render_library.overrideBlend(on, srcBlend, destBlend, blendFunc, srcBle
 	else
 		render.OverrideBlend(on, srcBlend, destBlend, blendFunc, srcBlendAlpha, destBlendAlpha, blendFuncAlpha)
 	end
+end
+
+--- Returns the current alpha blending
+-- @return number Blending in the range 0 to 1
+function render_library.getBlend()
+	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
+	return render.GetBlend()
 end
 
 --- Changes alpha blending for the upcoming model drawing operations
