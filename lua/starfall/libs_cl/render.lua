@@ -866,13 +866,13 @@ function render_library.getColorModulation()
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 	return render.GetColorModulation()
 end
-	
+
 --- Sets the draw color modulation.
 -- @param number r Red channel
 -- @param number g Green channel
 -- @param number b Blue channel
 function render_library.setColorModulation(r, g, b)
-	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end		
+	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 	render.SetColorModulation(r, g, b)
 end
 
@@ -892,7 +892,7 @@ end
 function render_library.getTint()
 	local r, g, b = render.GetColorModulation()
 	local a = render.GetBlend()
-		
+
 	return setmetatable({ r * 255, g * 255, b * 255, a * 255 }, col_meta)
 end
 
