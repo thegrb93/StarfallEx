@@ -388,10 +388,11 @@ function PANEL:DoRightClick(node)
 						local oldFile = node:GetFileName()
 						local saveFile
 						if string.sub(text, 1, 1)=="/" then
-							saveFile = "starfall/"..SF.NormalizePath(text)..".txt"
+							saveFile = "starfall/"..SF.NormalizePath(text)
 						else
-							saveFile = string.GetPathFromFilename(node:GetFileName())..SF.NormalizePath(text)..".txt"
+							saveFile = string.GetPathFromFilename(node:GetFileName())..SF.NormalizePath(text)
 						end
+						if not string.match(saveFile, "%.txt$") then saveFile = saveFile .. ".txt" end
 						SF.Editor.renameFile(oldFile,saveFile)
 						self:ReloadTree()
 					end)
@@ -416,7 +417,8 @@ function PANEL:DoRightClick(node)
 					function (text)
 						if text == "" then return end
 						text = string.GetFileFromFilename(string.gsub(text, ".", invalid_filename_chars))
-						local saveFile = node:GetFolder().."/"..text..".txt"
+						local saveFile = node:GetFolder().."/"..text
+						if not string.match(saveFile, "%.txt$") then saveFile = saveFile .. ".txt" end
 						SF.FileWrite(saveFile, SF.DefaultCode())
 						SF.AddNotify(LocalPlayer(), "New file: " .. saveFile, "GENERIC", 7, "DRIP3")
 						self:ReloadTree()

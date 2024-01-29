@@ -1643,7 +1643,8 @@ function Editor:SaveFile(Line, close, SaveAs, Func)
 
 		Derma_StringRequestNoBlur("Save to New File", "", (str ~= nil and str .. "/" or "") .. self.savefilefn,
 			function(strTextOut)
-				strTextOut = self.Location .. "/" .. string.gsub(strTextOut, ".", invalid_filename_chars) .. ".txt"
+				strTextOut = self.Location .. "/" .. string.gsub(strTextOut, ".", invalid_filename_chars)
+				if not string.match(strTextOut, "%.txt$") then strTextOut = strTextOut .. ".txt" end
 				local function save()
 					if Func then
 						Func(strTextOut)
