@@ -124,8 +124,11 @@ end
 function particleef_methods:destroy()
 	local uw = unwrap(self)
 
-	if (uw and uw:IsValid()) then
-		uw:StopEmissionAndDestroyImmediately()
+	if uw and particleEffects[uw] then
+		if uw:IsValid() then
+			uw:StopEmissionAndDestroyImmediately()
+		end
+		particleEffects[uw] = nil
 		plyCount:free(instance.player, 1)
 	end
 end
