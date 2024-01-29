@@ -1812,8 +1812,8 @@ function render_library.overrideBlend(on, srcBlend, destBlend, blendFunc, srcBle
 end
 
 --- Returns the current alpha blending
---return number Blending in the range 0 to 1
-function render_library.getBlend(alpha)
+-- @return number Blending in the range 0 to 1
+function render_library.getBlend()
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 	return render.GetBlend()
 end
