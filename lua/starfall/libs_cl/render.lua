@@ -893,7 +893,7 @@ function render_library.getTint()
 	local r, g, b = render.GetColorModulation()
 	local a = render.GetBlend()
 		
-	return cwrap{r * 255, g * 255, b * 255, a * 255}
+	return setmetatable({ r * 255, g * 255, b * 255, a * 255 }, col_meta)
 end
 
 --- Sets the drawing tint. Internally, calls render.setColorModulation and render.setBlend with the color parameters divided by 255.
