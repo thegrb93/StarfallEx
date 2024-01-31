@@ -22,13 +22,7 @@ registerprivilege("render.fog", "Render Fog", "Allows the user to control fog", 
 local cv_max_fonts = CreateConVar("sf_render_maxfonts", "30", { FCVAR_ARCHIVE })
 local cv_max_rendertargets = CreateConVar("sf_render_maxrendertargets", "20", { FCVAR_ARCHIVE })
 local cv_max_maxrenderviewsperframe = CreateConVar("sf_render_maxrenderviewsperframe", "2", { FCVAR_ARCHIVE })
-
-
-hook.Add("PreRender", "SF_PreRender_ResetRenderedViews", function()
-	for instance, _ in pairs(SF.allInstances) do
-		instance.data.render.renderedViews = 0
-	end
-end)
+local cv_max_pixelhandles = CreateConVar("sf_render_maxpixvishandlesperframe", "50", { FCVAR_ARCHIVE })
 
 local RT_Material = CreateMaterial("SF_RT_Material", "UnlitGeneric", {
 	["$nolod"] = 1,
@@ -161,6 +155,28 @@ cvars.AddChangeCallback( "sf_render_maxrendertargets", function()
 	rt_bank.max = cv_max_rendertargets:GetInt()
 end )
 
+local pixhandle_bank = SF.ResourceHandler(cv_max_pixelhandles:GetInt(),
+	function()
+		return util.GetPixelVisibleHandle()
+	end, nil, function() return 1 end
+)
+
+cvars.AddChangeCallback( "sf_render_maxpixvishandlesperframe", function()
+	pixhandle_bank.max = cv_max_pixelhandles:GetInt()
+end )
+
+
+hook.Add("PreRender", "SF_PreRender_ResetRenderedViews", function()
+	for instance, _ in pairs(SF.allInstances) do
+		local renderdata = instance.data.render
+		renderdata.renderedViews = 0
+
+		for k, v in ipairs(renderdata.usedPixelVis) do
+			pixhandle_bank:free(instance.player, v)
+			renderdata.usedPixelVis[k] = nil
+		end
+	end
+end)
 
 local dummyrt = GetRenderTarget("starfall_dummyrt", 32, 32)
 
@@ -421,6 +437,7 @@ local renderdata = {}
 renderdata.renderedViews = 0
 renderdata.rendertargets = {}
 renderdata.validrendertargets = {}
+renderdata.usedPixelVis = {}
 renderdata.oldW = ScrW()
 renderdata.oldH = ScrH()
 instance.data.render = renderdata
@@ -445,6 +462,10 @@ instance:AddHook("deinitialize", function ()
 		rt_bank:free(instance.player, v)
 		renderdata.rendertargets[k] = nil
 		renderdata.validrendertargets[v:GetName()] = nil
+	end
+	for k, v in ipairs(renderdata.usedPixelVis) do
+		pixhandle_bank:free(instance.player, v)
+		renderdata.usedPixelVis[k] = nil
 	end
 end)
 
@@ -526,7 +547,6 @@ function instance:cleanupRender()
 		renderdata.prevClippingState = nil
 	end
 end
-
 
 -- ------------------------------------------------------------------ --
 --- Call EyePos()
@@ -2439,6 +2459,21 @@ end
 function render_library.depthRange(min, max)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	render.DepthRange(min, max)
+end
+
+--- Returns the visibility of a sphere in the world.
+-- @client
+-- @param Vector position
+-- @param number radius
+-- @return number Percentage visible, from 0-1
+function render_library.pixelVisible(position, radius)
+	position = vunwrap(position)
+	checkluatype(radius, TYPE_NUMBER)
+	
+	local PixVis = pixhandle_bank:use(instance.player, 1)
+	if not PixVis then SF.Throw("Can't call PixelVisible more than "..cv_max_pixelhandles:GetInt().." times per frame!", 2) end
+	renderdata.usedPixelVis[#renderdata.usedPixelVis + 1] = PixVis
+	return util.PixelVisible(position, radius, PixVis)
 end
 
 end
