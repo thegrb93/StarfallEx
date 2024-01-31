@@ -171,9 +171,9 @@ hook.Add("PreRender", "SF_PreRender_ResetRenderedViews", function()
 		local render = instance.data.render
 		render.renderedViews = 0
 
-		for k, v in ipairs(render.usedPixelVis) do
-			pixhandle_bank:free(instance.player, v)
-			render.usedPixelVis[k] = nil
+		for i=1,#render.usedPixelVis do
+			pixhandle_bank:free(instance.player, render.usedPixelVis[i])
+			render.usedPixelVis[i] = nil
 		end
 	end
 end)
@@ -461,6 +461,10 @@ instance:AddHook("deinitialize", function ()
 		rt_bank:free(instance.player, v)
 		renderdata.rendertargets[k] = nil
 		renderdata.validrendertargets[v:GetName()] = nil
+	end
+	for i=1,#renderdata.usedPixelVis do
+		pixhandle_bank:free(instance.player, renderdata.usedPixelVis[i])
+		renderdata.usedPixelVis[i] = nil
 	end
 end)
 
@@ -2427,6 +2431,7 @@ function render_library.pixelVisible(position, radius)
 	checkluatype(radius, TYPE_NUMBER)
 	
 	local PixVis = pixhandle_bank:use(instance.player, 1)
+	if not PixVis then SF.Throw("Can't call PixelVisible more than "..cv_max_pixelhandles:GetInt().." times per frame!", 2) end
 	usedPixelVis[#usedPixelVis + 1] = PixVis
 	return util.PixelVisible(position, radius, PixVis)
 end
