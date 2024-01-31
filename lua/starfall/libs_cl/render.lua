@@ -168,12 +168,12 @@ end )
 
 hook.Add("PreRender", "SF_PreRender_ResetRenderedViews", function()
 	for instance, _ in pairs(SF.allInstances) do
-		local render = instance.data.render
-		render.renderedViews = 0
+		local renderdata = instance.data.render
+		renderdata.renderedViews = 0
 
-		for i=1,#render.usedPixelVis do
-			pixhandle_bank:free(instance.player, render.usedPixelVis[i])
-			render.usedPixelVis[i] = nil
+		for k, v in ipairs(renderdata.usedPixelVis) do
+			pixhandle_bank:free(instance.player, v)
+			renderdata.usedPixelVis[k] = nil
 		end
 	end
 end)
@@ -437,6 +437,7 @@ local renderdata = {}
 renderdata.renderedViews = 0
 renderdata.rendertargets = {}
 renderdata.validrendertargets = {}
+renderdata.usedPixelVis = {}
 renderdata.oldW = ScrW()
 renderdata.oldH = ScrH()
 instance.data.render = renderdata
@@ -462,9 +463,9 @@ instance:AddHook("deinitialize", function ()
 		renderdata.rendertargets[k] = nil
 		renderdata.validrendertargets[v:GetName()] = nil
 	end
-	for i=1,#renderdata.usedPixelVis do
-		pixhandle_bank:free(instance.player, renderdata.usedPixelVis[i])
-		renderdata.usedPixelVis[i] = nil
+	for k, v in ipairs(renderdata.usedPixelVis) do
+		pixhandle_bank:free(instance.player, v)
+		renderdata.usedPixelVis[k] = nil
 	end
 end)
 
@@ -545,9 +546,6 @@ function instance:cleanupRender()
 		renderdata.prevClippingState = nil
 	end
 end
-
-local usedPixelVis = {}
-instance.data.render.usedPixelVis = usedPixelVis
 
 -- ------------------------------------------------------------------ --
 --- Call EyePos()
@@ -2432,7 +2430,7 @@ function render_library.pixelVisible(position, radius)
 	
 	local PixVis = pixhandle_bank:use(instance.player, 1)
 	if not PixVis then SF.Throw("Can't call PixelVisible more than "..cv_max_pixelhandles:GetInt().." times per frame!", 2) end
-	usedPixelVis[#usedPixelVis + 1] = PixVis
+	renderdata.usedPixelVis[#renderdata.usedPixelVis + 1] = PixVis
 	return util.PixelVisible(position, radius, PixVis)
 end
 
