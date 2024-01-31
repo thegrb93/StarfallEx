@@ -24,13 +24,6 @@ local cv_max_rendertargets = CreateConVar("sf_render_maxrendertargets", "20", { 
 local cv_max_maxrenderviewsperframe = CreateConVar("sf_render_maxrenderviewsperframe", "2", { FCVAR_ARCHIVE })
 local cv_max_pixelhandles = CreateConVar("sf_render_maxpixvishandlesperframe", "50", { FCVAR_ARCHIVE })
 
-
-hook.Add("PreRender", "SF_PreRender_ResetRenderedViews", function()
-	for instance, _ in pairs(SF.allInstances) do
-		instance.data.render.renderedViews = 0
-	end
-end)
-
 local RT_Material = CreateMaterial("SF_RT_Material", "UnlitGeneric", {
 	["$nolod"] = 1,
 	["$ignorez"] = 1,
@@ -158,16 +151,32 @@ local rt_bank = SF.ResourceHandler(cv_max_rendertargets:GetInt(),
 	function() return "RT" end
 )
 
+cvars.AddChangeCallback( "sf_render_maxrendertargets", function()
+	rt_bank.max = cv_max_rendertargets:GetInt()
+end )
+
 local pixhandle_bank = SF.ResourceHandler(cv_max_pixelhandles:GetInt(),
 	function()
 		return util.GetPixelVisibleHandle()
 	end, nil, function() return 1 end
 )
 
-cvars.AddChangeCallback( "sf_render_maxrendertargets", function()
-	rt_bank.max = cv_max_rendertargets:GetInt()
+cvars.AddChangeCallback( "sf_render_maxpixvishandlesperframe", function()
+	pixhandle_bank.max = cv_max_pixelhandles:GetInt()
 end )
 
+
+hook.Add("PreRender", "SF_PreRender_ResetRenderedViews", function()
+	for instance, _ in pairs(SF.allInstances) do
+		local render = instance.data.render
+		render.renderedViews = 0
+
+		for k, v in ipairs(render.usedPixelVis) do
+			pixhandle_bank:free(instance.player, v)
+			render.usedPixelVis[k] = nil
+		end
+	end
+end)
 
 local dummyrt = GetRenderTarget("starfall_dummyrt", 32, 32)
 
@@ -534,13 +543,7 @@ function instance:cleanupRender()
 end
 
 local usedPixelVis = {}
-local function freePixelVis()
-    for _, v in ipairs(usedPixelVis) do
-        pixhandle_bank:free(instance.player, v)
-    end
-    hook.Remove("PostRender","SF_FreePixelVis")
-end
-
+instance.data.render.usedPixelVis = usedPixelVis
 
 -- ------------------------------------------------------------------ --
 --- Call EyePos()
@@ -2419,15 +2422,13 @@ end
 -- @param Vector position
 -- @param number radius
 -- @return number Percentage visible, from 0-1
-function render_library.pixelVisible(position,radius,PixVis)
+function render_library.pixelVisible(position, radius)
+	position = vunwrap(position)
 	checkluatype(radius, TYPE_NUMBER)
 	
 	local PixVis = pixhandle_bank:use(instance.player, 1)
-	if #usedPixelVis==0 then
-		hook.Add("PostRender","SF_FreePixelVis",freePixelVis)
-	end
 	usedPixelVis[#usedPixelVis + 1] = PixVis
-	return util.PixelVisible(vunwrap(position),radius,PixVis)
+	return util.PixelVisible(position, radius, PixVis)
 end
 
 end
