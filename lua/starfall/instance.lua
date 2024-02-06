@@ -43,7 +43,7 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 		mainfile = mainfile or "generic"
 		code = { [mainfile] = code }
 	end
-	local ok, message = hook.Run("StarfallShouldCompile", code, mainfile, player, entity)
+	local ok, message = hook.Run("StarfallCanCompile", code, mainfile, player, entity)
 	if ok == false then
 	  return false, { message = message, traceback = "" }
 	end
