@@ -1892,12 +1892,14 @@ end
 --- Draws a 3D Line
 -- @param Vector startPos Starting position
 -- @param Vector endPos Ending position
-function render_library.draw3DLine(startPos, endPos)
+-- @param boolean? writeZ Optional should the line be drawn with depth considered
+function render_library.draw3DLine(startPos, endPos, writeZ)
+	if writeZ ~= nil then checkluatype(writeZ, TYPE_BOOL)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	startPos = vunwrap(startPos)
 	endPos = vunwrap(endPos)
 
-	render.DrawLine(startPos, endPos, currentcolor, true)
+	render.DrawLine(startPos, endPos, currentcolor, writeZ)
 end
 
 --- Draws a box in 3D space
