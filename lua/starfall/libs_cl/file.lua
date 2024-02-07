@@ -328,7 +328,6 @@ function file_library.isDir(path)
 	return file.IsDir("sf_filedata/" .. SF.NormalizePath(path), "DATA")
 end
 
-
 --- Deletes a file
 -- @param string path Filepath relative to data/sf_filedata/.
 -- @return boolean? True if successful, nil if it wasn't found
