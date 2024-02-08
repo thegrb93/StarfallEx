@@ -1881,12 +1881,14 @@ end
 -- @param number radius Radius of the sphere
 -- @param number longitudeSteps The amount of longitude steps. The larger this number is, the smoother the sphere is
 -- @param number latitudeSteps The amount of latitude steps. The larger this number is, the smoother the sphere is
-function render_library.draw3DWireframeSphere(pos, radius, longitudeSteps, latitudeSteps)
+-- @param boolean? writeZ Optional should the sphere be drawn with depth considered (default: true)
+function render_library.draw3DWireframeSphere(pos, radius, longitudeSteps, latitudeSteps, writeZ)
+	if writeZ == nil then writeZ = true end
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	pos = vunwrap(pos)
 	longitudeSteps = math.Clamp(longitudeSteps, 3, 50)
 	latitudeSteps = math.Clamp(latitudeSteps, 3, 50)
-	render.DrawWireframeSphere(pos, radius, longitudeSteps, latitudeSteps, currentcolor, true)
+	render.DrawWireframeSphere(pos, radius, longitudeSteps, latitudeSteps, currentcolor, writeZ)
 end
 
 --- Draws a 3D Line
