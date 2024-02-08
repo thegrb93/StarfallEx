@@ -1894,7 +1894,6 @@ end
 -- @param Vector endPos Ending position
 -- @param boolean? writeZ Optional should the line be drawn with depth considered (default: true)
 function render_library.draw3DLine(startPos, endPos, writeZ)
-	if writeZ ~= nil then checkluatype(writeZ, TYPE_BOOL) end
 	if writeZ == nil then writeZ = true end
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	startPos = vunwrap(startPos)
