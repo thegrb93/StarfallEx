@@ -44,9 +44,8 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 		code = { [mainfile] = code }
 	end
 	local ok, message = hook.Run("StarfallCanCompile", code, mainfile, player, entity)
-	if ok == false then
-	  return false, { message = message, traceback = "" }
-	end
+	if ok == false then return false, { message = message, traceback = "" } end
+
 	local instance = setmetatable({}, SF.Instance)
 	instance.entity = entity
 	instance.data = {}
