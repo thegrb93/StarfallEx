@@ -1924,14 +1924,15 @@ end
 -- @param Angle angle Orientation of the box
 -- @param Vector mins Start position of the box, relative to origin.
 -- @param Vector maxs End position of the box, relative to origin.
-function render_library.draw3DWireframeBox(origin, angle, mins, maxs)
+-- @param boolean? writeZ Optional should the line be drawn with depth considered (default: false)
+function render_library.draw3DWireframeBox(origin, angle, mins, maxs, writeZ)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	origin = vunwrap(origin)
 	mins = vunwrap(mins)
 	maxs = vunwrap(maxs)
 	angle = aunwrap(angle)
 
-	render.DrawWireframeBox(origin, angle, mins, maxs, currentcolor, false)
+	render.DrawWireframeBox(origin, angle, mins, maxs, currentcolor, writeZ)
 end
 
 --- Draws textured beam.
