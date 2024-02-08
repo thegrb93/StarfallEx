@@ -43,6 +43,8 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 		mainfile = mainfile or "generic"
 		code = { [mainfile] = code }
 	end
+	local ok, message = hook.Run("StarfallCanCompile", code, mainfile, player, entity)
+	if ok == false then return false, { message = message, traceback = "" } end
 
 	local instance = setmetatable({}, SF.Instance)
 	instance.entity = entity
@@ -68,7 +70,8 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 		player = SF.Superuser
 	elseif instance.ppdata.superuser and instance.ppdata.superuser[mainfile] then
 		if not SF.AllowSuperUser:GetBool() then return false, { message = "Can't use --@superuser unless sf_superuserallowed is enabled!", traceback = "" } end
-		if not player:IsSuperAdmin() then return false, { message = "Can't use --@superuser unless you are superadmin!", traceback = "" } end
+		local ok, message = hook.Run("StarfallCanSuperUser", player)
+		if ok == false or (ok == nil and not player:IsSuperAdmin()) then return false, { message = message or "Can't use --@superuser unless you are superadmin!", traceback = "" } end
 		player = SF.Superuser
 	end
 	instance.player = player
