@@ -321,7 +321,7 @@ end
 
 --- Checks if a given file is a directory or not
 -- @param string path Filepath relative to data/sf_filedata/.
--- @return boolean? True if given path is a directory, false if it's a file
+-- @return boolean True if given path is a directory, false if it's a file
 function file_library.isDir(path)
 	checkpermission (instance, path, "file.isDir")
 	checkluatype (path, TYPE_STRING)
