@@ -6,6 +6,7 @@ registerprivilege("file.read", "Read files", "Allows the user to read files from
 registerprivilege("file.write", "Write files", "Allows the user to write files to data/sf_filedata directory", { client = { default = 1 } })
 registerprivilege("file.writeTemp", "Write temporary files", "Allows the user to write temp files to data/sf_filedatatemp directory", { client = {} })
 registerprivilege("file.exists", "File existence check", "Allows the user to determine whether a file in data/sf_filedata exists", { client = { default = 1 } })
+registerprivilege("file.isDir", "Directory check", "Allows the user to determine whether a file in data/sf_filedata is a directory", { client = { default = 1 } })
 registerprivilege("file.find", "File find", "Allows the user to see what files are in data/sf_filedata", { client = { default = 1 } })
 registerprivilege("file.findInGame", "File find in garrysmod", "Allows the user to see what files are in garrysmod", { client = { default = 1 } })
 registerprivilege("file.open", "Get a file object", "Allows the user to use a file object", { client = { default = 1 } })
@@ -316,6 +317,15 @@ function file_library.exists(path)
 	checkpermission (instance, path, "file.exists")
 	checkluatype (path, TYPE_STRING)
 	return file.Exists("sf_filedata/" .. SF.NormalizePath(path), "DATA")
+end
+
+--- Checks if a given file is a directory or not
+-- @param string path Filepath relative to data/sf_filedata/.
+-- @return boolean True if given path is a directory, false if it's a file
+function file_library.isDir(path)
+	checkpermission (instance, path, "file.isDir")
+	checkluatype (path, TYPE_STRING)
+	return file.IsDir("sf_filedata/" .. SF.NormalizePath(path), "DATA")
 end
 
 --- Deletes a file
