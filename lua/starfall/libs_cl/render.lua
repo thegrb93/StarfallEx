@@ -1924,8 +1924,9 @@ end
 -- @param Angle angle Orientation of the box
 -- @param Vector mins Start position of the box, relative to origin.
 -- @param Vector maxs End position of the box, relative to origin.
--- @param boolean? writeZ Optional should the line be drawn with depth considered (default: false)
+-- @param boolean? writeZ Optional should the box be drawn with depth considered (default: true)
 function render_library.draw3DWireframeBox(origin, angle, mins, maxs, writeZ)
+	if writeZ == nil then writeZ = true end
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	origin = vunwrap(origin)
 	mins = vunwrap(mins)
