@@ -473,7 +473,6 @@ end)
 
 
 function instance:prepareRender()
-	-- currentcolor = Color(255, 255, 255, 255)
 	rawset(currentcolor, "r", rawget(currentcolor, "r"))
 	rawset(currentcolor, "g", rawget(currentcolor, "g"))
 	rawset(currentcolor, "b", rawget(currentcolor, "b"))
@@ -908,7 +907,6 @@ end
 -- @param number b Number, blue value
 -- @param number a Number, alpha value
 function render_library.setRGBA(r, g, b, a)
-	-- currentcolor = Color(r, g, b, a)
 	rawset(currentcolor, "r", r or 255)
 	rawset(currentcolor, "g", g or 255)
 	rawset(currentcolor, "b", b or 255)
@@ -1476,7 +1474,6 @@ function render_library.drawTexturedRectUV(x, y, w, h, startU, startV, endU, end
 	makeQuad(x, y, w, h)
 	mesh.Begin(MATERIAL_QUADS, 1)
 	local success, err = pcall(function(startU, startV, endU, endV)
-		-- local r,g,b,a = currentcolor.r, currentcolor.g, currentcolor.b, currentcolor.a
 		local r, g, b, a = rawget(currentcolor, "r"), rawget(currentcolor, "g"), rawget(currentcolor, "b"), rawget(currentcolor, "a")
 		mesh.Position( quad_v1 )
 		mesh.Color( r,g,b,a )
