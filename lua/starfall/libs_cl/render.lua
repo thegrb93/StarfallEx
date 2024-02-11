@@ -120,7 +120,7 @@ local circleMeshMaterial = CreateMaterial("SF_Circle_Material", "UnlitGeneric", 
 	["$vertexcolor"] = 1
 })
 
-local currentcolor = Color()
+local currentcolor = Color(0, 0, 0, 0)
 local defaultFont
 local MATRIX_STACK_LIMIT = 8
 local matrix_stack = {}
