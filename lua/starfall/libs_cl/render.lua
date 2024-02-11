@@ -473,7 +473,11 @@ end)
 
 
 function instance:prepareRender()
-	currentcolor = Color(255, 255, 255, 255)
+	-- currentcolor = Color(255, 255, 255, 255)
+	rawset(currentcolor, "r", rawget(currentcolor, "r"))
+	rawset(currentcolor, "g", rawget(currentcolor, "g"))
+	rawset(currentcolor, "b", rawget(currentcolor, "b"))
+	rawset(currentcolor, "a", rawget(currentcolor, "a"))
 	circleMeshMatrix:Identity()
 	render.SetColorMaterial()
 	draw.NoTexture()
