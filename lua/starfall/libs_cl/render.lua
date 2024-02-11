@@ -120,7 +120,7 @@ local circleMeshMaterial = CreateMaterial("SF_Circle_Material", "UnlitGeneric", 
 	["$vertexcolor"] = 1
 })
 
-local currentcolor
+local currentcolor = Color()
 local defaultFont
 local MATRIX_STACK_LIMIT = 8
 local matrix_stack = {}
@@ -473,7 +473,7 @@ end)
 
 
 function instance:prepareRender()
-	currentcolor = COLOR_WHITE
+	currentcolor = Color(255, 255, 255, 255)
 	circleMeshMatrix:Identity()
 	render.SetColorMaterial()
 	draw.NoTexture()
