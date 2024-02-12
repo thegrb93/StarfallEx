@@ -171,9 +171,9 @@ end
 
 --- Sets the fade distance of the sound in 3D space. Must have `3d` flag to get this work on.
 -- @param number min The channel's volume is at maximum when the listener is within this distance (50-1000)
--- @param number max The channel's volume stops decreasing when the listener is beyond this distance. (10,000-200,000)
+-- @param number max The channel's volume stops decreasing when the listener is beyond this distance. (1,100-200,000)
 function bass_methods:setFade(min, max)
-	getsnd(self):Set3DFadeDistance(math.Clamp(min, 50, 1000), math.Clamp(max, 10000, 200000))
+	getsnd(self):Set3DFadeDistance(math.Clamp(min, 50, 1000), math.Clamp(max, 1100, 200000))
 end
 
 --- Sets whether the sound channel should loop. Requires the 'noblock' flag
