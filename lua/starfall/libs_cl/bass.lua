@@ -171,7 +171,7 @@ function bass_methods:setPos(pos)
 end
 
 --- Gets the position of the sound in 3D space.
--- @param Vector pos The position of the sound.
+-- @return Vector The position of the sound.
 function bass_methods:getPos()
 	return vwrap(getsnd(self):GetPos())
 end
@@ -184,8 +184,8 @@ function bass_methods:setFade(min, max)
 end
 
 --- Gets the fade distance of the sound in 3D space. 
--- @param number min The channel's volume is at maximum when the listener is within this distance (50-1000)
--- @param number max The channel's volume stops decreasing when the listener is beyond this distance. (1,100-200,000)
+-- @return number The distance before the sound starts to fade. (50-1000)
+-- @return number The distance before the sound stops fading. (1,100-200,000)
 function bass_methods:getFade()
 	return getsnd(self):Get3DFadeDistance()
 end
@@ -197,7 +197,7 @@ function bass_methods:setLooping(loop)
 end
 
 --- Gets whether the sound channel loops.
--- @param boolean loop Whether the sound channel loops.
+-- @return boolean Whether the sound channel loops.
 function bass_methods:isLooping()
 	return getsnd(self):IsLooping()
 end
