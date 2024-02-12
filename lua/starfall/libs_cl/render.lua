@@ -3,6 +3,8 @@ local surface = surface
 local clamp = math.Clamp
 local max = math.max
 local cam = cam
+local rawget = rawget
+local rawset = rawset
 local dgetmeta = debug.getmetatable
 local checkluatype = SF.CheckLuaType
 local haspermission = SF.Permissions.hasAccess
@@ -118,7 +120,7 @@ local circleMeshMaterial = CreateMaterial("SF_Circle_Material", "UnlitGeneric", 
 	["$vertexcolor"] = 1
 })
 
-local currentcolor
+local currentcolor = Color(0, 0, 0, 0)
 local defaultFont
 local MATRIX_STACK_LIMIT = 8
 local matrix_stack = {}
@@ -471,7 +473,10 @@ end)
 
 
 function instance:prepareRender()
-	currentcolor = COLOR_WHITE
+	rawset(currentcolor, "r", 255)
+	rawset(currentcolor, "g", 255)
+	rawset(currentcolor, "b", 255)
+	rawset(currentcolor, "a", 255)
 	circleMeshMatrix:Identity()
 	render.SetColorMaterial()
 	draw.NoTexture()
@@ -902,7 +907,10 @@ end
 -- @param number b Number, blue value
 -- @param number a Number, alpha value
 function render_library.setRGBA(r, g, b, a)
-	currentcolor = Color(r, g, b, a)
+	rawset(currentcolor, "r", r or 255)
+	rawset(currentcolor, "g", g or 255)
+	rawset(currentcolor, "b", b or 255)
+	rawset(currentcolor, "a", a or 255)
 	surface.SetDrawColor(r, g, b, a)
 	surface.SetTextColor(r, g, b, a)
 end
@@ -1373,10 +1381,11 @@ end
 function render_library.drawFilledCircle(x, y, r)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
-	circleMeshVector:SetUnpacked(currentcolor.r / 255, currentcolor.g / 255, currentcolor.b / 255)
+	local r, g, b, a = rawget(currentcolor, "r"), rawget(currentcolor, "g"), rawget(currentcolor, "b"), rawget(currentcolor, "a")
+	circleMeshVector:SetUnpacked(r / 255, g / 255, b / 255)
 
 	circleMeshMaterial:SetVector("$color", circleMeshVector)
-	circleMeshMaterial:SetFloat("$alpha", currentcolor.a / 255)
+	circleMeshMaterial:SetFloat("$alpha", a / 255)
 
 	surface.SetMaterial(circleMeshMaterial)
 	render.SetMaterial(circleMeshMaterial)
@@ -1465,7 +1474,7 @@ function render_library.drawTexturedRectUV(x, y, w, h, startU, startV, endU, end
 	makeQuad(x, y, w, h)
 	mesh.Begin(MATERIAL_QUADS, 1)
 	local success, err = pcall(function(startU, startV, endU, endV)
-		local r,g,b,a = currentcolor.r, currentcolor.g, currentcolor.b, currentcolor.a
+		local r, g, b, a = rawget(currentcolor, "r"), rawget(currentcolor, "g"), rawget(currentcolor, "b"), rawget(currentcolor, "a")
 		mesh.Position( quad_v1 )
 		mesh.Color( r,g,b,a )
 		mesh.TexCoord( 0, startU, startV )
@@ -1975,20 +1984,21 @@ function render_library.draw3DQuadUV(vert1, vert2, vert3, vert4)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	mesh.Begin(MATERIAL_QUADS, 1)
 	local ok, err = pcall(function()
+		local r, g, b, a = rawget(currentcolor, "r"), rawget(currentcolor, "g"), rawget(currentcolor, "b"), rawget(currentcolor, "a")
 		mesh.Position( Vector(vert1[1], vert1[2], vert1[3]) )
-		mesh.Color( currentcolor.r, currentcolor.g, currentcolor.b, currentcolor.a )
+		mesh.Color( r, g, b, a )
 		mesh.TexCoord( 0, vert1[4], vert1[5] )
 		mesh.AdvanceVertex()
 		mesh.Position( Vector(vert2[1], vert2[2], vert2[3]) )
-		mesh.Color( currentcolor.r, currentcolor.g, currentcolor.b, currentcolor.a )
+		mesh.Color( r, g, b, a )
 		mesh.TexCoord( 0, vert2[4], vert2[5] )
 		mesh.AdvanceVertex()
 		mesh.Position( Vector(vert3[1], vert3[2], vert3[3]) )
-		mesh.Color( currentcolor.r, currentcolor.g, currentcolor.b, currentcolor.a )
+		mesh.Color( r, g, b, a )
 		mesh.TexCoord( 0, vert3[4], vert3[5] )
 		mesh.AdvanceVertex()
 		mesh.Position( Vector(vert4[1], vert4[2], vert4[3]) )
-		mesh.Color( currentcolor.r, currentcolor.g, currentcolor.b, currentcolor.a )
+		mesh.Color( r, g, b, a )
 		mesh.TexCoord( 0, vert4[4], vert4[5] )
 		mesh.AdvanceVertex()
 	end)
