@@ -407,6 +407,8 @@ function vec_methods:rotate(b)
 	self[3] = x * (-psin) + y * (pcos * rsin) + z * (pcos * rcos)
 end
 
+
+local vec_rotated = {}
 --- Returns Rotated vector by Angle b
 -- @param Angle b Angle to rotate by.
 -- @return Vector Rotated Vector
@@ -418,11 +420,11 @@ function vec_methods:getRotated(b)
 	local psin_rsin, psin_rcos = psin*rsin, psin*rcos
 	local x, y, z = self[1], self[2], self[3]
 
-	return wrap({ 
-		x * (ycos * pcos) + y * (ycos * psin_rsin - ysin * rcos) + z * (ycos * psin_rcos + ysin * rsin),
-		x * (ysin * pcos) + y * (ysin * psin_rsin + ycos * rcos) + z * (ysin * psin_rcos - ycos * rsin),
-		x * (-psin) + y * (pcos * rsin) + z * (pcos * rcos)
-	})
+	vec_rotated[1] = x * (ycos * pcos) + y * (ycos * psin_rsin - ysin * rcos) + z * (ycos * psin_rcos + ysin * rsin)
+	vec_rotated[2] = x * (ysin * pcos) + y * (ysin * psin_rsin + ycos * rcos) + z * (ysin * psin_rcos - ycos * rsin)
+	vec_rotated[3] = x * (-psin) + y * (pcos * rsin) + z * (pcos * rcos)
+
+	return wrap(vec_rotated)
 end
 
 --- Returns an arbitrary orthogonal basis from the direction of the vector. Input must be a normalized vector
