@@ -62,6 +62,22 @@ local function write(func, size, ...)
 	netData[#netData + 1] = { func, { ... } }
 end
 
+local function net_start()
+	netBurst:use(instance.player, netSize)
+
+	net.Start("SF_netmessage", unreliable)
+	net.WriteEntity(instance.entity)
+	local data = netData
+	for i = 1, #data do
+		local args = data[i][2]
+		data[i][1](unpack(args, 1, table.maxn(args)))
+	end
+
+	netSize = 0
+	netData = {}
+	netStarted = false
+end
+
 --- Starts the net message
 -- @shared
 -- @param string name The message name
@@ -106,15 +122,8 @@ function net_library.send(target, unreliable)
 		end
 	end
 
-	netBurst:use(instance.player, netSize)
-
-	net.Start("SF_netmessage", unreliable)
-	net.WriteEntity(instance.entity)
-	local data = netData
-	for i = 1, #data do
-		local args = data[i][2]
-		data[i][1](unpack(args, 1, table.maxn(args)))
-	end
+	net_start()
+	
 	if SERVER then
 		if newtarget then
 			net.Send(newtarget)
@@ -125,10 +134,20 @@ function net_library.send(target, unreliable)
 		net.SendToServer()
 	end
 
-	netSize = 0
-	netData = {}
-	netStarted = false
 	instance:checkCpu()
+end
+
+if SERVER then
+	--- Send net message to all players within the visible area of a vector
+	-- @server
+	-- @param Vector pos A vector within the PVS area to send a message 
+	function net_library.sendPVS(pos)
+		if not netStarted then SF.Throw("net message not started", 2) end
+		pos = vunwrap(pos)
+		net_start()
+		net.SendPVS(pos)
+		instance:checkCpu()
+	end
 end
 
 --- Writes an object to a net message automatically typing it
