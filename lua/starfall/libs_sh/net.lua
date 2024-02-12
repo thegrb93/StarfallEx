@@ -123,7 +123,7 @@ function net_library.send(target, unreliable)
 	end
 
 	net_start()
-	
+
 	if SERVER then
 		if newtarget then
 			net.Send(newtarget)
@@ -140,7 +140,7 @@ end
 if SERVER then
 	--- Send net message to all players within the visible area of a vector
 	-- @server
-	-- @param Vector pos A vector within the PVS area to send a message 
+	-- @param Vector pos A vector within the PVS area to send a message
 	function net_library.sendPVS(pos)
 		if not netStarted then SF.Throw("net message not started", 2) end
 		pos = vunwrap(pos)
