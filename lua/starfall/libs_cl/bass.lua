@@ -280,4 +280,35 @@ function bass_methods:is3D()
 	return getsnd(self):Is3D()
 end
 
+--- Returns the state of the sound channel.
+-- @return number The state enum of the sound channel. https://wiki.facepunch.com/gmod/Enums/GMOD_CHANNEL
+function bass_methods:getState()
+	return getsnd(self):GetState()
+end
+
+--- Returns whether or not the sound channel is stopped.
+-- Only true if the `noplay` flag is used and Bass:play() hasn't been called yet, since Bass:stop() will destroy the sound channel.
+-- @return boolean True if the sound channel is stopped.
+function bass_methods:isStopped()
+	return getsnd(self):GetState() == GMOD_CHANNEL_STOPPED
+end
+
+--- Returns whether or not the sound channel is playing.
+-- @return boolean True if the sound channel is playing.
+function bass_methods:isPlaying()
+	return getsnd(self):GetState() == GMOD_CHANNEL_PLAYING
+end
+
+--- Returns whether or not the sound channel is paused.
+-- @return boolean True if the sound channel is paused.
+function bass_methods:isPaused()
+	return getsnd(self):GetState() == GMOD_CHANNEL_PAUSED
+end
+
+--- Returns whether or not the sound channel is stalled.
+-- @return boolean True if the sound channel is stalled.
+function bass_methods:isStalled()
+	return getsnd(self):GetState() == GMOD_CHANNEL_STALLED
+end
+
 end

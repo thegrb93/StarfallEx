@@ -1384,4 +1384,18 @@ env.DAMAGE = {
 	["MISSILEDEFENSE"] = 2147483648
 }
 
+--- ENUMs used by Bass:getState()
+-- @name bass.GMOD_CHANNEL
+-- @class table
+-- @field STOPPED 0
+-- @field PLAYING 1
+-- @field PAUSED 2
+-- @field STALLED 3
+env.GMOD_CHANNEL = {
+	STOPPED = GMOD_CHANNEL_STOPPED,
+	PLAYING = GMOD_CHANNEL_PLAYING,
+	PAUSED = GMOD_CHANNEL_PAUSED,
+	STALLED = GMOD_CHANNEL_STALLED
+}
+
 end
