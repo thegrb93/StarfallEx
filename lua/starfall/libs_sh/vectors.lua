@@ -388,7 +388,7 @@ function vec_methods:normalize()
 	self[3] = self[3] / len
 end
 
-local math_sin, math_cos, math_rad = math.sin, math.cos, math.rad
+local math_sin, math_cos = math.sin, math.cos
 local deg2rad = math.pi/180
 
 --- Rotate the vector by Angle b.
@@ -396,14 +396,15 @@ local deg2rad = math.pi/180
 -- @param Angle b Angle to rotate by.
 function vec_methods:rotate(b)
 	local vec, ang = unwrap(self), aunwrap(b) 
-	local yaw, pitch, roll = ang.yaw * deg2rad, ang.pitch * deg2rad, ang.roll * deg2rad
-	local ycos, ysin = math_cos(yaw), math_sin(yaw)	
-	local pcos, psin = math_cos(pitch), math_sin(pitch)
-	local rcos, rsin = math_cos(roll), math_sin(roll)
 
-	rawset(self, 1, (vec.x*(ycos*pcos) + vec.y*(ycos*pcos*rcos-ysin*rcos) + vec.z*(ycos*pcos*rcos+ysin*rcos))	)
-	rawset(self, 2, (vec.x*(ysin*pcos) + vec.y*(ysin*pcos*rcos+ycos*rcos) + vec.z*(ysin*pcos*rcos-ycos*rcos)))
-	rawset(self, 3, (vec.x*(-pcos) + vec.y*(pcos*rcos) + vec.z*(pcos*rcos)))
+	local y, p, r = ang.yaw * deg2rad, ang.pitch * deg2rad, ang.roll * deg2rad
+	local ysin, ycos, psin, pcos, rsin, rcos = math_sin(y), math_cos(y), math_sin(p), math_cos(p), math_sin(r), math_cos(r)
+	local psin_rsin, psin_rcos = psin*rsin, psin*rcos
+	local x, y, z = self[1], self[2], self[3]
+
+	self[1] = x * (ycos * pcos) + y * (ycos * psin_rsin - ysin * rcos) + z * (ycos * psin_rcos + ysin * rsin)
+	self[2] = x * (ysin * pcos) + y * (ysin * psin_rsin + ycos * rcos) + z * (ysin * psin_rcos - ycos * rsin)
+	self[3] = x * (-psin) + y * (pcos * rsin) + z * (pcos * rcos)
 end
 
 --- Returns Rotated vector by Angle b
@@ -411,15 +412,16 @@ end
 -- @return Vector Rotated Vector
 function vec_methods:getRotated(b)
 	local vec, ang = unwrap(self), aunwrap(b) 
-	local yaw, pitch, roll = ang.yaw * deg2rad, ang.pitch * deg2rad, ang.roll * deg2rad
-	local ycos, ysin = math_cos(yaw), math_sin(yaw)	
-	local pcos, psin = math_cos(pitch), math_sin(pitch)
-	local rcos, rsin = math_cos(roll), math_sin(roll)
+
+	local y, p, r = ang.yaw * deg2rad, ang.pitch * deg2rad, ang.roll * deg2rad
+	local ysin, ycos, psin, pcos, rsin, rcos = math_sin(y), math_cos(y), math_sin(p), math_cos(p), math_sin(r), math_cos(r)
+	local psin_rsin, psin_rcos = psin*rsin, psin*rcos
+	local x, y, z = self[1], self[2], self[3]
 
 	return wrap({ 
-		(vec.x*(ycos*pcos) + vec.y*(ycos*pcos*rcos-ysin*rcos) + vec.z*(ycos*pcos*rcos+ysin*rcos)), 
-		(vec.x*(ysin*pcos) + vec.y*(ysin*pcos*rcos+ycos*rcos) + vec.z*(ysin*pcos*rcos-ycos*rcos)), 
-		(vec.x*(-pcos) + vec.y*(pcos*rcos) + vec.z*(pcos*rcos))
+		x * (ycos * pcos) + y * (ycos * psin_rsin - ysin * rcos) + z * (ycos * psin_rcos + ysin * rsin),
+		x * (ysin * pcos) + y * (ysin * psin_rsin + ycos * rcos) + z * (ysin * psin_rcos - ycos * rsin),
+		x * (-psin) + y * (pcos * rsin) + z * (pcos * rcos)
 	})
 end
 
