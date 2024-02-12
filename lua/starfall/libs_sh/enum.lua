@@ -1387,7 +1387,7 @@ env.DAMAGE = {
 
 if CLIENT then
 	--- ENUMs used by Bass:getState()
-	-- @name bass.GMOD_CHANNEL
+	-- @name builtins_library.GMOD_CHANNEL
 	-- @class table
 	-- @client
 	-- @field STOPPED 0
