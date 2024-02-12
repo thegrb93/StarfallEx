@@ -164,23 +164,42 @@ function bass_methods:setPitch(pitch)
 	getsnd(self):SetPlaybackRate(math.Clamp(pitch, 0, 100))
 end
 
---- Sets the position of the sound in 3D space. Must have `3d` flag to get this work on.
+--- Sets the position of the sound in 3D space. Must have `3d` flag for this to have any effect.
 -- @param Vector pos Where to position the sound.
 function bass_methods:setPos(pos)
 	getsnd(self):SetPos(vunwrap(pos))
 end
 
---- Sets the fade distance of the sound in 3D space. Must have `3d` flag to get this work on.
+--- Gets the position of the sound in 3D space.
+-- @param Vector pos The position of the sound.
+function bass_methods:getPos()
+	return vwrap(getsnd(self):GetPos())
+end
+
+--- Sets the fade distance of the sound in 3D space. Must have `3d` flag for this to have any effect.
 -- @param number min The channel's volume is at maximum when the listener is within this distance (50-1000)
 -- @param number max The channel's volume stops decreasing when the listener is beyond this distance. (1,100-200,000)
 function bass_methods:setFade(min, max)
 	getsnd(self):Set3DFadeDistance(math.Clamp(min, 50, 1000), math.Clamp(max, 1100, 200000))
 end
 
---- Sets whether the sound channel should loop. Requires the 'noblock' flag
+--- Gets the fade distance of the sound in 3D space. 
+-- @param number min The channel's volume is at maximum when the listener is within this distance (50-1000)
+-- @param number max The channel's volume stops decreasing when the listener is beyond this distance. (1,100-200,000)
+function bass_methods:getFade()
+	return getsnd(self):Get3DFadeDistance()
+end
+
+--- Sets whether the sound channel should loop. Requires the 'noblock' flag.
 -- @param boolean loop Whether the sound channel should loop.
 function bass_methods:setLooping(loop)
 	getsnd(self):EnableLooping(loop)
+end
+
+--- Gets whether the sound channel loops.
+-- @param boolean loop Whether the sound channel loops.
+function bass_methods:isLooping()
+	return getsnd(self):IsLooping()
 end
 
 --- Gets the length of a sound channel.
@@ -189,7 +208,7 @@ function bass_methods:getLength()
 	return getsnd(self):GetLength()
 end
 
---- Sets the current playback time of the sound channel. Requires the 'noblock' flag
+--- Sets the current playback time of the sound channel. Requires the 'noblock' flag.
 -- @param number time Sound channel playback time in seconds.
 -- @param boolean? dontDecode Skip decoding to set time, which is much faster but less accurate. True by default.
 function bass_methods:setTime(time, dontDecode)
@@ -197,7 +216,7 @@ function bass_methods:setTime(time, dontDecode)
 	getsnd(self):SetTime(time, dontDecode ~= false)
 end
 
---- Gets the current playback time of the sound channel. Requires the 'noblock' flag
+--- Gets the current playback time of the sound channel. Requires the 'noblock' flag.
 -- @return number Sound channel playback time in seconds.
 function bass_methods:getTime()
 	return getsnd(self):GetTime()
