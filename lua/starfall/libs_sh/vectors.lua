@@ -411,7 +411,7 @@ end
 -- @return Vector Rotated Vector
 function vec_methods:getRotated(b)
 	checktype(b, ang_meta)
-	local y, p, r = b[3] * deg2rad, b[21] * deg2rad, b[2] * deg2rad
+	local y, p, r = b[3] * deg2rad, b[1] * deg2rad, b[2] * deg2rad
 	local ysin, ycos, psin, pcos, rsin, rcos = math_sin(y), math_cos(y), math_sin(p), math_cos(p), math_sin(r), math_cos(r)
 	local psin_rsin, psin_rcos = psin*rsin, psin*rcos
 	local x, y, z = self[1], self[2], self[3]
