@@ -14,11 +14,11 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 	local function sanitizeTypeMeta(theType, myMeta)
 		local meta = debug.getmetatable(theType)
 		if meta then
-			for k, v in pairs(meta) do 
+			for k, v in pairs(meta) do
 				if isfunction(v) then
 					local myMetaFunc = myMeta and myMeta[k]
 					if myMetaFunc then
-						meta[k] = function(...) 
+						meta[k] = function(...)
 							if SF.runningOps then return myMetaFunc(...) else return v(...) end
 						end
 					else
