@@ -395,8 +395,7 @@ local deg2rad = math.pi/180
 -- Self-Modifies. Does not return anything
 -- @param Angle b Angle to rotate by.
 function vec_methods:rotate(b)
-	local vec, ang = unwrap(self), aunwrap(b) 
-
+	local ang = aunwrap(b)
 	local y, p, r = ang.yaw * deg2rad, ang.pitch * deg2rad, ang.roll * deg2rad
 	local ysin, ycos, psin, pcos, rsin, rcos = math_sin(y), math_cos(y), math_sin(p), math_cos(p), math_sin(r), math_cos(r)
 	local psin_rsin, psin_rcos = psin*rsin, psin*rcos
@@ -407,24 +406,21 @@ function vec_methods:rotate(b)
 	self[3] = x * (-psin) + y * (pcos * rsin) + z * (pcos * rcos)
 end
 
-
-local vec_rotated = {}
 --- Returns Rotated vector by Angle b
 -- @param Angle b Angle to rotate by.
 -- @return Vector Rotated Vector
 function vec_methods:getRotated(b)
-	local vec, ang = unwrap(self), aunwrap(b) 
-
+	local ang = aunwrap(b)
 	local y, p, r = ang.yaw * deg2rad, ang.pitch * deg2rad, ang.roll * deg2rad
 	local ysin, ycos, psin, pcos, rsin, rcos = math_sin(y), math_cos(y), math_sin(p), math_cos(p), math_sin(r), math_cos(r)
 	local psin_rsin, psin_rcos = psin*rsin, psin*rcos
 	local x, y, z = self[1], self[2], self[3]
 
-	vec_rotated[1] = x * (ycos * pcos) + y * (ycos * psin_rsin - ysin * rcos) + z * (ycos * psin_rcos + ysin * rsin)
-	vec_rotated[2] = x * (ysin * pcos) + y * (ysin * psin_rsin + ycos * rcos) + z * (ysin * psin_rcos - ycos * rsin)
-	vec_rotated[3] = x * (-psin) + y * (pcos * rsin) + z * (pcos * rcos)
-
-	return wrap(vec_rotated)
+	return wrap({
+		x * (ycos * pcos) + y * (ycos * psin_rsin - ysin * rcos) + z * (ycos * psin_rcos + ysin * rsin),
+		x * (ysin * pcos) + y * (ysin * psin_rsin + ycos * rcos) + z * (ysin * psin_rcos - ycos * rsin),
+		x * (-psin) + y * (pcos * rsin) + z * (pcos * rcos)
+	})
 end
 
 --- Returns an arbitrary orthogonal basis from the direction of the vector. Input must be a normalized vector
