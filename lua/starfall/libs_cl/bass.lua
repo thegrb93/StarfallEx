@@ -57,27 +57,16 @@ local function not3D(flags)
 	return true
 end
 
---- Loads a sound channel from a file.
--- @param string path File path to play from.
--- @param string flags Flags for the sound (`3d`, `mono`, `noplay`, `noblock`).
--- @param function callback Function which is called when the sound channel is loaded. It'll get 3 arguments: `Bass` object, error number and name.
-function bass_library.loadFile(path, flags, callback)
-	checkpermission(instance, nil, "bass.loadFile")
+local function loadSound(path, flags, callback, loadFunc)
+	local is2D = not3D(flags)
 
-	checkluatype(path, TYPE_STRING)
-	checkluatype(flags, TYPE_STRING)
-	checkluatype(callback, TYPE_FUNCTION)
-
-	if #path>260 then SF.Throw("Sound path too long!") end
-	if string.match(path, "[\"?]") then SF.Throw("Sound path contains invalid characters!") end
-
-	if not3D(flags) then
+	if is2D then
 		checkpermission(instance, nil, "bass.play2D")
 	end
 
 	plyCount:use(instance.player, 1)
 
-	sound.PlayFile(path, flags, function(snd, er, name)
+	loadFunc(path, flags, function(snd, er, name)
 		if er then
 			instance:runFunction(callback, nil, er, name)
 			plyCount:free(instance.player, 1)
@@ -93,6 +82,24 @@ function bass_library.loadFile(path, flags, callback)
 	end)
 end
 
+
+--- Loads a sound channel from a file.
+-- @param string path File path to play from.
+-- @param string flags Flags for the sound (`3d`, `mono`, `noplay`, `noblock`).
+-- @param function callback Function which is called when the sound channel is loaded. It'll get 3 arguments: `Bass` object, error number and name.
+function bass_library.loadFile(path, flags, callback)
+	checkpermission(instance, nil, "bass.loadFile")
+
+	checkluatype(path, TYPE_STRING)
+	checkluatype(flags, TYPE_STRING)
+	checkluatype(callback, TYPE_FUNCTION)
+
+	if #path>260 then SF.Throw("Sound path too long!") end
+	if string.match(path, "[\"?]") then SF.Throw("Sound path contains invalid characters!") end
+
+	loadSound(path, flags, callback, sound.PlayFile)
+end
+
 --- Loads a sound channel from an URL.
 -- @param string path URL path to play from.
 -- @param string flags Flags for the sound (`3d`, `mono`, `noplay`, `noblock`). noblock will fail if the webserver doesn't provide file length.
@@ -105,27 +112,8 @@ function bass_library.loadURL(path, flags, callback)
 	checkluatype(callback, TYPE_FUNCTION)
 
 	if #path > 2000 then SF.Throw("URL is too long!", 2) end
-	if not3D(flags) then
-		checkpermission(instance, nil, "bass.play2D")
-	end
 
-	plyCount:use(instance.player, 1)
-
-	SF.HTTPNotify(instance.player, path)
-	sound.PlayURL(path, flags, function(snd, er, name)
-		if er then
-			instance:runFunction(callback, nil, er, name)
-			plyCount:free(instance.player, 1)
-		else
-			if instance.error then
-				snd:Stop()
-				plyCount:free(instance.player, 1)
-			else
-				sounds[snd] = true
-				instance:runFunction(callback, wrap(snd), 0, "")
-			end
-		end
-	end)
+	loadSound(path, flags, callback, sound.PlayURL)
 end
 
 --- Returns the number of sounds left that can be created
