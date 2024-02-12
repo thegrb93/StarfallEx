@@ -79,6 +79,7 @@ local function loadSound(path, flags, callback, loadFunc)
 					flags = flags
 				}
 
+				snd:Set3DFadeDistance(200, 200000) -- Default fade distance
 				instance:runFunction(callback, wrap(snd), 0, "")
 			end
 		end
