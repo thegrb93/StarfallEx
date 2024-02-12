@@ -33,7 +33,6 @@ local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check
 
 -- Register functions to be called when the chip is initialised and deinitialised
 local sounds = {}
-local soundToFlags = {}
 instance:AddHook("deinitialize", function()
 	for s in pairs(sounds) do
 		deleteSound(instance.player, s)
@@ -76,8 +75,10 @@ local function loadSound(path, flags, callback, loadFunc)
 				snd:Stop()
 				plyCount:free(instance.player, 1)
 			else
-				soundToFlags[snd] = flags -- IGModAudioChannel is userdata, so we can't attach extra key-value pairs or functions to it.
-				sounds[snd] = true
+				sounds[snd] = { -- IGModAudioChannel is userdata, so we can't attach extra key-value pairs or functions to it directly.
+					flags = flags
+				}
+
 				instance:runFunction(callback, wrap(snd), 0, "")
 			end
 		end
@@ -136,7 +137,6 @@ function bass_methods:stop()
 	local snd = getsnd(self)
 	deleteSound(instance.player, snd)
 	sounds[snd] = nil
-	soundToFlags[snd] = nil
 
 	-- This makes the sound no longer unwrap
 	local sensitive2sf, sf2sensitive = bass_meta.sensitive2sf, bass_meta.sf2sensitive
@@ -265,7 +265,7 @@ end
 --- Returns the flags used to create the sound channel.
 -- @return string The flags of the sound channel (`3d`, `mono`, `noplay`, `noblock`).
 function bass_methods:getFlags()
-	return soundToFlags[getsnd(self)]
+	return sounds[getsnd(self)].flags
 end
 
 --- Returns whether or not the sound channel is 2D.
