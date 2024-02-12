@@ -1,5 +1,6 @@
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
+local math_sqrt = math.sqrt
 
 -- Register privileges
 registerprivilege("bass.loadFile", "Play local sound files with `bass`.", "Allows users to create sound channels by file path.", { client = {} })
@@ -7,6 +8,7 @@ registerprivilege("bass.loadURL", "Play remote sound files with `bass`.", "Allow
 registerprivilege("bass.play2D", "Play sounds in global game context with `bass`.", "Allows users to create sound channels which play in global game context (without `3d` flag).", { client = { default = 1 } })
 
 local plyCount = SF.LimitObject("bass", "bass sounds", 20, "The number of sounds allowed to be playing via Starfall client at once")
+local instanceIncr = 0
 
 SF.ResourceCounters.Bass = {icon = "icon16/sound_add.png", count = function(ply) return plyCount:get(ply).val end}
 
@@ -33,9 +35,24 @@ local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check
 
 -- Register functions to be called when the chip is initialised and deinitialised
 local sounds = {}
+local soundList = {}
+local instanceUID = nil
+
+instance:AddHook("initialize", function()
+	instanceIncr = instanceIncr + 1
+	instanceUID = instanceIncr
+end)
+
 instance:AddHook("deinitialize", function()
-	for s in pairs(sounds) do
-		deleteSound(instance.player, s)
+	for _, snd in ipairs(soundList) do
+		deleteSound(instance.player, snd)
+	end
+
+	sounds = {}
+	soundList = {}
+
+	if instanceUID then
+		hook.Remove("Think", "SF_BassThink_" .. instanceUID)
 	end
 end)
 
@@ -50,11 +67,60 @@ local function getsnd(self)
 	return isValid and isValid(snd) and snd or SF.Throw("Sound is not valid.", 3)
 end
 
-
 local function not3D(flags)
 	for flag in string.gmatch(string.lower(flags), "%S+") do if flag=="3d" then return false end end
 	if SF.IsHUDActive(instance.entity) then return false end
 	return true
+end
+
+-- Calculates whether or not a 3D sound is out of earshot, and its fade multiplier.
+local function checkFade(snd)
+	local pos = snd:GetPos()
+	local earPos = EyePos()
+	local fadeMin, fadeMax = snd:Get3DFadeDistance()
+	local distSqr = pos:DistToSqr(earPos)
+
+	if distSqr <= fadeMin * fadeMin then return false, 1 end
+	if distSqr >= fadeMax * fadeMax then return true, 0 end
+
+	local dist = math_sqrt(distSqr)
+	local farnessFrac = (dist - fadeMin) / (fadeMax - fadeMin)
+
+	return false, 1 - farnessFrac
+end
+
+-- Fixes a IGModAudioChannel bug where it doesn't approach volume 0 at the fade max, and is still audible past it, if the base volume is > 1.
+local function enforceFadeMax(snd)
+	if not snd:Is3D() then return end
+
+	local sndData = sounds[snd]
+	local shouldBeOutOfEarshot, fadeMult = checkFade(snd)
+
+	if sndData.fadeMult ~= fadeMult then
+		sndData.fadeMult = fadeMult
+		sndData.outOfEarshot = shouldBeOutOfEarshot
+
+		if shouldBeOutOfEarshot then
+			snd:SetVolume(0)
+		else
+			-- When the distance is between fadeMin and fadeMax, IGModAudioChannel appears to do finalVolume = soundVolume - farnessFrac, no multiplication at all!
+			-- This is fine when soundVolume is between 0 and 1, but when it's > 1, issues arise.
+			-- To fix this, do the proper multiplication and then add farnessFrac so it cancels out, resulting in finalVolume = soundVolume * fadeMult as it should be.
+			snd:SetVolume(sndData.targetVolume * fadeMult + (1 - fadeMult))
+		end
+	end
+end
+
+local function tryStartBassThink()
+	if #soundList ~= 1 then return end -- Hook is already running
+
+	hook.Add("Think", "SF_BassThink_" .. instanceUID, function()
+		for _, snd in ipairs(soundList) do
+			if snd:IsValid() and snd:GetState() == GMOD_CHANNEL_PLAYING then
+				enforceFadeMax(snd)
+			end
+		end
+	end)
 end
 
 local function loadSound(path, flags, callback, loadFunc)
@@ -75,11 +141,18 @@ local function loadSound(path, flags, callback, loadFunc)
 				snd:Stop()
 				plyCount:free(instance.player, 1)
 			else
+				table.insert(soundList, snd)
 				sounds[snd] = { -- IGModAudioChannel is userdata, so we can't attach extra key-value pairs or functions to it directly.
-					flags = flags
+					flags = flags,
+					targetVolume = 1,
+					fadeMult = 1,
+					outOfEarshot = false
 				}
 
 				snd:Set3DFadeDistance(200, 200000) -- Default fade distance
+				enforceFadeMax(snd)
+				tryStartBassThink()
+
 				instance:runFunction(callback, wrap(snd), 0, "")
 			end
 		end
@@ -138,11 +211,16 @@ function bass_methods:stop()
 	local snd = getsnd(self)
 	deleteSound(instance.player, snd)
 	sounds[snd] = nil
+	table.RemoveByValue(soundList, snd)
 
 	-- This makes the sound no longer unwrap
 	local sensitive2sf, sf2sensitive = bass_meta.sensitive2sf, bass_meta.sf2sensitive
 	sensitive2sf[snd] = nil
 	sf2sensitive[self] = nil
+
+	if #soundList == 0 then
+		hook.Remove("Think", "SF_BassThink_" .. instanceUID)
+	end
 end
 
 --- Pauses the sound.
@@ -154,7 +232,40 @@ end
 -- @param number vol Volume multiplier (1 is normal), between 0x and 10x.
 function bass_methods:setVolume(vol)
 	checkluatype(vol, TYPE_NUMBER)
-	getsnd(self):SetVolume(math.Clamp(vol, 0, 10))
+
+	local snd = getsnd(self)
+	local sndData = sounds[snd]
+
+	vol = math.Clamp(vol, 0, 10)
+	sndData.targetVolume = vol
+
+	if not sndData.outOfEarshot then
+		snd:SetVolume(vol)
+	end
+end
+
+--- Gets the base volume of the sound channel.
+-- This is the volume before distance fading is applied on 3D sounds.
+-- @return number Volume multiplier (1 is normal), between 0x and 10x.
+function bass_methods:getVolume()
+	return sounds[getsnd(self)].targetVolume
+end
+
+--- Gets the distance-based fade multiplier of the sound channel. Always 1 for 2D sounds.
+-- Bass:getVolume() * Bass:getFadeMultiplier() is the actual volume of the sound channel.
+-- Only updates once per frame while the sound is playing.
+-- This is zero when the sound channel is out of earshot.
+-- @return number Volume fade multiplier (1 is normal), between 0x and 10x.
+function bass_methods:getFadeMultiplier()
+	return sounds[getsnd(self)].fadeMult
+end
+
+--- Returns whether or not the sound channel is out of earshot.
+-- Only updates once per frame while the sound is playing.
+-- Always false for 2D sounds.
+-- @return boolean True if the sound channel's distance is greater than its fade maximum.
+function bass_methods:isOutOfEarshot()
+	return sounds[getsnd(self)].outOfEarshot
 end
 
 --- Sets the pitch of the sound channel.
