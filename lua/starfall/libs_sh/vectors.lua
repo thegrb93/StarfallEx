@@ -395,8 +395,8 @@ local deg2rad = math.pi/180
 -- Self-Modifies. Does not return anything
 -- @param Angle b Angle to rotate by.
 function vec_methods:rotate(b)
-	checktype(b, ang_meta, 2)
-	local y, p, r = b.yaw * deg2rad, b.pitch * deg2rad, b.roll * deg2rad
+	checktype(b, ang_meta)
+	local y, p, r = b[1] * deg2rad, b[2] * deg2rad, b[3] * deg2rad
 	local ysin, ycos, psin, pcos, rsin, rcos = math_sin(y), math_cos(y), math_sin(p), math_cos(p), math_sin(r), math_cos(r)
 	local psin_rsin, psin_rcos = psin*rsin, psin*rcos
 	local x, y, z = self[1], self[2], self[3]
@@ -410,8 +410,8 @@ end
 -- @param Angle b Angle to rotate by.
 -- @return Vector Rotated Vector
 function vec_methods:getRotated(b)
-	checktype(b, ang_meta, 2)
-	local y, p, r = b.yaw * deg2rad, b.pitch * deg2rad, b.roll * deg2rad
+	checktype(b, ang_meta)
+	local y, p, r = b[1] * deg2rad, b[2] * deg2rad, b[3] * deg2rad
 	local ysin, ycos, psin, pcos, rsin, rcos = math_sin(y), math_cos(y), math_sin(p), math_cos(p), math_sin(r), math_cos(r)
 	local psin_rsin, psin_rcos = psin*rsin, psin*rcos
 	local x, y, z = self[1], self[2], self[3]
