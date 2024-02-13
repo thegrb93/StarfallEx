@@ -63,8 +63,6 @@ local function write(data)
 end
 
 local function net_write(unreliable)
-	netBurst:use(instance.player, netSize)
-
 	net.Start("SF_netmessage", unreliable)
 	net.WriteEntity(instance.entity)
 	for _, v in ipairs(netData) do
@@ -120,6 +118,7 @@ function net_library.send(target, unreliable)
 		end
 	end
 
+	netBurst:use(instance.player, netSize)
 	net_write(unreliable)
 
 	if SERVER then
@@ -143,8 +142,12 @@ if SERVER then
 	function net_library.sendPVS(pos, unreliable)
 		if not netStarted then SF.Throw("net message not started", 2) end
 		pos = vunwrap(pos)
+
+		netBurst:use(instance.player, netSize)
 		net_write(unreliable)
+
 		net.SendPVS(pos)
+
 		instance:checkCpu()
 	end
 end
@@ -238,7 +241,7 @@ function net_library.writeStream(str, compress)
 	if not netStarted then SF.Throw("net message not started", 2) end
 	checkluatype (str, TYPE_STRING)
 	if #str > 64e6 then SF.Throw("String is too long!") end
-	write{net.WriteStream, 8*8, str, nil, compress == false}
+	write{net.WriteStream, 8*8, str, function() end, compress == false}
 end
 
 --- Reads a large string stream from the net message.
