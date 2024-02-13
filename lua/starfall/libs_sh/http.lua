@@ -182,9 +182,15 @@ end
 -- @param string url The url to convert
 -- @return string The converted url
 function http_library.urlGoogleDriveToRaw(url)
-    local id = string.match(url, "https://drive%.google%.com/file/d/([^/]+)/view")
-	if not id then SF.Throw("Failed to parse google drive link!", 2) end
-    return "https://drive.google.com/uc?export=download&id="..id
+	local id = string.match(url, "https://drive%.google%.com/file/d/([^/]+)/view") or SF.Throw("Failed to parse google drive link!", 2)
+	return "https://drive.google.com/uc?export=download&id="..id
+end
+
+--- Converts a regular dropbox url to a raw one
+-- @param string url The url to convert
+-- @return string The converted url
+function http_library.urlDropboxToRaw(url)
+	return string.gsub(url, "www%.dropbox%.com", "dl%.dropboxusercontent%.com")
 end
 
 end
