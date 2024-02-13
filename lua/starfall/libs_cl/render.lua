@@ -878,9 +878,7 @@ end
 --- Sets the draw color
 -- @param Color clr Color type
 function render_library.setColor(clr)
-	currentcolor = clr
-	surface.SetDrawColor(clr)
-	surface.SetTextColor(clr)
+	render_library.setRGBA(clr.r, clr.g, clr.b, clr.a)
 end
 
 --- Gets the draw color modulation.
@@ -907,9 +905,9 @@ end
 -- @param number b Number, blue value
 -- @param number a Number, alpha value
 function render_library.setRGBA(r, g, b, a)
-	rawset(currentcolor, "r", r or 255)
-	rawset(currentcolor, "g", g or 255)
-	rawset(currentcolor, "b", b or 255)
+	rawset(currentcolor, "r", r)
+	rawset(currentcolor, "g", g)
+	rawset(currentcolor, "b", b)
 	rawset(currentcolor, "a", a or 255)
 	surface.SetDrawColor(r, g, b, a)
 	surface.SetTextColor(r, g, b, a)
@@ -1378,7 +1376,7 @@ end
 -- @param number x Center x coordinate
 -- @param number y Center y coordinate
 -- @param number r Radius
-function render_library.drawFilledCircle(x, y, r)
+function render_library.drawFilledCircle(x, y, radius)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
 	local r, g, b, a = rawget(currentcolor, "r"), rawget(currentcolor, "g"), rawget(currentcolor, "b"), rawget(currentcolor, "a")
@@ -1390,11 +1388,11 @@ function render_library.drawFilledCircle(x, y, r)
 	surface.SetMaterial(circleMeshMaterial)
 	render.SetMaterial(circleMeshMaterial)
 
-	if x ~= 0 or y ~= 0 or r ~= 1 then
+	if x ~= 0 or y ~= 0 or radius ~= 1 then
 		circleMeshVector:SetUnpacked(x, y, 0)
 		circleMeshMatrix:SetTranslation(circleMeshVector)
 
-		circleMeshVector:SetUnpacked(r, r, r)
+		circleMeshVector:SetUnpacked(radius, radius, radius)
 		circleMeshMatrix:SetScale(circleMeshVector)
 
 		cam.PushModelMatrix(circleMeshMatrix, true)
