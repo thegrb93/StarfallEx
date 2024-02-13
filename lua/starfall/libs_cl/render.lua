@@ -907,10 +907,10 @@ end
 -- @param number b Number, blue value
 -- @param number a Number, alpha value
 function render_library.setRGBA(r, g, b, a)
-	rawset(currentcolor, "r", r or 255)
-	rawset(currentcolor, "g", g or 255)
-	rawset(currentcolor, "b", b or 255)
-	rawset(currentcolor, "a", a or 255)
+	rawset(currentcolor, 1, r or 255)
+	rawset(currentcolor, 2, g or 255)
+	rawset(currentcolor, 3, b or 255)
+	rawset(currentcolor, 4, a or 255)
 	surface.SetDrawColor(r, g, b, a)
 	surface.SetTextColor(r, g, b, a)
 end
@@ -1378,10 +1378,10 @@ end
 -- @param number x Center x coordinate
 -- @param number y Center y coordinate
 -- @param number r Radius
-function render_library.drawFilledCircle(x, y, r)
+function render_library.drawFilledCircle(x, y, radius)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
-	local r, g, b, a = rawget(currentcolor, "r"), rawget(currentcolor, "g"), rawget(currentcolor, "b"), rawget(currentcolor, "a")
+	local r, g, b, a = rawget(currentcolor, 1), rawget(currentcolor, 2), rawget(currentcolor, 3), rawget(currentcolor, 4)
 	circleMeshVector:SetUnpacked(r / 255, g / 255, b / 255)
 
 	circleMeshMaterial:SetVector("$color", circleMeshVector)
@@ -1390,11 +1390,11 @@ function render_library.drawFilledCircle(x, y, r)
 	surface.SetMaterial(circleMeshMaterial)
 	render.SetMaterial(circleMeshMaterial)
 
-	if x ~= 0 or y ~= 0 or r ~= 1 then
+	if x ~= 0 or y ~= 0 or radius ~= 1 then
 		circleMeshVector:SetUnpacked(x, y, 0)
 		circleMeshMatrix:SetTranslation(circleMeshVector)
 
-		circleMeshVector:SetUnpacked(r, r, r)
+		circleMeshVector:SetUnpacked(radius, radius, radius)
 		circleMeshMatrix:SetScale(circleMeshVector)
 
 		cam.PushModelMatrix(circleMeshMatrix, true)
@@ -1474,7 +1474,7 @@ function render_library.drawTexturedRectUV(x, y, w, h, startU, startV, endU, end
 	makeQuad(x, y, w, h)
 	mesh.Begin(MATERIAL_QUADS, 1)
 	local success, err = pcall(function(startU, startV, endU, endV)
-		local r, g, b, a = rawget(currentcolor, "r"), rawget(currentcolor, "g"), rawget(currentcolor, "b"), rawget(currentcolor, "a")
+		local r, g, b, a = rawget(currentcolor, 1), rawget(currentcolor, 2), rawget(currentcolor, 3), rawget(currentcolor, 4)
 		mesh.Position( quad_v1 )
 		mesh.Color( r,g,b,a )
 		mesh.TexCoord( 0, startU, startV )
@@ -1984,7 +1984,7 @@ function render_library.draw3DQuadUV(vert1, vert2, vert3, vert4)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	mesh.Begin(MATERIAL_QUADS, 1)
 	local ok, err = pcall(function()
-		local r, g, b, a = rawget(currentcolor, "r"), rawget(currentcolor, "g"), rawget(currentcolor, "b"), rawget(currentcolor, "a")
+		local r, g, b, a = rawget(currentcolor, 1), rawget(currentcolor, 2), rawget(currentcolor, 3), rawget(currentcolor, 4)
 		mesh.Position( Vector(vert1[1], vert1[2], vert1[3]) )
 		mesh.Color( r, g, b, a )
 		mesh.TexCoord( 0, vert1[4], vert1[5] )
