@@ -1028,7 +1028,6 @@ env.RENDERFX = {
 --- VRmod library enums
 -- @name vr_library.VR
 -- @class table
--- @client
 -- @field BOOLEAN_PRIMARYFIRE
 -- @field VECTOR1_PRIMARYFIRE
 -- @field BOOLEAN_SECONDARYFIRE
@@ -1384,22 +1383,18 @@ env.DAMAGE = {
 	["MISSILEDEFENSE"] = 2147483648
 }
 
-
-if CLIENT then
-	--- ENUMs used by Bass:getState()
-	-- @name builtins_library.GMOD_CHANNEL
-	-- @class table
-	-- @client
-	-- @field STOPPED 0
-	-- @field PLAYING 1
-	-- @field PAUSED 2
-	-- @field STALLED 3
-	env.GMOD_CHANNEL = {
-		STOPPED = GMOD_CHANNEL_STOPPED,
-		PLAYING = GMOD_CHANNEL_PLAYING,
-		PAUSED = GMOD_CHANNEL_PAUSED,
-		STALLED = GMOD_CHANNEL_STALLED
-	}
-end
+--- ENUMs used by Bass:getState()
+-- @name builtins_library.GMOD_CHANNEL
+-- @class table
+-- @field STOPPED 0
+-- @field PLAYING 1
+-- @field PAUSED 2
+-- @field STALLED 3
+env.GMOD_CHANNEL = {
+	STOPPED = 0,
+	PLAYING = 1,
+	PAUSED = 2,
+	STALLED = 3
+}
 
 end
