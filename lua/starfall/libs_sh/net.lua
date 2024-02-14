@@ -66,7 +66,7 @@ local function net_write(unreliable)
 	net.Start("SF_netmessage", unreliable)
 	net.WriteEntity(instance.entity)
 	for _, v in ipairs(netData) do
-		v[1](unpack(v, 3, #v))
+		v[1](unpack(v, 3))
 	end
 
 	netSize = 0
