@@ -440,8 +440,8 @@ renderdata.renderedViews = 0
 renderdata.rendertargets = {}
 renderdata.validrendertargets = {}
 renderdata.usedPixelVis = {}
-renderdata.oldW = ScrW()
-renderdata.oldH = ScrH()
+renderdata.scrW = ScrW()
+renderdata.scrH = ScrH()
 instance.data.render = renderdata
 
 local render_library = instance.Libraries.render
@@ -483,9 +483,11 @@ function instance:prepareRender()
 	surface.SetDrawColor(255, 255, 255, 255)
 	surface.DisableClipping( true )
 	renderdata.isRendering = true
-	renderdata.needRT = false
-	renderdata.oldW = ScrW()
-	renderdata.oldH = ScrH()
+	if not renderingView then
+		renderdata.needRT = false
+		renderdata.scrW = ScrW()
+		renderdata.scrH = ScrH()
+	end
 end
 
 function instance:prepareRenderOffscreen()
@@ -512,7 +514,7 @@ function instance:cleanupRender()
 	render.SetBlend(1)
 	render.SuppressEngineLighting(false)
 	render.SetWriteDepthToDestAlpha(true)
-	render.SetViewPort(0, 0, renderdata.oldW, renderdata.oldH)
+	render.SetViewPort(0, 0, renderdata.scrW, renderdata.scrH)
 	pp.colour:SetTexture("$fbtexture", tex_screenEffect)
 	pp.downsample:SetTexture("$fbtexture", tex_screenEffect)
 	for i = #matrix_stack, 1, -1 do
@@ -1120,7 +1122,7 @@ function render_library.drawBlurEffect(blurx, blury, passes)
 	passes = math.Clamp(blurx, 0, 100)
 
 	local rt = render.GetRenderTarget()
-	local w, h = renderdata.oldW, renderdata.oldH
+	local w, h = renderdata.scrW, renderdata.scrH
 	local aspectRatio = w / h
 
 	render.BlurRenderTarget(rt, blurx*aspectRatio, blury, passes)
@@ -2126,7 +2128,7 @@ end
 -- @return number the X size of the game window
 -- @return number the Y size of the game window
 function render_library.getGameResolution()
-	return renderdata.oldW, renderdata.oldH
+	return renderdata.scrW, renderdata.scrH
 end
 
 --- Does a trace and returns the color of the textel the trace hits.
