@@ -878,7 +878,7 @@ end
 --- Sets the draw color
 -- @param Color clr Color type
 function render_library.setColor(clr)
-	render_library.setRGBA(rawget(clr, "r"), rawget(clr, "g"), rawget(clr, "b"), rawget(clr, "a"))
+	render_library.setRGBA(clr[1], clr[2], clr[3], clr[4])
 end
 
 --- Gets the draw color modulation.
