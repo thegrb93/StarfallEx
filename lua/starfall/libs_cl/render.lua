@@ -878,7 +878,7 @@ end
 --- Sets the draw color
 -- @param Color clr Color type
 function render_library.setColor(clr)
-	render_library.setRGBA(clr.r, clr.g, clr.b, clr.a)
+	render_library.setRGBA(rawget(clr, "r"), rawget(clr, "g"), rawget(clr, "b"), rawget(clr, "a"))
 end
 
 --- Gets the draw color modulation.
@@ -905,10 +905,14 @@ end
 -- @param number b Number, blue value
 -- @param number a Number, alpha value
 function render_library.setRGBA(r, g, b, a)
+	if r==nil then r=255 end
+	if g==nil then g=255 end
+	if b==nil then b=255 end
+	if a==nil then a=255 end
 	rawset(currentcolor, "r", r)
 	rawset(currentcolor, "g", g)
 	rawset(currentcolor, "b", b)
-	rawset(currentcolor, "a", a or 255)
+	rawset(currentcolor, "a", a)
 	surface.SetDrawColor(r, g, b, a)
 	surface.SetTextColor(r, g, b, a)
 end
@@ -1375,7 +1379,7 @@ end
 --- Draws a filled circle
 -- @param number x Center x coordinate
 -- @param number y Center y coordinate
--- @param number r Radius
+-- @param number radius Radius
 function render_library.drawFilledCircle(x, y, radius)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
