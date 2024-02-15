@@ -57,9 +57,21 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
 
-local function write(func, size, ...)
-	netSize = netSize + size
-	netData[#netData + 1] = { func, { ... } }
+local function write(data)
+	netSize = netSize + data[2]
+	netData[#netData + 1] = data
+end
+
+local function net_write(unreliable)
+	net.Start("SF_netmessage", unreliable)
+	net.WriteEntity(instance.entity)
+	for _, v in ipairs(netData) do
+		v[1](unpack(v, 3))
+	end
+
+	netSize = 0
+	netData = {}
+	netStarted = false
 end
 
 --- Starts the net message
@@ -73,7 +85,7 @@ function net_library.start(name)
 	netSize = 8*8 -- 8 byte overhead
 	netData = {}
 
-	write(net.WriteString, (#name + 1) * 8, name) -- Include null character
+	write{net.WriteString, (#name + 1) * 8, name} -- Include null character
 end
 
 --- Send a net message from client->server, or server->client.
@@ -107,14 +119,8 @@ function net_library.send(target, unreliable)
 	end
 
 	netBurst:use(instance.player, netSize)
+	net_write(unreliable)
 
-	net.Start("SF_netmessage", unreliable)
-	net.WriteEntity(instance.entity)
-	local data = netData
-	for i = 1, #data do
-		local args = data[i][2]
-		data[i][1](unpack(args, 1, table.maxn(args)))
-	end
 	if SERVER then
 		if newtarget then
 			net.Send(newtarget)
@@ -125,10 +131,25 @@ function net_library.send(target, unreliable)
 		net.SendToServer()
 	end
 
-	netSize = 0
-	netData = {}
-	netStarted = false
 	instance:checkCpu()
+end
+
+if SERVER then
+	--- Send net message to all players within the visible area of a vector
+	-- @server
+	-- @param Vector pos A vector within the PVS area to send a message
+	-- @param boolean? unreliable Optional choose whether it's more important for the message to actually reach its destination (false) or reach it as fast as possible (true).
+	function net_library.sendPVS(pos, unreliable)
+		if not netStarted then SF.Throw("net message not started", 2) end
+		pos = vunwrap(pos)
+
+		netBurst:use(instance.player, netSize)
+		net_write(unreliable)
+
+		net.SendPVS(pos)
+
+		instance:checkCpu()
+	end
 end
 
 --- Writes an object to a net message automatically typing it
@@ -138,8 +159,8 @@ function net_library.writeType(v)
 	if not netStarted then SF.Throw("net message not started", 2) end
 
 	local str = util.Compress(SF.TableToString({v}, instance))
-	write(net.WriteUInt, 32, #str, 32)
-	write(net.WriteData, #str*8, str, #str)
+	write{net.WriteUInt, 32, #str, 32}
+	write{net.WriteData, #str*8, str, #str}
 end
 
 --- Reads an object from a net message automatically typing it
@@ -158,8 +179,8 @@ function net_library.writeTable(t)
 	checkluatype(t, TYPE_TABLE)
 
 	local str = util.Compress(SF.TableToString(t, instance))
-	write(net.WriteUInt, 32, #str, 32)
-	write(net.WriteData, #str*8, str, #str)
+	write{net.WriteUInt, 32, #str, 32}
+	write{net.WriteData, #str*8, str, #str}
 end
 
 --- Reads an table from a net message automatically typing it
@@ -178,7 +199,7 @@ function net_library.writeString(t)
 
 	checkluatype (t, TYPE_STRING)
 
-	write(net.WriteString, (#t+1)*8, t)
+	write{net.WriteString, (#t+1)*8, t}
 end
 
 --- Reads a string from the net message
@@ -199,7 +220,7 @@ function net_library.writeData(t, n)
 	checkluatype (n, TYPE_NUMBER)
 
 	n = math.Clamp(n, 0, 64000)
-	write(net.WriteData, n*8, t, n)
+	write{net.WriteData, n*8, t, n}
 end
 
 --- Reads a string from the net message
@@ -220,7 +241,7 @@ function net_library.writeStream(str, compress)
 	if not netStarted then SF.Throw("net message not started", 2) end
 	checkluatype (str, TYPE_STRING)
 	if #str > 64e6 then SF.Throw("String is too long!") end
-	write(net.WriteStream, 8*8, str, nil, compress == false)
+	write{net.WriteStream, 8*8, str, function() end, compress == false}
 end
 
 --- Reads a large string stream from the net message.
@@ -270,7 +291,7 @@ function net_library.writeInt(t, n)
 	checkluatype (n, TYPE_NUMBER)
 
 	n = math.Clamp(n, 0, 32)
-	write(net.WriteInt, n, t, n)
+	write{net.WriteInt, n, t, n}
 end
 
 --- Reads an integer from the net message
@@ -293,7 +314,7 @@ function net_library.writeUInt(t, n)
 	checkluatype (n, TYPE_NUMBER)
 
 	n = math.Clamp(n, 0, 32)
-	write(net.WriteUInt, n, t, n)
+	write{net.WriteUInt, n, t, n}
 end
 
 --- Reads an unsigned integer from the net message
@@ -313,7 +334,7 @@ function net_library.writeBit(t)
 
 	checkluatype (t, TYPE_NUMBER)
 
-	write(net.WriteBit, 1, t~=0)
+	write{net.WriteBit, 1, t~=0}
 end
 
 --- Reads a bit from the net message
@@ -331,7 +352,7 @@ function net_library.writeBool(t)
 
 	checkluatype (t, TYPE_BOOL)
 
-	write(net.WriteBool, 1, t)
+	write{net.WriteBool, 1, t}
 end
 
 --- Reads a boolean from the net message
@@ -349,7 +370,7 @@ function net_library.writeDouble(t)
 
 	checkluatype (t, TYPE_NUMBER)
 
-	write(net.WriteDouble, 8*8, t)
+	write{net.WriteDouble, 8*8, t}
 end
 
 --- Reads a double from the net message
@@ -367,7 +388,7 @@ function net_library.writeFloat(t)
 
 	checkluatype (t, TYPE_NUMBER)
 
-	write(net.WriteFloat, 4*8, t)
+	write{net.WriteFloat, 4*8, t}
 end
 
 --- Reads a float from the net message
@@ -382,9 +403,9 @@ end
 -- @param Angle t The angle to be written
 function net_library.writeAngle(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
-	write(net.WriteFloat, 4*8, t[1])
-	write(net.WriteFloat, 4*8, t[2])
-	write(net.WriteFloat, 4*8, t[3])
+	write{net.WriteFloat, 4*8, t[1]}
+	write{net.WriteFloat, 4*8, t[2]}
+	write{net.WriteFloat, 4*8, t[3]}
 end
 
 --- Reads an angle from the net message
@@ -399,9 +420,9 @@ end
 -- @param Vector t The vector to be written
 function net_library.writeVector(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
-	write(net.WriteFloat, 4*8, t[1])
-	write(net.WriteFloat, 4*8, t[2])
-	write(net.WriteFloat, 4*8, t[3])
+	write{net.WriteFloat, 4*8, t[1]}
+	write{net.WriteFloat, 4*8, t[2]}
+	write{net.WriteFloat, 4*8, t[3]}
 end
 
 --- Reads a vector from the net message
@@ -418,7 +439,7 @@ function net_library.writeMatrix(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
 	local vals = {munwrap(t):Unpack()}
 	for i=1, 16 do
-		write(net.WriteFloat, 4*8, vals[i])
+		write{net.WriteFloat, 4*8, vals[i]}
 	end
 end
 
@@ -436,7 +457,7 @@ end
 -- @param Color t The color to be written
 function net_library.writeColor(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
-	write(net.WriteColor, 4*8, cunwrap(t))
+	write{net.WriteColor, 4*8, cunwrap(t)}
 end
 
 --- Reads a color from the net message
@@ -451,7 +472,7 @@ end
 -- @param Entity t The entity to be written
 function net_library.writeEntity(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
-	write(net.WriteUInt, 16, getent(t):EntIndex(), 16)
+	write{net.WriteUInt, 16, getent(t):EntIndex(), 16}
 end
 
 --- Reads a entity from the net message
