@@ -51,7 +51,7 @@ local function addSoundToSimpleFade(snd)
 	table.insert(simpleFadeSounds, snd)
 	applySimpleFading(snd)
 
-	if #simpleFadeSounds ~= 1 then return end -- Hook is already running
+	if #simpleFadeSounds ~= 1 then return end -- Hook is already running.
 
 	hook.Add("Think", "SF_Bass_SimpleFade", function()
 		for _, s in ipairs(simpleFadeSounds) do
@@ -106,7 +106,7 @@ SF.RegisterType("Bass", true, false)
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
--- Register functions to be called when the chip is initialised and deinitialised
+-- Register functions to be called when the chip is initialized and deinitialized.
 local soundList = {}
 
 instance:AddHook("deinitialize", function()
@@ -174,10 +174,10 @@ local function loadSound(path, flags, callback, loadFunc)
 end
 
 
---- Loads a sound channel from a file.
+--- Loads a sound as a Bass object from a file.
 -- @param string path File path to play from.
 -- @param string flags Flags for the sound (`3d`, `mono`, `noplay`, `noblock`).
--- @param function callback Function which is called when the sound channel is loaded. It'll get 3 arguments: `Bass` object, error number and name.
+-- @param function callback Function which is called when the sound is loaded. It'll get 3 arguments: `Bass` object, error number and name.
 function bass_library.loadFile(path, flags, callback)
 	checkpermission(instance, nil, "bass.loadFile")
 
@@ -191,10 +191,10 @@ function bass_library.loadFile(path, flags, callback)
 	loadSound(path, flags, callback, sound.PlayFile)
 end
 
---- Loads a sound channel from an URL.
+--- Loads a sound as a Bass object from a URL.
 -- @param string path URL path to play from.
 -- @param string flags Flags for the sound (`3d`, `mono`, `noplay`, `noblock`). noblock will fail if the webserver doesn't provide file length.
--- @param function callback Function which is called when the sound channel is loaded. It'll get 3 arguments: `Bass` object, error number and name.
+-- @param function callback Function which is called when the sound is loaded. It'll get 3 arguments: `Bass` object, error number and name.
 function bass_library.loadURL(path, flags, callback)
 	checkpermission(instance, path, "bass.loadURL")
 
@@ -207,8 +207,8 @@ function bass_library.loadURL(path, flags, callback)
 	loadSound(path, flags, callback, sound.PlayURL)
 end
 
---- Returns the number of sounds left that can be created
--- @return number The number of sounds left
+--- Returns the number of sounds left that can be created.
+-- @return number The number of sounds left.
 function bass_library.soundsLeft()
 	return plyCount:check(instance.player)
 end
@@ -220,7 +220,7 @@ function bass_methods:play()
 	getsnd(self):Play()
 end
 
---- Stops playing the sound and destroys it. Use pause instead if you don't want it destroyed
+--- Stops playing the sound and destroys it. Use pause instead if you don't want it destroyed.
 function bass_methods:stop()
 	local snd = getsnd(self)
 	deleteSound(instance.player, snd)
@@ -237,7 +237,7 @@ function bass_methods:pause()
 	getsnd(self):Pause()
 end
 
---- Sets the volume of the sound channel.
+--- Sets the volume of the sound.
 -- @param number vol Volume multiplier (1 is normal), between 0x and 10x.
 function bass_methods:setVolume(vol)
 	checkluatype(vol, TYPE_NUMBER)
@@ -255,15 +255,15 @@ function bass_methods:setVolume(vol)
 	end
 end
 
---- Gets the base volume of the sound channel.
+--- Gets the base volume of the sound.
 -- This is the volume before distance fading is applied on 3D sounds.
 -- @return number Volume multiplier (1 is normal), between 0x and 10x.
 function bass_methods:getVolume()
 	return soundDatas[getsnd(self)].targetVolume
 end
 
---- Gets the distance-based fade multiplier of the sound channel.
--- Bass:getVolume() * Bass:getFadeMultiplier() is the effective volume of the sound channel.
+--- Gets the distance-based fade multiplier of the sound.
+-- Bass:getVolume() * Bass:getFadeMultiplier() is the effective volume of the sound.
 -- Always 1 for 2D sounds.
 -- Always 1 for 3D sounds that don't use simple fading. See Bass:setFade().
 -- Only updates once per frame while the sound is playing.
@@ -272,16 +272,16 @@ function bass_methods:getFadeMultiplier()
 	return soundDatas[getsnd(self)].fadeMult
 end
 
---- Returns whether or not the sound channel is out of earshot.
+--- Returns whether or not the sound is out of earshot.
 -- Always false for 2D sounds.
 -- Always true for 3D sounds that don't use simple fading. See Bass:setFade().
 -- Only updates once per frame while the sound is playing.
--- @return boolean True if the sound channel's distance is greater than its fade maximum.
+-- @return boolean True if the sound's distance is greater than its fade maximum.
 function bass_methods:isOutOfEarshot()
 	return soundDatas[getsnd(self)].outOfEarshot
 end
 
---- Sets the pitch of the sound channel.
+--- Sets the pitch of the sound.
 -- @param number pitch Pitch to set to. (0-100) 1 is normal pitch.
 function bass_methods:setPitch(pitch)
 	checkluatype(pitch, TYPE_NUMBER)
@@ -343,39 +343,39 @@ function bass_methods:getFade()
 	return min, max, simpleFadeEnabled
 end
 
---- Sets whether the sound channel should loop. Requires the 'noblock' flag.
--- @param boolean loop Whether the sound channel should loop.
+--- Sets whether the sound should loop. Requires the 'noblock' flag.
+-- @param boolean loop Whether the sound should loop.
 function bass_methods:setLooping(loop)
 	getsnd(self):EnableLooping(loop)
 end
 
---- Gets whether the sound channel loops.
--- @return boolean Whether the sound channel loops.
+--- Gets whether the sound loops.
+-- @return boolean Whether the sound loops.
 function bass_methods:isLooping()
 	return getsnd(self):IsLooping()
 end
 
---- Gets the length of a sound channel.
--- @return number Sound channel length in seconds.
+--- Gets the length of a sound.
+-- @return number Sound length in seconds.
 function bass_methods:getLength()
 	return getsnd(self):GetLength()
 end
 
---- Sets the current playback time of the sound channel. Requires the 'noblock' flag.
--- @param number time Sound channel playback time in seconds.
+--- Sets the current playback time of the sound. Requires the 'noblock' flag.
+-- @param number time Sound playback time in seconds.
 -- @param boolean? dontDecode Skip decoding to set time, which is much faster but less accurate. True by default.
 function bass_methods:setTime(time, dontDecode)
 	checkluatype(time, TYPE_NUMBER)
 	getsnd(self):SetTime(time, dontDecode ~= false)
 end
 
---- Gets the current playback time of the sound channel. Requires the 'noblock' flag.
--- @return number Sound channel playback time in seconds.
+--- Gets the current playback time of the sound. Requires the 'noblock' flag.
+-- @return number Sound playback time in seconds.
 function bass_methods:getTime()
 	return getsnd(self):GetTime()
 end
 
---- Perform fast Fourier transform algorithm to compute the DFT of the sound channel.
+--- Perform fast Fourier transform algorithm to compute the DFT of the sound.
 -- @param number n Number of consecutive audio samples, between 0 and 7. Depending on this parameter you will get 256*2^n samples.
 -- @return table Table containing DFT magnitudes, each between 0 and 1.
 function bass_methods:getFFT(n)
@@ -384,8 +384,8 @@ function bass_methods:getFFT(n)
 	return arr
 end
 
---- Gets whether the sound channel is streamed online.
--- @return boolean Boolean of whether the sound channel is streamed online.
+--- Gets whether the sound is streamed online.
+-- @return boolean Boolean of whether the sound is streamed online.
 function bass_methods:isOnline()
 	return getsnd(self):IsOnline()
 end
@@ -398,7 +398,7 @@ function bass_methods:isValid()
 	return isValid and isValid(uw) or false
 end
 
---- Gets the left and right levels of the audio channel
+--- Gets the left and right audio channel levels.
 -- @return number The left sound level, a value between 0 and 1.
 -- @return number The right sound level, a value between 0 and 1.
 function bass_methods:getLevels()
@@ -412,74 +412,74 @@ function bass_methods:getPan()
 end
 
 --- Sets the relative volume of the left and right channels.
--- @param number Relative integer volume between the left and right channels. Values must be -1 to 1 for relative left to right
+-- @param number Relative integer volume between the left and right channels. Values must be -1 to 1 for relative left to right.
 function bass_methods:setPan(pan)
 	checkluatype(pan, TYPE_NUMBER)
 
 	local uw = getsnd(self)
-	-- If we ever use / add Set3DEnabled to SF, remember to change this Is3D to Get3DEnabled
+	-- If we ever use / add Set3DEnabled to SF, remember to change this Is3D to Get3DEnabled.
 	if uw:Is3D() then SF.Throw("You cannot set the pan of a 3D Bass Object!", 2) end
 	uw:SetPan( pan )
 end
 
---- Retrieves the number of bits per sample of the sound channel.
+--- Retrieves the number of bits per sample of the sound.
 -- Doesn't work for mp3 and ogg files.
 -- @return number Floating point number of bits per sample, or 0 if unknown.
 function bass_methods:getBitsPerSample()
 	return getsnd(self):GetBitsPerSample()
 end
 
---- Returns the average bit rate of the sound channel.
--- @return number The average bit rate of the sound channel.
+--- Returns the average bit rate of the sound.
+-- @return number The average bit rate of the sound.
 function bass_methods:getAverageBitRate()
 	return getsnd(self):GetAverageBitRate()
 end
 
---- Returns the flags used to create the sound channel.
--- @return string The flags of the sound channel (`3d`, `mono`, `noplay`, `noblock`).
+--- Returns the flags used to create the sound.
+-- @return string The flags of the sound (`3d`, `mono`, `noplay`, `noblock`).
 function bass_methods:getFlags()
 	return sounds[getsnd(self)].flags
 end
 
---- Returns whether or not the sound channel is 2D.
--- @return boolean True if the sound channel is 2D.
+--- Returns whether or not the sound is 2D.
+-- @return boolean True if the sound is 2D.
 function bass_methods:is2D()
 	return not getsnd(self):Is3D()
 end
 
---- Returns whether or not the sound channel is 3D.
--- @return boolean True if the sound channel is 3D.
+--- Returns whether or not the sound is 3D.
+-- @return boolean True if the sound is 3D.
 function bass_methods:is3D()
 	return getsnd(self):Is3D()
 end
 
---- Returns the state of the sound channel.
--- @return number The state enum of the sound channel. https://wiki.facepunch.com/gmod/Enums/GMOD_CHANNEL
+--- Returns the state of the sound.
+-- @return number The state enum of the sound. https://wiki.facepunch.com/gmod/Enums/GMOD_CHANNEL
 function bass_methods:getState()
 	return getsnd(self):GetState()
 end
 
---- Returns whether or not the sound channel is stopped.
+--- Returns whether or not the sound is stopped.
 -- Only true if the `noplay` flag is used and Bass:play() hasn't been called yet, since Bass:stop() will destroy the sound channel.
--- @return boolean True if the sound channel is stopped.
+-- @return boolean True if the sound is stopped.
 function bass_methods:isStopped()
 	return getsnd(self):GetState() == GMOD_CHANNEL_STOPPED
 end
 
---- Returns whether or not the sound channel is playing.
--- @return boolean True if the sound channel is playing.
+--- Returns whether or not the sound is playing.
+-- @return boolean True if the sound is playing.
 function bass_methods:isPlaying()
 	return getsnd(self):GetState() == GMOD_CHANNEL_PLAYING
 end
 
---- Returns whether or not the sound channel is paused.
--- @return boolean True if the sound channel is paused.
+--- Returns whether or not the sound is paused.
+-- @return boolean True if the sound is paused.
 function bass_methods:isPaused()
 	return getsnd(self):GetState() == GMOD_CHANNEL_PAUSED
 end
 
---- Returns whether or not the sound channel is stalled.
--- @return boolean True if the sound channel is stalled.
+--- Returns whether or not the sound is stalled.
+-- @return boolean True if the sound is stalled.
 function bass_methods:isStalled()
 	return getsnd(self):GetState() == GMOD_CHANNEL_STALLED
 end
