@@ -7,7 +7,9 @@ local dgetmeta = debug.getmetatable
 local checkluatype = SF.CheckLuaType
 local haspermission = SF.Permissions.hasAccess
 local registerprivilege = SF.Permissions.registerPrivilege
-local COLOR_WHITE = Color(255, 255, 255)
+local col_meta = FindMetaTable("Color")
+local col_SetUnpacked = col_meta.SetUnpacked
+local col_Unpack = col_meta.Unpack
 
 registerprivilege("render.screen", "Render Screen", "Allows the user to render to a starfall screen", { client = {} })
 registerprivilege("render.hud", "Render Hud", "Allows the user to render to your hud", { client = {} })
@@ -471,7 +473,7 @@ end)
 
 
 function instance:prepareRender()
-	currentcolor:SetUnpacked(255, 255, 255, 255)
+	col_SetUnpacked(currentcolor, 255, 255, 255, 255)
 	circleMeshMatrix:Identity()
 	render.SetColorMaterial()
 	draw.NoTexture()
@@ -906,7 +908,7 @@ function render_library.setRGBA(r, g, b, a)
 	if g==nil then g=255 end
 	if b==nil then b=255 end
 	if a==nil then a=255 end
-	currentcolor:SetUnpacked(r, g, b, a)
+	col_SetUnpacked(currentcolor, r, g, b, a)
 	surface.SetDrawColor(r, g, b, a)
 	surface.SetTextColor(r, g, b, a)
 end
@@ -1377,7 +1379,7 @@ end
 function render_library.drawFilledCircle(x, y, radius)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
-	local r, g, b, a = currentcolor:Unpack()
+	local r, g, b, a = col_Unpack(currentcolor)
 	circleMeshVector:SetUnpacked(r / 255, g / 255, b / 255)
 
 	circleMeshMaterial:SetVector("$color", circleMeshVector)
@@ -1470,7 +1472,7 @@ function render_library.drawTexturedRectUV(x, y, w, h, startU, startV, endU, end
 	makeQuad(x, y, w, h)
 	mesh.Begin(MATERIAL_QUADS, 1)
 	local success, err = pcall(function(startU, startV, endU, endV)
-		local r, g, b, a = currentcolor:Unpack()
+		local r, g, b, a = col_Unpack(currentcolor)
 		mesh.Position( quad_v1 )
 		mesh.Color( r,g,b,a )
 		mesh.TexCoord( 0, startU, startV )
@@ -1980,7 +1982,7 @@ function render_library.draw3DQuadUV(vert1, vert2, vert3, vert4)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	mesh.Begin(MATERIAL_QUADS, 1)
 	local ok, err = pcall(function()
-		local r, g, b, a = currentcolor:Unpack()
+		local r, g, b, a = col_Unpack(currentcolor)
 		mesh.Position( Vector(vert1[1], vert1[2], vert1[3]) )
 		mesh.Color( r, g, b, a )
 		mesh.TexCoord( 0, vert1[4], vert1[5] )
