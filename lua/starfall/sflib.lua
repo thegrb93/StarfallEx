@@ -712,7 +712,9 @@ do
 							end
 						end
 					end
-					return result and unpack(result)
+					if result then
+						unpack(result)
+					end
 				end
 			else
 				return function(...)
@@ -735,7 +737,9 @@ do
 							if #sane > 0 then result = sane end
 						end
 					end
-					return result and unpack(result)
+					if result then
+						unpack(result)
+					end
 				end
 			else
 				return function(...)
