@@ -706,11 +706,13 @@ do
 						local canrun, customargs = customargfunc(instance, ...)
 						if canrun then
 							local tbl = instance:runScriptHookForResult(hookname, unpack(customargs))
-							local sane = customretfunc(instance, tbl, ...)
-							if sane ~= nil then result = sane end
+							if #tbl>1 then
+								local sane = {customretfunc(instance, tbl, ...)}
+								if #sane > 0 then result = sane end
+							end
 						end
 					end
-					return result
+					return result and unpack(result)
 				end
 			else
 				return function(...)
@@ -728,10 +730,12 @@ do
 					local result
 					for instance, _ in pairs(instances) do
 						local tbl = instance:runScriptHookForResult(hookname, unpack(instance.Sanitize({...})))
-						local sane = customretfunc(instance, tbl, ...)
-						if sane ~= nil then result = sane end
+						if #tbl>1 then
+							local sane = {customretfunc(instance, tbl, ...)}
+							if #sane > 0 then result = sane end
+						end
 					end
-					return result
+					return result and unpack(result)
 				end
 			else
 				return function(...)
