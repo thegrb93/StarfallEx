@@ -713,7 +713,7 @@ do
 						end
 					end
 					if result then
-						unpack(result)
+						return unpack(result)
 					end
 				end
 			else
@@ -738,7 +738,7 @@ do
 						end
 					end
 					if result then
-						unpack(result)
+						return unpack(result)
 					end
 				end
 			else
