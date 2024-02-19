@@ -89,6 +89,18 @@ local function deleteSound(ply, snd)
 	plyCount:free(ply, 1)
 end
 
+-- Sets the min/max fade distance of a sound, and whether or not to use simple fading.
+local function setSoundFade(snd, min, max, useSimpleFading)
+	if useSimpleFading then
+		soundDatas[snd].fadeMax = max -- Need to keep track of fadeMax ourselves due to the line below.
+		snd:Set3DFadeDistance(min, min) -- Use min, min so that gmod doesn't do any fading of its own.
+		addSoundToSimpleFade(snd)
+	else
+		snd:Set3DFadeDistance(min, max)
+		removeSoundFromSimpleFade(snd)
+	end
+end
+
 
 --- `bass` library is intended to be used only on client side. It's good for streaming local and remote sound files and playing them directly in player's "2D" context.
 -- @name bass
@@ -163,7 +175,7 @@ local function loadSound(path, flags, callback, loadFunc)
 
 				-- Default with simple fade settings
 				if not is2D then
-					instance:runFunction(bass_methods.setFade, wrap(snd), 200, 5000, true)
+					setSoundFade(snd, 200, 5000, true)
 				end
 
 				instance:runFunction(callback, wrap(snd), 0, "")
@@ -312,22 +324,15 @@ function bass_methods:setFade(min, max, useSimpleFading)
 
 	if useSimpleFading == nil then useSimpleFading = true end
 
-	local snd = getsnd(self)
-
 	if useSimpleFading then
 		min = math.Clamp(min, 50, 1000)
 		max = math.Clamp(max, min, 20000)
-
-		soundDatas[snd].fadeMax = max -- Need to keep track of fadeMax ourselves due to the line below.
-		snd:Set3DFadeDistance(min, min) -- Use min, min so that gmod doesn't do any fading of its own.
-		addSoundToSimpleFade(snd)
 	else
 		min = math.Clamp(min, 50, 1000)
 		max = math.Clamp(max, 5000, 200000)
-
-		snd:Set3DFadeDistance(min, max)
-		removeSoundFromSimpleFade(snd)
 	end
+
+	setSoundFade(getsnd(self), min, max, useSimpleFading)
 end
 
 --- Gets the fade distance of the sound in 3D space. 
