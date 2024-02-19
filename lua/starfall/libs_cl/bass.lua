@@ -50,15 +50,15 @@ local function addSoundToSimpleFade(snd)
 	table.insert(simpleFadeSounds, snd)
 	applySimpleFading(snd)
 
-	if #simpleFadeSounds ~= 1 then return end -- Hook is already running.
-
-	hook.Add("Think", "SF_Bass_SimpleFade", function()
-		for _, s in ipairs(simpleFadeSounds) do
-			if s:IsValid() and s:GetState() == GMOD_CHANNEL_PLAYING then
-				applySimpleFading(s)
+	if #simpleFadeSounds == 1 then
+		hook.Add("Think", "SF_Bass_SimpleFade", function()
+			for _, s in ipairs(simpleFadeSounds) do
+				if s:IsValid() and s:GetState() == GMOD_CHANNEL_PLAYING then
+					applySimpleFading(s)
+				end
 			end
-		end
-	end)
+		end)
+	end
 end
 
 local function removeSoundFromSimpleFade(snd)
@@ -73,9 +73,9 @@ local function removeSoundFromSimpleFade(snd)
 		snd:SetVolume(sndData.targetVolume) -- Remove manual fading, reset to target volume.
 	end
 
-	if #simpleFadeSounds ~= 0 then return end -- Hook is still needed
-
-	hook.Remove("Think", "SF_Bass_SimpleFade")
+	if #simpleFadeSounds == 0 then
+		hook.Remove("Think", "SF_Bass_SimpleFade")
+	end
 end
 
 local function deleteSound(ply, snd)
