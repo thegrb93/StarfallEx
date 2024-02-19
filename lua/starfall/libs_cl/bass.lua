@@ -14,7 +14,7 @@ local simpleFadeSounds = {} -- { [1] = IGModAudioChannel, ... } -- A list of sou
 SF.ResourceCounters.Bass = {icon = "icon16/sound_add.png", count = function(ply) return plyCount:get(ply).val end}
 
 
--- Calculates whether or not a 3D sound is out of earshot, and its fade multiplier.
+-- Calculates the simple fade multiplier for a 3D sound.
 local function getSimpleFading(snd)
 	local pos = snd:GetPos()
 	local earPos = EyePos()
@@ -22,22 +22,21 @@ local function getSimpleFading(snd)
 	local fadeMax = soundDatas[snd].fadeMax
 	local distSqr = pos:DistToSqr(earPos)
 
-	if distSqr <= fadeMin * fadeMin then return false, 1 end
-	if distSqr >= fadeMax * fadeMax then return true, 0 end
+	if distSqr <= fadeMin * fadeMin then return 1 end
+	if distSqr >= fadeMax * fadeMax then return 0 end
 
 	local dist = math_sqrt(distSqr)
 	local farnessFrac = (dist - fadeMin) / (fadeMax - fadeMin)
 
-	return false, (1 - farnessFrac) ^ 2 -- Sounds falls off with dist^2. Unfortunately, we still have to do the square root inbetween.
+	return (1 - farnessFrac) ^ 2 -- Sounds falls off with dist^2. Unfortunately, we still have to do the square root inbetween.
 end
 
 local function applySimpleFading(snd)
 	local sndData = soundDatas[snd]
-	local outOfEarshot, fadeMult = getSimpleFading(snd)
+	local fadeMult = getSimpleFading(snd)
 
 	if sndData.fadeMult ~= fadeMult then
 		sndData.fadeMult = fadeMult
-		sndData.outOfEarshot = outOfEarshot
 
 		snd:SetVolume(sndData.targetVolume * fadeMult)
 	end
@@ -68,7 +67,6 @@ local function removeSoundFromSimpleFade(snd)
 
 	sndData.simpleFadeEnabled = false
 	sndData.fadeMult = 1
-	sndData.outOfEarshot = false
 	table.RemoveByValue(simpleFadeSounds, snd)
 
 	if snd:IsValid() then -- Could be in the process of being deleted.
@@ -169,7 +167,6 @@ local function loadSound(path, flags, callback, loadFunc)
 					targetVolume = 1,
 					fadeMult = 1,
 					fadeMax = 5000,
-					outOfEarshot = false,
 					simpleFadeEnabled = false
 				}
 
@@ -281,15 +278,6 @@ end
 -- @return number Volume fade multiplier (1 is normal), between 0x and 10x.
 function bass_methods:getFadeMultiplier()
 	return soundDatas[getsnd(self)].fadeMult
-end
-
---- Returns whether or not the sound is out of earshot.
--- Always false for 2D sounds.
--- Always true for 3D sounds that don't use simple fading. See Bass:setFade().
--- Only updates once per frame while the sound is playing.
--- @return boolean True if the sound's distance is greater than its fade maximum.
-function bass_methods:isOutOfEarshot()
-	return soundDatas[getsnd(self)].outOfEarshot
 end
 
 --- Sets the pitch of the sound.
