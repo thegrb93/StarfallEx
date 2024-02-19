@@ -106,15 +106,14 @@ SF.RegisterType("Bass", true, false)
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
--- Register functions to be called when the chip is initialized and deinitialized.
-local soundList = {}
+local instanceSounds = {} -- A list of sounds created by this instance.
 
 instance:AddHook("deinitialize", function()
-	for _, snd in ipairs(soundList) do
+	for _, snd in ipairs(instanceSounds) do
 		deleteSound(instance.player, snd)
 	end
 
-	soundList = nil
+	instanceSounds = nil
 end)
 
 
@@ -152,7 +151,7 @@ local function loadSound(path, flags, callback, loadFunc)
 				snd:Stop()
 				plyCount:free(instance.player, 1)
 			else
-				table.insert(soundList, snd)
+				table.insert(instanceSounds, snd)
 				soundDatas[snd] = { -- IGModAudioChannel is userdata, so we can't attach extra key-value pairs or functions to it directly.
 					flags = flags,
 					targetVolume = 1,
@@ -224,7 +223,7 @@ end
 function bass_methods:stop()
 	local snd = getsnd(self)
 	deleteSound(instance.player, snd)
-	table.RemoveByValue(soundList, snd)
+	table.RemoveByValue(instanceSounds, snd)
 
 	-- This makes the sound no longer unwrap
 	local sensitive2sf, sf2sensitive = bass_meta.sensitive2sf, bass_meta.sf2sensitive
