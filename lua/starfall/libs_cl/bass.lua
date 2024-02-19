@@ -25,10 +25,10 @@ local function getSimpleFading(snd)
 	if distSqr <= fadeMin * fadeMin then return 1 end
 	if distSqr >= fadeMax * fadeMax then return 0 end
 
+	-- Sounds falls off with dist^2. Unfortunately, we still have to do the square root inbetween.
 	local dist = math_sqrt(distSqr)
-	local farnessFrac = (dist - fadeMin) / (fadeMax - fadeMin)
 
-	return (1 - farnessFrac) ^ 2 -- Sounds falls off with dist^2. Unfortunately, we still have to do the square root inbetween.
+	return ((fadeMax - dist) / (fadeMax - fadeMin)) ^ 2
 end
 
 local function applySimpleFading(snd)
