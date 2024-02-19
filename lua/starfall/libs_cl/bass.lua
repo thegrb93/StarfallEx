@@ -438,7 +438,7 @@ end
 --- Returns the flags used to create the sound.
 -- @return string The flags of the sound (`3d`, `mono`, `noplay`, `noblock`).
 function bass_methods:getFlags()
-	return sounds[getsnd(self)].flags
+	return soundDatas[getsnd(self)].flags
 end
 
 --- Returns whether or not the sound is 2D.
