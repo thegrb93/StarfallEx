@@ -15,11 +15,9 @@ SF.ResourceCounters.Bass = {icon = "icon16/sound_add.png", count = function(ply)
 
 
 -- Calculates the simple fade multiplier for a 3D sound.
-local function getSimpleFading(snd)
+local function getSimpleFading(snd, fadeMin, fadeMax)
 	local pos = snd:GetPos()
 	local earPos = EyePos()
-	local fadeMin = snd:Get3DFadeDistance()
-	local fadeMax = soundDatas[snd].fadeMax
 	local distSqr = pos:DistToSqr(earPos)
 
 	if distSqr <= fadeMin * fadeMin then return 1 end
@@ -33,7 +31,7 @@ end
 
 local function applySimpleFading(snd)
 	local sndData = soundDatas[snd]
-	local fadeMult = getSimpleFading(snd)
+	local fadeMult = getSimpleFading(snd, sndData.fadeMin, sndData.fadeMax)
 
 	if sndData.fadeMult ~= fadeMult then
 		sndData.fadeMult = fadeMult
@@ -89,8 +87,12 @@ end
 
 -- Sets the min/max fade distance of a sound, and whether or not to use simple fading.
 local function setSoundFade(snd, min, max, useSimpleFading)
+	local sndData = soundDatas[snd]
+
+	sndData.fadeMin = min
+	sndData.fadeMax = max
+
 	if useSimpleFading then
-		soundDatas[snd].fadeMax = max -- Need to keep track of fadeMax ourselves due to the line below.
 		snd:Set3DFadeDistance(min, min) -- Use min, min so that gmod doesn't do any fading of its own.
 		addSoundToSimpleFade(snd)
 	else
@@ -166,6 +168,7 @@ local function loadSound(path, flags, callback, loadFunc)
 					flags = flags,
 					targetVolume = 1,
 					fadeMult = 1,
+					fadeMin = 200,
 					fadeMax = 5000,
 					simpleFadeEnabled = false
 				}
@@ -329,10 +332,9 @@ end
 -- @return boolean Whether or not this sound uses simple fading.
 function bass_methods:getFade()
 	local snd = getsnd(self)
-	local min, max = snd:Get3DFadeDistance()
-	local simpleFadeEnabled = soundDatas[snd].simpleFadeEnabled
+	local sndData = soundDatas[snd]
 
-	return min, max, simpleFadeEnabled
+	return sndData.fadeMin, sndData.fadeMax, sndData.simpleFadeEnabled
 end
 
 --- Sets whether the sound should loop. Requires the 'noblock' flag.
