@@ -262,6 +262,7 @@ function bass_methods:setVolume(vol)
 	sndData.targetVolume = vol
 
 	if sndData.simpleFade then
+		sndData.fadeMult = -1 -- Force the SetVolume in calcFade
 		sndData:calcFade()
 	else
 		snd:SetVolume(vol)
