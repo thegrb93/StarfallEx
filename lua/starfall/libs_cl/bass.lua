@@ -118,10 +118,10 @@ SF.RegisterType("Bass", true, false)
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
-local instanceSounds = {} -- A list of sounds created by this instance.
+local instanceSounds = {} -- A lookup table of sounds created by this instance.
 
 instance:AddHook("deinitialize", function()
-	for _, snd in ipairs(instanceSounds) do
+	for snd in pairs(instanceSounds) do
 		deleteSound(instance.player, snd)
 	end
 
@@ -163,7 +163,7 @@ local function loadSound(path, flags, callback, loadFunc)
 				snd:Stop()
 				plyCount:free(instance.player, 1)
 			else
-				table.insert(instanceSounds, snd)
+				instanceSounds[snd] = true
 				soundDatas[snd] = { -- IGModAudioChannel is userdata, so we can't attach extra key-value pairs or functions to it directly.
 					flags = flags,
 					targetVolume = 1,
@@ -235,7 +235,7 @@ end
 function bass_methods:stop()
 	local snd = getsnd(self)
 	deleteSound(instance.player, snd)
-	table.RemoveByValue(instanceSounds, snd)
+	instanceSounds[snd] = nil
 
 	-- This makes the sound no longer unwrap
 	local sensitive2sf, sf2sensitive = bass_meta.sensitive2sf, bass_meta.sf2sensitive
