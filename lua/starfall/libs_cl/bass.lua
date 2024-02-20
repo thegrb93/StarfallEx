@@ -186,6 +186,7 @@ end
 
 
 --- Loads a sound as a Bass object from a file.
+-- 2D sounds require a HUD connection.
 -- @param string path File path to play from.
 -- @param string flags Flags for the sound (`3d`, `mono`, `noplay`, `noblock`).
 -- @param function callback Function which is called when the sound is loaded. It'll get 3 arguments: `Bass` object, error number and name.
@@ -203,6 +204,7 @@ function bass_library.loadFile(path, flags, callback)
 end
 
 --- Loads a sound as a Bass object from a URL.
+-- 2D sounds require a HUD connection.
 -- @param string path URL path to play from.
 -- @param string flags Flags for the sound (`3d`, `mono`, `noplay`, `noblock`). noblock will fail if the webserver doesn't provide file length.
 -- @param function callback Function which is called when the sound is loaded. It'll get 3 arguments: `Bass` object, error number and name.
