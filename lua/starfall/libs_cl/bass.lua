@@ -8,96 +8,113 @@ registerprivilege("bass.loadURL", "Play remote sound files with `bass`.", "Allow
 registerprivilege("bass.play2D", "Play sounds in global game context with `bass`.", "Allows users to create sound channels which play in global game context (without `3d` flag).", { client = { default = 1 } })
 
 local plyCount = SF.LimitObject("bass", "bass sounds", 20, "The number of sounds allowed to be playing via Starfall client at once")
-local soundDatas = {} -- { [IGModAudioChannel] = { ... }, ... } -- Contains extra data for each starfall sound.
-local simpleFadeSounds = {} -- { [1] = IGModAudioChannel, ... } -- A list of sounds that need to be manually controlled through 'simple fading'.
-
 SF.ResourceCounters.Bass = {icon = "icon16/sound_add.png", count = function(ply) return plyCount:get(ply).val end}
 
+local bassSounds = {} -- { [IGModAudioChannel] = { ... }, ... } -- Contains extra data for each starfall sound.
+local bassSimpleFadeSounds = {} -- { [IGModAudioChannel] = { ... }, ... } -- A list of sounds that need to be manually controlled through 'simple fading'.
 
--- Calculates the simple fade multiplier for a 3D sound.
-local function getSimpleFading(snd, fadeMin, fadeMax)
-	local pos = snd:GetPos()
-	local earPos = EyePos()
-	local distSqr = pos:DistToSqr(earPos)
+--- Returns a bass sound with custom fading capability
+local bassSound = {
+	__index = {
+		calcFade = function(self)
+			local fadeMult
+			local distSqr = self.sound:GetPos():DistToSqr(EyePos())
+			if distSqr <= self.fadeMin * self.fadeMin then
+				fadeMult = 1
+			elseif distSqr >= self.fadeMax * self.fadeMax then
+				fadeMult = 0
+			else
+				-- Sounds falls off with dist^2. Unfortunately, we still have to do the square root inbetween.
+				fadeMult = ((self.fadeMax - math_sqrt(distSqr)) / (self.fadeMax - self.fadeMin)) ^ 2
+			end
+		
+			if self.fadeMult ~= fadeMult then
+				self.fadeMult = fadeMult
+				self.sound:SetVolume(self.targetVolume * fadeMult)
+			end
+		end,
 
-	if distSqr <= fadeMin * fadeMin then return 1 end
-	if distSqr >= fadeMax * fadeMax then return 0 end
+		setFade = function(self, min, max, useSimpleFading)
+			if useSimpleFading then
+				self.fadeMin = math.Clamp(min, 50, 1000)
+				self.fadeMax = math.Clamp(max, min, 20000)
 
-	-- Sounds falls off with dist^2. Unfortunately, we still have to do the square root inbetween.
-	local dist = math_sqrt(distSqr)
+				if self.simpleFade ~= useSimpleFading then
+					self.simpleFade = useSimpleFading
+					local snd = self.sound
+					snd:Set3DFadeDistance(200, 200)
+					bassSound.addSoundToSimpleFade(snd, self)
+					self.fadeMult = -1 -- Force the SetVolume in calcFade
+					self:calcFade()
+				end
+			else
+				self.fadeMin = math.Clamp(min, 50, 1000)
+				self.fadeMax = math.Clamp(max, 5000, 200000)
 
-	return ((fadeMax - dist) / (fadeMax - fadeMin)) ^ 2
-end
-
-local function applySimpleFading(snd)
-	local sndData = soundDatas[snd]
-	local fadeMult = getSimpleFading(snd, sndData.fadeMin, sndData.fadeMax)
-
-	if sndData.fadeMult ~= fadeMult then
-		sndData.fadeMult = fadeMult
-
-		snd:SetVolume(sndData.targetVolume * fadeMult)
-	end
-end
-
-local function addSoundToSimpleFade(snd)
-	local sndData = soundDatas[snd]
-	if sndData.simpleFadeEnabled then return end
-
-	sndData.simpleFadeEnabled = true
-	table.insert(simpleFadeSounds, snd)
-	applySimpleFading(snd)
-
-	if #simpleFadeSounds == 1 then
-		hook.Add("Think", "SF_Bass_SimpleFade", function()
-			for _, s in ipairs(simpleFadeSounds) do
-				if s:IsValid() and s:GetState() == GMOD_CHANNEL_PLAYING then
-					applySimpleFading(s)
+				if self.simpleFade ~= useSimpleFading then
+					self.simpleFade = useSimpleFading
+					local snd = self.sound
+					snd:Set3DFadeDistance(self.fadeMin, self.fadeMax)
+					snd:SetVolume(self.targetVolume) -- Remove manual fading, reset to target volume.
+					bassSound.removeSoundFromSimpleFade(snd)
 				end
 			end
-		end)
+		end,
+	},
+
+	__call = function(p, sound, flags, simpleFade)
+		local newsound = setmetatable({
+			sound = sound,
+			flags = flags,
+			simpleFade = false
+			targetVolume = 1,
+			fadeMult = 1,
+			fadeMin = 200,
+			fadeMax = 5000,
+		}, p)
+
+		if simpleFade then
+			newsound:setFade(200, 5000, true)
+		end
+
+		return newsound
+	end,
+
+	think = function()
+		for s, sndData in pairs(bassSimpleFadeSounds) do
+			if s:IsValid() then
+				if s:GetState() == GMOD_CHANNEL_PLAYING then
+					sndData:calcFade()
+				end
+			else
+				bassSound.removeSoundFromSimpleFade(s)
+			end
+		end
+	end,
+
+	addSoundToSimpleFade = function(snd, soundData)
+		if next(bassSimpleFadeSounds)==nil then
+			hook.Add("Think", "SF_Bass_SimpleFade", bassSound.think)
+		end
+		bassSimpleFadeSounds[snd] = soundData
+	end,
+
+	removeSoundFromSimpleFade = function(snd)
+		bassSimpleFadeSounds[snd] = nil
+		if next(bassSimpleFadeSounds)==nil then
+			hook.Remove("Think", "SF_Bass_SimpleFade")
+		end
 	end
-end
-
-local function removeSoundFromSimpleFade(snd)
-	local sndData = soundDatas[snd]
-	if not sndData.simpleFadeEnabled then return end
-
-	sndData.simpleFadeEnabled = false
-	sndData.fadeMult = 1
-	table.RemoveByValue(simpleFadeSounds, snd)
-
-	if snd:IsValid() then -- Could be in the process of being deleted.
-		snd:SetVolume(sndData.targetVolume) -- Remove manual fading, reset to target volume.
-	end
-
-	if #simpleFadeSounds == 0 then
-		hook.Remove("Think", "SF_Bass_SimpleFade")
-	end
-end
+}
+setmetatable(bassSound, bassSound)
 
 local function deleteSound(ply, snd)
 	if snd:IsValid() then snd:Stop() end
-	if not soundDatas[snd] then return end
 
-	removeSoundFromSimpleFade(snd)
-	soundDatas[snd] = nil
-	plyCount:free(ply, 1)
-end
-
--- Sets the min/max fade distance of a sound, and whether or not to use simple fading.
-local function setSoundFade(snd, min, max, useSimpleFading)
-	local sndData = soundDatas[snd]
-
-	sndData.fadeMin = min
-	sndData.fadeMax = max
-
-	if useSimpleFading then
-		snd:Set3DFadeDistance(min, min) -- Use min, min so that gmod doesn't do any fading of its own.
-		addSoundToSimpleFade(snd)
-	else
-		snd:Set3DFadeDistance(min, max)
-		removeSoundFromSimpleFade(snd)
+	local sndData = bassSounds[snd]
+	if sndData then
+		bassSounds[snd] = nil
+		plyCount:free(ply, 1)
 	end
 end
 
@@ -124,8 +141,6 @@ instance:AddHook("deinitialize", function()
 	for snd in pairs(instanceSounds) do
 		deleteSound(instance.player, snd)
 	end
-
-	instanceSounds = nil
 end)
 
 
@@ -164,20 +179,7 @@ local function loadSound(path, flags, callback, loadFunc)
 				plyCount:free(instance.player, 1)
 			else
 				instanceSounds[snd] = true
-				soundDatas[snd] = { -- IGModAudioChannel is userdata, so we can't attach extra key-value pairs or functions to it directly.
-					flags = flags,
-					targetVolume = 1,
-					fadeMult = 1,
-					fadeMin = 200,
-					fadeMax = 5000,
-					simpleFadeEnabled = false
-				}
-
-				-- Default with simple fade settings
-				if not is2D then
-					setSoundFade(snd, 200, 5000, true)
-				end
-
+				bassSounds[snd] = bassSound(snd, flags, not is2D)
 				instance:runFunction(callback, wrap(snd), 0, "")
 			end
 		end
@@ -254,13 +256,13 @@ function bass_methods:setVolume(vol)
 	checkluatype(vol, TYPE_NUMBER)
 
 	local snd = getsnd(self)
-	local sndData = soundDatas[snd]
+	local sndData = bassSounds[snd]
 
 	vol = math.Clamp(vol, 0, 10)
 	sndData.targetVolume = vol
 
-	if sndData.simpleFadeEnabled then
-		applySimpleFading(snd)
+	if sndData.simpleFade then
+		sndData:calcFade()
 	else
 		snd:SetVolume(vol)
 	end
@@ -270,7 +272,7 @@ end
 -- This is the volume before distance fading is applied on 3D sounds.
 -- @return number Volume multiplier (1 is normal), between 0x and 10x.
 function bass_methods:getVolume()
-	return soundDatas[getsnd(self)].targetVolume
+	return bassSounds[getsnd(self)].targetVolume
 end
 
 --- Gets the distance-based fade multiplier of the sound.
@@ -280,7 +282,7 @@ end
 -- Only updates once per frame while the sound is playing.
 -- @return number Volume fade multiplier (1 is normal), between 0x and 10x.
 function bass_methods:getFadeMultiplier()
-	return soundDatas[getsnd(self)].fadeMult
+	return bassSounds[getsnd(self)].fadeMult
 end
 
 --- Sets the pitch of the sound.
@@ -312,18 +314,9 @@ end
 function bass_methods:setFade(min, max, useSimpleFading)
 	checkluatype(min, TYPE_NUMBER)
 	checkluatype(max, TYPE_NUMBER)
+	if useSimpleFading ~= nil then checkluatype(useSimpleFading, TYPE_BOOL) else useSimpleFading = true end
 
-	if useSimpleFading == nil then useSimpleFading = true end
-
-	if useSimpleFading then
-		min = math.Clamp(min, 50, 1000)
-		max = math.Clamp(max, min, 20000)
-	else
-		min = math.Clamp(min, 50, 1000)
-		max = math.Clamp(max, 5000, 200000)
-	end
-
-	setSoundFade(getsnd(self), min, max, useSimpleFading)
+	bassSounds[getsnd(self)]:setFade(min, max, useSimpleFading)
 end
 
 --- Gets the fade distance of the sound in 3D space. 
@@ -331,10 +324,9 @@ end
 -- @return number The distance before the sound stops fading.
 -- @return boolean Whether or not this sound uses simple fading.
 function bass_methods:getFade()
-	local snd = getsnd(self)
-	local sndData = soundDatas[snd]
+	local sndData = bassSounds[getsnd(self)]
 
-	return sndData.fadeMin, sndData.fadeMax, sndData.simpleFadeEnabled
+	return sndData.fadeMin, sndData.fadeMax, sndData.simpleFade
 end
 
 --- Sets whether the sound should loop. Requires the 'noblock' flag.
@@ -432,7 +424,7 @@ end
 --- Returns the flags used to create the sound.
 -- @return string The flags of the sound (`3d`, `mono`, `noplay`, `noblock`).
 function bass_methods:getFlags()
-	return soundDatas[getsnd(self)].flags
+	return bassSounds[getsnd(self)].flags
 end
 
 --- Returns whether or not the sound is 2D.
