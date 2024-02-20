@@ -141,7 +141,6 @@ end
 
 local function not3D(flags)
 	for flag in string.gmatch(string.lower(flags), "%S+") do if flag=="3d" then return false end end
-	if SF.IsHUDActive(instance.entity) then return false end
 	return true
 end
 
@@ -149,6 +148,7 @@ local function loadSound(path, flags, callback, loadFunc)
 	local is2D = not3D(flags)
 
 	if is2D then
+		if not SF.IsHUDActive(instance.entity) then SF.Throw("Player isn't connected to HUD!", 2) end
 		checkpermission(instance, nil, "bass.play2D")
 	end
 
