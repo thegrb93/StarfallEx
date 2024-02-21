@@ -10,8 +10,8 @@ registerprivilege("bass.play2D", "Play sounds in global game context with `bass`
 local plyCount = SF.LimitObject("bass", "bass sounds", 20, "The number of sounds allowed to be playing via Starfall client at once")
 SF.ResourceCounters.Bass = {icon = "icon16/sound_add.png", count = function(ply) return plyCount:get(ply).val end}
 
-local bassSounds = {} -- { [IGModAudioChannel] = { ... }, ... } -- Contains extra data for each starfall sound.
-local bassSimpleFadeSounds = {} -- { [IGModAudioChannel] = { ... }, ... } -- A list of sounds that need to be manually controlled through 'simple fading'.
+local bassSounds = {} -- { [IGModAudioChannel] = baseSound, ... } -- Contains extra data for each starfall sound.
+local bassSimpleFadeSounds = {} -- { [IGModAudioChannel] = baseSound, ... } -- A list of sounds that need to be manually controlled through 'simple fading'.
 
 --- Returns a bass sound with custom fading capability
 local bassSound = {
@@ -43,9 +43,9 @@ local bassSound = {
 					self.simpleFade = useSimpleFading
 					local snd = self.sound
 					snd:Set3DFadeDistance(200, 200)
-					bassSound.addSoundToSimpleFade(snd, self)
 					self.fadeMult = -1 -- Force the SetVolume in calcFade
 					self:calcFade()
+					bassSound.addSoundToSimpleFade(snd, self)
 				end
 			else
 				self.fadeMin = math.Clamp(min, 50, 1000)
@@ -81,13 +81,13 @@ local bassSound = {
 	end,
 
 	think = function()
-		for s, sndData in pairs(bassSimpleFadeSounds) do
-			if s:IsValid() then
-				if s:GetState() == GMOD_CHANNEL_PLAYING then
+		for snd, sndData in pairs(bassSimpleFadeSounds) do
+			if snd:IsValid() then
+				if snd:GetState() == GMOD_CHANNEL_PLAYING then
 					sndData:calcFade()
 				end
 			else
-				bassSound.removeSoundFromSimpleFade(s)
+				bassSound.removeSoundFromSimpleFade(snd)
 			end
 		end
 	end,
