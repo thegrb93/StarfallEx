@@ -62,10 +62,11 @@ local bassSound = {
 		end,
 	},
 
-	__call = function(p, sound, flags, simpleFade)
+	__call = function(p, sound, flags, is3D)
 		local newsound = setmetatable({
 			sound = sound,
 			flags = flags,
+			is3D = is3D,
 			simpleFade = false
 			targetVolume = 1,
 			fadeMult = 1,
@@ -73,7 +74,7 @@ local bassSound = {
 			fadeMax = 5000,
 		}, p)
 
-		if simpleFade then
+		if is3D then
 			newsound:setFade(200, 5000, true)
 		end
 
@@ -318,7 +319,10 @@ function bass_methods:setFade(min, max, useSimpleFading)
 	checkluatype(max, TYPE_NUMBER)
 	if useSimpleFading ~= nil then checkluatype(useSimpleFading, TYPE_BOOL) else useSimpleFading = true end
 
-	bassSounds[getsnd(self)]:setFade(min, max, useSimpleFading)
+	local soundData = bassSounds[getsnd(self)]
+	if not soundData.is3D then SF.Throw("Can't set the fade of 2D sounds", 2) end
+
+	soundData:setFade(min, max, useSimpleFading)
 end
 
 --- Gets the fade distance of the sound in 3D space. 
