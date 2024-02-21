@@ -14,7 +14,8 @@ local bassSounds = {} -- { [IGModAudioChannel] = baseSound, ... } -- Contains ex
 local bassSimpleFadeSounds = {} -- { [IGModAudioChannel] = baseSound, ... } -- A list of sounds that need to be manually controlled through 'simple fading'.
 
 --- Returns a bass sound with custom fading capability
-local bassSound = {
+local bassSound
+bassSound = {
 	__index = {
 		calcFade = function(self)
 			local fadeMult
@@ -67,7 +68,7 @@ local bassSound = {
 			sound = sound,
 			flags = flags,
 			is3D = is3D,
-			simpleFade = false
+			simpleFade = false,
 			targetVolume = 1,
 			fadeMult = 1,
 			fadeMin = 200,
