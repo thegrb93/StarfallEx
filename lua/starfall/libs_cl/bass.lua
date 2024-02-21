@@ -141,7 +141,6 @@ end
 
 local function not3D(flags)
 	for flag in string.gmatch(string.lower(flags), "%S+") do if flag=="3d" then return false end end
-	if SF.IsHUDActive(instance.entity) then return false end
 	return true
 end
 
@@ -149,6 +148,7 @@ local function loadSound(path, flags, callback, loadFunc)
 	local is2D = not3D(flags)
 
 	if is2D then
+		if not SF.IsHUDActive(instance.entity) then SF.Throw("Player isn't connected to HUD!", 2) end
 		checkpermission(instance, nil, "bass.play2D")
 	end
 
@@ -186,6 +186,7 @@ end
 
 
 --- Loads a sound as a Bass object from a file.
+-- 2D sounds require a HUD connection.
 -- @param string path File path to play from.
 -- @param string flags Flags for the sound (`3d`, `mono`, `noplay`, `noblock`).
 -- @param function callback Function which is called when the sound is loaded. It'll get 3 arguments: `Bass` object, error number and name.
@@ -203,6 +204,7 @@ function bass_library.loadFile(path, flags, callback)
 end
 
 --- Loads a sound as a Bass object from a URL.
+-- 2D sounds require a HUD connection.
 -- @param string path URL path to play from.
 -- @param string flags Flags for the sound (`3d`, `mono`, `noplay`, `noblock`). noblock will fail if the webserver doesn't provide file length.
 -- @param function callback Function which is called when the sound is loaded. It'll get 3 arguments: `Bass` object, error number and name.
