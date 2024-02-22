@@ -14,8 +14,7 @@ local bassSounds = {} -- { [IGModAudioChannel] = baseSound, ... } -- Contains ex
 local bassSimpleFadeSounds = {} -- { [IGModAudioChannel] = baseSound, ... } -- A list of sounds that need to be manually controlled through 'simple fading'.
 
 --- Returns a bass sound with custom fading capability
-local bassSound
-bassSound = {
+local bassSound = {
 	__index = {
 		calcFade = function(self)
 			local fadeMult
@@ -46,7 +45,7 @@ bassSound = {
 					snd:Set3DFadeDistance(200, 200)
 					self.fadeMult = -1 -- Force the SetVolume in calcFade
 					self:calcFade()
-					bassSound.addSoundToSimpleFade(snd, self)
+					self:addSoundToSimpleFade()
 				end
 			else
 				self.fadeMin = math.Clamp(min, 50, 1000)
@@ -57,7 +56,33 @@ bassSound = {
 					local snd = self.sound
 					snd:Set3DFadeDistance(self.fadeMin, self.fadeMax)
 					snd:SetVolume(self.targetVolume) -- Remove manual fading, reset to target volume.
-					bassSound.removeSoundFromSimpleFade(snd)
+					self:removeSoundFromSimpleFade()
+				end
+			end
+		end,
+
+		addSoundToSimpleFade = function(self)
+			if next(bassSimpleFadeSounds)==nil then
+				hook.Add("Think", "SF_Bass_SimpleFade", self.think)
+			end
+			bassSimpleFadeSounds[self.sound] = self
+		end,
+
+		removeSoundFromSimpleFade = function(self)
+			bassSimpleFadeSounds[self.sound] = nil
+			if next(bassSimpleFadeSounds)==nil then
+				hook.Remove("Think", "SF_Bass_SimpleFade")
+			end
+		end,
+
+		think = function()
+			for snd, sndData in pairs(bassSimpleFadeSounds) do
+				if snd:IsValid() then
+					if snd:GetState() == GMOD_CHANNEL_PLAYING then
+						sndData:calcFade()
+					end
+				else
+					sndData:removeSoundFromSimpleFade()
 				end
 			end
 		end,
@@ -81,32 +106,6 @@ bassSound = {
 
 		return newsound
 	end,
-
-	think = function()
-		for snd, sndData in pairs(bassSimpleFadeSounds) do
-			if snd:IsValid() then
-				if snd:GetState() == GMOD_CHANNEL_PLAYING then
-					sndData:calcFade()
-				end
-			else
-				bassSound.removeSoundFromSimpleFade(snd)
-			end
-		end
-	end,
-
-	addSoundToSimpleFade = function(snd, soundData)
-		if next(bassSimpleFadeSounds)==nil then
-			hook.Add("Think", "SF_Bass_SimpleFade", bassSound.think)
-		end
-		bassSimpleFadeSounds[snd] = soundData
-	end,
-
-	removeSoundFromSimpleFade = function(snd)
-		bassSimpleFadeSounds[snd] = nil
-		if next(bassSimpleFadeSounds)==nil then
-			hook.Remove("Think", "SF_Bass_SimpleFade")
-		end
-	end
 }
 setmetatable(bassSound, bassSound)
 
