@@ -240,18 +240,33 @@ local function runHudHooks(ply, chip, activator, enabled)
 	end
 end
 
+local function isVehicleOrHudControlsLocked(activator)
+	if activator.locksControls then
+		return activator
+	end
+	activator = SF.HudVehicleLinks[activator]
+	if activator then
+		for v in pairs(activator) do
+			if v.locksControls then
+				return v
+			end
+		end
+	end
+end
+
 if SERVER then
 	function SF.EnableHud(ply, chip, activator, enabled, dontsync)
 		local huds = chip.ActiveHuds
 		if activator and activator:IsValid() then
 			local n = "SF_HUD"..ply:EntIndex()..":"..activator:EntIndex()
+			local lockController = isVehicleOrHudControlsLocked(activator)
 			local function disconnect(sync)
 				huds[ply] = nil
 				hook.Remove("EntityRemoved", n)
 				ply:SetViewEntity()
-				if activator.locksControls and activator.link and activator.link:IsValid() then
+				if lockController and lockController:IsValid() and lockController.link and lockController.link:IsValid() then
 					net.Start("starfall_lock_control")
-						net.WriteEntity(activator.link)
+						net.WriteEntity(lockController.link)
 						net.WriteBool(false)
 					net.Send(ply)
 				end
@@ -263,9 +278,9 @@ if SERVER then
 			if enabled then
 				huds[ply] = true
 				hook.Add("EntityRemoved",n,function(e) if e==ply or e==activator then disconnect(true) end end)
-				if activator.locksControls and activator.link and activator.link:IsValid() then
+				if lockController and lockController:IsValid() and lockController.link and lockController.link:IsValid() then
 					net.Start("starfall_lock_control")
-						net.WriteEntity(activator.link)
+						net.WriteEntity(lockController.link)
 						net.WriteBool(true)
 					net.Send(ply)
 				end
