@@ -78,13 +78,11 @@ function ENT:Compile()
 end
 
 function ENT:Destroy()
-	if self.instance then
-		self.instance:runScriptHook("removed")
-		--removed hook can cause instance to become nil
-		if self.instance then
-			self.instance:deinitialize()
-			self.instance = nil
-		end
+	local instance = self.instance
+	if instance then
+		instance:runScriptHook("removed")
+		instance:deinitialize()
+		self.instance = nil
 	end
 end
 
