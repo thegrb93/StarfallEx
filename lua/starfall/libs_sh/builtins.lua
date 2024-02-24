@@ -12,6 +12,7 @@ if SERVER then
 	concmdBurst = SF.BurstObject("concmd", "concmd", 1000, 1000, "The concmd burst regen rate in Bytes/sec.", "The concmd burst limit in Bytes")
 else
 	SF.Permissions.registerPrivilege("enablehud", "Allow enabling hud", "Allows the starfall to enable hud rendering", { client = { default = 1 } })
+	restartCooldown = CreateConVar("sf_restart_cooldown_cl", 5, FCVAR_ARCHIVE, "The cooldown for using restart() on the same chip.")
 end
 
 
@@ -596,28 +597,6 @@ if SERVER then
 	-- @return string String data
 	function builtins_library.getUserdata()
 		return instance.entity.starfalluserdata or ""
-	end
-
-	--- Restarts a chip owned by yourself.
-	-- @server
-	-- @param Entity? chip The chip to restart. If nil, it will restart the current chip.
-	function builtins_library.restart(chip)
-		if chip then
-			chip = getent(chip)
-			if not (chip.Starfall and chip.instance) then SF.Throw("Entity has no starfall instance", 2) end
-			if chip.owner ~= instance.player then SF.Throw("You don't own that starfall", 2) end
-		else
-			chip = instance.entity
-		end
-
-		local now = CurTime()
-		if (chip.nextRestartTime or 0) > now then SF.Throw("That starfall is on restart() cooldown", 2) end
-
-		chip.nextRestartTime = now + restartCooldown:GetFloat()
-
-		timer.Simple(0, function()
-			if IsValid(chip) then chip:SetupFiles(chip.sfdata) end
-		end)
 	end
 else
 	--- Sets the chip's display name
@@ -1212,6 +1191,34 @@ function builtins_library.enableHud(ply, active)
 			SF.Throw("Player must be sitting in owner's vehicle or be owner of the chip!", 2)
 		end
 	end
+end
+
+--- Restarts a chip owned by yourself.
+-- If used serverside, it will restart for both realms.
+-- @param Entity? chip The chip to restart. If nil, it will restart the current chip.
+function builtins_library.restart(chip)
+	if chip then
+		chip = getent(chip)
+		if not (chip.Starfall and chip.instance) then SF.Throw("Entity has no starfall instance", 2) end
+		if chip.owner ~= instance.player then SF.Throw("You don't own that starfall", 2) end
+	else
+		chip = instance.entity
+	end
+
+	local now = CurTime()
+	if (chip.nextRestartTime or 0) > now then SF.Throw("That starfall is on restart() cooldown", 2) end
+
+	chip.nextRestartTime = now + restartCooldown:GetFloat()
+
+	timer.Simple(0, function()
+		if IsValid(chip) then
+			if SERVER then
+				chip:SetupFiles(chip.sfdata)
+			else
+				chip:Compile()
+			end
+		end
+	end)
 end
 
 --- Creates a 'middleclass' class object that can be used similarly to Java/C++ classes. See https://github.com/kikito/middleclass for examples.
