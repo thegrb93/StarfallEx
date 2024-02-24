@@ -218,6 +218,7 @@ function bass_library.loadURL(path, flags, callback)
 	if #path > 2000 then SF.Throw("URL is too long!", 2) end
 
 	loadSound(path, flags, callback, sound.PlayURL)
+	SF.HTTPNotify(instance.player, path)
 end
 
 --- Returns the number of sounds left that can be created.
