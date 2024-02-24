@@ -169,7 +169,7 @@ end
 --- Sets a custom prop's shadow forces, moving the entity to the desired position and angles
 -- This gets overriden by Entity.setCustomPropForces and cannot be used together
 -- See available parameters here: https://wiki.facepunch.com/gmod/PhysObj:ComputeShadowControl
--- @param data table|false Shadow physics data, excluding 'deltatime'. 'teleportdistance' higher than 0 requires 'entities.setPos'. Pass a falsy value to disable custom physics entirely
+-- @param table|false data Shadow physics data, excluding 'deltatime'. 'teleportdistance' higher than 0 requires 'entities.setPos'. Pass a falsy value to disable custom physics entirely
 function ents_methods:setCustomPropShadowForce(data)
 	local ent = getent(self)
 	if ent:GetClass()~="starfall_prop" then SF.Throw("The entity isn't a custom prop", 2) end

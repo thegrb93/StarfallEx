@@ -32,7 +32,7 @@ local function valid_sftype(type1)
 	if sf_types[type1] or generic_lua_types[type1] then return true end
 
 	if string_find(type1, "|", 1, true) then
-		for str in type1:gmatch("[^|]+") do
+		for str in type1:gmatch("[^|?]+") do
 			-- Note that we shouldn't use nullables / variadics in a multi-type <type>|<type2> so we don't support it here.
 			-- Just use the variadic since it can equal nil or add |nil to it.
 
