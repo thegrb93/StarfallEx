@@ -602,28 +602,21 @@ if SERVER then
 	-- @server
 	-- @param Entity? chip The chip to restart. If nil, it will restart the current chip.
 	function builtins_library.restart(chip)
-		local inst = instance
-
 		if chip then
 			chip = getent(chip)
-			inst = chip.instance
-
-			if not inst then SF.Throw("Entity has no starfall instance", 2) end
+			if not (chip.Starfall and chip.instance) then SF.Throw("Entity has no starfall instance", 2) end
 			if chip.owner ~= instance.player then SF.Throw("You don't own that starfall", 2) end
+		else
+			chip = instance.entity
 		end
 
 		local now = CurTime()
-		chip = inst.entity
-
 		if (chip.nextRestartTime or 0) > now then SF.Throw("That starfall is on restart() cooldown", 2) end
 
 		chip.nextRestartTime = now + restartCooldown:GetFloat()
 
 		timer.Simple(0, function()
-			chip = inst.entity
-			if not IsValid(chip) then return end -- Could happen during entity removal
-
-			chip:SetupFiles(chip.sfdata)
+			if IsValid(chip) then chip:SetupFiles(chip.sfdata) end
 		end)
 	end
 else
