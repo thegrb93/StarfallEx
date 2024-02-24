@@ -4,9 +4,10 @@ local dgetmeta = debug.getmetatable
 
 SF.Permissions.registerPrivilege("console.command", "Console command", "Allows the starfall to run console commands")
 
-local userdataLimit, printBurst, concmdBurst
+local userdataLimit, restartCooldown, printBurst, concmdBurst
 if SERVER then
 	userdataLimit = CreateConVar("sf_userdata_max", "1048576", { FCVAR_ARCHIVE }, "The maximum size of userdata (in bytes) that can be stored on a Starfall chip (saved in duplications).")
+	restartCooldown = CreateConVar("sf_restart_cooldown", 5, FCVAR_ARCHIVE, "The cooldown for using restart() on the same chip.")
 	printBurst = SF.BurstObject("print", "print", 3000, 10000, "The print burst regen rate in Bytes/sec.", "The print burst limit in Bytes")
 	concmdBurst = SF.BurstObject("concmd", "concmd", 1000, 1000, "The concmd burst regen rate in Bytes/sec.", "The concmd burst limit in Bytes")
 else
@@ -595,6 +596,35 @@ if SERVER then
 	-- @return string String data
 	function builtins_library.getUserdata()
 		return instance.entity.starfalluserdata or ""
+	end
+
+	--- Restarts a chip owned by yourself.
+	-- @server
+	-- @param Entity? chip The chip to restart. If nil, it will restart the current chip.
+	function builtins_library.restart(chip)
+		local inst = instance
+
+		if chip then
+			chip = getent(chip)
+			inst = chip.instance
+
+			if not inst then SF.Throw("Entity has no starfall instance", 2) end
+			if chip.owner ~= instance.player then SF.Throw("You don't own that starfall", 2) end
+		end
+
+		local now = CurTime()
+		chip = inst.entity
+
+		if (chip.nextRestartTime or 0) > now then SF.Throw("That starfall is on restart() cooldown", 2) end
+
+		chip.nextRestartTime = now + restartCooldown:GetFloat()
+
+		timer.Simple(0, function()
+			chip = inst.entity
+			if not IsValid(chip) then return end -- Could happen during entity removal
+
+			chip:SetupFiles(chip.sfdata)
+		end)
 	end
 else
 	--- Sets the chip's display name
