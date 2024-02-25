@@ -1194,9 +1194,9 @@ function builtins_library.enableHud(ply, active)
 end
 
 --- Restarts a chip owned by yourself.
+-- Only restarts the realm that this gets called in.
 -- @param Entity? chip The chip to restart. If nil, it will restart the current chip.
--- @param boolean? fullUpdate When run serverside, determines if the restart should happen on both realms, fully reuploading the chip. False by default.
-function builtins_library.restart(chip, fullUpdate)
+function builtins_library.restart(chip)
 	if chip then
 		chip = getent(chip)
 		if not (chip.Starfall and chip.instance) then SF.Throw("Entity has no starfall instance", 2) end
@@ -1212,11 +1212,7 @@ function builtins_library.restart(chip, fullUpdate)
 
 	timer.Simple(0, function()
 		if IsValid(chip) then
-			if SERVER and fullUpdate then
-				chip:SetupFiles(chip.sfdata)
-			else
-				chip:Compile()
-			end
+			chip:Compile()
 		end
 	end)
 end
