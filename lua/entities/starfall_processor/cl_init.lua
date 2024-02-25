@@ -20,6 +20,7 @@ function ENT:OnRemove()
 		timer.Simple(0, function()
 			if not self:IsValid() then
 				instance:deinitialize()
+				self.instance = nil
 			end
 		end)
 	end
