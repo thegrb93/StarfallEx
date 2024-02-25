@@ -901,7 +901,7 @@ if CLIENT then
 	-- @param number? rate Optional float (Default 1), the playback rate of the animation
 	-- @param boolean? loop Optional boolean (Default false), should the animation loop
 	-- @param boolean? auto_advance Optional boolean (Default true), should the animation handle advancing itself
-	-- @param string|number|nil? act Optional number or string name (Default sequence value), the activity the player should use
+	-- @param number|string|nil act Optional number or string name (Default sequence value), the activity the player should use
 	function player_methods:setAnimation(seq, progress, rate, loop, auto_advance, act)
 		local ply = getply(self)
 		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end

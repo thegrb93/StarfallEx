@@ -1846,7 +1846,7 @@ function render_library.getBlend()
 end
 
 --- Changes alpha blending for the upcoming model drawing operations
--- @param alpha number Blending in the range 0 to 1
+-- @param number alpha Blending in the range 0 to 1
 function render_library.setBlend(alpha)
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 	render.SetBlend(alpha)
