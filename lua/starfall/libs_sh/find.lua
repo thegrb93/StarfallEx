@@ -251,7 +251,7 @@ end
 
 --- Finds the player with the given a steamid. Returns nil if not found
 -- @param string steamid Steam Id to search for
--- @return Entity? The player with matching steamid
+-- @return Player? The player with matching steamid
 function find_library.playerBySteamID(steamid)
 	local found = player.GetBySteamID(steamid)
 	if found then return plywrap(found) end
@@ -259,7 +259,7 @@ end
 
 --- Finds the player with the given a 64-bit steamid. Returns nil if not found
 -- @param string steamid 64-bit steam id to search for
--- @return Entity? The player with matching steamid
+-- @return Player? The player with matching steamid
 function find_library.playerBySteamID64(steamid)
 	local found = player.GetBySteamID64(steamid)
 	if found then return plywrap(found) end
