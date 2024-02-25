@@ -266,10 +266,12 @@ function props_library.createComponent(pos, ang, class, model, frozen)
 	local ply = instance.player
 	model = SF.CheckModel(model, ply, true)
 
-	if not ply:CheckLimit("starfall_components") then SF.Throw("Limit of components reached!", 2) end
-	plyPropBurst:use(ply, 1)
-	entList:checkuse(ply, 1)
-	if ply ~= SF.Superuser and gamemode.Call("PlayerSpawnSENT", ply, class)==false then SF.Throw("Another hook prevented the component from spawning", 2) end
+	if ply ~= SF.Superuser then
+		if not ply:CheckLimit("starfall_components") then SF.Throw("Limit of components reached!", 2) end
+		plyPropBurst:use(ply, 1)
+		entList:checkuse(ply, 1)
+		if gamemode.Call("PlayerSpawnSENT", ply, class)==false then SF.Throw("Another hook prevented the component from spawning", 2) end
+	end
 
 	local comp = ents.Create(class)
 	comp:SetPos(pos)
