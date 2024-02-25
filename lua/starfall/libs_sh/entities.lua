@@ -350,8 +350,8 @@ end
 
 --- Parents or unparents an entity. Only holograms can be parented to players and clientside holograms can only be parented in the CLIENT realm.
 -- @param Entity? parent Entity parent (nil to unparent)
--- @param number|string? attachment Optional attachment name or ID.
--- @param number|string? bone Optional bone name or ID. Can't be used at the same time as attachment
+-- @param number|string|nil attachment Optional attachment name or ID.
+-- @param number|string|nil bone Optional bone name or ID. Can't be used at the same time as attachment
 function ents_methods:setParent(parent, attachment, bone)
 	local child = getent(self)
 	checkpermission(instance, child, "entities.setParent")
