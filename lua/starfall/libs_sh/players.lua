@@ -383,9 +383,14 @@ end
 -- For bots, this will return 90071996842377216 (equivalent to STEAM_0:0:0) for the first bot to join, and adds 1 to the id for the bot id.
 -- Returns no value for bots clientside.
 -- @shared
+-- @param boolean? owner Return the actual game owner account id
 -- @return string SteamID64 aka Community ID
-function player_methods:getSteamID64()
-	return getply(self):SteamID64()
+function player_methods:getSteamID64(owner)
+	if owner then
+		return getply(self):OwnerSteamID64()
+	else
+		return getply(self):SteamID64()
+	end
 end
 
 --- Returns the player's current team
