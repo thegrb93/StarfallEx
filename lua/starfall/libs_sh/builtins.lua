@@ -7,12 +7,12 @@ SF.Permissions.registerPrivilege("console.command", "Console command", "Allows t
 local userdataLimit, restartCooldown, printBurst, concmdBurst
 if SERVER then
 	userdataLimit = CreateConVar("sf_userdata_max", "1048576", { FCVAR_ARCHIVE }, "The maximum size of userdata (in bytes) that can be stored on a Starfall chip (saved in duplications).")
-	restartCooldown = CreateConVar("sf_restart_cooldown", 5, FCVAR_ARCHIVE, "The cooldown for using restart() on the same chip.")
+	restartCooldown = CreateConVar("sf_restart_cooldown", 5, FCVAR_ARCHIVE, "The cooldown for using restart() on the same chip.", 0.1, 60)
 	printBurst = SF.BurstObject("print", "print", 3000, 10000, "The print burst regen rate in Bytes/sec.", "The print burst limit in Bytes")
 	concmdBurst = SF.BurstObject("concmd", "concmd", 1000, 1000, "The concmd burst regen rate in Bytes/sec.", "The concmd burst limit in Bytes")
 else
 	SF.Permissions.registerPrivilege("enablehud", "Allow enabling hud", "Allows the starfall to enable hud rendering", { client = { default = 1 } })
-	restartCooldown = CreateConVar("sf_restart_cooldown_cl", 5, FCVAR_ARCHIVE, "The cooldown for using restart() on the same chip.")
+	restartCooldown = CreateConVar("sf_restart_cooldown_cl", 5, FCVAR_ARCHIVE, "The cooldown for using restart() on the same chip.", 0.1, 60)
 end
 
 
