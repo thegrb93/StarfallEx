@@ -19,7 +19,7 @@ else
 		bass.loadURL(songURL, "3d noblock", function(snd, err, errtxt)
 			if snd then
 				song = snd
-				snd:setFade(500, 100000)
+				snd:setFade(500, 2000)
 				snd:setVolume(2)
 				pcall(snd.setLooping, snd, true) -- pcall in case of audio stream
 
