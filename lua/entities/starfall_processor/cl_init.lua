@@ -12,16 +12,15 @@ function ENT:Initialize()
 end
 
 function ENT:OnRemove()
-	if self.instance then
-		self.instance:runScriptHook("removed")
-	end
-
 	-- This is required because snapshots can cause OnRemove to run even if it wasn't removed.
 	local instance = self.instance
 	if instance then
+		instance:runScriptHook("removed")
+
 		timer.Simple(0, function()
 			if not self:IsValid() then
 				instance:deinitialize()
+				self.instance = nil
 			end
 		end)
 	end

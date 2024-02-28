@@ -624,7 +624,6 @@ end
 -- @return True if it executed ok, false if not or if there was no hook
 -- @return If the first return value is false then the error message or nil if no hook was registered
 function SF.Instance:runScriptHook(hook, ...)
-	if self.error then return {} end
 	local hooks = self.hooks[hook]
 	if not hooks then return {} end
 	local tbl
@@ -646,7 +645,6 @@ end
 -- @return If the first return value is false then the error message or nil if no hook was registered. Else any values that the hook returned.
 -- @return The traceback if the instance errored
 function SF.Instance:runScriptHookForResult(hook, ...)
-	if self.error then return {} end
 	local hooks = self.hooks[hook]
 	if not hooks then return {} end
 	local tbl
@@ -671,8 +669,6 @@ end
 -- @param func Function to run
 -- @param ... Arguments to pass to func
 function SF.Instance:runFunction(func, ...)
-	if self.error then return {} end
-
 	local tbl = self:run(func, ...)
 	if not tbl[1] then
 		tbl[2].message = "Callback errored with: " .. tbl[2].message
@@ -709,7 +705,14 @@ function SF.Instance:deinitialize()
 			SF.playerInstances[self.player] = nil
 		end
 	end
+
 	self.error = true
+	local noop = function() end
+	self.runScriptHook = noop
+	self.runScriptHookForResult = noop
+	self.runFunction = noop
+	self.deinitialize = noop
+	self.Error = noop
 end
 
 hook.Add("Think", "SF_Think", function()
@@ -767,7 +770,6 @@ end)
 
 --- Errors the instance. Should only be called from the tips of the call tree (aka from places such as the hook library, timer library, the entity's think function, etc)
 function SF.Instance:Error(err)
-	if self.error then return end
 	if self.runOnError then -- We have a custom error function, use that instead
 		self.runOnError(err)
 	else
