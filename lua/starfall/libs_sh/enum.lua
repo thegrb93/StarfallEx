@@ -1311,7 +1311,7 @@ env.NAV_TRAVERSE_TYPE = {
 	GO_ELEVATOR_DOWN = 8
 }
 
--- ENUMs used for anything that returns a damage type.
+--- ENUMs used for anything that returns a damage type.
 -- @name builtins_library.DAMAGE
 -- @class table
 -- @field GENERIC
