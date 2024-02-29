@@ -5,7 +5,7 @@ SF.Modules = {}
 SF.Types = {}
 SF.Libraries = {}
 SF.ResourceCounters = {}
-SF.Superuser = {IsValid = function() return false end}
+SF.Superuser = {IsValid = function() return false end, SteamID64 = function() return "Superuser" end}
 local dgetmeta = debug.getmetatable
 local TypeID = TypeID
 
