@@ -138,10 +138,7 @@ function hologram_library.create(pos, ang, model, scale)
 			holoent:SetPos(SF.clampPos(pos))
 			holoent:SetAngles(ang)
 			holoent:SetModel(model)
-			holoent:SetRenderMode(RENDERGROUP_TRANSLUCENT)
-			
 			debug.setmetatable(holoent, cl_hologram_meta)
-
 			holoent:Spawn()
 
 			if scale~=nil then
