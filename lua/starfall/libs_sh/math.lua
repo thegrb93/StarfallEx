@@ -344,7 +344,8 @@ function math_library.integral(func, from, to, delta)
 	checkluatype(func, TYPE_FUNCTION)
 	checkluatype(from, TYPE_NUMBER)
 	checkluatype(to, TYPE_NUMBER)
-	if (delta ~= nil or delta <= 0) then checkluatype(delta, TYPE_NUMBER) else delta = 0.000001 end
+	if (delta ~= nil) then checkluatype(delta, TYPE_NUMBER) else delta = 0.000001 end
+	if (delta <= 0) then delta = 0.000001 end
     local sum = 0
     for i = from, to, delta do
         sum = sum + func(i)
