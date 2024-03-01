@@ -231,6 +231,12 @@ math_library.pi = math.pi
 -- @return number Exponent power of base
 math_library.pow = math.pow
 
+--- Returns factorial of given value
+-- @class function
+-- @param number value The number value
+-- @return number Factorial of value
+math_library.factorial = math.Factorial
+
 --- Converts an angle from degrees to radians.
 -- @class function
 -- @param number deg Angle in degrees
@@ -313,6 +319,38 @@ math_library.timeFraction = math.TimeFraction
 -- @param number? digits The amount of digits to keep after the point. Default 0
 -- @return number Rounded number
 math_library.truncate = math.Truncate
+
+--- Returns derivative function value 
+-- @class function
+-- @param number x The number value
+-- @param function func Function with 1 parameter to get derivative from
+-- @param number? delta Delta, the lower the number, the higher the accuracy. Default 0.000001
+-- @return number Output of derivative function
+function math_library.derivative(x, func, delta)
+	checkluatype(x, TYPE_NUMBER)
+	checkluatype(func, TYPE_FUNCTION)
+	if (delta ~= nil) then checkluatype(delta, TYPE_NUMBER) else delta = 0.000001 end
+    return (func(x+delta)-func(x))/delta
+end
+
+--- Returns integral of function 
+-- @class function
+-- @param function func Function with 1 parameter to integrate
+-- @param number from The starting value
+-- @param number to The ending value
+-- @param number? delta Delta, the lower the number, the higher the accuracy. Default 0.000001
+-- @return number Integral of function
+function math_library.integral(func, from, to, delta)
+	checkluatype(func, TYPE_FUNCTION)
+	checkluatype(from, TYPE_NUMBER)
+	checkluatype(to, TYPE_NUMBER)
+	if (delta ~= nil) then checkluatype(delta, TYPE_NUMBER) else delta = 0.000001 end
+    local sum = 0
+    for i = from, to, delta do
+        sum = sum + func(i)
+    end
+    return sum*delta
+end
 
 --- Calculates B-Spline point.
 -- @class function
