@@ -231,6 +231,12 @@ math_library.pi = math.pi
 -- @return number Exponent power of base
 math_library.pow = math.pow
 
+--- Returns factorial of given value
+-- @class function
+-- @param number value The number value
+-- @return number Factorial of value
+math_library.factorial = math.Factorial
+
 --- Converts an angle from degrees to radians.
 -- @class function
 -- @param number deg Angle in degrees

@@ -171,6 +171,11 @@ table_library.removeByValue = table.RemoveByValue
 -- @return table A reversed copy of the table
 table_library.reverse = table.Reverse
 
+--- Performs an inline Fisher-Yates shuffle on the table in O(n) time
+-- @class function
+-- @param table tbl Table to shuffle
+table_library.shuffle = table.Shuffle
+
 --- Sorts a table either ascending or by the given sort function
 -- @class function
 -- @param table tbl The table to sort
