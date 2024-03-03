@@ -1362,7 +1362,7 @@ function render_library.drawRect(x, y, w, h)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	render_SetColorMaterial()
 	makeQuad(x, y, w, h)
-	render_DrawQuad(quad_v1, quad_v2, quad_v3, quad_v4)
+	render_DrawQuad(quad_v1, quad_v2, quad_v3, quad_v4, currentcolor)
 end
 
 --- Draws a rotated, rectangle using the current color
@@ -1463,7 +1463,7 @@ end
 function render_library.drawTexturedRect(x, y, w, h)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	makeQuad(x, y, w, h)
-	render_DrawQuad(quad_v1, quad_v2, quad_v3, quad_v4)
+	render_DrawQuad(quad_v1, quad_v2, quad_v3, quad_v4, currentcolor)
 end
 
 --- Draws a textured rectangle with UV coordinates
