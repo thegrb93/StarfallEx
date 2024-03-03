@@ -1406,7 +1406,7 @@ end
 --- Draws a circle outline
 -- @param number x Center x coordinate
 -- @param number y Center y coordinate
--- @param number r Radius
+-- @param number radius Radius
 function render_library.drawCircle(x, y, radius)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	local r, g, b, a = col_Unpack(currentcolor)
