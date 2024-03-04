@@ -1,5 +1,6 @@
 local render = render
 local surface = surface
+local mesh = mesh
 local clamp = math.Clamp
 local max = math.max
 local cam = cam
@@ -7,9 +8,11 @@ local dgetmeta = debug.getmetatable
 local checkluatype = SF.CheckLuaType
 local haspermission = SF.Permissions.hasAccess
 local registerprivilege = SF.Permissions.registerPrivilege
-local col_meta = FindMetaTable("Color")
+local col_meta = getmetatable(Color(255, 255, 255, 255))
 local col_SetUnpacked = col_meta.SetUnpacked
 local col_Unpack = col_meta.Unpack
+local vec_meta = getmetatable(Vector(0, 0, 0))
+local vec_SetUnpacked = vec_meta.SetUnpacked
 
 registerprivilege("render.screen", "Render Screen", "Allows the user to render to a starfall screen", { client = {} })
 registerprivilege("render.hud", "Render Hud", "Allows the user to render to your hud", { client = {} })
@@ -97,7 +100,7 @@ local function buildCircleMesh(vertexCount)
 
 		vtxX, vtxY = rotX * vtxX - rotY * vtxY, rotY * vtxX + rotX * vtxY
 		vtxU, vtxV = (vtxX + 1) * 0.5, (vtxY + 1) * 0.5
-		pos:SetUnpacked(vtxX, vtxY, 0)
+		vec_SetUnpacked(pos, vtxX, vtxY, 0)
 
 		mesh.Position(pos)
 		mesh.TexCoord(0, vtxU, vtxV)
@@ -898,6 +901,9 @@ function render_library.setColorModulation(r, g, b)
 	render.SetColorModulation(r, g, b)
 end
 
+local surface_SetDrawColor = surface.SetDrawColor
+local surface_SetTextColor = surface.SetTextColor
+
 --- Sets the draw color by RGBA values
 -- @param number r Number, red value
 -- @param number g Number, green value
@@ -909,8 +915,8 @@ function render_library.setRGBA(r, g, b, a)
 	if b==nil then b=255 end
 	if a==nil then a=255 end
 	col_SetUnpacked(currentcolor, r, g, b, a)
-	surface.SetDrawColor(r, g, b, a)
-	surface.SetTextColor(r, g, b, a)
+	surface_SetDrawColor(r, g, b, a)
+	surface_SetTextColor(r, g, b, a)
 end
 
 --- Gets the drawing tint. Internally, calls render.getColorModulation and render.getBlend, multiplies the values by 255, then returns a color object.
@@ -956,17 +962,22 @@ function render_library.destroyTexture(mat)
 	mat:destroy()
 end
 
+local surface_SetMaterial = surface.SetMaterial
+local render_SetMaterial = render.SetMaterial
+local render_SetColorMaterial = render.SetColorMaterial
+local draw_NoTexture = draw.NoTexture
+
 --- Sets the current render material
 -- @param Material mat The material object
 function render_library.setMaterial(mat)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if mat then
 		local m = mtlunwrap(mat)
-		surface.SetMaterial(m)
-		render.SetMaterial(m)
+		surface_SetMaterial(m)
+		render_SetMaterial(m)
 	else
-		render.SetColorMaterial()
-		draw.NoTexture()
+		render_SetColorMaterial()
+		draw_NoTexture()
 	end
 end
 
@@ -990,8 +1001,8 @@ function render_library.setMaterialEffectAdd(mat)
 	local tex = gettexture(mat)
 
 	pp.add:SetTexture("$basetexture", tex)
-	surface.SetMaterial(pp.add)
-	render.SetMaterial(pp.add)
+	surface_SetMaterial(pp.add)
+	render_SetMaterial(pp.add)
 
 end
 
@@ -1004,8 +1015,8 @@ function render_library.setMaterialEffectSub(mat)
 	local tex = gettexture(mat)
 
 	pp.sub:SetTexture("$basetexture", tex)
-	surface.SetMaterial(pp.sub)
-	render.SetMaterial(pp.sub)
+	surface_SetMaterial(pp.sub)
+	render_SetMaterial(pp.sub)
 
 end
 
@@ -1020,18 +1031,18 @@ function render_library.setMaterialEffectBloom(mat, levelr, levelg, levelb, colo
 	checkpermission(instance, nil, "render.effects")
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	local tex = gettexture(mat)
-	levelr = math.Clamp(levelr, -1024, 1024)
-	levelg = math.Clamp(levelg, -1024, 1024)
-	levelb = math.Clamp(levelb, -1024, 1024)
-	colormul = math.Clamp(colormul, -1024, 1024)
+	levelr = clamp(levelr, -1024, 1024)
+	levelg = clamp(levelg, -1024, 1024)
+	levelb = clamp(levelb, -1024, 1024)
+	colormul = clamp(colormul, -1024, 1024)
 
 	pp.bloom:SetTexture("$basetexture", tex)
 	pp.bloom:SetFloat("$levelr", levelr)
 	pp.bloom:SetFloat("$levelg", levelg)
 	pp.bloom:SetFloat("$levelb", levelb)
 	pp.bloom:SetFloat("$colormul", colormul)
-	surface.SetMaterial(pp.bloom)
-	render.SetMaterial(pp.bloom)
+	surface_SetMaterial(pp.bloom)
+	render_SetMaterial(pp.bloom)
 
 end
 
@@ -1044,14 +1055,14 @@ function render_library.setMaterialEffectDownsample(mat, darken, multiply)
 	checkpermission(instance, nil, "render.effects")
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	local tex = gettexture(mat)
-	darken = math.Clamp(darken, -1, 1)
-	multiply = math.Clamp(multiply, 0, 1024)
+	darken = clamp(darken, -1, 1)
+	multiply = clamp(multiply, 0, 1024)
 
 	pp.downsample:SetTexture("$fbtexture", tex)
 	pp.downsample:SetFloat("$darken", darken)
 	pp.downsample:SetFloat("$multiply", multiply)
-	surface.SetMaterial(pp.downsample)
-	render.SetMaterial(pp.downsample)
+	surface_SetMaterial(pp.downsample)
+	render_SetMaterial(pp.downsample)
 
 end
 
@@ -1088,13 +1099,13 @@ function render_library.setMaterialEffectColorModify(mat, cmStructure)
 			end
 		elseif TypeID(value) ~= TYPE_NUMBER then SF.Throw("Invalid type for key \"" .. key .. "\" (expected number, got " .. SF.GetType(value) .. ")", 2) end
 
-		value = math.Clamp(value, -1024, 1024)
+		value = clamp(value, -1024, 1024)
 		pp.colour:SetFloat("$pp_colour_" .. key, value)
 	end
 
 	pp.colour:SetTexture("$fbtexture", tex)
-	surface.SetMaterial(pp.colour)
-	render.SetMaterial(pp.colour)
+	surface_SetMaterial(pp.colour)
+	render_SetMaterial(pp.colour)
 
 end
 
@@ -1111,9 +1122,9 @@ function render_library.drawBlurEffect(blurx, blury, passes)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if not renderdata.usingRT then SF.Throw("Cannot use this function outside of a rendertarget.", 2) end
 
-	blurx = math.Clamp(blurx, 0, 1024)
-	blury = math.Clamp(blury, 0, 1024)
-	passes = math.Clamp(blurx, 0, 100)
+	blurx = clamp(blurx, 0, 1024)
+	blury = clamp(blury, 0, 1024)
+	passes = clamp(blurx, 0, 100)
 
 	local rt = render.GetRenderTarget()
 	local w, h = renderdata.scrW, renderdata.scrH
@@ -1213,19 +1224,19 @@ end
 function render_library.setRenderTargetTexture(name)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if name == nil then
-		render.SetColorMaterial()
-		draw.NoTexture()
+		render_SetColorMaterial()
+		draw_NoTexture()
 	else
 		checkluatype (name, TYPE_STRING)
 
 		local rt = renderdata.rendertargets[name]
 		if rt then
 			RT_Material:SetTexture("$basetexture", rt)
-			surface.SetMaterial(RT_Material)
-			render.SetMaterial(RT_Material)
+			surface_SetMaterial(RT_Material)
+			render_SetMaterial(RT_Material)
 		else
-			render.SetColorMaterial()
-			draw.NoTexture()
+			render_SetColorMaterial()
+			draw_NoTexture()
 		end
 	end
 end
@@ -1238,11 +1249,11 @@ function render_library.setTextureFromScreen(ent)
 	ent = getent(ent)
 	if ent.GPU and ent.GPU.RT then
 		RT_Material:SetTexture("$basetexture", ent.GPU.RT)
-		surface.SetMaterial(RT_Material)
-		render.SetMaterial(RT_Material)
+		surface_SetMaterial(RT_Material)
+		render_SetMaterial(RT_Material)
 	else
-		render.SetColorMaterial()
-		draw.NoTexture()
+		render_SetColorMaterial()
+		draw_NoTexture()
 	end
 
 end
@@ -1317,18 +1328,20 @@ function render_library.drawRoundedBoxEx(r, x, y, w, h, tl, tr, bl, br)
 	draw.RoundedBoxEx(r, x, y, w, h, currentcolor, tl, tr, bl, br)
 end
 
+local quad_pos, quad_normal = Vector(0, 0, 0), Vector(0, 0, -1)
 local quad_v1, quad_v2, quad_v3, quad_v4 = Vector(0,0,0), Vector(0,0,0), Vector(0,0,0), Vector(0,0,0)
+
+local render_DrawQuad = render.DrawQuad
+local render_DrawQuadEasy = render.DrawQuadEasy
+
 local function makeQuad(x, y, w, h)
 	local right, bot = x + w, y + h
-	quad_v1.x = x
-	quad_v1.y = y
-	quad_v2.x = right
-	quad_v2.y = y
-	quad_v3.x = right
-	quad_v3.y = bot
-	quad_v4.x = x
-	quad_v4.y = bot
+	vec_SetUnpacked(quad_v1, x, y, 0)
+	vec_SetUnpacked(quad_v2, right, y, 0)
+	vec_SetUnpacked(quad_v3, right, bot, 0)
+	vec_SetUnpacked(quad_v4, x, bot, 0)
 end
+
 --- Draws a rectangle using the current color
 --- Faster, but uses integer coordinates and will get clipped by user's screen resolution
 -- @param number x Top left corner x
@@ -1347,10 +1360,37 @@ end
 -- @param number h Height
 function render_library.drawRect(x, y, w, h)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	render_SetColorMaterial()
 	makeQuad(x, y, w, h)
-	render.SetColorMaterial()
-	render.DrawQuad(quad_v1, quad_v2, quad_v3, quad_v4, currentcolor)
+	render_DrawQuad(quad_v1, quad_v2, quad_v3, quad_v4, currentcolor)
 end
+
+--- Draws a rotated, rectangle using the current color
+--- Faster, but uses integer coordinates and will get clipped by user's screen resolution
+-- @param number x X coordinate of center of rect
+-- @param number y Y coordinate of center of rect
+-- @param number w Width
+-- @param number h Height
+-- @param number rot Rotation in degrees
+function render_library.drawRectRotatedFast(x, y, w, h, rot)
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	draw_NoTexture()
+	surface.DrawTexturedRectRotated(x, y, w, h, rot)
+end
+
+--- Draws a rotated, rectangle using the current color
+-- @param number x X coordinate of center of rect
+-- @param number y Y coordinate of center of rect
+-- @param number w Width
+-- @param number h Height
+-- @param number rot Rotation in degrees
+function render_library.drawRectRotated(x, y, w, h, rot)
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	render_SetColorMaterial()
+	vec_SetUnpacked(quad_pos, x, y, 0)
+	render_DrawQuadEasy(quad_pos, quad_normal, w, h, currentcolor, -90 - rot)
+end
+
 
 --- Draws a rectangle outline using the current color.
 -- @param number x Top left corner x integer coordinate
@@ -1366,10 +1406,11 @@ end
 --- Draws a circle outline
 -- @param number x Center x coordinate
 -- @param number y Center y coordinate
--- @param number r Radius
-function render_library.drawCircle(x, y, r)
+-- @param number radius Radius
+function render_library.drawCircle(x, y, radius)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	surface.DrawCircle(x, y, r, currentcolor)
+	local r, g, b, a = col_Unpack(currentcolor)
+	surface.DrawCircle(x, y, radius, r, g, b, a)
 end
 
 --- Draws a filled circle
@@ -1380,19 +1421,19 @@ function render_library.drawFilledCircle(x, y, radius)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
 	local r, g, b, a = col_Unpack(currentcolor)
-	circleMeshVector:SetUnpacked(r / 255, g / 255, b / 255)
+	vec_SetUnpacked(circleMeshVector, r / 255, g / 255, b / 255)
 
 	circleMeshMaterial:SetVector("$color", circleMeshVector)
 	circleMeshMaterial:SetFloat("$alpha", a / 255)
 
-	surface.SetMaterial(circleMeshMaterial)
-	render.SetMaterial(circleMeshMaterial)
+	surface_SetMaterial(circleMeshMaterial)
+	render_SetMaterial(circleMeshMaterial)
 
 	if x ~= 0 or y ~= 0 or radius ~= 1 then
-		circleMeshVector:SetUnpacked(x, y, 0)
+		vec_SetUnpacked(circleMeshVector, x, y, 0)
 		circleMeshMatrix:SetTranslation(circleMeshVector)
 
-		circleMeshVector:SetUnpacked(radius, radius, radius)
+		vec_SetUnpacked(circleMeshVector, radius, radius, radius)
 		circleMeshMatrix:SetScale(circleMeshVector)
 
 		cam.PushModelMatrix(circleMeshMatrix, true)
@@ -1422,7 +1463,7 @@ end
 function render_library.drawTexturedRect(x, y, w, h)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	makeQuad(x, y, w, h)
-	render.DrawQuad(quad_v1, quad_v2, quad_v3, quad_v4, currentcolor)
+	render_DrawQuad(quad_v1, quad_v2, quad_v3, quad_v4, currentcolor)
 end
 
 --- Draws a textured rectangle with UV coordinates
@@ -1517,24 +1558,8 @@ end
 -- @param number rot Rotation in degrees
 function render_library.drawTexturedRectRotated(x, y, w, h, rot)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-
-	local rad = math.rad(rot)
-	local cos, sin = math.cos(rad), math.sin(rad)
-	makeQuad(-w/2, -h/2, w, h)
-	local function rotateVector(vec)
-		-- These locals are needed because the next line requires the vector to be unmodified
-		local x = vec.x * cos - vec.y * sin + x
-		local y = vec.x * sin + vec.y * cos + y
-		vec.x = x
-		vec.y = y
-	end
-
-	rotateVector(quad_v1)
-	rotateVector(quad_v2)
-	rotateVector(quad_v3)
-	rotateVector(quad_v4)
-
-	render.DrawQuad(quad_v1, quad_v2, quad_v3, quad_v4, currentcolor)
+	vec_SetUnpacked(quad_pos, x, y, 0)
+	render_DrawQuadEasy(quad_pos, quad_normal, w, h, currentcolor, -90 - rot)
 end
 
 --- Draws RGB color channel tables to current render target.
@@ -1807,10 +1832,9 @@ function markup_methods:getSize()
 end
 
 --- Draws a polygon.
+-- @class function
 -- @param table poly Table of polygon vertices. Texture coordinates are optional. {{x=x1, y=y1, u=u1, v=v1}, ... }
-function render_library.drawPoly(poly)
-	surface.DrawPoly(poly)
-end
+render_library.drawPoly = surface.DrawPoly
 
 --- Enables or disables Depth Buffer
 -- @param boolean enable True to enable
@@ -1878,8 +1902,8 @@ end
 function render_library.draw3DSphere(pos, radius, longitudeSteps, latitudeSteps)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	pos = vunwrap(pos)
-	longitudeSteps = math.Clamp(longitudeSteps, 3, 50)
-	latitudeSteps = math.Clamp(latitudeSteps, 3, 50)
+	longitudeSteps = clamp(longitudeSteps, 3, 50)
+	latitudeSteps = clamp(latitudeSteps, 3, 50)
 	render.DrawSphere(pos, radius, longitudeSteps, latitudeSteps, currentcolor, true)
 end
 
@@ -1893,8 +1917,8 @@ function render_library.draw3DWireframeSphere(pos, radius, longitudeSteps, latit
 	if writeZ == nil then writeZ = true end
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	pos = vunwrap(pos)
-	longitudeSteps = math.Clamp(longitudeSteps, 3, 50)
-	latitudeSteps = math.Clamp(latitudeSteps, 3, 50)
+	longitudeSteps = clamp(longitudeSteps, 3, 50)
+	latitudeSteps = clamp(latitudeSteps, 3, 50)
 	render.DrawWireframeSphere(pos, radius, longitudeSteps, latitudeSteps, currentcolor, writeZ)
 end
 
@@ -1970,7 +1994,7 @@ function render_library.draw3DQuad(vert1, vert2, vert3, vert4)
 	vert3 = vunwrap(vert3)
 	vert4 = vunwrap(vert4)
 
-	render.DrawQuad(vert1, vert2, vert3, vert4, currentcolor)
+	render_DrawQuad(vert1, vert2, vert3, vert4, currentcolor)
 end
 
 --- Draws 2 connected triangles with custom UVs.
@@ -1983,19 +2007,23 @@ function render_library.draw3DQuadUV(vert1, vert2, vert3, vert4)
 	mesh.Begin(MATERIAL_QUADS, 1)
 	local ok, err = pcall(function()
 		local r, g, b, a = col_Unpack(currentcolor)
-		mesh.Position( Vector(vert1[1], vert1[2], vert1[3]) )
+		vec_SetUnpacked(quad_v1, vert1[1], vert1[2], vert1[3])
+		vec_SetUnpacked(quad_v2, vert2[1], vert2[2], vert2[3])
+		vec_SetUnpacked(quad_v3, vert3[1], vert3[2], vert3[3])
+		vec_SetUnpacked(quad_v4, vert4[1], vert4[2], vert4[3])
+		mesh.Position( quad_v1 )
 		mesh.Color( r, g, b, a )
 		mesh.TexCoord( 0, vert1[4], vert1[5] )
 		mesh.AdvanceVertex()
-		mesh.Position( Vector(vert2[1], vert2[2], vert2[3]) )
+		mesh.Position( quad_v2 )
 		mesh.Color( r, g, b, a )
 		mesh.TexCoord( 0, vert2[4], vert2[5] )
 		mesh.AdvanceVertex()
-		mesh.Position( Vector(vert3[1], vert3[2], vert3[3]) )
+		mesh.Position( quad_v3 )
 		mesh.Color( r, g, b, a )
 		mesh.TexCoord( 0, vert3[4], vert3[5] )
 		mesh.AdvanceVertex()
-		mesh.Position( Vector(vert4[1], vert4[2], vert4[3]) )
+		mesh.Position( quad_v4 )
 		mesh.Color( r, g, b, a )
 		mesh.TexCoord( 0, vert4[4], vert4[5] )
 		mesh.AdvanceVertex()
@@ -2003,6 +2031,7 @@ function render_library.draw3DQuadUV(vert1, vert2, vert3, vert4)
 	mesh.End()
 	if not ok then SF.Throw(err, 2) end
 end
+
 
 --- Gets a 2D cursor position where ply is aiming at the current rendered screen or nil if they aren't aiming at it.
 -- @param Player? ply player to get cursor position from. Default player()
@@ -2150,8 +2179,8 @@ function render_library.renderView(tbl)
 	if tbl.aspectratio~=nil then checkluatype(tbl.aspectratio, TYPE_NUMBER) end
 	if tbl.x~=nil then checkluatype(tbl.x, TYPE_NUMBER) end
 	if tbl.y~=nil then checkluatype(tbl.y, TYPE_NUMBER) end
-	if tbl.w~=nil then checkluatype(tbl.w, TYPE_NUMBER) w = math.Clamp(tbl.w, 1, 1024) end
-	if tbl.h~=nil then checkluatype(tbl.h, TYPE_NUMBER) h = math.Clamp(tbl.h, 1, 1024) end
+	if tbl.w~=nil then checkluatype(tbl.w, TYPE_NUMBER) w = clamp(tbl.w, 1, 1024) end
+	if tbl.h~=nil then checkluatype(tbl.h, TYPE_NUMBER) h = clamp(tbl.h, 1, 1024) end
 	if tbl.fov~=nil then checkluatype(tbl.fov, TYPE_NUMBER) end
 	if tbl.zfar~=nil then checkluatype(tbl.zfar, TYPE_NUMBER) end
 	if tbl.znear~=nil then checkluatype(tbl.znear, TYPE_NUMBER) end
@@ -2464,7 +2493,7 @@ end
 -- @param number duration The duration of the effect in seconds, max 10.
 function render_library.screenShake(amplitude, frequency, duration)
 	if not SF.IsHUDActive(instance.entity) then SF.Throw("Player isn't connected to HUD!", 2) end
-	util.ScreenShake(Vector(0, 0, 0), amplitude, frequency, math.Clamp(duration, 0, 10), 0)
+	util.ScreenShake(Vector(0, 0, 0), amplitude, frequency, clamp(duration, 0, 10), 0)
 end
 
 --- Set's the depth range of the upcoming render.
