@@ -1893,7 +1893,7 @@ function ents_methods:getInternalVariable(variableName)
 	return istable(result) and instance.Sanitize(result) or owrap(result)
 end
 
---- Returns entity's map creation ID. Unlike Entity:EntIndex or Entity:GetCreationID, it will always be the same on same map, no matter how much you clean up or restart it.
+--- Returns entity's map creation ID. Unlike Entity:entIndex or Entity:getCreationID, it will always be the same on same map, no matter how much you clean up or restart it.
 -- @shared
 -- @param Entity ent
 -- @return number The map creation ID or -1 if the entity is not compiled into the map.
