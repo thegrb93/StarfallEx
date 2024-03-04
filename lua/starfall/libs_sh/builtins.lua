@@ -86,14 +86,6 @@ function builtins_library.entity(num)
 	return owrap(Entity(num))
 end
 
---- Returns entity that has given Entity:mapCreationID.
--- @param number num Entity's creation id
--- @return Entity Found entity
-function builtins_library.getMapCreatedEntity(num)
-	checkluatype(num, TYPE_NUMBER)
-	return owrap(ents.GetMapCreatedEntity(num))
-end
-
 
 --- Used to select single values from a vararg or get the count of values in it.
 -- @name builtins_library.select

@@ -265,4 +265,12 @@ function find_library.playerBySteamID64(steamid)
 	if found then return plywrap(found) end
 end
 
+--- Returns entity that has given Entity:mapCreationID.
+-- @param number num Entity's creation id
+-- @return Entity Found entity
+function find_library.getMapCreatedEntity(num)
+	checkluatype(num, TYPE_NUMBER)
+	return owrap(ents.GetMapCreatedEntity(num))
+end
+
 end
