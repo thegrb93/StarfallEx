@@ -1895,7 +1895,6 @@ end
 
 --- Returns entity's map creation ID. Unlike Entity:entIndex or Entity:getCreationID, it will always be the same on same map, no matter how much you clean up or restart it.
 -- @shared
--- @param Entity ent
 -- @return number The map creation ID or -1 if the entity is not compiled into the map.
 function ents_methods:mapCreationID()
 	return getent(self):MapCreationID()
