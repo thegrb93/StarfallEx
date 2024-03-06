@@ -14,24 +14,24 @@ return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 local find_library = instance.Libraries.find
+local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local plywrap = instance.Types.Player.Wrap
 
 local function convert(results, func)
 	if func~=nil then checkluatype (func, TYPE_FUNCTION) end
-	local wrap = instance.WrapObject
 
 	local t = {}
 	if func then
 		for i = 1, #results do
-			local e = wrap(results[i])
+			local e = owrap(results[i])
 			if e and func(e) then
 				t[#t + 1] = e
 			end
 		end
 	else
 		for i = 1, #results do
-			local e = wrap(results[i])
+			local e = owrap(results[i])
 			if e then
 				t[#t + 1] = e
 			end
@@ -263,6 +263,14 @@ end
 function find_library.playerBySteamID64(steamid)
 	local found = player.GetBySteamID64(steamid)
 	if found then return plywrap(found) end
+end
+
+--- Returns entity that has given Entity:mapCreationID.
+-- @param number num Entity's creation id
+-- @return Entity? The found entity or nil if not found
+function find_library.getMapCreatedEntity(num)
+	checkluatype(num, TYPE_NUMBER)
+	return owrap(ents.GetMapCreatedEntity(num))
 end
 
 end
