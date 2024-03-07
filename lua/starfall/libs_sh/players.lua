@@ -2,6 +2,7 @@
 local checkluatype = SF.CheckLuaType
 local checkvalidnumber = SF.CheckValidNumber
 local registerprivilege = SF.Permissions.registerPrivilege
+local IsValid = FindMetaTable("Entity").IsValid
 
 local playerMaxScale
 if SERVER then
@@ -87,10 +88,18 @@ SF.RegisterType("Player", false, true, FindMetaTable("Player"), "Entity")
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
+local player_methods, player_meta, wrap, unwrap = instance.Types.Player.Methods, instance.Types.Player, instance.Types.Player.Wrap, instance.Types.Player.Unwrap
+local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
+local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local wep_meta, wwrap, wunwrap = instance.Types.Weapon, instance.Types.Weapon.Wrap, instance.Types.Weapon.Unwrap
+local veh_meta, vhwrap, vhunwrap = instance.Types.Vehicle, instance.Types.Vehicle.Wrap, instance.Types.Vehicle.Unwrap
 
 local getent
 instance:AddHook("initialize", function()
-	getent = instance.Types.Entity.GetEntity
+	getent = ent_meta.GetEntity
+	player_meta.__tostring = ent_meta.__tostring
 end)
 
 if SERVER then
@@ -103,33 +112,15 @@ if SERVER then
 	end)
 end
 
-
-local player_methods, player_meta, wrap, unwrap = instance.Types.Player.Methods, instance.Types.Player, instance.Types.Player.Wrap, instance.Types.Player.Unwrap
-local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
-local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
-local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
-local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
-local wep_meta, wwrap, wunwrap = instance.Types.Weapon, instance.Types.Weapon.Wrap, instance.Types.Weapon.Unwrap
-local veh_meta, vhwrap, vhunwrap = instance.Types.Vehicle, instance.Types.Vehicle.Wrap, instance.Types.Vehicle.Unwrap
-
-
 local function getply(self)
 	local ent = unwrap(self)
-	if ent:IsValid() then
+	if IsValid(ent) then
 		return ent
 	else
 		SF.Throw("Entity is not valid.", 3)
 	end
 end
-instance.Types.Player.GetPlayer = getply
-
-
-function player_meta:__tostring()
-	local ent = unwrap(self)
-	if not ent:IsValid() then return "(null entity)"
-	else return tostring(ent) end
-end
-
+player_meta.GetPlayer = getply
 
 -- ------------------------------------------------------------------------- --
 --- Returns whether the player is alive

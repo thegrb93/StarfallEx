@@ -7,6 +7,8 @@ util.AddNetworkString("starfall_hud_set_enabled")
 local vehiclelinks = SF.EntityTable("vehicleLinks")
 SF.HudVehicleLinks = vehiclelinks
 
+local IsValid = FindMetaTable("Entity").IsValid
+
 function ENT:Initialize()
 	self.BaseClass.Initialize(self)
 	self:PhysicsInit(SOLID_VPHYSICS)
@@ -23,7 +25,7 @@ function ENT:UpdateTransmitState()
 end
 
 function ENT:Use(ply)
-	if not (self.link and self.link:IsValid()) then ply:ChatPrint("This hud isn't linked to a chip!") return end
+	if not IsValid(self.link) then ply:ChatPrint("This hud isn't linked to a chip!") return end
 	local enabled = not self.enabled[ply]
 	self.enabled[ply] = enabled or nil
 	SF.EnableHud(ply, self.link, self, enabled)
@@ -44,8 +46,8 @@ local function vehicleEnableHud(ply, vehicle, enabled)
 	local huds = vehiclelinks[vehicle]
 	if huds then
 		for v in pairs(huds) do
-			if v:IsValid() then
-				if v.link and v.link:IsValid() then
+			if IsValid(v) then
+				if IsValid(v.link) then
 					SF.EnableHud(ply, v.link, vehicle, enabled)
 				end
 			else
@@ -61,12 +63,12 @@ hook.Add("PlayerLeaveVehicle", "Starfall_HUD", function(ply, vehicle) vehicleEna
 function ENT:PreEntityCopy()
 	if self.EntityMods then self.EntityMods.SFLink = nil end
 	local info = {}
-	if (self.link and self.link:IsValid()) then
+	if IsValid(self.link) then
 		info.link = self.link:EntIndex()
 	end
 	local linkedvehicles = {}
 	for k, huds in pairs(vehiclelinks) do
-		if huds[self] and k:IsValid() then
+		if huds[self] and IsValid(k) then
 			linkedvehicles[#linkedvehicles + 1] = k:EntIndex()
 		end
 	end
@@ -83,7 +85,7 @@ function ENT:PostEntityPaste(ply, ent, CreatedEntities)
 		local info = ent.EntityMods.SFLink
 		if info.link then
 			local e = CreatedEntities[info.link]
-			if (e and e:IsValid()) then
+			if IsValid(e) then
 				SF.LinkEnt(self, e)
 			end
 		end
@@ -91,7 +93,7 @@ function ENT:PostEntityPaste(ply, ent, CreatedEntities)
 		if info.linkedvehicles then
 			for k, v in pairs(info.linkedvehicles) do
 				local e = CreatedEntities[v]
-				if (e and e:IsValid()) then
+				if IsValid(e) then
 					self:LinkVehicle(e)
 				end
 			end

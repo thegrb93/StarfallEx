@@ -6,6 +6,7 @@ ENT.DefaultMaterial = Material( "hunter/myplastic" )
 ENT.Material = ENT.DefaultMaterial
 
 local VECTOR_PLAYER_COLOR_DISABLED = Vector(-1, -1, -1)
+local IsValid = FindMetaTable("Entity").IsValid
 
 function ENT:Initialize()
 	self.clips = {}
@@ -76,7 +77,7 @@ function ENT:Draw(flags)
 		prevClip = render.EnableClipping(true)
 		for _, clip in pairs(selfTbl.clips) do
 			local clipent = clip.entity
-			if clipent and clipent:IsValid() then
+			if IsValid(clipent) then
 				local norm = clipent:LocalToWorld(clip.normal) - clipent:GetPos()
 				render.PushCustomClipPlane(norm, norm:Dot(clipent:LocalToWorld(clip.origin)))
 			else
@@ -167,12 +168,12 @@ local function ShowHologramOwners()
 			local name = "No Owner"
 			local steamID = ""
 			local ply = SF.Permissions.getOwner(ent)
-			if ply and ply:IsValid() then
+			if IsValid(ply) then
 				name = ply:Name()
 				steamID = ply:SteamID()
 			else
 				ply = ent.SFHoloOwner
-				if ply and ply:IsValid() then
+				if IsValid(ply) then
 					name = ply:Name()
 					steamID = ply:SteamID()
 				end
