@@ -4,6 +4,8 @@ DEFINE_BASECLASS("base_gmodentity")
 
 ENT.RenderGroup = RENDERGROUP_BOTH
 
+local IsValid = FindMetaTable("Entity").IsValid
+
 function ENT:Initialize()
 	self.name = "Generic ( No-Name )"
 	self.OverlayFade = 0
@@ -18,7 +20,7 @@ function ENT:OnRemove()
 		instance:runScriptHook("removed")
 
 		timer.Simple(0, function()
-			if not self:IsValid() then
+			if not IsValid(self) then
 				instance:deinitialize()
 				self.instance = nil
 			end
@@ -130,7 +132,7 @@ else
 end
 
 hook.Add("StarfallError", "StarfallErrorReport", function(_, owner, client, main_file, message, traceback, should_notify)
-	if not (owner and owner:IsValid()) then return end
+	if not IsValid(owner) then return end
 	local local_player = LocalPlayer()
 	if owner == local_player then
 		if not client or client == owner then
@@ -182,7 +184,7 @@ end)
 
 net.Receive("starfall_processor_kill", function()
 	local target = net.ReadEntity()
-	if target:IsValid() and target:GetClass()=="starfall_processor" then
+	if IsValid(target) and target:GetClass()=="starfall_processor" then
 		target:Error({message = "Killed by admin", traceback = ""})
 	end
 end)
@@ -191,14 +193,14 @@ net.Receive("starfall_processor_used", function(len)
 	local chip = net.ReadEntity()
 	local used = net.ReadEntity()
 	local activator = net.ReadEntity()
-	if not (chip and chip:IsValid()) then return end
-	if not (used and used:IsValid()) then return end
+	if not IsValid(chip) then return end
+	if not IsValid(used) then return end
 	local instance = chip.instance
 	if not instance then return end
 
 	instance:runScriptHook("starfallused", instance.WrapObject( activator ), instance.WrapObject( used ))
 
-	if activator == LocalPlayer() and instance.player ~= SF.Superuser and instance.permissionRequest and instance.permissionRequest.showOnUse and not SF.Permissions.permissionRequestSatisfied( instance ) and not IsValid(SF.permPanel) then
+	if activator == LocalPlayer() and instance.player ~= SF.Superuser and instance.permissionRequest and instance.permissionRequest.showOnUse and not SF.Permissions.permissionRequestSatisfied( instance ) and not (SF.permPanel and SF.permPanel:IsValid()) then
 		local pnl = vgui.Create("SFChipPermissions")
 		if pnl then
 			pnl:OpenForChip( chip )

@@ -1,6 +1,7 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
+local IsValid = FindMetaTable("Entity").IsValid
 
 if SERVER then
 	-- Register privileges
@@ -26,26 +27,18 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 
 local getent
 instance:AddHook("initialize", function()
-	getent = instance.Types.Entity.GetEntity
+	getent = ent_meta.GetEntity
+	npc_meta.__tostring = ent_meta.__tostring
 end)
 
 local function getnpc(self)
 	local ent = unwrap(self)
-	if ent:IsValid() then
+	if IsValid(ent) then
 		return ent
 	else
 		SF.Throw("Entity is not valid.", 3)
 	end
 end
-
---- Turns a NPC object into a string.
--- @return string String representing the NPC.
-function npc_meta:__tostring()
-	local ent = unwrap(self)
-	if not ent then return "(null entity)"
-	else return tostring(ent) end
-end
-
 
 if SERVER then
 	--- Adds a relationship to the npc
@@ -101,7 +94,7 @@ if SERVER then
 		checkpermission(instance, npc, "npcs.giveweapon")
 
 		local weapon = npc:GetActiveWeapon()
-		if (weapon:IsValid()) then
+		if IsValid(weapon) then
 			if (weapon:GetClass() == "weapon_" .. wep) then return end
 			weapon:Remove()
 		end

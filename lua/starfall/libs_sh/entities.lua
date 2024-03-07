@@ -1,6 +1,9 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
+local IsValid = FindMetaTable("Entity").IsValid
+local IsValidPhys = FindMetaTable("PhysObject").IsValid
+local IsWorld = FindMetaTable("Entity").IsWorld
 
 registerprivilege("entities.setParent", "Parent", "Allows the user to parent an entity to another entity", { entities = {} })
 registerprivilege("entities.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { client = (CLIENT and {} or nil), entities = {} })
@@ -74,7 +77,7 @@ local swrap, sunwrap = instance.Types.SurfaceInfo.Wrap, instance.Types.SurfaceIn
 
 local function getent(self)
 	local ent = eunwrap(self)
-	if ent:IsValid() or ent:IsWorld() then
+	if IsValid(ent) or IsWorld(ent) then
 		return ent
 	else
 		SF.Throw("Entity is not valid.", 3)
@@ -86,8 +89,7 @@ instance.Types.Entity.GetEntity = getent
 -- @return string String representation of the entity
 function ent_meta:__tostring()
 	local ent = eunwrap(self)
-	if not ent then return "(null entity)"
-	else return tostring(ent) end
+	return IsValid(ent) and tostring(ent) or "(null entity)"
 end
 
 -- ------------------------- Methods ------------------------- --
@@ -820,14 +822,7 @@ end
 -- @shared
 -- @return boolean True if valid, false if not
 function ents_methods:isValid()
-	local ent = eunwrap(self)
-	if ent then
-		local isValid = ent.IsValid
-		if isValid then
-			return isValid(ent)
-		end
-	end
-	return false
+	return IsValid(eunwrap(self))
 end
 
 --- Checks if an entity is a player.
@@ -945,7 +940,7 @@ if SERVER then
 
 		local plys = {}
 		for ply, _ in pairs(ent.ErroredPlayers) do
-			if ply:IsValid() then
+			if IsValid(ply) then
 				table.insert(plys, plywrap(ply))
 			end
 		end
@@ -1175,7 +1170,7 @@ end
 function ents_methods:getMassCenter()
 	local ent = getent(self)
 	local phys = ent:GetPhysicsObject()
-	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
+	if not IsValidPhys(phys) then SF.Throw("Physics object is invalid", 2) end
 	return vwrap(phys:GetMassCenter())
 end
 
@@ -1185,7 +1180,7 @@ end
 function ents_methods:getMassCenterW()
 	local ent = getent(self)
 	local phys = ent:GetPhysicsObject()
-	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
+	if not IsValidPhys(phys) then SF.Throw("Physics object is invalid", 2) end
 	return vwrap(ent:LocalToWorld(phys:GetMassCenter()))
 end
 
@@ -1202,7 +1197,7 @@ end
 function ents_methods:getMass()
 	local ent = getent(self)
 	local phys = ent:GetPhysicsObject()
-	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
+	if not IsValidPhys(phys) then SF.Throw("Physics object is invalid", 2) end
 
 	return phys:GetMass()
 end
@@ -1213,7 +1208,7 @@ end
 function ents_methods:getInertia()
 	local ent = getent(self)
 	local phys = ent:GetPhysicsObject()
-	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
+	if not IsValidPhys(phys) then SF.Throw("Physics object is invalid", 2) end
 
 	return vwrap(phys:GetInertia())
 end
@@ -1238,7 +1233,7 @@ end
 -- @return Vector The angular velocity as a vector
 function ents_methods:getAngleVelocity()
 	local phys = getent(self):GetPhysicsObject()
-	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
+	if not IsValidPhys(phys) then SF.Throw("Physics object is invalid", 2) end
 	return vwrap(phys:GetAngleVelocity())
 end
 
@@ -1247,7 +1242,7 @@ end
 -- @return Angle The angular velocity as an angle
 function ents_methods:getAngleVelocityAngle()
 	local phys = getent(self):GetPhysicsObject()
-	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
+	if not IsValidPhys(phys) then SF.Throw("Physics object is invalid", 2) end
 	local vec = phys:GetAngleVelocity()
 	return awrap(Angle(vec.y, vec.z, vec.x))
 end

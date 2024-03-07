@@ -1,6 +1,7 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
+local IsValid = FindMetaTable("Entity").IsValid
 
 if SERVER then
 	-- Register privileges
@@ -22,23 +23,20 @@ return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 local vehicle_methods, vehicle_meta, wrap, unwrap = instance.Types.Vehicle.Methods, instance.Types.Vehicle, instance.Types.Vehicle.Wrap, instance.Types.Vehicle.Unwrap
+local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local pwrap = instance.Types.Player.Wrap
+
+instance:AddHook("initialize", function()
+	vehicle_meta.__tostring = ent_meta.__tostring
+end)
 
 local function getveh(self)
 	local ent = unwrap(self)
-	if ent:IsValid() then
+	if IsValid(ent) then
 		return ent
 	else
 		SF.Throw("Entity is not valid.", 3)
 	end
-end
-
---- Turns a vehicle into a string.
--- @return string String representing the vehicle.
-function vehicle_meta:__tostring()
-	local ent = unwrap(self)
-	if not ent then return "(null entity)"
-	else return tostring(ent) end
 end
 
 --- Returns the driver of the vehicle
@@ -60,7 +58,7 @@ if SERVER then
 	-- @server
 	function vehicle_methods:ejectDriver()
 		local driver = getveh(self):GetDriver()
-		if driver:IsValid() then
+		if IsValid(driver) then
 			driver:ExitVehicle()
 		end
 	end
@@ -71,7 +69,7 @@ if SERVER then
 		local ent = getveh(self)
 		checkpermission(instance, ent, "vehicle.kill")
 		local driver = ent:GetDriver()
-		if driver:IsValid() then
+		if IsValid(driver) then
 			driver:Kill()
 		end
 	end
@@ -84,7 +82,7 @@ if SERVER then
 		local ent = getveh(self)
 		checkpermission(instance, ent, "vehicle.strip")
 		local driver = ent:GetDriver()
-		if driver:IsValid() then
+		if IsValid(driver) then
 			if class then
 				driver:StripWeapon(class)
 			else

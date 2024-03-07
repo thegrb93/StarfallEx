@@ -8,6 +8,7 @@ SF.ResourceCounters = {}
 SF.Superuser = {IsValid = function() return false end, SteamID64 = function() return "Superuser" end}
 local dgetmeta = debug.getmetatable
 local TypeID = TypeID
+local IsValid = FindMetaTable("Entity").IsValid
 
 -- Make sure this is done after metatables have been set
 hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
@@ -108,7 +109,7 @@ function SF.EntityTable(key, destructor, dontwait)
 				else
 					e:CallOnRemove("SF_" .. key, function()
 						timer.Simple(0, function()
-							if t[e] and not e:IsValid() then
+							if t[e] and not IsValid(e) then
 								if destructor then destructor(e, v) end
 								t[e] = nil
 							end
@@ -161,7 +162,7 @@ SF.BurstObject = {
 			return ret
 		end,
 		use = function(self, ply, amount)
-			if ply:IsValid() or ply==SF.Superuser then
+			if IsValid(ply) or ply==SF.Superuser then
 				local obj = self:get(ply)
 				local new = self:calc(obj) - amount
 				if new < 0 and ply~=SF.Superuser then
@@ -173,7 +174,7 @@ SF.BurstObject = {
 			end
 		end,
 		check = function(self, ply)
-			if ply:IsValid() or ply==SF.Superuser then
+			if IsValid(ply) or ply==SF.Superuser then
 				local obj = self:get(ply)
 				obj.val = self:calc(obj)
 				return obj.val
@@ -220,7 +221,7 @@ setmetatable(SF.BurstObject, SF.BurstObject)
 SF.LimitObject = {
 	__index = {
 		use = function(self, ply, amount)
-			if ply:IsValid() or ply==SF.Superuser then
+			if IsValid(ply) or ply==SF.Superuser then
 				local obj = self:get(ply)
 				local new = obj.val + amount
 				if new > self.max and ply~=SF.Superuser then
@@ -232,7 +233,7 @@ SF.LimitObject = {
 			end
 		end,
 		checkuse = function(self, ply, amount)
-			if ply:IsValid() or ply==SF.Superuser then
+			if IsValid(ply) or ply==SF.Superuser then
 				local obj = self:get(ply)
 				if obj.val + amount > self.max and ply~=SF.Superuser then
 					SF.Throw("The ".. self.name .." limit has been reached. (".. self.max ..")", 3)
@@ -242,7 +243,7 @@ SF.LimitObject = {
 			end
 		end,
 		check = function(self, ply)
-			if ply:IsValid() or ply==SF.Superuser then
+			if IsValid(ply) or ply==SF.Superuser then
 				return self.max - self:get(ply).val
 			else
 				SF.Throw("Invalid starfall user", 3)
@@ -300,7 +301,7 @@ SF.EntManager = {
 			self:free(instance.player, -1)
 		end,
 		remove = function(self, instance, ent)
-			if ent:IsValid() then
+			if IsValid(ent) then
 				if self.nocallonremove then
 					self:onremove(instance, ent)
 				else
@@ -563,7 +564,7 @@ SF.Parent = {
 		},
 
 		setParent = function(self, parent, type, param)
-			if self.parent and self.parent:IsValid() then
+			if IsValid(self.parent) then
 				self.parent.sfParent.children[self.ent] = nil
 				self:removeParent()
 			end
@@ -585,11 +586,11 @@ SF.Parent = {
 
 		fix = function(self)
 			local cleanup = true
-			if self.parent and self.parent:IsValid() then
+			if IsValid(self.parent) then
 				cleanup = false
 			end
 			for child, data in pairs(self.children) do
-				if child:IsValid() then
+				if IsValid(child) then
 					data:applyTransform()
 					data:applyParent()
 					cleanup = false
@@ -1090,7 +1091,7 @@ end
 
 function SF.EntIsReady(ent)
 	if ent:IsWorld() then return true end
-	if ent:IsValid() then
+	if IsValid(ent) then
 		-- https://github.com/Facepunch/garrysmod-issues/issues/3127
 		local class = ent:GetClass()
 		if class=="player" then
@@ -1144,7 +1145,7 @@ local playerinithooks = {}
 hook.Add("PlayerInitialSpawn","SF_PlayerInitialize",function(ply)
 	local n = "SF_WaitForPlayerInit"..ply:EntIndex()
 	hook.Add("SetupMove", n, function(ply2, mv, cmd)
-		if ply:IsValid() then
+		if IsValid(ply) then
 			if ply == ply2 and not cmd:IsForced() then
 				for _, v in ipairs(playerinithooks) do v(ply) end
 				hook.Remove("SetupMove", n)
@@ -1310,7 +1311,7 @@ function SF.CheckModel(model, player, prop)
 	if #model > 260 then return false end
 	model = SF.NormalizePath(string.lower(model))
 	if string.GetExtensionFromFilename(model) == "mdl" and (CLIENT or (util.IsValidModel(model) and (not prop or util.IsValidProp(model)))) then
-		if player and player:IsValid() then
+		if IsValid(player) then
 			if hook.Run("PlayerSpawnObject", player, model)~=false then
 				return model
 			end
@@ -1339,7 +1340,7 @@ local drawEntityClasses = {
 	["prop_vehicle_prisoner_pod"] = true,
 }
 function SF.CanDrawEntity(ent)
-	return drawEntityClasses[ent:GetClass()] and not ent:GetParent():IsValid() and ent.RenderOverride==nil
+	return drawEntityClasses[ent:GetClass()] and not IsValid(ent:GetParent()) and ent.RenderOverride==nil
 end
 
 --- Chooses whether to use absolute or relative path
@@ -1393,7 +1394,7 @@ end
 function SF.ParentChainTooLong(parent, child)
 	local index = parent
 	local parentLength = 0
-	while index:IsValid() do
+	while IsValid(index) do
 		if index == child then return true end
 		parentLength = parentLength + 1
 		index = index:GetParent()
@@ -1490,7 +1491,7 @@ if SERVER then
 	util.AddNetworkString("starfall_print")
 
 	function SF.AddNotify(ply, msg, notifyType, duration, sound)
-		if not (ply and ply:IsValid()) then return end
+		if not IsValid(ply) then return end
 
 		net.Start("starfall_addnotify")
 		net.WriteString(string.sub(msg, 1, 1024))
@@ -1541,7 +1542,7 @@ else
 
 	function SF.HTTPNotify(ply, url)
 		local plyStr
-		if ply:IsValid() then
+		if IsValid(ply) then
 			plyStr = ply:Nick() .. " [" .. ply:SteamID() .. "]"
 		elseif ply == SF.Superuser then
 			plyStr = "Superuser"
@@ -1957,7 +1958,7 @@ do
 
 		-- Command to reload the libraries
 		concommand.Add("sf_reloadlibrary", function(ply, com, arg)
-			if ply:IsValid() and not ply:IsSuperAdmin() then return end
+			if IsValid(ply) and not ply:IsSuperAdmin() then return end
 			local name = arg[1]
 			if not name then return end
 			name = string.lower(name)
