@@ -4,9 +4,6 @@ ENT.RenderGroup = RENDERGROUP_OPAQUE
 ENT.DefaultMaterial = Material( "models/wireframe" )
 ENT.Material = ENT.DefaultMaterial
 
-local IsValid = FindMetaTable("Entity").IsValid
-local IsValidPhys = FindMetaTable("PhysObject").IsValid
-
 function ENT:Initialize()
 	self.rendermesh = Mesh(self.Material)
 	self.rendermeshloaded = false
@@ -23,7 +20,7 @@ end
 
 function ENT:Think()
 	local physobj = self:GetPhysicsObject()
-	if IsValidPhys(physobj) then
+	if physobj:IsValid() then
 		physobj:SetPos( self:GetPos() )
 		physobj:SetAngles( self:GetAngles() )
 		physobj:EnableMotion(false)
@@ -58,7 +55,7 @@ function ENT:OnRemove()
 	local mesh = self.rendermesh
 	if mesh then
 		timer.Simple(0, function()
-			if not IsValid(self) then
+			if not self:IsValid() then
 				mesh:Destroy()
 			end
 		end)
@@ -70,7 +67,7 @@ net.Receive("starfall_custom_prop", function()
 	local self, data
 
 	local function applyData()
-		if not (IsValid(self) and data and not self.rendermeshloaded) then return end
+		if not (self and self:IsValid() and data and not self.rendermeshloaded) then return end
 		local stream = SF.StringStream(data)
 		local physmesh = {}
 		local mins, maxs = Vector(math.huge, math.huge, math.huge), Vector(-math.huge, -math.huge, -math.huge)
@@ -91,7 +88,7 @@ net.Receive("starfall_custom_prop", function()
 		self:BuildPhysics(physmesh)
 
 		local phys = self:GetPhysicsObject()
-		if IsValidPhys(phys) then
+		if phys:IsValid() then
 			local convexes = phys:GetMeshConvexes()
 			local rendermesh = convexes[1]
 			for i=2, #convexes do

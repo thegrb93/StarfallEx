@@ -1,8 +1,6 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
-local IsValid = FindMetaTable("Entity").IsValid
-local IsWorld = FindMetaTable("Entity").IsWorld
 
 -- Register privileges
 registerprivilege("constraints.weld", "Weld", "Allows the user to weld two entities", { entities = {} })
@@ -90,13 +88,17 @@ function constr_methods:isValid()
 end
 
 local function checkConstraint(e, t)
-	if IsValid(e) then
-		if e:GetMoveType() == MOVETYPE_VPHYSICS then
-			checkpermission(instance, e, t)
-		else
-			SF.Throw("Can only constrain entities with physics", 3)
+	if e then
+		if e:IsValid() then
+			if e:GetMoveType() == MOVETYPE_VPHYSICS then
+				checkpermission(instance, e, t)
+			else
+				SF.Throw("Can only constrain entities with physics", 3)
+			end
+		elseif not e:IsWorld() then
+			SF.Throw("Invalid Entity", 3)
 		end
-	elseif not IsWorld(e) then
+	else
 		SF.Throw("Invalid Entity", 3)
 	end
 end
@@ -492,7 +494,7 @@ function constraint_library.setElasticLength(index, e, length)
 
 	if e.Elastics then
 		local con = e.Elastics[index]
-		if IsValid(con) then
+		if (con and con:IsValid()) then
 			con:Fire("SetSpringLength", length, 0)
 		end
 	end
@@ -514,7 +516,7 @@ function constraint_library.setElasticDamping(index, e, damping)
 
 	if e.Elastics then
 		local con = e.Elastics[index]
-		if IsValid(con) then
+		if (con and con:IsValid()) then
 			con:Fire("SetSpringDamping", damping, 0)
 		end
 	end
@@ -536,7 +538,7 @@ function constraint_library.setElasticConstant(index, e, constant)
 
 	if e.Elastics then
 		local con = e.Elastics[index]
-		if IsValid(con) then
+		if (con and con:IsValid()) then
 			con:Fire("SetSpringConstant", constant, 0)
 		end
 	end

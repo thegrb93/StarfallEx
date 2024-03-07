@@ -1,6 +1,4 @@
 
-local IsValid = FindMetaTable("Entity").IsValid
-
 -- Net extension stuff
 function net.ReadStarfall(ply, callback)
 	local sfdata = {files = {}}
@@ -129,7 +127,7 @@ if SERVER then
 
 	net.Receive("starfall_error", function(_, ply)
 		local chip = net.ReadEntity()
-		if not IsValid(chip) then return end
+		if not (chip and chip:IsValid()) then return end
 		if chip.ErroredPlayers[ply] then return end
 		chip.ErroredPlayers[ply] = true
 
@@ -167,7 +165,7 @@ if SERVER then
 		net.ReadStarfall(ply, function(ok, sfdata)
 			if not ok then return end
 
-			if not (IsValid(sf) and sf:GetClass() == "starfall_processor" and sf.sfdata) then return end
+			if not (sf:IsValid() and sf:GetClass() == "starfall_processor" and sf.sfdata) then return end
 			if sf.sfdata.mainfile ~= sfdata.mainfile or sf.sfdata.owner ~= ply then return end
 			sfdata.owner = ply
 			sf:SetupFiles(sfdata)
@@ -196,7 +194,7 @@ else
 	
 	function SF.SendError(chip, message, traceback)
 		local owner, is_blocked = chip.owner, false
-		if IsValid(owner) then
+		if owner and owner:IsValid() then
 			is_blocked = SF.BlockedUsers:isBlocked(owner:SteamID())
 		end
 		net.Start("starfall_error")
@@ -209,16 +207,16 @@ else
 
 	net.Receive("starfall_error", function()
 		local chip = net.ReadEntity()
-		if not IsValid(chip) then return end
+		if not chip:IsValid() then return end
 		local owner = net.ReadEntity()
-		if not IsValid(owner) then return end
+		if not owner:IsValid() then return end
 		local mainfile = net.ReadString()
 		local message = net.ReadString()
 		local traceback = net.ReadString()
 		local client, should_notify
 		if net.ReadBool() then
 			client = net.ReadEntity()
-			if not IsValid(client) then return end
+			if not client:IsValid() then return end
 			should_notify = net.ReadBool()
 		end
 		hook.Run("StarfallError", chip, owner, client, mainfile, message, traceback, should_notify)

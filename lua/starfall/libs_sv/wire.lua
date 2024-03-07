@@ -1,7 +1,6 @@
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 local debug_getmetatable = debug.getmetatable
-local IsValid = FindMetaTable("Entity").IsValid
 
 -- Register privileges
 registerprivilege("wire.setOutputs", "Set outputs", "Allows the user to specify the set of outputs")
@@ -45,24 +44,12 @@ return function(instance)
 if not (WireLib and WireLib.CreateInputs) then return end
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
-local wire_library = instance.Libraries.wire
-
-local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
-local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
-local wirelink_methods, wirelink_meta, wlwrap, wlunwrap = instance.Types.Wirelink.Methods, instance.Types.Wirelink, instance.Types.Wirelink.Wrap, instance.Types.Wirelink.Unwrap
-local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
-local vec2_meta, v2wrap, v2unwrap = instance.Types.Vector2, instance.Types.Vector2.Wrap, instance.Types.Vector2.Unwrap
-local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
-local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
-local wirelink_meta, wlwrap, wlunwrap = instance.Types.Wirelink, instance.Types.Wirelink.Wrap, instance.Types.Wirelink.Unwrap
-local COLOR_WHITE = Color(255, 255, 255)
-
 local wirecache = {}
 local wirecachevals = {}
 
 local getent
 instance:AddHook("initialize", function()
-	getent = ent_meta.GetEntity
+	getent = instance.Types.Entity.GetEntity
 
 	local ent = instance.entity
 	if ent.Inputs == nil then
@@ -100,9 +87,22 @@ instance:AddHook("initialize", function()
 	end
 end)
 
+
+local wire_library = instance.Libraries.wire
+
+local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
+local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local wirelink_methods, wirelink_meta, wlwrap, wlunwrap = instance.Types.Wirelink.Methods, instance.Types.Wirelink, instance.Types.Wirelink.Wrap, instance.Types.Wirelink.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local vec2_meta, v2wrap, v2unwrap = instance.Types.Vector2, instance.Types.Vector2.Wrap, instance.Types.Vector2.Unwrap
+local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
+local wirelink_meta, wlwrap, wlunwrap = instance.Types.Wirelink, instance.Types.Wirelink.Wrap, instance.Types.Wirelink.Unwrap
+local COLOR_WHITE = Color(255, 255, 255)
+
 local function getwl(self)
 	local wl = wlunwrap(self)
-	if IsValid(wl) then
+	if wl:IsValid() then
 		return wl
 	else
 		SF.Throw("Wirelink is not valid", 3)
@@ -497,8 +497,8 @@ function wire_library.create(entI, entO, inputname, outputname, width, color, ma
 	local entI = eunwrap(entI)
 	local entO = eunwrap(entO)
 
-	if not IsValid(entI) then SF.Throw("Invalid source") end
-	if not IsValid(entO) then SF.Throw("Invalid target") end
+	if not (entI and entI:IsValid()) then SF.Throw("Invalid source") end
+	if not (entO and entO:IsValid()) then SF.Throw("Invalid target") end
 
 	checkpermission(instance, entI, "wire.createWire")
 	checkpermission(instance, entO, "wire.createWire")
@@ -528,7 +528,7 @@ end
 function wire_library.delete(entI, inputname)
 	checkluatype(inputname, TYPE_STRING)
 
-	entI = getent(entI)
+	local entI = getent(entI)
 
 	checkpermission(instance, entI, "wire.deleteWire")
 
@@ -541,11 +541,13 @@ end
 local function parseEntity(ent, io)
 
 	if ent then
-		ent = getent(ent)
+		ent = eunwrap(ent)
 		checkpermission(instance, ent, "wire.get" .. io)
 	else
-		ent = instance.entity
+		ent = instance.entity or nil
 	end
+
+	if not (ent and ent:IsValid()) then SF.Throw("Invalid source") end
 
 	local names, types = {}, {}
 	for k, v in pairs(ent[io]) do
@@ -578,7 +580,8 @@ end
 -- @param Entity ent Wire entity
 -- @return Wirelink Wirelink of the entity
 function wire_library.getWirelink(ent)
-	ent = getent(ent)
+	ent = eunwrap(ent)
+	if not ent:IsValid() then return end
 	checkpermission(instance, ent, "wire.wirelink")
 
 	if not ent.extended then
@@ -603,7 +606,9 @@ wirelink_meta.__index = function(self, k)
 	if wirelink_methods[k] then
 		return wirelink_methods[k]
 	else
-		local wl = getwl(self)
+		local wl = wlunwrap(self)
+		if not wl:IsValid() or not wl.extended then return end -- TODO: What is wl.extended?
+
 		if isnumber(k) then
 			return wl.ReadCell and wl:ReadCell(k) or nil
 		else
@@ -619,7 +624,8 @@ end
 -- @param any val Value to set at the index
 wirelink_meta.__newindex = function(self, k, v)
 	checkpermission(instance, nil, "wire.wirelink.write")
-	local wl = getwl(self)
+	local wl = wlunwrap(self)
+	if not wl:IsValid() or not wl.extended then return end -- TODO: What is wl.extended?
 	if isnumber(k) then
 		checkluatype(v, TYPE_NUMBER)
 		if not wl.WriteCell then return
@@ -718,7 +724,7 @@ function wirelink_methods:isWired(name)
 	checkluatype(name, TYPE_STRING)
 	local wl = getwl(self)
 	local input = wl.Inputs[name]
-	if input and IsValid(input.Src) then return true
+	if input and input.Src and input.Src:IsValid() then return true
 	else return false end
 end
 
@@ -729,7 +735,7 @@ function wirelink_methods:getWiredTo(name)
 	checkluatype(name, TYPE_STRING)
 	local wl = getwl(self)
 	local input = wl.Inputs[name]
-	if input and IsValid(input.Src) then
+	if input and input.Src and input.Src:IsValid() then
 		return owrap(input.Src)
 	end
 end
@@ -741,7 +747,7 @@ function wirelink_methods:getWiredToName(name)
 	checkluatype(name, TYPE_STRING)
 	local wl = getwl(self)
 	local input = wl.Inputs[name]
-	if input and IsValid(input.Src) then
+	if input and input.Src and input.Src:IsValid() then
 		return input.SrcId
 	end
 end

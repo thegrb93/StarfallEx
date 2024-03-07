@@ -3,7 +3,6 @@ include("shared.lua")
 ENT.RenderGroup = RENDERGROUP_BOTH
 
 local render = render
-local IsValid = FindMetaTable("Entity").IsValid
 
 surface.CreateFont("Starfall_ErrorFont", {
 	font = "arial",
@@ -59,7 +58,7 @@ function ENT:SetScreenMatrix(info)
 end
 
 function ENT:RenderScreen()
-	if IsValid(self.link) then
+	if (self.link and self.link:IsValid()) then
 		local instance = self.link.instance
 		if instance then
 			if SF.Permissions.hasAccess(instance, nil, "render.screen") then

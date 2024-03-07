@@ -2,7 +2,6 @@ AddCSLuaFile('cl_init.lua')
 AddCSLuaFile('shared.lua')
 include('shared.lua')
 
-local IsValid = FindMetaTable("Entity").IsValid
 
 function ENT:Initialize()
 	self.BaseClass.Initialize(self)
@@ -45,7 +44,7 @@ end
 
 function ENT:PreEntityCopy()
 	if self.EntityMods then self.EntityMods.SFLink = nil end
-	if IsValid(self.link) then
+	if (self.link and self.link:IsValid()) then
 		duplicator.StoreEntityModifier(self, "SFLink", { link = self.link:EntIndex() })
 	end
 end
@@ -55,7 +54,7 @@ function ENT:PostEntityPaste(ply, ent, CreatedEntities)
 		local info = ent.EntityMods.SFLink
 		if info.link then
 			local e = CreatedEntities[info.link]
-			if IsValid(e) then
+			if (e and e:IsValid()) then
 				SF.LinkEnt(self, e)
 			end
 		end

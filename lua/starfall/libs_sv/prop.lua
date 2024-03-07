@@ -1,8 +1,6 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
-local IsValid = FindMetaTable("Entity").IsValid
-local IsValidPhys = FindMetaTable("PhysicsObject").IsValid
 
 -- Register privileges
 registerprivilege("prop.create", "Create prop", "Allows the user to create props")
@@ -77,7 +75,7 @@ function props_library.create(pos, ang, model, frozen)
 
 	for I = 0, propent:GetPhysicsObjectCount() - 1 do
 		local obj = propent:GetPhysicsObjectNum(I)
-		if IsValidPhys(obj) then
+		if obj:IsValid() then
 			obj:EnableMotion(not frozen)
 		end
 	end
@@ -126,7 +124,7 @@ function props_library.createRagdoll(model, frozen)
 	if frozen then
 		for I = 0, ent:GetPhysicsObjectCount() - 1 do
 			local obj = ent:GetPhysicsObjectNum(I)
-			if IsValidPhys(obj) then
+			if obj:IsValid() then
 				obj:EnableMotion(false)
 			end
 		end
@@ -214,7 +212,7 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	entList:register(instance, propent)
 
 	local physobj = propent:GetPhysicsObject()
-	if not IsValidPhys(physobj) then
+	if not physobj:IsValid() then
 		SF.Throw("Custom prop generated with invalid physics object!", 2)
 	end
 
@@ -290,7 +288,7 @@ function props_library.createComponent(pos, ang, class, model, frozen)
 
 	for I = 0,  comp:GetPhysicsObjectCount() - 1 do
 		local obj = comp:GetPhysicsObjectNum(I)
-		if IsValidPhys(obj) then
+		if obj:IsValid() then
 			obj:EnableMotion(not frozen)
 		end
 	end
@@ -378,7 +376,7 @@ function props_library.createSeat(pos, ang, model, frozen)
 	entList:register(instance, prop)
 
 	local phys = prop:GetPhysicsObject()
-	if IsValidPhys(phys) then
+	if phys:IsValid() then
 		phys:EnableMotion(not frozen)
 	end
 
@@ -437,7 +435,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		end
 
 		entity = ents.Create(swep.ClassName)
-		if IsValid(entity) then
+		if entity and entity:IsValid() then
 			entity:SetPos(pos)
 			entity:SetAngles(ang)
 			entity:Spawn()
@@ -456,7 +454,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 			entity = sent.t.SpawnFunction( sent.t, ply, SF.dumbTrace(NULL, pos), class )
 		else
 			entity = ents.Create( class )
-			if IsValid(entity) then
+			if entity and entity:IsValid() then
 				entity:SetPos(pos)
 				entity:SetAngles(ang)
 				entity:Spawn()
@@ -473,7 +471,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 
 		entity = ents.Create(npc.Class)
 
-		if IsValid(entity) then
+		if entity and entity:IsValid() then
 			if (npc.Model) then
 				entity:SetModel(npc.Model)
 			end
@@ -505,7 +503,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 
 		entity = ents.Create(vehicle.Class)
 
-		if IsValid(entity) then
+		if entity and entity:IsValid() then
 			entity:SetModel(vehicle.Model)
 			if (vehicle.Model == "models/buggy.mdl") then
 				entity:SetKeyValue("vehiclescript", "scripts/vehicles/jeep_test.txt")
@@ -641,13 +639,13 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		end
 	end
 
-	if IsValid(entity) then
+	if entity and entity:IsValid() then
 		entList:register(instance, entity)
 
 		if CPPI then entity:CPPISetOwner(ply == SF.Superuser and NULL or ply) end
 
 		local phys = entity:GetPhysicsObject()
-		if IsValidPhys(phys) then
+		if phys:IsValid() then
 			phys:EnableMotion(not frozen)
 		end
 

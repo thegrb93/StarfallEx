@@ -2,8 +2,6 @@ AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include("shared.lua")
 
-local IsValid = FindMetaTable("Entity").IsValid
-
 function ENT:Initialize()
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
@@ -24,7 +22,7 @@ end
 
 function ENT:SetCustomModel(model)
 	if self:GetModel() == model then return end
-	if IsValid(self:GetParent()) then
+	if self:GetParent():IsValid() then
 		self:SetModel(model)
 	else
 		local constraints = constraint.GetTable(self)
@@ -165,7 +163,7 @@ local function EntityLookup(CreatedEntities)
 		if id == nil then return default end
 		if id == 0 then return game.GetWorld() end
 		local ent = CreatedEntities[id]
-		if IsValid(ent) then return ent else return default end
+		if (ent and ent:IsValid()) then return ent else return default end
 	end
 end
 function ENT:PostEntityPaste(ply, ent, CreatedEntities)
@@ -225,7 +223,7 @@ util.AddNetworkString("starfall_processor_clinit")
 -- Request code from the chip. If the chip doesn't have code yet add player to list to send when there is code.
 net.Receive("starfall_processor_download", function(len, ply)
 	local proc = net.ReadEntity()
-	if IsValid(ply) and IsValid(proc) then
+	if ply:IsValid() and proc:IsValid() then
 		proc:SendCode(ply)
 	end
 end)
@@ -233,14 +231,14 @@ end)
 net.Receive("starfall_processor_link", function(len, ply)
 	local entIndex = net.ReadUInt(16)
 	local linked = Entity(entIndex)
-	if IsValid(linked.link) then
+	if linked.link and linked.link:IsValid() then
 		SF.LinkEnt(linked, linked.link, ply)
 	end
 end)
 
 net.Receive("starfall_processor_kill", function(len, ply)
 	local target = net.ReadEntity()
-	if ply:IsAdmin() and IsValid(target) and target:GetClass()=="starfall_processor" then
+	if ply:IsAdmin() and target:IsValid() and target:GetClass()=="starfall_processor" then
 		target:Error({message = "Killed by admin", traceback = ""})
 		net.Start("starfall_processor_kill")
 		net.WriteEntity(target)
@@ -250,7 +248,7 @@ end)
 
 net.Receive("starfall_processor_clinit", function(len, ply)
 	local proc = net.ReadEntity()
-	if IsValid(ply) and IsValid(proc) then
+	if ply:IsValid() and proc:IsValid() then
 		local instance = proc.instance
 		if instance then
 			instance:runScriptHook("clientinitialized", instance.Types.Player.Wrap(ply))

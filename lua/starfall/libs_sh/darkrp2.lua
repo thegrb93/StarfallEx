@@ -11,7 +11,6 @@ end)
 local checkluatype = SF.CheckLuaType
 local checkpattern = SF.CheckPattern
 local registerprivilege = SF.Permissions.registerPrivilege
-local IsValid = FindMetaTable("Entity").IsValid
 
 -- Under normal circumstances, an API change could introduce security
 -- vulnerabilities. Suppose a DarkRP function changes to also return a Player
@@ -95,8 +94,8 @@ function requestClass:__tostring()
 	return string.format(
 		"%s from %s to %s, expiring in %.02f seconds",
 		DarkRP.formatMoney(self.amount),
-		IsValid(self.sender) and self.sender:SteamID() or "<INVALID>",
-		IsValid(self.receiver) and self.receiver:SteamID() or "<INVALID>",
+		self.sender:IsValid() and self.sender:SteamID() or "<INVALID>",
+		self.receiver:IsValid() and self.receiver:SteamID() or "<INVALID>",
 		self.expiry-CurTime()
 	)
 end
@@ -176,7 +175,7 @@ if SERVER then
 		for sender, requestsForPlayer in pairs(self.requests) do
 			if IsValid(sender) then
 				for receiver, request in pairs(requestsForPlayer) do
-					if not IsValid(receiver) then
+					if not receiver:IsValid() then
 						self:pop(sender, receiver, true)
 						printDebug("SF: Removed money request because the receiver was invalid.", request)
 						if request.callbackFailure then
@@ -226,7 +225,7 @@ if SERVER then
 	-- Console commands for managing money requests
 	local function chatPrint(ply, ...)
 		local message = string.format(...)
-		if IsValid(ply) and ply:IsPlayer() then
+		if ply:IsValid() and ply:IsPlayer() then
 			ply:PrintMessage(HUD_PRINTCONSOLE, message)
 		else
 			print(message)
@@ -238,14 +237,14 @@ if SERVER then
 			return chatPrint(executor, "sf_moneyrequest: malformed parameters (do \"help sf_moneyrequest\")")
 		end
 		sender = sender == 0 and executor or Entity(sender)
-		if not (IsValid(sender) and sender:IsPlayer()) then
+		if not (sender:IsValid() and sender:IsPlayer()) then
 			return chatPrint(executor, "sf_moneyrequest: invalid sender")
 		end
 		receiver = Entity(receiver)
-		if not (IsValid(receiver) and receiver:IsPlayer()) then
+		if not (receiver:IsValid() and receiver:IsPlayer()) then
 			return chatPrint(executor, "sf_moneyrequest: invalid receiver")
 		end
-		if IsValid(executor) and sender ~= executor and not executor:IsSuperAdmin() then
+		if executor:IsValid() and sender ~= executor and not executor:IsSuperAdmin() then
 			return chatPrint(executor, "sf_moneyrequest: only superadmins can interact with other people's money requests")
 		end
 		local request = manager:pop(sender, receiver)
@@ -381,7 +380,7 @@ else
 	net.Receive("sf_moneyrequest2", function()
 		local request = manager:receive()
 		local receiver, amount, expiry, message = request.receiver, request.amount, request.expiry, request.message
-		if not IsValid(receiver) or amount == 0 or expiry <= CurTime() then
+		if not receiver:IsValid() or amount == 0 or expiry <= CurTime() then
 			printDebug("SF: Ignoring malformed request.", request)
 		end
 		printDebug("SF: Received money request.", request)
