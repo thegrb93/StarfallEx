@@ -64,19 +64,19 @@ local entList = SF.EntManager("nextbots", "nextbots", 30, "The number of props a
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
+local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local nextbot_library, nb_meta, nb_methods = instance.Libraries.nextbot, instance.Types.NextBot, instance.Types.NextBot.Methods
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local navarea_methods, navarea_meta, navwrap, navunwrap = instance.Types.NavArea.Methods, instance.Types.NavArea, instance.Types.NavArea.Wrap, instance.Types.NavArea.Unwrap
 local nbwrap, nbunwrap = instance.Types.NextBot.Wrap, instance.Types.NextBot.Unwrap
 
+instance:AddHook("initialize", function()
+	nb_meta.__tostring = ent_meta.__tostring
+end)
 
 instance:AddHook("deinitialize", function()
 	entList:deinitialize(instance, true)
 end)
-
-function nb_meta:__tostring()
-	return "NextBot"
-end
 
 --- Creates a customizable NextBot
 -- @server

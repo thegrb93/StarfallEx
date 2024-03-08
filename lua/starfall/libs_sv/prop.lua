@@ -2,7 +2,7 @@
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 local IsValid = FindMetaTable("Entity").IsValid
-local IsValidPhys = FindMetaTable("PhysicsObject").IsValid
+local IsValidPhys = FindMetaTable("PhysObj").IsValid
 
 -- Register privileges
 registerprivilege("prop.create", "Create prop", "Allows the user to create props")

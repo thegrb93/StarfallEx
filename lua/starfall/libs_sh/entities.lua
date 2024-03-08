@@ -2,7 +2,7 @@
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 local IsValid = FindMetaTable("Entity").IsValid
-local IsValidPhys = FindMetaTable("PhysObject").IsValid
+local IsValidPhys = FindMetaTable("PhysObj").IsValid
 local IsWorld = FindMetaTable("Entity").IsWorld
 
 registerprivilege("entities.setParent", "Parent", "Allows the user to parent an entity to another entity", { entities = {} })

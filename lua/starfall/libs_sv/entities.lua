@@ -3,7 +3,8 @@ local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 local haspermission = SF.Permissions.hasAccess
 local IsValid = FindMetaTable("Entity").IsValid
-local IsValidPhys = FindMetaTable("PhysObject").IsValid
+local IsValidPhys = FindMetaTable("PhysObj").IsValid
+local isentity = isentity
 
 local huge = math.huge
 local abs = math.abs
@@ -786,7 +787,7 @@ function ents_methods:getAllConstrained(filter)
 			if not filter or filter.Wire then
 				if istable(ent.Inputs) then
 					for _, v in pairs(ent.Inputs) do
-						if IsValid(v.Src) then
+						if isentity(v.Src) and IsValid(v.Src) then
 							recursive_find(v.Src)
 						end
 					end
@@ -795,7 +796,7 @@ function ents_methods:getAllConstrained(filter)
 					for _, v in pairs(ent.Outputs) do
 						if istable(v.Connected) then
 							for _, v in pairs(v.Connected) do
-								if IsValid(v.Entity) then
+								if isentity(v.Entity) and IsValid(v.Entity) then
 									recursive_find(v.Entity)
 								end
 							end

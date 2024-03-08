@@ -5,7 +5,7 @@ ENT.DefaultMaterial = Material( "models/wireframe" )
 ENT.Material = ENT.DefaultMaterial
 
 local IsValid = FindMetaTable("Entity").IsValid
-local IsValidPhys = FindMetaTable("PhysObject").IsValid
+local IsValidPhys = FindMetaTable("PhysObj").IsValid
 
 function ENT:Initialize()
 	self.rendermesh = Mesh(self.Material)
