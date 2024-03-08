@@ -65,6 +65,7 @@ function ENT:ChasePos(options)
 		-- If we're stuck then call the HandleStuck function and abandon
 		if ( self.loco:IsStuck() ) then
 			self:HandleStuck()
+			addPerf(self.instance, startPerfTime)
 			return "stuck"
 		end
 
