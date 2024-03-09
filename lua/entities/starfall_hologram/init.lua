@@ -72,10 +72,11 @@ function ENT:TransmitClips(recip)
 	if recip then net.Send(recip) else net.Broadcast() end
 end
 
-net.Receive("starfall_hologram_clips", function(len, ply)
-	local self = net.ReadEntity()
-	if self:IsValid() and self.IsSFHologram and #self.clipdata>0 then
-		self:TransmitClips(ply)
+SF.WaitForPlayerInit(function(ply)
+	for k, v in ipairs(ents.FindByClass("starfall_hologram")) do
+		if #v.clipdata>0 then
+			v:TransmitClips(ply)
+		end
 	end
 end)
 
