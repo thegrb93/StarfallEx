@@ -33,7 +33,13 @@ function ENT:Initialize()
 	self.ReachCallbacks = SF.HookTable()
 end
 
+local function addPerf(instance, startPerfTime)
+	instance.cpu_total = instance.cpu_total + (SysTime() - startPerfTime)
+end
+
 function ENT:ChasePos(options)
+	local startPerfTime = SysTime()
+
 	local options = options or {}
 	local path = Path( "Follow" )
 	path:SetMinLookAheadDistance( options.lookahead or 300 )
@@ -41,9 +47,12 @@ function ENT:ChasePos(options)
 	-- Compute the path towards the enemy's position
 	path:Compute( self, self.goTo )
 
+	addPerf(self.instance, startPerfTime)
 	if ( !path:IsValid() ) then return "failed" end
 
 	while ( path:IsValid() and self.goTo ) do
+		startPerfTime = SysTime()
+
 		-- Since we are following the player we have to constantly remake the path
 		if ( path:GetAge() > 0.1 ) then
 			-- Compute the path towards the enemy's position again
@@ -56,8 +65,11 @@ function ENT:ChasePos(options)
 		-- If we're stuck then call the HandleStuck function and abandon
 		if ( self.loco:IsStuck() ) then
 			self:HandleStuck()
+			addPerf(self.instance, startPerfTime)
 			return "stuck"
 		end
+
+		addPerf(self.instance, startPerfTime)
 		coroutine.yield()
 	end
 
@@ -75,7 +87,7 @@ function ENT:RunBehaviour()
 			self:ChasePos()
 			self:StartActivity(self.IDLEACT)
 			self.goTo = nil
-			self.ReachCallbacks:run(self.chip.instance)
+			self.ReachCallbacks:run(self.instance)
 		elseif self.approachPos then
 			self.loco:SetDesiredSpeed(self.MoveSpeed)
 			self:StartActivity(self.RUNACT)
@@ -85,7 +97,7 @@ function ENT:RunBehaviour()
 			end
 			self:StartActivity(self.IDLEACT)
 			self.approachPos = nil
-			self.ReachCallbacks:run(self.chip.instance)
+			self.ReachCallbacks:run(self.instance)
 		end
 		coroutine.wait( 1 )
 		coroutine.yield()
@@ -94,7 +106,7 @@ end
 
 function ENT:OnInjured(dmginfo)
 	if self.InjuredCallbacks:isEmpty() then return end
-	local inst = self.chip.instance
+	local inst = self.instance
 	self.InjuredCallbacks:run(inst,
 		dmginfo:GetDamage(),
 		inst.WrapObject(dmginfo:GetAttacker()),
@@ -106,7 +118,7 @@ end
 
 function ENT:OnKilled(dmginfo)
 	if not self.DeathCallbacks:isEmpty() then
-		local inst = self.chip.instance
+		local inst = self.instance
 		self.DeathCallbacks:run(inst,
 			dmginfo:GetDamage(),
 			inst.WrapObject(dmginfo:GetAttacker()),
@@ -120,24 +132,24 @@ end
 
 function ENT:OnLandOnGround(groundent)
 	if self.LandCallbacks:isEmpty() then return end
-	local inst = self.chip.instance
+	local inst = self.instance
 	self.LandCallbacks:run(inst, inst.WrapObject(groundent))
 end
 
 function ENT:OnLeaveGround(groundent)
 	if self.JumpCallbacks:isEmpty() then return end
-	local inst = self.chip.instance
+	local inst = self.instance
 	self.JumpCallbacks:run(inst, inst.WrapObject(groundent))
 end
 
 function ENT:OnIgnite()
 	if self.IgniteCallbacks:isEmpty() then return end
-	self.IgniteCallbacks:run(self.chip.instance)
+	self.IgniteCallbacks:run(self.instance)
 end
 
 function ENT:OnNavAreaChanged(old, new)
 	if self.NavChangeCallbacks:isEmpty() then return end
-	local inst = self.chip.instance
+	local inst = self.instance
 	self.NavChangeCallbacks:run(inst,
 		inst.Types.NavArea.Wrap(old),
 		inst.Types.NavArea.Wrap(new))
@@ -145,6 +157,6 @@ end
 
 function ENT:OnContact(colent)
 	if self.ContactCallbacks:isEmpty() then return end
-	local inst = self.chip.instance
+	local inst = self.instance
 	self.ContactCallbacks:run(inst, inst.WrapObject(colent))
 end
