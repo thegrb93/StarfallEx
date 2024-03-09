@@ -34,6 +34,17 @@ SF.RegisterType("Constraint", true, false)
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
+local getent
+instance:AddHook("initialize", function()
+	getent = instance.Types.Entity.GetEntity
+end)
+
+local constraintsClean = true
+
+instance:AddHook("deinitialize", function()
+	entList:deinitialize(instance, constraintsClean)
+end)
+
 local constraint_library = instance.Libraries.constraint
 
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
@@ -42,17 +53,13 @@ local vwrap, vunwrap = instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local awrap, aunwrap = instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 
 
-local getent
-instance:AddHook("initialize", function()
-	getent = instance.Types.Entity.GetEntity
-	constr_meta.__tostring = ent_meta.__tostring
-end)
-
-local constraintsClean = true
-
-instance:AddHook("deinitialize", function()
-	entList:deinitialize(instance, constraintsClean)
-end)
+--- Gets the string representation of the constraint
+-- @return string String representation of the constraint
+function constr_meta:__tostring()
+	local ent = cunwrap(self)
+	if not ent then return "(null entity)"
+	else return tostring(ent) end
+end
 
 local function check_constr_perms(ent)
 	if ent.Ent1 and not ent.Ent1:IsWorld() then checkpermission(instance, ent.Ent1, "entities.remove", 3) end

@@ -94,19 +94,19 @@ end
 -- @param Player|table|nil target Optional target location to send the net message. Player or table of targets. If nil, sends to server on client
 -- @param boolean? unreliable Optional choose whether it's more important for the message to actually reach its destination (false) or reach it as fast as possible (true).
 function net_library.send(target, unreliable)
-	if target~=nil then checkluatype(target, TYPE_TABLE) end
 	if unreliable~=nil then checkluatype(unreliable, TYPE_BOOL) end
 	if not netStarted then SF.Throw("net message not started", 2) end
 
 	local newtarget
-	if SERVER then
-		if #target>0 then
+	if SERVER and target then
+		checkluatype(target, TYPE_TABLE)
+		if debug.getmetatable(target)==instance.Types.Player then
+			newtarget = instance.Types.Player.GetPlayer(target)
+		else
 			newtarget = {}
 			for i, pl in ipairs(target) do
 				newtarget[i] = instance.Types.Player.GetPlayer(pl)
 			end
-		else
-			newtarget = instance.Types.Player.GetPlayer(target)
 		end
 	end
 
