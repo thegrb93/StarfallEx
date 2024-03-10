@@ -1,5 +1,6 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
+local IsValidPhys = FindMetaTable("PhysObj").IsValid
 
 local function checknumber(n)
 	if n<-1e12 or n>1e12 or n~=n then
@@ -40,7 +41,7 @@ local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.
 -- @shared
 -- @return boolean If the physics object is valid
 function physobj_methods:isValid()
-	return unwrap(self):IsValid()
+	return IsValidPhys(unwrap(self))
 end
 
 --- Gets the entity attached to the physics object

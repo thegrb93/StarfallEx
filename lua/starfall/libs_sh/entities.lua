@@ -735,7 +735,7 @@ end
 -- @return PhysObj The main physics object of the entity
 function ents_methods:getPhysicsObject()
 	local ent = getent(self)
-	if ent:IsWorld() then SF.Throw("Cannot get the world physobj.", 2) end
+	if IsWorld(ent) then SF.Throw("Cannot get the world physobj.", 2) end
 	return pwrap(ent:GetPhysicsObject())
 end
 
