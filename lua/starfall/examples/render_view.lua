@@ -17,7 +17,7 @@ mat:setTextureRenderTarget("$basetexture", rtName)
 local scrW, scrH
 local screenEnt
 
-hook.add("renderscene", "render_view", function()
+hook.add("renderscene", "render_view", function(origin, angles)
     if not permissionSatisfied then return end
 
     if not render.isInRenderView() and screenEnt then
@@ -28,10 +28,10 @@ hook.add("renderscene", "render_view", function()
         local clipNormal = screenEnt:getUp()
         render.pushCustomClipPlane(clipNormal, (screenEnt:getPos() + clipNormal):dot(clipNormal))
         
-        local localOrigin = screenEnt:worldToLocal(render.getOrigin())
-        local reflectedOrigin = screenEnt:localToWorld(localOrigin * Vector(1, 1, -1))  
+        local localOrigin = screenEnt:worldToLocal(origin)
+        local reflectedOrigin = screenEnt:localToWorld(localOrigin * Vector(1, 1, -1))
         
-        local localAng = screenEnt:worldToLocalAngles(render.getAngles())
+        local localAng = screenEnt:worldToLocalAngles(angles)
         local reflectedAngle = screenEnt:localToWorldAngles(Angle(-localAng.p, localAng.y, -localAng.r + 180))
         
         render.renderView({
