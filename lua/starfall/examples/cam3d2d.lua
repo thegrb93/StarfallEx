@@ -11,7 +11,7 @@ local font = render.createFont("Roboto", 256, 400, true)
 -- m:setTranslation(Vector(0, 0, 0))
 -- m:setScale(Vector(scale, -scale))
 
-hook.add("PreDrawTranslucentRenderables", "", function()
+hook.add("PostDrawTranslucentRenderables", "", function()
     local m = chip():getMatrix()
     m:translate(Vector(0, 0, 45))
     m:setAngles((eyePos() - m:getTranslation()):getAngle() + Angle(90, 0, 0))
