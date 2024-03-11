@@ -1,6 +1,7 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
+local IsValid = FindMetaTable("Entity").IsValid
 
 registerprivilege("hologram.modify", "Modify holograms", "Allows the user to modify holograms", { entities = {} })
 registerprivilege("hologram.create", "Create hologram", "Allows the user to create holograms", CLIENT and { client = {} } or nil)
@@ -78,7 +79,7 @@ end)
 
 local function getholo(self)
 	local ent = unwrap(self)
-	if ent:IsValid() then
+	if IsValid(ent) then
 		return ent
 	else
 		SF.Throw("Entity is not valid.", 3)
@@ -116,7 +117,7 @@ function hologram_library.create(pos, ang, model, scale)
 	local holoent
 	if SERVER then
 		holoent = ents.Create("starfall_hologram")
-		if holoent and holoent:IsValid() then
+		if IsValid(holoent) then
 			holoent:SetPos(SF.clampPos(pos))
 			holoent:SetAngles(ang)
 			holoent:SetModel(model)
@@ -132,7 +133,7 @@ function hologram_library.create(pos, ang, model, scale)
 		end
 	else
 		holoent = ents.CreateClientside("starfall_hologram")
-		if holoent and holoent:IsValid() then
+		if IsValid(holoent) then
 			holoent.SFHoloOwner = ply
 
 			holoent:SetPos(SF.clampPos(pos))
@@ -216,7 +217,7 @@ else
 		holo:SetPos(pos)
 
 		local sfParent = holo.sfParent
-		if sfParent and sfParent.parent and sfParent.parent:IsValid() then
+		if sfParent and IsValid(sfParent.parent) then
 			sfParent:updateTransform()
 		end
 	end
@@ -232,7 +233,7 @@ else
 		holo:SetAngles(angle)
 		
 		local sfParent = holo.sfParent
-		if sfParent and sfParent.parent and sfParent.parent:IsValid() then
+		if sfParent and IsValid(sfParent.parent) then
 			sfParent:updateTransform()
 		end
 	end
@@ -513,7 +514,7 @@ function hologram_methods:remove()
 	if CLIENT and instance.data.render.isRendering then SF.Throw("Cannot remove while in rendering hook!", 2) end
 
 	local holo = getholo(self)
-	if not (holo:IsValid() and holo.IsSFHologram) then SF.Throw("Invalid hologram!", 2) end
+	if not (IsValid(holo) and holo.IsSFHologram) then SF.Throw("Invalid hologram!", 2) end
 	checkpermission(instance, holo, "hologram.create")
 	entList:remove(instance, holo)
 end

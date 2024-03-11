@@ -1,6 +1,8 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
+local IsValid = FindMetaTable("Entity").IsValid
+local IsWorld = FindMetaTable("Entity").IsWorld
 
 -- Register privileges
 registerprivilege("constraints.weld", "Weld", "Allows the user to weld two entities", { entities = {} })
@@ -60,10 +62,10 @@ function constr_meta:__tostring()
 end
 
 local function check_constr_perms(ent)
-	if ent.Ent1 and not ent.Ent1:IsWorld() then checkpermission(instance, ent.Ent1, "entities.remove", 3) end
-	if ent.Ent2 and not ent.Ent2:IsWorld() then checkpermission(instance, ent.Ent2, "entities.remove", 3) end
-	if ent.Ent3 and not ent.Ent3:IsWorld() then checkpermission(instance, ent.Ent3, "entities.remove", 3) end
-	if ent.Ent4 and not ent.Ent4:IsWorld() then checkpermission(instance, ent.Ent4, "entities.remove", 3) end
+	if ent.Ent1 and not IsWorld(ent.Ent1) then checkpermission(instance, ent.Ent1, "entities.remove", 3) end
+	if ent.Ent2 and not IsWorld(ent.Ent2) then checkpermission(instance, ent.Ent2, "entities.remove", 3) end
+	if ent.Ent3 and not IsWorld(ent.Ent3) then checkpermission(instance, ent.Ent3, "entities.remove", 3) end
+	if ent.Ent4 and not IsWorld(ent.Ent4) then checkpermission(instance, ent.Ent4, "entities.remove", 3) end
 end
 
 --- Removes the constraint
@@ -88,17 +90,13 @@ function constr_methods:isValid()
 end
 
 local function checkConstraint(e, t)
-	if e then
-		if e:IsValid() then
-			if e:GetMoveType() == MOVETYPE_VPHYSICS then
-				checkpermission(instance, e, t)
-			else
-				SF.Throw("Can only constrain entities with physics", 3)
-			end
-		elseif not e:IsWorld() then
-			SF.Throw("Invalid Entity", 3)
+	if IsValid(e) then
+		if e:GetMoveType() == MOVETYPE_VPHYSICS then
+			checkpermission(instance, e, t)
+		else
+			SF.Throw("Can only constrain entities with physics", 3)
 		end
-	else
+	elseif not IsWorld(e) then
 		SF.Throw("Invalid Entity", 3)
 	end
 end
@@ -494,7 +492,7 @@ function constraint_library.setElasticLength(index, e, length)
 
 	if e.Elastics then
 		local con = e.Elastics[index]
-		if (con and con:IsValid()) then
+		if IsValid(con) then
 			con:Fire("SetSpringLength", length, 0)
 		end
 	end
@@ -516,7 +514,7 @@ function constraint_library.setElasticDamping(index, e, damping)
 
 	if e.Elastics then
 		local con = e.Elastics[index]
-		if (con and con:IsValid()) then
+		if IsValid(con) then
 			con:Fire("SetSpringDamping", damping, 0)
 		end
 	end
@@ -538,7 +536,7 @@ function constraint_library.setElasticConstant(index, e, constant)
 
 	if e.Elastics then
 		local con = e.Elastics[index]
-		if (con and con:IsValid()) then
+		if IsValid(con) then
 			con:Fire("SetSpringConstant", constant, 0)
 		end
 	end

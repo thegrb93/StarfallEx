@@ -1,6 +1,7 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local dgetmeta = debug.getmetatable
+local IsValid = FindMetaTable("Entity").IsValid
 
 SF.Permissions.registerPrivilege("console.command", "Console command", "Allows the starfall to run console commands")
 
@@ -369,7 +370,7 @@ if CLIENT then
 	function builtins_library.sendPermissionRequest()
 		if not SF.IsHUDActive(instance.entity) then SF.Throw("Player isn't connected to HUD!", 2) end
 		if sentPermRequest then SF.Throw("Can only send the permission request once!", 2) end
-		if instance.permissionRequest and not SF.Permissions.permissionRequestSatisfied( instance ) and not IsValid(SF.permPanel) then
+		if instance.permissionRequest and not SF.Permissions.permissionRequestSatisfied( instance ) and not (SF.permPanel and SF.permPanel:IsValid()) then
 			sentPermRequest = true
 			local pnl = vgui.Create("SFChipPermissions")
 			if pnl then
@@ -605,7 +606,7 @@ else
 	function builtins_library.setName(name)
 		checkluatype(name, TYPE_STRING)
 		local e = instance.entity
-		if (e and e:IsValid()) then
+		if IsValid(e) then
 			e.name = string.sub(name, 1, 256)
 		end
 	end
@@ -616,7 +617,7 @@ else
 	function builtins_library.setAuthor(author)
 		checkluatype(author, TYPE_STRING)
 		local e = instance.entity
-		if (e and e:IsValid()) then
+		if IsValid(e) then
 			e.author = string.sub(author, 1, 256)
 		end
 	end
@@ -1185,7 +1186,7 @@ function builtins_library.enableHud(ply, active)
 		SF.EnableHud(ply, instance.entity, nil, active)
 	else
 		local vehicle = ply:GetVehicle()
-		if vehicle:IsValid() and SF.Permissions.getOwner(vehicle)==instance.player then
+		if IsValid(vehicle) and SF.Permissions.getOwner(vehicle)==instance.player then
 			SF.EnableHud(ply, instance.entity, vehicle, active)
 		else
 			SF.Throw("Player must be sitting in owner's vehicle or be owner of the chip!", 2)

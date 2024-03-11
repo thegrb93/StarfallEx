@@ -1,6 +1,7 @@
 -- Global to all starfalls
 local net = net
 local checkluatype = SF.CheckLuaType
+local IsValid = FindMetaTable("Entity").IsValid
 
 local streams = SF.EntityTable("playerStreams")
 local netBurst = SF.BurstObject("net", "net message", 5, 10, "Regen rate of net message burst in kB/sec.", "The net message burst limit in kB.", 1000 * 8)
@@ -12,7 +13,7 @@ end
 
 net.Receive("SF_netmessage", function(len, ply)
 	local ent = net.ReadEntity()
-	if ent:IsValid() then
+	if IsValid(ent) then
 		local instance = ent.instance
 		if instance and instance.runScriptHook then
 			local name = net.ReadString()
@@ -90,30 +91,21 @@ end
 
 --- Send a net message from client->server, or server->client.
 -- @shared
--- @param Entity|table|nil target Optional target location to send the net message. Entity or table of targets. If nil, sends to server on client
+-- @param Player|table|nil target Optional target location to send the net message. Player or table of targets. If nil, sends to server on client
 -- @param boolean? unreliable Optional choose whether it's more important for the message to actually reach its destination (false) or reach it as fast as possible (true).
 function net_library.send(target, unreliable)
-	if target~=nil then checkluatype(target, TYPE_TABLE) end
 	if unreliable~=nil then checkluatype(unreliable, TYPE_BOOL) end
 	if not netStarted then SF.Throw("net message not started", 2) end
 
 	local newtarget
-	if SERVER then
-		if target then
-			newtarget = instance.UnwrapObject(target)
-			if newtarget then
-				if not (newtarget.IsValid and newtarget.IsPlayer and newtarget:IsValid() and newtarget:IsPlayer()) then SF.Throw("Invalid player", 2) end
-			else
-				if #target == 0 then SF.Throw("Send array is empty", 2) end
-				newtarget = {}
-				for i = 1, #target do
-					local pl = eunwrap(target[i])
-					if pl:IsValid() and pl:IsPlayer() then
-						newtarget[i] = pl
-					else
-						SF.Throw("Invalid player inside send array", 2)
-					end
-				end
+	if SERVER and target then
+		checkluatype(target, TYPE_TABLE)
+		if debug.getmetatable(target)==instance.Types.Player then
+			newtarget = instance.Types.Player.GetPlayer(target)
+		else
+			newtarget = {}
+			for i, pl in ipairs(target) do
+				newtarget[i] = instance.Types.Player.GetPlayer(pl)
 			end
 		end
 	end
