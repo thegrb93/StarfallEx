@@ -168,6 +168,14 @@ else
 	-- @return number Server frametime standard deviation
 	game_library.serverFrameTime = engine.ServerFrameTime
 
+	--- Returns if the client is currently timing out from the server
+	-- @name game_library.isTimingOut
+	-- @client
+	-- @class function
+	-- @return boolean If currently timing out
+	-- @return number Time since the connection started to timeout
+	game_library.isTimingOut = GetTimeoutInfo
+
 end
 
 end
