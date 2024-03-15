@@ -86,19 +86,19 @@ function SF.DefaultCode()
 	elseif file.Exists("starfall/default.lua", "DATA") then
 		return file.Read("starfall/default.lua", "DATA")
 	else
-		local code = [=[--@name
---@author
+		local code = [=[--@name Untitled
+--@author <AUTHOR>
 --@shared
 
---[[
-Starfall Scripting Environment
+--[[ Starfall Scripting Environment 
 
-Github: https://github.com/thegrb93/StarfallEx
-Reference Page: http://thegrb93.github.io/Starfall/
+Documentation: http://thegrb93.github.io/StarfallEx/
+StarfallEx Addon: https://github.com/thegrb93/StarfallEx
 
-Default Keyboard shortcuts: https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts
+Editor Keyboard shortcuts: https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts
 ]]]=]
 		code = string.gsub(code, "\r", "")
+		code = string.gsub(code, "<AUTHOR>", "https://steamcommunity.com/profiles/" .. LocalPlayer():SteamID64())
 		file.Write("starfall/default.txt", code)
 		return code
 	end
