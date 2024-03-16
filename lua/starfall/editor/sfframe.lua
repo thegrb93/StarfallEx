@@ -87,18 +87,15 @@ function SF.DefaultCode()
 		return file.Read("starfall/default.lua", "DATA")
 	else
 		local code = [=[--@name Untitled
---@author <AUTHOR>
+--@author ]=] .. LocalPlayer():Nick() .. [=[
 --@shared
 
 --[[ Starfall Scripting Environment 
 
-Documentation: http://thegrb93.github.io/StarfallEx/
 StarfallEx Addon: https://github.com/thegrb93/StarfallEx
-
-Editor Keyboard shortcuts: https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts
+Documentation: http://thegrb93.github.io/StarfallEx
 ]]]=]
 		code = string.gsub(code, "\r", "")
-		code = string.gsub(code, "<AUTHOR>", "https://steamcommunity.com/profiles/" .. LocalPlayer():SteamID64())
 		file.Write("starfall/default.txt", code)
 		return code
 	end
