@@ -86,8 +86,10 @@ function SF.DefaultCode()
 	elseif file.Exists("starfall/default.lua", "DATA") then
 		return file.Read("starfall/default.lua", "DATA")
 	else
-		local code = [=[--@name Untitled
---@author ]=] .. LocalPlayer():Nick() .. [=[
+		local code = [=[
+--@name Untitled
+--@author ]=] .. string.gsub(LocalPlayer():Nick(), "[^%w%s%p_]", "") ..[=[
+
 --@shared
 
 --[[
