@@ -91,7 +91,7 @@ function SF.DefaultCode()
 --@shared
 
 --[[
-Starfall Scripting Environment 
+Starfall Scripting Environment
 
 StarfallEx Addon: https://github.com/thegrb93/StarfallEx
 Documentation: http://thegrb93.github.io/StarfallEx
