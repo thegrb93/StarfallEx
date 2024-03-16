@@ -90,11 +90,13 @@ function SF.DefaultCode()
 --@author ]=] .. LocalPlayer():Nick() .. [=[
 --@shared
 
---[[ Starfall Scripting Environment 
+--[[
+Starfall Scripting Environment 
 
 StarfallEx Addon: https://github.com/thegrb93/StarfallEx
 Documentation: http://thegrb93.github.io/StarfallEx
-]]]=]
+]]
+]=]
 		code = string.gsub(code, "\r", "")
 		file.Write("starfall/default.txt", code)
 		return code
