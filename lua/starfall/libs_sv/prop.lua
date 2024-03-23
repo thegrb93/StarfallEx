@@ -203,7 +203,7 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	streamdata = util.Compress(streamdata:getString())
 	SF.NetBurst:use(instance.player, #streamdata*8)
 
-	plyVertexCount:free(-totalVertices)
+	plyVertexCount:free(ply, -totalVertices)
 
 	local propent = ents.Create("starfall_prop")
 	propent.streamdata = streamdata
