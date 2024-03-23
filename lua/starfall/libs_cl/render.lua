@@ -1592,7 +1592,7 @@ do
 	
 	local v1_vec, v2_vec, v3_vec = Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0)
 
-	drawTriangleUV = function(vert1, vert2, vert3)
+	drawTexturedTriangleUV = function(vert1, vert2, vert3)
 		vec_SetUnpacked(v1_vec, vert1.x, vert1.y, 0)
 		vec_SetUnpacked(v2_vec, vert2.x, vert2.y, 0)
 		vec_SetUnpacked(v3_vec, vert3.x, vert3.y, 0)
@@ -1610,7 +1610,7 @@ end
 render_library.drawTexturedTriangleUV = function(vert1, vert2, vert3)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	mesh_Begin(MATERIAL_TRIANGLES, 1)
-		local success, err = pcall(drawTriangleUV, vert1, vert2, vert3)
+		local success, err = pcall(drawTexturedTriangleUV, vert1, vert2, vert3)
 	mesh_End()
 	if not success then 
 		error(err, 2)
