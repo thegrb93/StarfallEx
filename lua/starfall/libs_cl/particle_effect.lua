@@ -6,7 +6,7 @@ local IsValid = IsValid
 registerprivilege("particleEffect.attach", "Allow users to create particle effect", { client = {}, entities = {} })
 
 local plyCount = SF.LimitObject("particleeffects", "particle effects", 16, "The number of created particle effects via Starfall per client at once")
-SF.ResourceCounters.ParticleEffects = {icon = "icon16/asterisk_orange.png", count = function(ply) return plyCount:get(ply).val end}
+SF.ResourceCounters.ParticleEffects = {icon = "icon16/asterisk_orange.png", count = function(ply) return plyCount:get(ply) end}
 
 --- ParticleEffect library.
 -- @name particleEffect

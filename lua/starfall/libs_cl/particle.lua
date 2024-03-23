@@ -8,7 +8,7 @@ SF.Permissions.registerPrivilege("particle.create", "Particle", "Allows the user
 local plyEmitterCount = SF.LimitObject("particleemitters", "particle emitters", 8, "The number of created particle emitters via Starfall per client at once")
 local cv_particle_count = CreateConVar("sf_particles_max", "100", { FCVAR_ARCHIVE }, "The max number of created particles per emitter at once")
 
-SF.ResourceCounters.ParticleEmitters = {icon = "icon16/asterisk_yellow.png", count = function(ply) return plyEmitterCount:get(ply).val end}
+SF.ResourceCounters.ParticleEmitters = {icon = "icon16/asterisk_yellow.png", count = function(ply) return plyEmitterCount:get(ply) end}
 
 --- Particles library.
 -- @name particle

@@ -25,9 +25,7 @@ registerprivilege("render.captureImage", "Render Capture Image", "Allows capturi
 registerprivilege("render.fog", "Render Fog", "Allows the user to control fog", { client = {} })
 
 local cv_max_fonts = CreateConVar("sf_render_maxfonts", "30", { FCVAR_ARCHIVE })
-local cv_max_rendertargets = CreateConVar("sf_render_maxrendertargets", "20", { FCVAR_ARCHIVE })
 local cv_max_maxrenderviewsperframe = CreateConVar("sf_render_maxrenderviewsperframe", "2", { FCVAR_ARCHIVE })
-local cv_max_pixelhandles = CreateConVar("sf_render_maxpixvishandlesperframe", "50", { FCVAR_ARCHIVE })
 
 local RT_Material = CreateMaterial("SF_RT_Material", "UnlitGeneric", {
 	["$nolod"] = 1,
@@ -143,33 +141,23 @@ local pp = {
 }
 local tex_screenEffect = render.GetScreenEffectTexture(0)
 
-local rt_bank = SF.ResourceHandler(cv_max_rendertargets:GetInt(),
-	function(t, i)
+local rt_bank = SF.ResourceHandler("render_rendertargets", "Render targets", "20", "The max number of user created rendertargets",
+	function(_, i)
 		return GetRenderTarget("Starfall_CustomRT_" .. i, 1024, 1024)
 	end,
-	function(t, Rt)
+	function(_, Rt)
 		local oldRt = render.GetRenderTarget()
 		render.SetRenderTarget( Rt )
 		render.Clear(0, 0, 0, 255, true)
 		render.SetRenderTarget( oldRt )
-	end,
-	function() return "RT" end
+	end
 )
 
-cvars.AddChangeCallback( "sf_render_maxrendertargets", function()
-	rt_bank.max = cv_max_rendertargets:GetInt()
-end )
-
-local pixhandle_bank = SF.ResourceHandler(cv_max_pixelhandles:GetInt(),
+local pixhandle_bank = SF.ResourceHandler("render_pixvishandlesperframe", "Pixvis handles", "50", "How many render.isPixelVisible can be called per frame",
 	function()
 		return util.GetPixelVisibleHandle()
-	end, nil, function() return 1 end
+	end
 )
-
-cvars.AddChangeCallback( "sf_render_maxpixvishandlesperframe", function()
-	pixhandle_bank.max = cv_max_pixelhandles:GetInt()
-end )
-
 
 hook.Add("PreRender", "SF_PreRender_ResetRenderedViews", function()
 	for instance, _ in pairs(SF.allInstances) do
@@ -1149,8 +1137,7 @@ function render_library.createRenderTarget(name)
 
 	if renderdata.rendertargets[name] then SF.Throw("A rendertarget with this name already exists!", 2) end
 
-	local rt = rt_bank:use(instance.player, "RT")
-	if not rt then SF.Throw("Rendertarget limit reached", 2) end
+	local rt = rt_bank:use(instance.player)
 
 	render.ClearRenderTarget(rt, Color(0, 0, 0))
 	renderdata.rendertargets[name] = rt
@@ -2513,8 +2500,7 @@ function render_library.pixelVisible(position, radius)
 	position = vunwrap(position)
 	checkluatype(radius, TYPE_NUMBER)
 	
-	local PixVis = pixhandle_bank:use(instance.player, 1)
-	if not PixVis then SF.Throw("Can't call PixelVisible more than "..cv_max_pixelhandles:GetInt().." times per frame!", 2) end
+	local PixVis = pixhandle_bank:use(instance.player)
 	renderdata.usedPixelVis[#renderdata.usedPixelVis + 1] = PixVis
 	return util.PixelVisible(position, radius, PixVis)
 end

@@ -221,21 +221,21 @@ setmetatable(SF.BurstObject, SF.BurstObject)
 SF.LimitObject = {
 	__index = {
 		use = function(self, ply, amount)
-			if IsValid(ply) or ply==SF.Superuser then
-				local obj = self:get(ply)
-				local new = obj.val + amount
-				if new > self.max and ply~=SF.Superuser then
+			if ply==SF.Superuser then return end
+			if IsValid(ply) then
+				local new = self.counters[ply] + amount
+				if new > self.max then
 					SF.Throw("The ".. self.name .." limit has been reached. (".. self.max ..")", 3)
 				end
-				obj.val = new
+				self.counters[ply] = new
 			else
 				SF.Throw("Invalid starfall user", 3)
 			end
 		end,
 		checkuse = function(self, ply, amount)
-			if IsValid(ply) or ply==SF.Superuser then
-				local obj = self:get(ply)
-				if obj.val + amount > self.max and ply~=SF.Superuser then
+			if ply==SF.Superuser then return end
+			if IsValid(ply) then
+				if self.counters[ply] + amount > self.max then
 					SF.Throw("The ".. self.name .." limit has been reached. (".. self.max ..")", 3)
 				end
 			else
@@ -243,34 +243,34 @@ SF.LimitObject = {
 			end
 		end,
 		check = function(self, ply)
-			if IsValid(ply) or ply==SF.Superuser then
-				return self.max - self:get(ply).val
+			if ply==SF.Superuser then return self.max end
+			if IsValid(ply) then
+				return self.max - self.counters[ply]
 			else
 				SF.Throw("Invalid starfall user", 3)
 			end
 		end,
 		free = function(self, ply, amount)
-			local obj = self.objects[ply]
-			if obj then
-				obj.val = math.Clamp(obj.val - amount, 0, self.max)
+			if ply==SF.Superuser then return end
+			if IsValid(ply) then
+				self.counters[ply] = math.Clamp(self.counters[ply] - amount, 0, self.max)
 			end
 		end,
 		get = function(self, ply)
-			local obj = self.objects[ply]
-			if not obj then
-				obj = {
-					val = 0,
-				}
-				self.objects[ply] = obj
+			if ply==SF.Superuser then return 0 end
+			if IsValid(ply) then
+				return self.counters[ply]
+			else
+				return 0
 			end
-			return obj
 		end,
 	},
 	__call = function(p, cvarname, limitname, max, maxhelp, scale)
 		local t = {
 			name = limitname,
-			objects = SF.EntityTable("limit"..cvarname)
+			counters = SF.EntityTable("limit"..cvarname)
 		}
+		getmetatable(t.counters).__index = function(t,k) t[k]=0 return 0 end
 
 		local maxname = "sf_"..cvarname.."_max"..(CLIENT and "_cl" or "")
 		local maxcvar = CreateConVar(maxname, tostring(max), FCVAR_ARCHIVE, maxhelp)
@@ -341,43 +341,39 @@ setmetatable(SF.EntManager.__index, SF.LimitObject)
 --- Returns a class that can limit per player and recycle a indestructable resource
 SF.ResourceHandler = {
 	__index = {
-		use = function(self, ply, t)
-			if self:check(ply) then
-				self.objects[t] = self.objects[t] or {}
-				local obj = next(self.objects[t])
-				if obj then
-					self.objects[t][obj] = nil
-				else
-					self.n = self.n + 1
-					obj = self.allocator(t, self.n)
-				end
-				if self.initializer then self.initializer(t, obj) end
-				self.players[ply] = self.players[ply] + 1
-				return obj
+		use = function(self, ply, key)
+			if not key then key = 1 end
+			self.limit:use(ply, 1)
+			local obj = next(self.objects[key])
+			if obj then
+				self.objects[key][obj] = nil
+			else
+				self.n = self.n + 1
+				obj = self.allocator(key, self.n)
 			end
+			if self.initializer then self.initializer(key, obj) end
+			return obj
 		end,
 		check = function(self, ply)
-			return self.players[ply] < self.max or ply==SF.Superuser
+			return self.limit:check(ply)
 		end,
-		free = function(self, ply, object)
-			local t = self.typer(object)
-			if not self.objects[t][object] then
-				if self.players[ply] <= 1 then self.players[ply] = nil else self.players[ply] = self.players[ply] - 1 end
-				self.objects[t][object] = true
-				if self.destructor then self.destructor(object) end
+		free = function(self, ply, obj, key)
+			if not key then key = 1 end
+			if not self.objects[key][obj] then
+				self.limit:free(ply, 1)
+				self.objects[key][obj] = true
+				if self.destructor then self.destructor(key, obj) end
 			end
 		end
 	},
-	__call = function(p, max, allocator, initializer, typer, destructor)
+	__call = function(p, cvarname, limitname, max, maxhelp, allocator, initializer, destructor)
 		local t = {
 			n = 0,
 			allocator = allocator,
 			initializer = initializer,
 			destructor = destructor,
-			typer = typer,
-			objects = {},
-			players = setmetatable({},{__index=function() return 0 end}),
-			max = max,
+			objects = setmetatable({}, {__index = function(t,k) local r={} t[k]=r return r end}),
+			limit = SF.LimitObject(cvarname, limitname, max, maxhelp),
 		}
 		return setmetatable(t, p)
 	end

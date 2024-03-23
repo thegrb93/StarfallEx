@@ -8,7 +8,7 @@ registerprivilege("bass.loadURL", "Play remote sound files with `bass`.", "Allow
 registerprivilege("bass.play2D", "Play sounds in global game context with `bass`.", "Allows users to create sound channels which play in global game context (without `3d` flag).", { client = { default = 1 } })
 
 local plyCount = SF.LimitObject("bass", "bass sounds", 20, "The number of sounds allowed to be playing via Starfall client at once")
-SF.ResourceCounters.Bass = {icon = "icon16/sound_add.png", count = function(ply) return plyCount:get(ply).val end}
+SF.ResourceCounters.Bass = {icon = "icon16/sound_add.png", count = function(ply) return plyCount:get(ply) end}
 
 local bassSounds = {} -- { [IGModAudioChannel] = baseSound, ... } -- Contains extra data for each starfall sound.
 local bassSimpleFadeSounds = {} -- { [IGModAudioChannel] = baseSound, ... } -- A list of sounds that need to be manually controlled through 'simple fading'.

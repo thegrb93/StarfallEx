@@ -9,7 +9,6 @@ registerprivilege("material.imagecreate", "Create material from image", "Allows 
 registerprivilege("material.urlcreate", "Create material from online image", "Allows users to create a new material from an online image.", { client = {}, urlwhitelist = {} })
 registerprivilege("material.datacreate", "Create material from base64 image data", "Allows users to create a new material from base64 image data.", { client = {} })
 
-local cv_max_materials = CreateConVar("sf_render_maxusermaterials", "40", { FCVAR_ARCHIVE })
 local cv_max_data_material_size = CreateConVar("sf_render_maxdatamaterialsize", "1000000", { FCVAR_ARCHIVE })
 
 -- Make sure to update the material.create doc if you add stuff to this list.
@@ -129,7 +128,7 @@ local default_values = {
 	["$treeswaystrength"] = {"SetFloat", 10},
 }
 
-local material_bank = SF.ResourceHandler(cv_max_materials:GetInt(),
+local material_bank = SF.ResourceHandler("render_usermaterials", "user materials", 40, "The max number of user created materials",
 	function(shader, i)
 		return CreateMaterial("sf_material_" .. shader .. "_" .. i, shader, {})
 	end,
@@ -138,8 +137,7 @@ local material_bank = SF.ResourceHandler(cv_max_materials:GetInt(),
 			mat:SetInt("$flags",32816) --MATERIAL_VAR_VERTEXCOLOR + MATERIAL_VAR_VERTEXALPHA + MATERIAL_VAR_IGNOREZ
 		end
 	end,
-	FindMetaTable("IMaterial").GetShader,
-	function(material)
+	function(shader, material)
 		-- This is necessary because when the material is going to be reused
 		-- it will set some of its undefined parameters to old values (engine bug?)
 		material:SetFloat("$alpha", 1)
@@ -150,9 +148,6 @@ local material_bank = SF.ResourceHandler(cv_max_materials:GetInt(),
 		end
 	end
 )
-cvars.AddChangeCallback( "sf_render_maxusermaterials", function()
-	material_bank.max = cv_max_materials:GetInt()
-end)
 
 local blacklisted_keys = {
 	["$flags2"] = true,
@@ -342,7 +337,7 @@ local matrix_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatr
 local usermaterials = {}
 instance:AddHook("deinitialize", function()
 	for k in pairs(usermaterials) do
-		material_bank:free(instance.player, k)
+		material_bank:free(instance.player, k, k:GetShader())
 	end
 end)
 
@@ -498,7 +493,6 @@ function material_library.create(shader)
 	checkpermission(instance, nil, "material.create")
 	if not allowed_shaders[shader] then SF.Throw("Tried to use unsupported shader: "..shader, 2) end
 	local m = material_bank:use(instance.player, shader)
-	if not m then SF.Throw("Exceeded the maximum user materials", 2) end
 	usermaterials[m] = true
 	return wrap(m)
 end
@@ -550,7 +544,7 @@ function material_methods:destroy()
 	dsetmeta(self, nil)
 
 	usermaterials[m] = nil
-	material_bank:free(instance.player, m)
+	material_bank:free(instance.player, m, m:GetShader())
 end
 function lmaterial_methods:destroy()
 end
