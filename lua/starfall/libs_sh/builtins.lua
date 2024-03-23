@@ -311,6 +311,7 @@ end
 -- @param string perm The permission id to check
 -- @param any obj Optional object to pass to the permission system.
 -- @return boolean Whether the client has granted the specified permission.
+-- @return string The reason the permission check failed
 function builtins_library.hasPermission(perm, obj)
 	checkluatype(perm, TYPE_STRING)
 	if not SF.Permissions.privileges[perm] then SF.Throw("Permission doesn't exist", 2) end
