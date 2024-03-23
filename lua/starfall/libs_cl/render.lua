@@ -4,6 +4,8 @@ local mesh = mesh
 local clamp = math.Clamp
 local max = math.max
 local cam = cam
+local pcall = pcall
+local setmetatable = setmetatable
 local dgetmeta = debug.getmetatable
 local checkluatype = SF.CheckLuaType
 local haspermission = SF.Permissions.hasAccess
@@ -1431,6 +1433,61 @@ function render_library.drawFilledCircle(x, y, radius)
 	end
 end
 
+local drawTriangle
+do
+	local mesh_Position, mesh_Color, mesh_AdvanceVertex =
+		mesh.Position, mesh.Color, mesh.AdvanceVertex
+	
+	local v1_vec, v2_vec, v3_vec = Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0)
+
+	drawTriangle = function(x1, y1, x2, y2, x3, y3)
+		vec_SetUnpacked(v1_vec, x1, y1, 0)
+		vec_SetUnpacked(v2_vec, x2, y2, 0)
+		vec_SetUnpacked(v3_vec, x3, y3, 0)
+		local r, g, b, a = col_Unpack(currentcolor)
+		mesh_Position( v1_vec ); mesh_Color( r, g, b, a ); mesh_AdvanceVertex();
+		mesh_Position( v2_vec ); mesh_Color( r, g, b, a ); mesh_AdvanceVertex();
+		mesh_Position( v3_vec ); mesh_Color( r, g, b, a ); mesh_AdvanceVertex();
+	end
+end
+
+local mesh_Begin, mesh_End = mesh.Begin, mesh.End
+
+--- Draws a triangle using the current color
+-- @param number x1 X of the first vertex
+-- @param number y1 Y of the first vertex
+-- @param number x2 X of the second vertex
+-- @param number y2 Y of the second vertex
+-- @param number x3 X of the third vertex
+-- @param number y3 Y of the third vertex
+render_library.drawTriangle = function(x1, y1, x2, y2, x3, y3)
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	draw_NoTexture()
+	mesh_Begin(MATERIAL_TRIANGLES, 1)
+		local success, err = pcall(drawTriangle, x1, y1, x2, y2, x3, y3)
+	mesh_End()
+	if not success then 
+		error(err, 2)
+	end
+end
+
+--- Draws a textured triangle
+-- @param number x1 X of the first vertex
+-- @param number y1 Y of the first vertex
+-- @param number x2 X of the second vertex
+-- @param number y2 Y of the second vertex
+-- @param number x3 X of the third vertex
+-- @param number y3 Y of the third vertex
+render_library.drawTexturedTriangle = function(x1, y1, x2, y2, x3, y3)
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	mesh_Begin(MATERIAL_TRIANGLES, 1)
+		local success, err = pcall(drawTriangle, x1, y1, x2, y2, x3, y3)
+	mesh_End()
+	if not success then 
+		error(err, 2)
+	end
+end
+
 --- Draws a textured rectangle
 --- Faster, but uses integer coordinates and will get clipped by user's screen resolution
 -- @param number x Top left corner x
@@ -1477,6 +1534,20 @@ function render_library.drawTexturedRectUVFast(x, y, w, h, startU, startV, endU,
 	surface.DrawTexturedRectUV(x, y, w, h, startU, startV, endU, endV)
 end
 
+local drawTexturedRectUV
+do
+	local mesh_Position, mesh_Color, mesh_TexCoord, mesh_AdvanceVertex =
+		mesh.Position, mesh.Color, mesh.TexCoord, mesh.AdvanceVertex
+	
+	drawTexturedRectUV = function(startU, startV, endU, endV)
+		local r, g, b, a = col_Unpack(currentcolor)
+		mesh_Position( quad_v1 ); mesh_Color( r, g, b, a ); mesh_TexCoord( 0, startU, startV ); mesh_AdvanceVertex();
+		mesh_Position( quad_v2 ); mesh_Color( r, g, b, a ); mesh_TexCoord( 0, endU, startV ); mesh_AdvanceVertex();
+		mesh_Position( quad_v3 ); mesh_Color( r, g, b, a ); mesh_TexCoord( 0, endU, endV ); mesh_AdvanceVertex();
+		mesh_Position( quad_v4 ); mesh_Color( r, g, b, a ); mesh_TexCoord( 0, startU, endV ); mesh_AdvanceVertex();
+	end
+end
+
 --- Draws a textured rectangle with UV coordinates
 -- @param number x Top left corner x
 -- @param number y Top left corner y
@@ -1498,27 +1569,9 @@ function render_library.drawTexturedRectUV(x, y, w, h, startU, startV, endU, end
 	checkluatype (endV, TYPE_NUMBER)
 
 	makeQuad(x, y, w, h)
-	mesh.Begin(MATERIAL_QUADS, 1)
-	local success, err = pcall(function(startU, startV, endU, endV)
-		local r, g, b, a = col_Unpack(currentcolor)
-		mesh.Position( quad_v1 )
-		mesh.Color( r,g,b,a )
-		mesh.TexCoord( 0, startU, startV )
-		mesh.AdvanceVertex()
-		mesh.Position( quad_v2 )
-		mesh.Color( r,g,b,a )
-		mesh.TexCoord( 0, endU, startV )
-		mesh.AdvanceVertex()
-		mesh.Position( quad_v3 )
-		mesh.Color( r,g,b,a )
-		mesh.TexCoord( 0, endU, endV )
-		mesh.AdvanceVertex()
-		mesh.Position( quad_v4 )
-		mesh.Color( r,g,b,a )
-		mesh.TexCoord( 0, startU, endV )
-		mesh.AdvanceVertex()
-	end, startU, startV, endU, endV)
-	mesh.End()
+	mesh_Begin(MATERIAL_QUADS, 1)
+		local success, err = pcall(drawTexturedRectUV, startU, startV, endU, endV)
+	mesh_End()
 	if not success then
 		error(err, 2)
 	end
@@ -1547,6 +1600,38 @@ function render_library.drawTexturedRectRotated(x, y, w, h, rot)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	vec_SetUnpacked(quad_pos, x, y, 0)
 	render_DrawQuadEasy(quad_pos, quad_normal, w, h, currentcolor, -90 - rot)
+end
+
+local drawTriangleUV
+do
+	local mesh_Position, mesh_Color, mesh_TexCoord, mesh_AdvanceVertex =
+		mesh.Position, mesh.Color, mesh.TexCoord, mesh.AdvanceVertex
+	
+	local v1_vec, v2_vec, v3_vec = Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0)
+
+	drawTriangleUV = function(vert1, vert2, vert3)
+		vec_SetUnpacked(v1_vec, vert1.x, vert1.y, 0)
+		vec_SetUnpacked(v2_vec, vert2.x, vert2.y, 0)
+		vec_SetUnpacked(v3_vec, vert3.x, vert3.y, 0)
+		local r, g, b, a = col_Unpack(currentcolor)
+		mesh_Position( v1_vec ); mesh_Color( r, g, b, a ); mesh_TexCoord( 0, vert1.u or 0, vert1.v or 0 ); mesh_AdvanceVertex();
+		mesh_Position( v2_vec ); mesh_Color( r, g, b, a ); mesh_TexCoord( 0, vert2.u or 0, vert2.v or 0 ); mesh_AdvanceVertex();
+		mesh_Position( v3_vec ); mesh_Color( r, g, b, a ); mesh_TexCoord( 0, vert3.u or 0, vert3.v or 0 ); mesh_AdvanceVertex();
+	end
+end
+
+--- Draws a textured triangle with UV coordinates
+-- @param table vert1 First vertex. {x = x1, y = y1, u = u1, v = v1}
+-- @param table vert2 The second vertex.
+-- @param table vert3 The third vertex.
+render_library.drawTexturedTriangleUV = function(vert1, vert2, vert3)
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	mesh_Begin(MATERIAL_TRIANGLES, 1)
+		local success, err = pcall(drawTriangleUV, vert1, vert2, vert3)
+	mesh_End()
+	if not success then 
+		error(err, 2)
+	end
 end
 
 --- Draws RGB color channel tables to current render target.
@@ -1984,39 +2069,99 @@ function render_library.draw3DQuad(vert1, vert2, vert3, vert4)
 	render_DrawQuad(vert1, vert2, vert3, vert4, currentcolor)
 end
 
---- Draws 2 connected triangles with custom UVs.
--- @param Vector vert1 First vertex. {x, y, z, u, v}
--- @param Vector vert2 The second vertex.
--- @param Vector vert3 The third vertex.
--- @param Vector vert4 The fourth vertex.
-function render_library.draw3DQuadUV(vert1, vert2, vert3, vert4)
-	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	mesh.Begin(MATERIAL_QUADS, 1)
-	local ok, err = pcall(function()
+local draw3DQuadUV
+do
+	local mesh_Position, mesh_Color, mesh_TexCoord, mesh_AdvanceVertex =
+		mesh.Position, mesh.Color, mesh.TexCoord, mesh.AdvanceVertex
+	
+	draw3DQuadUV = function(vert1, vert2, vert3, vert4)
 		local r, g, b, a = col_Unpack(currentcolor)
 		vec_SetUnpacked(quad_v1, vert1[1], vert1[2], vert1[3])
 		vec_SetUnpacked(quad_v2, vert2[1], vert2[2], vert2[3])
 		vec_SetUnpacked(quad_v3, vert3[1], vert3[2], vert3[3])
 		vec_SetUnpacked(quad_v4, vert4[1], vert4[2], vert4[3])
-		mesh.Position( quad_v1 )
-		mesh.Color( r, g, b, a )
-		mesh.TexCoord( 0, vert1[4], vert1[5] )
-		mesh.AdvanceVertex()
-		mesh.Position( quad_v2 )
-		mesh.Color( r, g, b, a )
-		mesh.TexCoord( 0, vert2[4], vert2[5] )
-		mesh.AdvanceVertex()
-		mesh.Position( quad_v3 )
-		mesh.Color( r, g, b, a )
-		mesh.TexCoord( 0, vert3[4], vert3[5] )
-		mesh.AdvanceVertex()
-		mesh.Position( quad_v4 )
-		mesh.Color( r, g, b, a )
-		mesh.TexCoord( 0, vert4[4], vert4[5] )
-		mesh.AdvanceVertex()
-	end)
-	mesh.End()
+		mesh.Position( quad_v1 ); mesh.Color( r, g, b, a ); mesh.TexCoord( 0, vert1[4], vert1[5] ); mesh.AdvanceVertex();
+		mesh.Position( quad_v2 ); mesh.Color( r, g, b, a ); mesh.TexCoord( 0, vert2[4], vert2[5] ); mesh.AdvanceVertex();
+		mesh.Position( quad_v3 ); mesh.Color( r, g, b, a ); mesh.TexCoord( 0, vert3[4], vert3[5] ); mesh.AdvanceVertex();
+		mesh.Position( quad_v4 ); mesh.Color( r, g, b, a ); mesh.TexCoord( 0, vert4[4], vert4[5] ); mesh.AdvanceVertex();
+	end
+end
+
+--- Draws 2 connected triangles with custom UVs.
+-- @param table vert1 First vertex. {x, y, z, u, v}
+-- @param table vert2 The second vertex.
+-- @param table vert3 The third vertex.
+-- @param table vert4 The fourth vertex.
+function render_library.draw3DQuadUV(vert1, vert2, vert3, vert4)
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	mesh_Begin(MATERIAL_QUADS, 1)
+		local ok, err = pcall(draw3DQuadUV, vert1, vert2, vert3, vert4)
+	mesh_End()
 	if not ok then SF.Throw(err, 2) end
+end
+
+local draw3DTriangle
+do
+	local mesh_Position, mesh_Color, mesh_AdvanceVertex =
+		mesh.Position, mesh.Color, mesh.AdvanceVertex
+	
+	local v1_vec, v2_vec, v3_vec = Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0)
+
+	draw3DTriangle = function(vert1, vert2, vert3)
+		vec_SetUnpacked(v1_vec, vert1[1], vert1[2], vert1[3])
+		vec_SetUnpacked(v2_vec, vert2[1], vert2[2], vert2[3])
+		vec_SetUnpacked(v3_vec, vert3[1], vert3[2], vert3[3])
+		local r, g, b, a = col_Unpack(currentcolor)
+		mesh_Position( v1_vec ); mesh_Color( r, g, b, a ); mesh_AdvanceVertex();
+		mesh_Position( v2_vec ); mesh_Color( r, g, b, a ); mesh_AdvanceVertex();
+		mesh_Position( v3_vec ); mesh_Color( r, g, b, a ); mesh_AdvanceVertex();
+	end
+end
+
+--- Draws a triangle in 3D space
+-- @param Vector vert1 Position of the first vertex.
+-- @param Vector vert2 Position of the the second vertex.
+-- @param Vector vert3 Position of the the third vertex.
+render_library.draw3DTriangle = function(vert1, vert2, vert3)
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	mesh_Begin(MATERIAL_TRIANGLES, 1)
+		local success, err = pcall(draw3DTriangle, vert1, vert2, vert3)
+	mesh_End()
+	if not success then 
+		error(err, 2)
+	end
+end
+
+local draw3DTriangleUV
+do
+	local mesh_Position, mesh_Color, mesh_TexCoord, mesh_AdvanceVertex =
+		mesh.Position, mesh.Color, mesh.TexCoord, mesh.AdvanceVertex
+	
+	local v1_vec, v2_vec, v3_vec = Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0)
+
+	draw3DTriangleUV = function(vert1, vert2, vert3)
+		vec_SetUnpacked(v1_vec, vert1.x, vert1.y, vert1.z)
+		vec_SetUnpacked(v2_vec, vert2.x, vert2.y, vert2.z)
+		vec_SetUnpacked(v3_vec, vert3.x, vert3.y, vert3.z)
+		local r, g, b, a = col_Unpack(currentcolor)
+		mesh_Position( v1_vec ); mesh_Color( r, g, b, a ); mesh_TexCoord( 0, vert1.u or 0, vert1.v or 0 ); mesh_AdvanceVertex();
+		mesh_Position( v2_vec ); mesh_Color( r, g, b, a ); mesh_TexCoord( 0, vert2.u or 0, vert2.v or 0 ); mesh_AdvanceVertex();
+		mesh_Position( v3_vec ); mesh_Color( r, g, b, a ); mesh_TexCoord( 0, vert3.u or 0, vert3.v or 0 ); mesh_AdvanceVertex();
+	end
+end
+
+--- Draws a triangle with UV coordinates in 3D space
+-- @param table vert1 First vertex. {x = x1, y = y1, z = z1, u = u1, v = v1}
+-- @param table vert2 The second vertex.
+-- @param table vert3 The third vertex.
+render_library.draw3DTriangleUV = function(vert1, vert2, vert3)
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	mesh_Begin(MATERIAL_TRIANGLES, 1)
+		local success, err = pcall(draw3DTriangleUV, vert1, vert2, vert3)
+	mesh_End()
+	if not success then 
+		error(err, 2)
+	end
 end
 
 
@@ -2116,10 +2261,8 @@ end
 -- @param number y Pixel y-coordinate.
 -- @return Color Color object with ( r, g, b, a ) from the specified pixel.
 function render_library.readPixel(x, y)
-	if not renderdata.isRendering then
-		SF.Throw("Not in rendering hook.", 2)
-	end
-	return cwrap(Color(render.ReadPixel(x, y)))
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	return setmetatable({render.ReadPixel(x, y)}, col_meta)
 end
 
 --- Returns the render context's width and height. If a rendertarget is selected, will return 1024, 1024
@@ -2141,12 +2284,17 @@ function render_library.getGameResolution()
 	return renderdata.scrW, renderdata.scrH
 end
 
+local startpos_vec, endpos_vec = Vector(0, 0, 0), Vector(0, 0, 0)
+
 --- Does a trace and returns the color of the textel the trace hits.
--- @param Vector vec1 The starting vector
--- @param Vector vec2 The ending vector
+-- @param Vector startpos The starting vector
+-- @param Vector endpos The ending vector
 -- @return Color The color
-function render_library.traceSurfaceColor(vec1, vec2)
-	return cwrap(render.GetSurfaceColor(vunwrap(vec1), vunwrap(vec2)):ToColor())
+function render_library.traceSurfaceColor(startpos, endpos)
+	vec_SetUnpacked(startpos_vec, startpos[1], startpos[2], startpos[3])
+	vec_SetUnpacked(endpos_vec, endpos[1], endpos[2], endpos[3])
+	local color = render.GetSurfaceColor(startpos_vec, endpos_vec)
+	return setmetatable({color.x * 255, color.y * 255, color.z * 255}, col_meta)
 end
 
 --- Checks if the client is connected to a HUD component that's linked to this chip
@@ -2318,6 +2466,8 @@ function render_library.enableClipping(state)
 	return prevState
 end
 
+local normal_vec = Vector(0, 0, 0)
+
 --- Pushes a new clipping plane of the clip plane stack.
 -- @param Vector normal The normal of the clipping plane.
 -- @param number distance The normal of the clipping plane.
@@ -2328,7 +2478,8 @@ function render_library.pushCustomClipPlane(normal, distance)
 		SF.Throw("Pushed too many clipping planes.", 2)
 	end
 
-	render.PushCustomClipPlane(vunwrap(normal), distance)
+	vec_SetUnpacked(normal_vec, normal[1], normal[2], normal[3])
+	render.PushCustomClipPlane(normal_vec, distance)
 
 	pushedClippingPlanes = pushedClippingPlanes + 1
 end
@@ -2343,12 +2494,16 @@ function render_library.popCustomClipPlane()
 	pushedClippingPlanes = pushedClippingPlanes - 1
 end
 
+local pos_vec = Vector(0, 0, 0)
+
 --- Calculates the light color of a certain surface
 -- @param Vector pos Vector position to sample from
 -- @param Vector normal Normal vector of the surface
 -- @return Vector Vector representing color of the light
 function render_library.computeLighting(pos, normal)
-	return vwrap(render.ComputeLighting(vunwrap(pos), vunwrap(normal)))
+	vec_SetUnpacked(pos_vec, pos[1], pos[2], pos[3])
+	vec_SetUnpacked(normal_vec, normal[1], normal[2], normal[3])
+	return vwrap(render.ComputeLighting(pos_vec, normal_vec))
 end
 
 --- Calculates the lighting caused by dynamic lights for the specified surface
@@ -2356,14 +2511,17 @@ end
 -- @param Vector normal Normal vector of the surface
 -- @return Vector Vector representing color of the light
 function render_library.computeDynamicLighting(pos, normal)
-	return vwrap(render.ComputeDynamicLighting(vunwrap(pos), vunwrap(normal)))
+	vec_SetUnpacked(pos_vec, pos[1], pos[2], pos[3])
+	vec_SetUnpacked(normal_vec, normal[1], normal[2], normal[3])
+	return vwrap(render.ComputeDynamicLighting(pos_vec, normal_vec))
 end
 
 --- Gets the light exposure on the specified position
 -- @param Vector pos Vector position to sample from
 -- @return Vector Vector representing color of the light
 function render_library.getLightColor(pos)
-	return vwrap(render.GetLightColor(vunwrap(pos)))
+	vec_SetUnpacked(pos_vec, pos[1], pos[2], pos[3])
+	return vwrap(render.GetLightColor(pos_vec))
 end
 
 --- Returns the ambient color of the map
@@ -2387,8 +2545,7 @@ function render_library.setFogColor(color)
 	checkpermission(instance, nil, "render.fog")
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
-	local col = cunwrap(color)
-	render.FogColor(col.r, col.g, col.b)
+	render.FogColor(color.r, color.g, color.b)
 end
 
 --- Changes density of the fog
@@ -2474,13 +2631,15 @@ function render_library.setScreenDimensions(screen, x, y, w, h)
 	screen:SetRenderBounds(Vector(-1024, -1024, -10), Vector(1024, 1024, 10))
 end
 
+local vector_zero = Vector(0, 0, 0)
+
 --- Makes the screen shake, client must be connected to a HUD.
 -- @param number amplitude The strength of the effect
 -- @param number frequency The frequency of the effect in hertz
 -- @param number duration The duration of the effect in seconds, max 10.
 function render_library.screenShake(amplitude, frequency, duration)
 	if not SF.IsHUDActive(instance.entity) then SF.Throw("Player isn't connected to HUD!", 2) end
-	util.ScreenShake(Vector(0, 0, 0), amplitude, frequency, clamp(duration, 0, 10), 0)
+	util.ScreenShake(vector_zero, amplitude, frequency, clamp(duration, 0, 10), 0)
 end
 
 --- Set's the depth range of the upcoming render.
