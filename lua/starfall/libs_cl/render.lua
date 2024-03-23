@@ -1462,24 +1462,7 @@ local mesh_Begin, mesh_End = mesh.Begin, mesh.End
 -- @param number y3 Y of the third vertex
 render_library.drawTriangle = function(x1, y1, x2, y2, x3, y3)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	draw_NoTexture()
-	mesh_Begin(MATERIAL_TRIANGLES, 1)
-		local success, err = pcall(drawTriangle, x1, y1, x2, y2, x3, y3)
-	mesh_End()
-	if not success then 
-		error(err, 2)
-	end
-end
-
---- Draws a textured triangle
--- @param number x1 X of the first vertex
--- @param number y1 Y of the first vertex
--- @param number x2 X of the second vertex
--- @param number y2 Y of the second vertex
--- @param number x3 X of the third vertex
--- @param number y3 Y of the third vertex
-render_library.drawTexturedTriangle = function(x1, y1, x2, y2, x3, y3)
-	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	render_SetColorMaterial()
 	mesh_Begin(MATERIAL_TRIANGLES, 1)
 		local success, err = pcall(drawTriangle, x1, y1, x2, y2, x3, y3)
 	mesh_End()
@@ -1602,7 +1585,7 @@ function render_library.drawTexturedRectRotated(x, y, w, h, rot)
 	render_DrawQuadEasy(quad_pos, quad_normal, w, h, currentcolor, -90 - rot)
 end
 
-local drawTriangleUV
+local drawTexturedTriangleUV
 do
 	local mesh_Position, mesh_Color, mesh_TexCoord, mesh_AdvanceVertex =
 		mesh.Position, mesh.Color, mesh.TexCoord, mesh.AdvanceVertex
@@ -2124,6 +2107,7 @@ end
 -- @param Vector vert3 Position of the the third vertex.
 render_library.draw3DTriangle = function(vert1, vert2, vert3)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	render_SetColorMaterial()
 	mesh_Begin(MATERIAL_TRIANGLES, 1)
 		local success, err = pcall(draw3DTriangle, vert1, vert2, vert3)
 	mesh_End()
