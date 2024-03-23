@@ -1138,7 +1138,6 @@ function render_library.createRenderTarget(name)
 	if renderdata.rendertargets[name] then SF.Throw("A rendertarget with this name already exists!", 2) end
 
 	local rt = rt_bank:use(instance.player)
-	if not rt then SF.Throw("Rendertarget limit reached", 2) end
 
 	render.ClearRenderTarget(rt, Color(0, 0, 0))
 	renderdata.rendertargets[name] = rt
@@ -2502,7 +2501,6 @@ function render_library.pixelVisible(position, radius)
 	checkluatype(radius, TYPE_NUMBER)
 	
 	local PixVis = pixhandle_bank:use(instance.player)
-	if not PixVis then SF.Throw("Can't call PixelVisible more than "..cv_max_pixelhandles:GetInt().." times per frame!", 2) end
 	renderdata.usedPixelVis[#renderdata.usedPixelVis + 1] = PixVis
 	return util.PixelVisible(position, radius, PixVis)
 end

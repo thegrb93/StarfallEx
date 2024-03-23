@@ -493,7 +493,6 @@ function material_library.create(shader)
 	checkpermission(instance, nil, "material.create")
 	if not allowed_shaders[shader] then SF.Throw("Tried to use unsupported shader: "..shader, 2) end
 	local m = material_bank:use(instance.player, shader)
-	if not m then SF.Throw("Exceeded the maximum user materials", 2) end
 	usermaterials[m] = true
 	return wrap(m)
 end
