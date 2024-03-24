@@ -1968,6 +1968,32 @@ function render_library.draw3DBeam(startPos, endPos, width, textureStart, textur
 	render.DrawBeam(startPos, endPos, width, textureStart, textureEnd, currentcolor)
 end
 
+--- Begin drawing a multi-segment beam.
+-- @param number segmentCount The number of Beam Segments that this multi-segment Beam will contain
+function render_library.start3DBeam(segmentCount)
+    if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+    render.StartBeam(segmentCount)
+end
+
+--- Adds a beam segment to the beam started by render.start3DBeam.
+-- @param Vector startPos Beam start position.
+-- @param number width The width of the beam.
+-- @param number textureEnd The end coordinate of the texture used.
+-- @param Color color The color to be used.
+function render_library.add3DBeam(startPos, width, textureEnd, color)
+    if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+    startPos = vunwrap(startPos)
+    color = cunwrap(color)
+
+    render.AddBeam(startPos, width, textureEnd, color)
+end
+
+--- Ends the beam mesh of a beam started with render.start3DBeam.
+function render_library.end3DBeam()
+    if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+    render.EndBeam()
+end
+
 --- Draws 2 connected triangles.
 -- @param Vector vert1 First vertex.
 -- @param Vector vert2 The second vertex.
