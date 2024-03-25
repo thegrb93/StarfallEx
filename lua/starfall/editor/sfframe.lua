@@ -2083,6 +2083,7 @@ function PANEL:UpdatePlayers(players)
 			local svtotal = 0
 			local cltotal = 0
 			for instance, _ in pairs(SF.playerInstances[ply] or {}) do
+				if not isValid(instance.entity) then continue end
 				svtotal = svtotal + instance.entity:GetNWInt("CPUus")
 				cltotal = cltotal + instance.cpu_average
 			end
