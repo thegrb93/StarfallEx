@@ -1312,7 +1312,7 @@ end
 function render_library.clearRGBA(r, g, b, a, depth)
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 	if renderdata.usingRT then
-		render.Clear(r, g, b, a or 255, depth)
+		render.Clear(r, g, b, a, depth)
 	end
 end
 
