@@ -2284,8 +2284,7 @@ end
 -- @return number The alpha channel value.
 function render_library.readPixelRGBA(x, y)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	local r, g, b, a = render.ReadPixel(x, y)
-	return r, g, b, a or 255
+	return render.ReadPixel(x, y)
 end
 
 --- Returns the render context's width and height. If a rendertarget is selected, will return 1024, 1024
