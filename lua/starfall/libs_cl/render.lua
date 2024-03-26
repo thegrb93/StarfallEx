@@ -1312,11 +1312,7 @@ end
 function render_library.clearRGBA(r, g, b, a, depth)
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 	if renderdata.usingRT then
-		if r==nil then r=0 end
-		if g==nil then g=0 end
-		if b==nil then b=0 end
-		if a==nil then a=255 end
-		render.Clear(r, g, b, a, depth)
+		render.Clear(r, g, b, a or 255, depth)
 	end
 end
 
@@ -2322,19 +2318,6 @@ function render_library.traceSurfaceColor(startpos, endpos)
 	vec_SetUnpacked(endpos_vec, endpos[1], endpos[2], endpos[3])
 	local color = render.GetSurfaceColor(startpos_vec, endpos_vec)
 	return setmetatable({color.x * 255, color.y * 255, color.z * 255}, col_meta)
-end
-
---- Does a trace and returns the color of the textel the trace hits.
--- @param Vector startpos The starting vector
--- @param Vector endpos The ending vector
--- @return number The red channel value.
--- @return number The green channel value.
--- @return number The blue channel value.
-function render_library.traceSurfaceColorRGB(startpos, endpos)
-	vec_SetUnpacked(startpos_vec, startpos[1], startpos[2], startpos[3])
-	vec_SetUnpacked(endpos_vec, endpos[1], endpos[2], endpos[3])
-	local color = render.GetSurfaceColor(startpos_vec, endpos_vec)
-	return color.x * 255, color.y * 255, color.z * 255
 end
 
 --- Checks if the client is connected to a HUD component that's linked to this chip
