@@ -2104,6 +2104,23 @@ function render_library.draw3DQuad(vert1, vert2, vert3, vert4)
 	render_DrawQuad(vert1, vert2, vert3, vert4, currentcolor)
 end
 
+--- Draws a quad.
+-- @param Vector pos Origin of the quad.
+-- @param Vector normal The face direction of the quad.
+-- @param number width The width of the quad.
+-- @param number height The height of the quad.
+-- @param Color? clr The color of the quad.
+-- @param number? rot The rotation of the quad counter-clockwise in degrees around the normal axis. In other words, the quad will always face the same way but this will rotate its corners.
+function render_library.draw3DQuadEasy(pos, norm, width, height, clr, rot)
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+
+	pos = vunwrap(pos)
+	norm = vunwrap(norm)
+	clr = clr or color_white
+
+	render_DrawQuadEasy(pos, norm, width, height, clr, rot)
+end
+
 local draw3DQuadUV
 do
 	local mesh_Position, mesh_Color, mesh_TexCoord, mesh_AdvanceVertex =
