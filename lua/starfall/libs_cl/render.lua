@@ -2104,6 +2104,7 @@ function render_library.draw3DQuad(vert1, vert2, vert3, vert4)
 	render_DrawQuad(vert1, vert2, vert3, vert4, currentcolor)
 end
 
+local pos_vec, norm_vec = Vector(0, 0, 0), Vector(0, 0, 0)
 --- Draws a quad.
 -- @param Vector pos Origin of the quad.
 -- @param Vector normal The face direction of the quad.
@@ -2114,10 +2115,10 @@ end
 function render_library.draw3DQuadEasy(pos, norm, width, height, rot)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
-	vec_SetUnpacked(startpos_vec, pos[1], pos[2], pos[3])
-	vec_SetUnpacked(endpos_vec, norm[1], norm[2], norm[3])
+	vec_SetUnpacked(pos_vec, pos[1], pos[2], pos[3])
+	vec_SetUnpacked(norm_vec, norm[1], norm[2], norm[3])
 
-	render_DrawQuadEasy(startpos_vec, endpos_vec, width, height, currentcolor, rot)
+	render_DrawQuadEasy(pos_vec, norm_vec, width, height, currentcolor, rot)
 end
 
 local draw3DQuadUV
