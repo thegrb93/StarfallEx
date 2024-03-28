@@ -1304,18 +1304,11 @@ end
 
 
 function SF.CheckModel(model, player, prop)
-	if #model > 260 then return false end
+	if #model > 260 then SF.Throw("Model path too long!", 3) end
 	model = SF.NormalizePath(string.lower(model))
-	if string.GetExtensionFromFilename(model) == "mdl" and (CLIENT or (util.IsValidModel(model) and (not prop or util.IsValidProp(model)))) then
-		if IsValid(player) then
-			if hook.Run("PlayerSpawnObject", player, model)~=false then
-				return model
-			end
-		else
-			return model
-		end
-	end
-	SF.Throw("Invalid model: "..model, 3)
+	if string.GetExtensionFromFilename(model) ~= "mdl" or (SERVER and (not util.IsValidModel(model) or (prop and not util.IsValidProp(model)))) then SF.Throw("Invalid model: "..model, 3) end
+	if player~=SF.Superuser and hook.Run("PlayerSpawnObject", player, model)==false then SF.Throw("Not allowed to use model: "..model, 3) end
+	return model
 end
 
 function SF.CheckRagdoll(model)
