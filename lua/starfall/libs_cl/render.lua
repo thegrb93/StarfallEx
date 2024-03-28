@@ -2114,8 +2114,8 @@ end
 function render_library.draw3DQuadEasy(pos, norm, width, height, rot)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
-	pos = vunwrap(pos)
-	norm = vunwrap(norm)
+	pos = pos_vector(pos)
+	norm = norm_vector(norm)
 
 	render_DrawQuadEasy(pos, norm, width, height, currentcolor, rot)
 end
