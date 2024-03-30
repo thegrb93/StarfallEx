@@ -498,6 +498,14 @@ function player_methods:isSprinting()
 	return getply(self):IsSprinting()
 end
 
+--- Returns whether the player is walking
+-- In singleplayer, this will return false clientside
+-- @shared
+-- @return boolean Whether they are walking
+function player_methods:isWalking()
+	return getply(self):IsWalking()
+end
+
 --- Gets the player's death ragdoll
 -- @return Entity? The entity or nil if it doesn't exist
 function player_methods:getDeathRagdoll()
