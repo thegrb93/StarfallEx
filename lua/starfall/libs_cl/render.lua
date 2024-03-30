@@ -2104,6 +2104,22 @@ function render_library.draw3DQuad(vert1, vert2, vert3, vert4)
 	render_DrawQuad(vert1, vert2, vert3, vert4, currentcolor)
 end
 
+local pos_vec, norm_vec = Vector(0, 0, 0), Vector(0, 0, 0)
+--- Draws a quad.
+-- @param Vector pos Origin of the quad.
+-- @param Vector normal The face direction of the quad.
+-- @param number width The width of the quad.
+-- @param number height The height of the quad.
+-- @param number? rot The rotation of the quad counter-clockwise in degrees around the normal axis. In other words, the quad will always face the same way but this will rotate its corners.
+function render_library.draw3DQuadEasy(pos, norm, width, height, rot)
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+
+	vec_SetUnpacked(pos_vec, pos[1], pos[2], pos[3])
+	vec_SetUnpacked(norm_vec, norm[1], norm[2], norm[3])
+
+	render_DrawQuadEasy(pos_vec, norm_vec, width, height, currentcolor, rot)
+end
+
 local draw3DQuadUV
 do
 	local mesh_Position, mesh_Color, mesh_TexCoord, mesh_AdvanceVertex =
@@ -2514,8 +2530,6 @@ function render_library.enableClipping(state)
 	return prevState
 end
 
-local normal_vec = Vector(0, 0, 0)
-
 --- Pushes a new clipping plane of the clip plane stack.
 -- @param Vector normal The normal of the clipping plane.
 -- @param number distance The normal of the clipping plane.
@@ -2526,8 +2540,8 @@ function render_library.pushCustomClipPlane(normal, distance)
 		SF.Throw("Pushed too many clipping planes.", 2)
 	end
 
-	vec_SetUnpacked(normal_vec, normal[1], normal[2], normal[3])
-	render.PushCustomClipPlane(normal_vec, distance)
+	vec_SetUnpacked(norm_vec, normal[1], normal[2], normal[3])
+	render.PushCustomClipPlane(norm_vec, distance)
 
 	pushedClippingPlanes = pushedClippingPlanes + 1
 end
@@ -2542,16 +2556,14 @@ function render_library.popCustomClipPlane()
 	pushedClippingPlanes = pushedClippingPlanes - 1
 end
 
-local pos_vec = Vector(0, 0, 0)
-
 --- Calculates the light color of a certain surface
 -- @param Vector pos Vector position to sample from
 -- @param Vector normal Normal vector of the surface
 -- @return Vector Vector representing color of the light
 function render_library.computeLighting(pos, normal)
 	vec_SetUnpacked(pos_vec, pos[1], pos[2], pos[3])
-	vec_SetUnpacked(normal_vec, normal[1], normal[2], normal[3])
-	return vwrap(render.ComputeLighting(pos_vec, normal_vec))
+	vec_SetUnpacked(norm_vec, normal[1], normal[2], normal[3])
+	return vwrap(render.ComputeLighting(pos_vec, norm_vec))
 end
 
 --- Calculates the lighting caused by dynamic lights for the specified surface
@@ -2560,8 +2572,8 @@ end
 -- @return Vector Vector representing color of the light
 function render_library.computeDynamicLighting(pos, normal)
 	vec_SetUnpacked(pos_vec, pos[1], pos[2], pos[3])
-	vec_SetUnpacked(normal_vec, normal[1], normal[2], normal[3])
-	return vwrap(render.ComputeDynamicLighting(pos_vec, normal_vec))
+	vec_SetUnpacked(norm_vec, normal[1], normal[2], normal[3])
+	return vwrap(render.ComputeDynamicLighting(pos_vec, norm_vec))
 end
 
 --- Gets the light exposure on the specified position
