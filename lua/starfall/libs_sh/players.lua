@@ -499,6 +499,7 @@ function player_methods:isSprinting()
 end
 
 --- Returns whether the player is walking
+-- In singleplayer, this will return false clientside
 -- @shared
 -- @return boolean Whether they are walking
 function player_methods:isWalking()
