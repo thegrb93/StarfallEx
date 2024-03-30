@@ -157,14 +157,14 @@ end)
 net.Receive("starfall_processor_download", function(len)
 	net.ReadStarfall(nil, function(ok, sfdata)
 		if ok then
-			local function setup(sfdata, proc, owner)
+			local proc, owner
+			local function setup()
 				sfdata.proc = proc
 				sfdata.owner = owner
 				proc:Destroy()
 				proc:SetupFiles(sfdata)
 			end
 
-			local proc, owner
 			if sfdata.ownerindex == 0 then
 				owner = game.GetWorld()
 			else
