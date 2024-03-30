@@ -272,7 +272,7 @@ else
 	-- @param boolean isdead Whether the message was send from a dead player
 	-- @return boolean Return true to hide the message. Can only be done for the owner of the chip
 	add("OnPlayerChat", "playerchat", nil, function(instance, ret)
-		if ret[1] and instance.player == LocalPlayer() and args[2] then return true end
+		if ret[1] and instance.player == LocalPlayer() and ret[2] then return true end
 	end)
 
 	--- Called when the player's chat box text changes.
