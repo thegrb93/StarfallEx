@@ -1128,7 +1128,7 @@ end
 function SF.WaitForEntity(index, creationIndex, callback)
 	SF.WaitForConditions(function()
 		local ent=Entity(index)
-		if SF.EntIsReady(ent) and ent:GetCreationIndex()==creationIndex then
+		if SF.EntIsReady(ent) and ent:GetCreationID()==creationIndex then
 			callback(ent)
 			return true
 		end

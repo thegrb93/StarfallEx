@@ -466,7 +466,7 @@ function net_library.writeEntity(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
 	local ent = getent(t)
 	write{net.WriteUInt, 16, ent:EntIndex(), 16}
-	write{net.WriteUInt, 32, ent:GetCreationIndex(), 32}
+	write{net.WriteUInt, 32, ent:GetCreationID(), 32}
 end
 
 --- Reads a entity from the net message

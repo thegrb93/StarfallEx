@@ -524,7 +524,7 @@ end
 local function writeEntity(self, instance, e)
 	local ent = instance.Types.Entity.GetEntity(e)
 	self:writeInt16(ent:EntIndex())
-	self:writeInt32(ent:GetCreationIndex())
+	self:writeInt32(ent:GetCreationID())
 end
 	
 --- Reads an entity from the byte stream and advances the buffer pointer.

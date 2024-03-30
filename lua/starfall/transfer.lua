@@ -35,9 +35,9 @@ function net.WriteStarfall(sfdata, callback)
 	if #sfdata.mainfile > 255 then error("Main file name too large: " .. #sfdata.mainfile .. " (max is 255)") end
 	if SERVER then
 		net.WriteUInt(sfdata.proc:EntIndex(), 16)
-		net.WriteUInt(sfdata.proc:GetCreationIndex(), 32)
+		net.WriteUInt(sfdata.proc:GetCreationID(), 32)
 		net.WriteUInt(sfdata.owner:EntIndex(), 16)
-		net.WriteUInt(sfdata.owner:GetCreationIndex(), 32)
+		net.WriteUInt(sfdata.owner:GetCreationID(), 32)
 	end
 	net.WriteString(sfdata.mainfile)
 
