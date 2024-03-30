@@ -37,6 +37,7 @@ local function checkvector(v)
 	end
 end
 
+local base_physicscollide = baseclass.Get("base_gmodentity").PhysicsCollide
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
@@ -55,11 +56,11 @@ end)
 instance:AddHook("deinitialize", function()
 	for ent in pairs(collisionlisteners) do
 		if IsValid(ent) then
-			if ent:GetClass() ~= "starfall_prop" then
+			if ent:IsScripted() then
+				ent.PhysicsCollide = base_physicscollide
+			else
 				ent:RemoveCallback("PhysicsCollide", ent.SF_CollisionCallback)
 				ent.SF_CollisionCallback = nil
-			else
-				ent.PhysicsCollide = nil
 			end
 		end
 	end
@@ -376,16 +377,17 @@ end
 -- @param function func The callback function with argument, table collsiondata, http://wiki.facepunch.com/gmod/Structures/CollisionData
 function ents_methods:addCollisionListener(func)
 	local ent = getent(self)
+	if collisionlisteners[ent] then SF.Throw("The entity is already listening to collisions!", 2) end
+
 	checkluatype(func, TYPE_FUNCTION)
 	checkpermission(instance, ent, "entities.canTool")
 
 	local callback = addCollisions(func)
-	if ent:GetClass() ~= "starfall_prop" then
-		if ent.SF_CollisionCallback then SF.Throw("The entity is already listening to collisions!", 2) end
-		ent.SF_CollisionCallback = ent:AddCallback("PhysicsCollide", function(ent, data) callback(data) end)
-	else
-		if ent.PhysicsCollide then SF.Throw("The entity is already listening to collisions!", 2) end
+	if ent:IsScripted() then
+		if ent.PhysicsCollide ~= base_physicscollide and ent.PhysicsCollide ~= nil then SF.Throw("The entity is already listening to collisions!", 2) end
 		function ent:PhysicsCollide( data, phys ) callback(data) end
+	else
+		ent.SF_CollisionCallback = ent:AddCallback("PhysicsCollide", function(ent, data) callback(data) end)
 	end
 	collisionlisteners[ent] = true
 end
@@ -393,14 +395,15 @@ end
 --- Removes a collision listening hook from the entity so that a new one can be added
 function ents_methods:removeCollisionListener()
 	local ent = getent(self)
+	if not collisionlisteners[ent] then SF.Throw("The entity isn't listening to collisions!", 2) end
+
 	checkpermission(instance, ent, "entities.canTool")
-	if ent:GetClass() ~= "starfall_prop" then
-		if not ent.SF_CollisionCallback then SF.Throw("The entity isn't listening to collisions!", 2) end
+
+	if ent:IsScripted() then
+		ent.PhysicsCollide = base_physicscollide
+	else
 		ent:RemoveCallback("PhysicsCollide", ent.SF_CollisionCallback)
 		ent.SF_CollisionCallback = nil
-	else
-		if not ent.PhysicsCollide then SF.Throw("The entity isn't listening to collisions!", 2) end
-		ent.PhysicsCollide = nil
 	end
 	collisionlisteners[ent] = nil
 end
