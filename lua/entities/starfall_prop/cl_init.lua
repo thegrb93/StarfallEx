@@ -67,6 +67,7 @@ end
 
 net.Receive("starfall_custom_prop", function()
 	local index = net.ReadUInt(16)
+	local creationindex = net.ReadUInt(32)
 	local self, data
 
 	local function applyData()
@@ -110,7 +111,7 @@ net.Receive("starfall_custom_prop", function()
 		self.rendermeshloaded = true
 	end
 
-	SF.WaitForEntity(index, function(e)
+	SF.WaitForEntity(index, creationindex, function(e)
 		if e and e:GetClass()=="starfall_prop" then
 			self = e
 			applyData()

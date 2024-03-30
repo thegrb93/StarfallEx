@@ -1101,7 +1101,7 @@ function SF.EntIsReady(ent)
 end
 
 local waitingConditions = {}
-function SF.WaitForConditions(callback, timeout)
+function SF.WaitForConditions(callback, timeoutcallback, timeout)
 	if not callback() then
 		if #waitingConditions == 0 then
 			hook.Add("Think", "SF_WaitingForConditions", function()
@@ -1112,7 +1112,7 @@ function SF.WaitForConditions(callback, timeout)
 					if v.callback() then
 						table.remove(waitingConditions, i)
 					elseif time>v.timeout then
-						v.callback(true)
+						if v.timeoutcallback then v.timeoutcallback() end
 						table.remove(waitingConditions, i)
 					else
 						i = i + 1
@@ -1121,20 +1121,18 @@ function SF.WaitForConditions(callback, timeout)
 				if #waitingConditions == 0 then hook.Remove("Think", "SF_WaitingForConditions") end
 			end)
 		end
-		waitingConditions[#waitingConditions+1] = {callback = callback, timeout = CurTime()+timeout}
+		waitingConditions[#waitingConditions+1] = {callback = callback, timeoutcallback = timeoutcallback, timeout = CurTime()+timeout}
 	end
 end
 
-function SF.WaitForEntity(index, callback)
-	SF.WaitForConditions(function(timeout)
+function SF.WaitForEntity(index, creationIndex, callback)
+	SF.WaitForConditions(function()
 		local ent=Entity(index)
-		if SF.EntIsReady(ent) then
+		if SF.EntIsReady(ent) and ent:GetCreationIndex()==creationIndex then
 			callback(ent)
 			return true
-		elseif timeout then
-			callback(nil)
 		end
-	end, 10)
+	end, callback, 10)
 end
 
 local playerinithooks = {}

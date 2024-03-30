@@ -157,7 +157,7 @@ end)
 net.Receive("starfall_processor_download", function(len)
 	net.ReadStarfall(nil, function(ok, sfdata)
 		if ok then
-			SF.WaitForConditions(function(timedout)
+			SF.WaitForConditions(function()
 				local proc, owner = Entity(sfdata.procindex), Entity(sfdata.ownerindex)
 				if SF.EntIsReady(proc) and proc:GetClass()=="starfall_processor" and SF.EntIsReady(owner) and (owner:IsPlayer() or owner:IsWorld()) then
 					sfdata.owner = owner
@@ -173,7 +173,7 @@ end)
 net.Receive("starfall_processor_link", function()
 	local componenti = net.ReadUInt(16)
 	local proci = net.ReadUInt(16)
-	SF.WaitForConditions(function(timedout)
+	SF.WaitForConditions(function()
 		local component, proc = Entity(componenti), Entity(proci)
 		if SF.EntIsReady(component) and SF.EntIsReady(proc) then
 			SF.LinkEnt(component, proc)
