@@ -37,9 +37,9 @@ local function checkvector(v)
 	end
 end
 
-local base_physicscollide = baseclass.Get("base_gmodentity").PhysicsCollide
 
 return function(instance)
+local base_physicscollide = baseclass.Get("base_gmodentity").PhysicsCollide
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
