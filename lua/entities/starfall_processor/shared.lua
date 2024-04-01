@@ -121,7 +121,6 @@ function ENT:GetGateName()
 end
 
 function ENT:Error(err)
-	if not self.instance then return end
 	self.error = err
 
 	local msg = err.message
@@ -138,11 +137,13 @@ function ENT:Error(err)
 		msg = string.sub(msg, 1, newline - 1)
 	end
 
-	hook.Run("StarfallError", self, self.owner, CLIENT and LocalPlayer() or false, self.sfdata.mainfile, msg, traceback)
+	hook.Run("StarfallError", self, self.owner, CLIENT and LocalPlayer() or false, self.sfdata and self.sfdata.mainfile or "", msg, traceback)
 	SF.SendError(self, msg, traceback)
 
-	self.instance:deinitialize()
-	self.instance = nil
+	if self.instance then
+		self.instance:deinitialize()
+		self.instance = nil
+	end
 
 	for inst, _ in pairs(SF.allInstances) do
 		inst:runScriptHook("starfallerror", inst.Types.Entity.Wrap(self), inst.Types.Player.Wrap(SERVER and self.owner or LocalPlayer()), msg)
