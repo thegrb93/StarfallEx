@@ -89,33 +89,41 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 	end
 end)
 
+local removedHooks = setmetatable({}, {__index=function(t,k) local r={} t[k]=r return r end}
+hook.Add("EntityRemoved","SF_CallOnRemove",function(ent, fullsnapshot)
+	if fullsnapshot then return end
+	local hooks = removedHooks[ent]
+	if hooks then
+		for k, v in pairs(hooks) do
+			v(ent)
+		end
+		removedHooks[ent] = nil
+	end
+end)
+function SF.CallOnRemove(ent, key, func)
+	removedHooks[ent][key] = func
+end
+function SF.RemoveCallOnRemove(ent, key)
+	removedHooks[ent][key] = nil
+	if next(removedHooks[ent])==nil then removedHooks[ent] = nil end
+end
+
 -------------------------------------------------------------------------------
 -- Declare Basic Starfall Types
 -------------------------------------------------------------------------------
 
 -- Returns a class that manages a table of entity keys
-function SF.EntityTable(key, destructor, dontwait)
+function SF.EntityTable(key, destructor)
 	return setmetatable({}, {
 		__newindex = function(t, e, v)
 			rawset(t, e, v)
 			if e ~= SF.Superuser then
-				if dontwait then
-					e:CallOnRemove("SF_" .. key, function()
-						if t[e] then
-							if destructor then destructor(e, v) end
-							t[e] = nil
-						end
-					end)
-				else
-					e:CallOnRemove("SF_" .. key, function()
-						timer.Simple(0, function()
-							if t[e] and not IsValid(e) then
-								if destructor then destructor(e, v) end
-								t[e] = nil
-							end
-						end)
-					end)
-				end
+				SF.CallOnRemove(e, key, function()
+					if t[e] then
+						if destructor then destructor(e, v) end
+						t[e] = nil
+					end
+				end)
 			end
 		end
 	})
@@ -294,23 +302,22 @@ SF.EntManager = {
 			if not self.nocallonremove then
 				local function sf_on_remove() self:onremove(instance, ent) end
 				ent.sf_on_remove = sf_on_remove
-				ent:CallOnRemove("starfall_entity_onremove", sf_on_remove)
+				SF.CallOnRemove(ent, "entmanager", sf_on_remove)
 			end
 
 			self.entsByInstance[instance][ent] = true
 			self:free(instance.player, -1)
 		end,
 		remove = function(self, instance, ent)
-			if IsValid(ent) then
-				if self.nocallonremove then
-					self:onremove(instance, ent)
-				else
-					-- The die function is called the next frame after 'Remove' which is too slow so call it ourself
-					ent:RemoveCallOnRemove("starfall_entity_onremove")
-					ent.sf_on_remove()
-				end
-				ent:Remove()
+			if not IsValid(ent) then return end
+			if self.nocallonremove then
+				self:onremove(instance, ent)
+			else
+				-- The die function is called the next frame after 'Remove' which is too slow so call it ourself
+				SF.RemoveCallOnRemove(ent, "entmanager")
+				ent.sf_on_remove()
 			end
+			ent:Remove()
 		end,
 		onremove = function(self, instance, ent)
 			self.entsByInstance[instance][ent] = nil

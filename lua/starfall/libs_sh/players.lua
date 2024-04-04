@@ -75,7 +75,7 @@ if CLIENT then
 		return playerAnimation[ply]
 	end
 
-	playerAnimation = SF.EntityTable("playerAnimation", playerAnimRemove, true)
+	playerAnimation = SF.EntityTable("playerAnimation", playerAnimRemove)
 end
 
 --- Player type

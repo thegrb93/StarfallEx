@@ -87,6 +87,14 @@ function ENT:Destroy()
 	end
 end
 
+function ENT:OnRemove(fullsnapshot)
+	if fullsnapshot then return end
+	self:Destroy()
+
+	-- This should remove the hook if it existed
+	if CLIENT then self:SetReuploadOnReload(false) end
+end
+
 function ENT:SetupFiles(sfdata)
 	self.sfdata = sfdata
 	self.owner = sfdata.owner
