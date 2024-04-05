@@ -522,7 +522,9 @@ end
 -- @class function
 -- @param Entity e The entity to be written
 local function writeEntity(self, instance, e)
-	self:writeInt16(instance.Types.Entity.GetEntity(e):EntIndex())
+	local ent = instance.Types.Entity.GetEntity(e)
+	self:writeInt16(ent:EntIndex())
+	self:writeInt32(ent:GetCreationID())
 end
 	
 --- Reads an entity from the byte stream and advances the buffer pointer.
@@ -532,8 +534,9 @@ end
 -- @return Entity The entity that was read
 local function readEntity(self, instance, callback)
 	local index = self:readUInt16()
+	local creationindex = self:readUInt32()
 	if callback ~= nil and CLIENT then
-		checkluatype(callback, TYPE_FUNCTION)
+		checkluatype(callback, creationindex, TYPE_FUNCTION)
 		SF.WaitForEntity(index, function(ent)
 			if ent ~= nil then ent = instance.WrapObject(ent) end
 			instance:runFunction(callback, ent)

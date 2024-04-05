@@ -42,7 +42,12 @@ function ENT:Think()
 			clipdata:writeFloat(v.origin[1])
 			clipdata:writeFloat(v.origin[2])
 			clipdata:writeFloat(v.origin[3])
-			clipdata:writeInt16(v.entity and v.entity:EntIndex() or 0)
+			if v.entity then
+				clipdata:writeInt16(v.entity:EntIndex())
+				clipdata:writeInt32(v.entity:GetCreationID())
+			else
+				clipdata:writeInt16(0)
+			end
 		end
 		self.clipdata = clipdata:getString()
 
@@ -67,6 +72,7 @@ end
 function ENT:TransmitClips(recip)
 	net.Start("starfall_hologram_clips")
 	net.WriteUInt(self:EntIndex(), 16)
+	net.WriteUInt(self:GetCreationID(), 32)
 	net.WriteUInt(#self.clipdata, 32)
 	net.WriteData(self.clipdata, #self.clipdata)
 	if recip then net.Send(recip) else net.Broadcast() end

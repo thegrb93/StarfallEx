@@ -464,7 +464,9 @@ end
 -- @param Entity t The entity to be written
 function net_library.writeEntity(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
-	write{net.WriteUInt, 16, getent(t):EntIndex(), 16}
+	local ent = getent(t)
+	write{net.WriteUInt, 16, ent:EntIndex(), 16}
+	write{net.WriteUInt, 32, ent:GetCreationID(), 32}
 end
 
 --- Reads a entity from the net message
@@ -473,9 +475,10 @@ end
 -- @return Entity The entity that was read
 function net_library.readEntity(callback)
 	local index = net.ReadUInt(16)
+	local creationindex = net.ReadUInt(32)
 	if callback ~= nil and CLIENT then
 		checkluatype(callback, TYPE_FUNCTION)
-		SF.WaitForEntity(index, function(ent)
+		SF.WaitForEntity(index, creationindex, function(ent)
 			if ent ~= nil then ent = instance.WrapObject(ent) end
 			instance:runFunction(callback, ent)
 		end)
