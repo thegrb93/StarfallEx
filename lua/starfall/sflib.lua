@@ -89,7 +89,7 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 	end
 end)
 
-local removedHooks = setmetatable({}, {__index=function(t,k) local r={} t[k]=r return r end}
+local removedHooks = setmetatable({}, {__index=function(t,k) local r={} t[k]=r return r end})
 hook.Add("EntityRemoved","SF_CallOnRemove",function(ent, fullsnapshot)
 	if fullsnapshot then return end
 	local hooks = removedHooks[ent]
