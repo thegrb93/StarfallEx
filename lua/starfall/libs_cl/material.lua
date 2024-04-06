@@ -173,137 +173,150 @@ end
 
 local LoadingTextureQueue = {}
 local Panel
-local function NextInTextureQueue()
-	if not Panel then
-		Panel = SF.URLTextureLoader
-		if not Panel then
-			Panel = vgui.Create("DHTML")
-			Panel:SetSize(1024, 1024)
-			Panel:SetAlpha(0)
-			Panel:SetMouseInputEnabled(false)
-			Panel:SetHTML(
-			[[<html style="overflow:hidden"><body><script>
-			if (!requestAnimationFrame)
-				var requestAnimationFrame = webkitRequestAnimationFrame;
-			function renderImage(){
+
+local function TextureProcessingFailed(requestTbl, delay)
+	if not requestTbl.Instance.error and requestTbl.Callback then 
+		requestTbl.Callback() 
+	end
+	table.remove(LoadingTextureQueue, 1)
+
+	if delay ~= nil then
+		timer.Simple(delay, NextInTextureQueue)
+	else
+		NextInTextureQueue()
+	end
+end
+
+local function TrySetupTexturePanel()
+	if Panel then return false end
+	Panel = SF.URLTextureLoader
+	if Panel then return false end
+
+	Panel = vgui.Create("DHTML")
+	Panel:SetSize(1024, 1024)
+	Panel:SetAlpha(0)
+	Panel:SetMouseInputEnabled(false)
+	Panel:SetHTML(
+	[[<html style="overflow:hidden"><body><script>
+	if (!requestAnimationFrame)
+		var requestAnimationFrame = webkitRequestAnimationFrame;
+	function renderImage(){
+		requestAnimationFrame(function(){
+			requestAnimationFrame(function(){
+				document.body.offsetWidth
 				requestAnimationFrame(function(){
-					requestAnimationFrame(function(){
-						document.body.offsetWidth
-						requestAnimationFrame(function(){
-							sf.imageLoaded(img.width, img.height);
-						});
-					});
+					sf.imageLoaded(img.width, img.height);
 				});
-			}
-			var img = new Image();
-			img.style.position="absolute";
-			img.onload = renderImage;
-			img.onerror = function (){sf.imageErrored();}
-			document.body.appendChild(img);
-			</script></body></html>]])
-			Panel:Hide()
-			SF.URLTextureLoader = Panel
-			timer.Simple(0.5, NextInTextureQueue)
-			return
+			});
+		});
+	}
+	var img = new Image();
+	img.style.position="absolute";
+	img.onload = renderImage;
+	img.onerror = function (){sf.imageErrored();}
+	document.body.appendChild(img);
+	</script></body></html>]])
+	Panel:Hide()
+	SF.URLTextureLoader = Panel
+	return true
+end
+
+local function ApplyTextureGeneric(requestTbl, w, h)
+	--Timer to prevent being in javascript stack frame
+	if requestTbl.Instance.error then
+		TextureProcessingFailed(requestTbl)
+		return
+	end
+
+	local function imageDone(usedLayout)
+		if requestTbl.Loaded then return end
+		requestTbl.Loaded = true
+
+		hook.Add("PreRender","SF_HTMLPanelCopyTexture",function()
+			Panel:UpdateHTMLTexture()
+			local mat = Panel:GetHTMLMaterial()
+			if not mat then return end
+
+			render.PushRenderTarget(requestTbl.Texture)
+				render.Clear(0, 0, 0, 0, false, false)
+				cam.Start2D()
+				surface.SetMaterial(mat)
+				surface.SetDrawColor(255, 255, 255)
+				surface.DrawTexturedRect(0, 0, 1024, 1024)
+				cam.End2D()
+			render.PopRenderTarget()
+
+			hook.Remove("PreRender","SF_HTMLPanelCopyTexture")
+			table.remove(LoadingTextureQueue, 1)
+			timer.Simple(0, function()
+				if requestTbl.CallbackDone then requestTbl.CallbackDone() end
+				NextInTextureQueue()
+			end)
+		end)
+	end
+
+	if requestTbl.Usedlayout then
+		imageDone()
+	else
+		local function layout(x,y,w,h,pixelated)
+			if requestTbl.Usedlayout then SF.Throw("You can only use layout once", 2) end
+			checkluatype(x, TYPE_NUMBER)
+			checkluatype(y, TYPE_NUMBER)
+			checkluatype(w, TYPE_NUMBER)
+			checkluatype(h, TYPE_NUMBER)
+			if pixelated~=nil then checkluatype(pixelated, TYPE_BOOL) end
+			requestTbl.Usedlayout = true
+			Panel:RunJavascript([[
+				img.style.left=']]..x..[[px';img.style.top=']]..y..[[px';img.width=]]..w..[[;img.height=]]..h..[[;img.style.imageRendering=']]..(pixelated and "pixelated" or "auto")..[[';
+				renderImage();
+			]])
 		end
+
+		if requestTbl.Callback then requestTbl.Callback(w, h, layout, false) end
+		if not requestTbl.Usedlayout then
+			requestTbl.Usedlayout = true
+			imageDone()
+		end
+	end
+end
+
+local USE_AWESOMIUM_HACK = BRANCH == "unknown" or BRANCH == "dev" or BRANCH == "prerelease"
+
+local function ProcessTextureRequest(requestTbl)
+	if requestTbl.Instance.error then
+		TextureProcessingFailed(requestTbl, 0)
+		return
+	end
+
+	Panel:AddFunction("sf", "imageLoaded", function(w, h) ApplyTextureGeneric(requestTbl, w, h) end)
+	Panel:AddFunction("sf", "imageErrored", function() TextureProcessingFailed(requestTbl, 0) end)
+	Panel:RunJavascript(
+	[[img.removeAttribute("width");
+	img.removeAttribute("height");
+	img.style.left="0px";
+	img.style.top="0px";
+	img.src="]] .. string.JavascriptSafe( requestTbl.Url ) .. [[";]]..
+	(USE_AWESOMIUM_HACK and "\nif(img.complete)renderImage();" or ""))
+	Panel:Show()
+
+	timer.Create("SF_URLTextureTimeout", 10, 1, function()
+		TextureProcessingFailed(requestTbl)
+	end)
+end
+
+local function NextInTextureQueue()
+	if TrySetupTexturePanel() then 
+		timer.Simple(0.5, NextInTextureQueue)
+		return 
 	end
 
 	local requestTbl = LoadingTextureQueue[1]
-	if requestTbl then
-		if requestTbl.Instance.error then
-			-- Chip already deinitialized so don't need to free anything
-			table.remove(LoadingTextureQueue, 1)
-			timer.Simple(0, NextInTextureQueue)
-			return
-		end
-
-		local function applyTexture(w, h)
-			--Timer to prevent being in javascript stack frame
-			if requestTbl.Instance.error then
-				table.remove(LoadingTextureQueue, 1)
-				timer.Simple(0, NextInTextureQueue)
-			else
-				local function imageDone(usedLayout)
-					if requestTbl.Loaded then return end
-					requestTbl.Loaded = true
-
-					hook.Add("PreRender","SF_HTMLPanelCopyTexture",function()
-						Panel:UpdateHTMLTexture()
-						local mat = Panel:GetHTMLMaterial()
-						if not mat then return end
-
-						render.PushRenderTarget(requestTbl.Texture)
-							render.Clear(0, 0, 0, 0, false, false)
-							cam.Start2D()
-							surface.SetMaterial(mat)
-							surface.SetDrawColor(255, 255, 255)
-							surface.DrawTexturedRect(0, 0, 1024, 1024)
-							cam.End2D()
-						render.PopRenderTarget()
-
-						hook.Remove("PreRender","SF_HTMLPanelCopyTexture")
-						table.remove(LoadingTextureQueue, 1)
-						timer.Simple(0, function()
-							if requestTbl.CallbackDone then requestTbl.CallbackDone() end
-							NextInTextureQueue()
-						end)
-					end)
-				end
-
-				if requestTbl.Usedlayout then
-					imageDone()
-				else
-					local function layout(x,y,w,h,pixelated)
-						if requestTbl.Usedlayout then SF.Throw("You can only use layout once", 2) end
-						checkluatype(x, TYPE_NUMBER)
-						checkluatype(y, TYPE_NUMBER)
-						checkluatype(w, TYPE_NUMBER)
-						checkluatype(h, TYPE_NUMBER)
-						if pixelated~=nil then checkluatype(pixelated, TYPE_BOOL) end
-						requestTbl.Usedlayout = true
-						Panel:RunJavascript([[
-							img.style.left=']]..x..[[px';img.style.top=']]..y..[[px';img.width=]]..w..[[;img.height=]]..h..[[;img.style.imageRendering=']]..(pixelated and "pixelated" or "auto")..[[';
-							renderImage();
-						]])
-					end
-
-					if requestTbl.Callback then requestTbl.Callback(w, h, layout, false) end
-					if not requestTbl.Usedlayout then
-						requestTbl.Usedlayout = true
-						imageDone()
-					end
-				end
-			end
-		end
-		local function errorTexture()
-			timer.Simple(0, function()
-				if not requestTbl.Instance.error and requestTbl.Callback then requestTbl.Callback() end
-				table.remove(LoadingTextureQueue, 1)
-				NextInTextureQueue()
-			end)
-		end
-
-		Panel:AddFunction("sf", "imageLoaded", applyTexture)
-		Panel:AddFunction("sf", "imageErrored", errorTexture)
-		Panel:RunJavascript(
-		[[img.removeAttribute("width");
-		img.removeAttribute("height");
-		img.style.left="0px";
-		img.style.top="0px";
-		img.src="]] .. string.JavascriptSafe( requestTbl.Url ) .. [[";]]..
-		(BRANCH == "unknown" and "\nif(img.complete)renderImage();" or ""))
-		Panel:Show()
-
-		timer.Create("SF_URLTextureTimeout", 10, 1, function()
-			if requestTbl.Callback then requestTbl.Callback() end
-			table.remove(LoadingTextureQueue, 1)
-			NextInTextureQueue()
-		end)
-
-	else
+	if not requestTbl then
 		timer.Remove("SF_URLTextureTimeout")
 		Panel:Hide()
 	end
+
+	ProcessTextureRequest(requestTbl)	
 end
 
 --- `material` library is allows creating material objects which are used for controlling shaders in rendering.
