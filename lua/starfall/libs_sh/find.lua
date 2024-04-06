@@ -19,10 +19,9 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 local plywrap = instance.Types.Player.Wrap
 
 local function convert(results, func)
-	if func~=nil then checkluatype (func, TYPE_FUNCTION) end
-
 	local t = {}
-	if func then
+	if func~=nil then
+		checkluatype(func, TYPE_FUNCTION, 1)
 		for i = 1, #results do
 			local e = owrap(results[i])
 			if e and func(e) then
@@ -32,6 +31,27 @@ local function convert(results, func)
 	else
 		for i = 1, #results do
 			local e = owrap(results[i])
+			if e then
+				t[#t + 1] = e
+			end
+		end
+	end
+	return t
+end
+
+local function convertIter(iter, func)
+	local t = {}
+	if func~=nil then
+		checkluatype(func, TYPE_FUNCTION, 1)
+		for _, v in iter() do
+			local e = owrap(v)
+			if e and func(e) then
+				t[#t + 1] = e
+			end
+		end
+	else
+		for _, v in iter() do
+			local e = owrap(v)
 			if e then
 				t[#t + 1] = e
 			end
@@ -157,7 +177,7 @@ end
 function find_library.allPlayers(filter)
 	checkpermission(instance, nil, "find")
 
-	return convert(player.GetAll(), filter)
+	return convertIter(player.Iterator, filter)
 end
 
 --- Finds all entities
@@ -166,7 +186,7 @@ end
 function find_library.all(filter)
 	checkpermission(instance, nil, "find")
 
-	return convert(ents.GetAll(), filter)
+	return convertIter(ents.Iterator, filter)
 end
 
 --- Finds the closest entity to a point

@@ -165,7 +165,7 @@ hook.Add("NetworkEntityCreated", "starfall_hologram_rescale", function(holo)
 end)
 
 local function ShowHologramOwners()
-	for _, ent in pairs(ents.GetAll()) do
+	for _, ent in ents.Iterator() do
 		if ent.IsSFHologram then
 			local name = "No Owner"
 			local steamID = ""
