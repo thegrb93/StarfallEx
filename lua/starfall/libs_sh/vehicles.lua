@@ -98,7 +98,7 @@ if SERVER then
 		checkpermission(instance, ent, "vehicle.lock")
 		local n = "SF_CanExitVehicle"..ent:EntIndex()
 		hook.Add("CanExitVehicle", n, function(v) if v==ent then return false end end)
-		ent:CallOnRemove(n, function() hook.Remove("CanExitVehicle", n) end)
+		SF.CallOnRemove(ent, n, function() hook.Remove("CanExitVehicle", n) end)
 		ent:Fire("Lock")
 	end
 

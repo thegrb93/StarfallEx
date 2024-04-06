@@ -14,7 +14,7 @@ local soundsByEntity = SF.EntityTable("soundsByEntity", function(e, t)
 	for snd, _ in pairs(t) do
 		snd:Stop()
 	end
-end, true)
+end)
 
 local function deleteSound(ply, ent, sound)
 	sound:Stop()

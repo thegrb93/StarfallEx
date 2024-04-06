@@ -13,24 +13,6 @@ function ENT:Initialize()
 	self.reuploadOnReload = false
 end
 
-function ENT:OnRemove()
-	-- This is required because snapshots can cause OnRemove to run even if it wasn't removed.
-	local instance = self.instance
-	if instance then
-		instance:runScriptHook("removed")
-
-		timer.Simple(0, function()
-			if not IsValid(self) then
-				instance:deinitialize()
-				self.instance = nil
-			end
-		end)
-	end
-
-	-- This should remove the hook if it existed
-	self:SetReuploadOnReload(false)
-end
-
 function ENT:GetOverlayText()
 	local state = self:GetNWInt("State", 1)
 	local clientstr, serverstr
