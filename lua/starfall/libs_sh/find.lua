@@ -43,14 +43,14 @@ local function convertIter(iter, func)
 	local t = {}
 	if func~=nil then
 		checkluatype(func, TYPE_FUNCTION, 2)
-		for _, v in iter do
+		for _, v in iter() do
 			local e = owrap(v)
 			if e and func(e) then
 				t[#t + 1] = e
 			end
 		end
 	else
-		for _, v in iter do
+		for _, v in iter() do
 			local e = owrap(v)
 			if e then
 				t[#t + 1] = e
@@ -177,7 +177,7 @@ end
 function find_library.allPlayers(filter)
 	checkpermission(instance, nil, "find")
 
-	return convertIter(player.Iterator(), filter)
+	return convertIter(player.Iterator, filter)
 end
 
 --- Finds all entities
@@ -186,7 +186,7 @@ end
 function find_library.all(filter)
 	checkpermission(instance, nil, "find")
 
-	return convertIter(ents.Iterator(), filter)
+	return convertIter(ents.Iterator, filter)
 end
 
 --- Finds the closest entity to a point
