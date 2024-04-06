@@ -185,11 +185,13 @@ net.Receive("starfall_processor_link", function()
 	local component, proc
 
 	SF.WaitForEntity(componenti, componentci, function(e)
-		component = e if component and proc then SF.LinkEnt(component, proc) end
+		component = e if component and (proc or proci==0) then SF.LinkEnt(component, proc) end
 	end)
-	SF.WaitForEntity(proci, procci, function(e)
-		proc = e if component and proc then SF.LinkEnt(component, proc) end
-	end)
+	if proci~=0 then
+		SF.WaitForEntity(proci, procci, function(e)
+			proc = e if component and proc then SF.LinkEnt(component, proc) end
+		end)
+	end
 end)
 
 net.Receive("starfall_processor_kill", function()
