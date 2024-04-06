@@ -21,7 +21,7 @@ local plywrap = instance.Types.Player.Wrap
 local function convert(results, func)
 	local t = {}
 	if func~=nil then
-		checkluatype(func, TYPE_FUNCTION, 2)
+		checkluatype(func, TYPE_FUNCTION, 1)
 		for i = 1, #results do
 			local e = owrap(results[i])
 			if e and func(e) then
@@ -42,7 +42,7 @@ end
 local function convertIter(iter, func)
 	local t = {}
 	if func~=nil then
-		checkluatype(func, TYPE_FUNCTION, 2)
+		checkluatype(func, TYPE_FUNCTION, 1)
 		for _, v in iter() do
 			local e = owrap(v)
 			if e and func(e) then
