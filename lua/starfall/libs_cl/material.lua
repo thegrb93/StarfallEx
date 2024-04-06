@@ -282,7 +282,7 @@ end
 
 local USE_AWESOMIUM_HACK = BRANCH == "unknown" or BRANCH == "dev" or BRANCH == "prerelease"
 
-local function ProcessTextureRequest(requestTbl)
+local function ProcessTextureRequest(requestTbl, urlOverride)
 	if requestTbl.Instance.error then
 		TextureProcessingFailed(requestTbl, 0)
 		return
@@ -295,13 +295,35 @@ local function ProcessTextureRequest(requestTbl)
 	img.removeAttribute("height");
 	img.style.left="0px";
 	img.style.top="0px";
-	img.src="]] .. string.JavascriptSafe( requestTbl.Url ) .. [[";]]..
+	img.src="]] .. string.JavascriptSafe( urlOverride or requestTbl.Url ) .. [[";]]..
 	(USE_AWESOMIUM_HACK and "\nif(img.complete)renderImage();" or ""))
 	Panel:Show()
+end
 
-	timer.Create("SF_URLTextureTimeout", 10, 1, function()
-		TextureProcessingFailed(requestTbl)
-	end)
+local function ProcessTextureRequest_AwesomiumHack(requestTbl)
+	if requestTbl.Instance.error then
+		TextureProcessingFailed(requestTbl, 0)
+		return
+	end
+
+	local url = requestTbl.Url
+	http.Fetch(url, function(body, _, headers, code)
+		if code >= 300 then 
+			TextureProcessingFailed(requestTbl, 0)
+			return
+		end
+
+		local content_type = headers["Content-Type"] or headers["content-type"]
+		local data = util.Base64Encode(body, true)
+		
+		local img = table.concat({
+			"data:", content_type, ";base64,", data
+		}, "")
+
+		ProcessTextureRequest(requestTbl, img)
+	end, function(error)
+		TextureProcessingFailed(requestTbl, 0)
+	end)	
 end
 
 local function NextInTextureQueue()
@@ -316,7 +338,15 @@ local function NextInTextureQueue()
 		Panel:Hide()
 	end
 
-	ProcessTextureRequest(requestTbl)	
+	if USE_AWESOMIUM_HACK then
+		ProcessTextureRequest_AwesomiumHack(requestTbl)
+	else
+		ProcessTextureRequest(requestTbl)	
+	end
+
+	timer.Create("SF_URLTextureTimeout", 10, 1, function()
+		TextureProcessingFailed(requestTbl)
+	end)
 end
 
 --- `material` library is allows creating material objects which are used for controlling shaders in rendering.
