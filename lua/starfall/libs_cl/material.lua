@@ -173,6 +173,7 @@ end
 
 local LoadingTextureQueue = {}
 local Panel
+local NextInTextureQueue
 
 local function TextureProcessingFailed(requestTbl, delay)
 	if not requestTbl.Instance.error and requestTbl.Callback then 
@@ -222,9 +223,9 @@ local function TrySetupTexturePanel()
 end
 
 local function ApplyTextureGeneric(requestTbl, w, h)
-	--Timer to prevent being in javascript stack frame
 	if requestTbl.Instance.error then
-		TextureProcessingFailed(requestTbl)
+		--Timer to prevent being in javascript stack frame
+		TextureProcessingFailed(requestTbl, 0)
 		return
 	end
 
@@ -326,7 +327,7 @@ local function ProcessTextureRequest_AwesomiumHack(requestTbl)
 	end)	
 end
 
-local function NextInTextureQueue()
+function NextInTextureQueue()
 	if TrySetupTexturePanel() then 
 		timer.Simple(0.5, NextInTextureQueue)
 		return 
@@ -336,6 +337,7 @@ local function NextInTextureQueue()
 	if not requestTbl then
 		timer.Remove("SF_URLTextureTimeout")
 		Panel:Hide()
+		return
 	end
 
 	if USE_AWESOMIUM_HACK then
