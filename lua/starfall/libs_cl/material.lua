@@ -174,29 +174,30 @@ end
 local USE_AWESOMIUM_HACK = BRANCH == "unknown" or BRANCH == "dev" or BRANCH == "prerelease"
 local HttpTextureLoader = {}
 local HttpTexture = {
-	INIT=0, LOADING=1, FETCH=2, LAYOUT=3, RENDERING=4, DESTROYED=5
+	INIT=0, LOADING=1, FETCH=2, LAYOUT=3, RENDER=4, DESTROY=5
 	__index = {
 		newstate = function(self, state)
-			if state~=self.DESTROYED and self.instance.error then self:error() return false end
+			if self.instance.error and state~=self.DESTROY then self:error() return false end
 
 			if state == self.LOADING then
-				return self.state == self.INIT or self.state == self.FETCH
+				assert(self.state == self.INIT or self.state == self.FETCH)
 			elseif state == self.FETCH then
-				return self.state == self.LOADING
+				assert(self.state == self.LOADING)
 			elseif state == self.LAYOUT then
-				return self.state == self.LOADING or self.state == self.LAYOUT
-			elseif state == self.RENDERING then
-				return self.state == self.LAYOUT
-			elseif state == self.DESTROYED then
-				return self.state ~= self.DESTROYED
+				assert(self.state == self.LOADING or self.state == self.LAYOUT)
+			elseif state == self.RENDER then
+				assert(self.state == self.LAYOUT)
+			elseif state == self.DESTROY then
+				assert(self.state ~= self.DESTROY)
 			else
-				return false
+				error("Bogus state "..state)
 			end
+			self.state = state
+			return true
 		end,
 
 		load = function(self)
 			if not self:newstate(self.LOADING) then return end
-			self.state = self.LOADING
 
 			if USE_AWESOMIUM_HACK and not string.match(self.url, "^data:") then
 				self:loadAwesomium()
@@ -217,7 +218,6 @@ local HttpTexture = {
 
 		loadAwesomium = function(self)
 			if not self:newstate(self.FETCH) then return end
-			self.state = self.FETCH
 
 			http.Fetch(self.url, function(body, _, headers, code)
 				if code >= 300 then self:error() return end
@@ -235,7 +235,6 @@ local HttpTexture = {
 
 		onload = function(self, w, h)
 			if not self:newstate(self.LAYOUT) then return end
-			self.state = self.LAYOUT
 
 			if self.usedlayout then self:render() return end
 
@@ -266,8 +265,7 @@ local HttpTexture = {
 		end,
 
 		render = function(self)
-			if not self:newstate(self.RENDERING) then return end
-			self.state = self.RENDERING
+			if not self:newstate(self.RENDER) then return end
 
 			hook.Add("PreRender","SF_HTMLPanelCopyTexture",function()
 				HttpTextureLoader.Panel:UpdateHTMLTexture()
@@ -288,17 +286,13 @@ local HttpTexture = {
 		end,
 		
 		error = function(self)
-			if not self:newstate(self.DESTROYED) then return end
-			self.state = self.DESTROYED
-
+			if not self:newstate(self.DESTROY) then return end
 			if self.callback then self.callback() end
 			HttpTextureLoader.pop()
 		end,
 
 		done = function(self)
-			if not self:newstate(self.DESTROYED) then return end
-			self.state = self.DESTROYED
-
+			if not self:newstate(self.DESTROY) then return end
 			if self.donecallback then self.donecallback() end
 			HttpTextureLoader.pop()
 		end
