@@ -1094,17 +1094,23 @@ end
 
 function SF.EntIsReady(ent)
 	if ent:IsWorld() then return true end
-	if IsValid(ent) then
-		-- https://github.com/Facepunch/garrysmod-issues/issues/3127
-		local class = ent:GetClass()
-		if class=="player" then
-			return ent:IsPlayer()
-		else
-			local n = next(baseclass.Get(class))
-			return n==nil or ent[n]~=nil
-		end
+	if not IsValid(ent) then return false end
+
+	-- https://github.com/Facepunch/garrysmod-issues/issues/3127
+	local class = ent:GetClass()
+	if class=="player" then
+		return ent:IsPlayer()
+	elseif class=="starfall_processor" then
+		return ent.Starfall~=nil
+	elseif class=="starfall_hologram" then
+		return ent.IsSFHologram~=nil
+	elseif class=="starfall_prop" then
+		return ent.IsSFProp~=nil
+	elseif class=="starfall_screen" or class=="starfall_hud" then
+		return ent:IsScripted()
+	else
+		return true
 	end
-	return false
 end
 
 local waitingConditions = {}

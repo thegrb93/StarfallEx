@@ -80,7 +80,8 @@ end
 
 SF.WaitForPlayerInit(function(ply)
 	for k, v in ipairs(ents.FindByClass("starfall_hologram")) do
-		if #v.clipdata>0 then
+		local clipdata = v.clipdata
+		if clipdata and #clipdata>0 then
 			v:TransmitClips(ply)
 		end
 	end
