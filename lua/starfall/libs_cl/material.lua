@@ -174,20 +174,33 @@ end
 local USE_AWESOMIUM_HACK = BRANCH == "unknown" or BRANCH == "dev" or BRANCH == "prerelease"
 local HttpTextureLoader = {}
 local HttpTexture = {
+	INIT=0, LOADING=1, FETCH=2, LAYOUT=3, RENDERING=4, DESTROYED=5
 	__index = {
-		load = function(self)
-			if self.error then return end
-			if self.instance.error then self:error() return end
+		newstate = function(self, state)
+			if state~=self.DESTROYED and self.instance.error then self:error() return false end
 
-			local src
-			if USE_AWESOMIUM_HACK then
-				if not string.match(self.url, "^base64:") then
-					self:loadAwesomium()
-					return
-				end
-				src = self.url
+			if state == self.LOADING then
+				return self.state == self.INIT or self.state == self.FETCH
+			elseif state == self.FETCH then
+				return self.state == self.LOADING
+			elseif state == self.LAYOUT then
+				return self.state == self.LOADING or self.state == self.LAYOUT
+			elseif state == self.RENDERING then
+				return self.state == self.LAYOUT
+			elseif state == self.DESTROYED then
+				return self.state ~= self.DESTROYED
 			else
-				src = string.JavascriptSafe( self.url )
+				return false
+			end
+		end,
+
+		load = function(self)
+			if not self:newstate(self.LOADING) then return end
+			self.state = self.LOADING
+
+			if USE_AWESOMIUM_HACK and not string.match(self.url, "^data:") then
+				self:loadAwesomium()
+				return
 			end
 
 			HttpTextureLoader.Panel:AddFunction("sf", "imageLoaded", function(w, h) timer.Simple(0, function() self:onload(w, h) end) end)
@@ -197,34 +210,33 @@ local HttpTexture = {
 			img.removeAttribute("height");
 			img.style.left="0px";
 			img.style.top="0px";
-			img.src="]] .. src .. [[";]]..
+			img.src="]] .. string.JavascriptSafe(self.url) .. [[";]]..
 			(BRANCH == "unknown" and "\nif(img.complete)renderImage();" or ""))
 			HttpTextureLoader.Panel:Show()
 		end,
 
 		loadAwesomium = function(self)
+			if not self:newstate(self.FETCH) then return end
+			self.state = self.FETCH
+
 			http.Fetch(self.url, function(body, _, headers, code)
-				if code >= 300 then 
-					TextureProcessingFailed(requestTbl, 0)
-					return
-				end
+				if code >= 300 then self:error() return end
 
 				local content_type = headers["Content-Type"] or headers["content-type"]
 				local data = util.Base64Encode(body, true)
 				
-				local img = table.concat({
+				self.url = table.concat({
 					"data:", content_type, ";base64,", data
 				}, "")
 
-				ProcessTextureRequest(requestTbl, img)
-			end, function(error)
-				TextureProcessingFailed(requestTbl, 0)
-			end)
+				self:load()
+			end, function() self:error() end)
 		end
 
 		onload = function(self, w, h)
-			if self.error then return end
-			if self.instance.error then self:error() return end
+			if not self:newstate(self.LAYOUT) then return end
+			self.state = self.LAYOUT
+
 			if self.usedlayout then self:render() return end
 
 			if self.callback then
@@ -254,6 +266,9 @@ local HttpTexture = {
 		end,
 
 		render = function(self)
+			if not self:newstate(self.RENDERING) then return end
+			self.state = self.RENDERING
+
 			hook.Add("PreRender","SF_HTMLPanelCopyTexture",function()
 				HttpTextureLoader.Panel:UpdateHTMLTexture()
 				local mat = HttpTextureLoader.Panel:GetHTMLMaterial()
@@ -273,15 +288,17 @@ local HttpTexture = {
 		end,
 		
 		error = function(self)
-			if self.error then return end
-			self.error = true
+			if not self:newstate(self.DESTROYED) then return end
+			self.state = self.DESTROYED
+
 			if self.callback then self.callback() end
 			HttpTextureLoader.pop()
 		end,
 
 		done = function(self)
-			if self.error then return end
-			self.error = true
+			if not self:newstate(self.DESTROYED) then return end
+			self.state = self.DESTROYED
+
 			if self.donecallback then self.donecallback() end
 			HttpTextureLoader.pop()
 		end
@@ -294,7 +311,7 @@ local HttpTexture = {
 			callback = callback,
 			donecallback = donecallback,
 			usedlayout = false,
-			error = false,
+			state = t.INIT,
 		}, t)
 	end
 }
