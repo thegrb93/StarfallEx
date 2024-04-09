@@ -174,21 +174,21 @@ end
 local USE_AWESOMIUM_HACK = BRANCH == "unknown" or BRANCH == "dev" or BRANCH == "prerelease"
 local HttpTextureLoader = {}
 local HttpTexture = {
-	INIT=0, LOADING=1, FETCH=2, LAYOUT=3, RENDER=4, DESTROY=5
+	INIT=0, LOADING=1, FETCH=2, LAYOUT=3, RENDER=4, DESTROY=5,
 	__index = {
 		newstate = function(self, state)
 			if self.instance.error and state~=self.DESTROY then self:error() return false end
 
 			if state == self.LOADING then
-				assert(self.state == self.INIT or self.state == self.FETCH)
+				if self.state ~= self.INIT and self.state ~= self.FETCH then return false end
 			elseif state == self.FETCH then
-				assert(self.state == self.LOADING)
+				if self.state ~= self.LOADING then return false end
 			elseif state == self.LAYOUT then
-				assert(self.state == self.LOADING or self.state == self.LAYOUT)
+				if self.state ~= self.LOADING and self.state ~= self.LAYOUT then return false end
 			elseif state == self.RENDER then
-				assert(self.state == self.LAYOUT)
+				if self.state ~= self.LAYOUT then return false end
 			elseif state == self.DESTROY then
-				assert(self.state ~= self.DESTROY)
+				if self.state == self.DESTROY then return false end
 			else
 				error("Bogus state "..state)
 			end
@@ -231,7 +231,7 @@ local HttpTexture = {
 
 				self:load()
 			end, function() self:error() end)
-		end
+		end,
 
 		onload = function(self, w, h)
 			if not self:newstate(self.LAYOUT) then return end
