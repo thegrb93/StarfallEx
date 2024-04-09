@@ -171,184 +171,198 @@ local function tex2str(t)
 	return t
 end
 
-local LoadingTextureQueue = {}
-local Panel
-local NextInTextureQueue
+local USE_AWESOMIUM_HACK = BRANCH == "unknown" or BRANCH == "dev" or BRANCH == "prerelease"
+local HttpTextureLoader = {}
+local HttpTexture = {
+	__index = {
+		load = function(self)
+			if self.error then return end
+			if self.instance.error then self:error() return end
 
-local function TextureProcessingFailed(requestTbl, delay)
-	if not requestTbl.Instance.error and requestTbl.Callback then 
-		requestTbl.Callback() 
-	end
-	table.remove(LoadingTextureQueue, 1)
+			local src
+			if USE_AWESOMIUM_HACK then
+				if not string.match(self.url, "^base64:") then
+					self:loadAwesomium()
+					return
+				end
+				src = self.url
+			else
+				src = string.JavascriptSafe( self.url )
+			end
 
-	if delay ~= nil then
-		timer.Simple(delay, NextInTextureQueue)
-	else
-		NextInTextureQueue()
-	end
-end
+			HttpTextureLoader.Panel:AddFunction("sf", "imageLoaded", function(w, h) timer.Simple(0, function() self:onload(w, h) end) end)
+			HttpTextureLoader.Panel:AddFunction("sf", "imageErrored", function() timer.Simple(0, function() self:error() end) end)
+			HttpTextureLoader.Panel:RunJavascript(
+			[[img.removeAttribute("width");
+			img.removeAttribute("height");
+			img.style.left="0px";
+			img.style.top="0px";
+			img.src="]] .. src .. [[";]]..
+			(BRANCH == "unknown" and "\nif(img.complete)renderImage();" or ""))
+			HttpTextureLoader.Panel:Show()
+		end,
 
-local function TrySetupTexturePanel()
-	if Panel then return false end
-	Panel = SF.URLTextureLoader
-	if Panel then return false end
+		loadAwesomium = function(self)
+			http.Fetch(self.url, function(body, _, headers, code)
+				if code >= 300 then 
+					TextureProcessingFailed(requestTbl, 0)
+					return
+				end
 
-	Panel = vgui.Create("DHTML")
-	Panel:SetSize(1024, 1024)
-	Panel:SetAlpha(0)
-	Panel:SetMouseInputEnabled(false)
-	Panel:SetHTML(
-	[[<html style="overflow:hidden"><body><script>
-	if (!requestAnimationFrame)
-		var requestAnimationFrame = webkitRequestAnimationFrame;
-	function renderImage(){
-		requestAnimationFrame(function(){
-			requestAnimationFrame(function(){
-				document.body.offsetWidth
-				requestAnimationFrame(function(){
-					sf.imageLoaded(img.width, img.height);
-				});
-			});
-		});
-	}
-	var img = new Image();
-	img.style.position="absolute";
-	img.onload = renderImage;
-	img.onerror = function (){sf.imageErrored();}
-	document.body.appendChild(img);
-	</script></body></html>]])
-	Panel:Hide()
-	SF.URLTextureLoader = Panel
-	return true
-end
+				local content_type = headers["Content-Type"] or headers["content-type"]
+				local data = util.Base64Encode(body, true)
+				
+				local img = table.concat({
+					"data:", content_type, ";base64,", data
+				}, "")
 
-local function ApplyTextureGeneric(requestTbl, w, h)
-	if requestTbl.Instance.error then
-		--Timer to prevent being in javascript stack frame
-		TextureProcessingFailed(requestTbl, 0)
-		return
-	end
-
-	local function imageDone(usedLayout)
-		if requestTbl.Loaded then return end
-		requestTbl.Loaded = true
-
-		hook.Add("PreRender","SF_HTMLPanelCopyTexture",function()
-			Panel:UpdateHTMLTexture()
-			local mat = Panel:GetHTMLMaterial()
-			if not mat then return end
-
-			render.PushRenderTarget(requestTbl.Texture)
-				render.Clear(0, 0, 0, 0, false, false)
-				cam.Start2D()
-				surface.SetMaterial(mat)
-				surface.SetDrawColor(255, 255, 255)
-				surface.DrawTexturedRect(0, 0, 1024, 1024)
-				cam.End2D()
-			render.PopRenderTarget()
-
-			hook.Remove("PreRender","SF_HTMLPanelCopyTexture")
-			table.remove(LoadingTextureQueue, 1)
-			timer.Simple(0, function()
-				if requestTbl.CallbackDone then requestTbl.CallbackDone() end
-				NextInTextureQueue()
+				ProcessTextureRequest(requestTbl, img)
+			end, function(error)
+				TextureProcessingFailed(requestTbl, 0)
 			end)
-		end)
-	end
+		end
 
-	if requestTbl.Usedlayout then
-		imageDone()
-	else
-		local function layout(x,y,w,h,pixelated)
-			if requestTbl.Usedlayout then SF.Throw("You can only use layout once", 2) end
-			checkluatype(x, TYPE_NUMBER)
-			checkluatype(y, TYPE_NUMBER)
-			checkluatype(w, TYPE_NUMBER)
-			checkluatype(h, TYPE_NUMBER)
-			if pixelated~=nil then checkluatype(pixelated, TYPE_BOOL) end
-			requestTbl.Usedlayout = true
-			Panel:RunJavascript([[
+		onload = function(self, w, h)
+			if self.error then return end
+			if self.instance.error then self:error() return end
+			if self.usedlayout then self:render() return end
+
+			if self.callback then
+				self.callback(w, h, function(x,y,w,h,pixelated)
+					self:layout(x,y,w,h,pixelated)
+				end, false)
+			end
+
+			if not self.usedlayout then
+				self.usedlayout = true
+				self:render()
+			end
+		end,
+
+		layout = function(self,x,y,w,h,pixelated)
+			if self.usedlayout then SF.Throw("You can only use layout once", 3) end
+			checkluatype(x, TYPE_NUMBER, 2)
+			checkluatype(y, TYPE_NUMBER, 2)
+			checkluatype(w, TYPE_NUMBER, 2)
+			checkluatype(h, TYPE_NUMBER, 2)
+			if pixelated~=nil then checkluatype(pixelated, TYPE_BOOL, 2) end
+			self.usedlayout = true
+			HttpTextureLoader.Panel:RunJavascript([[
 				img.style.left=']]..x..[[px';img.style.top=']]..y..[[px';img.width=]]..w..[[;img.height=]]..h..[[;img.style.imageRendering=']]..(pixelated and "pixelated" or "auto")..[[';
 				renderImage();
 			]])
-		end
+		end,
 
-		if requestTbl.Callback then requestTbl.Callback(w, h, layout, false) end
-		if not requestTbl.Usedlayout then
-			requestTbl.Usedlayout = true
-			imageDone()
-		end
-	end
-end
-
-local USE_AWESOMIUM_HACK = BRANCH == "unknown" or BRANCH == "dev" or BRANCH == "prerelease"
-
-local function ProcessTextureRequest(requestTbl, urlOverride)
-	if requestTbl.Instance.error then
-		TextureProcessingFailed(requestTbl, 0)
-		return
-	end
-
-	Panel:AddFunction("sf", "imageLoaded", function(w, h) ApplyTextureGeneric(requestTbl, w, h) end)
-	Panel:AddFunction("sf", "imageErrored", function() TextureProcessingFailed(requestTbl, 0) end)
-	Panel:RunJavascript(
-	[[img.removeAttribute("width");
-	img.removeAttribute("height");
-	img.style.left="0px";
-	img.style.top="0px";
-	img.src="]] .. string.JavascriptSafe( urlOverride or requestTbl.Url ) .. [[";]]..
-	(USE_AWESOMIUM_HACK and "\nif(img.complete)renderImage();" or ""))
-	Panel:Show()
-end
-
-local function ProcessTextureRequest_AwesomiumHack(requestTbl)
-	if requestTbl.Instance.error then
-		TextureProcessingFailed(requestTbl, 0)
-		return
-	end
-
-	local url = requestTbl.Url
-	http.Fetch(url, function(body, _, headers, code)
-		if code >= 300 then 
-			TextureProcessingFailed(requestTbl, 0)
-			return
-		end
-
-		local content_type = headers["Content-Type"] or headers["content-type"]
-		local data = util.Base64Encode(body, true)
+		render = function(self)
+			hook.Add("PreRender","SF_HTMLPanelCopyTexture",function()
+				HttpTextureLoader.Panel:UpdateHTMLTexture()
+				local mat = HttpTextureLoader.Panel:GetHTMLMaterial()
+				if mat then
+					render.PushRenderTarget(self.texture)
+						render.Clear(0, 0, 0, 0, false, false)
+						cam.Start2D()
+						surface.SetMaterial(mat)
+						surface.SetDrawColor(255, 255, 255)
+						surface.DrawTexturedRect(0, 0, 1024, 1024)
+						cam.End2D()
+					render.PopRenderTarget()
+				end
+				hook.Remove("PreRender","SF_HTMLPanelCopyTexture")
+				timer.Simple(0, function() self:done() end)
+			end)
+		end,
 		
-		local img = table.concat({
-			"data:", content_type, ";base64,", data
-		}, "")
+		error = function(self)
+			if self.error then return end
+			self.error = true
+			if self.callback then self.callback() end
+			HttpTextureLoader.pop()
+		end,
 
-		ProcessTextureRequest(requestTbl, img)
-	end, function(error)
-		TextureProcessingFailed(requestTbl, 0)
-	end)	
+		done = function(self)
+			if self.error then return end
+			self.error = true
+			if self.donecallback then self.donecallback() end
+			HttpTextureLoader.pop()
+		end
+	},
+	__call = function(t, instance, texture, url, callback, donecallback)
+		return setmetatable({
+			instance = instance,
+			texture = texture,
+			url = url,
+			callback = callback,
+			donecallback = donecallback,
+			usedlayout = false,
+			error = false,
+		}, t)
+	end
+}
+setmetatable(HttpTexture, HttpTexture)
+
+local HttpTextureLoader = {}
+HttpTextureLoader.Queue = {}
+
+function HttpTextureLoader.initialize()
+	local Panel = SF.URLTextureLoader
+	if not Panel then
+		Panel = vgui.Create("DHTML")
+		Panel:SetSize(1024, 1024)
+		Panel:SetAlpha(0)
+		Panel:SetMouseInputEnabled(false)
+		Panel:SetHTML(
+		[[<html style="overflow:hidden"><body><script>
+		if (!requestAnimationFrame)
+			var requestAnimationFrame = webkitRequestAnimationFrame;
+		function renderImage(){
+			requestAnimationFrame(function(){
+				requestAnimationFrame(function(){
+					document.body.offsetWidth
+					requestAnimationFrame(function(){
+						sf.imageLoaded(img.width, img.height);
+					});
+				});
+			});
+		}
+		var img = new Image();
+		img.style.position="absolute";
+		img.onload = renderImage;
+		img.onerror = function (){sf.imageErrored();}
+		document.body.appendChild(img);
+		</script></body></html>]])
+		Panel:Hide()
+		SF.URLTextureLoader = Panel
+	end
+	HttpTextureLoader.Panel = Panel
 end
 
-function NextInTextureQueue()
-	if TrySetupTexturePanel() then 
-		timer.Simple(0.5, NextInTextureQueue)
-		return 
-	end
+function HttpTextureLoader.request_preInit(request)
+	HttpTextureLoader.initialize()
+	HttpTextureLoader.request = HttpTextureLoader.request_postInit
+	HttpTextureLoader.request(request)
+end
+HttpTextureLoader.request = HttpTextureLoader.request_preInit
 
-	local requestTbl = LoadingTextureQueue[1]
-	if not requestTbl then
-		timer.Remove("SF_URLTextureTimeout")
-		Panel:Hide()
-		return
-	end
+function HttpTextureLoader.request_postInit(request)
+	local len = #HttpTextureLoader.Queue
+	HttpTextureLoader.Queue[len + 1] = request
+	if len==0 then timer.Simple(0, HttpTextureLoader.nextRequest) end
+end
 
-	if USE_AWESOMIUM_HACK then
-		ProcessTextureRequest_AwesomiumHack(requestTbl)
+function HttpTextureLoader.nextRequest()
+	local request = HttpTextureLoader.Queue[1]
+	request:load()
+	timer.Create("SF_URLTextureTimeout", 10, 1, function() request:error() end)
+end
+
+function HttpTextureLoader.pop()
+	table.remove(HttpTextureLoader.Queue, 1)
+	if #HttpTextureLoader.Queue > 0 then
+		HttpTextureLoader.nextRequest()
 	else
-		ProcessTextureRequest(requestTbl)	
+		timer.Remove("SF_URLTextureTimeout")
+		HttpTextureLoader.Panel:Hide()
 	end
-
-	timer.Create("SF_URLTextureTimeout", 10, 1, function()
-		TextureProcessingFailed(requestTbl)
-	end)
 end
 
 --- `material` library is allows creating material objects which are used for controlling shaders in rendering.
@@ -795,25 +809,19 @@ function material_methods:setTextureURL(key, url, cb, done)
 		end
 	end
 
-	requestTbl = {
-		Instance = instance,
-		Texture = texture,
-		Url = url
-	}
+	local callback, donecallback
 	if cb then
-		requestTbl.Callback = function(w, h, layout)
+		callback = function(w, h, layout)
 			if w then instance:runFunction(cb, self, url, w, h, layout) else instance:runFunction(cb) end
 		end
 	end
 	if done then
-		requestTbl.CallbackDone = function()
+		donecallback = function()
 			instance:runFunction(done, self, url)
 		end
 	end
-
-	local inqueue = #LoadingTextureQueue
-	LoadingTextureQueue[inqueue + 1] = requestTbl
-	if inqueue == 0 then timer.Simple(0, NextInTextureQueue) end
+	
+	HttpTextureLoader.request(HttpTexture(instance, texture, url, callback, donecallback))
 end
 
 --- Sets a rendertarget texture to the specified texture key
