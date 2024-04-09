@@ -770,6 +770,7 @@ if CLIENT then
 	timer.Create("starfall_editor_status", 1 / 3, 0, function ()
 		rolldelta = -rolldelta
 		for ply, _ in pairs(busy_players) do
+			if not ply:IsValid() then continue end
 			local BoneIndx = ply:LookupBone("ValveBiped.Bip01_Head1") or ply:LookupBone("ValveBiped.HC_Head_Bone") or 0
 			local BonePos, BoneAng = ply:GetBonePosition(BoneIndx)
 			local particle = emitter:Add("radon/starfall2", BonePos + Vector(math.random(-10, 10), math.random(-10, 10), 60 + math.random(0, 10)))
