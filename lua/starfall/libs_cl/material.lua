@@ -182,7 +182,7 @@ local HttpTexture = {
 	DESTROY=function(self, new) return true end,
 	__index = {
 		badnewstate = function(self, new)
-			if self.instance.error and new~=self.DESTROY then self:error() return true end
+			if self.instance.error and new~=self.DESTROY then self:destroy() return true end
 			if self:state(new) then return true end
 			self.state = new
 			return false
@@ -197,7 +197,7 @@ local HttpTexture = {
 			end
 
 			HttpTextureLoader.Panel:AddFunction("sf", "imageLoaded", function(w, h) timer.Simple(0, function() self:onload(w, h) end) end)
-			HttpTextureLoader.Panel:AddFunction("sf", "imageErrored", function() timer.Simple(0, function() self:error() end) end)
+			HttpTextureLoader.Panel:AddFunction("sf", "imageErrored", function() timer.Simple(0, function() self:destroy() end) end)
 			HttpTextureLoader.Panel:RunJavascript(
 			[[img.removeAttribute("width");
 			img.removeAttribute("height");
@@ -212,7 +212,7 @@ local HttpTexture = {
 			if self:badnewstate(self.FETCH) then return end
 
 			http.Fetch(self.url, function(body, _, headers, code)
-				if code >= 300 then self:error() return end
+				if code >= 300 then self:destroy() return end
 
 				local content_type = headers["Content-Type"] or headers["content-type"]
 				local data = util.Base64Encode(body, true)
@@ -222,7 +222,7 @@ local HttpTexture = {
 				}, "")
 
 				self:load()
-			end, function() self:error() end)
+			end, function() self:destroy() end)
 		end,
 
 		onload = function(self, w, h)
@@ -273,21 +273,19 @@ local HttpTexture = {
 					render.PopRenderTarget()
 				end
 				hook.Remove("PreRender","SF_HTMLPanelCopyTexture")
-				timer.Simple(0, function() self:done() end)
+				timer.Simple(0, function() self:destroy(true) end)
 			end)
 		end,
 		
-		error = function(self)
+		destroy = function(self, success)
 			if self:badnewstate(self.DESTROY) then return end
-			if self.callback then self.callback() end
+			if success then
+				if self.donecallback then self.donecallback() end
+			else
+				if self.callback then self.callback() end
+			end
 			HttpTextureLoader.pop()
 		end,
-
-		done = function(self)
-			if self:badnewstate(self.DESTROY) then return end
-			if self.donecallback then self.donecallback() end
-			HttpTextureLoader.pop()
-		end
 	},
 	__call = function(t, instance, texture, url, callback, donecallback)
 		return setmetatable({
@@ -355,7 +353,7 @@ end
 function HttpTextureLoader.nextRequest()
 	local request = HttpTextureLoader.Queue[1]
 	request:load()
-	timer.Create("SF_URLTextureTimeout", 10, 1, function() request:error() end)
+	timer.Create("SF_URLTextureTimeout", 10, 1, function() request:destroy() end)
 end
 
 function HttpTextureLoader.pop()
