@@ -174,13 +174,14 @@ end
 local USE_AWESOMIUM_HACK = BRANCH == "unknown" or BRANCH == "dev" or BRANCH == "prerelease"
 local HttpTextureLoader = {}
 local HttpTexture = {
-	INIT=function(self, new) return new~=self.LOADING and new~=self.DESTROY end,
-	LOADING=function(self, new) return new~=self.FETCH and new~=self.LAYOUT and new~=self.DESTROY end,
-	FETCH=function(self, new) return new~=self.LOADING and new~=self.DESTROY end,
-	LAYOUT=function(self, new) return new~=self.RENDER and new~=self.DESTROY end,
-	RENDER=function(self, new) return new~=self.DESTROY end,
-	DESTROY=function(self, new) return true end,
 	__index = {
+		INIT=function(self, new) return new~=self.LOAD and new~=self.DESTROY end,
+		LOAD=function(self, new) return new~=self.FETCH and new~=self.LAYOUT and new~=self.DESTROY end,
+		FETCH=function(self, new) return new~=self.LOAD and new~=self.DESTROY end,
+		LAYOUT=function(self, new) return new~=self.RENDER and new~=self.LAYOUT and new~=self.DESTROY end,
+		RENDER=function(self, new) return new~=self.DESTROY end,
+		DESTROY=function(self, new) return true end,
+
 		badnewstate = function(self, new)
 			if self.instance.error and new~=self.DESTROY then self:destroy() return true end
 			if self:state(new) then return true end
@@ -189,7 +190,7 @@ local HttpTexture = {
 		end,
 
 		load = function(self)
-			if self:badnewstate(self.LOADING) then return end
+			if self:badnewstate(self.LOAD) then return end
 
 			if USE_AWESOMIUM_HACK and not string.match(self.url, "^data:") then
 				self:loadAwesomium()
@@ -233,7 +234,7 @@ local HttpTexture = {
 			if self.callback then
 				self.callback(w, h, function(x,y,w,h,pixelated)
 					self:layout(x,y,w,h,pixelated)
-				end, false)
+				end)
 			end
 
 			if not self.usedlayout then
@@ -301,7 +302,6 @@ local HttpTexture = {
 }
 setmetatable(HttpTexture, HttpTexture)
 
-local HttpTextureLoader = {}
 HttpTextureLoader.Queue = {}
 
 function HttpTextureLoader.initialize()
