@@ -197,7 +197,7 @@ local HttpTexture = {
 				return
 			end
 
-			HttpTextureLoader.Panel:AddFunction("sf", "imageLoaded", function(w, h) timer.Simple(0, function() self:onload(w, h) end) end)
+			HttpTextureLoader.Panel:AddFunction("sf", "imageLoaded", function(w, h) timer.Simple(0, function() self:layout(w, h) end) end)
 			HttpTextureLoader.Panel:AddFunction("sf", "imageErrored", function() timer.Simple(0, function() self:destroy() end) end)
 			HttpTextureLoader.Panel:RunJavascript(
 			[[img.removeAttribute("width");
@@ -218,22 +218,20 @@ local HttpTexture = {
 				local content_type = headers["Content-Type"] or headers["content-type"]
 				local data = util.Base64Encode(body, true)
 				
-				self.url = table.concat({
-					"data:", content_type, ";base64,", data
-				}, "")
+				self.url = table.concat({"data:", content_type, ";base64,", data})
 
 				self:load()
 			end, function() self:destroy() end)
 		end,
 
-		onload = function(self, w, h)
+		layout = function(self, w, h)
 			if self:badnewstate(self.LAYOUT) then return end
 
 			if self.usedlayout then self:render() return end
 
 			if self.callback then
 				self.callback(w, h, function(x,y,w,h,pixelated)
-					self:layout(x,y,w,h,pixelated)
+					self:applyLayout(x,y,w,h,pixelated)
 				end)
 			end
 
@@ -243,7 +241,7 @@ local HttpTexture = {
 			end
 		end,
 
-		layout = function(self,x,y,w,h,pixelated)
+		applyLayout = function(self,x,y,w,h,pixelated)
 			if self.usedlayout then SF.Throw("You can only use layout once", 3) end
 			checkluatype(x, TYPE_NUMBER, 2)
 			checkluatype(y, TYPE_NUMBER, 2)
