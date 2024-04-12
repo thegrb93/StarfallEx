@@ -206,7 +206,6 @@ local HttpTexture = {
 			img.style.top="0px";
 			img.src="]] .. string.JavascriptSafe(self.url) .. [[";]]..
 			(BRANCH == "unknown" and "\nif(img.complete)renderImage();" or ""))
-			HttpTextureLoader.Panel:Show()
 		end,
 
 		loadAwesomium = function(self)
@@ -257,9 +256,11 @@ local HttpTexture = {
 
 		render = function(self)
 			if self:badnewstate(self.RENDER) then return end
-
+			local frame = 0
 			hook.Add("PreRender","SF_HTMLPanelCopyTexture",function()
 				HttpTextureLoader.Panel:UpdateHTMLTexture()
+				-- Running UpdateHTMLTexture a few times seems to fix materials not rendering
+				if frame<2 then frame = frame + 1 return end
 				local mat = HttpTextureLoader.Panel:GetHTMLMaterial()
 				if mat then
 					render.PushRenderTarget(self.texture)
@@ -307,7 +308,6 @@ function HttpTextureLoader.initialize()
 	if not Panel then
 		Panel = vgui.Create("DHTML")
 		Panel:SetSize(1024, 1024)
-		Panel:SetAlpha(0)
 		Panel:SetMouseInputEnabled(false)
 		Panel:SetHTML(
 		[[<html style="overflow:hidden"><body><script>
@@ -360,7 +360,6 @@ function HttpTextureLoader.pop()
 		HttpTextureLoader.nextRequest()
 	else
 		timer.Remove("SF_URLTextureTimeout")
-		HttpTextureLoader.Panel:Hide()
 	end
 end
 
