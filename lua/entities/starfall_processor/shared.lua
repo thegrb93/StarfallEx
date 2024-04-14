@@ -96,6 +96,10 @@ function ENT:OnRemove(fullsnapshot)
 end
 
 function ENT:SetupFiles(sfdata)
+	if self.instance then
+		self:Destroy()
+	end
+
 	self.sfdata = sfdata
 	self.owner = sfdata.owner
 	sfdata.proc = self

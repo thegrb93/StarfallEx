@@ -1,7 +1,6 @@
 include("shared.lua")
 ENT.RenderGroup = RENDERGROUP_OPAQUE
 
-ENT.IsHologram = true
 ENT.DefaultMaterial = Material( "hunter/myplastic" )
 ENT.Material = ENT.DefaultMaterial
 
