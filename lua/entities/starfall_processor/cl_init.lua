@@ -143,7 +143,6 @@ net.Receive("starfall_processor_download", function(len)
 			local function setup()
 				sfdata.proc = proc
 				sfdata.owner = owner
-				proc:Destroy()
 				proc:SetupFiles(sfdata)
 			end
 
@@ -155,7 +154,7 @@ net.Receive("starfall_processor_download", function(len)
 				end)
 			end
 			SF.WaitForEntity(sfdata.procindex, sfdata.proccreateindex, function(e)
-				proc = e if proc and owner then setup() end
+				proc = e if proc and proc:GetClass()=="starfall_processor" and owner then setup() end
 			end)
 		end
 	end)
