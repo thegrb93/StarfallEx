@@ -167,11 +167,11 @@ if SERVER then
 	add("PlayerSay", nil, nil, returnOnlyOnYourself, true)
 	
 	-- Serverside implementation of playerchat
-	gameevent.Listen( "player_say" )
-	hook.Add( "player_say", "playerchat", function( data )
+	gameevent.Listen("player_say")
+	add("player_say", "playerchat", function( data )
 		local ply = Player(data.userid)
 		return true, {instance.WrapObject(ply), data.text, data.teamonly, not ply:Alive()}
-	end )
+	end)
 
 	--- Called when a players sprays their logo
 	-- @name PlayerSpray
