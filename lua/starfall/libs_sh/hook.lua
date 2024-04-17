@@ -165,6 +165,13 @@ if SERVER then
 	-- @param boolean teamChat True if team chat
 	-- @return string? New text. "" to stop from displaying. Nil to keep original.
 	add("PlayerSay", nil, nil, returnOnlyOnYourself, true)
+	
+	-- Serverside implementation of playerchat
+	gameevent.Listen("player_say")
+	add("player_say", "playerchat", function(instance, data)
+		local ply = Player(data.userid)
+		return true, {instance.WrapObject(ply), data.text, data.teamonly, not ply:Alive()}
+	end)
 
 	--- Called when a players sprays their logo
 	-- @name PlayerSpray
@@ -265,7 +272,7 @@ else
 	--- Called when a player's chat message is printed to the chat window
 	-- @name PlayerChat
 	-- @class hook
-	-- @client
+	-- @shared
 	-- @param Player ply Player that said the message
 	-- @param string text The message
 	-- @param boolean team Whether the message was team only
