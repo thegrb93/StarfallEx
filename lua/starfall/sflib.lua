@@ -1105,7 +1105,7 @@ function SF.EntIsReady(ent)
 	elseif class=="starfall_hologram" then
 		return ent.SetClip~=nil
 	elseif class=="starfall_prop" then
-		return ent.IsSFProp~=nil
+		return ent.BuildPhysics~=nil
 	elseif class=="starfall_screen" or class=="starfall_hud" then
 		return ent:IsScripted()
 	else
