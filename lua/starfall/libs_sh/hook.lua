@@ -269,7 +269,7 @@ else
 	-- @client
 	add("FinishChat")
 
-	--- Called when a player's chat message is printed to the chat window
+	--- Called when a chat message is printed your chat window (chip owner only)
 	-- @name PlayerChat
 	-- @class hook
 	-- @shared
@@ -278,7 +278,10 @@ else
 	-- @param boolean team Whether the message was team only
 	-- @param boolean isdead Whether the message was send from a dead player
 	-- @return boolean Return true to hide the message. Can only be done for the owner of the chip
-	add("OnPlayerChat", "playerchat", nil, function(instance, ret)
+	add("OnPlayerChat", "playerchat", function(instance, ply, text, teamChat, isDead)
+		if ply~=LocalPlayer() then return false end
+		return true, {instance.WrapObject(ply), text, teamChat, isDead}
+	end, function(instance, ret)
 		if ret[1] and instance.player == LocalPlayer() and ret[2] then return true end
 	end)
 
