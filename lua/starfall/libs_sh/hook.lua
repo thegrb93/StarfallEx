@@ -168,7 +168,7 @@ if SERVER then
 	
 	-- Serverside implementation of playerchat
 	gameevent.Listen("player_say")
-	add("player_say", "playerchat", function( data )
+	add("player_say", "playerchat", function(instance, data)
 		local ply = Player(data.userid)
 		return true, {instance.WrapObject(ply), data.text, data.teamonly, not ply:Alive()}
 	end)
