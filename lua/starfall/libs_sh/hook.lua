@@ -269,20 +269,22 @@ else
 	-- @client
 	add("FinishChat")
 
-	--- Called when a chat message is printed your chat window (chip owner only)
+	--- Called when a chat message is printed in the local player chat window (only owner client can see message from other than local player or owner)
 	-- @name PlayerChat
 	-- @class hook
-	-- @shared
+	-- @client
 	-- @param Player ply Player that said the message
 	-- @param string text The message
 	-- @param boolean team Whether the message was team only
 	-- @param boolean isdead Whether the message was send from a dead player
-	-- @return boolean Return true to hide the message. Can only be done for the owner of the chip
+	-- @return boolean Return true to hide the message. Can only be done on message sent by the owner of the chip if local player is not the owner
 	add("OnPlayerChat", "playerchat", function(instance, ply, text, teamChat, isDead)
-		if ply~=LocalPlayer() then return false end
+		if LocalPlayer() ~= instance.player and (ply ~= LocalPlayer() and ply ~= instance.player) then
+			return false
+		end
 		return true, {instance.WrapObject(ply), text, teamChat, isDead}
-	end, function(instance, ret)
-		if ret[1] and instance.player == LocalPlayer() and ret[2] then return true end
+	end, function(instance, ret, ply)
+		if ret[1] and (instance.player == ply or instance.player == LocalPlayer()) and ret[2] then return true end
 	end)
 
 	--- Called when the player's chat box text changes.
