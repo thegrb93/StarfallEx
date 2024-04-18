@@ -383,11 +383,7 @@ add("PlayerFootstep", nil, function(instance, ply, pos, foot, sound, volume)
         sound,
         volume,
     }
-end, function(instance, args, ply)
-    if args[1] and args[2] == true and ply == instance.player then
-        return true
-    end
-end)
+end, returnOnlyOnYourself end)
 
 --- Called when a player presses a key
 -- @name KeyPress
