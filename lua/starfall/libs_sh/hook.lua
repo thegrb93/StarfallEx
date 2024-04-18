@@ -383,7 +383,7 @@ add("PlayerFootstep", nil, function(instance, ply, pos, foot, sound, volume)
         sound,
         volume,
     }
-end, returnOnlyOnYourself end)
+end, returnOnlyOnYourself )
 
 --- Called when a player presses a key
 -- @name KeyPress
