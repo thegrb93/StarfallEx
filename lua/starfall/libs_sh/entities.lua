@@ -1895,4 +1895,12 @@ function ents_methods:mapCreationID()
 	return getent(self):MapCreationID()
 end
 
+--- Returns entity's networked variables table (data table).
+-- @shared
+-- @return table The networked variables table.
+function ents_methods:getNetworkVars()
+    return instance.Sanitize(getent(self):GetNetworkVars())
+end
+
+	
 end
