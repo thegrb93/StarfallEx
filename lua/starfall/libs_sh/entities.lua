@@ -1897,9 +1897,10 @@ end
 
 --- Returns entity's networked variables table (data table).
 -- @shared
--- @return table The networked variables table.
+-- @return table The networked variables table of the entity or nil if it doesn't have one.
 function ents_methods:getNetworkVars()
-    return instance.Sanitize(getent(self):GetNetworkVars())
+    local ent = getent(self)
+    return istable(ent.dt) and instance.Sanitize(ent:GetNetworkVars()) or nil
 end
 
 	
