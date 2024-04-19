@@ -279,7 +279,7 @@ else
 	-- @param boolean isdead Whether the message was send from a dead player
 	-- @return boolean Return true to hide the message. Can only be done for the owner of the chip
 	add("OnPlayerChat", "playerchat", function(instance, ply, text, teamChat, isDead)
-		if ply~=LocalPlayer() then return false end
+		if instance.player~=LocalPlayer() then return false end
 		return true, {instance.WrapObject(ply), text, teamChat, isDead}
 	end, function(instance, ret)
 		if ret[1] and instance.player == LocalPlayer() and ret[2] then return true end
