@@ -170,7 +170,7 @@ SF.BurstObject = {
 			return ret
 		end,
 		use = function(self, ply, amount)
-			if IsValid(ply) or ply==SF.Superuser then
+			if ply==SF.Superuser or IsValid(ply) then
 				local obj = self:get(ply)
 				local new = self:calc(obj) - amount
 				if new < 0 and ply~=SF.Superuser then
@@ -182,7 +182,7 @@ SF.BurstObject = {
 			end
 		end,
 		check = function(self, ply)
-			if IsValid(ply) or ply==SF.Superuser then
+			if ply==SF.Superuser or IsValid(ply) then
 				local obj = self:get(ply)
 				obj.val = self:calc(obj)
 				return obj.val
