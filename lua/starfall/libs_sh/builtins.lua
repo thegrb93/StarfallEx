@@ -531,6 +531,10 @@ if SERVER then
 	-- @param ... printArgs Values to print. Colors before text will set the text color
 	function builtins_library.print(...)
 		local data, strlen, size = argsToChat(...)
+		if instance.player == SF.Superuser then
+			print("[SF] ".. ...)
+			return
+		end
 		printBurst:use(instance.player, size)
 		sendPrintToPlayer(instance.player, data, false)
 	end
@@ -637,6 +641,10 @@ else
 	-- @param number mtype How the message should be displayed. See http://wiki.facepunch.com/gmod/Enums/HUD
 	-- @param string text The message text.
 	function builtins_library.printMessage(mtype, text)
+		if instance.player == SF.Superuser then
+			LocalPlayer():PrintMessage(mtype, text)
+			return
+		end
 		if instance.player ~= LocalPlayer() then return end
 		checkluatype(text, TYPE_STRING)
 		instance.player:PrintMessage(mtype, text)
@@ -645,6 +653,9 @@ else
 	function builtins_library.print(...)
 		if instance.player == LocalPlayer() then
 			chat.AddText(unpack((argsToChat(...))))
+		end
+		if instance.player == SF.Superuser then
+			chat.AddText(unpack((argsToChat(builtins_library.Color(5,125,222), "[SF] ", builtins_library.Color(255,255,255), ...))))
 		end
 	end
 
@@ -670,7 +681,7 @@ else
 
 	function builtins_library.printTable(tbl)
 		checkluatype(tbl, TYPE_TABLE)
-		if instance.player == LocalPlayer() then
+		if instance.player == LocalPlayer() or instance.player == SF.Superuser then
 			printTableX(tbl, 0, { tbl = true })
 		end
 	end
