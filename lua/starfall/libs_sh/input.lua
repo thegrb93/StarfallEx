@@ -32,9 +32,9 @@ if game.SinglePlayer() then
 			local down = net.ReadBool()
 			local key = net.ReadInt(16)
 			if down then
-				hook.Run("PlayerButtonDown", LocalPlayer(), key)
+				hook.Run("SF_PlayerButtonDown", LocalPlayer(), key)
 			else
-				hook.Run("PlayerButtonUp", LocalPlayer(), key)
+				hook.Run("SF_PlayerButtonUp", LocalPlayer(), key)
 			end
 		end)
 	end
@@ -103,19 +103,24 @@ local function CheckButtonPerms(instance, ply, button)
 	return true, { button }
 end
 
---- Called when a button is pressed
--- @client
--- @name inputPressed
--- @class hook
--- @param number button Number of the button
-SF.hookAdd("PlayerButtonDown", "inputpressed", CheckButtonPerms)
+if game.SinglePlayer() then
+	SF.hookAdd("SF_PlayerButtonDown", "inputpressed", CheckButtonPerms)
+	SF.hookAdd("SF_PlayerButtonUp", "inputreleased", CheckButtonPerms)
+else
+	--- Called when a button is pressed
+	-- @client
+	-- @name inputPressed
+	-- @class hook
+	-- @param number button Number of the button
+	SF.hookAdd("PlayerButtonDown", "inputpressed", CheckButtonPerms)
 
---- Called when a button is released
--- @client
--- @name inputReleased
--- @class hook
--- @param number button Number of the button
-SF.hookAdd("PlayerButtonUp", "inputreleased", CheckButtonPerms)
+	--- Called when a button is released
+	-- @client
+	-- @name inputReleased
+	-- @class hook
+	-- @param number button Number of the button
+	SF.hookAdd("PlayerButtonUp", "inputreleased", CheckButtonPerms)
+end
 
 --- Called when the mouse is moved
 -- @client
