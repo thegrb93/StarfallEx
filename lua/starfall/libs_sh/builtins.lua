@@ -63,6 +63,7 @@ end
 --- Returns whoever created the chip
 -- @return Player Owner of the chip
 function builtins_library.owner()
+	if instance.player==SF.Superuser then SF.Throw("Superuser chips don't have an owner", 2) end
 	return instance.Types.Player.Wrap(instance.player)
 end
 
