@@ -147,7 +147,7 @@ local invalidators = {
 local printC = function(...) (SERVER and MsgC or chat.AddText)(Color(255, 255, 255), "[", Color(11, 147, 234), "Starfall", Color(255, 255, 255), "]: ", ...) if SERVER then MsgC("\n") end end
 
 function P.savePermissions()
-	file.Write(P.filename, util.TableToJSON(P.settings))
+	file.Write(P.filename, util.TableToJSON(P.settings, true))
 end
 
 -- Load the permission settings for each provider
