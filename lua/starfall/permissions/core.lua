@@ -82,9 +82,6 @@ local Privilege = {
 			self:buildcheck()
 			return saveSettings
 		end,
-		check = function(self)
-			error("Check function isn't set! id="..self.id.." name="..self.name)
-		end
 	},
 	__call = function(p, id, name, description, providerconfig)
 		if not providerconfig then providerconfig = {} end
@@ -100,7 +97,8 @@ local Privilege = {
 			id = id,
 			name = name,
 			description = description,
-			providerconfig = providerconfig
+			providerconfig = providerconfig,
+			check = function() error("Check function isn't set! id="..id.." name="..name) end
 		}, p)
 	end
 }
