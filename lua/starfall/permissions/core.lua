@@ -82,6 +82,9 @@ local Privilege = {
 			self:buildcheck()
 			return saveSettings
 		end,
+		check = function(self)
+			error("Check function isn't set! id="..self.id.." name="..self.name)
+		end
 	},
 	__call = function(p, id, name, description, providerconfig)
 		if not providerconfig then providerconfig = {} end
@@ -151,6 +154,13 @@ end
 
 -- Load the permission settings for each provider
 function P.loadPermissions()
+	if not pcall(P.loadPermissionsSafe) then
+		-- Errored, try deleting the old config and trying again
+		file.Delete(P.filename, "DATA")
+		pcall(P.loadPermissionsSafe)
+	end
+end
+function P.loadPermissionsSafe()
 	local saveSettings = not file.Exists(P.filename, "DATA")
 	P.settings = setmetatable(util.JSONToTable(file.Read(P.filename) or "") or {}, getmetatable(P.settings))
 
