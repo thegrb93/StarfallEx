@@ -532,7 +532,7 @@ if SERVER then
 	function builtins_library.print(...)
 		local data, strlen, size = argsToChat(...)
 		if instance.player == SF.Superuser then
-			print("[SF] ".. ...)
+			print("[SF] ", unpack(data))
 			return
 		end
 		printBurst:use(instance.player, size)
