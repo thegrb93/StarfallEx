@@ -144,7 +144,10 @@ end
 -- @return string The converted data
 function http_library.base64Encode(data)
 	checkluatype(data, TYPE_STRING)
-	return string.gsub(util.Base64Encode(data),"\n","")
+	if #data > 64e6 then SF.Throw("String exceeds length limit!", 2) end
+	local ret = string.gsub(util.Base64Encode(data),"\n","")
+	instance:checkCpu()
+	return ret
 end
 
 --- Converts data from base64 format
@@ -159,6 +162,7 @@ http_library.base64Decode = util.Base64Decode
 -- @return string The converted data
 function http_library.urlEncode(data)
 	checkluatype(data, TYPE_STRING)
+	if #data > 64e3 then SF.Throw("String exceeds length limit!", 2) end
 	data = string.gsub(data, "[^%w_~%.%-%(%)!%*]", function(char)
 		return string.format("%%%02X", string.byte(char))
 	end)
@@ -170,6 +174,7 @@ end
 -- @return string The converted data
 function http_library.urlDecode(data)
 	checkluatype(data, TYPE_STRING)
+	if #data > 64e3 then SF.Throw("String exceeds length limit!", 2) end
 	data = string.gsub(data, "%%(..)", function(char)
 		char = tonumber(char, 16)
 		if char==nil or char < 0 or char > 255 then error("Invalid '%' value found: "..char) end
@@ -182,6 +187,8 @@ end
 -- @param string url The url to convert
 -- @return string The converted url
 function http_library.urlGoogleDriveToRaw(url)
+	checkluatype(url, TYPE_STRING)
+	if #url > 64e3 then SF.Throw("String exceeds length limit!", 2) end
 	local id = string.match(url, "https://drive%.google%.com/file/d/([^/]+)/view") or SF.Throw("Failed to parse google drive link!", 2)
 	return "https://drive.google.com/uc?export=download&id="..id
 end
@@ -190,6 +197,8 @@ end
 -- @param string url The url to convert
 -- @return string The converted url
 function http_library.urlDropboxToRaw(url)
+	checkluatype(url, TYPE_STRING)
+	if #url > 64e3 then SF.Throw("String exceeds length limit!", 2) end
 	return string.gsub(url, "www%.dropbox%.com", "dl%.dropboxusercontent%.com")
 end
 
