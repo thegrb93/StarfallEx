@@ -24,13 +24,14 @@ local Privilege = {
 				if provider.overridable then overridable = true end
 				if check == "block" then
 					if overridable then
-						checks[#checks+1] = function() return false, "This function's permission is blocked!" end
+						check = function() return false, "This function's permission is blocked!" end
 					else
 						allAllow = false
 						anyBlock = true
 						break
 					end
-				elseif check ~= "allow" then
+				end
+				if check ~= "allow" then
 					allAllow = false
 					checks[#checks+1] = check
 				end
@@ -97,7 +98,8 @@ local Privilege = {
 			id = id,
 			name = name,
 			description = description,
-			providerconfig = providerconfig
+			providerconfig = providerconfig,
+			check = function() error("Check function isn't set! id="..id.." name="..name) end
 		}, p)
 	end
 }
@@ -146,11 +148,21 @@ local invalidators = {
 local printC = function(...) (SERVER and MsgC or chat.AddText)(Color(255, 255, 255), "[", Color(11, 147, 234), "Starfall", Color(255, 255, 255), "]: ", ...) if SERVER then MsgC("\n") end end
 
 function P.savePermissions()
-	file.Write(P.filename, util.TableToJSON(P.settings))
+	local meta = getmetatable(P.settings)
+	setmetatable(P.settings, nil)
+	file.Write(P.filename, util.TableToJSON(P.settings, true))
+	setmetatable(P.settings, meta)
 end
 
 -- Load the permission settings for each provider
 function P.loadPermissions()
+	if not pcall(P.loadPermissionsSafe) then
+		-- Errored, try deleting the old config and trying again
+		file.Delete(P.filename, "DATA")
+		pcall(P.loadPermissionsSafe)
+	end
+end
+function P.loadPermissionsSafe()
 	local saveSettings = not file.Exists(P.filename, "DATA")
 	P.settings = setmetatable(util.JSONToTable(file.Read(P.filename) or "") or {}, getmetatable(P.settings))
 
