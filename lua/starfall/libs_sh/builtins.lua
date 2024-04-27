@@ -641,20 +641,18 @@ else
 	-- @param number mtype How the message should be displayed. See http://wiki.facepunch.com/gmod/Enums/HUD
 	-- @param string text The message text.
 	function builtins_library.printMessage(mtype, text)
-		if instance.player == SF.Superuser then
-			LocalPlayer():PrintMessage(mtype, text)
-			return
-		end
-		if instance.player ~= LocalPlayer() then return end
 		checkluatype(text, TYPE_STRING)
-		instance.player:PrintMessage(mtype, text)
+		if instance.player == LocalPlayer() then
+			instance.player:PrintMessage(mtype, text)
+		elseif instance.player == SF.Superuser then
+			LocalPlayer():PrintMessage(mtype, text)
+		end
 	end
 
 	function builtins_library.print(...)
 		if instance.player == LocalPlayer() then
 			chat.AddText(unpack((argsToChat(...))))
-		end
-		if instance.player == SF.Superuser then
+		elseif instance.player == SF.Superuser then
 			chat.AddText(unpack((argsToChat(builtins_library.Color(5,125,222), "[SF] ", builtins_library.Color(255,255,255), ...))))
 		end
 	end
