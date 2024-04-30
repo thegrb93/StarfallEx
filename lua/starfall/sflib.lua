@@ -1542,10 +1542,10 @@ else
 
 	function SF.HTTPNotify(ply, url)
 		local plyStr
-		if IsValid(ply) then
-			plyStr = ply:Nick() .. " [" .. ply:SteamID() .. "]"
-		elseif ply == SF.Superuser then
+		if ply == SF.Superuser then
 			plyStr = "Superuser"
+		elseif IsValid(ply) then
+			plyStr = ply:Nick() .. " [" .. ply:SteamID() .. "]"
 		else
 			plyStr = "Invalid user"
 		end
