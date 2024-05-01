@@ -30,7 +30,7 @@ SF.RegisterLibrary("prop")
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
-local propConfig = {clean = true, undo = false}
+local propConfig = {clean = true, undo = false, propList = entList}
 instance.prop = propConfig
 
 instance:AddHook("deinitialize", function()
