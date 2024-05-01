@@ -696,13 +696,13 @@ end
 
 --- Sets whether the chip should remove created props when the chip is removed
 -- @param boolean on Whether the props should be cleaned or not
-function props_library.setpropConfig.clean(on)
+function props_library.setPropClean(on)
 	propConfig.clean = on
 end
 
 --- Sets whether the props should be undo-able
 -- @param boolean on Whether the props should be undo-able
-function props_library.setpropConfig.undo(on)
+function props_library.setPropUndo(on)
 	propConfig.undo = on
 end
 
