@@ -31,7 +31,7 @@ return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 local propConfig = {clean = true, undo = false, propList = entList}
-instance.props = propConfig
+instance.data.props = propConfig
 
 instance:AddHook("deinitialize", function()
 	entList:deinitialize(instance, propConfig.clean)
