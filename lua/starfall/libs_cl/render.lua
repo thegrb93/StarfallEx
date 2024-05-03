@@ -15,6 +15,7 @@ local col_SetUnpacked = col_meta.SetUnpacked
 local col_Unpack = col_meta.Unpack
 local vec_meta = getmetatable(Vector(0, 0, 0))
 local vec_SetUnpacked = vec_meta.SetUnpacked
+local vec_Unpack = vec_meta.Unpack
 
 registerprivilege("render.screen", "Render Screen", "Allows the user to render to a starfall screen", { client = {} })
 registerprivilege("render.hud", "Render Hud", "Allows the user to render to your hud", { client = {} })
@@ -2357,8 +2358,8 @@ local startpos_vec, endpos_vec = Vector(0, 0, 0), Vector(0, 0, 0)
 function render_library.traceSurfaceColor(startpos, endpos)
 	vec_SetUnpacked(startpos_vec, startpos[1], startpos[2], startpos[3])
 	vec_SetUnpacked(endpos_vec, endpos[1], endpos[2], endpos[3])
-	local color = render.GetSurfaceColor(startpos_vec, endpos_vec)
-	return setmetatable({color.x * 255, color.y * 255, color.z * 255}, col_meta)
+	local r, g, b = vec_Unpack(render.GetSurfaceColor(startpos_vec, endpos_vec))
+	return setmetatable({r * 255, g * 255, b * 255, 255}, col_meta)
 end
 
 --- Checks if the client is connected to a HUD component that's linked to this chip
