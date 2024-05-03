@@ -30,11 +30,11 @@ SF.RegisterLibrary("prop")
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
-local propClean = true
-local propUndo = false
+local propConfig = {clean = true, undo = false, propList = entList}
+instance.data.props = propConfig
 
 instance:AddHook("deinitialize", function()
-	entList:deinitialize(instance, propClean)
+	entList:deinitialize(instance, propConfig.clean)
 end)
 
 local props_library = instance.Libraries.prop
@@ -86,7 +86,7 @@ function props_library.create(pos, ang, model, frozen)
 	if ply ~= SF.Superuser then
 		gamemode.Call("PlayerSpawnedProp", ply, model, propent)
 
-		if propUndo then
+		if propConfig.undo then
 			undo.Create("Prop")
 				undo.SetPlayer(ply)
 				undo.AddEntity(propent)
@@ -135,7 +135,7 @@ function props_library.createRagdoll(model, frozen)
 	if ply ~= SF.Superuser then
 		gamemode.Call("PlayerSpawnedRagdoll", ply, model, ent)
 
-		if propUndo then
+		if propConfig.undo then
 			undo.Create("Ragdoll")
 				undo.SetPlayer(ply)
 				undo.AddEntity(ent)
@@ -228,7 +228,7 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	if ply ~= SF.Superuser then
 		gamemode.Call("PlayerSpawnedProp", ply, "starfall_prop", propent)
 
-		if propUndo then
+		if propConfig.undo then
 			undo.Create("Prop")
 				undo.SetPlayer(ply)
 				undo.AddEntity(propent)
@@ -296,7 +296,7 @@ function props_library.createComponent(pos, ang, class, model, frozen)
 	end
 
 	if ply ~= SF.Superuser then
-		if propUndo then
+		if propConfig.undo then
 			undo.Create(class)
 				undo.SetPlayer(ply)
 				undo.AddEntity(comp)
@@ -385,7 +385,7 @@ function props_library.createSeat(pos, ang, model, frozen)
 	if ply ~= SF.Superuser then
 		prop:SetCreator( ply )
 
-		if propUndo then
+		if propConfig.undo then
 			undo.Create("SF")
 				undo.SetPlayer(ply)
 				undo.AddEntity(prop)
@@ -654,7 +654,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		if ply ~= SF.Superuser then
 			entity:SetCreator( ply )
 
-			if propUndo then
+			if propConfig.undo then
 				undo.Create("SF")
 					undo.SetPlayer(ply)
 					undo.AddEntity(entity)
@@ -697,13 +697,13 @@ end
 --- Sets whether the chip should remove created props when the chip is removed
 -- @param boolean on Whether the props should be cleaned or not
 function props_library.setPropClean(on)
-	propClean = on
+	propConfig.clean = on
 end
 
 --- Sets whether the props should be undo-able
 -- @param boolean on Whether the props should be undo-able
 function props_library.setPropUndo(on)
-	propUndo = on
+	propConfig.undo = on
 end
 
 end
