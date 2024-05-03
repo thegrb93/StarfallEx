@@ -338,7 +338,8 @@ end
 function HttpTextureLoader.request_preInit(request)
 	HttpTextureLoader.initialize()
 	HttpTextureLoader.request = HttpTextureLoader.request_postInit
-	HttpTextureLoader.request(request)
+	HttpTextureLoader.Queue[1] = request
+	HttpTextureLoader.Panel.OnFinishLoadingDocument = HttpTextureLoader.nextRequest
 end
 HttpTextureLoader.request = HttpTextureLoader.request_preInit
 
