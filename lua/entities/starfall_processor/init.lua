@@ -3,6 +3,7 @@ AddCSLuaFile("shared.lua")
 include("shared.lua")
 
 local IsValid = FindMetaTable("Entity").IsValid
+local IsWorld = FindMetaTable("Entity").IsWorld
 
 function ENT:Initialize()
 	self:PhysicsInit(SOLID_VPHYSICS)
@@ -119,6 +120,7 @@ function ENT:GetSendData(toowner)
 end
 
 function ENT:SendCode(recipient)
+	if not (IsValid(self.owner) or IsWorld(self.owner)) then return end
 	if not self.sfsenddata then return end
 	if self.sfownerdata then -- Send specific data for owner if there are owner-only files
 		local others = {}
