@@ -298,9 +298,12 @@ setmetatable(SF.LimitObject, SF.LimitObject)
 --- Returns a class that handles entities spawned by an instance
 SF.EntManager = {
 	__index = {
-		register = function(self, instance, ent)
+		register = function(self, instance, ent, onremove)
 			if not self.nocallonremove then
-				local function sf_on_remove() self:onremove(instance, ent) end
+				local function sf_on_remove()
+					self:onremove(instance, ent)
+					if onremove then onremove() end
+				end
 				ent.sf_on_remove = sf_on_remove
 				SF.CallOnRemove(ent, "entmanager", sf_on_remove)
 			end

@@ -211,7 +211,9 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	propent:SetAngles(ang)
 	propent.Mesh = uwVertices
 	propent:Spawn()
-	entList:register(instance, propent)
+	entList:register(instance, propent, function()
+		plyVertexCount:free(ply, totalVertices)
+	end)
 
 	local physobj = propent:GetPhysicsObject()
 	if not IsValidPhys(physobj) then
