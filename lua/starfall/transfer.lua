@@ -134,7 +134,7 @@ if SERVER then
 	net.Receive("starfall_error", function(_, ply)
 		local chip = net.ReadEntity()
 		if not IsValid(chip) then return end
-		if chip.ErroredPlayers[ply] then return end
+		if not chip.ErroredPlayers or chip.ErroredPlayers[ply] then return end
 		chip.ErroredPlayers[ply] = true
 
 		local message, traceback, should_notify = net.ReadString(), net.ReadString(), net.ReadBool()
