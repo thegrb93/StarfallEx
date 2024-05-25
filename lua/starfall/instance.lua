@@ -707,7 +707,7 @@ function SF.Instance:deinitialize()
 	end
 
 	self.error = true
-	local noop = function() end
+	local noop = function() return {} end
 	self.runScriptHook = noop
 	self.runScriptHookForResult = noop
 	self.runFunction = noop
