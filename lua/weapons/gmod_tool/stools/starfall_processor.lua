@@ -126,7 +126,10 @@ function TOOL:LeftClick(trace)
 	if ent:IsValid() and ent:GetClass() == "starfall_processor" then
 		sf = ent
 	else
-		local model = self:GetClientInfo("Model")
+		local model = self:GetClientInfo("ScriptModel")
+		if model=="" or not (util.IsValidModel(model) and util.IsValidProp(model)) then
+			model = self:GetClientInfo("Model")
+		end
 		if not self:GetSWEP():CheckLimit("starfall_processor") then return false end
 
 		local Ang = trace.HitNormal:Angle()
@@ -200,7 +203,7 @@ function TOOL:Think()
 	-- Ghost code
 	if (SERVER and game.SinglePlayer()) or (CLIENT and not game.SinglePlayer()) then
 		local model = self:GetClientInfo("ScriptModel")
-		if model=="" then
+		if model=="" or not (util.IsValidModel(model) and util.IsValidProp(model)) then
 			model = self:GetClientInfo("Model")
 		end
 		local ghost = self.GhostEntity
