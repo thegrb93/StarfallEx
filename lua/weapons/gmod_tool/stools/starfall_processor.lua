@@ -131,7 +131,7 @@ function TOOL:LeftClick(trace)
 			model = self:GetClientInfo("Model")
 		end
 
-		ok, model = pcall(SF.CheckModel, model, ply, true)
+		ok, error = pcall(SF.CheckModel, model, ply, true)
 		if not ok then
 			SF.AddNotify(ply, "Invalid chip model specified: " .. model, "ERROR", 7, "ERROR1")
 			return false
@@ -209,7 +209,7 @@ function TOOL:Think()
 	-- Ghost code
 	if (SERVER and game.SinglePlayer()) or (CLIENT and not game.SinglePlayer()) then
 		local model = self:GetClientInfo("ScriptModel")
-		if model=="" or not (util.IsValidModel(model) and util.IsValidProp(model)) then
+		if model=="" then
 			model = self:GetClientInfo("Model")
 		end
 		local ghost = self.GhostEntity
