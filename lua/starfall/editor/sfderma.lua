@@ -307,7 +307,7 @@ local function sort(tbl)
 	table.sort(sorted, function(a,b) return a[1]<b[1] end)
 	for k, v in pairs(sorted) do tbl[k] = v[2] end
 end
-local function addFiles(search, dir, node)
+local function addFiles(search, dir, node, expansions)
 	local found = false
 	local allFiles, allFolders = file.Find(dir .. "/*", "DATA")
 	allFiles = allFiles or {}
@@ -319,7 +319,11 @@ local function addFiles(search, dir, node)
 			local newNode = node:AddNode(v)
 			addDragHandling(newNode)
 			newNode:SetFolder(dir .. "/" .. v)
-			addFiles(search, dir .. "/" .. v, newNode)
+			local childExpansions = expansions[v]
+			addFiles(search, dir .. "/" .. v, newNode, childExpansions or {})
+			if childExpansions then
+				newNode:SetExpanded(true)
+			end
 		end
 		for k, v in pairs(allFiles) do
 			local fnode = node:AddNode(v, "icon16/page_white.png")
@@ -350,16 +354,33 @@ local function addFiles(search, dir, node)
 	return found
 end
 
-function PANEL:AddFiles(filter)
+local function getTreeExpansions(node)
+	local expanded = {}
+	for k, child in pairs(node:GetChildNodes()) do
+		if child:GetExpanded() then
+			local name = child:GetText()
+			expanded[name] = getTreeExpansions(child)
+		end
+	end
+	return expanded
+end
+
+function PANEL:AddFiles(filter, expansions)
 	if self.Root.ChildNodes then self.Root.ChildNodes:Clear() end
-	if addFiles(filter, "starfall", self.Root) then
+	if addFiles(filter, "starfall", self.Root, expansions or {}) then
 		self.Root:SetExpanded(true)
 	end
 	self.Root:SetExpanded(true)
 end
 
 function PANEL:ReloadTree()
-	self:AddFiles("")
+	print(self:GetParent().searchBox)
+	chat.AddText("Reloading tree")
+	if self:GetParent().searchBox:GetValue():PatternSafe() == "" then
+		self:AddFiles("", getTreeExpansions(self.Root))
+	else
+		self:AddFiles("")
+	end
 end
 
 function PANEL:DoRightClick(node)
@@ -507,11 +528,12 @@ function PANEL:Init()
 	self.Update:SetTall(20)
 	self.Update:Dock(BOTTOM)
 	self.Update:DockMargin(0, 0, 0, 0)
-	self.Update:SetText("Refresh")
+	self.Update:SetText("Refresh") 
 	self.Update.DoClick = function(button)
 		tree:ReloadTree()
 		searchBox:SetValue("Search...")
 	end
+	
 end
 function PANEL:GetComponents()
 	return self.searchBox, self.tree
