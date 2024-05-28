@@ -258,6 +258,7 @@ end
 function PANEL:Setup(folder)
 	self.folder = folder
 	self.Root = self.RootNode:AddNode(folder)
+	self.expansions = {}
 	addDragHandling(self.Root)
 	self.Root:SetDraggableName("sf_filenode")
 	self.Root:SetFolder(folder)
@@ -335,7 +336,8 @@ local function addFiles(search, dir, node, expansions)
 			local newNode = node:AddNode(v)
 			addDragHandling(newNode)
 			newNode:SetFolder(v)
-			if addFiles(search, dir .. "/" .. v, newNode) then
+			local childExpansions = expansions[v]
+			if addFiles(search, dir .. "/" .. v, newNode, childExpansions or {}) then
 				newNode:SetExpanded(true)
 				found = true
 			else
@@ -354,33 +356,41 @@ local function addFiles(search, dir, node, expansions)
 	return found
 end
 
-local function getTreeExpansions(node)
+local function getNodeExpansions(node)
 	local expanded = {}
 	for k, child in pairs(node:GetChildNodes()) do
 		if child:GetExpanded() then
 			local name = child:GetText()
-			expanded[name] = getTreeExpansions(child)
+			expanded[name] = getNodeExpansions(child)
 		end
 	end
 	return expanded
 end
 
-function PANEL:AddFiles(filter, expansions)
+function PANEL:UpdateNodeExpantions()
+	local expansions = getNodeExpansions(self.Root)
+	self.expansions = expansions
+end
+
+function PANEL:AddFiles(filter, keepExpanded)
 	if self.Root.ChildNodes then self.Root.ChildNodes:Clear() end
-	if addFiles(filter, "starfall", self.Root, expansions or {}) then
+	if addFiles(filter, "starfall", self.Root, keepExpanded and self.expansions or {}) then
 		self.Root:SetExpanded(true)
 	end
 	self.Root:SetExpanded(true)
 end
 
-function PANEL:ReloadTree()
-	print(self:GetParent().searchBox)
-	chat.AddText("Reloading tree")
-	if self:GetParent().searchBox:GetValue():PatternSafe() == "" then
-		self:AddFiles("", getTreeExpansions(self.Root))
-	else
-		self:AddFiles("")
+function PANEL:ReloadTree(updateExpanded)
+	if self:ShouldUpdateExpanded() then
+		self:UpdateNodeExpantions()
 	end
+
+	self:AddFiles("", true)
+end
+
+function PANEL:ShouldUpdateExpanded()
+	local searchStr = self:GetParent().searchBox:GetValue():PatternSafe()
+	return searchStr == "" or searchStr == "Search%.%.%."
 end
 
 function PANEL:DoRightClick(node)
@@ -506,6 +516,9 @@ function PANEL:Init()
 		if self:GetValue() == "Search..." then
 			self:SetValue("")
 		end
+		if tree:ShouldUpdateExpanded() then
+			tree:UpdateNodeExpantions()
+		end
 		searchBox:_OnGetFocus()
 	end
 
@@ -518,9 +531,8 @@ function PANEL:Init()
 	end
 
 	function searchBox:OnChange()
-
-		tree:AddFiles(self:GetValue():PatternSafe())
-
+		local searchStr = self:GetValue():PatternSafe()
+		tree:AddFiles(searchStr, searchStr == "")
 	end
 	self.searchBox = searchBox
 
@@ -528,12 +540,11 @@ function PANEL:Init()
 	self.Update:SetTall(20)
 	self.Update:Dock(BOTTOM)
 	self.Update:DockMargin(0, 0, 0, 0)
-	self.Update:SetText("Refresh") 
+	self.Update:SetText("Refresh")
 	self.Update.DoClick = function(button)
 		tree:ReloadTree()
 		searchBox:SetValue("Search...")
 	end
-	
 end
 function PANEL:GetComponents()
 	return self.searchBox, self.tree
