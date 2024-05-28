@@ -126,9 +126,15 @@ function TOOL:LeftClick(trace)
 	if ent:IsValid() and ent:GetClass() == "starfall_processor" then
 		sf = ent
 	else
-		local model = self:GetClientInfo("ScriptModel")
-		if model=="" or not (util.IsValidModel(model) and util.IsValidProp(model)) then
+		local ok, model = true, self:GetClientInfo("ScriptModel")
+		if model == "" then
 			model = self:GetClientInfo("Model")
+		end
+
+		ok, model = pcall(SF.CheckModel, model, ply, true)
+		if not ok then
+			SF.AddNotify(ply, "Invalid chip model specified: " .. model, "ERROR", 7, "ERROR1")
+			return false
 		end
 		if not self:GetSWEP():CheckLimit("starfall_processor") then return false end
 
