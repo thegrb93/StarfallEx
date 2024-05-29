@@ -210,9 +210,6 @@ function TOOL:Think()
 		if model == "" then
 			model = self:GetClientInfo("Model")
 		end
-		if not pcall(SF.CheckModel, model, ply, true) then
-			model = "models/spacecode/sfchip.mdl"
-		end
 
 		local ghost = self.GhostEntity
 		if not (ghost and ghost:IsValid() and ghost:GetModel() == model) then
