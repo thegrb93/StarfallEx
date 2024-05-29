@@ -126,12 +126,11 @@ function TOOL:LeftClick(trace)
 	if ent:IsValid() and ent:GetClass() == "starfall_processor" then
 		sf = ent
 	else
-		local ok_model, model = true, self:GetClientInfo("ScriptModel")
+		local model = self:GetClientInfo("ScriptModel")
 		if model == "" then
 			model = self:GetClientInfo("Model")
 		end
-		ok_model, model = pcall(SF.CheckModel, model, ply, true)
-		if not ok_model then
+		if not pcall(SF.CheckModel, model, ply, true) then
 			SF.AddNotify(ply, "Invalid chip model specified: " .. model, "ERROR", 7, "ERROR1")
 			return false
 		end
@@ -207,12 +206,11 @@ function TOOL:Think()
 
 	-- Ghost code
 	if (SERVER and game.SinglePlayer()) or (CLIENT and not game.SinglePlayer()) then
-		local ok_model, model = true, self:GetClientInfo("ScriptModel")
+		local model = self:GetClientInfo("ScriptModel")
 		if model == "" then
 			model = self:GetClientInfo("Model")
 		end
-		ok_model, model = pcall(SF.CheckModel, model, ply, true)
-		if not ok_model then
+		if not pcall(SF.CheckModel, model, ply, true) then
 			model = "models/spacecode/sfchip.mdl"
 		end
 
