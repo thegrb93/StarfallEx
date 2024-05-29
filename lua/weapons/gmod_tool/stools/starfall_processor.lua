@@ -126,7 +126,14 @@ function TOOL:LeftClick(trace)
 	if ent:IsValid() and ent:GetClass() == "starfall_processor" then
 		sf = ent
 	else
-		local model = self:GetClientInfo("Model")
+		local model = self:GetClientInfo("ScriptModel")
+		if model == "" then
+			model = self:GetClientInfo("Model")
+		end
+		if not pcall(SF.CheckModel, model, ply, true) then
+			SF.AddNotify(ply, "Invalid chip model specified: " .. model, "ERROR", 7, "ERROR1")
+			return false
+		end
 		if not self:GetSWEP():CheckLimit("starfall_processor") then return false end
 
 		local Ang = trace.HitNormal:Angle()
@@ -200,9 +207,10 @@ function TOOL:Think()
 	-- Ghost code
 	if (SERVER and game.SinglePlayer()) or (CLIENT and not game.SinglePlayer()) then
 		local model = self:GetClientInfo("ScriptModel")
-		if model=="" then
+		if model == "" then
 			model = self:GetClientInfo("Model")
 		end
+
 		local ghost = self.GhostEntity
 		if not (ghost and ghost:IsValid() and ghost:GetModel() == model) then
 			self:MakeGhostEntity(model, Vector(0, 0, 0), Angle(0, 0, 0))
