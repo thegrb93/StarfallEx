@@ -214,6 +214,8 @@ local invalid_filename_chars = {
 	['"'] = "",
 }
 
+local searchDebounceTimerId = "sf_editor_search_debounce"
+
 PANEL = {}
 
 function PANEL:Init()
@@ -380,17 +382,17 @@ function PANEL:AddFiles(filter, keepExpanded)
 	self.Root:SetExpanded(true)
 end
 
-function PANEL:ReloadTree(updateExpanded)
+function PANEL:ReloadTree()
 	if self:ShouldUpdateExpanded() then
 		self:UpdateNodeExpantions()
 	end
-
+	timer.Remove(searchDebounceTimerId)
 	self:AddFiles("", true)
 end
 
 function PANEL:ShouldUpdateExpanded()
 	local searchStr = self:GetParent().searchBox:GetValue():PatternSafe()
-	return searchStr == "" or searchStr == "Search%.%.%."
+	return searchStr == ""
 end
 
 function PANEL:DoRightClick(node)
@@ -508,14 +510,12 @@ function PANEL:Init()
 	self.tree = tree
 
 	local searchBox = vgui.Create("DTextEntry", self)
+	self.searchBox = searchBox
 	searchBox:Dock(TOP)
-	searchBox:SetValue("Search...")
+	searchBox:SetPlaceholderText("Search...")
 
 	searchBox._OnGetFocus = searchBox.OnGetFocus
 	function searchBox:OnGetFocus()
-		if self:GetValue() == "Search..." then
-			self:SetValue("")
-		end
 		if tree:ShouldUpdateExpanded() then
 			tree:UpdateNodeExpantions()
 		end
@@ -524,17 +524,26 @@ function PANEL:Init()
 
 	searchBox._OnLoseFocus = searchBox.OnLoseFocus
 	function searchBox:OnLoseFocus()
-		if self:GetValue() == "" then
-			self:SetText("Search...")
-		end
+		timer.Adjust(searchDebounceTimerId, 0)
 		searchBox:_OnLoseFocus()
 	end
 
 	function searchBox:OnChange()
-		local searchStr = self:GetValue():PatternSafe()
-		tree:AddFiles(searchStr, searchStr == "")
+		self:Debounce(function()
+			local searchStr = self:GetValue():PatternSafe()
+			tree:AddFiles(searchStr, searchStr == "")
+		end)
 	end
-	self.searchBox = searchBox
+
+	function searchBox:Debounce(callback)
+		timer.Create(searchDebounceTimerId, 0.5, 1, function()
+			callback()
+		end)
+	end
+
+	function searchBox:OnRemove()
+		timer.Remove(searchDebounceTimerId)
+	end
 
 	self.Update = vgui.Create("DButton", self)
 	self.Update:SetTall(20)
@@ -543,9 +552,10 @@ function PANEL:Init()
 	self.Update:SetText("Refresh")
 	self.Update.DoClick = function(button)
 		tree:ReloadTree()
-		searchBox:SetValue("Search...")
+		searchBox:SetValue("")
 	end
 end
+
 function PANEL:GetComponents()
 	return self.searchBox, self.tree
 end
