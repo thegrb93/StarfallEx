@@ -27,7 +27,7 @@ registerprivilege("entities.remove", "Remove", "Allows the user to remove entiti
 registerprivilege("entities.ignite", "Ignite", "Allows the user to ignite entities", { entities = {} })
 registerprivilege("entities.canTool", "CanTool", "Whether or not the user can use the toolgun on the entity", { entities = {} })
 registerprivilege("entities.use", "Use", "Whether or not the user can use the entity", { entities = {} })
-registerprivilege("entities.getTable", "GetTable", "Allows the user to get an entity's table", { entities = {} })
+registerprivilege("entities.getTable", "GetTable", "Allows the user to get an entity's table", { entities = {}, usergroups = { default = 1 } })
 
 local function checkvector(v)
 	if v[1]<-1e12 or v[1]>1e12 or v[1]~=v[1] or
@@ -935,7 +935,7 @@ function ents_methods:setPhysicsUpdateListener(func)
 	end
 end
 
---- Returns entity's table.
+--- Returns a copy of the entity's sanitized internal glua table.
 -- @return table The entity's table.
 function ents_methods:getTable()
     local ent = getent(self)
@@ -943,7 +943,7 @@ function ents_methods:getTable()
     return instance.Sanitize(ent:GetTable())
 end
 
---- Returns a variable from the entity's table.
+--- Returns a variable from the entity's internal glua table.
 -- @param string key The variable's key.
 -- @return any The variable.
 function ents_methods:getVar(key)
