@@ -8,10 +8,8 @@ registerprivilege("light.create", "Create dynamic lights.", "Allows creation of 
 local maxSize = CreateClientConVar( "sf_light_maxsize", "1024", true, false, "Max size lights can be" )
 
 SF.ResourceCounters.Lights = {icon = "icon16/lightbulb.png", count = function(ply)
-	local instances = SF.playerInstances[ply]
-	if not instances then return 0 end
 	local total = 0
-	for instance in pairs(instances) do
+	for instance in pairs(SF.playerInstances[ply]) do
 		total = total + table.Count(instance.data.light.lights)
 	end
 	return total
