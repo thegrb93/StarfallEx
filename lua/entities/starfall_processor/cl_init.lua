@@ -232,11 +232,9 @@ end, "Terminates a user's starfall chips clientside.", true)
 ---Terminates a user's starfall chips. Admin only
 SF.SteamIDConcommand("sf_kill", function( executor, ply )
 	if not executor:IsAdmin() then return end
-	if SF.playerInstances[ply] then
-		for instance, _ in pairs( SF.playerInstances[ply] ) do
-			net.Start( "starfall_processor_kill" )
-			net.WriteEntity( instance.entity )
-			net.SendToServer()
-		end
+	for instance, _ in pairs( SF.playerInstances[ply] ) do
+		net.Start( "starfall_processor_kill" )
+		net.WriteEntity( instance.entity )
+		net.SendToServer()
 	end
 end, "Admin Only. Terminate a user's starfall chips.", true )

@@ -2082,7 +2082,7 @@ function PANEL:UpdatePlayers(players)
 
 			local svtotal = 0
 			local cltotal = 0
-			for instance, _ in pairs(SF.playerInstances[ply] or {}) do
+			for instance, _ in pairs(SF.playerInstances[ply]) do
 				svtotal = svtotal + (instance.entity:IsValid() and instance.entity:GetNWInt("CPUus") or 0)
 				cltotal = cltotal + instance.cpu_average
 			end
@@ -2097,7 +2097,7 @@ end
 function PANEL:CheckPlayersChanged()
 	local players = {}
 	for k, v in pairs(player.GetAll()) do
-		if SF.playerInstances[v] or SF.BlockedUsers:isBlocked(v:SteamID()) then
+		if rawget(SF.playerInstances, v) or SF.BlockedUsers:isBlocked(v:SteamID()) then
 			players[v] = true
 		end
 	end

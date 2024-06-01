@@ -29,7 +29,7 @@ SF.Instance.__index = SF.Instance
 --- A set of all instances that have been created. It has weak keys and values.
 -- Instances are put here after initialization.
 SF.allInstances = {}
-SF.playerInstances = {}
+SF.playerInstances = setmetatable({}, {__index = function() return {} end})
 
 --- Preprocesses and Compiles code and returns an Instance
 -- @param code Either a string of code, or a {path=source} table
@@ -598,7 +598,7 @@ function SF.Instance:initialize()
 	self.cpu_softquota = 1
 
 	SF.allInstances[self] = true
-	if SF.playerInstances[self.player] then
+	if rawget(SF.playerInstances, self.player) then
 		SF.playerInstances[self.player][self] = true
 	else
 		SF.playerInstances[self.player] = {[self] = true}
@@ -698,12 +698,9 @@ end
 function SF.Instance:deinitialize()
 	self:RunHook("deinitialize")
 	SF.allInstances[self] = nil
-	local playerInstances = SF.playerInstances[self.player]
-	if playerInstances then
-		playerInstances[self] = nil
-		if not next(playerInstances) then
-			SF.playerInstances[self.player] = nil
-		end
+	SF.playerInstances[self.player][self] = nil
+	if next(SF.playerInstances[self.player])==nil then
+		SF.playerInstances[self.player] = nil
 	end
 
 	self.error = true
