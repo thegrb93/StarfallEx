@@ -425,6 +425,61 @@ SF.StringRestrictor = {
 }
 setmetatable(SF.StringRestrictor, SF.StringRestrictor)
 
+SF.NetValidator = {
+	Players = {},
+	__index = {
+		receive = function(self)
+			if net.ReadDouble() == self.validation then
+				self.successes = self.successes + 1
+				if self.successes == 5 then
+					self.success()
+					self:remove()
+				end
+			end
+		end,
+		tick = function(self)
+			if IsValid(self.player) then
+				self.validation = math.random()
+				net.Start("starfall_net_validate")
+				net.WriteDouble(self.validation)
+				net.Send(self.player)
+			else
+				self:remove()
+			end
+		end,
+		remove = function(self)
+			SF.NetValidator.Players[self.player] = nil
+			timer.Remove(self.timername)
+		end
+	},
+	__call = function(p, ply, success)
+		local t = setmetatable({
+			player = ply,
+			timername = "sf_net_validate"..ply:EntIndex(),
+			successes = 0,
+			success = success,
+		}, p)
+		SF.NetValidator.Players[ply] = t
+		timer.Create(t.timername, 2, 0, function() t:tick() end)
+	end
+}
+setmetatable(SF.NetValidator, SF.NetValidator)
+
+if SERVER then
+	util.AddNetworkString("starfall_net_validate")
+	net.Receive("starfall_net_validate", function(len, ply)
+		if SF.NetValidator.Players[ply] then
+			SF.NetValidator.Players[ply]:receive()
+		end
+	end)
+else
+	net.Receive("starfall_net_validate", function()
+		net.Start("starfall_net_validate")
+		net.WriteDouble(net.ReadDouble())
+		net.SendToServer()
+	end)
+end
+
 local function steamIdToConsoleSafeName(steamid)
 	local ply = player.GetBySteamID(steamid)
 	return IsValid(ply) and string.gsub(ply:Nick(), '[%z\x01-\x1f\x7f;"\']', "") or ""
@@ -1151,24 +1206,16 @@ function SF.WaitForEntity(index, creationIndex, callback)
 	end, callback, 10)
 end
 
+
 local playerinithooks = {}
 hook.Add("PlayerInitialSpawn","SF_PlayerInitialize",function(ply)
-	local n = "SF_WaitForPlayerInit"..ply:EntIndex()
-	hook.Add("SetupMove", n, function(ply2, mv, cmd)
-		if IsValid(ply) then
-			if ply == ply2 and not cmd:IsForced() then
-				for _, v in ipairs(playerinithooks) do v(ply) end
-				hook.Remove("SetupMove", n)
-			end
-		else
-			hook.Remove("SetupMove", n)
-		end
+	SF.NetValidator(ply, function()
+		for _, v in ipairs(playerinithooks) do v(ply) end
 	end)
 end)
 function SF.WaitForPlayerInit(func)
 	playerinithooks[#playerinithooks+1] = func
 end
-
 
 -- Table networking
 do
