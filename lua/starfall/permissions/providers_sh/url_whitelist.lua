@@ -250,3 +250,8 @@ pattern [[tts.cyzon.us/(.+)]]
 ---  https://autumn.revolt.chat/attachments/mmCR_bFMLEfBAE8mweH2u4o9_x6DiDtU9JXoSbdvZE/live-bocchi-reaction.gif
 simple [[static.revolt.chat]]
 simple [[autumn.revolt.chat]]
+
+-- Youtube Converter API
+--- Examples:
+---  https://youtube.michaelbelgium.me/storage/YTID.mp3
+simple [[youtube.michaelbelgium.me]]
