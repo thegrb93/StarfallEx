@@ -61,7 +61,6 @@ end
 ---  https://dl.dropboxusercontent.com/u/12345/abc123/abc123.bin
 ---  https://www.dropbox.com/s/abcd123/efg123.txt?dl=0
 ---  https://dl.dropboxusercontent.com/content_link/abc123/file?dl=1
-
 simple [[dl.dropboxusercontent.com]]
 pattern [[%w+%.dl%.dropboxusercontent%.com/(.+)]]
 simple [[www.dropbox.com]]
@@ -70,13 +69,11 @@ simple [[dl.dropbox.com]] --Sometimes redirects to usercontent link
 -- OneDrive
 --- Examples:
 ---  https://onedrive.live.com/redir?resid=123!178&authkey=!gweg&v=3&ithint=abcd%2cefg
-
 simple [[onedrive.live.com/redir]]
 
 -- Google Drive
 --- Examples:
 ---  https://docs.google.com/uc?export=download&confirm=UYyi&id=0BxUpZqVaDxVPeENDM1RtZDRvaTA
-
 pattern [[docs%.google%.com/uc.+]]
 pattern [[drive%.google%.com/uc.+]]
 
@@ -88,21 +85,17 @@ pattern [[(%w+)%.backblazeb2%.com/(.+)]]
 -- Imgur
 --- Examples:
 ---  http://i.imgur.com/abcd123.xxx
-
 simple [[i.imgur.com]]
 
 -- pastebin
 --- Examples:
 ---  http://pastebin.com/abcdef
-
 simple [[pastebin.com]]
 
 -- gitlab
-
 simple [[gitlab.com]]
 
 -- bitbucket
-
 simple [[bitbucket.org]]
 
 -- github / gist
@@ -112,7 +105,6 @@ simple [[bitbucket.org]]
 ---  https://raw.github.com/github/explore/master/topics/lua/lua.png
 ---  https://user-images.githubusercontent.com/13347909/103649539-ef956e80-4f5e-11eb-94dc-d22ee20380e9.png
 ---  https://avatars2.githubusercontent.com/u/6713261?s=460&v=4
-
 simple [[raw.githubusercontent.com]]
 simple [[gist.githubusercontent.com]]
 simple [[raw.github.com]]
