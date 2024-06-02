@@ -245,5 +245,5 @@ simple [[autumn.revolt.chat]]
 
 -- Youtube Converter API
 --- Examples:
----  https://youtube.michaelbelgium.me/storage/YTID.mp3
+---  https://youtube.michaelbelgium.me/storage/5zrORMBb0-8.mp3
 simple [[youtube.michaelbelgium.me]]
