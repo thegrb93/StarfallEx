@@ -174,7 +174,6 @@ blacklist [[steamcommunity.com/linkfilter]]
 ---  https://cdn.discordapp.com/attachments/269175189382758400/421572398689550338/unknown.png
 ---  https://images-ext-2.discordapp.net/external/UVPTeOLUWSiDXGwwtZ68cofxU1uaA2vMb2ZCjRY8XXU/https/i.imgur.com/j0QGfKN.jpg?width=1202&height=67
 ---  https://media.discordapp.net/attachments/695591357158391879/1096409191792508958/image.png?width=1432&height=88
-
 pattern [[cdn[%w-_]*.discordapp%.com/(.+)]]
 pattern [[images-([%w%-]+)%.discordapp%.net/external/(.+)]]
 pattern [[media%.discordapp%.net/attachments/(.+)]]
@@ -184,7 +183,6 @@ pattern [[media%.discordapp%.net/attachments/(.+)]]
 ---  https://i.redd.it/u46wumt13an01.jpg
 ---  https://i.redditmedia.com/RowF7of6hQJAdnJPfgsA-o7ioo_uUzhwX96bPmnLo0I.jpg?w=320&s=116b72a949b6e4b8ac6c42487ffb9ad2
 ---  https://preview.redd.it/injjlk3t6lb51.jpg?width=640&height=800&crop=smart&auto=webp&s=19261cc37b68ae0216bb855f8d4a77ef92b76937
-
 simple [[i.redditmedia.com]]
 simple [[i.redd.it]]
 simple [[preview.redd.it]]
@@ -192,19 +190,16 @@ simple [[preview.redd.it]]
 -- Furry things
 --- Examples:
 --- https://static1.e621.net/data/8f/db/8fdbc9af34698d470c90ca6cb69c5529.jpg
-
 simple [[static1.e621.net]]
 
 -- ipfs
 --- Examples:
 --- https://ipfs.io/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/I/m/Ellis_Sigil.jpg
-
 simple [[ipfs.io]]
 
 -- neocities
 --- Examples:
 --- https://fauux.neocities.org/LainDressSlow.gif
-
 pattern [[([%w-_]+)%.neocities%.org/(.+)]]
 
 -- Soundcloud
@@ -253,6 +248,5 @@ pattern [[tts.cyzon.us/(.+)]]
 ---  https://static.revolt.chat/emoji/mutant/1f440.svg?rev=3
 ---  https://autumn.revolt.chat/emojis/01G7J9RTHKEPJM8DM19TX35M8N
 ---  https://autumn.revolt.chat/attachments/mmCR_bFMLEfBAE8mweH2u4o9_x6DiDtU9JXoSbdvZE/live-bocchi-reaction.gif
-
 simple [[static.revolt.chat]]
 simple [[autumn.revolt.chat]]
