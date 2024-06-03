@@ -256,6 +256,7 @@ string_library.stripExtension = sfstring.StripExtension
 -- @param string str The string you'll take a sub-string out of
 -- @param number startPos The position of the first character that will be included in the sub-string
 -- @param number? endPos The position of the last character to be included in the sub-string. It can be negative to count from the end
+-- @return string The sub-string
 string_library.sub = sfstring.sub
 
 --- Converts time to minutes and seconds string.
