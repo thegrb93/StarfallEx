@@ -64,10 +64,10 @@ end
 --- Creates a table struct that resembles a Color
 -- @name builtins_library.Color
 -- @class function
--- @param number r Red or string hexadecimal color
--- @param number g Green
--- @param number b Blue
--- @param number a Alpha
+-- @param number|string? r Red component or string hexadecimal color. Defaults to 255.
+-- @param number? g Green component. Defaults to 255.
+-- @param number? b Blue component. Defaults to 255.
+-- @param number? a Alpha component. Defaults to 255.
 -- @return Color New color
 function instance.env.Color(r, g, b, a)
 	if isstring(r) then
