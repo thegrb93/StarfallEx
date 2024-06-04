@@ -648,9 +648,9 @@ bit_library.tohex = bit.tohex
 --- Creates a StringStream object
 -- @name bit_library.stringstream
 -- @class function
--- @param string stream String to set the initial buffer to (default "")
--- @param number i The initial buffer pointer (default 1)
--- @param string endian The endianness of number types. "big" or "little" (default "little")
+-- @param string? stream String to set the initial buffer to (default "")
+-- @param number? i The initial buffer pointer (default 1)
+-- @param string? endian The endianness of number types. "big" or "little" (default "little")
 -- @return StringStream StringStream object
 function bit_library.stringstream(stream, i, endian)
 	local ret = SF.StringStream(stream, i, endian)
