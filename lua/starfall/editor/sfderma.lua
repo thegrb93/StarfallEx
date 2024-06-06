@@ -443,6 +443,24 @@ function PANEL:DoRightClick(node)
 					"Cancel")
 			end)
 	elseif menu == "folder" then
+		local function expandChildren(node, expand)
+			for k, child in pairs(node:GetChildNodes()) do
+				if child:GetFolder() then
+					child:SetExpanded(expand)
+					expandChildren(child, expand)
+				end
+			end
+		end
+
+		self.menu:AddOption("Expand recursively", function ()
+			node:SetExpanded(true)
+			expandChildren(node, true)
+		end)
+		self.menu:AddOption("Collapse recursively", function ()
+			node:SetExpanded(false)
+			expandChildren(node, false)
+		end)
+		self.menu:AddSpacer()
 		self.menu:AddOption("New file", function ()
 				Derma_StringRequestNoBlur("New file",
 					"",
