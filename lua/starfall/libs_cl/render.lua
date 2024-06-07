@@ -2132,10 +2132,10 @@ do
 		vec_SetUnpacked(quad_v2, vert2[1], vert2[2], vert2[3])
 		vec_SetUnpacked(quad_v3, vert3[1], vert3[2], vert3[3])
 		vec_SetUnpacked(quad_v4, vert4[1], vert4[2], vert4[3])
-		mesh.Position( quad_v1 ); mesh.Color( r, g, b, a ); mesh.TexCoord( 0, vert1[4], vert1[5] ); mesh.AdvanceVertex();
-		mesh.Position( quad_v2 ); mesh.Color( r, g, b, a ); mesh.TexCoord( 0, vert2[4], vert2[5] ); mesh.AdvanceVertex();
-		mesh.Position( quad_v3 ); mesh.Color( r, g, b, a ); mesh.TexCoord( 0, vert3[4], vert3[5] ); mesh.AdvanceVertex();
-		mesh.Position( quad_v4 ); mesh.Color( r, g, b, a ); mesh.TexCoord( 0, vert4[4], vert4[5] ); mesh.AdvanceVertex();
+		mesh_Position( quad_v1 ); mesh_Color( r, g, b, a ); mesh_TexCoord( 0, vert1[4], vert1[5] ); mesh_AdvanceVertex();
+		mesh_Position( quad_v2 ); mesh_Color( r, g, b, a ); mesh_TexCoord( 0, vert2[4], vert2[5] ); mesh_AdvanceVertex();
+		mesh_Position( quad_v3 ); mesh_Color( r, g, b, a ); mesh_TexCoord( 0, vert3[4], vert3[5] ); mesh_AdvanceVertex();
+		mesh_Position( quad_v4 ); mesh_Color( r, g, b, a ); mesh_TexCoord( 0, vert4[4], vert4[5] ); mesh_AdvanceVertex();
 	end
 end
 
