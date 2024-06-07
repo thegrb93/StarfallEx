@@ -24,11 +24,8 @@ SF.RegisterLibrary("trace")
 
 local structWrapper, util_TraceLine, util_TraceHull, util_IntersectRayWithOBB, util_IntersectRayWithPlane, util_Decal, util_PointContents, util_AimVector = SF.StructWrapper, util.TraceLine, util.TraceHull, util.IntersectRayWithOBB, util.IntersectRayWithPlane, util.Decal, util.PointContents, util.AimVector
 
-local vec_meta = getmetatable(Vector(0, 0, 0))
-local vec_SetUnpacked = vec_meta.SetUnpacked
-
-local ang_meta = getmetatable(Angle(0, 0, 0))
-local ang_SetUnpacked = ang_meta.SetUnpacked
+local vec_SetUnpacked = getmetatable(Vector(0, 0, 0)).SetUnpacked
+local ang_SetUnpacked = getmetatable(Angle(0, 0, 0)).SetUnpacked
 
 return function(instance)
 
@@ -63,7 +60,8 @@ local function convertFilter(filter)
 	end
 end
 
-local start_vec, endpos_vec = Vector(0, 0, 0), Vector(0, 0, 0)
+local start_vec, endpos_vec, minbox_vec, maxbox_vec, origin_vec, angles_ang, normal_vec 
+	= Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0), Angle(0, 0, 0), Vector(0, 0, 0)
 
 --- Does a line trace
 -- @param Vector start Start position
@@ -86,8 +84,6 @@ function trace_library.line(start, endpos, filter, mask, colgroup, ignworld)
 		ignoreworld = ignworld,
 	}), "TraceResult")
 end
-
-local minbox_vec, maxbox_vec = Vector(0, 0, 0), Vector(0, 0, 0)
 
 --- Does a swept-AABB trace
 -- @param Vector start Start position
@@ -117,8 +113,6 @@ function trace_library.hull(start, endpos, minbox, maxbox, filter, mask, colgrou
 	}), "TraceResult")
 end
 
-local origin_vec, angles_ang = Vector(0, 0, 0), Angle(0, 0, 0)
-
 --- Does a ray box intersection returning the position hit, normal, and trace fraction, or nil if not hit.
 -- @param Vector rayStart The origin of the ray
 -- @param Vector rayDelta The direction and length of the ray
@@ -140,8 +134,6 @@ function trace_library.intersectRayWithOBB(rayStart, rayDelta, boxOrigin, boxAng
 	local pos, normal, fraction = util_IntersectRayWithOBB(start_vec, endpos_vec, origin_vec, angles_ang, minbox_vec, maxbox_vec)
 	if pos then return vwrap(pos), vwrap(normal), fraction end
 end
-
-local normal_vec = Vector(0, 0, 0)
 
 --- Does a ray plane intersection returning the position hit or nil if not hit
 -- @param Vector rayStart The origin of the ray
