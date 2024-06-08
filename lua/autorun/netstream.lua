@@ -14,6 +14,8 @@ net.Stream.MaxTries = 3 --Maximum times the client may retry downloading the who
 local WriteStreamQueue = {
 	__index = {
 		Add = function(self, stream)
+			self.activitytimeout = CurTime()+net.Stream.Timeout
+
 			local identifier = self.curidentifier
 			local startid = identifier
 			while self.queue[identifier] do
@@ -33,19 +35,29 @@ local WriteStreamQueue = {
 		end,
 
 		Write = function(self, ply)
+			self.activitytimeout = CurTime()+net.Stream.Timeout
+
 			local identifier = net.ReadUInt(32)
 			local chunkidx = net.ReadUInt(32)
 			local stream = self.queue[identifier]
 			--print("Got request", identifier, chunkidx, stream)
-			if stream and stream:Write(ply, chunkidx) then
-				stream.timeout = CurTime()+net.Stream.Timeout
+			if stream then
+				if stream:Write(ply, chunkidx) then
+					stream.timeout = CurTime()+net.Stream.Timeout
+				end
+			else
+				-- Tell them the stream doesn't exist
+				net.Start("NetStreamRead")
+				net.WriteUInt(identifier, 32)
+				net.WriteUInt(0, 32)
+				if SERVER then net.Send(ply) else net.SendToServer() end
 			end
 		end,
 
 		Clean = function(self)
 			local t = CurTime()
 			for k, stream in pairs(self.queue) do
-				if stream.timeout > 0 and t >= stream.timeout then
+				if (next(stream.clients)~=nil and t >= stream.timeout) or t >= self.activitytimeout then
 					stream:Remove()
 					self.queue[k] = nil
 				end
@@ -57,6 +69,7 @@ local WriteStreamQueue = {
 	},
 	__call = function(t)
 		return setmetatable({
+			activitytimeout = CurTime()+net.Stream.Timeout,
 			curidentifier = 1,
 			queue = {}
 		}, t)
@@ -194,6 +207,7 @@ local WritingDataItem = {
 		end
 
 		return setmetatable({
+			timeout = CurTime()+net.Stream.Timeout,
 			chunks = chunks,
 			callback = callback,
 			lasttouched = 0,
