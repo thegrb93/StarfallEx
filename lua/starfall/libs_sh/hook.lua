@@ -382,6 +382,14 @@ add("PlayerFootstep", nil, function(instance, ply, pos, foot, sound, volume)
     }
 end, returnOnlyOnYourself )
 
+--- Called when a player jumps.
+-- @name OnPlayerJump
+-- @class hook
+-- @shared
+-- @param Player ply Player who jumped
+-- @param number speed The velocity/impulse of the jump
+add("OnPlayerJump")
+
 --- Called when a player presses a key
 -- @name KeyPress
 -- @class hook
