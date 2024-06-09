@@ -346,10 +346,16 @@ local sfTypeToWireTypeTable = {
 -- letter and contain only alphabetical characters or numbers but may not begin with a number.
 -- @param table names An array of input names. May be modified by the function.
 -- @param table types An array of input types. Can be shortcuts. May be modified by the function.
-function wire_library.adjustInputs(names, types)
+-- @param table descriptions An optional array of input descriptions. 
+function wire_library.adjustInputs(names, types, descriptions)
 	checkpermission(instance, nil, "wire.setInputs")
+
 	checkluatype(names, TYPE_TABLE)
 	checkluatype(types, TYPE_TABLE)
+	if descriptions ~= nil then
+		checkluatype(descriptions, TYPE_TABLE)
+	end
+
 	local ent = instance.entity
 	if not ent then SF.Throw("No entity to create inputs on", 2) end
 
@@ -367,17 +373,23 @@ function wire_library.adjustInputs(names, types)
 		types[i] = newtype
 	end
 	ent._inputs = { names, types }
-	WireLib.AdjustSpecialInputs(ent, names, types)
+	WireLib.AdjustSpecialInputs(ent, names, types, descriptions)
 end
 
 --- Creates/Modifies wire outputs. All wire ports must begin with an uppercase
 -- letter and contain only alphabetical characters or numbers but may not begin with a number.
 -- @param table names An array of output names. May be modified by the function.
 -- @param table types An array of output types. Can be shortcuts. May be modified by the function.
-function wire_library.adjustOutputs(names, types)
+-- @param table descriptions An optional array of output descriptions. 
+function wire_library.adjustOutputs(names, types, descriptions)
 	checkpermission(instance, nil, "wire.setOutputs")
+
 	checkluatype(names, TYPE_TABLE)
 	checkluatype(types, TYPE_TABLE)
+	if descriptions ~= nil then
+		checkluatype(descriptions, TYPE_TABLE)
+	end
+
 	local ent = instance.entity
 	if not ent then SF.Throw("No entity to create outputs on", 2) end
 
@@ -406,7 +418,7 @@ function wire_library.adjustOutputs(names, types)
 
 	ent._outputs = { names, types }
 
-	WireLib.AdjustSpecialOutputs(ent, names, types)
+	WireLib.AdjustSpecialOutputs(ent, names, types, descriptions)
 end
 
 --- Creates/Modifies wire inputs/outputs. All wire ports must begin with an uppercase
