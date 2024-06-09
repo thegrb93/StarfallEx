@@ -24,6 +24,9 @@ SF.RegisterLibrary("trace")
 
 local structWrapper, util_TraceLine, util_TraceHull, util_IntersectRayWithOBB, util_IntersectRayWithPlane, util_Decal, util_PointContents, util_AimVector = SF.StructWrapper, util.TraceLine, util.TraceHull, util.IntersectRayWithOBB, util.IntersectRayWithPlane, util.Decal, util.PointContents, util.AimVector
 
+local vec_SetUnpacked = getmetatable(Vector(0, 0, 0)).SetUnpacked
+local ang_SetUnpacked = getmetatable(Angle(0, 0, 0)).SetUnpacked
+
 return function(instance)
 
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
@@ -57,6 +60,9 @@ local function convertFilter(filter)
 	end
 end
 
+local start_vec, endpos_vec, minbox_vec, maxbox_vec, origin_vec, angles_ang, normal_vec 
+	= Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0), Angle(0, 0, 0), Vector(0, 0, 0)
+
 --- Does a line trace
 -- @param Vector start Start position
 -- @param Vector endpos End position
@@ -66,9 +72,12 @@ end
 -- @param boolean? ignworld Whether the trace should ignore world
 -- @return table Result of the trace https://wiki.facepunch.com/gmod/Structures/TraceResult
 function trace_library.line(start, endpos, filter, mask, colgroup, ignworld)
+	vec_SetUnpacked(start_vec, start[1], start[2], start[3])
+	vec_SetUnpacked(endpos_vec, endpos[1], endpos[2], endpos[3])
+
 	return structWrapper(instance, util_TraceLine({
-		start = vunwrap(start),
-		endpos = vunwrap(endpos),
+		start = start_vec,
+		endpos = endpos_vec,
 		filter = convertFilter(filter),
 		mask = mask,
 		collisiongroup = colgroup,
@@ -87,15 +96,20 @@ end
 -- @param boolean? ignworld Whether the trace should ignore world
 -- @return table Result of the trace https://wiki.facepunch.com/gmod/Structures/TraceResult
 function trace_library.hull(start, endpos, minbox, maxbox, filter, mask, colgroup, ignworld)
+	vec_SetUnpacked(start_vec, start[1], start[2], start[3])
+	vec_SetUnpacked(endpos_vec, endpos[1], endpos[2], endpos[3])
+	vec_SetUnpacked(minbox_vec, minbox[1], minbox[2], minbox[3])
+	vec_SetUnpacked(maxbox_vec, maxbox[1], maxbox[2], maxbox[3])
+
 	return structWrapper(instance, util_TraceHull({
-		start = vunwrap(start),
-		endpos = vunwrap(endpos),
+		start = start_vec,
+		endpos = endpos_vec,
 		filter = convertFilter(filter),
 		mask = mask,
 		collisiongroup = colgroup,
 		ignoreworld = ignworld,
-		mins = vunwrap(minbox),
-		maxs = vunwrap(maxbox),
+		mins = minbox_vec,
+		maxs = maxbox_vec,
 	}), "TraceResult")
 end
 
@@ -110,7 +124,14 @@ end
 -- @return Vector? Hit normal or nil if not hit
 -- @return number? Hit fraction or nil if not hit
 function trace_library.intersectRayWithOBB(rayStart, rayDelta, boxOrigin, boxAngles, boxMins, boxMaxs)
-	local pos, normal, fraction = util_IntersectRayWithOBB(vunwrap(rayStart), vunwrap(rayDelta), vunwrap(boxOrigin), aunwrap(boxAngles), vunwrap(boxMins), vunwrap(boxMaxs))
+	vec_SetUnpacked(start_vec, rayStart[1], rayStart[2], rayStart[3])
+	vec_SetUnpacked(endpos_vec, rayDelta[1], rayDelta[2], rayDelta[3])
+	vec_SetUnpacked(origin_vec, boxOrigin[1], boxOrigin[2], boxOrigin[3])
+	ang_SetUnpacked(angles_ang, boxAngles[1], boxAngles[2], boxAngles[3])
+	vec_SetUnpacked(minbox_vec, boxMins[1], boxMins[2], boxMins[3])
+	vec_SetUnpacked(maxbox_vec, boxMaxs[1], boxMaxs[2], boxMaxs[3])
+
+	local pos, normal, fraction = util_IntersectRayWithOBB(start_vec, endpos_vec, origin_vec, angles_ang, minbox_vec, maxbox_vec)
 	if pos then return vwrap(pos), vwrap(normal), fraction end
 end
 
@@ -121,7 +142,12 @@ end
 -- @param Vector planeNormal The normal of the plane
 -- @return Vector? Hit position or nil if not hit
 function trace_library.intersectRayWithPlane(rayStart, rayDelta, planeOrigin, planeNormal)
-	local pos = util_IntersectRayWithPlane(vunwrap(rayStart), vunwrap(rayDelta), vunwrap(planeOrigin), vunwrap(planeNormal))
+	vec_SetUnpacked(start_vec, rayStart[1], rayStart[2], rayStart[3])
+	vec_SetUnpacked(endpos_vec, rayDelta[1], rayDelta[2], rayDelta[3])
+	vec_SetUnpacked(origin_vec, planeOrigin[1], planeOrigin[2], planeOrigin[3])
+	vec_SetUnpacked(normal_vec, planeNormal[1], planeNormal[2], planeNormal[3])
+
+	local pos = util_IntersectRayWithPlane(start_vec, endpos_vec, origin_vec, normal_vec)
 	if pos then return vwrap(pos) end
 end
 
@@ -138,8 +164,11 @@ function trace_library.decal(name, start, endpos, filter)
 
 	if filter ~= nil then checkluatype(filter, TYPE_TABLE) filter = convertFilter(filter) end
 
+	vec_SetUnpacked(start_vec, start[1], start[2], start[3])
+	vec_SetUnpacked(endpos_vec, endpos[1], endpos[2], endpos[3])
+
 	plyDecalBurst:use(instance.player, 1)
-	util_Decal(name, vunwrap(start), vunwrap(endpos), filter)
+	util_Decal(name, start_vec, endpos_vec, filter)
 end
 
 --- Returns True if player is allowed to use trace.decal
@@ -158,7 +187,8 @@ end
 -- @param Vector position The position to get the CONTENTS of
 -- @return number Contents bitflag, see the CONTENTS enums
 function trace_library.pointContents(position)
-	return util_PointContents(vunwrap(position))
+	vec_SetUnpacked(endpos_vec, position[1], position[2], position[3])
+	return util_PointContents(endpos_vec)
 end
 
 --- Calculates the aim vector from a 2D screen position. This is essentially a generic version of input.screenToVector, where you can define the view angles and screen size manually.
@@ -175,7 +205,8 @@ function trace_library.aimVector(viewAngles, viewFOV, x, y, screenWidth, screenH
 	checkluatype(y, TYPE_NUMBER)
 	checkluatype(screenWidth, TYPE_NUMBER)
 	checkluatype(screenHeight, TYPE_NUMBER)
-	return vwrap(util_AimVector(aunwrap(viewAngles), viewFOV, x, y, screenWidth, screenHeight))
+	ang_SetUnpacked(angles_ang, viewAngles[1], viewAngles[2], viewAngles[3])
+	return vwrap(util_AimVector(angles_ang, viewFOV, x, y, screenWidth, screenHeight))
 end
 
 end
