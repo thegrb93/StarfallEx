@@ -312,7 +312,8 @@ SF.EntManager = {
 			self:free(instance.player, -1)
 		end,
 		remove = function(self, instance, ent)
-			if not IsValid(ent) then return end
+			-- ent:IsValid() used since not all types this class supports are entity
+			if not (ent and ent:IsValid()) then return end
 			if self.nocallonremove then
 				self:onremove(instance, ent)
 			else
