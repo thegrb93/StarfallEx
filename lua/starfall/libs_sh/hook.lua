@@ -390,6 +390,16 @@ end, returnOnlyOnYourself )
 -- @param number speed The velocity/impulse of the jump
 add("OnPlayerJump")
 
+--- Called when a player makes contact with the ground after a jump or a fall.
+-- @name OnPlayerHitGround
+-- @class hook
+-- @shared
+-- @param Player ply Player that hit the ground
+-- @param boolean inWater Did the player land in water?
+-- @param boolean onFloater Did the player land on an object floating in the water?
+-- @param number speed The speed at which the player hit the ground
+add("OnPlayerHitGround")
+
 --- Called when a player presses a key
 -- @name KeyPress
 -- @class hook
