@@ -245,6 +245,18 @@ if CLIENT then
 		ent.sf_userrenderbounds = {mins, maxs}
 	end
 
+	--- Sets the Level Of Detail model to use with this entity. This may not work for all models if the model doesn't include any LOD sub models.
+	-- This function works exactly like the clientside r_lod convar and takes priority over it.
+	-- -1 leaves the engine to automatically set the Level of Detail. The Level Of Detail may range from 0 to 8, with 0 being the highest quality and 8 the lowest.
+	-- @client
+	-- @param number lod The Level Of Detail model ID to use.
+	function ents_methods:setLOD(num)
+		local ent = getent(self)
+		checkluatype(num, TYPE_NUMBER)
+		checkpermission(instance, ent, "entities.setRenderProperty")
+		ent:SetLOD(num)
+	end
+
 	local canDrawEntity = SF.CanDrawEntity
 	--- Returns whether or not the entity can be drawn using Entity.draw function
 	-- Checks Entity against a predefined class whitelist
