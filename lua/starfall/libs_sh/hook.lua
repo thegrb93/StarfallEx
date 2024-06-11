@@ -488,7 +488,7 @@ end)
 -- @class hook
 -- @shared
 -- @param Entity ent Entity being removed
--- @param boolean isSnapshot If clientside, will be true if the entity isn't actually removed
+-- @param boolean fullupdate If clientside, will be true if the entity was removed by a fullupdate
 add("EntityRemoved")
 
 --- Called when an entity is broken

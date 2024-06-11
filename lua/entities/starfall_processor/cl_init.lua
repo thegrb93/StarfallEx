@@ -12,6 +12,21 @@ function ENT:Initialize()
 	self.OverlayFade = 0
 	self.ActiveHuds = {}
 	self.reuploadOnReload = false
+
+	local instance
+	SF.CallOnRemove(self, "sf_processor", function()
+		instance = self.instance
+
+		-- This should remove the hook if it existed
+		self:SetReuploadOnReload(false)
+	end,
+	function()
+		if instance then
+			instance:runScriptHook("removed")
+			instance:deinitialize()
+			self.instance = nil
+		end
+	end)
 end
 
 function ENT:GetOverlayText()
