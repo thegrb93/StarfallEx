@@ -126,20 +126,16 @@ function SF.EntityTable(key, destructor, dontwait)
 		__newindex = function(t, e, v)
 			rawset(t, e, v)
 			if e ~= SF.Superuser then
+				local function ondestroy()
+					if t[e] then
+						if destructor then destructor(e, v) end
+						t[e] = nil
+					end
+				end
 				if SERVER or dontwait then
-					SF.CallOnRemove(e, key, function()
-						if t[e] then
-							if destructor then destructor(e, v) end
-							t[e] = nil
-						end
-					end)
+					SF.CallOnRemove(e, key, ondestroy)
 				else
-					SF.CallOnRemove(e, key, nil, function()
-						if t[e] then
-							if destructor then destructor(e, v) end
-							t[e] = nil
-						end
-					end)
+					SF.CallOnRemove(e, key, nil, ondestroy)
 				end
 			end
 		end
@@ -336,9 +332,9 @@ SF.EntManager = {
 			else
 				-- The die function is called the next frame after 'Remove' which is too slow so call it ourself
 				SF.RemoveCallOnRemove(ent, "entmanager")
-					ent.sf_on_remove()
-				end
-				ent:Remove()
+				ent.sf_on_remove()
+			end
+			ent:Remove()
 		end,
 		onremove = function(self, instance, ent)
 			self.entsByInstance[instance][ent] = nil
