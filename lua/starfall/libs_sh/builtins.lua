@@ -1211,7 +1211,7 @@ end
 function builtins_library.restart(chip)
 	if chip then
 		chip = getent(chip)
-		if not (chip.Starfall and chip.instance) then SF.Throw("Entity has no starfall instance", 2) end
+		if not (chip.Starfall and chip.sfdata) then SF.Throw("Entity has no starfall data", 2) end
 		if chip.owner ~= instance.player then SF.Throw("You don't own that starfall", 2) end
 	else
 		chip = instance.entity
