@@ -285,7 +285,7 @@ local soundsByEntity = SF.EntityTable("emitSoundsByEntity", function(e, t)
 	for snd, _ in pairs(t) do
 		e:StopSound(snd)
 	end
-end)
+end, true)
 
 local sound_library = instance.Libraries.sound
 

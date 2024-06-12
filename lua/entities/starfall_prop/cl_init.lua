@@ -12,6 +12,11 @@ function ENT:Initialize()
 	self.rendermeshloaded = false
 	self:DrawShadow(false)
 	self:EnableCustomCollisions( true )
+
+	local mesh
+	SF.CallOnRemove(self, "sf_prop",
+	function() mesh = self.rendermesh end,
+	function() if mesh then mesh:Destroy() end end)
 end
 
 function ENT:BuildPhysics(mesh)
@@ -50,14 +55,6 @@ function ENT:GetRenderMesh()
 		end
 	else
 		return { Mesh = self.rendermesh, Material = self.Material--[[, Matrix = self.render_matrix]] }
-	end
-end
-
-function ENT:OnRemove(fullsnapshot)
-	if fullsnapshot then return end
-	local mesh = self.rendermesh
-	if mesh then
-		mesh:Destroy()
 	end
 end
 
