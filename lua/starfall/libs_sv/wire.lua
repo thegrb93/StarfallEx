@@ -407,12 +407,12 @@ function wire_library.adjustOutputs(names, types, descriptions)
 
 	for i = 1, #names do
 		local name = names[i]
-		if not isstring(name) then SF.Throw("Non-string output name: " .. name, 2) end
+		if not isstring(name) then SF.Throw("Non-string output name at index " .. i, 2) end
 		if not string.match(name, "^[%u][%a%d_]*$") then SF.Throw("Invalid output name: " .. name, 2) end
 		names_out[i] = name
 
 		local porttype = types[i]
-		if not isstring(porttype) then SF.Throw("Non-string output type: " .. porttype, 2) end
+		if not isstring(porttype) then SF.Throw("Non-string output type at index " .. i, 2) end
 		porttype = string.upper(porttype)
 		porttype = sfTypeToWireTypeTable[porttype] or porttype
 		if not outputConverters[porttype] then SF.Throw("Invalid/unsupported output type: " .. porttype, 2) end
