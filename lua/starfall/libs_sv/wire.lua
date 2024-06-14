@@ -357,24 +357,32 @@ function wire_library.adjustInputs(names, types, descriptions)
 	end
 
 	local ent = instance.entity
-	if not ent then SF.Throw("No entity to create inputs on", 2) end
+	if not IsValid(ent) then SF.Throw("No entity to create inputs on", 2) end
+	if #names ~= #types or (descriptions and #names ~= #descriptions) then SF.Throw("Table lengths not equal", 2) end
 
-	if #names ~= #types then SF.Throw("Table lengths not equal", 2) end
+	local names_out, types_out, descriptions_out = {}, {}, {}
+
 	for i = 1, #names do
-		local newname = names[i]
-		local newtype = types[i]
-		if not isstring(newname) then SF.Throw("Non-string input name: " .. newname, 2) end
-		if not isstring(newtype) then SF.Throw("Non-string input type: " .. newtype, 2) end
-		newtype = newtype:upper()
-		newtype = sfTypeToWireTypeTable[newtype] or newtype
-		if not newname:match("^[%u][%a%d_]*$") then SF.Throw("Invalid input name: " .. newname, 2) end
-		if not inputConverters[newtype] then SF.Throw("Invalid/unsupported input type: " .. newtype, 2) end
-		names[i] = newname
-		types[i] = newtype
+		local name = names[i]
+		if not isstring(name) then SF.Throw("Non-string input name at index " .. i, 2) end
+		if not string.match(name, "^[%u][%a%d_]*$") then SF.Throw("Invalid input name: " .. name, 2) end
+		names_out[i] = name
+
+		local porttype = types[i]
+		if not isstring(porttype) then SF.Throw("Non-string input type at index " .. i, 2) end
+		porttype = string.upper(porttype)
+		porttype = sfTypeToWireTypeTable[porttype] or porttype
+		if not inputConverters[porttype] then SF.Throw("Invalid/unsupported input type: " .. porttype, 2) end
+		types_out[i] = porttype
+
+		if descriptions then
+			if not isstring(descriptions[i]) then SF.Throw("Non-string input description at index " .. i, 2) end
+			descriptions_out[i] = descriptions[i]
+		end
 	end
-	descriptions = instance.Unsanitize(descriptions)
-	ent._inputs = { names, types, descriptions }
-	WireLib.AdjustSpecialInputs(ent, names, types, descriptions)
+
+	ent._inputs = { names_out, types_out, descriptions_out }
+	WireLib.AdjustSpecialInputs(ent, names_out, types_out, descriptions_out)
 end
 
 --- Creates/Modifies wire outputs. All wire ports must begin with an uppercase
@@ -392,34 +400,41 @@ function wire_library.adjustOutputs(names, types, descriptions)
 	end
 
 	local ent = instance.entity
-	if not ent then SF.Throw("No entity to create outputs on", 2) end
+	if not IsValid(ent) then SF.Throw("No entity to create outputs on", 2) end
+	if #names ~= #types or (descriptions and #names ~= #descriptions) then SF.Throw("Table lengths not equal", 2) end
 
-	if #names ~= #types then SF.Throw("Table lengths not equal", 2) end
+	local names_out, types_out, descriptions_out = {}, {}, {}
+
 	for i = 1, #names do
-		local newname = names[i]
-		local newtype = types[i]
-		if not isstring(newname) then SF.Throw("Non-string output name: " .. newname, 2) end
-		if not isstring(newtype) then SF.Throw("Non-string output type: " .. newtype, 2) end
-		newtype = newtype:upper()
-		newtype = sfTypeToWireTypeTable[newtype] or newtype
-		if not newname:match("^[%u][%a%d_]*$") then SF.Throw("Invalid output name: " .. newname, 2) end
-		if not outputConverters[newtype] then SF.Throw("Invalid/unsupported output type: " .. newtype, 2) end
-		names[i] = newname
-		types[i] = newtype
+		local name = names[i]
+		if not isstring(name) then SF.Throw("Non-string output name: " .. name, 2) end
+		if not string.match(name, "^[%u][%a%d_]*$") then SF.Throw("Invalid output name: " .. name, 2) end
+		names_out[i] = name
+
+		local porttype = types[i]
+		if not isstring(porttype) then SF.Throw("Non-string output type: " .. porttype, 2) end
+		porttype = string.upper(porttype)
+		porttype = sfTypeToWireTypeTable[porttype] or porttype
+		if not outputConverters[porttype] then SF.Throw("Invalid/unsupported output type: " .. porttype, 2) end
+		types_out[i] = porttype
+
+		if descriptions then
+			if not isstring(descriptions[i]) then SF.Throw("Non-string input description at index " .. i, 2) end
+			descriptions_out[i] = descriptions[i]
+		end
 	end
 
 	-- Restore wirelink and entity output if present, because these outputs are created by the Wire ToolGun
 	-- and breaks on every code update.
 	for k,v in pairs( ent.Outputs ) do
 		if v.Name == "wirelink" or v.Name == "entity" then
-			table.insert(names, v.Name)
-			table.insert(types, v.Type)
+			table.insert(names_out, v.Name)
+			table.insert(types_out, v.Type)
 		end
 	end
 
-	descriptions = instance.Unsanitize(descriptions)
-	ent._outputs = { names, types, descriptions }
-	WireLib.AdjustSpecialOutputs(ent, names, types, descriptions)
+	ent._outputs = { names_out, types_out, descriptions_out }
+	WireLib.AdjustSpecialOutputs(ent, names_out, types_out, descriptions_out)
 end
 
 --- Creates/Modifies wire inputs/outputs. All wire ports must begin with an uppercase
