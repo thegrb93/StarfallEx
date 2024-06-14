@@ -346,112 +346,150 @@ local sfTypeToWireTypeTable = {
 -- letter and contain only alphabetical characters or numbers but may not begin with a number.
 -- @param table names An array of input names. May be modified by the function.
 -- @param table types An array of input types. Can be shortcuts. May be modified by the function.
-function wire_library.adjustInputs(names, types)
+-- @param table? descriptions An optional array of input descriptions. 
+function wire_library.adjustInputs(names, types, descriptions)
 	checkpermission(instance, nil, "wire.setInputs")
+
 	checkluatype(names, TYPE_TABLE)
 	checkluatype(types, TYPE_TABLE)
-	local ent = instance.entity
-	if not ent then SF.Throw("No entity to create inputs on", 2) end
-
-	if #names ~= #types then SF.Throw("Table lengths not equal", 2) end
-	for i = 1, #names do
-		local newname = names[i]
-		local newtype = types[i]
-		if not isstring(newname) then SF.Throw("Non-string input name: " .. newname, 2) end
-		if not isstring(newtype) then SF.Throw("Non-string input type: " .. newtype, 2) end
-		newtype = newtype:upper()
-		newtype = sfTypeToWireTypeTable[newtype] or newtype
-		if not newname:match("^[%u][%a%d_]*$") then SF.Throw("Invalid input name: " .. newname, 2) end
-		if not inputConverters[newtype] then SF.Throw("Invalid/unsupported input type: " .. newtype, 2) end
-		names[i] = newname
-		types[i] = newtype
+	if descriptions ~= nil then
+		checkluatype(descriptions, TYPE_TABLE)
 	end
-	ent._inputs = { names, types }
-	WireLib.AdjustSpecialInputs(ent, names, types)
+
+	local ent = instance.entity
+	if not IsValid(ent) then SF.Throw("No entity to create inputs on", 2) end
+	if #names ~= #types or (descriptions and #names ~= #descriptions) then SF.Throw("Table lengths not equal", 2) end
+
+	local names_out, types_out, descriptions_out = {}, {}, {}
+
+	for i = 1, #names do
+		local name = names[i]
+		if not isstring(name) then SF.Throw("Non-string input name at index " .. i, 2) end
+		if not string.match(name, "^[%u][%a%d_]*$") then SF.Throw("Invalid input name: " .. name, 2) end
+		names_out[i] = name
+
+		local porttype = types[i]
+		if not isstring(porttype) then SF.Throw("Non-string input type at index " .. i, 2) end
+		porttype = string.upper(porttype)
+		porttype = sfTypeToWireTypeTable[porttype] or porttype
+		if not inputConverters[porttype] then SF.Throw("Invalid/unsupported input type: " .. porttype, 2) end
+		types_out[i] = porttype
+
+		if descriptions then
+			if not isstring(descriptions[i]) then SF.Throw("Non-string input description at index " .. i, 2) end
+			descriptions_out[i] = descriptions[i]
+		end
+	end
+
+	ent._inputs = { names_out, types_out, descriptions_out }
+	WireLib.AdjustSpecialInputs(ent, names_out, types_out, descriptions_out)
 end
 
 --- Creates/Modifies wire outputs. All wire ports must begin with an uppercase
 -- letter and contain only alphabetical characters or numbers but may not begin with a number.
 -- @param table names An array of output names. May be modified by the function.
 -- @param table types An array of output types. Can be shortcuts. May be modified by the function.
-function wire_library.adjustOutputs(names, types)
+-- @param table? descriptions An optional array of output descriptions. 
+function wire_library.adjustOutputs(names, types, descriptions)
 	checkpermission(instance, nil, "wire.setOutputs")
+
 	checkluatype(names, TYPE_TABLE)
 	checkluatype(types, TYPE_TABLE)
-	local ent = instance.entity
-	if not ent then SF.Throw("No entity to create outputs on", 2) end
+	if descriptions ~= nil then
+		checkluatype(descriptions, TYPE_TABLE)
+	end
 
-	if #names ~= #types then SF.Throw("Table lengths not equal", 2) end
+	local ent = instance.entity
+	if not IsValid(ent) then SF.Throw("No entity to create outputs on", 2) end
+	if #names ~= #types or (descriptions and #names ~= #descriptions) then SF.Throw("Table lengths not equal", 2) end
+
+	local names_out, types_out, descriptions_out = {}, {}, {}
+
 	for i = 1, #names do
-		local newname = names[i]
-		local newtype = types[i]
-		if not isstring(newname) then SF.Throw("Non-string output name: " .. newname, 2) end
-		if not isstring(newtype) then SF.Throw("Non-string output type: " .. newtype, 2) end
-		newtype = newtype:upper()
-		newtype = sfTypeToWireTypeTable[newtype] or newtype
-		if not newname:match("^[%u][%a%d_]*$") then SF.Throw("Invalid output name: " .. newname, 2) end
-		if not outputConverters[newtype] then SF.Throw("Invalid/unsupported output type: " .. newtype, 2) end
-		names[i] = newname
-		types[i] = newtype
+		local name = names[i]
+		if not isstring(name) then SF.Throw("Non-string output name: " .. name, 2) end
+		if not string.match(name, "^[%u][%a%d_]*$") then SF.Throw("Invalid output name: " .. name, 2) end
+		names_out[i] = name
+
+		local porttype = types[i]
+		if not isstring(porttype) then SF.Throw("Non-string output type: " .. porttype, 2) end
+		porttype = string.upper(porttype)
+		porttype = sfTypeToWireTypeTable[porttype] or porttype
+		if not outputConverters[porttype] then SF.Throw("Invalid/unsupported output type: " .. porttype, 2) end
+		types_out[i] = porttype
+
+		if descriptions then
+			if not isstring(descriptions[i]) then SF.Throw("Non-string input description at index " .. i, 2) end
+			descriptions_out[i] = descriptions[i]
+		end
 	end
 
 	-- Restore wirelink and entity output if present, because these outputs are created by the Wire ToolGun
 	-- and breaks on every code update.
 	for k,v in pairs( ent.Outputs ) do
 		if v.Name == "wirelink" or v.Name == "entity" then
-			table.insert(names, v.Name)
-			table.insert(types, v.Type)
+			table.insert(names_out, v.Name)
+			table.insert(types_out, v.Type)
 		end
 	end
 
-	ent._outputs = { names, types }
-
-	WireLib.AdjustSpecialOutputs(ent, names, types)
+	ent._outputs = { names_out, types_out, descriptions_out }
+	WireLib.AdjustSpecialOutputs(ent, names_out, types_out, descriptions_out)
 end
 
 --- Creates/Modifies wire inputs/outputs. All wire ports must begin with an uppercase
 -- letter and contain only alphabetical characters or numbers but may not begin with a number.
--- @param table? inputs (Optional) A key-value table with input port names as keys and types as values. e.g. {MyInput="number"} or {MyInput={type="number"}}. If nil, input ports won't be changed.
--- @param table? outputs (Optional) A key-value table with output port names as keys and types as values. e.g. {MyOutput="number"} or {MyOutput={type="number"}}. If nil, output ports won't be changed.
+-- @param table? inputs (Optional) A key-value table with input port names as keys and types as values. e.g. {MyInput="number"} or {MyInput={type="number"}}. If nil, input ports won't be changed. If you use the latter syntax for defining ports, you can also specify description alongside the type, ex. {MyInput={type="number", description="Description for this input."}}
+-- @param table? outputs (Optional) A key-value table with output port names as keys and types as values. The above behavior for inputs also applies for outputs.
 function wire_library.adjustPorts(inputs, outputs)
 	if inputs ~= nil then
 		checkluatype(inputs, TYPE_TABLE)
 
-		local ports, names, types = {}, {}, {}
+		local ports, names, types, descs = {}, {}, {}, {}
 
 		for n,t in pairs( inputs ) do
-			if istable(t) then t = t.type end
-			if not isstring(n) or not isstring(t) then SF.Throw("Inputs Error! Expected string string key value pairs, got a " .. SF.GetType(n) .. " " .. SF.GetType(t) .. " pair.", 2) end
-
-			ports[#ports+1] = {string.lower(n),n,t}
+			local d = nil
+			if istable(t) then
+				d = t.description
+				t = t.type
+			end
+			if not isstring(n) or not isstring(t) then SF.Throw("Inputs Error: Expected string string key value pairs, got a " .. SF.GetType(n) .. " " .. SF.GetType(t) .. " pair.", 2) end
+			if d ~= nil and not isstring(d) then SF.Throw("Inputs Error: Expected IO description to be a string, got " .. SF.GetType(d)) end
+			ports[#ports+1] = {string.lower(n),n,t,d}
 		end
 		table.sort(ports, function(a,b) return a[1]<b[1] end)
 		for k, v in ipairs(ports) do
 			names[k] = v[2]
 			types[k] = v[3]
+			descs[k] = v[4]
 		end
 
-		wire_library.adjustInputs(names, types)
+		wire_library.adjustInputs(names, types, descs)
 	end
 
 	if outputs ~= nil then
 		checkluatype(outputs, TYPE_TABLE)
 
-		local ports, names, types = {}, {}, {}
+		local ports, names, types, descs = {}, {}, {}, {}
 
 		for n,t in pairs( outputs ) do
-			if istable(t) then t = t.type end
-			if not isstring(n) or not isstring(t) then SF.Throw("Outputs Error! Expected string string key value pairs, got a " .. SF.GetType(n) .. " " .. SF.GetType(t) .. " pair.", 2) end
-
-			ports[#ports+1] = {string.lower(n),n,t}
+			local d = nil
+			if istable(t) then
+				d = t.description
+				t = t.type
+			end
+			if not isstring(n) or not isstring(t) then SF.Throw("Outputs Error: Expected string string key value pairs, got a " .. SF.GetType(n) .. " " .. SF.GetType(t) .. " pair.", 2) end
+			if d ~= nil and not isstring(d) then SF.Throw("Outputs Error: Expected IO description to be a string, got " .. SF.GetType(d)) end
+			ports[#ports+1] = {string.lower(n),n,t, d}
 		end
 		table.sort(ports, function(a,b) return a[1]<b[1] end)
 		for k, v in ipairs(ports) do
 			names[k] = v[2]
 			types[k] = v[3]
+			descs[k] = v[4]
 		end
 
-		wire_library.adjustOutputs(names, types)
+		wire_library.adjustOutputs(names, types, descs)
 	end
 end
 
