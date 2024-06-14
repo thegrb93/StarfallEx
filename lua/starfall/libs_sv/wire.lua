@@ -358,7 +358,7 @@ function wire_library.adjustInputs(names, types, descriptions)
 
 	local ent = instance.entity
 	if not IsValid(ent) then SF.Throw("No entity to create inputs on", 2) end
-	if #names ~= #types or (descriptions and #names ~= #descriptions) then SF.Throw("Table lengths not equal", 2) end
+	if #names ~= #types then SF.Throw("Table lengths not equal", 2) end
 
 	local names_out, types_out, descriptions_out = {}, {}, {}
 
@@ -375,7 +375,7 @@ function wire_library.adjustInputs(names, types, descriptions)
 		if not inputConverters[porttype] then SF.Throw("Invalid/unsupported input type: " .. porttype, 2) end
 		types_out[i] = porttype
 
-		if descriptions then
+		if descriptions and descriptions[i] then
 			if not isstring(descriptions[i]) then SF.Throw("Non-string input description at index " .. i, 2) end
 			descriptions_out[i] = descriptions[i]
 		end
@@ -401,7 +401,7 @@ function wire_library.adjustOutputs(names, types, descriptions)
 
 	local ent = instance.entity
 	if not IsValid(ent) then SF.Throw("No entity to create outputs on", 2) end
-	if #names ~= #types or (descriptions and #names ~= #descriptions) then SF.Throw("Table lengths not equal", 2) end
+	if #names ~= #types then SF.Throw("Table lengths not equal", 2) end
 
 	local names_out, types_out, descriptions_out = {}, {}, {}
 
@@ -418,7 +418,7 @@ function wire_library.adjustOutputs(names, types, descriptions)
 		if not outputConverters[porttype] then SF.Throw("Invalid/unsupported output type: " .. porttype, 2) end
 		types_out[i] = porttype
 
-		if descriptions then
+		if descriptions and descriptions[i] then
 			if not isstring(descriptions[i]) then SF.Throw("Non-string input description at index " .. i, 2) end
 			descriptions_out[i] = descriptions[i]
 		end
