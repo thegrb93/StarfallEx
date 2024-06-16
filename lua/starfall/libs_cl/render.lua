@@ -714,28 +714,20 @@ end
 -- ------------------------------------------------------------------ --
 
 --- Pushes a matrix onto the model matrix stack.
--- @param VMatrix m The matrix
--- @param boolean? world Should the transformation be relative to the screen or world?
-function render_library.pushMatrix(m, world)
-	if world == nil then
-		world = renderdata.usingRT
+-- @param VMatrix transform The matrix
+-- @param boolean? absolute (default false) Should the transformation be absolute with respect to world or multipled with existing stack?
+function render_library.pushMatrix(transform, absolute)
+	if absolute == nil then
+		absolute = renderdata.usingRT
 	end
 
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	local id = #matrix_stack
 	if id + 1 > MATRIX_STACK_LIMIT then SF.Throw("Pushed too many matrices", 2) end
-	local newmatrix
-	if matrix_stack[id] then
-		newmatrix = matrix_stack[id] * munwrap(m)
-	else
-		newmatrix = munwrap(m)
-		if not world and renderdata.renderEnt and renderdata.renderEnt.Transform then
-			newmatrix = renderdata.renderEnt.Transform * newmatrix
-		end
-	end
+	transform = munwrap(transform)
 
-	matrix_stack[id + 1] = newmatrix
-	cam.PushModelMatrix(newmatrix)
+	matrix_stack[id + 1] = transform
+	cam.PushModelMatrix(transform, not absolute)
 end
 
 --- Enables a scissoring rect which limits the drawing area. Only works 2D contexts such as HUD or render targets.
@@ -2232,14 +2224,18 @@ function render_library.cursorPos(ply, screen)
 	end
 
 	if screen~=nil then screen = getent(screen) else screen = renderdata.renderEnt end
-	if not (screen and screen.Transform) then SF.Throw("Invalid screen", 2) end
+	if not screen then SF.Throw("Invalid screen", 2) end
+	local screenTransform = screen.Transform
+	if not screenTransform then SF.Throw("Invalid screen", 2) end
+
+	local transform, transforminv = screenTransform:get()
 
 	local Normal, Pos
 	-- Get monitor screen pos & size
 
 	Pos = screen:LocalToWorld(screen.Origin)
 
-	Normal = -screen.Transform:GetUp():GetNormalized()
+	Normal = -transform:GetUp():GetNormalized()
 
 	local Start = ply:GetShootPos()
 	local Dir = ply:GetAimVector()
@@ -2252,7 +2248,7 @@ function render_library.cursorPos(ply, screen)
 	local B = Normal:Dot(Pos-Start) / A
 	if (B >= 0) then
 		local w = 512 / screen.Aspect
-		local HitPos = screen.Transform:GetInverseTR() * (Start + Dir * B)
+		local HitPos = transforminv * (Start + Dir * B)
 		local x = HitPos.x / screen.Scale^2
 		local y = HitPos.y / screen.Scale^2
 		if x < 0 or x > w or y < 0 or y > 512 then return nil end -- Aiming off the screen

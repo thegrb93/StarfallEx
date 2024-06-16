@@ -39,6 +39,17 @@ function ENT:Initialize()
 
 	self.ScreenInfo = info
 	self:SetScreenMatrix(info)
+
+	self.Transform = {
+		lastUpdate = 0,
+		get = function(self)
+			if CurTime()>self.lastUpdate then
+				self.lastUpdate = CurTime()
+				self.matrixinv = self.matrix:GetInverseTR()
+			end
+			return self.matrix, self.matrixinv
+		end
+	}
 end
 
 function ENT:SetScreenMatrix(info)
@@ -52,7 +63,7 @@ function ENT:SetScreenMatrix(info)
 	self.Aspect = info.RatioX
 	self.Scale = info.RS
 	self.Origin = info.offset
-	self.Transform = self:GetWorldTransformMatrix() * self.ScreenMatrix
+	self.Transform.matrix = self:GetWorldTransformMatrix() * self.ScreenMatrix
 
 	local w, h = 512 / self.Aspect, 512
 	self.ScreenQuad = {Vector(0,0,0), Vector(w,0,0), Vector(w,h,0), Vector(0,h,0), Color(0, 0, 0, 255)}
@@ -105,12 +116,10 @@ function ENT:DrawTranslucent()
 	self:DrawModel()
 
 	if halo.RenderedEntity() == self then return end
-	
-	local entityMatrix = self:GetWorldTransformMatrix()
 
-	-- Draw screen here
-	local transform = entityMatrix * self.ScreenMatrix
-	self.Transform = transform
+	local transform = self:GetWorldTransformMatrix() * self.ScreenMatrix
+	self.Transform.matrix = transform
+
 	cam.PushModelMatrix(transform)
 		render.ClearStencil()
 		render.SetStencilEnable(true)
