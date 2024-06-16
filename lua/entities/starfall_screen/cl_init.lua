@@ -100,6 +100,7 @@ function ENT:SetBackgroundColor(r, g, b, a)
 	self.ScreenQuad[5] = Color(r, g, b, math.max(a, 1))
 end
 
+local VECTOR_1_1_1 = Vector(1, 1, 1)
 local writez = Material("engine/writez")
 function ENT:DrawTranslucent()
 	self:DrawModel()
@@ -128,6 +129,9 @@ function ENT:DrawTranslucent()
 		render.SetStencilCompareFunction(STENCILCOMPARISONFUNCTION_EQUAL)
 		render.SetStencilTestMask(1)
 
+		local tone = render.GetToneMappingScaleLinear()
+		render.SetToneMappingScaleLinear(VECTOR_1_1_1)
+
 		--Clear it to the clear color and clear depth as well
 		local color = self.ScreenQuad[5]
 		if color.a == 255 then
@@ -142,6 +146,8 @@ function ENT:DrawTranslucent()
 
 		render.PopFilterMag()
 		render.PopFilterMin()
+
+		render.SetToneMappingScaleLinear(tone)
 
 		render.SetStencilEnable(false)
 
