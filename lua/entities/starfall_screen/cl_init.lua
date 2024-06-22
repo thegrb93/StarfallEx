@@ -18,6 +18,17 @@ function ENT:Initialize()
 		net.WriteUInt(self:EntIndex(), 16)
 	net.SendToServer()
 
+	self.Transform = {
+		lastUpdate = 0,
+		get = function(self)
+			if CurTime()>self.lastUpdate then
+				self.lastUpdate = CurTime()
+				self.matrixinv = self.matrix:GetInverseTR()
+			end
+			return self.matrix, self.matrixinv
+		end
+	}
+
 	local info = self.Monitor_Offsets[self:GetModel()]
 	if not info then
 		local mins = self:OBBMins()
@@ -39,17 +50,6 @@ function ENT:Initialize()
 
 	self.ScreenInfo = info
 	self:SetScreenMatrix(info)
-
-	self.Transform = {
-		lastUpdate = 0,
-		get = function(self)
-			if CurTime()>self.lastUpdate then
-				self.lastUpdate = CurTime()
-				self.matrixinv = self.matrix:GetInverseTR()
-			end
-			return self.matrix, self.matrixinv
-		end
-	}
 end
 
 function ENT:SetScreenMatrix(info)
