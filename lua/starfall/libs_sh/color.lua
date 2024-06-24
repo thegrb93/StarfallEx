@@ -171,7 +171,7 @@ function color_meta.__mul(a, b)
 end
 
 --- Division metamethod
--- @param number|Color b Number or Color dividend
+-- @param number|Color a Number or Color dividend
 -- @param number|Color b Number or Color divisor
 -- @return Color Scaled color.
 function color_meta.__div(a, b)
