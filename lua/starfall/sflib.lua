@@ -102,10 +102,12 @@ hook.Add("EntityRemoved","SF_CallOnRemove",function(ent)
 					for k, v in pairs(hooks) do
 						if v[2] then v[2](ent) end
 					end
+					removedHooks[ent] = nil
 				end
 			end)
+		elseif SERVER then
+			removedHooks[ent] = nil
 		end
-		removedHooks[ent] = nil
 	end
 end)
 function SF.CallOnRemove(ent, key, func, deferedfunc)
