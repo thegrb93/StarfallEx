@@ -468,7 +468,6 @@ end)
 
 function instance:prepareRender()
 	col_SetUnpacked(currentcolor, 255, 255, 255, 255)
-	circleMeshMatrix:Identity()
 	render.SetColorMaterial()
 	draw.NoTexture()
 	surface.SetDrawColor(255, 255, 255, 255)
@@ -1438,6 +1437,8 @@ function render_library.drawFilledCircle(x, y, radius)
 	render_SetMaterial(circleMeshMaterial)
 
 	if x ~= 0 or y ~= 0 or radius ~= 1 then
+		circleMeshMatrix:Identity()
+
 		vec_SetUnpacked(circleMeshVector, x, y, 0)
 		circleMeshMatrix:SetTranslation(circleMeshVector)
 
