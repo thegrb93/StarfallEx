@@ -326,13 +326,6 @@ function player_methods:isBot()
 	return getply(self):IsBot()
 end
 
---- Returns whether the player is connected
--- @shared
--- @return boolean True if player is connected
-function player_methods:isConnected()
-	return getply(self):IsConnected()
-end
-
 --- Returns whether the player is frozen
 -- @shared
 -- @return boolean True if player is frozen
@@ -654,6 +647,13 @@ if SERVER then
 	-- @return boolean isTimingOut
 	function player_methods:isTimingOut()
 		return getply(self):IsTimingOut()
+	end
+
+	--- Returns whether the player is connected
+	-- @server
+	-- @return boolean True if player is connected
+	function player_methods:isConnected()
+		return getply(self):IsConnected()
 	end
 
 	--- Forces the player to say the first argument
