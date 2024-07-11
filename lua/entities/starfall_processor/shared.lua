@@ -129,7 +129,6 @@ function ENT:Error(err)
 	if SERVER then
 		self:SetNWInt("State", self.States.Error)
 		self:SetColor(Color(255, 0, 0, 255))
-		self:SetDTString(0, traceback or msg)
 	end
 
 	local newline = string.find(msg, "\n")
