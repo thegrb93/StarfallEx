@@ -114,8 +114,10 @@ if SERVER then
 	end
 
 	function SF.SendError(chip, message, traceback, client, should_notify)
+		if not IsValid(chip.owner) then return end
+
 		-- The chip owner gets more data
-		if IsValid(chip.owner) and client~=chip.owner then
+		if client~=chip.owner then
 			net.Start("starfall_error")
 				net.WriteEntity(chip)
 				net.WriteEntity(chip.owner)
