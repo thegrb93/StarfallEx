@@ -114,20 +114,40 @@ if SERVER then
 	end
 
 	function SF.SendError(chip, message, traceback, client, should_notify)
+		if not IsValid(chip.owner) then return end
+
+		-- The chip owner gets more data
+		if client~=chip.owner then
+			net.Start("starfall_error")
+				net.WriteEntity(chip)
+				net.WriteEntity(chip.owner)
+				net.WriteString(string.sub(chip.sfdata.mainfile, 1, 1024))
+				net.WriteString(string.sub(message, 1, 1024))
+				net.WriteString(string.sub(traceback, 1, 1024))
+			if client~=nil and should_notify~=nil then
+				net.WriteBool(true)
+				net.WriteEntity(client)
+				net.WriteBool(should_notify)
+			else
+				net.WriteBool(false)
+			end
+			net.Send(chip.owner)
+		end
+
 		net.Start("starfall_error")
 			net.WriteEntity(chip)
 			net.WriteEntity(chip.owner)
-			net.WriteString(string.sub(chip.sfdata.mainfile, 1, 1024))
-			net.WriteString(string.sub(message, 1, 1024))
-			net.WriteString(string.sub(traceback, 1, 1024))
+			net.WriteString(string.sub(chip.sfdata.mainfile, 1, 128))
+			net.WriteString(string.sub(message, 1, 128))
+			net.WriteString("")
 		if client~=nil and should_notify~=nil then
 			net.WriteBool(true)
 			net.WriteEntity(client)
 			net.WriteBool(should_notify)
-			net.SendOmit(client)
+			net.SendOmit({client, chip.owner})
 		else
 			net.WriteBool(false)
-			net.Broadcast()
+			net.SendOmit(chip.owner)
 		end
 	end
 
