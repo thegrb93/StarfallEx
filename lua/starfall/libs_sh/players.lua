@@ -807,7 +807,9 @@ if SERVER then
 	function player_methods:kill()
 		local ent = getply(self)
 		checkpermission(instance, ent, "entities.setHealth")
-		ent:Kill()
+		if ent:Alive() then
+			ent:Kill()
+		end
 	end
 end
 
