@@ -569,7 +569,7 @@ function material_library.createFromImage(path, params)
 	local ext = string.GetExtensionFromFilename(path)
 	if ext ~= "jpg" and ext ~= "png" then SF.Throw("Expected a .jpg or .png file", 2) end
 
-	if not (file.Exists("materials/" .. path, "GAME") or (string.sub(path,1,5)=="data/" and file.Exists(path,"GAME"))) then
+	if not (file.Exists("materials/" .. path, "GAME") or ((string.sub(path,1,5)=="data/" or string.sub(path,1,12)=="data_static/") and file.Exists(path, "GAME"))) then
 		SF.Throw("The material path is invalid", 2)
 	end
 
