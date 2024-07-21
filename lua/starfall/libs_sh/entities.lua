@@ -941,6 +941,19 @@ function ents_methods:getQuotaMax()
 	end
 end
 
+--- Return if the entity has a starfall instance
+-- @shared
+-- @return boolean if has starfall instance
+function ents_methods:hasInstance()
+	local ent = getent(self)
+	if ent.Starfall then
+		if ent.instance then return true end
+		return false
+	else
+		SF.Throw("The entity isn't a starfall", 2)
+	end
+end
+
 if SERVER then
 	--- Gets all players the specified starfall errored for.
 	-- This excludes the owner of the starfall chip.
