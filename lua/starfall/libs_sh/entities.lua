@@ -946,12 +946,7 @@ end
 -- @return boolean if has starfall instance
 function ents_methods:hasInstance()
 	local ent = getent(self)
-	if ent.Starfall then
-		if ent.instance then return true end
-		return false
-	else
-		SF.Throw("The entity isn't a starfall", 2)
-	end
+	return ent.Starfall and ent.instance~=nil
 end
 
 if SERVER then
