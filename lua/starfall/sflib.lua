@@ -1315,8 +1315,8 @@ do
 
 		local function stringToType()
 			local t = ss:readUInt8()
-			local func = stringtotypefuncs[t]
-			if func then return func(ss) else error("Invalid type " .. t) end
+			local func = stringtotypefuncs[t] or error("Invalid type " .. t)
+			return instance and instance.WrapObject(func(ss)) or func(ss)
 		end
 
 		stringtotypefuncs[TYPE_TABLE] = function(ss)
@@ -1330,16 +1330,7 @@ do
 			tableLookup[index] = t
 			
 			for i=1, ss:readUInt16() do
-				local key, val
-				if instance then
-					key = stringToType()
-					key = instance.WrapObject(key) or key
-					val = stringToType()
-					val = instance.WrapObject(val) or val
-				else
-					key = stringToType()
-					val = stringToType()
-				end
+				local key, val = stringToType(), stringToType()
 				t[key] = val
 			end
 			return t
