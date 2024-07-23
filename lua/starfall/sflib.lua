@@ -1315,8 +1315,8 @@ do
 
 		local function stringToType()
 			local t = ss:readUInt8()
-			local func = stringtotypefuncs[t] or error("Invalid type " .. t)
-			return instance and instance.WrapObject(func(ss)) or func(ss)
+			local val = (stringtotypefuncs[t] or error("Invalid type " .. t))(ss)
+			return instance and instance.WrapObject(val) or val
 		end
 
 		stringtotypefuncs[TYPE_TABLE] = function(ss)
