@@ -1313,10 +1313,18 @@ do
 		local ss = SF.StringStream(str)
 		local tableLookup = {}
 
-		local function stringToType()
-			local t = ss:readUInt8()
-			local val = (stringtotypefuncs[t] or error("Invalid type " .. t))(ss)
-			return instance and instance.WrapObject(val) or val
+		local stringToType
+		if instance then
+			function stringToType()
+				local t = ss:readUInt8()
+				local val = (stringtotypefuncs[t] or error("Invalid type " .. t))(ss)
+				return instance.WrapObject(val) or val
+			end
+		else
+			function stringToType()
+				local t = ss:readUInt8()
+				return (stringtotypefuncs[t] or error("Invalid type " .. t))(ss)
+			end
 		end
 
 		stringtotypefuncs[TYPE_TABLE] = function(ss)
