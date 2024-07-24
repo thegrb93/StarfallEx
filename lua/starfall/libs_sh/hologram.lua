@@ -132,6 +132,7 @@ function hologram_library.create(pos, ang, model, scale)
 			return wrap(holoent)
 		end
 	else
+		if instance.data.render.isRendering then SF.Throw("Can't create hologram while rendering!", 2) end
 		holoent = ents.CreateClientside("starfall_hologram")
 		if IsValid(holoent) then
 			holoent.SFHoloOwner = ply
