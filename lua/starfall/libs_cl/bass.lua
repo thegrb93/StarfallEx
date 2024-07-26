@@ -164,8 +164,9 @@ local function loadSound(path, flags, callback, loadFunc)
 	local is2D = not3D(flags)
 
 	if is2D then
-		if not SF.IsHUDActive(instance.entity) then SF.Throw("Player isn't connected to HUD!", 2) end
-		checkpermission(instance, nil, "bass.play2D")
+		if not SF.IsHUDActive(instance.entity) then 
+			checkpermission(instance, nil, "bass.play2D")
+		end
 	end
 
 	plyCount:use(instance.player, 1)
