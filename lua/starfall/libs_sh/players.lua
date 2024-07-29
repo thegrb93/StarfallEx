@@ -348,6 +348,13 @@ function player_methods:isUserGroup(group)
 	return getply(self):IsUserGroup(group)
 end
 
+--- Returns the usergroup of the player
+-- @shared
+-- @return string Usergroup, "user" if player has no group
+function player_methods:getUserGroup()
+	return getply(self):GetUserGroup()
+end
+
 --- Returns the player's current ping
 -- @shared
 -- @return number The player's ping
