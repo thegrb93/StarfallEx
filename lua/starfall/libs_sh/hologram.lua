@@ -484,6 +484,18 @@ function hologram_methods:setAnimation(animation, frame, rate)
 	end
 end
 
+--- Set the cull mode for a hologram.
+-- @shared
+-- @param number mode Cull mode. 0 for counter clock wise, 1 for clock wise
+function hologram_methods:setCullMode(mode)
+	checkluatype(mode, TYPE_NUMBER)
+
+	local holo = getholo(self)
+	checkpermission(instance, holo, "entities.setRenderProperty")
+
+	holo:SetCullMode(mode==1)
+end
+
 --- Applies engine effects to the hologram
 -- @shared
 -- @param number effect The effects to add. See EF Enums
