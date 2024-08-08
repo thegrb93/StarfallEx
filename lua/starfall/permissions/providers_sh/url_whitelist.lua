@@ -69,7 +69,8 @@ simple [[dl.dropbox.com]] --Sometimes redirects to usercontent link
 -- OneDrive
 --- Examples:
 ---  https://onedrive.live.com/redir?resid=123!178&authkey=!gweg&v=3&ithint=abcd%2cefg
-simple [[onedrive.live.com/redir]]
+simple [[onedrive.live.com]]
+simple [[api.onedrive.com]]
 
 -- Google Drive
 --- Examples:
