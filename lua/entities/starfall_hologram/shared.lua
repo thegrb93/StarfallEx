@@ -13,6 +13,7 @@ function ENT:SetupDataTables()
 	self:NetworkVar( "Vector", 0, "Scale" )
 	self:NetworkVar( "Vector", 1, "PlayerColorInternal" )
 	self:NetworkVar( "Bool", 0, "SuppressEngineLighting" )
+	self:NetworkVar( "Bool", 1, "CullMode" )
 
 	if CLIENT then
 		self:NetworkVarNotify( "Scale", self.OnScaleChanged )

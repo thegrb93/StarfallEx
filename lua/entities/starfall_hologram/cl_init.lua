@@ -85,6 +85,11 @@ function ENT:Draw(flags)
 			clipCount = clipCount + 1
 		end
 	end
+	
+	local cullMode = self:GetCullMode()
+	if cullMode then
+		render.CullMode(MATERIAL_CULLMODE_CW)
+	end
 
 	local filter_mag, filter_min = selfTbl.filter_mag, selfTbl.filter_min
 	if filter_mag then render.PushFilterMag(filter_mag) end
@@ -96,6 +101,10 @@ function ENT:Draw(flags)
 		render.SuppressEngineLighting(false)
 	else
 		self:DrawModel(flags)
+	end
+	
+	if cullMode then
+		render.CullMode(MATERIAL_CULLMODE_CCW)
 	end
 	
 	if filter_mag then render.PopFilterMag() end
