@@ -1867,6 +1867,24 @@ function render_library.drawSimpleText(x, y, text, xalign, yalign)
 	return draw.SimpleText(text, font, x, y, currentcolor, xalign, yalign)
 end
 
+--- Draws outlined text more easily but no new lines or tabs.
+-- @param number x X coordinate
+-- @param number y Y coordinate
+-- @param string text Text to draw
+-- @param number outlinewidth Width of the outline.
+-- @param Color outlinecolor The color of the text.
+-- @param number? xalign Horizontal text alignment. Default TEXT_ALIGN.LEFT
+-- @param number? yalign Vertical text alignment. Default TEXT_ALIGN.TOP
+-- @return number Width of the drawn text. Same as calling render.getTextSize
+-- @return number Height of the drawn text. Same as calling render.getTextSize
+function render_library.drawSimpleTextOutlined(x, y, text, outlinewidth, outlinecolor, xalign, yalign)
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+
+	local font = renderdata.font or defaultFont
+
+	return draw.SimpleTextOutlined( text, font, x, y, currentcolor, xalign, yalign, outlinewidth, outlinecolor )
+end
+
 --- Constructs a markup object for quick styled text drawing.
 -- @param string str The markup string to parse
 -- @param number? maxsize The max width of the markup. Default nil
