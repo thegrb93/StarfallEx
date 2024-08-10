@@ -150,24 +150,49 @@ hook.Add("StarfallError", "StarfallErrorReport", function(_, owner, client, main
 end)
 
 net.Receive("starfall_processor_download", function(len)
-	net.ReadStarfall(nil, function(ok, sfdata)
-		if ok then
-			local proc, owner
-			local function setup()
-				if not IsValid(proc) then return end
-				if not (IsValid(owner) or IsWorld(owner)) then return end
-				sfdata.proc = proc
-				sfdata.owner = owner
+	net.ReadStarfall(nil, function(ok, sfdata, err)
+		local proc, owner
+		local function setup()
+			if not IsValid(proc) then return end
+			if not (IsValid(owner) or IsWorld(owner)) then return end
+			sfdata.proc = proc
+			sfdata.owner = owner
+			if ok then
 				proc:SetupFiles(sfdata)
-			end
-
-			if sfdata.ownerindex == 0 then
-				owner = game.GetWorld()
 			else
-				SF.WaitForEntity(sfdata.ownerindex, sfdata.ownercreateindex, function(e) owner = e setup() end)
+				-- create dummy instance
+				local instance = setmetatable({}, SF.Instance)
+				instance.entity = proc
+				instance.player = owner
+				instance.data = {}
+				instance.stackn = 0
+				instance.sfhooks = {}
+				instance.hooks = {}
+				instance.scripts = {}
+				instance.requires = {}
+				instance.permissionOverrides = {}
+				proc.instance = instance
+
+				local msg = "Failed to download Starfall chip #" .. sfdata.procindex ..  "'s code client-side: " .. tostring(err)
+				proc:Error{
+					message = msg,
+					traceback = ""
+				}
+
+				-- I don't know why, but it isn't sending a notification
+				if owner == LocalPlayer() then
+					notification.AddLegacy(msg, NOTIFY_ERROR, 6)
+				end
 			end
-			SF.WaitForEntity(sfdata.procindex, sfdata.proccreateindex, function(e) proc = e setup() end)
 		end
+
+		if sfdata.ownerindex == 0 then
+			owner = game.GetWorld()
+		else
+			SF.WaitForEntity(sfdata.ownerindex, sfdata.ownercreateindex, function(e) owner = e setup() end)
+		end
+
+		SF.WaitForEntity(sfdata.procindex, sfdata.proccreateindex, function(e) proc = e setup() end)
 	end)
 end)
 
