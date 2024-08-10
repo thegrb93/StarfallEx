@@ -10,10 +10,6 @@ local dgetmeta = debug.getmetatable
 local TypeID = TypeID
 local IsValid = FindMetaTable("Entity").IsValid
 
-hook.Add("Initialize", "SF_Initialize_SetNetstreamParams", function()
-	net.Stream.Timeout = 30
-end)
-
 -- Make sure this is done after metatables have been set
 hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 	local function sanitizeTypeMeta(theType, myMeta)

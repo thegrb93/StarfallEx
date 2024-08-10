@@ -157,32 +157,11 @@ net.Receive("starfall_processor_download", function(len)
 			if not (IsValid(owner) or IsWorld(owner)) then return end
 			sfdata.proc = proc
 			sfdata.owner = owner
-			if ok then
+			proc.owner = owner
+			if ok and false then
 				proc:SetupFiles(sfdata)
 			else
-				-- create dummy instance
-				local instance = setmetatable({}, SF.Instance)
-				instance.entity = proc
-				instance.player = owner
-				instance.data = {}
-				instance.stackn = 0
-				instance.sfhooks = {}
-				instance.hooks = {}
-				instance.scripts = {}
-				instance.requires = {}
-				instance.permissionOverrides = {}
-				proc.instance = instance
-
-				local msg = "Failed to download Starfall chip #" .. sfdata.procindex ..  "'s code client-side: " .. tostring(err)
-				proc:Error{
-					message = msg,
-					traceback = ""
-				}
-
-				-- I don't know why, but it isn't sending a notification
-				if owner == LocalPlayer() then
-					notification.AddLegacy(msg, NOTIFY_ERROR, 6)
-				end
+				proc:Error({message = "Failed to download and initialize client: " .. tostring(err), traceback = "" })
 			end
 		end
 
@@ -191,7 +170,6 @@ net.Receive("starfall_processor_download", function(len)
 		else
 			SF.WaitForEntity(sfdata.ownerindex, sfdata.ownercreateindex, function(e) owner = e setup() end)
 		end
-
 		SF.WaitForEntity(sfdata.procindex, sfdata.proccreateindex, function(e) proc = e setup() end)
 	end)
 end)
