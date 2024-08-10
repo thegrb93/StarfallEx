@@ -723,6 +723,55 @@ if CLIENT then
 	end)
 end
 
+SF.RenderStack = {
+	__index = {
+		create = function(self, data)
+			return setmetatable({
+				run = self.runDirty,
+				data = data,
+			}, self.objindex)
+		end,
+
+		runDirty = function(self, flags)
+			local pushes = {self.maincode[1]}
+			local pops = {self.maincode[3]}
+			for _, v in ipairs(self.properties) do
+				pushes[#pushes+1], pops[#pops+1] = v(self.data)
+			end
+
+			local code = {}
+			for i=1, #pushes do
+				code[#code + 1] = pushes[i]
+			end
+			code[#code + 1] = self.maincode[2]
+			for i=#pops, 1, -1 do
+				code[#code + 1] = pops[i]
+			end
+
+			self.renderfunc = CompileString(table.concat(code, " "), "RenderStack")()
+			self.run = self.runClean
+			self:run(flags)
+		end,
+
+		runClean = function(self, flags)
+			self.renderfunc(self.data, flags)
+		end,
+
+		makeDirty = function(self)
+			self.run = self.runDirty
+		end,
+	},
+	__call = function(p, maincode, properties)
+		local ret = setmetatable({
+			maincode = maincode,
+			properties = properties
+		}, p)
+		ret.objindex = {__index = ret}
+		return ret
+	end
+}
+setmetatable(SF.RenderStack, SF.RenderStack)
+
 
 -- Error type containing error info
 SF.Errormeta = {

@@ -18,5 +18,7 @@ function ENT:SetupDataTables()
 	if CLIENT then
 		self:NetworkVarNotify( "Scale", self.OnScaleChanged )
 		self:NetworkVarNotify( "PlayerColorInternal", self.OnPlayerColorChanged )
+		self:NetworkVarNotify( "SuppressEngineLighting", self.OnSuppressEngineLightingChanged )
+		self:NetworkVarNotify( "CullMode", self.OnCullModeChanged )
 	end
 end
