@@ -158,7 +158,7 @@ net.Receive("starfall_processor_download", function(len)
 			sfdata.proc = proc
 			sfdata.owner = owner
 			proc.owner = owner
-			if ok and false then
+			if ok then
 				proc:SetupFiles(sfdata)
 			else
 				proc:Error({message = "Failed to download and initialize client: " .. tostring(err), traceback = "" })
