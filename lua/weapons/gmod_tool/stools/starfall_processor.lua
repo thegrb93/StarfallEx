@@ -69,7 +69,7 @@ else
 		SF.Editor.open()
 
 		if net.ReadBool() then
-			net.ReadStarfall(nil, function(ok, sfdata)
+			net.ReadStarfall(nil, function(ok, sfdata, err)
 				if ok then
 					local mainfile = sfdata.files[sfdata.mainfile]
 					sfdata.files[sfdata.mainfile] = nil
@@ -79,7 +79,7 @@ else
 					-- Add mainfile last so it gets focus
 					SF.Editor.openWithCode(sfdata.mainfile, mainfile, nil, false)
 				else
-					SF.AddNotify(LocalPlayer(), "Error downloading SF code. ("..sfdata..")", "ERROR", 7, "ERROR1")
+					SF.AddNotify(LocalPlayer(), "Error downloading SF code. (" .. err .. ")", "ERROR", 7, "ERROR1")
 				end
 			end)
 		end
