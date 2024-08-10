@@ -80,12 +80,15 @@ function ENT:Initialize()
 end
 
 function ENT:SetClip(index, enabled, normal, origin, entity)
+	local clips = self.clips
+	local empty = next(clips)==nil
 	if enabled then
-		self.clips[index] = {normal = normal, origin = origin, entity = entity}
+		if empty then self.renderstack:makeDirty() end
+		clips[index] = {normal = normal, origin = origin, entity = entity}
 	else
-		self.clips[index] = nil
+		clips[index] = nil
+		if not empty and next(clips)==nil then self.renderstack:makeDirty() end
 	end
-	self.renderstack:makeDirty()
 end
 
 function ENT:OnScaleChanged(name, old, scale)
