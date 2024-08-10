@@ -85,7 +85,7 @@ function ENT:SetClip(index, enabled, normal, origin, entity)
 	else
 		self.clips[index] = nil
 	end
-	holo.renderstack:makeDirty()
+	self.renderstack:makeDirty()
 end
 
 function ENT:OnScaleChanged(name, old, scale)

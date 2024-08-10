@@ -748,14 +748,14 @@ SF.RenderStack = {
                 code[#code + 1] = pops[i]
             end
 
-            self.renderfunc = loadstring(table.concat(code), " ")()
+            self.renderfunc = CompileString(table.concat(code, " "), "RenderStack")()
             self.run = self.runClean
             self:run(flags)
         end,
 
         runClean = function(self, flags)
             self.renderfunc(self.data, flags)
-        end
+        end,
 
         makeDirty = function(self)
             self.run = self.runDirty
