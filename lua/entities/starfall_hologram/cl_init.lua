@@ -8,57 +8,57 @@ local VECTOR_PLAYER_COLOR_DISABLED = Vector(-1, -1, -1)
 local IsValid = FindMetaTable("Entity").IsValid
 
 local HoloRenderStack = SF.RenderStack({
-    "return function(self, flags)",
-    "self:DrawModel(flags)",
-    "end"
+	"return function(self, flags)",
+	"self:DrawModel(flags)",
+	"end"
 },
 {
-    function(data)
-        if data:GetCullMode() then
-            return "render.CullMode(MATERIAL_CULLMODE_CW)", "render.CullMode(MATERIAL_CULLMODE_CCW)"
-        end
-    end,
-    function(data)
-        if data:GetSuppressEngineLighting() then
-            return "render.SuppressEngineLighting(true)", "render.SuppressEngineLighting(false)"
-        end
-    end,
-    function(data)
-        if data.filter_min then
-            return "render.PushFilterMin("..data.filter_min..")", "render.PopFilterMin()"
-        end
-    end,
-    function(data)
-        if data.filter_mag then
-            return "render.PushFilterMag("..data.filter_mag..")", " render.PopFilterMag()"
-        end
-    end,
-    function(data)
-        if next(data.clips) then
-            return 
+	function(data)
+		if data:GetCullMode() then
+			return "render.CullMode(MATERIAL_CULLMODE_CW)", "render.CullMode(MATERIAL_CULLMODE_CCW)"
+		end
+	end,
+	function(data)
+		if data:GetSuppressEngineLighting() then
+			return "render.SuppressEngineLighting(true)", "render.SuppressEngineLighting(false)"
+		end
+	end,
+	function(data)
+		if data.filter_min then
+			return "render.PushFilterMin("..data.filter_min..")", "render.PopFilterMin()"
+		end
+	end,
+	function(data)
+		if data.filter_mag then
+			return "render.PushFilterMag("..data.filter_mag..")", " render.PopFilterMag()"
+		end
+	end,
+	function(data)
+		if next(data.clips) then
+			return 
 [[local clipCount = 0
 local prevClip = render.EnableClipping(true)
 for _, clip in pairs(self.clips) do
-    local clipent = clip.entity
-    if IsValid(clipent) then
-        local norm = clipent:LocalToWorld(clip.normal) - clipent:GetPos()
-        render.PushCustomClipPlane(norm, norm:Dot(clipent:LocalToWorld(clip.origin)))
-    else
-        render.PushCustomClipPlane(clip.normal, clip.normal:Dot(clip.origin))
-    end
-    clipCount = clipCount + 1
+	local clipent = clip.entity
+	if IsValid(clipent) then
+		local norm = clipent:LocalToWorld(clip.normal) - clipent:GetPos()
+		render.PushCustomClipPlane(norm, norm:Dot(clipent:LocalToWorld(clip.origin)))
+	else
+		render.PushCustomClipPlane(clip.normal, clip.normal:Dot(clip.origin))
+	end
+	clipCount = clipCount + 1
 end]],
 [[for i=1, clipCount do
-    render.PopCustomClipPlane()
+	render.PopCustomClipPlane()
 end
 render.EnableClipping(prevClip)]]
-        end
-    end,
-    function(data)
-        if data.AutomaticFrameAdvance then
-            return nil, "self:FrameAdvance(0)"
-        end
-    end
+		end
+	end,
+	function(data)
+		if data.AutomaticFrameAdvance then
+			return nil, "self:FrameAdvance(0)"
+		end
+	end
 })
 
 function ENT:Initialize()
