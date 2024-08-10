@@ -7,6 +7,60 @@ ENT.Material = ENT.DefaultMaterial
 local VECTOR_PLAYER_COLOR_DISABLED = Vector(-1, -1, -1)
 local IsValid = FindMetaTable("Entity").IsValid
 
+local HoloRenderStack = SF.RenderStack({
+    "return function(self, flags)",
+    "self:DrawModel(flags)",
+    "end"
+},
+{
+    function(data)
+        if data:GetCullMode() then
+            return "render.CullMode(MATERIAL_CULLMODE_CW)", "render.CullMode(MATERIAL_CULLMODE_CCW)"
+        end
+    end,
+    function(data)
+        if data:GetSuppressEngineLighting() then
+            return "render.SuppressEngineLighting(true)", "render.SuppressEngineLighting(false)"
+        end
+    end,
+    function(data)
+        if data.filter_min then
+            return "render.PushFilterMin("..data.filter_min..")", "render.PopFilterMin()"
+        end
+    end,
+    function(data)
+        if data.filter_mag then
+            return "render.PushFilterMag("..data.filter_mag..")", " render.PopFilterMag()"
+        end
+    end,
+    function(data)
+        if next(data.clips) then
+            return 
+[[local clipCount = 0
+local prevClip = render.EnableClipping(true)
+for _, clip in pairs(self.clips) do
+    local clipent = clip.entity
+    if IsValid(clipent) then
+        local norm = clipent:LocalToWorld(clip.normal) - clipent:GetPos()
+        render.PushCustomClipPlane(norm, norm:Dot(clipent:LocalToWorld(clip.origin)))
+    else
+        render.PushCustomClipPlane(clip.normal, clip.normal:Dot(clip.origin))
+    end
+    clipCount = clipCount + 1
+end]],
+[[for i=1, clipCount do
+    render.PopCustomClipPlane()
+end
+render.EnableClipping(prevClip)]]
+        end
+    end,
+    function(data)
+        if data.AutomaticFrameAdvance then
+            return nil, "self:FrameAdvance(0)"
+        end
+    end
+})
+
 function ENT:Initialize()
 	self.clips = {}
 	self.sf_userrenderbounds = false
@@ -22,6 +76,7 @@ function ENT:Initialize()
 	-- Fixes future SetParent calls not keeping offset from the parent
 	self:SetParent(Entity(0))
 	self:SetParent()
+	self.renderstack = HoloRenderStack:create(self)
 end
 
 function ENT:SetClip(index, enabled, normal, origin, entity)
@@ -30,6 +85,7 @@ function ENT:SetClip(index, enabled, normal, origin, entity)
 	else
 		self.clips[index] = nil
 	end
+	holo.renderstack:makeDirty()
 end
 
 function ENT:OnScaleChanged(name, old, scale)
@@ -62,6 +118,14 @@ function ENT:OnPlayerColorChanged(name, old, color)
 	end
 end
 
+function ENT:OnSuppressEngineLightingChanged()
+	self.renderstack:makeDirty()
+end
+
+function ENT:OnCullModeChanged()
+	self.renderstack:makeDirty()
+end
+
 function ENT:Draw(flags)
 	local selfTbl = self:GetTable()
 	if self:GetColor().a ~= 255 then
@@ -70,56 +134,7 @@ function ENT:Draw(flags)
 		selfTbl.RenderGroup = RENDERGROUP_OPAQUE
 	end
 
-	local clipCount = 0
-	local prevClip
-	if next(selfTbl.clips) then
-		prevClip = render.EnableClipping(true)
-		for _, clip in pairs(selfTbl.clips) do
-			local clipent = clip.entity
-			if IsValid(clipent) then
-				local norm = clipent:LocalToWorld(clip.normal) - clipent:GetPos()
-				render.PushCustomClipPlane(norm, norm:Dot(clipent:LocalToWorld(clip.origin)))
-			else
-				render.PushCustomClipPlane(clip.normal, clip.normal:Dot(clip.origin))
-			end
-			clipCount = clipCount + 1
-		end
-	end
-	
-	local cullMode = self:GetCullMode()
-	if cullMode then
-		render.CullMode(MATERIAL_CULLMODE_CW)
-	end
-
-	local filter_mag, filter_min = selfTbl.filter_mag, selfTbl.filter_min
-	if filter_mag then render.PushFilterMag(filter_mag) end
-	if filter_min then render.PushFilterMin(filter_min) end
-	
-	if self:GetSuppressEngineLighting() then
-		render.SuppressEngineLighting(true)
-		self:DrawModel(flags)
-		render.SuppressEngineLighting(false)
-	else
-		self:DrawModel(flags)
-	end
-	
-	if cullMode then
-		render.CullMode(MATERIAL_CULLMODE_CCW)
-	end
-	
-	if filter_mag then render.PopFilterMag() end
-	if filter_min then render.PopFilterMin() end
-
-	if next(selfTbl.clips) then
-		for i=1, clipCount do
-			render.PopCustomClipPlane()
-		end
-		render.EnableClipping(prevClip)
-	end
-	
-	if selfTbl.AutomaticFrameAdvance then
-		self:FrameAdvance(0)
-	end
+	self.renderstack:run(flags)
 end
 
 function ENT:GetRenderMesh()

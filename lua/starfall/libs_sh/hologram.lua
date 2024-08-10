@@ -253,6 +253,7 @@ else
 		else
 			holo.filter_mag = nil
 		end
+		holo.renderstack:makeDirty()
 	end
 
 	--- Sets the texture filtering function when viewing a far texture
@@ -269,6 +270,7 @@ else
 		else
 			holo.filter_min = nil
 		end
+		holo.renderstack:makeDirty()
 	end
 
 	--- Sets a hologram entity's rendermatrix
@@ -474,6 +476,7 @@ function hologram_methods:setAnimation(animation, frame, rate)
 	if animation~=nil then
 		holo:ResetSequence(animation)
 		holo.AutomaticFrameAdvance = animation~=-1
+		holo.renderstack:makeDirty()
 	end
 	if frame ~= nil then
 		checkluatype(frame, TYPE_NUMBER)
