@@ -150,24 +150,27 @@ hook.Add("StarfallError", "StarfallErrorReport", function(_, owner, client, main
 end)
 
 net.Receive("starfall_processor_download", function(len)
-	net.ReadStarfall(nil, function(ok, sfdata)
-		if ok then
-			local proc, owner
-			local function setup()
-				if not IsValid(proc) then return end
-				if not (IsValid(owner) or IsWorld(owner)) then return end
-				sfdata.proc = proc
-				sfdata.owner = owner
+	net.ReadStarfall(nil, function(ok, sfdata, err)
+		local proc, owner
+		local function setup()
+			if not IsValid(proc) then return end
+			if not (IsValid(owner) or IsWorld(owner)) then return end
+			sfdata.proc = proc
+			sfdata.owner = owner
+			proc.owner = owner
+			if ok then
 				proc:SetupFiles(sfdata)
-			end
-
-			if sfdata.ownerindex == 0 then
-				owner = game.GetWorld()
 			else
-				SF.WaitForEntity(sfdata.ownerindex, sfdata.ownercreateindex, function(e) owner = e setup() end)
+				proc:Error({message = "Failed to download and initialize client: " .. tostring(err), traceback = "" })
 			end
-			SF.WaitForEntity(sfdata.procindex, sfdata.proccreateindex, function(e) proc = e setup() end)
 		end
+
+		if sfdata.ownerindex == 0 then
+			owner = game.GetWorld()
+		else
+			SF.WaitForEntity(sfdata.ownerindex, sfdata.ownercreateindex, function(e) owner = e setup() end)
+		end
+		SF.WaitForEntity(sfdata.procindex, sfdata.proccreateindex, function(e) proc = e setup() end)
 	end)
 end)
 

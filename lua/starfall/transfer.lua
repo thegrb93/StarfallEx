@@ -21,10 +21,10 @@ function net.ReadStarfall(ply, callback)
 				sfdata.files = files
 				callback(true, sfdata)
 			else
-				callback(false, files)
+				callback(false, sfdata, files)
 			end
 		else
-			callback(false, "Net timeout")
+			callback(false, sfdata, "Net timeout")
 		end
 	end)
 
@@ -171,15 +171,15 @@ if SERVER then
 
 		updata.reading = true
 
-		net.ReadStarfall(ply, function(ok, sfdata)
+		net.ReadStarfall(ply, function(ok, sfdata, err)
 			if ok then
 				if #sfdata.mainfile > 0 then
 					sfdata.owner = ply
 					updata.callback(sfdata)
 				end
 			else
-				if uploaddata[ply]==updata then
-					SF.AddNotify(ply, "There was a problem uploading your code ("..sfdata.."). Try again in a second.", "ERROR", 7, "ERROR1")
+				if uploaddata[ply] == updata then
+					SF.AddNotify(ply, "There was a problem uploading your code (" .. err .. "). Try again in a second.", "ERROR", 7, "ERROR1")
 				end
 			end
 			uploaddata[ply] = nil
