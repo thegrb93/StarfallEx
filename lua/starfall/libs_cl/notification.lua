@@ -61,7 +61,7 @@ function notification_library.addProgress(id, text, progress)
 	checkluatype(id, TYPE_STRING)
 	checkluatype(text, TYPE_STRING)
 	if progress~=nil then
-		checkluatype(text, TYPE_NUMBER)
+		checkluatype(progress, TYPE_NUMBER)
 		progress = math.Clamp(progress, 0, 1)
 	end
 
