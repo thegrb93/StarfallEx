@@ -249,3 +249,8 @@ simple [[autumn.revolt.chat]]
 --- Examples:
 ---  https://youtube.michaelbelgium.me/storage/5zrORMBb0-8.mp3
 simple [[youtube.michaelbelgium.me]]
+
+-- Nekoweb
+--- Examples:
+---  https://website.nekoweb.org/path/to/resource
+pattern [[([%w-_]+)%.nekoweb%.org/(.+)]]
