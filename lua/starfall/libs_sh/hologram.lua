@@ -476,7 +476,7 @@ function hologram_methods:setAnimation(animation, frame, rate)
 	if animation~=nil then
 		holo:ResetSequence(animation)
 		holo.AutomaticFrameAdvance = animation~=-1
-		holo.renderstack:makeDirty()
+		if CLIENT then holo.renderstack:makeDirty() end
 	end
 	if frame ~= nil then
 		checkluatype(frame, TYPE_NUMBER)
