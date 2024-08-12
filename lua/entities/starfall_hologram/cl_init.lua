@@ -81,13 +81,14 @@ end
 
 function ENT:SetClip(index, enabled, normal, origin, entity)
 	local clips = self.clips
-	local empty = next(clips)==nil
+	local prevempty = table.Empty(clips)
 	if enabled then
-		if empty then self.renderstack:makeDirty() end
 		clips[index] = {normal = normal, origin = origin, entity = entity}
 	else
 		clips[index] = nil
-		if not empty and next(clips)==nil then self.renderstack:makeDirty() end
+	end
+	if prevempty~=table.Empty(clips) then
+		self.renderstack:makeDirty()
 	end
 end
 
