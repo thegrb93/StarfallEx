@@ -23,7 +23,7 @@ end
 -- @name PhysObj
 -- @class type
 -- @libtbl physobj_methods
-SF.RegisterType("PhysObj", true, false)
+SF.RegisterType("PhysObj", true, false, FindMetaTable("PhysObj"))
 
 
 return function(instance)
