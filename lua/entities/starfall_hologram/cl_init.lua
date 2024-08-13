@@ -81,13 +81,14 @@ end
 
 function ENT:SetClip(index, enabled, normal, origin, entity)
 	local clips = self.clips
-	local empty = next(clips)==nil
+	local prevempty = table.IsEmpty(clips)
 	if enabled then
-		if empty then self.renderstack:makeDirty() end
 		clips[index] = {normal = normal, origin = origin, entity = entity}
 	else
 		clips[index] = nil
-		if not empty and next(clips)==nil then self.renderstack:makeDirty() end
+	end
+	if prevempty~=table.IsEmpty(clips) then
+		self.renderstack:makeDirty()
 	end
 end
 
@@ -171,6 +172,10 @@ net.Receive("starfall_hologram_clips", function()
 					SF.WaitForEntity(entind, creationid, function(e) clip.entity = e end)
 				end
 				clips[index] = clip
+			end
+			print(table.IsEmpty(self.clips), table.IsEmpty(clips))
+			if table.IsEmpty(self.clips) ~= table.IsEmpty(clips) then
+				self.renderstack:makeDirty()
 			end
 			self.clips = clips
 		end
