@@ -51,7 +51,8 @@ end
 --- Displays a notification with an animated progress bar, will persist unless killed or chip is removed.
 -- @param string id String index of the notification
 -- @param string text The text to display
-function notification_library.addProgress(id, text)
+-- @param number? progress An optional progress val 0-1 indicating progress.
+function notification_library.addProgress(id, text, progress)
 	if SF.IsHUDActive(instance.entity) then
 		checkpermission(instance, nil, "notification.hud")
 	else
@@ -59,6 +60,10 @@ function notification_library.addProgress(id, text)
 	end
 	checkluatype(id, TYPE_STRING)
 	checkluatype(text, TYPE_STRING)
+	if progress~=nil then
+		checkluatype(progress, TYPE_NUMBER)
+		progress = math.Clamp(progress, 0, 1)
+	end
 
 	if #id > 256 then SF.Throw("ID is greater than 256 limit!", 2) end
 	if #text > 256 then SF.Throw("Text is greater than 256 limit!", 2) end
@@ -72,7 +77,7 @@ function notification_library.addProgress(id, text)
 		SF.Throw("Invalid chip owner", 2)
 	end
 
-	notification.AddProgress( id, text )
+	notification.AddProgress( id, text, progress )
 	notifications[id] = true
 end
 
