@@ -22,7 +22,7 @@ instance:AddHook("initialize", function()
 end)
 
 local function getwep(self)
-	local ent = unwrap(self)
+	local ent = weapon_meta.sf2sensitive[self]
 	if IsValid(ent) then
 		return ent
 	else

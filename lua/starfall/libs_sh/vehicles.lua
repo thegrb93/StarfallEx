@@ -31,7 +31,7 @@ instance:AddHook("initialize", function()
 end)
 
 local function getveh(self)
-	local ent = unwrap(self)
+	local ent = vehicle_meta.sf2sensitive[self]
 	if IsValid(ent) then
 		return ent
 	else

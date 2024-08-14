@@ -76,7 +76,7 @@ local plywrap = instance.Types.Player.Wrap
 local swrap, sunwrap = instance.Types.SurfaceInfo.Wrap, instance.Types.SurfaceInfo.Unwrap
 
 local function getent(self)
-	local ent = eunwrap(self)
+	local ent = ent_meta.sf2sensitive[self]
 	if IsValid(ent) or IsWorld(ent) then
 		return ent
 	else
@@ -834,7 +834,8 @@ end
 -- @shared
 -- @return boolean True if valid, false if not
 function ents_methods:isValid()
-	return IsValid(eunwrap(self))
+	local ent = ent_meta.sf2sensitive[self]
+	return IsValid(ent)
 end
 
 --- Checks if an entity is a player.

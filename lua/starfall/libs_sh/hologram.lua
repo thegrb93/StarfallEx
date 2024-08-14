@@ -78,7 +78,7 @@ instance:AddHook("deinitialize", function()
 end)
 
 local function getholo(self)
-	local ent = unwrap(self)
+	local ent = hologram_meta.sf2sensitive[self]
 	if IsValid(ent) then
 		return ent
 	else

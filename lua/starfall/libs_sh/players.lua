@@ -113,7 +113,7 @@ if SERVER then
 end
 
 local function getply(self)
-	local ent = unwrap(self)
+	local ent = player_meta.sf2sensitive[self]
 	if IsValid(ent) then
 		return ent
 	else

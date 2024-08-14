@@ -253,7 +253,7 @@ function SF.Instance:CreateWrapper(metatable, typedata)
 		end
 		function unwrap(value)
 			local ret = sf2sensitive[value]
-			return ret or self.CheckType(value, metatable, 2) or SF.Throw("Object no longer valid", 3)
+			return ret or self.CheckType(value, metatable, 2)~=value or SF.Throw("Object no longer valid", 3)
 		end
 	end
 
