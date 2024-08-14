@@ -32,7 +32,7 @@ instance:AddHook("initialize", function()
 end)
 
 local function getnpc(self)
-	local ent = unwrap(self)
+	local ent = npc_meta.sf2sensitive[self]
 	if IsValid(ent) then
 		return ent
 	else
