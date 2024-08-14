@@ -173,7 +173,6 @@ net.Receive("starfall_hologram_clips", function()
 				end
 				clips[index] = clip
 			end
-			print(table.IsEmpty(self.clips), table.IsEmpty(clips))
 			if table.IsEmpty(self.clips) ~= table.IsEmpty(clips) then
 				self.renderstack:makeDirty()
 			end
