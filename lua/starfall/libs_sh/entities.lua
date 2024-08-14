@@ -834,8 +834,7 @@ end
 -- @shared
 -- @return boolean True if valid, false if not
 function ents_methods:isValid()
-	local ent = ent_meta.sf2sensitive[self]
-	return IsValid(ent)
+	return IsValid(ent_meta.sf2sensitive[self])
 end
 
 --- Checks if an entity is a player.
