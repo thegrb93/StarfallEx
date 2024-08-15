@@ -255,6 +255,19 @@ if SERVER then
 		phys:SetVelocity(vel)
 	end
 
+	--- Sets the instantaneous velocity of the physics object
+	-- @server
+	-- @param Vector vel The velocity vector to set it to
+	function physobj_methods:setVelocityInstantaneous(vel)
+
+		vel = vunwrap(vel)
+		checkvector(vel)
+
+		local phys = unwrap(self)
+		checkpermission(instance, phys:GetEntity(), "entities.setVelocity")
+		phys:SetVelocityInstantaneous(vel)
+	end
+
     --- Applies velocity to an object
     -- @server
     -- @param Vector vel The world velocity vector to apply
@@ -322,6 +335,19 @@ if SERVER then
 		checkpermission(instance, phys:GetEntity(), "entities.applyForce")
 
 		phys:AddAngleVelocity(angvel - phys:GetAngleVelocity())
+	end
+
+	--- Sets the specified instantaneous angular velocity on a physics object
+	-- @server
+	-- @param Vector angvel The new velocity to set velocity
+	function physobj_methods:setAngleVelocityInstantaneous(angvel)
+		angvel = vunwrap(angvel)
+		checkvector(angvel)
+
+		local phys = unwrap(self)
+		checkpermission(instance, phys:GetEntity(), "entities.applyForce")
+
+		phys:SetAngleVelocityInstantaneous(angvel)
 	end
 
 	--- Applies a angular velocity to an object
