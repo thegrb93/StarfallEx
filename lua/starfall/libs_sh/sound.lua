@@ -133,15 +133,10 @@ end
 --- Removes the sound from the game so new one can be created if limit is reached
 function sound_methods:destroy()
 	local snd = unwrap(self)
-	if snd and sounds[snd] then
+	if sounds[snd] then
 		deleteSound(instance.player, sounds[snd], snd)
 		sounds[snd] = nil
-		local sensitive2sf, sf2sensitive = sound_meta.sensitive2sf, sound_meta.sf2sensitive
-		sensitive2sf[snd] = nil
-		sf2sensitive[self] = nil
-		debug.setmetatable(self, nil)
-	else
-		SF.Throw("Tried to destroy invalid sound", 2)
+		sound_meta.sf2sensitive[self] = nil
 	end
 end
 
