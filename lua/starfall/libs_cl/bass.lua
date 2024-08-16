@@ -151,7 +151,11 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 
 local function getsnd(self)
 	local snd = unwrap(self)
-	return snd:IsValid() and snd or SF.Throw("Sound is not valid.", 3)
+	if snd:IsValid() then
+		return snd
+	else
+		SF.Throw("Sound is not valid.", 3)
+	end
 end
 
 local function not3D(flags)
