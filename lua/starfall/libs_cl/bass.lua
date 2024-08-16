@@ -151,8 +151,11 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 
 local function getsnd(self)
 	local snd = unwrap(self)
-	local isValid = snd.IsValid
-	return isValid and isValid(snd) and snd or SF.Throw("Sound is not valid.", 3)
+	if snd:IsValid() then
+		return snd
+	else
+		SF.Throw("Sound is not valid.", 3)
+	end
 end
 
 local function not3D(flags)
@@ -242,11 +245,6 @@ function bass_methods:stop()
 	local snd = getsnd(self)
 	deleteSound(instance.player, snd)
 	instanceSounds[snd] = nil
-
-	-- This makes the sound no longer unwrap
-	local sensitive2sf, sf2sensitive = bass_meta.sensitive2sf, bass_meta.sf2sensitive
-	sensitive2sf[snd] = nil
-	sf2sensitive[self] = nil
 end
 
 --- Pauses the sound.
@@ -386,9 +384,7 @@ end
 --- Gets whether the bass is valid.
 -- @return boolean Boolean of whether the bass is valid.
 function bass_methods:isValid()
-	local uw = unwrap(self)
-	local isValid = uw.IsValid
-	return isValid and isValid(uw) or false
+	return unwrap(self):IsValid()
 end
 
 --- Gets the left and right audio channel levels.
