@@ -1,8 +1,5 @@
 --- Provides permissions for entities based on CPPI if present
 
-local IsValid = FindMetaTable("Entity").IsValid
-
-
 local owneraccess
 if SERVER then
 	owneraccess = CreateConVar("sf_permissions_entity_owneraccess", "0", { FCVAR_ARCHIVE }, "Allows starfall chip's owner to access their player entity")
@@ -26,7 +23,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 		if SERVER then
 			P.checks = {
 				function(instance, target)
-					if IsValid(target) then
+					if target and target:IsValid() then
 						if target == instance.player and owneraccess:GetBool() then return true end
 						if instance.player:IsSuperAdmin() then return true end
 						if target:CPPIGetOwner()==instance.player then
@@ -39,7 +36,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 					end
 				end,
 				function(instance, target)
-					if IsValid(target) then
+					if target and target:IsValid() then
 						if target == instance.player and owneraccess:GetBool() then return true end
 						if target:CPPICanTool(instance.player, "starfall_ent_lib") then
 							return true
@@ -51,7 +48,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 					end
 				end,
 				function(instance, target)
-					if IsValid(target) then
+					if target and target:IsValid() then
 						if target == instance.player and owneraccess:GetBool() then return true end
 						if target:CPPICanPhysgun(instance.player) then
 							return true
@@ -67,7 +64,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 		else
 			P.checks = {
 				function(instance, target)
-					if IsValid(target) then
+					if target and target:IsValid() then
 						if target==instance.player or LocalPlayer()==instance.player or instance.player:IsSuperAdmin() then return true end
 						if target:CPPIGetOwner()==instance.player then
 							return true
@@ -79,7 +76,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 					end
 				end,
 				function(instance, target)
-					if IsValid(target) then
+					if target and target:IsValid() then
 						if target==instance.player or LocalPlayer()==instance.player or instance.player:IsSuperAdmin() then return true end
 						if target:CPPICanTool(instance.player, "starfall_ent_lib") then
 							return true
@@ -91,7 +88,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 					end
 				end,
 				function(instance, target)
-					if IsValid(target) then
+					if target and target:IsValid() then
 						if target==instance.player or LocalPlayer()==instance.player or instance.player:IsSuperAdmin() then return true end
 						if target:CPPICanPhysgun(instance.player) then
 							return true
@@ -112,7 +109,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 		if SERVER then
 			P.checks = {
 				function(instance, target)
-					if IsValid(target) then
+					if target and target:IsValid() then
 						if target == instance.player and owneraccess:GetBool() then return true end
 						if instance.player:IsSuperAdmin() then return true end
 						if P.props[target]==instance.player then
@@ -125,7 +122,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 					end
 				end,
 				function(instance, target)
-					if IsValid(target) then
+					if target and target:IsValid() then
 						if target == instance.player and owneraccess:GetBool() then return true end
 						local pos = target:GetPos()
 						if hook.Run("CanTool", instance.player, SF.dumbTrace(target), "starfall_ent_lib") ~= false then
@@ -138,7 +135,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 					end
 				end,
 				function(instance, target)
-					if IsValid(target) then
+					if target and target:IsValid() then
 						if target == instance.player and owneraccess:GetBool() then return true end
 						if hook.Run("PhysgunPickup", instance.player, target) ~= false then
 							-- Some mods expect a release when there's a pickup involved.
@@ -167,7 +164,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 			if(cleanup) then
 				local backupcleanupAdd = cleanup.Add
 				function cleanup.Add(ply, enttype, ent)
-					if IsValid(ent) and ply:IsPlayer() then
+					if ent and ent:IsValid() and ply:IsPlayer() then
 						PropOwn(ply, ent)
 					end
 					backupcleanupAdd(ply, enttype, ent)
@@ -204,7 +201,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 		else
 			P.checks = {
 				function(instance, target)
-					if IsValid(target) then
+					if target and target:IsValid() then
 						if target==instance.player or LocalPlayer()==instance.player or instance.player:IsSuperAdmin() then return true end
 						local owner = target:GetNWEntity("SFPP")
 						if owner ~= NULL then
