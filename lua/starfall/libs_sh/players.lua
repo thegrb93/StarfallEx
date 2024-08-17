@@ -1130,6 +1130,13 @@ if CLIENT then
 		if not anim then return 0 end
 		return (anim.progress * anim.range + anim.min) * anim.duration
 	end
+
+	--- Returns whether the player's player model will be drawn at the time the function is called.
+	-- @client
+	-- @return boolean True if the player's playermodel is visible
+	function player_methods:shouldDrawLocalPlayer()
+		return getply(self):ShouldDrawLocalPlayer()
+	end
 end
 
 end
