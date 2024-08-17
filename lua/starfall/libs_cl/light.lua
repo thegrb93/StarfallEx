@@ -87,20 +87,32 @@ SF.RegisterType("Light", true, false)
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
+local light_library = instance.Libraries.light
+local light_methods, light_meta, wrap, unwrap = instance.Types.Light.Methods, instance.Types.Light, instance.Types.Light.Wrap, instance.Types.Light.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
+
+local numlights = 0
 local lights = {}
+local function registerLight(light)
+	lights[light] = true
+	gSFLights[light.slot] = light
+	numlights = numlights + 1
+end
+local function destroyLight(light)
+	if lights[light] then
+		lights[light] = nil
+		gSFLights[light.slot] = nil
+		numlights = numlights - 1
+	end
+end
+
 instance.data.light = {lights = lights}
 instance:AddHook("deinitialize", function()
 	for light in pairs(lights) do
 		gSFLights[light.slot] = nil
 	end
 end)
-
-
-local light_library = instance.Libraries.light
-local light_methods, light_meta, wrap, unwrap = instance.Types.Light.Methods, instance.Types.Light, instance.Types.Light.Wrap, instance.Types.Light.Unwrap
-local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
-local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
-
 
 --- Creates a dynamic light (make sure to draw it)
 -- @param Vector pos The position of the light
@@ -109,7 +121,7 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 -- @param Color color The color of the light
 -- @return Light Dynamic light
 function light_library.create(pos, size, brightness, color)
-	if table.Count(lights) >= 256 then SF.Throw("Too many lights have already been allocated (max 256)", 2) end
+	if numlights >= 256 then SF.Throw("Too many lights have already been allocated (max 256)", 2) end
 	if maxSize:GetFloat() == 0 then SF.Throw("sf_light_maxsize is set to 0", 2) end
 	checkpermission(instance, nil, "light.create")
 	checkluatype(size, TYPE_NUMBER)
@@ -124,9 +136,7 @@ function light_library.create(pos, size, brightness, color)
 		dietime = 1
 	}
 
-	lights[light] = true
-	gSFLights[slot] = light
-
+	registerLight(light)
 	return wrap(light)
 end
 
@@ -240,6 +250,14 @@ function light_methods:setColor(color)
 	data.r = col.r
 	data.g = col.g
 	data.b = col.b
+end
+
+--- Destroys the light object freeing up whatever slot it was using
+function light_methods:destroy()
+	local light = unwrap(self)
+	destroyLight(light)
+	light_meta.sf2sensitive[self] = nil
+	light_meta.sensitive2sf[light] = nil
 end
 
 end

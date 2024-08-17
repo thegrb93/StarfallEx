@@ -586,9 +586,7 @@ end
 
 --- Frees a user created material allowing you to create others
 function material_methods:destroy()
-
 	local m = unwrap(self)
-	if not m then SF.Throw("The material is already destroyed?", 2) end
 
 	local name = m:GetName()
 	local rt = instance.data.render.rendertargets[name]
@@ -596,11 +594,8 @@ function material_methods:destroy()
 		instance.env.render.destroyRenderTarget(name)
 	end
 
-	local sensitive2sf, sf2sensitive = material_meta.sensitive2sf, material_meta.sf2sensitive
-	sensitive2sf[m] = nil
-	sf2sensitive[self] = nil
-	dsetmeta(self, nil)
-
+	material_meta.sf2sensitive[self] = nil
+	material_meta.sensitive2sf[m] = nil
 	usermaterials[m] = nil
 	material_bank:free(instance.player, m, m:GetShader())
 end

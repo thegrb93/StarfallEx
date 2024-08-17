@@ -41,7 +41,7 @@ local function convertFilter(filter)
 	if filter == nil then
 		return nil
 	elseif istable(filter) then
-		if ent_meta.sf2sensitive[filter]==nil then
+		if debug.getmetatable(filter)~=ent_meta then
 			local l = {}
 			for i, v in ipairs(filter) do
 				l[i] = eunwrap(v)
