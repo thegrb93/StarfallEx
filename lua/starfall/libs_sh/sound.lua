@@ -93,7 +93,7 @@ function sound_library.create(ent, path, nofilter)
 	end
 
 	local sound = CreateSound(e, path, filter)
-	registerSound(sounds, e, sound)
+	registerSound(e, sound)
 	return wrap(sound)
 end
 
