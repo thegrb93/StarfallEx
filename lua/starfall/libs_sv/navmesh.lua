@@ -654,6 +654,7 @@ return function(instance)
 		local nav = navunwrap(self)
 		entList:remove(instance, nav)
 		navarea_meta.sf2sensitive[self] = nil
+		navarea_meta.sensitive2sf[nav] = nil
 	end
 
 	--- Removes the given NavArea from the Closed List

@@ -254,8 +254,10 @@ end
 
 --- Destroys the light object freeing up whatever slot it was using
 function light_methods:destroy()
-	deleteLight(unwrap(self))
+	local light = unwrap(self)
+	deleteLight(light)
 	light_meta.sf2sensitive[self] = nil
+	light_meta.sensitive2sf[light] = nil
 end
 
 end

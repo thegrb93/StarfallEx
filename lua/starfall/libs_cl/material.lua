@@ -595,6 +595,7 @@ function material_methods:destroy()
 	end
 
 	material_meta.sf2sensitive[self] = nil
+	material_meta.sensitive2sf[m] = nil
 	usermaterials[m] = nil
 	material_bank:free(instance.player, m, m:GetShader())
 end
