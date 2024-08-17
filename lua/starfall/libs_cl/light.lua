@@ -99,7 +99,7 @@ local function registerLight(light)
 	gSFLights[light.slot] = light
 	numlights = numlights + 1
 end
-local function deleteLight(light)
+local function destroyLight(light)
 	if lights[light] then
 		lights[light] = nil
 		gSFLights[light.slot] = nil
@@ -255,7 +255,7 @@ end
 --- Destroys the light object freeing up whatever slot it was using
 function light_methods:destroy()
 	local light = unwrap(self)
-	deleteLight(light)
+	destroyLight(light)
 	light_meta.sf2sensitive[self] = nil
 	light_meta.sensitive2sf[light] = nil
 end
