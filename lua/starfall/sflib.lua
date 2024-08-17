@@ -98,7 +98,7 @@ hook.Add("EntityRemoved","SF_CallOnRemove",function(ent)
 		end
 		if CLIENT then
 			timer.Simple(0, function()
-				if not IsValid(ent) then
+				if not ent:IsValid() then
 					for k, v in pairs(hooks) do
 						if v[2] then v[2](ent) end
 					end
@@ -185,7 +185,7 @@ SF.BurstObject = {
 			return ret
 		end,
 		use = function(self, ply, amount)
-			if ply==SF.Superuser or IsValid(ply) then
+			if ply:IsValid() then
 				local obj = self:get(ply)
 				local new = self:calc(obj) - amount
 				if new < 0 and ply~=SF.Superuser then
@@ -197,7 +197,7 @@ SF.BurstObject = {
 			end
 		end,
 		check = function(self, ply)
-			if ply==SF.Superuser or IsValid(ply) then
+			if ply:IsValid() then
 				local obj = self:get(ply)
 				obj.val = self:calc(obj)
 				return obj.val
@@ -245,7 +245,7 @@ SF.LimitObject = {
 	__index = {
 		use = function(self, ply, amount)
 			if ply==SF.Superuser then return end
-			if IsValid(ply) then
+			if ply:IsValid() then
 				local new = self.counters[ply] + amount
 				if new > self.max then
 					SF.Throw("The ".. self.name .." limit has been reached. (".. self.max ..")", 3)
@@ -257,7 +257,7 @@ SF.LimitObject = {
 		end,
 		checkuse = function(self, ply, amount)
 			if ply==SF.Superuser then return end
-			if IsValid(ply) then
+			if ply:IsValid() then
 				if self.counters[ply] + amount > self.max then
 					SF.Throw("The ".. self.name .." limit has been reached. (".. self.max ..")", 3)
 				end
@@ -267,7 +267,7 @@ SF.LimitObject = {
 		end,
 		check = function(self, ply)
 			if ply==SF.Superuser then return self.max end
-			if IsValid(ply) then
+			if ply:IsValid() then
 				return self.max - self.counters[ply]
 			else
 				SF.Throw("Invalid starfall user", 3)
@@ -275,13 +275,13 @@ SF.LimitObject = {
 		end,
 		free = function(self, ply, amount)
 			if ply==SF.Superuser then return end
-			if IsValid(ply) then
+			if ply:IsValid() then
 				self.counters[ply] = math.Clamp(self.counters[ply] - amount, 0, self.max)
 			end
 		end,
 		get = function(self, ply)
 			if ply==SF.Superuser then return 0 end
-			if IsValid(ply) then
+			if ply:IsValid() then
 				return self.counters[ply]
 			else
 				return 0
@@ -454,7 +454,7 @@ SF.NetValidator = {
 			end
 		end,
 		tick = function(self)
-			if IsValid(self.player) then
+			if self.player:IsValid() then
 				self.validation = math.random()
 				net.Start("starfall_net_validate")
 				net.WriteDouble(self.validation)
@@ -498,7 +498,7 @@ end
 
 local function steamIdToConsoleSafeName(steamid)
 	local ply = player.GetBySteamID(steamid)
-	return IsValid(ply) and string.gsub(ply:Nick(), '[%z\x01-\x1f\x7f;"\']', "") or ""
+	return ply and ply:IsValid() and string.gsub(ply:Nick(), '[%z\x01-\x1f\x7f;"\']', "") or ""
 end
 
 --- Returns a class that can keep a list of blocked users
@@ -1508,7 +1508,7 @@ end
 function SF.ParentChainTooLong(parent, child)
 	local index = parent
 	local parentLength = 0
-	while IsValid(index) do
+	while index and index:IsValid() do
 		if index == child then return true end
 		parentLength = parentLength + 1
 		index = index:GetParent()
@@ -1605,7 +1605,7 @@ if SERVER then
 	util.AddNetworkString("starfall_print")
 
 	function SF.AddNotify(ply, msg, notifyType, duration, sound)
-		if not IsValid(ply) then return end
+		if ply:IsValid() then return end
 
 		net.Start("starfall_addnotify")
 		net.WriteString(string.sub(msg, 1, 1024))
@@ -1658,7 +1658,7 @@ else
 		local plyStr
 		if ply == SF.Superuser then
 			plyStr = "Superuser"
-		elseif IsValid(ply) then
+		elseif ply:IsValid() then
 			plyStr = ply:Nick() .. " [" .. ply:SteamID() .. "]"
 		else
 			plyStr = "Invalid user"
@@ -2072,7 +2072,7 @@ do
 
 		-- Command to reload the libraries
 		concommand.Add("sf_reloadlibrary", function(ply, com, arg)
-			if IsValid(ply) and not ply:IsSuperAdmin() then return end
+			if ply:IsValid() and not ply:IsSuperAdmin() then return end
 			local name = arg[1]
 			if not name then return end
 			name = string.lower(name)
