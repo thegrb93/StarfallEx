@@ -132,6 +132,7 @@ if SERVER then
 		if client~=chip.owner then
 			net.Start("starfall_error")
 				net.WriteReliableEntity(chip)
+				net.WriteReliableEntity(chip.owner)
 				net.WriteString(string.sub(chip.sfdata.mainfile, 1, 1024))
 				net.WriteString(string.sub(message, 1, 1024))
 				net.WriteString(string.sub(traceback, 1, 1024))
@@ -147,6 +148,7 @@ if SERVER then
 
 		net.Start("starfall_error")
 			net.WriteReliableEntity(chip)
+			net.WriteReliableEntity(chip.owner)
 			net.WriteString(string.sub(chip.sfdata.mainfile, 1, 128))
 			net.WriteString(string.sub(message, 1, 128))
 			net.WriteString("")
@@ -242,18 +244,20 @@ else
 	end
 
 	net.Receive("starfall_error", function()
-		local chip, client, mainfile, message, traceback, should_notify
-		local callback = 3
+		local chip, owner, client, mainfile, message, traceback, should_notify
+		local callback = 4
 
 		local function doError()
 			callback = callback - 1
 			if callback>0 then return end
-			if chip and client then
-				hook.Run("StarfallError", chip, chip.owner, client, mainfile, message, traceback, should_notify)
+			if chip and owner and client then
+				if client:IsWorld() then client = nil end
+				hook.Run("StarfallError", chip, owner, client, mainfile, message, traceback, should_notify)
 			end
 		end
 
 		net.ReadReliableEntity(function(e) chip=e doError() end)
+		net.ReadReliableEntity(function(e) owner=e doError() end)
 		mainfile = net.ReadString()
 		message = net.ReadString()
 		traceback = net.ReadString()
