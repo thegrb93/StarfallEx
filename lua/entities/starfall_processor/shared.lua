@@ -34,19 +34,18 @@ function ENT:Compile(sfdata)
 	local ok, instance = SF.Instance.Compile(sfdata.files, sfdata.mainfile, self.owner, self)
 	if not ok then self:Error(instance) return end
 
-	if instance.ppdata.scriptnames and instance.mainfile and instance.ppdata.scriptnames[instance.mainfile] then
-		self.name = string.sub(tostring(instance.ppdata.scriptnames[instance.mainfile]), 1, 64)
-	else
-		self.name = "Generic ( No-Name )"
-	end
+	self.name = instance.ppdata:Get(instance.mainfile, "scriptname") or "Generic ( No-Name )"
+	self.author = instance.ppdata:Get(instance.mainfile, "scriptauthor") or "No-Author"
 
-	if instance.ppdata.scriptauthors and instance.mainfile and instance.ppdata.scriptauthors[instance.mainfile] then
-		self.author = string.sub(tostring(instance.ppdata.scriptauthors[instance.mainfile]), 1, 64)
-	else
-		self.author = nil
+	if SERVER then
+		local model = instance.ppdata:Get(instance.mainfile, "models")
+		if model then
+			pcall(function() self:SetCustomModel(SF.CheckModel(model, self.owner, true)) end)
+		end
 	end
 
 	self.instance = instance
+
 	instance.runOnError = function(err)
 		-- Have to make sure it's valid because the chip can be deleted before deinitialization and trigger errors
 		if IsValid(self) then
@@ -95,16 +94,7 @@ function ENT:SetupFiles(sfdata)
 	self:Compile(sfdata)
 
 	if SERVER and self.instance then
-		self.sfsenddata = self:GetSendData()
-		self.sfownerdata = self.instance and self.instance.ppdata and self.instance.ppdata.owneronly and self:GetSendData(true) or nil
-
-		if self.instance and self.instance.ppdata.models and self.instance.mainfile then
-			local model = self.instance.ppdata.models[self.instance.mainfile]
-			if model then
-				pcall(function() self:SetCustomModel(SF.CheckModel(model, self.owner, true)) end)
-			end
-		end
-
+		self.sfsenddata, self.sfownerdata = self:GetSendData()
 		self:SendCode()
 	end
 end

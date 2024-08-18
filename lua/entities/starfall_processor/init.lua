@@ -77,50 +77,55 @@ function ENT:Think()
 end
 
 function ENT:GetSendData(toowner)
-	if not self.instance then return end
-
+	local ppdata = self.instance.ppdata
 	local senddata = {
 		owner = self.sfdata.owner,
-		files = {},
-		mainfile = self.sfdata.mainfile,
+		mainfile = ppdata:Get(self.sfdata.mainfile, "clientmain") or self.sfdata.mainfile,
 		proc = self
 	}
+	local ownersenddata
 
-	for k, v in pairs(self.sfdata.files) do senddata.files[k] = v end
+	local files = {} for k, v in pairs(self.sfdata.files) do files[k] = v end
 
-	local ppdata = self.instance and self.instance.ppdata
-	if ppdata then
-		if ppdata.serverorclient or (not toowner and ppdata.owneronly) then
-			for filename, code in pairs(senddata.files) do
-				local isserver, isowneronly = ppdata.serverorclient and ppdata.serverorclient[filename] == "server", ppdata.owneronly and ppdata.owneronly[filename]
-				if isserver or (not toowner and isowneronly) then
-					local infodata = {}
-					if ppdata.scriptnames and ppdata.scriptnames[filename] then
-						infodata[#infodata + 1] = "--@name " .. ppdata.scriptnames[filename]
-					end
-					if ppdata.scriptauthors and ppdata.scriptauthors[filename] then
-						infodata[#infodata + 1] = "--@author " .. ppdata.scriptauthors[filename]
-					end
-					infodata[#infodata + 1] = isserver and "--@server" or "--@owneronly"
-					senddata.files[filename] = table.concat(infodata, "\n")
-				end
-			end
-		end
-		local clientmain = ppdata.clientmain and ppdata.clientmain[self.sfdata.mainfile]
-		if clientmain then
-			if senddata.files[clientmain] then
-				senddata.mainfile = clientmain
-			else
-				clientmain = SF.NormalizePath(string.GetPathFromFilename(self.sfdata.mainfile) .. clientmain)
-				if senddata.files[clientmain] then
-					senddata.mainfile = clientmain
-				end
-			end
+	for filename, fileppdata in pairs(ppdata.files) do
+		if fileppdata.owneronly then ownersenddata = true end
+		if fileppdata.serverorclient == "server" then
+			files[filename] = table.concat({
+				"--@name " .. (fileppdata.scriptname or ""),
+				"--@author " .. (fileppdata.scriptauthor or ""),
+				"--@server",
+				""
+			}, "\n")
 		end
 	end
-	senddata.compressed = SF.CompressFiles(senddata.files)
 
-	return senddata
+	if ownersenddata then
+		local ownerfiles = {} for k, v in pairs(files) do ownerfiles[k] = v end
+
+		for filename, fileppdata in pairs(ppdata.files) do
+			if fileppdata.owneronly then
+				files[filename] = table.concat({
+					"--@name " .. (fileppdata.scriptname or ""),
+					"--@author " .. (fileppdata.scriptauthor or ""),
+					"--@owneronly",
+					""
+				}, "\n")
+			end
+		end
+
+		ownersenddata = {
+			owner = senddata.owner,
+			mainfile = senddata.mainfile,
+			proc = self,
+			files = ownerfiles,
+			compressed = SF.CompressFiles(ownerfiles)
+		}
+	end
+
+	senddata.files = files
+	senddata.compressed = SF.CompressFiles(files)
+
+	return senddata, ownersenddata
 end
 
 function ENT:SendCode(recipient)
