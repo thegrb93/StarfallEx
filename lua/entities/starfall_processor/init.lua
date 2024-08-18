@@ -76,58 +76,6 @@ function ENT:Think()
 	end
 end
 
-function ENT:GetSendData(toowner)
-	local ppdata = self.instance.ppdata
-	local senddata = {
-		owner = self.sfdata.owner,
-		mainfile = ppdata:Get(self.sfdata.mainfile, "clientmain") or self.sfdata.mainfile,
-		proc = self
-	}
-	local ownersenddata
-
-	local files = {} for k, v in pairs(self.sfdata.files) do files[k] = v end
-
-	for filename, fileppdata in pairs(ppdata.files) do
-		if fileppdata.owneronly then ownersenddata = true end
-		if fileppdata.serverorclient == "server" then
-			files[filename] = table.concat({
-				"--@name " .. (fileppdata.scriptname or ""),
-				"--@author " .. (fileppdata.scriptauthor or ""),
-				"--@server",
-				""
-			}, "\n")
-		end
-	end
-
-	if ownersenddata then
-		local ownerfiles = {} for k, v in pairs(files) do ownerfiles[k] = v end
-
-		for filename, fileppdata in pairs(ppdata.files) do
-			if fileppdata.owneronly then
-				files[filename] = table.concat({
-					"--@name " .. (fileppdata.scriptname or ""),
-					"--@author " .. (fileppdata.scriptauthor or ""),
-					"--@owneronly",
-					""
-				}, "\n")
-			end
-		end
-
-		ownersenddata = {
-			owner = senddata.owner,
-			mainfile = senddata.mainfile,
-			proc = self,
-			files = ownerfiles,
-			compressed = SF.CompressFiles(ownerfiles)
-		}
-	end
-
-	senddata.files = files
-	senddata.compressed = SF.CompressFiles(files)
-
-	return senddata, ownersenddata
-end
-
 function ENT:SendCode(recipient)
 	if not (IsValid(self.owner) or IsWorld(self.owner)) then return end
 	if not self.sfsenddata then return end
@@ -214,7 +162,7 @@ local function dupefinished(TimedPasteData, TimedPasteDataCurrent)
 		end
 	end
 	for k, v in pairs(starfalls) do
-		v:SetupFiles(v.sfdata)
+		v:Compile(v.sfdata)
 		local instance = v.instance
 		if instance then
 			instance:runScriptHook("dupefinished", instance.Sanitize(entList))

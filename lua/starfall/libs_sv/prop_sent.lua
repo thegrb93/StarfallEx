@@ -1021,7 +1021,7 @@ registerSent("starfall_processor", {
 			["mainfile"] = "main",
 			["owner"] = ply
 		}
-		self:SetupFiles( Data )
+		self:Compile( Data )
 	end,
 	{
 		["Model"] = {TYPE_STRING, "models/spacecode/sfchip_medium.mdl"},

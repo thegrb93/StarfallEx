@@ -20,7 +20,8 @@ local IsValid = FindMetaTable("Entity").IsValid
 
 function ENT:Compile(sfdata)
 	self:Destroy()
-	if sfdata then
+	local newdata = sfdata~=nil
+	if newdata then
 		self.sfdata = sfdata
 		self.owner = sfdata.owner
 		sfdata.proc = self
@@ -34,13 +35,17 @@ function ENT:Compile(sfdata)
 	local ok, instance = SF.Instance.Compile(sfdata.files, sfdata.mainfile, self.owner, self)
 	if not ok then self:Error(instance) return end
 
-	self.name = instance.ppdata:Get(instance.mainfile, "scriptname") or "Generic ( No-Name )"
-	self.author = instance.ppdata:Get(instance.mainfile, "scriptauthor") or "No-Author"
+	if newdata then
+		self.name = instance.ppdata:Get(instance.mainfile, "scriptname") or "Generic ( No-Name )"
+		self.author = instance.ppdata:Get(instance.mainfile, "scriptauthor") or "No-Author"
+		if SERVER then
+			local model = instance.ppdata:Get(instance.mainfile, "model")
+			if model then
+				pcall(function() self:SetCustomModel(SF.CheckModel(model, self.owner, true)) end)
+			end
 
-	if SERVER then
-		local model = instance.ppdata:Get(instance.mainfile, "model")
-		if model then
-			pcall(function() self:SetCustomModel(SF.CheckModel(model, self.owner, true)) end)
+			self.sfsenddata, self.sfownerdata = instance.ppdata:GetSendData(sfdata)
+			self:SendCode()
 		end
 	end
 
@@ -87,15 +92,6 @@ function ENT:Destroy()
 		instance:runScriptHook("removed")
 		instance:deinitialize()
 		self.instance = nil
-	end
-end
-
-function ENT:SetupFiles(sfdata)
-	self:Compile(sfdata)
-
-	if SERVER and self.instance then
-		self.sfsenddata, self.sfownerdata = self:GetSendData()
-		self:SendCode()
 	end
 end
 

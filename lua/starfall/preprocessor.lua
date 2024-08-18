@@ -189,8 +189,57 @@ SF.Preprocessor = {
 			return SF.ChoosePath(path, curdir, function(testpath)
 				return self.files[testpath]
 			end)
-		end
+		end,
+		GetSendData = function(sfdata)
+			local senddata = {
+				owner = sfdata.owner,
+				mainfile = ppdata:Get(sfdata.mainfile, "clientmain") or sfdata.mainfile,
+				proc = sfdata.proc
+			}
+			local ownersenddata
 
+			local files = {} for k, v in pairs(sfdata.files) do files[k] = v end
+
+			for filename, fileppdata in pairs(self.files) do
+				if fileppdata.owneronly then ownersenddata = true end
+				if fileppdata.serverorclient == "server" then
+					files[filename] = table.concat({
+						"--@name " .. (fileppdata.scriptname or ""),
+						"--@author " .. (fileppdata.scriptauthor or ""),
+						"--@server",
+						""
+					}, "\n")
+				end
+			end
+
+			if ownersenddata then
+				local ownerfiles = {} for k, v in pairs(files) do ownerfiles[k] = v end
+
+				for filename, fileppdata in pairs(self.files) do
+					if fileppdata.owneronly then
+						files[filename] = table.concat({
+							"--@name " .. (fileppdata.scriptname or ""),
+							"--@author " .. (fileppdata.scriptauthor or ""),
+							"--@owneronly",
+							""
+						}, "\n")
+					end
+				end
+
+				ownersenddata = {
+					owner = sfdata.owner,
+					mainfile = senddata.mainfile,
+					proc = sfdata.proc,
+					files = ownerfiles,
+					compressed = SF.CompressFiles(ownerfiles)
+				}
+			end
+
+			senddata.files = files
+			senddata.compressed = SF.CompressFiles(files)
+
+			return senddata, ownersenddata
+		end
 	},
 	__call = function(t)
 		return setmetatable({

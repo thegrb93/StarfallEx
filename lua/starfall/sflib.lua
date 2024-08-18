@@ -1224,7 +1224,7 @@ function SF.EntIsReady(ent)
 	if class=="player" then
 		return ent:IsPlayer()
 	elseif class=="starfall_processor" then
-		return ent.SetupFiles~=nil
+		return ent.Compile~=nil
 	elseif class=="starfall_hologram" then
 		return ent.SetClip~=nil
 	elseif class=="starfall_prop" then
