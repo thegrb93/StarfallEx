@@ -126,6 +126,8 @@ if SERVER then
 	end
 
 	function SF.SendError(chip, message, traceback, client, should_notify)
+		if not IsValid(chip.owner) then return end
+
 		-- The chip owner gets more data
 		if client~=chip.owner then
 			net.Start("starfall_error")
