@@ -151,43 +151,24 @@ end)
 
 net.Receive("starfall_processor_download", function(len)
 	net.ReadStarfall(nil, function(ok, sfdata, err)
-		local proc, owner
-		local function setup()
-			if not IsValid(proc) then return end
-			if not (IsValid(owner) or IsWorld(owner)) then return end
-			sfdata.proc = proc
-			sfdata.owner = owner
-			proc.owner = owner
-			if ok then
-				proc:SetupFiles(sfdata)
-			else
-				proc:Error({message = "Failed to download and initialize client: " .. tostring(err), traceback = "" })
-			end
+		if ok then
+			sfdata.proc:SetupFiles(sfdata)
+		elseif IsValid(sfdata.proc) and IsValid(sfdata.owner) then
+			sfdata.proc.owner = sfdata.owner
+			sfdata.proc:Error({message = "Failed to download and initialize client: " .. tostring(err), traceback = "" })
 		end
-
-		if sfdata.ownerindex == 0 then
-			owner = game.GetWorld()
-		else
-			SF.WaitForEntity(sfdata.ownerindex, sfdata.ownercreateindex, function(e) owner = e setup() end)
-		end
-		SF.WaitForEntity(sfdata.procindex, sfdata.proccreateindex, function(e) proc = e setup() end)
 	end)
 end)
 
 net.Receive("starfall_processor_link", function()
-	local componenti, componentci = net.ReadUInt(16), net.ReadUInt(32)
-	local proci, procci = net.ReadUInt(16), net.ReadUInt(32)
 	local component, proc
 	local function link()
-		if not IsValid(component) then return end
-		if not (IsValid(proc) or proci==0) then return end
-		SF.LinkEnt(component, proc)
+		if component and proc then
+			SF.LinkEnt(component, proc)
+		end
 	end
-
-	SF.WaitForEntity(componenti, componentci, function(e) component = e link() end)
-	if proci~=0 then
-		SF.WaitForEntity(proci, procci, function(e) proc = e link() end)
-	end
+	net.ReadReliableEntity(function(e) component=e link() end)
+	net.ReadReliableEntity(function(e) proc=e link() end)
 end)
 
 net.Receive("starfall_processor_kill", function()

@@ -54,8 +54,7 @@ end
 
 function ENT:TransmitData(recip)
 	net.Start("starfall_custom_prop")
-	net.WriteUInt(self:EntIndex(), 16)
-	net.WriteUInt(self:GetCreationID(), 32)
+	net.WriteReliableEntity(self)
 	local stream = net.WriteStream(self.streamdata, nil, true)
 	if recip then net.Send(recip) else net.Broadcast() end
 	return stream
