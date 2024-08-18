@@ -136,10 +136,10 @@ if SERVER then
 				net.WriteString(string.sub(message, 1, 1024))
 				net.WriteString(string.sub(traceback, 1, 1024))
 			if client~=nil and should_notify~=nil then
-				net.WriteBool(true)
 				net.WriteReliableEntity(client)
 				net.WriteBool(should_notify)
 			else
+				net.WriteReliableEntity(Entity(0))
 				net.WriteBool(false)
 			end
 			net.Send(chip.owner)
@@ -151,11 +151,11 @@ if SERVER then
 			net.WriteString(string.sub(message, 1, 128))
 			net.WriteString("")
 		if client~=nil and should_notify~=nil then
-			net.WriteBool(true)
 			net.WriteReliableEntity(client)
 			net.WriteBool(should_notify)
 			net.SendOmit({client, chip.owner})
 		else
+			net.WriteReliableEntity(Entity(0))
 			net.WriteBool(false)
 			net.SendOmit(chip.owner)
 		end
@@ -243,9 +243,12 @@ else
 
 	net.Receive("starfall_error", function()
 		local chip, client, mainfile, message, traceback, should_notify
+		local callback = 3
 
 		local function doError()
-			if chip and (client or should_notify==nil) then
+			callback = callback - 1
+			if callback>0 then return end
+			if chip and client then
 				hook.Run("StarfallError", chip, chip.owner, client, mainfile, message, traceback, should_notify)
 			end
 		end
@@ -254,10 +257,9 @@ else
 		mainfile = net.ReadString()
 		message = net.ReadString()
 		traceback = net.ReadString()
-		if net.ReadBool() then
-			net.ReadReliableEntity(function(e) client=e doError() end)
-			should_notify = net.ReadBool()
-		end
+		net.ReadReliableEntity(function(e) client=e doError() end)
+		should_notify = net.ReadBool()
+		doError()
 	end)
 
 	net.Receive("starfall_upload", function()
