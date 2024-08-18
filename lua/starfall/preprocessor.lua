@@ -13,18 +13,34 @@ SF.Preprocessor = {
 			return self.files[filename] and self.files[filename][key]
 		end,
 		ProcessFile = function(self, filename, source)
+			local data = self.files[filename]
+			data.filename = filename
+			for _, func in pairs(SF.Preprocessor.directives) do
+				if func.init then func.init(self, data) end
+			end
 			for directive, args in string.gmatch(source, "%-%-@(%w+)([^\r\n]*)") do
 				local func = SF.Preprocessor.directives[directive]
 				if func then
-					func(self, string.Trim(args), self.files[filename])
+					func.process(self, data, string.Trim(args))
 				end
 			end
-			return self.files[filename]
+			return data
+		end,
+		PostProcessFiles = function(self)
+			for _, func in pairs(SF.Preprocessor.directives) do
+				local postprocess = func.postprocess
+				if postprocess then
+					for _, data in pairs(self.files) do
+						postprocess(self, data)
+					end
+				end
+			end
 		end,
 		ProcessFiles = function(self, code)
 			for filename, source in pairs(code) do
 				self:ProcessFile(filename, source)
 			end
+			self:PostProcessFiles()
 		end,
 		LoadFiles = function(self, openfiles)
 			local tbl = {}
@@ -47,7 +63,7 @@ SF.Preprocessor = {
 
 				if dontParse then return end
 
-				local ppfiledata = ppdata:ProcessFile(codepath, code)
+				local ppfiledata = self:ProcessFile(codepath, code)
 
 				local clientmain = ppfiledata.clientmain
 				if clientmain then
@@ -173,6 +189,12 @@ SF.Preprocessor = {
 					}
 				end
 			end
+		end,
+		ResolvePath = function(self, callingfile, path)
+			local curdir = string.GetPathFromFilename(callingfile)
+			return SF.ChoosePath(path, curdir, function(testpath)
+				return self.files[testpath]
+			end)
 		end
 
 	},
@@ -185,71 +207,113 @@ SF.Preprocessor = {
 setmetatable(SF.Preprocessor, SF.Preprocessor)
 
 local directives = SF.Preprocessor.directives
+local postprocess = SF.Preprocessor.postprocess
 
-function directives.include(self, args, data)
-	if #args == 0 then error("Empty include directive") end
-	if string.match(args, "^https?://") then
-		-- HTTP approach
-		local httpUrl, httpName = string.match(args, "^(.+)%s+as%s+(.+)$")
-		if httpUrl then
-			if not data.httpincludes then data.httpincludes = {} end
-			data.httpincludes[#data.httpincludes + 1] = { httpUrl, httpName }
+directives.include = {
+	init = function(self, data)
+		data.httpincludes = {}
+		data.includes = {}
+	end,
+	process = function(self, data, args)
+		if #args == 0 then error("Empty include directive") end
+		if string.match(args, "^https?://") then
+			-- HTTP approach
+			local httpUrl, httpName = string.match(args, "^(.+)%s+as%s+(.+)$")
+			if httpUrl then
+				data.httpincludes[#data.httpincludes + 1] = { httpUrl, httpName }
+			else
+				error("Bad include format - Expected '--@include http://url as filename'")
+			end
 		else
-			error("Bad include format - Expected '--@include http://url as filename'")
+			-- Standard/Filesystem approach
+			data.includes[#data.includes + 1] = args
 		end
-	else
-		-- Standard/Filesystem approach
-		if not data.includes then data.includes = {} end
-		data.includes[#data.includes + 1] = args
 	end
-end
+}
 
-function directives.includedir(self, args, data)
-	if #args == 0 then error("Empty includedir directive") end
-	if not data.includedirs then data.includedirs = {} end
-	data.includedirs[#data.includedirs + 1] = args
-end
+directives.includedir = {
+	init = function(self, data)
+		data.includedirs = {}
+	end,
+	process = function(self, data, args)
+		if #args == 0 then error("Empty includedir directive") end
+		data.includedirs[#data.includedirs + 1] = args
+	end
+}
 
-function directives.includedata(self, args, data)
-	if #args == 0 then error("Empty includedata directive") end
-	if not self.includesdata then self.includesdata = {} end
-	data.includesdata[#data.includesdata + 1] = args
-	directive_include(self, args, data)
-end
+directives.includedata = {
+	init = function(self, data)
+		data.includesdata = {}
+	end,
+	process = function(self, data, args)
+		if #args == 0 then error("Empty includedata directive") end
+		data.includesdata[#data.includesdata + 1] = args
+		directives.include.process(self, data, args)
+	end,
+	postprocess = function(self, data)
+		for i, incdata in ipairs(data.includesdata) do
+			incdata = self:ResolvePath(data.filename, incdata) or error("Bad --@includedata "..incdata.." in file "..data.filename)
+			self.files[incdata].datafile = true
+		end
+	end
+}
 
-function directives.name(self, args, data)
-	data.scriptname = string.sub(args, 1, 64)
-end
+directives.name = {
+	process = function(self, data, args)
+		data.scriptname = string.sub(args, 1, 64)
+	end
+}
 
-function directives.author(self, args, data)
-	data.scriptauthor = string.sub(args, 1, 64)
-end
+directives.author = {
+	process = function(self, data, args)
+		data.scriptauthor = string.sub(args, 1, 64)
+	end
+}
 
-function directives.model(self, args, data)
-	if #args == 0 then error("Empty model directive") end
-	data.models = args
-end
+directives.model = {
+	process = function(self, data, args)
+		if #args == 0 then error("Empty model directive") end
+		data.model = args
+	end
+}
 
-function directives.server(self, args, data)
-	data.serverorclient = "server"
-end
+directives.server = {
+	process = function(self, data, args)
+		data.serverorclient = "server"
+	end
+}
 
-function directives.client(self, args, data)
-	data.serverorclient = "client"
-end
+directives.client = {
+	process = function(self, data, args)
+		data.serverorclient = "client"
+	end
+}
 
-function directives.shared(self, args, data)
-	data.serverorclient = nil
-end
+directives.shared = {
+	process = function(self, data, args)
+		data.serverorclient = nil
+	end
+}
 
-function directives.clientmain(self, args, data)
-	data.clientmain = args
-end
+directives.clientmain = {
+	process = function(self, data, args)
+		data.clientmain = args
+	end,
+	postprocess = function(self, data)
+		if data.clientmain then
+			data.clientmain = self:ResolvePath(data.filename, data.clientmain) or error("Bad --@clientmain "..data.clientmain.." in file "..data.filename)
+		end
+	end
+}
 
-function directives.superuser(self, args, data)
-	data.superuser = true
-end
+directives.superuser = {
+	process = function(self, data, args)
+		data.superuser = true
+	end
+}
 
-function directives.owneronly(self, args, data)
-	data.owneronly = true
-end
+directives.owneronly = {
+	process = function(self, data, args)
+		data.owneronly = true
+	end
+}

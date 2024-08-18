@@ -38,7 +38,7 @@ function ENT:Compile(sfdata)
 	self.author = instance.ppdata:Get(instance.mainfile, "scriptauthor") or "No-Author"
 
 	if SERVER then
-		local model = instance.ppdata:Get(instance.mainfile, "models")
+		local model = instance.ppdata:Get(instance.mainfile, "model")
 		if model then
 			pcall(function() self:SetCustomModel(SF.CheckModel(model, self.owner, true)) end)
 		end

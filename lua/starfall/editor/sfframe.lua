@@ -1848,7 +1848,7 @@ function Editor:Close()
 		local model = nil
 		local ppdata = SF.Preprocessor()
 		pcall(ppdata.ProcessFile, ppdata, "file", self:GetCode())
-		RunConsoleCommand("starfall_processor_ScriptModel", ppdata:Get("file", "models") or "")
+		RunConsoleCommand("starfall_processor_ScriptModel", ppdata:Get("file", "model") or "")
 	end
 	hook.Run("StarfallEditorClose")
 end

@@ -118,7 +118,7 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 	for filename, source in pairs(code) do
 		local ppfiledata = instance.ppdata.files[filename]
 
-		if instance.ppdata.datafiles[filename] then continue end -- Don't compile data files
+		if instance.ppdata:Get(filename, "datafile") then continue end -- Don't compile data files
 		if CLIENT and ppfiledata.owneronly and LocalPlayer() ~= player then continue end -- Don't compile owner-only files if not owner
 		local serverorclient = ppfiledata.serverorclient
 		if (serverorclient == "server" and CLIENT) or (serverorclient == "client" and SERVER) then continue end -- Don't compile files for other realm
