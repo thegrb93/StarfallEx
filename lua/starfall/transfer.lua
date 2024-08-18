@@ -12,13 +12,13 @@ end
 
 -- Net extension stuff
 function net.ReadStarfall(ply, callback)
-	local callbacks = 0
+	local callbacks = SERVER and 1 or 3
 	local error
 	local sfdata = {}
 
 	local function setup()
-		callbacks = callbacks + 1
-		if callbacks<3 then return end
+		callbacks = callbacks - 1
+		if callbacks>0 then return end
 		if error then callback(false, sfdata, error) return end
 		callback(true, sfdata)
 	end
