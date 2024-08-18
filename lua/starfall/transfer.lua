@@ -1,43 +1,55 @@
 
 local IsValid = FindMetaTable("Entity").IsValid
 
+function net.WriteReliableEntity(ent)
+	net.WriteUInt(ent:EntIndex(), 16)
+	net.WriteUInt(ent:GetCreationID(), 32)
+end
+
+function net.ReadReliableEntity(cb)
+	SF.WaitForEntity(net.ReadUInt(16), net.ReadUInt(32), cb)
+end
+
 -- Net extension stuff
 function net.ReadStarfall(ply, callback)
-	local sfdata = {files = {}}
+	local callbacks = SERVER and 1 or 3
+	local error
+	local sfdata = {}
+
+	local function setup()
+		callbacks = callbacks - 1
+		if callbacks>0 then return end
+		if error then callback(false, sfdata, error) return end
+		callback(true, sfdata)
+	end
+	local function setupProc(e)
+		if e==nil then error="Invalid starfall processor entity" end
+		sfdata.proc=e setup()
+	end
+	local function setupOwner(e)
+		if e==nil then error="Invalid starfall owner entity" end
+		sfdata.owner=e setup()
+	end
+	local function setupFiles(data)
+		if data==nil then error="Net timeout" setup() return end
+		local ok, decompress = pcall(SF.DecompressFiles, data)
+		if not ok then error=decompress setup() return end
+		sfdata.files=decompress setup()
+	end
+
 	if CLIENT then
-		sfdata.procindex = net.ReadUInt(16)
-		sfdata.proccreateindex = net.ReadUInt(32)
-		sfdata.proc = Entity(sfdata.procindex)
-		sfdata.ownerindex = net.ReadUInt(16)
-		sfdata.ownercreateindex = net.ReadUInt(32)
-		sfdata.owner = Entity(sfdata.ownerindex)
+		net.ReadReliableEntity(setupProc)
+		net.ReadReliableEntity(setupOwner)
 	end
 	sfdata.mainfile = net.ReadString()
-
-	net.ReadStream(ply, function(data)
-		if data then
-			local ok, files = pcall(SF.DecompressFiles, data)
-			if ok then
-				sfdata.files = files
-				callback(true, sfdata)
-			else
-				callback(false, sfdata, files)
-			end
-		else
-			callback(false, sfdata, "Net timeout")
-		end
-	end)
-
-	return sfdata
+	net.ReadStream(ply, setupFiles)
 end
 
 function net.WriteStarfall(sfdata, callback)
 	if #sfdata.mainfile > 255 then error("Main file name too large: " .. #sfdata.mainfile .. " (max is 255)") end
 	if SERVER then
-		net.WriteUInt(sfdata.proc:EntIndex(), 16)
-		net.WriteUInt(sfdata.proc:GetCreationID(), 32)
-		net.WriteUInt(sfdata.owner:EntIndex(), 16)
-		net.WriteUInt(sfdata.owner:GetCreationID(), 32)
+		net.WriteReliableEntity(sfdata.proc)
+		net.WriteReliableEntity(sfdata.owner)
 	end
 	net.WriteString(sfdata.mainfile)
 
@@ -119,40 +131,38 @@ if SERVER then
 		-- The chip owner gets more data
 		if client~=chip.owner then
 			net.Start("starfall_error")
-				net.WriteEntity(chip)
-				net.WriteEntity(chip.owner)
+				net.WriteReliableEntity(chip)
 				net.WriteString(string.sub(chip.sfdata.mainfile, 1, 1024))
 				net.WriteString(string.sub(message, 1, 1024))
 				net.WriteString(string.sub(traceback, 1, 1024))
 			if client~=nil and should_notify~=nil then
-				net.WriteBool(true)
-				net.WriteEntity(client)
+				net.WriteReliableEntity(client)
 				net.WriteBool(should_notify)
 			else
+				net.WriteReliableEntity(Entity(0))
 				net.WriteBool(false)
 			end
 			net.Send(chip.owner)
 		end
 
 		net.Start("starfall_error")
-			net.WriteEntity(chip)
-			net.WriteEntity(chip.owner)
+			net.WriteReliableEntity(chip)
 			net.WriteString(string.sub(chip.sfdata.mainfile, 1, 128))
 			net.WriteString(string.sub(message, 1, 128))
 			net.WriteString("")
 		if client~=nil and should_notify~=nil then
-			net.WriteBool(true)
-			net.WriteEntity(client)
+			net.WriteReliableEntity(client)
 			net.WriteBool(should_notify)
 			net.SendOmit({client, chip.owner})
 		else
+			net.WriteReliableEntity(Entity(0))
 			net.WriteBool(false)
 			net.SendOmit(chip.owner)
 		end
 	end
 
 	net.Receive("starfall_error", function(_, ply)
-		local chip = net.ReadEntity()
+		local chip = Entity(net.ReadUInt(16))
 		if not IsValid(chip) then return end
 		if not chip.ErroredPlayers or chip.ErroredPlayers[ply] then return end
 		chip.ErroredPlayers[ply] = true
@@ -224,7 +234,7 @@ else
 			is_blocked = SF.BlockedUsers:isBlocked(owner:SteamID())
 		end
 		net.Start("starfall_error")
-			net.WriteEntity(chip)
+			net.WriteUInt(chip:EntIndex(), 16)
 			net.WriteString(string.sub(message, 1, 1024))
 			net.WriteString(string.sub(traceback, 1, 1024))
 			net.WriteBool(GetConVarNumber("sf_timebuffer_cl") > 0 and not is_blocked)
@@ -232,20 +242,24 @@ else
 	end
 
 	net.Receive("starfall_error", function()
-		local chip = net.ReadEntity()
-		if not IsValid(chip) then return end
-		local owner = net.ReadEntity()
-		if not IsValid(owner) then return end
-		local mainfile = net.ReadString()
-		local message = net.ReadString()
-		local traceback = net.ReadString()
-		local client, should_notify
-		if net.ReadBool() then
-			client = net.ReadEntity()
-			if not IsValid(client) then return end
-			should_notify = net.ReadBool()
+		local chip, client, mainfile, message, traceback, should_notify
+		local callback = 3
+
+		local function doError()
+			callback = callback - 1
+			if callback>0 then return end
+			if chip and client then
+				hook.Run("StarfallError", chip, chip.owner, client, mainfile, message, traceback, should_notify)
+			end
 		end
-		hook.Run("StarfallError", chip, owner, client, mainfile, message, traceback, should_notify)
+
+		net.ReadReliableEntity(function(e) chip=e doError() end)
+		mainfile = net.ReadString()
+		message = net.ReadString()
+		traceback = net.ReadString()
+		net.ReadReliableEntity(function(e) client=e doError() end)
+		should_notify = net.ReadBool()
+		doError()
 	end)
 
 	net.Receive("starfall_upload", function()

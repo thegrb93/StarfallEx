@@ -233,8 +233,7 @@ net.Receive("starfall_processor_download", function(len, ply)
 end)
 
 net.Receive("starfall_processor_link", function(len, ply)
-	local entIndex = net.ReadUInt(16)
-	local linked = Entity(entIndex)
+	local linked = Entity(net.ReadUInt(16))
 	if IsValid(linked.link) then
 		SF.LinkEnt(linked, linked.link, ply)
 	end
