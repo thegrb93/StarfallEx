@@ -12,13 +12,14 @@ SF.Preprocessor = {
 		Get = function(self, filename, key)
 			return self.files[filename] and self.files[filename][key]
 		end,
-		ProcessFile = function(self, filename, source)
+		ProcessFile = function(self, filename, code)
 			local data = self.files[filename]
 			data.filename = filename
+			data.code = code
 			for _, func in pairs(SF.Preprocessor.directives) do
 				if func.init then func.init(self, data) end
 			end
-			for directive, args in string.gmatch(source, "%-%-@(%w+)([^\r\n]*)") do
+			for directive, args in string.gmatch(code, "%-%-@(%w+)([^\r\n]*)") do
 				local func = SF.Preprocessor.directives[directive]
 				if func then
 					func.process(self, data, string.Trim(args))
@@ -42,11 +43,7 @@ SF.Preprocessor = {
 			end
 			self:PostProcessFiles()
 		end,
-		LoadFiles = function(self, openfiles)
-			local tbl = {}
-			tbl.mainfile = mainfile
-			tbl.files = {}
-
+		LoadFiles = function(self, openfiles, onSuccessSignal, onErrorSignal)
 			local function getInclude(path)
 				return openfiles[path] or file.Read("starfall/" .. path, "DATA") or error("Bad include: " .. path)
 			end
@@ -57,137 +54,108 @@ SF.Preprocessor = {
 				return path, string.GetPathFromFilename(path)
 			end
 
-			local function recursiveLoad(codepath, codedir, code, dontParse)
-				if tbl.files[codepath] then return end
-				tbl.files[codepath] = code
-
-				if dontParse then return end
-
-				local ppfiledata = self:ProcessFile(codepath, code)
-
-				local clientmain = ppfiledata.clientmain
-				if clientmain then
-					clientmain = getIncludePath(clientmain, codedir)
-					if clientmain then ppdata:Set(codepath, "clientmain", clientmain) end
-				end
-
-				local dontParseTbl = {}
-				local dataincludes = ppfiledata.includesdata
-				if dataincludes then
-					for k, v in ipairs(dataincludes) do
-						local datapath = getIncludePath(v, codedir)
-						if datapath then dontParseTbl[datapath] = true end
-					end
-				end
-
-				local includes = ppfiledata.includes
-				if includes then
-					for k, v in ipairs(includes) do
-						local codepath, codedir = getIncludePath(v, codedir)
-						local code = getInclude(codepath)
-						recursiveLoad(codepath, codedir, code, dontParseTbl[codepath])
-					end
-				end
-
-				local includedirs = ppfiledata.includedirs
-				if includedirs then
-					for i = 1, #includedirs do
-						local origdir = includedirs[i]
-						local dir = origdir
-						local files
-						if string.sub(dir, 1, 1)~="/" then
-							dir = SF.NormalizePath(codedir .. origdir)
-							files = file.Find("starfall/" .. dir .. "/*", "DATA")
-						end
-						if not files or #files==0 then
-							dir = SF.NormalizePath(origdir)
-							files = file.Find("starfall/" .. dir .. "/*", "DATA")
-						end
-						for k, v in ipairs(files) do
-							local codepath, codedir = getIncludePath(v, dir.."/")
-							local code = getInclude(codepath)
-							recursiveLoad(codepath, codedir, code, dontParseTbl[codepath])
-						end
-					end
-				end
-			end
-
-			local ok, msg = pcall(function()
-				local codepath, codedir = getIncludePath(mainfile, string.GetPathFromFilename(mainfile))
-				local code = getInclude(codepath)
-				recursiveLoad(codepath, codedir, code)
-			end)
-
-			if not ok then
-				local file = string.match(msg, "(Bad include%: .*)")
-				return err(file or msg)
-			end
-
-			local clientmain = ppdata.clientmain and ppdata.clientmain[tbl.mainfile]
-			if clientmain and not tbl.files[clientmain] then
-				return err("Clientmain not found: " .. clientmain)
-			end
-
-			local includes = ppdata.includes
-			local serverorclient = ppdata.serverorclient
-			if includes and serverorclient then
-				for filename, files in pairs(includes) do
-					for _, inc in ipairs(files) do
-						if serverorclient[inc] and serverorclient[filename] and serverorclient[filename] ~= serverorclient[inc] then
-							return err("Incompatible client/server realm: \""..filename.."\" trying to include \""..inc.."\"")
-						end
-					end
-				end
-			end
-
-			if not ppdata.httpincludes then onSuccessSignal(list) return end
-			local files = list.files
-			local usingCache, pendingRequestCount = {}, 0 -- a temporary HTTP in-memory cache
-			-- First stage: Iterate through all http --@include directives in all files and prepare our HTTP queue structure.
-			for fileName, fileUsing in next, ppdata.httpincludes do
-				for _, data in next, fileUsing do
-					local url, name = data[1], data[2]
-					if not usingCache[url] then
-						usingCache[url] = name or true -- prevents duplicate requests to the same URL
-						pendingRequestCount = pendingRequestCount + 1
-					end
-				end
-			end
-			-- Second stage: Once we know the total amount of requests and URLs, we fetch all URLs as HTTP resources.
-			--               Then we wait for all HTTP requests to complete.
-			local function CheckAndUploadIfReady()
+			local pendingRequestCount = 1
+			local function checkAndUploadIfReady()
 				pendingRequestCount = pendingRequestCount - 1
 				if pendingRequestCount > 0 then return end
-				-- The following should run only once, at the end when there are no more pending HTTP requests:
-				-- Final stage: Substitute all http --@include directives with the contents of their HTTP response.
-				for fileName, fileUsing in next, ppdata.httpincludes do
-					local code = files[fileName]
-					for _, data in next, fileUsing do
-						local url, name = data[1], data[2]
-						local result = usingCache[url]
-						files[name] = result
+				onSuccessSignal(self)
+			end
+
+			local dontParseTbl = {}
+			local filesToLoad = {}
+			local httpCache = {}
+			local errored = false
+			local function addFileToLoad(codepath, codedir, code)
+				if rawget(self.files, codepath) then return end
+				filesToLoad[#filesToLoad + 1] = {codepath, codedir, code}
+			end
+
+			local function loadFiles(name, codedir, code)
+				if errored then return end
+				addFileToLoad(name, codedir, code)
+
+				local ok, err = pcall(function()
+				while #filesToLoad>0 do
+					codepath, codedir, code = unpack(table.remove(filesToLoad))
+
+					local fdata = self.files[codepath]
+					if code==nil then code = getInclude(codepath) end
+					fdata.code = code
+
+					if dontParseTbl[codepath] then continue end
+
+					self:ProcessFile(codepath, code)
+
+					if fdata.includesdata then
+						for _, v in ipairs(fdata.includesdata) do
+							local datapath = getIncludePath(v, codedir)
+							if datapath then dontParseTbl[datapath] = true end
+						end
+					end
+
+					if fdata.includes then
+						for k, v in ipairs(fdata.includes) do
+							addFileToLoad(getIncludePath(v, codedir))
+						end
+					end
+
+					if fdata.includedirs then
+						for _, origdir in ipairs(fdata.includedirs) do
+							local dir = origdir
+							local files
+							if string.sub(dir, 1, 1)~="/" then
+								dir = SF.NormalizePath(codedir .. origdir)
+								files = file.Find("starfall/" .. dir .. "/*", "DATA")
+							end
+							if not files or #files==0 then
+								dir = SF.NormalizePath(origdir)
+								files = file.Find("starfall/" .. dir .. "/*", "DATA")
+							end
+							for k, v in ipairs(files) do
+								addFileToLoad(getIncludePath(v, dir.."/"))
+							end
+						end
+					end
+
+					if fdata.httpincludes then
+						for _, data in ipairs(fdata.httpincludes) do
+							local url, name = unpack(data)
+							if not httpCache[url] then
+								if rawget(self.files, name) then error("--@httpinclude file name conflicting with already included filename: "..name) end
+								httpCache[url] = name or true -- prevents duplicate requests to the same URL
+								pendingRequestCount = pendingRequestCount + 1
+								HTTP {
+									method = "GET",
+									url = url,
+									success = function(_, contents)
+										httpCache[url]=contents
+										loadFiles(name, codedir, contents)
+									end,
+									failed = function(reason)
+										errored=true
+										onErrorSignal(string.format("Could not fetch --@include link (%s): %s", reason, url))
+									end,
+								}
+							end
+						end
 					end
 				end
-				onSuccessSignal(list)
+				end)
+				if ok then
+					checkAndUploadIfReady()
+				else
+					errored=true
+					onErrorSignal(err)
+				end
 			end
-			for url in next, usingCache do
-				HTTP {
-					method = "GET";
-					url = url;
-					success = function(_, contents)
-						usingCache[url] = contents
-						CheckAndUploadIfReady()
-					end;
-					failed = function(reason)
-						onErrorSignal(string.format("Could not fetch --@include link (due %s): %s", reason, url))
-					end;
-				}
-			end
+
+			loadFiles(getIncludePath(mainfile, string.GetPathFromFilename(mainfile)))
+
 		end,
 		ResolvePath = function(self, callingfile, path)
 			local curdir = string.GetPathFromFilename(callingfile)
 			return SF.ChoosePath(path, curdir, function(testpath)
-				return self.files[testpath]
+				return rawget(self.files, testpath)
 			end)
 		end,
 		GetSendData = function(sfdata)
@@ -200,12 +168,12 @@ SF.Preprocessor = {
 
 			local files = {} for k, v in pairs(sfdata.files) do files[k] = v end
 
-			for filename, fileppdata in pairs(self.files) do
-				if fileppdata.owneronly then ownersenddata = true end
-				if fileppdata.serverorclient == "server" then
+			for filename, fdata in pairs(self.files) do
+				if fdata.owneronly then ownersenddata = true end
+				if fdata.serverorclient == "server" then
 					files[filename] = table.concat({
-						"--@name " .. (fileppdata.scriptname or ""),
-						"--@author " .. (fileppdata.scriptauthor or ""),
+						"--@name " .. (fdata.scriptname or ""),
+						"--@author " .. (fdata.scriptauthor or ""),
 						"--@server",
 						""
 					}, "\n")
@@ -215,11 +183,11 @@ SF.Preprocessor = {
 			if ownersenddata then
 				local ownerfiles = {} for k, v in pairs(files) do ownerfiles[k] = v end
 
-				for filename, fileppdata in pairs(self.files) do
-					if fileppdata.owneronly then
+				for filename, fdata in pairs(self.files) do
+					if fdata.owneronly then
 						files[filename] = table.concat({
-							"--@name " .. (fileppdata.scriptname or ""),
-							"--@author " .. (fileppdata.scriptauthor or ""),
+							"--@name " .. (fdata.scriptname or ""),
+							"--@author " .. (fdata.scriptauthor or ""),
 							"--@owneronly",
 							""
 						}, "\n")
@@ -243,7 +211,8 @@ SF.Preprocessor = {
 	},
 	__call = function(t)
 		return setmetatable({
-			files = setmetatable({}, {__index = function(t,k) local r={} t[k]=r return r end})
+			files = setmetatable({}, {__index = function(t,k) local r={} t[k]=r return r end}),
+			mainfile = ""
 		}, t)
 	end
 }
@@ -270,6 +239,17 @@ directives.include = {
 		else
 			-- Standard/Filesystem approach
 			data.includes[#data.includes + 1] = args
+		end
+	end,
+	postprocess = function(self, data)
+		local serverorclient = data.serverorclient
+		if serverorclient then
+			for _, inc in ipairs(data.includes) do
+				local incdata = self.files[inc]
+				if incdata.serverorclient and serverorclient ~= incdata.serverorclient then
+					return err("Incompatible client/server realm: \""..filename.."\" trying to include \""..inc.."\"")
+				end
+			end
 		end
 	end
 }
