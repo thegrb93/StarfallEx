@@ -151,7 +151,7 @@ end)
 
 net.Receive("starfall_processor_download", function(len)
 	net.ReadStarfall(nil, function(ok, sfdata, err)
-		if ok then
+		if ok and IsValid(sfdata.proc) and (IsValid(sfdata.owner) or IsWorld(sfdata.owner)) then
 			sfdata.proc:Compile(sfdata)
 		elseif IsValid(sfdata.proc) and IsValid(sfdata.owner) then
 			sfdata.proc.owner = sfdata.owner
