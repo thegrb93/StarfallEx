@@ -41,14 +41,15 @@ local function convertFilter(filter)
 	if filter == nil then
 		return nil
 	elseif istable(filter) then
-		if debug.getmetatable(filter)~=ent_meta then
+		local meta = debug.getmetatable(filter)
+		if meta==ent_meta or (meta and meta.supertype==ent_meta) then
+			return eunwrap(filter)
+		else
 			local l = {}
 			for i, v in ipairs(filter) do
 				l[i] = eunwrap(v)
 			end
 			return l
-		else
-			return eunwrap(filter)
 		end
 	elseif isfunction(filter) then
 		return function(ent)
