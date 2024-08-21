@@ -251,7 +251,6 @@ else
 			callback = callback - 1
 			if callback>0 then return end
 			if chip and owner and client then
-				if client:IsWorld() then client = nil end
 				hook.Run("StarfallError", chip, owner, client, mainfile, message, traceback, should_notify)
 			end
 		end

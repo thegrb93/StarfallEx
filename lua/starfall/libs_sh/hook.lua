@@ -575,7 +575,7 @@ add("Tick")
 -- @param Player|Entity ply Who's fault it errored. World-entity if it was a server error, or player that the script errored if on client
 -- @param string err Error message
 add("StarfallError", nil, function(instance, ent, owner, errply, _, err)
-	return true, {instance.WrapObject(ent), instance.WrapObject(errply or Entity(0)), err}
+	return true, {instance.WrapObject(ent), instance.WrapObject(errply), err}
 end)
 
 -- Game Events
