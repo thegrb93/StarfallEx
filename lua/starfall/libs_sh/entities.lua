@@ -251,12 +251,6 @@ if CLIENT then
 	-- @return Vector The maximum vector of the bounds
 	function ents_methods:getRenderBounds()
 		local ent = getent(self)
-
-		local sf_userrenderbounds = ent.sf_userrenderbounds
-		if sf_userrenderbounds then
-			return vwrap(sf_userrenderbounds[1]), vwrap(sf_userrenderbounds[2])
-		end
-
 		local mins, maxs = ent:GetRenderBounds()
 		return vwrap(mins), vwrap(maxs)
 	end
