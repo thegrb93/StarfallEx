@@ -572,10 +572,10 @@ add("Tick")
 -- @class hook
 -- @shared
 -- @param Entity ent Starfall chip that errored
--- @param Player ply Who's fault it errored. Owner of the chip if on server, or player that the script errored if on client
+-- @param Player|Entity ply Who's fault it errored. World-entity if it was a server error, or player that the script errored if on client
 -- @param string err Error message
 add("StarfallError", nil, function(instance, ent, owner, errply, _, err)
-	return true, {instance.WrapObject(ent), instance.WrapObject(errply or owner), err}
+	return true, {instance.WrapObject(ent), instance.WrapObject(errply), err}
 end)
 
 -- Game Events

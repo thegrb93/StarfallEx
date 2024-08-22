@@ -130,7 +130,7 @@ hook.Add("StarfallError", "StarfallErrorReport", function(_, owner, client, main
 	if not IsValid(owner) then return end
 	local local_player = LocalPlayer()
 	if owner == local_player then
-		if not client or client == owner then
+		if client:IsWorld() or client == owner then
 			SF.AddNotify(owner, message, "ERROR", 7, "ERROR1")
 		elseif client then
 			if should_notify then
