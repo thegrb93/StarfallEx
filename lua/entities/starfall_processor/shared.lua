@@ -135,7 +135,7 @@ function ENT:Error(err)
 		self:SetColor(Color(255, 0, 0, 255))
 	end
 
-	hook.Run("StarfallError", self, self.owner, CLIENT and LocalPlayer() or false, self.sfdata and self.sfdata.mainfile or "", msg, traceback)
+	hook.Run("StarfallError", self, self.owner, CLIENT and LocalPlayer() or Entity(0), self.sfdata and self.sfdata.mainfile or "", msg, traceback)
 	SF.SendError(self, msg, traceback)
 end
 
