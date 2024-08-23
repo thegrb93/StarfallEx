@@ -259,13 +259,17 @@ SF.FileLoader = {
 
 		Finish = function(self)
 			if self.httpRequests > 0 then return end
+			self.errored=true
 
-			self.errored = true
-			local files = {}
-			for path, fdata in pairs(self.files) do
-				files[path] = fdata.code
-			end
-			self.onsuccess(files)
+			local ok, err = pcall(function()
+				local files = {}
+				for path, fdata in pairs(self.files) do
+					fdata:Postprocess(self)
+					files[path] = fdata.code
+				end
+				self.onsuccess(files)
+			end)
+			if not ok then self.onfail(err) return end
 		end,
 	}
 	__call = function(t, mainfile, openfiles, onsuccess, onfail)

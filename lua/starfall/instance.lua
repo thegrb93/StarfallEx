@@ -59,11 +59,8 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 	instance.permissionOverrides = {}
 
 	local ok, ppdata = pcall(SF.Preprocessor, code)
-	if ok then
-		instance.ppdata = ppdata
-	else
-		return false, { message = ppdata, traceback = "" }
-	end
+	if not ok then return false, { message = ppdata, traceback = "" } end
+	instance.ppdata = ppdata
 
 	if player:IsWorld() then
 		player = SF.Superuser
@@ -118,13 +115,13 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 		return false, { message = "", traceback = err }
 	end
 
-	for filename, ppdata in pairs(ppdata.files) do
-		if ppdata.datafile then continue end -- Don't compile data files
-		if CLIENT and ppdata.owneronly and LocalPlayer() ~= player then continue end -- Don't compile owner-only files if not owner
-		local serverorclient = ppdata.serverorclient
+	for filename, fdata in pairs(ppdata.files) do
+		if fdata.datafile then continue end -- Don't compile data files
+		if CLIENT and fdata.owneronly and LocalPlayer() ~= player then continue end -- Don't compile owner-only files if not owner
+		local serverorclient = fdata.serverorclient
 		if (serverorclient == "server" and CLIENT) or (serverorclient == "client" and SERVER) then continue end -- Don't compile files for other realm
 
-		local func = SF.CompileString(ppdata.code, "SF:"..filename, false)
+		local func = SF.CompileString(fdata.code, "SF:"..filename, false)
 		if isstring(func) then
 			return false, { message = func, traceback = "" }
 		end
