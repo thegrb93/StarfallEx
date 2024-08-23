@@ -219,7 +219,7 @@ if CLIENT then
 			openfiles[mainfile] = SF.Editor.getCode()
 		end
 
-		SF.Preprocessor():LoadFiles(openfiles, success, err)
+		SF.FileLoader(mainfile, openfiles, success, err)
 	end
 
 	function SF.Editor.createModelViewer()

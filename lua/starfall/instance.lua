@@ -58,13 +58,16 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 	instance.requires = {}
 	instance.permissionOverrides = {}
 
-	instance.ppdata = SF.Preprocessor()
-	local ok, err = pcall(instance.ppdata.ProcessFiles, instance.ppdata, code)
-	if not ok then return false, { message = err, traceback = "" } end
+	local ok, ppdata = pcall(SF.Preprocessor, code)
+	if ok then
+		instance.ppdata = ppdata
+	else
+		return false, { message = ppdata, traceback = "" }
+	end
 
 	if player:IsWorld() then
 		player = SF.Superuser
-	elseif instance.ppdata:Get(mainfile, "superuser") then
+	elseif ppdata.files[mainfile].superuser then
 		if not SF.AllowSuperUser:GetBool() then return false, { message = "Can't use --@superuser unless sf_superuserallowed is enabled!", traceback = "" } end
 		local ok, message = hook.Run("StarfallCanSuperUser", player)
 		if ok == false or (ok == nil and not player:IsSuperAdmin()) then return false, { message = message or "Can't use --@superuser unless you are superadmin!", traceback = "" } end
@@ -115,15 +118,13 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 		return false, { message = "", traceback = err }
 	end
 
-	for filename, source in pairs(code) do
-		local ppfiledata = instance.ppdata.files[filename]
-
-		if instance.ppdata:Get(filename, "datafile") then continue end -- Don't compile data files
-		if CLIENT and ppfiledata.owneronly and LocalPlayer() ~= player then continue end -- Don't compile owner-only files if not owner
-		local serverorclient = ppfiledata.serverorclient
+	for filename, ppdata in pairs(ppdata.files) do
+		if ppdata.datafile then continue end -- Don't compile data files
+		if CLIENT and ppdata.owneronly and LocalPlayer() ~= player then continue end -- Don't compile owner-only files if not owner
+		local serverorclient = ppdata.serverorclient
 		if (serverorclient == "server" and CLIENT) or (serverorclient == "client" and SERVER) then continue end -- Don't compile files for other realm
 
-		local func = SF.CompileString(source, "SF:"..filename, false)
+		local func = SF.CompileString(ppdata.code, "SF:"..filename, false)
 		if isstring(func) then
 			return false, { message = func, traceback = "" }
 		end

@@ -186,21 +186,16 @@ SF.FileLoader = {
 
 		LoadUrl = function(self, name, url)
 			if self.files[name] then return end
-			local fdata = SF.PreprocessData(name)
-			self.files[name] = fdata
 
 			local cache = self.httpCache[url]
 			if cache then
-				if cache[1] and cache[1].code then
-					fdata.code = cache[1].code
-					self.filesToLoad[#self.filesToLoad + 1] = sfdata
-				else
-					cache[#cache + 1] = fdata
-				end
+				self.files[name] = cache
 				return
 			end
-			cache = {fdata}
-			self.httpCache[url] = cache
+			
+			local fdata = SF.PreprocessData(name)
+			self.files[name] = fdata
+			self.httpCache[url] = fdata
 			self.httpRequests = self.httpRequests + 1
 
 			HTTP {
