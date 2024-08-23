@@ -269,8 +269,8 @@ else
 		local mainfile = net.ReadString()
 		if #mainfile==0 then mainfile = nil end
 		SF.Editor.BuildIncludesTable(mainfile,
-			function(list)
-				SF.SendStarfall("starfall_upload", {files = list.files, mainfile = list.mainfile})
+			function(files, mainfile)
+				SF.SendStarfall("starfall_upload", {files = files, mainfile = mainfile})
 			end,
 			function(err)
 				SF.SendStarfall("starfall_upload", {files = {}, mainfile = ""})

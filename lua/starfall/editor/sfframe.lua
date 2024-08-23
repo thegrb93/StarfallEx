@@ -1846,9 +1846,9 @@ function Editor:Close()
 	local activeWep = LocalPlayer():GetActiveWeapon()
 	if activeWep:IsValid() and activeWep:GetClass() == "gmod_tool" and activeWep.Mode == "starfall_processor" then
 		local model = nil
-		local ppdata = SF.Preprocessor()
-		pcall(ppdata.ProcessFile, ppdata, "file", self:GetCode())
-		RunConsoleCommand("starfall_processor_ScriptModel", ppdata:Get("file", "model") or "")
+		local ppdata = SF.PreprocessData("", self:GetCode())
+		pcall(ppdata.Preprocess, ppdata)
+		RunConsoleCommand("starfall_processor_ScriptModel", ppdata.model or "")
 	end
 	hook.Run("StarfallEditorClose")
 end

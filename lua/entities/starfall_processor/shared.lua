@@ -36,12 +36,12 @@ function ENT:Compile(sfdata)
 	if not ok then self:Error(instance) return end
 
 	if newdata then
-		self.name = instance.ppdata:Get(instance.mainfile, "scriptname") or "Generic ( No-Name )"
-		self.author = instance.ppdata:Get(instance.mainfile, "scriptauthor") or "No-Author"
+		local mainpp = instance.ppdata.files[instance.mainfile]
+		self.name = mainpp.scriptname or "Generic ( No-Name )"
+		self.author = mainpp.scriptauthor or "No-Author"
 		if SERVER then
-			local model = instance.ppdata:Get(instance.mainfile, "model")
-			if model then
-				pcall(function() self:SetCustomModel(SF.CheckModel(model, self.owner, true)) end)
+			if mainpp.model then
+				pcall(function() self:SetCustomModel(SF.CheckModel(mainpp.model, self.owner, true)) end)
 			end
 
 			self.sfsenddata, self.sfownerdata = instance.ppdata:GetSendData(sfdata)

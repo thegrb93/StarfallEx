@@ -96,7 +96,7 @@ SF.Preprocessor = {
 		GetSendData = function(self, sfdata)
 			local senddata = {
 				owner = sfdata.owner,
-				mainfile = ppdata:Get(sfdata.mainfile, "clientmain") or sfdata.mainfile,
+				mainfile = self.files[sfdata.mainfile].clientmain or sfdata.mainfile,
 				proc = sfdata.proc
 			}
 			local ownersenddata
@@ -267,14 +267,15 @@ SF.FileLoader = {
 					fdata:Postprocess(self)
 					files[path] = fdata.code
 				end
-				self.onsuccess(files)
+				self.onsuccess(files, self.mainfile)
 			end)
 			if not ok then self.onfail(err) return end
 		end,
-	}
+	},
 	__call = function(t, mainfile, openfiles, onsuccess, onfail)
 		setmetatable({
 			files = {},
+			mainfile = mainfile,
 			openfiles = openfiles,
 			filesToLoad = {},
 			dontParseTbl = {},
