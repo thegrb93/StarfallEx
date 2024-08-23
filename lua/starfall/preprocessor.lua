@@ -202,10 +202,8 @@ SF.FileLoader = {
 				method = "GET",
 				url = url,
 				success = function(_, contents)
-					for _, v in ipairs(cache) do
-						v.code = contents
-						self.filesToLoad[#self.filesToLoad + 1] = v
-					end
+					fdata.code = contents
+					self.filesToLoad[#self.filesToLoad + 1] = fdata
 					self.httpRequests = self.httpRequests - 1
 					self:Start()
 				end,
