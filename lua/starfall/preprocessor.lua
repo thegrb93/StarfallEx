@@ -3,162 +3,97 @@
 -- Processes code for compile time directives.
 -------------------------------------------------------------------------------
 
-SF.Preprocessor = {
-	directives = {},
-	SetGlobalDirective = function(directive, func)
-		SF.Preprocessor.directives[directive] = func
-	end,
+SF.PreprocessData = {
+	directives = {
+		include = function(self, args)
+			if #args == 0 then error("Empty include directive") end
+			if string.match(args, "^https?://") then
+				-- HTTP approach
+				local httpUrl, httpName = string.match(args, "^(.+)%s+as%s+(.+)$")
+				if not httpUrl then error("Bad include format - Expected '--@include http://url as filename'") end
+				self.httpincludes[#self.httpincludes + 1] = { httpUrl, httpName }
+			else
+				-- Standard/Filesystem approach
+				self.includes[#self.includes + 1] = args
+			end
+		end,
+
+		includedata = function(self, args)
+			if #args == 0 then error("Empty includedata directive") end
+			self.includesdata[#self.includesdata + 1] = args
+			SF.PreprocessData.directives.include.process(self, args)
+		end,
+		
+		includedir = function(self, args)
+			if #args == 0 then error("Empty includedir directive") end
+			self.includedirs[#self.includedirs + 1] = args
+		end,
+
+		model = function(self, args)
+			if #args == 0 then error("Empty model directive") end
+			self.model = args
+		end,
+
+		name = function(self, args) self.scriptname = string.sub(args, 1, 64) end,
+		author = function(self, args) self.scriptauthor = string.sub(args, 1, 64) end,
+		server = function(self, args) self.serverorclient = "server" end,
+		client = function(self, args) self.serverorclient = "client" end,
+		shared = function(self, args) self.serverorclient = nil end,
+		clientmain = function(self, args) self.clientmain = args end,
+		superuser = function(self, args) self.superuser = true end,
+		owneronly = function(self, args) self.owneronly = true end,
+	},
 	__index = {
-		Get = function(self, filename, key)
-			return self.files[filename] and self.files[filename][key]
-		end,
-		ProcessFile = function(self, filename, code)
-			local data = self.files[filename]
-			data.filename = filename
-			data.code = code
-			for _, func in pairs(SF.Preprocessor.directives) do
-				if func.init then func.init(self, data) end
-			end
-			for directive, args in string.gmatch(code, "%-%-@(%w+)([^\r\n]*)") do
-				local func = SF.Preprocessor.directives[directive]
+		Preprocess = function(self)
+			for directive, args in string.gmatch(self.code, "%-%-@(%w+)([^\r\n]*)") do
+				local func = SF.PreprocessData.directives[directive]
 				if func then
-					func.process(self, data, string.Trim(args))
-				end
-			end
-			return data
-		end,
-		PostProcessFiles = function(self)
-			for _, func in pairs(SF.Preprocessor.directives) do
-				local postprocess = func.postprocess
-				if postprocess then
-					for _, data in pairs(self.files) do
-						postprocess(self, data)
-					end
+					func(self, string.Trim(args))
 				end
 			end
 		end,
-		ProcessFiles = function(self, code)
-			for filename, source in pairs(code) do
-				self:ProcessFile(filename, source)
+		Postprocess = function(self, processor)
+			if self.clientmain then
+				self.clientmain = self:ResolvePath(self.path, self.clientmain) or error("Bad --@clientmain "..self.clientmain.." in file "..self.path)
 			end
-			self:PostProcessFiles()
-		end,
-		LoadFiles = function(self, openfiles, onSuccessSignal, onErrorSignal)
-			local function getInclude(path)
-				return openfiles[path] or file.Read("starfall/" .. path, "DATA") or error("Bad include: " .. path)
+			
+			for _, incdata in ipairs(self.includesdata) do
+				incdata = processor:ResolvePath(self.path, incdata) or error("Bad --@includedata "..incdata.." in file "..self.path)
+				processor.files[incdata].datafile = true
 			end
-			local function getIncludePath(path, curdir)
-				local path = SF.ChoosePath(path, curdir, function(testpath)
-					return openfiles[testpath] or file.Exists("starfall/" .. testpath, "DATA")
-				end) or error("Bad include: " .. path)
-				return path, string.GetPathFromFilename(path)
-			end
-
-			local pendingRequestCount = 1
-			local function checkAndUploadIfReady()
-				pendingRequestCount = pendingRequestCount - 1
-				if pendingRequestCount > 0 then return end
-				onSuccessSignal(self)
-			end
-
-			local dontParseTbl = {}
-			local filesToLoad = {}
-			local httpCache = {}
-			local errored = false
-			local function addFileToLoad(codepath, codedir, code)
-				if rawget(self.files, codepath) then return end
-				filesToLoad[#filesToLoad + 1] = {codepath, codedir, code}
-			end
-
-			local function loadFiles(name, codedir, code)
-				if errored then return end
-				addFileToLoad(name, codedir, code)
-
-				local ok, err = pcall(function()
-				while #filesToLoad>0 do
-					codepath, codedir, code = unpack(table.remove(filesToLoad))
-
-					local fdata = self.files[codepath]
-					if code==nil then code = getInclude(codepath) end
-					fdata.code = code
-
-					if dontParseTbl[codepath] then continue end
-
-					self:ProcessFile(codepath, code)
-
-					if fdata.includesdata then
-						for _, v in ipairs(fdata.includesdata) do
-							local datapath = getIncludePath(v, codedir)
-							if datapath then dontParseTbl[datapath] = true end
-						end
-					end
-
-					if fdata.includes then
-						for k, v in ipairs(fdata.includes) do
-							addFileToLoad(getIncludePath(v, codedir))
-						end
-					end
-
-					if fdata.includedirs then
-						for _, origdir in ipairs(fdata.includedirs) do
-							local dir = origdir
-							local files
-							if string.sub(dir, 1, 1)~="/" then
-								dir = SF.NormalizePath(codedir .. origdir)
-								files = file.Find("starfall/" .. dir .. "/*", "DATA")
-							end
-							if not files or #files==0 then
-								dir = SF.NormalizePath(origdir)
-								files = file.Find("starfall/" .. dir .. "/*", "DATA")
-							end
-							for k, v in ipairs(files) do
-								addFileToLoad(getIncludePath(v, dir.."/"))
-							end
-						end
-					end
-
-					if fdata.httpincludes then
-						for _, data in ipairs(fdata.httpincludes) do
-							local url, name = unpack(data)
-							if not httpCache[url] then
-								if rawget(self.files, name) then error("--@httpinclude file name conflicting with already included filename: "..name) end
-								httpCache[url] = name or true -- prevents duplicate requests to the same URL
-								pendingRequestCount = pendingRequestCount + 1
-								HTTP {
-									method = "GET",
-									url = url,
-									success = function(_, contents)
-										httpCache[url]=contents
-										loadFiles(name, codedir, contents)
-									end,
-									failed = function(reason)
-										errored=true
-										onErrorSignal(string.format("Could not fetch --@include link (%s): %s", reason, url))
-									end,
-								}
-							end
-						end
+			
+			if self.serverorclient then
+				for _, inc in ipairs(self.includes) do
+					local incdata = processor.files[processor:ResolvePath(self.path, inc)]
+					if incdata.serverorclient and self.serverorclient ~= incdata.serverorclient then
+						error("Incompatible client/server realm: \""..self.path.."\" trying to include \""..inc.."\"")
 					end
 				end
-				end)
-				if ok then
-					checkAndUploadIfReady()
-				else
-					errored=true
-					onErrorSignal(err)
-				end
 			end
+		end
+	},
+	__call = function(t, path, code)
+		return setmetatable({
+			path = path,
+			code = code,
+			includes = {},
+			includedirs = {},
+			includesdata = {},
+			httpincludes = {},
+		}, t)
+	end
+}
+setmetatable(SF.PreprocessData, SF.PreprocessData)
 
-			loadFiles(getIncludePath(mainfile, string.GetPathFromFilename(mainfile)))
-
-		end,
-		ResolvePath = function(self, callingfile, path)
-			local curdir = string.GetPathFromFilename(callingfile)
-			return SF.ChoosePath(path, curdir, function(testpath)
+SF.Preprocessor = {
+	__index = {
+		ResolvePath = function(self, path, callingfile)
+			return SF.ChoosePath(path, string.GetPathFromFilename(callingfile), function(testpath)
 				return rawget(self.files, testpath)
 			end)
 		end,
-		GetSendData = function(sfdata)
+
+		GetSendData = function(self, sfdata)
 			local senddata = {
 				owner = sfdata.owner,
 				mainfile = ppdata:Get(sfdata.mainfile, "clientmain") or sfdata.mainfile,
@@ -168,10 +103,10 @@ SF.Preprocessor = {
 
 			local files = {} for k, v in pairs(sfdata.files) do files[k] = v end
 
-			for filename, fdata in pairs(self.files) do
+			for path, fdata in pairs(self.files) do
 				if fdata.owneronly then ownersenddata = true end
 				if fdata.serverorclient == "server" then
-					files[filename] = table.concat({
+					files[path] = table.concat({
 						"--@name " .. (fdata.scriptname or ""),
 						"--@author " .. (fdata.scriptauthor or ""),
 						"--@server",
@@ -183,9 +118,9 @@ SF.Preprocessor = {
 			if ownersenddata then
 				local ownerfiles = {} for k, v in pairs(files) do ownerfiles[k] = v end
 
-				for filename, fdata in pairs(self.files) do
+				for path, fdata in pairs(self.files) do
 					if fdata.owneronly then
-						files[filename] = table.concat({
+						files[path] = table.concat({
 							"--@name " .. (fdata.scriptname or ""),
 							"--@author " .. (fdata.scriptauthor or ""),
 							"--@owneronly",
@@ -207,136 +142,150 @@ SF.Preprocessor = {
 			senddata.compressed = SF.CompressFiles(files)
 
 			return senddata, ownersenddata
-		end
+		end,
 	},
-	__call = function(t)
-		return setmetatable({
-			files = setmetatable({}, {__index = function(t,k) local r={} t[k]=r return r end}),
+
+	__call = function(t, files)
+		local self = setmetatable({
+			files = setmetatable({}, {__index = function(t,k) error("Invalid file: "..k) end}),
 			mainfile = ""
 		}, t)
+
+		for path, code in pairs(files) do
+			local fdata = SF.PreprocessData(path, code)
+			fdata:Preprocess()
+			self.files[path] = fdata
+		end
+		for path, fdata in pairs(self.files) do
+			fdata:Postprocess(self)
+		end
+
+		return self
 	end
 }
 setmetatable(SF.Preprocessor, SF.Preprocessor)
 
-local directives = SF.Preprocessor.directives
-local postprocess = SF.Preprocessor.postprocess
+SF.FileLoader = {
+	__index = {
+		GetInclude = function(self, path)
+			return self.openfiles[path] or file.Read("starfall/" .. path, "DATA") or error("Failed to read: " .. path)
+		end,
 
-directives.include = {
-	init = function(self, data)
-		data.httpincludes = {}
-		data.includes = {}
-	end,
-	process = function(self, data, args)
-		if #args == 0 then error("Empty include directive") end
-		if string.match(args, "^https?://") then
-			-- HTTP approach
-			local httpUrl, httpName = string.match(args, "^(.+)%s+as%s+(.+)$")
-			if httpUrl then
-				data.httpincludes[#data.httpincludes + 1] = { httpUrl, httpName }
-			else
-				error("Bad include format - Expected '--@include http://url as filename'")
+		GetIncludePath = function(self, path, curfile)
+			return SF.ChoosePath(path, string.GetPathFromFilename(curfile), function(testpath)
+				return self.openfiles[testpath] or file.Exists("starfall/" .. testpath, "DATA")
+			end) or error("Bad include in "..curfile..": " .. path)
+		end,
+
+		AddFileToLoad = function(self, path, code)
+			if self.files[path] then return end
+			local fdata = SF.PreprocessData(path, code or self:GetInclude(path))
+			self.filesToLoad[#self.filesToLoad + 1] = fdata
+			self.files[path] = fdata
+		end,
+
+		LoadUrl = function(self, name, url)
+			if self.files[name] then return end
+			local fdata = SF.PreprocessData(name)
+			self.files[name] = fdata
+
+			local cache = self.httpCache[url]
+			if cache then
+				if cache[1] and cache[1].code then
+					fdata.code = cache[1].code
+					self.filesToLoad[#self.filesToLoad + 1] = sfdata
+				else
+					cache[#cache + 1] = fdata
+				end
+				return
 			end
-		else
-			-- Standard/Filesystem approach
-			data.includes[#data.includes + 1] = args
-		end
-	end,
-	postprocess = function(self, data)
-		local serverorclient = data.serverorclient
-		if serverorclient then
-			for _, inc in ipairs(data.includes) do
-				local incdata = self.files[inc]
-				if incdata.serverorclient and serverorclient ~= incdata.serverorclient then
-					return err("Incompatible client/server realm: \""..filename.."\" trying to include \""..inc.."\"")
+			cache = {fdata}
+			self.httpCache[url] = cache
+			self.httpRequests = self.httpRequests + 1
+
+			HTTP {
+				method = "GET",
+				url = url,
+				success = function(_, contents)
+					for _, v in ipairs(cache) do
+						v.code = contents
+						self.filesToLoad[#self.filesToLoad + 1] = v
+					end
+					self.httpRequests = self.httpRequests - 1
+					self:Start()
+				end,
+				failed = function(reason)
+					if self.errored then return end
+					self.errored=true
+					self.onfail(string.format("Could not fetch --@include link (%s): %s", reason, url))
+				end,
+			}
+		end,
+
+		LoadFile = function(self, fdata)
+			if self.dontParseTbl[fdata.path] then return end
+
+			fdata:Preprocess()
+
+			for _, v in ipairs(fdata.includesdata) do
+				self.dontParseTbl[self:GetIncludePath(v, fdata.path)] = true
+			end
+			for _, v in ipairs(fdata.includes) do
+				self:AddFileToLoad(self:GetIncludePath(v, fdata.path))
+			end
+			for _, v in ipairs(fdata.includedirs) do
+				local dir = self:GetIncludePath(v, fdata.path)
+				local files = file.Find("starfall/" .. dir .. "/*", "DATA")
+				for k, v in ipairs(files) do
+					self:AddFileToLoad(dir.."/"..v)
 				end
 			end
-		end
-	end
-}
+			for _, v in ipairs(fdata.httpincludes) do
+				self:LoadUrl(unpack(v))
+			end
+		end,
 
-directives.includedir = {
-	init = function(self, data)
-		data.includedirs = {}
-	end,
-	process = function(self, data, args)
-		if #args == 0 then error("Empty includedir directive") end
-		data.includedirs[#data.includedirs + 1] = args
-	end
-}
+		Start = function(self, mainfile)
+			if self.errored then return end
 
-directives.includedata = {
-	init = function(self, data)
-		data.includesdata = {}
-	end,
-	process = function(self, data, args)
-		if #args == 0 then error("Empty includedata directive") end
-		data.includesdata[#data.includesdata + 1] = args
-		directives.include.process(self, data, args)
-	end,
-	postprocess = function(self, data)
-		for i, incdata in ipairs(data.includesdata) do
-			incdata = self:ResolvePath(data.filename, incdata) or error("Bad --@includedata "..incdata.." in file "..data.filename)
-			self.files[incdata].datafile = true
-		end
-	end
-}
+			local ok, err = pcall(function()
+				if mainfile then
+					self:AddFileToLoad(mainfile)
+				end
+				while #self.filesToLoad>0 do
+					self:LoadFile(table.remove(self.filesToLoad))
+				end
+			end)
+			if ok then
+				self:Finish()
+			else
+				self.errored=true
+				self.onfail(err)
+			end
+		end,
 
-directives.name = {
-	process = function(self, data, args)
-		data.scriptname = string.sub(args, 1, 64)
-	end
-}
+		Finish = function(self)
+			if self.httpRequests > 0 then return end
 
-directives.author = {
-	process = function(self, data, args)
-		data.scriptauthor = string.sub(args, 1, 64)
+			self.errored = true
+			local files = {}
+			for path, fdata in pairs(self.files) do
+				files[path] = fdata.code
+			end
+			self.onsuccess(files)
+		end,
+	}
+	__call = function(t, mainfile, openfiles, onsuccess, onfail)
+		setmetatable({
+			files = {},
+			filesToLoad = {},
+			dontParseTbl = {},
+			httpRequests = 0,
+			httpCache = {},
+			errored = false,
+			onsuccess = onsuccess,
+			onfail = onfail,
+		}, t):Start(mainfile)
 	end
 }
-
-directives.model = {
-	process = function(self, data, args)
-		if #args == 0 then error("Empty model directive") end
-		data.model = args
-	end
-}
-
-directives.server = {
-	process = function(self, data, args)
-		data.serverorclient = "server"
-	end
-}
-
-directives.client = {
-	process = function(self, data, args)
-		data.serverorclient = "client"
-	end
-}
-
-directives.shared = {
-	process = function(self, data, args)
-		data.serverorclient = nil
-	end
-}
-
-directives.clientmain = {
-	process = function(self, data, args)
-		data.clientmain = args
-	end,
-	postprocess = function(self, data)
-		if data.clientmain then
-			data.clientmain = self:ResolvePath(data.filename, data.clientmain) or error("Bad --@clientmain "..data.clientmain.." in file "..data.filename)
-		end
-	end
-}
-
-directives.superuser = {
-	process = function(self, data, args)
-		data.superuser = true
-	end
-}
-
-directives.owneronly = {
-	process = function(self, data, args)
-		data.owneronly = true
-	end
-}
+setmetatable(SF.FileLoader, SF.FileLoader)
