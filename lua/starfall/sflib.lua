@@ -1498,7 +1498,7 @@ function SF.GetExecutingPath()
 		local info = debug.getinfo(stackLevel, "S")
 		if not info then break end
 
-		curdir = string.match(info.short_src, "^SF:(.*[/\\])")
+		curdir = string.match(info.short_src, "^SF:(.*)")
 		stackLevel = stackLevel + 1
 	until curdir
 	return curdir

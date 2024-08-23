@@ -275,6 +275,7 @@ SF.FileLoader = {
 	__call = function(t, mainfile, openfiles, onsuccess, onfail)
 		setmetatable({
 			files = {},
+			openfiles = openfiles,
 			filesToLoad = {},
 			dontParseTbl = {},
 			httpRequests = 0,

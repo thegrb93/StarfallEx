@@ -720,9 +720,7 @@ end
 function builtins_library.getScript(path)
 	checkluatype(path, TYPE_STRING)
 	local curdir = SF.GetExecutingPath() or ""
-	path = SF.ChoosePath(path, curdir, function(testpath)
-		return instance.scripts[testpath]
-	end) or path
+	path = instance.ppdata:ResolvePath(path, curdir) or path
 	return instance.source[path], instance.scripts[path]
 end
 
@@ -764,10 +762,7 @@ function builtins_library.require(path)
 	checkluatype(path, TYPE_STRING)
 
 	local curdir = SF.GetExecutingPath() or ""
-
-	path = SF.ChoosePath(path, curdir, function(testpath)
-		return instance.scripts[testpath]
-	end) or path
+	path = instance.ppdata:ResolvePath(path, curdir) or path
 
 	return instance:require(path)
 end
@@ -781,12 +776,9 @@ function builtins_library.requiredir(path, loadpriority)
 	checkluatype(path, TYPE_STRING)
 	if loadpriority~=nil then checkluatype(loadpriority, TYPE_TABLE) end
 
-	local curdir = SF.GetExecutingPath() or ""
-
-	path = SF.ChoosePath(path, curdir, function(testpath)
-		testpath = string.PatternSafe(testpath)
+	path = SF.ChoosePath(path, string.GetPathFromFilename(SF.GetExecutingPath() or ""), function(testpath)
 		for file in pairs(instance.scripts) do
-			if string.match(file, "^"..testpath.."/[^/]+%.txt$") or string.match(file, "^"..testpath.."/[^/]+%.lua$") then
+			if testpath == string.GetPathFromFilename(file) then
 				return true
 			end
 		end
@@ -824,10 +816,8 @@ function builtins_library.dofile(path)
 	checkluatype(path, TYPE_STRING)
 
 	local curdir = SF.GetExecutingPath() or ""
+	path = instance.ppdata:ResolvePath(path, curdir) or path
 
-	path = SF.ChoosePath(path, curdir, function(testpath)
-		return instance.scripts[testpath]
-	end) or path
 	return (instance.scripts[path] or SF.Throw("Can't find file '" .. path .. "' (did you forget to --@include it?)", 2))()
 end
 
@@ -839,12 +829,9 @@ function builtins_library.dodir(path, loadpriority)
 	checkluatype(path, TYPE_STRING)
 	if loadpriority ~= nil then checkluatype(loadpriority, TYPE_TABLE) end
 
-	local curdir = SF.GetExecutingPath() or ""
-
-	path = SF.ChoosePath(path, curdir, function(testpath)
-		testpath = string.PatternSafe(testpath)
+	path = SF.ChoosePath(path, string.GetPathFromFilename(SF.GetExecutingPath() or ""), function(testpath)
 		for file in pairs(instance.scripts) do
-			if string.match(file, "^"..testpath.."/[^/]+%.txt$") or string.match(file, "^"..testpath.."/[^/]+%.lua$") then
+			if testpath == string.GetPathFromFilename(file) then
 				return true
 			end
 		end
