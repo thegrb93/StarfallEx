@@ -177,9 +177,9 @@ SF.FileLoader = {
 			end) or error("Bad include in "..curfile..": " .. path)
 		end,
 
-		AddFileToLoad = function(self, path, code)
+		AddFileToLoad = function(self, path)
 			if self.files[path] then return end
-			local fdata = SF.PreprocessData(path, code or self:GetInclude(path))
+			local fdata = SF.PreprocessData(path, self:GetInclude(path))
 			self.filesToLoad[#self.filesToLoad + 1] = fdata
 			self.files[path] = fdata
 		end,
