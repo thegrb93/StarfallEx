@@ -952,6 +952,8 @@ function ents_methods:hasInstance()
 	elseif ent:GetClass()=="gmod_wire_expression2" then
 		return SERVER and not ent.error
 	end
+
+	return false
 end
 
 if SERVER then
