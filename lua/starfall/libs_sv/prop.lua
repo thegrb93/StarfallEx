@@ -413,8 +413,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 	checkpermission(instance,  nil, "prop.create")
 
 	checkluatype(class, TYPE_STRING)
-	checkluatype(frozen, TYPE_BOOL)
-	frozen = frozen and true or false
+	if frozen~=nil then checkluatype(frozen, TYPE_BOOL) end
 
 	local pos = SF.clampPos(vunwrap(pos))
 	local ang = aunwrap(ang)
