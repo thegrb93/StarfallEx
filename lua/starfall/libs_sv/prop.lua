@@ -354,7 +354,7 @@ end
 function props_library.createSeat(pos, ang, model, frozen)
 	checkpermission(instance, nil, "prop.create")
 	checkluatype(model, TYPE_STRING)
-	frozen = frozen and true or false
+	if frozen~=nil then checkluatype(frozen, TYPE_BOOL) else frozen = false end
 
 	local pos = SF.clampPos(vunwrap(pos))
 	local ang = aunwrap(ang)
