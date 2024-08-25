@@ -951,12 +951,19 @@ function ents_methods:getQuotaMax()
 	end
 end
 
---- Return if the entity has a starfall instance
+--- Return if the entity has a starfall instance or E2 instance
 -- @shared
--- @return boolean if has starfall instance
+-- @return boolean if has starfall instance or E2 instance
 function ents_methods:hasInstance()
 	local ent = getent(self)
-	return ent.Starfall and ent.instance~=nil
+
+	if ent.Starfall then
+		return ent.instance~=nil
+	elseif ent:GetClass()=="gmod_wire_expression2" then
+		return SERVER and not ent.error
+	end
+
+	return false
 end
 
 if SERVER then
