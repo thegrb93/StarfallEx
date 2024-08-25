@@ -405,7 +405,7 @@ end
 -- @param Vector pos Position of created sent
 -- @param Angle ang Angle of created sent
 -- @param string class Class of created sent
--- @param boolean frozen True to spawn frozen
+-- @param boolean? frozen True to spawn frozen (default false)
 -- @param table? data Optional table, additional entity data to be supplied to certain SENTs. See prop.SENT_Data_Structures table in Docs for list of SENTs
 -- @server
 -- @return Entity The sent object
@@ -413,7 +413,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 	checkpermission(instance,  nil, "prop.create")
 
 	checkluatype(class, TYPE_STRING)
-	frozen = frozen and true or false
+	if frozen~=nil then checkluatype(frozen, TYPE_BOOL) else frozen = false end
 
 	local pos = SF.clampPos(vunwrap(pos))
 	local ang = aunwrap(ang)
