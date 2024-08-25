@@ -54,7 +54,7 @@ function props_library.create(pos, ang, model, frozen)
 
 	checkpermission(instance, nil, "prop.create")
 	checkluatype(model, TYPE_STRING)
-	frozen = frozen and true or false
+	if frozen~=nil then checkluatype(frozen, TYPE_BOOL) else frozen = false end
 
 	local pos = SF.clampPos(vunwrap(pos))
 	local ang = aunwrap(ang)
@@ -106,7 +106,7 @@ end
 function props_library.createRagdoll(model, frozen)
 	checkpermission(instance, nil, "prop.createRagdoll")
 	checkluatype(model, TYPE_STRING)
-	frozen = frozen and true or false
+	if frozen~=nil then checkluatype(frozen, TYPE_BOOL) else frozen = false end
 
 	local ply = instance.player
 	model = SF.CheckRagdoll(model, ply)
@@ -152,13 +152,13 @@ end
 -- @param Vector pos The position to spawn the prop
 -- @param Angle ang The angles to spawn the prop
 -- @param table vertices The table of tables of vertices that make up the physics mesh {{v1,v2,...},{v1,v2,...},...}
--- @param boolean frozen Whether the prop starts frozen
+-- @param boolean? frozen True to spawn the entity in a frozen state. Default = False
 -- @return Entity The prop object
 function props_library.createCustom(pos, ang, vertices, frozen)
 	local pos = SF.clampPos(vunwrap(pos))
 	local ang = aunwrap(ang)
 	checkluatype(vertices, TYPE_TABLE)
-	frozen = frozen and true or false
+	if frozen~=nil then checkluatype(frozen, TYPE_BOOL) else frozen = false end
 
 	checkpermission(instance, nil, "prop.createCustom")
 
@@ -254,13 +254,14 @@ local allowed_components = {
 -- @param Angle ang Angle of created component
 -- @param string class Class of created component
 -- @param string model Model of created component
--- @param boolean frozen True to spawn frozen
+-- @param boolean? frozen True to spawn the entity in a frozen state. Default = False
 -- @server
 -- @return Entity Component entity
 function props_library.createComponent(pos, ang, class, model, frozen)
 	checkpermission(instance,  nil, "prop.create")
 	checkluatype(class, TYPE_STRING)
 	checkluatype(model, TYPE_STRING)
+	if frozen~=nil then checkluatype(frozen, TYPE_BOOL) else frozen = false end
 
 	if not allowed_components[class] then return SF.Throw("Invalid class!", 1) end
 
@@ -347,13 +348,13 @@ end
 -- @param Vector pos Position of created seat
 -- @param Angle ang Angle of created seat
 -- @param string model Model of created seat
--- @param boolean frozen True to spawn frozen
+-- @param boolean? frozen True to spawn the entity in a frozen state. Default = False
 -- @server
 -- @return Entity The seat object
 function props_library.createSeat(pos, ang, model, frozen)
 	checkpermission(instance, nil, "prop.create")
 	checkluatype(model, TYPE_STRING)
-	frozen = frozen and true or false
+	if frozen~=nil then checkluatype(frozen, TYPE_BOOL) else frozen = false end
 
 	local pos = SF.clampPos(vunwrap(pos))
 	local ang = aunwrap(ang)
@@ -405,7 +406,7 @@ end
 -- @param Vector pos Position of created sent
 -- @param Angle ang Angle of created sent
 -- @param string class Class of created sent
--- @param boolean? frozen True to spawn frozen (default false)
+-- @param boolean? frozen True to spawn the entity in a frozen state. Default = False
 -- @param table? data Optional table, additional entity data to be supplied to certain SENTs. See prop.SENT_Data_Structures table in Docs for list of SENTs
 -- @server
 -- @return Entity The sent object
