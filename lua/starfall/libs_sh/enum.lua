@@ -1317,7 +1317,7 @@ env.NAV_TRAVERSE_TYPE = {
 -- @field GENERIC
 -- @field CRUSH
 -- @field BULLET
--- @field SPLASH
+-- @field SLASH
 -- @field BURN
 -- @field VEHICLE
 -- @field FALL
