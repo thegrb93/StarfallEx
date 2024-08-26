@@ -6,11 +6,11 @@
 SF.PreprocessData = {
 	directives = {
 		include = function(self, args)
-			if #args == 0 then error("Empty include directive") end
+			if #args == 0 then return "Empty include directive" end
 			if string.match(args, "^https?://") then
 				-- HTTP approach
 				local httpUrl, httpName = string.match(args, "^(.+)%s+as%s+(.+)$")
-				if not httpUrl then error("Bad include format - Expected '--@include http://url as filename'") end
+				if not httpUrl then return "Bad include format - Expected '--@include http://url as filename'" end
 				self.httpincludes[#self.httpincludes + 1] = { httpUrl, httpName }
 			else
 				-- Standard/Filesystem approach
@@ -19,18 +19,18 @@ SF.PreprocessData = {
 		end,
 
 		includedata = function(self, args)
-			if #args == 0 then error("Empty includedata directive") end
+			if #args == 0 then return "Empty includedata directive" end
 			self.includesdata[#self.includesdata + 1] = args
 			SF.PreprocessData.directives.include.process(self, args)
 		end,
 		
 		includedir = function(self, args)
-			if #args == 0 then error("Empty includedir directive") end
+			if #args == 0 then return "Empty includedir directive" end
 			self.includedirs[#self.includedirs + 1] = args
 		end,
 
 		model = function(self, args)
-			if #args == 0 then error("Empty model directive") end
+			if #args == 0 then return "Empty model directive" end
 			self.model = args
 		end,
 
@@ -44,11 +44,21 @@ SF.PreprocessData = {
 		owneronly = function(self, args) self.owneronly = true end,
 	},
 	__index = {
+		FindError = function(self, err, args)
+			for lineN, line in SF.GetLines(self.code) do
+				if string.find(line, args, 1, true) then
+					return tostring(lineN)
+				end
+			end
+			return "?"
+		end,
 		Preprocess = function(self)
 			for directive, args in string.gmatch(self.code, "%-%-@(%w+)([^\r\n]*)") do
 				local func = SF.PreprocessData.directives[directive]
 				if func then
-					func(self, string.Trim(args))
+					args = string.Trim(args)
+					local err = func(self, args)
+					if err then error("In file "..self.path..":"..self:FindError(err, args)..", "..err) end
 				end
 			end
 		end,
