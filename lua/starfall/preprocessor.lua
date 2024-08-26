@@ -63,7 +63,7 @@ SF.PreprocessData = {
 		end,
 		Postprocess = function(self, processor)
 			if self.clientmain then
-				self.clientmain = self:ResolvePath(self.path, self.clientmain) or error("Bad --@clientmain "..self.clientmain.." in file "..self.path)
+				self.clientmain = processor:ResolvePath(self.path, self.clientmain) or error("Bad --@clientmain "..self.clientmain.." in file "..self.path)
 			end
 			
 			for _, incdata in ipairs(self.includesdata) do
