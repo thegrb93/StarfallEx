@@ -818,9 +818,9 @@ function SF.GetLines(str)
 	local current_pos = 1
 	local lineN = 0
 	return function()
-		local start_pos, end_pos = string_find( str, "\r?\n", current_pos )
+		local start_pos, end_pos = string.find( str, "\r?\n", current_pos )
 		if start_pos then
-			local ret = string_sub( str, current_pos, start_pos - 1 )
+			local ret = string.sub( str, current_pos, start_pos - 1 )
 			current_pos = end_pos + 1
 			lineN = lineN + 1
 			return lineN, ret
