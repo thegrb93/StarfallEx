@@ -814,6 +814,21 @@ function SF.MakeError(msg, level, uncatchable, prependinfo, userdata)
 	}, SF.Errormeta)
 end
 
+function SF.GetLines(str)
+	local current_pos = 1
+	local lineN = 0
+	return function()
+		local start_pos, end_pos = string.find( str, "\r?\n", current_pos )
+		if start_pos then
+			local ret = string.sub( str, current_pos, start_pos - 1 )
+			current_pos = end_pos + 1
+			lineN = lineN + 1
+			return lineN, ret
+		else
+			return nil
+		end
+	end
+end
 
 -------------------------------------------------------------------------------
 -- Starfall instance hook management
@@ -1224,7 +1239,7 @@ function SF.EntIsReady(ent)
 	if class=="player" then
 		return ent:IsPlayer()
 	elseif class=="starfall_processor" then
-		return ent.SetupFiles~=nil
+		return ent.Compile~=nil
 	elseif class=="starfall_hologram" then
 		return ent.SetClip~=nil
 	elseif class=="starfall_prop" then
@@ -1498,7 +1513,7 @@ function SF.GetExecutingPath()
 		local info = debug.getinfo(stackLevel, "S")
 		if not info then break end
 
-		curdir = string.match(info.short_src, "^SF:(.*[/\\])")
+		curdir = string.match(info.short_src, "^SF:(.*)")
 		stackLevel = stackLevel + 1
 	until curdir
 	return curdir

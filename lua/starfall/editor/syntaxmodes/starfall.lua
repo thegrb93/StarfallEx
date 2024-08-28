@@ -65,7 +65,7 @@ setmetatable(storageTypes, fallback_meta)
 
 -- Get directives from the preprocessor so we don't have to hard-code them here.
 -- Allows for addons to make their own directives that properly highlight.
-local directives = SF.Preprocessor.directives
+local directives = SF.PreprocessData.directives
 
 --Color scheme:
 --{foreground color, background color, fontStyle}

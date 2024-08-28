@@ -76,53 +76,6 @@ function ENT:Think()
 	end
 end
 
-function ENT:GetSendData(toowner)
-	if not self.instance then return end
-
-	local senddata = {
-		owner = self.sfdata.owner,
-		files = {},
-		mainfile = self.sfdata.mainfile,
-		proc = self
-	}
-
-	for k, v in pairs(self.sfdata.files) do senddata.files[k] = v end
-
-	local ppdata = self.instance and self.instance.ppdata
-	if ppdata then
-		if ppdata.serverorclient or (not toowner and ppdata.owneronly) then
-			for filename, code in pairs(senddata.files) do
-				local isserver, isowneronly = ppdata.serverorclient and ppdata.serverorclient[filename] == "server", ppdata.owneronly and ppdata.owneronly[filename]
-				if isserver or (not toowner and isowneronly) then
-					local infodata = {}
-					if ppdata.scriptnames and ppdata.scriptnames[filename] then
-						infodata[#infodata + 1] = "--@name " .. ppdata.scriptnames[filename]
-					end
-					if ppdata.scriptauthors and ppdata.scriptauthors[filename] then
-						infodata[#infodata + 1] = "--@author " .. ppdata.scriptauthors[filename]
-					end
-					infodata[#infodata + 1] = isserver and "--@server" or "--@owneronly"
-					senddata.files[filename] = table.concat(infodata, "\n")
-				end
-			end
-		end
-		local clientmain = ppdata.clientmain and ppdata.clientmain[self.sfdata.mainfile]
-		if clientmain then
-			if senddata.files[clientmain] then
-				senddata.mainfile = clientmain
-			else
-				clientmain = SF.NormalizePath(string.GetPathFromFilename(self.sfdata.mainfile) .. clientmain)
-				if senddata.files[clientmain] then
-					senddata.mainfile = clientmain
-				end
-			end
-		end
-	end
-	senddata.compressed = SF.CompressFiles(senddata.files)
-
-	return senddata
-end
-
 function ENT:SendCode(recipient)
 	if not (IsValid(self.owner) or IsWorld(self.owner)) then return end
 	if not self.sfsenddata then return end
@@ -209,7 +162,7 @@ local function dupefinished(TimedPasteData, TimedPasteDataCurrent)
 		end
 	end
 	for k, v in pairs(starfalls) do
-		v:SetupFiles(v.sfdata)
+		v:Compile(v.sfdata)
 		local instance = v.instance
 		if instance then
 			instance:runScriptHook("dupefinished", instance.Sanitize(entList))

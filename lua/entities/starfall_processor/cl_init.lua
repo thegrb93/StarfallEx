@@ -152,7 +152,7 @@ end)
 net.Receive("starfall_processor_download", function(len)
 	net.ReadStarfall(nil, function(ok, sfdata, err)
 		if ok and IsValid(sfdata.proc) and (IsValid(sfdata.owner) or IsWorld(sfdata.owner)) then
-			sfdata.proc:SetupFiles(sfdata)
+			sfdata.proc:Compile(sfdata)
 		elseif IsValid(sfdata.proc) and IsValid(sfdata.owner) then
 			sfdata.proc.owner = sfdata.owner
 			sfdata.proc:Error({message = "Failed to download and initialize client: " .. tostring(err), traceback = "" })

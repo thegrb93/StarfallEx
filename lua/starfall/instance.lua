@@ -58,17 +58,13 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 	instance.requires = {}
 	instance.permissionOverrides = {}
 
-	instance.ppdata = {}
-	for filename, source in pairs(code) do
-		local ok, err = pcall(SF.Preprocessor.ParseDirectives, filename, source, instance.ppdata)
-		if not ok then
-			return false, { message = err, traceback = "" }
-		end
-	end
+	local ok, ppdata = pcall(SF.Preprocessor, code)
+	if not ok then return false, { message = ppdata, traceback = "" } end
+	instance.ppdata = ppdata
 
 	if player:IsWorld() then
 		player = SF.Superuser
-	elseif instance.ppdata.superuser and instance.ppdata.superuser[mainfile] then
+	elseif ppdata.files[mainfile].superuser then
 		if not SF.AllowSuperUser:GetBool() then return false, { message = "Can't use --@superuser unless sf_superuserallowed is enabled!", traceback = "" } end
 		local ok, message = hook.Run("StarfallCanSuperUser", player)
 		if ok == false or (ok == nil and not player:IsSuperAdmin()) then return false, { message = message or "Can't use --@superuser unless you are superadmin!", traceback = "" } end
@@ -119,30 +115,18 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 		return false, { message = "", traceback = err }
 	end
 
-	local doNotRun = {}
-	local includesdata = instance.ppdata.includesdata
-	if includesdata then
-		for filename, t in pairs(includesdata) do
-			for _, datapath in ipairs(t) do
-				local codepath = SF.ChoosePath(datapath, string.GetPathFromFilename(filename), function(testpath)
-					return instance.source[testpath]
-				end)
-				if codepath then doNotRun[codepath] = true end
-			end
-		end
-	end
-
-	local serverorclientpp, owneronlypp = instance.ppdata.serverorclient or {}, instance.ppdata.owneronly or {}
-	for filename, source in pairs(code) do
-		if doNotRun[filename] then continue end -- Don't compile data files
-		if CLIENT and owneronlypp[filename] and LocalPlayer() ~= player then continue end -- Don't compile owner-only files if not owner
-		local serverorclient = serverorclientpp[filename]
+	for filename, fdata in pairs(ppdata.files) do
+		if fdata.datafile then continue end -- Don't compile data files
+		if CLIENT and fdata.owneronly and LocalPlayer() ~= player then continue end -- Don't compile owner-only files if not owner
+		local serverorclient = fdata.serverorclient
 		if (serverorclient == "server" and CLIENT) or (serverorclient == "client" and SERVER) then continue end -- Don't compile files for other realm
-		local func = SF.CompileString(source, "SF:"..filename, false)
+
+		local func = SF.CompileString(fdata.code, "SF:"..filename, false)
 		if isstring(func) then
 			return false, { message = func, traceback = "" }
 		end
 		debug.setfenv(func, instance.env)
+
 		instance.scripts[filename] = func
 	end
 

@@ -209,10 +209,6 @@ if CLIENT then
 		permsPanel:Dock(FILL)
 	end
 
-	--- (Client) Builds a table for the compiler to use
-	-- @param mainfile Manual selection of which file should be main. Otherwise it's the open file
-	-- @return True if ok, false if a file was missing
-	-- @return A table with mainfile name and files
 	function SF.Editor.BuildIncludesTable(mainfile, success, err)
 		if not SF.Editor.initialized then SF.Editor.init() end
 
@@ -223,157 +219,10 @@ if CLIENT then
 			openfiles[mainfile] = SF.Editor.getCode()
 		end
 
-		local tbl = {}
-		tbl.mainfile = mainfile
-		tbl.files = {}
-
-		local ppdata = {}
-
-		local function getInclude(path)
-			return openfiles[path] or file.Read("starfall/" .. path, "DATA") or error("Bad include: " .. path)
-		end
-		local function getIncludePath(path, curdir)
-			local path = SF.ChoosePath(path, curdir, function(testpath)
-				return openfiles[testpath] or file.Exists("starfall/" .. testpath, "DATA")
-			end) or error("Bad include: " .. path)
-			return path, string.GetPathFromFilename(path)
-		end
-
-		local function recursiveLoad(codepath, codedir, code, dontParse)
-			if tbl.files[codepath] then return end
-			tbl.files[codepath] = code
-
-			if dontParse then return end
-
-			SF.Preprocessor.ParseDirectives(codepath, code, ppdata)
-
-			local clientmain = ppdata.clientmain and ppdata.clientmain[codepath]
-			if clientmain then
-				clientmain = getIncludePath(clientmain, codedir)
-				if clientmain then ppdata.clientmain[codepath] = clientmain end
-			end
-
-			local dontParseTbl = {}
-			local dataincludes = ppdata.includesdata and ppdata.includesdata[codepath]
-			if dataincludes then
-				for k, v in ipairs(dataincludes) do
-					local datapath = getIncludePath(v, codedir)
-					if datapath then dontParseTbl[datapath] = true end
-				end
-			end
-
-			local includes = ppdata.includes and ppdata.includes[codepath]
-			if includes then
-				for k, v in ipairs(includes) do
-					local codepath, codedir = getIncludePath(v, codedir)
-					local code = getInclude(codepath)
-					recursiveLoad(codepath, codedir, code, dontParseTbl[codepath])
-				end
-			end
-
-			if ppdata.includedirs and ppdata.includedirs[codepath] then
-				local inc = ppdata.includedirs[codepath]
-
-				for i = 1, #inc do
-					local origdir = inc[i]
-					local dir = origdir
-					local files
-					if string.sub(dir, 1, 1)~="/" then
-						dir = SF.NormalizePath(codedir .. origdir)
-						files = file.Find("starfall/" .. dir .. "/*", "DATA")
-					end
-					if not files or #files==0 then
-						dir = SF.NormalizePath(origdir)
-						files = file.Find("starfall/" .. dir .. "/*", "DATA")
-					end
-					for k, v in ipairs(files) do
-						local codepath, codedir = getIncludePath(v, dir.."/")
-						local code = getInclude(codepath)
-						recursiveLoad(codepath, codedir, code, dontParseTbl[codepath])
-					end
-				end
-			end
-		end
-
-		local ok, msg = pcall(function()
-			local codepath, codedir = getIncludePath(mainfile, string.GetPathFromFilename(mainfile))
-			local code = getInclude(codepath)
-			recursiveLoad(codepath, codedir, code)
-		end)
-
-		if not ok then
-			local file = string.match(msg, "(Bad include%: .*)")
-			return err(file or msg)
-		end
-
-		local clientmain = ppdata.clientmain and ppdata.clientmain[tbl.mainfile]
-		if clientmain and not tbl.files[clientmain] then
-			return err("Clientmain not found: " .. clientmain)
-		end
-
-		local includes = ppdata.includes
-		local serverorclient = ppdata.serverorclient
-		if includes and serverorclient then
-			for filename, files in pairs(includes) do
-				for _, inc in ipairs(files) do
-					if serverorclient[inc] and serverorclient[filename] and serverorclient[filename] ~= serverorclient[inc] then
-						return err("Incompatible client/server realm: \""..filename.."\" trying to include \""..inc.."\"")
-					end
-				end
-			end
-		end
-
-		SF.Editor.HandlePostProcessing(tbl, ppdata, success, err)
+		SF.FileLoader(mainfile, openfiles, success, err)
 	end
 
-	--- Handles post-processing (as part of BuildIncludesTable)
-	function SF.Editor.HandlePostProcessing(list, ppdata, onSuccessSignal, onErrorSignal)
-		if not ppdata.httpincludes then onSuccessSignal(list) return end
-		local files = list.files
-		local usingCache, pendingRequestCount = {}, 0 -- a temporary HTTP in-memory cache
-		-- First stage: Iterate through all http --@include directives in all files and prepare our HTTP queue structure.
-		for fileName, fileUsing in next, ppdata.httpincludes do
-			for _, data in next, fileUsing do
-				local url, name = data[1], data[2]
-				if not usingCache[url] then
-					usingCache[url] = name or true -- prevents duplicate requests to the same URL
-					pendingRequestCount = pendingRequestCount + 1
-				end
-			end
-		end
-		-- Second stage: Once we know the total amount of requests and URLs, we fetch all URLs as HTTP resources.
-		--               Then we wait for all HTTP requests to complete.
-		local function CheckAndUploadIfReady()
-			pendingRequestCount = pendingRequestCount - 1
-			if pendingRequestCount > 0 then return end
-			-- The following should run only once, at the end when there are no more pending HTTP requests:
-			-- Final stage: Substitute all http --@include directives with the contents of their HTTP response.
-			for fileName, fileUsing in next, ppdata.httpincludes do
-				local code = files[fileName]
-				for _, data in next, fileUsing do
-					local url, name = data[1], data[2]
-					local result = usingCache[url]
-					files[name] = result
-				end
-			end
-			onSuccessSignal(list)
-		end
-		for url in next, usingCache do
-			HTTP {
-				method = "GET";
-				url = url;
-				success = function(_, contents)
-					usingCache[url] = contents
-					CheckAndUploadIfReady()
-				end;
-				failed = function(reason)
-					onErrorSignal(string.format("Could not fetch --@include link (due %s): %s", reason, url))
-				end;
-			}
-		end
-	end
-
-	function SF.Editor.createModelViewer ()
+	function SF.Editor.createModelViewer()
 		local frame = vgui.Create("StarfallFrame")
 		frame:SetTitle("Model Viewer - Click an icon to insert model filename into editor")
 		frame:SetVisible(false)

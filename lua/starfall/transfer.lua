@@ -206,7 +206,7 @@ if SERVER then
 			if not (IsValid(sf) and sf:GetClass() == "starfall_processor" and sf.sfdata) then return end
 			if sf.sfdata.mainfile ~= sfdata.mainfile or sf.sfdata.owner ~= ply then return end
 			sfdata.owner = ply
-			sf:SetupFiles(sfdata)
+			sf:Compile(sfdata)
 		end)
 	end)
 
@@ -269,8 +269,8 @@ else
 		local mainfile = net.ReadString()
 		if #mainfile==0 then mainfile = nil end
 		SF.Editor.BuildIncludesTable(mainfile,
-			function(list)
-				SF.SendStarfall("starfall_upload", {files = list.files, mainfile = list.mainfile})
+			function(files, mainfile)
+				SF.SendStarfall("starfall_upload", {files = files, mainfile = mainfile})
 			end,
 			function(err)
 				SF.SendStarfall("starfall_upload", {files = {}, mainfile = ""})

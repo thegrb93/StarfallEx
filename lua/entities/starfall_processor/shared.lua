@@ -20,7 +20,8 @@ local IsValid = FindMetaTable("Entity").IsValid
 
 function ENT:Compile(sfdata)
 	self:Destroy()
-	if sfdata then
+	local newdata = sfdata~=nil
+	if newdata then
 		self.sfdata = sfdata
 		self.owner = sfdata.owner
 		sfdata.proc = self
@@ -34,19 +35,22 @@ function ENT:Compile(sfdata)
 	local ok, instance = SF.Instance.Compile(sfdata.files, sfdata.mainfile, self.owner, self)
 	if not ok then self:Error(instance) return end
 
-	if instance.ppdata.scriptnames and instance.mainfile and instance.ppdata.scriptnames[instance.mainfile] then
-		self.name = string.sub(tostring(instance.ppdata.scriptnames[instance.mainfile]), 1, 64)
-	else
-		self.name = "Generic ( No-Name )"
-	end
+	if newdata then
+		local mainpp = instance.ppdata.files[instance.mainfile]
+		self.name = mainpp.scriptname or "Generic ( No-Name )"
+		self.author = mainpp.scriptauthor or "No-Author"
+		if SERVER then
+			if mainpp.model then
+				pcall(function() self:SetCustomModel(SF.CheckModel(mainpp.model, self.owner, true)) end)
+			end
 
-	if instance.ppdata.scriptauthors and instance.mainfile and instance.ppdata.scriptauthors[instance.mainfile] then
-		self.author = string.sub(tostring(instance.ppdata.scriptauthors[instance.mainfile]), 1, 64)
-	else
-		self.author = nil
+			self.sfsenddata, self.sfownerdata = instance.ppdata:GetSendData(sfdata)
+			self:SendCode()
+		end
 	end
 
 	self.instance = instance
+
 	instance.runOnError = function(err)
 		-- Have to make sure it's valid because the chip can be deleted before deinitialization and trigger errors
 		if IsValid(self) then
@@ -88,24 +92,6 @@ function ENT:Destroy()
 		instance:runScriptHook("removed")
 		instance:deinitialize()
 		self.instance = nil
-	end
-end
-
-function ENT:SetupFiles(sfdata)
-	self:Compile(sfdata)
-
-	if SERVER and self.instance then
-		self.sfsenddata = self:GetSendData()
-		self.sfownerdata = self.instance and self.instance.ppdata and self.instance.ppdata.owneronly and self:GetSendData(true) or nil
-
-		if self.instance and self.instance.ppdata.models and self.instance.mainfile then
-			local model = self.instance.ppdata.models[self.instance.mainfile]
-			if model then
-				pcall(function() self:SetCustomModel(SF.CheckModel(model, self.owner, true)) end)
-			end
-		end
-
-		self:SendCode()
 	end
 end
 

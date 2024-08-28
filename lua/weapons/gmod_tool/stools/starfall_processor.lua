@@ -117,7 +117,7 @@ function TOOL:LeftClick(trace)
 
 	if not SF.RequestCode(ply, function(sfdata)
 		if not (sf and sf:IsValid()) then return end -- Probably removed during transfer
-		sf:SetupFiles(sfdata)
+		sf:Compile(sfdata)
 	end) then
 		SF.AddNotify(ply, "Cannot upload SF code, please wait for the current upload to finish.", "ERROR", 7, "ERROR1")
 		return false
@@ -170,7 +170,7 @@ function TOOL:Reload(trace)
 
 		if not SF.RequestCode(ply, function(sfdata)
 			if not sf:IsValid() then return end -- Probably removed during transfer
-			sf:SetupFiles(sfdata)
+			sf:Compile(sfdata)
 		end, sf.sfdata.mainfile) then
 			SF.AddNotify(ply, "Cannot upload SF code, please wait for the current upload to finish.", "ERROR", 7, "ERROR1")
 		end
