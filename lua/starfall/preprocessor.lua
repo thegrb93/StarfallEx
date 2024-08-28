@@ -160,13 +160,15 @@ SF.Preprocessor = {
 			mainfile = ""
 		}, t)
 
-		for path, code in pairs(files) do
-			local fdata = SF.PreprocessData(path, code)
-			fdata:Preprocess()
-			self.files[path] = fdata
-		end
-		for path, fdata in pairs(self.files) do
-			fdata:Postprocess(self)
+		if files then
+			for path, code in pairs(files) do
+				local fdata = SF.PreprocessData(path, code)
+				fdata:Preprocess()
+				self.files[path] = fdata
+			end
+			for path, fdata in pairs(self.files) do
+				fdata:Postprocess(self)
+			end
 		end
 
 		return self
@@ -193,7 +195,7 @@ SF.FileLoader = {
 			self.files[path] = fdata
 		end,
 
-		LoadUrl = function(self, name, url)
+		LoadUrl = function(self, url, name)
 			if self.files[name] then return end
 
 			local cache = self.httpCache[url]
@@ -219,7 +221,7 @@ SF.FileLoader = {
 				failed = function(reason)
 					if self.errored then return end
 					self.errored=true
-					self.onfail(string.format("Could not fetch --@include link (%s): %s", reason, url))
+					self.onfail(string.format("Could not fetch --@include link (%s): %s", url, reason))
 				end,
 			}
 		end,
@@ -272,8 +274,10 @@ SF.FileLoader = {
 
 			local ok, err = pcall(function()
 				local files = {}
+				local postprocessor = SF.Preprocessor()
+				postprocessor.files = self.files
 				for path, fdata in pairs(self.files) do
-					fdata:Postprocess(self)
+					fdata:Postprocess(postprocessor)
 					files[path] = fdata.code
 				end
 				self.onsuccess(files, self.mainfile)
