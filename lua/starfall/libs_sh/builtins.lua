@@ -778,7 +778,7 @@ function builtins_library.requiredir(path, loadpriority)
 
 	path = SF.ChoosePath(path, string.GetPathFromFilename(SF.GetExecutingPath() or ""), function(testpath)
 		for file in pairs(instance.scripts) do
-			if testpath == string.GetPathFromFilename(file) then
+			if testpath == string.sub(string.GetPathFromFilename(file), 1, -2) then
 				return true
 			end
 		end
@@ -831,7 +831,7 @@ function builtins_library.dodir(path, loadpriority)
 
 	path = SF.ChoosePath(path, string.GetPathFromFilename(SF.GetExecutingPath() or ""), function(testpath)
 		for file in pairs(instance.scripts) do
-			if testpath == string.GetPathFromFilename(file) then
+			if testpath == string.sub(string.GetPathFromFilename(file), 1, -2) then
 				return true
 			end
 		end
