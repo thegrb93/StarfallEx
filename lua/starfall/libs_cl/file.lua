@@ -346,7 +346,7 @@ end
 -- @return boolean? True if successful, nil if it wasn't found
 function file_library.deleteTemp(filename)
 	checkpermission (instance, nil, "file.writeTemp")
-	checkluatype (path, TYPE_STRING)
+	checkluatype (filename, TYPE_STRING)
 	
 	if #filename > 128 then SF.Throw("Filename is too long!", 2) end
 	checkExtension(filename)
