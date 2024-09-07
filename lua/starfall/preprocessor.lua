@@ -63,21 +63,12 @@ SF.PreprocessData = {
 		end,
 		Postprocess = function(self, processor)
 			if self.clientmain then
-				self.clientmain = processor:ResolvePath(self.path, self.clientmain) or error("Bad --@clientmain "..self.clientmain.." in file "..self.path)
+				self.clientmain = processor:ResolvePath(self.clientmain, self.path) or error("Bad --@clientmain "..self.clientmain.." in file "..self.path)
 			end
 			
 			for _, incdata in ipairs(self.includesdata) do
-				incdata = processor:ResolvePath(self.path, incdata) or error("Bad --@includedata "..incdata.." in file "..self.path)
+				incdata = processor:ResolvePath(incdata, self.path) or error("Bad --@includedata "..incdata.." in file "..self.path)
 				processor.files[incdata].datafile = true
-			end
-			
-			if self.serverorclient then
-				for _, inc in ipairs(self.includes) do
-					local incdata = processor.files[processor:ResolvePath(self.path, inc)]
-					if incdata.serverorclient and self.serverorclient ~= incdata.serverorclient then
-						error("Incompatible client/server realm: \""..self.path.."\" trying to include \""..inc.."\"")
-					end
-				end
 			end
 		end
 	},
@@ -103,6 +94,7 @@ SF.Preprocessor = {
 		end,
 
 		GetSendData = function(self, sfdata)
+			print(self.files[sfdata.mainfile].clientmain, sfdata.mainfile)
 			local senddata = {
 				owner = sfdata.owner,
 				mainfile = self.files[sfdata.mainfile].clientmain or sfdata.mainfile,
