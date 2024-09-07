@@ -94,7 +94,6 @@ SF.Preprocessor = {
 		end,
 
 		GetSendData = function(self, sfdata)
-			print(self.files[sfdata.mainfile].clientmain, sfdata.mainfile)
 			local senddata = {
 				owner = sfdata.owner,
 				mainfile = self.files[sfdata.mainfile].clientmain or sfdata.mainfile,
