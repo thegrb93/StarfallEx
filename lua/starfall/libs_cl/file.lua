@@ -341,8 +341,8 @@ function file_library.delete(path)
 	end
 end
 
---- Deletes a file
--- @param string path Filepath relative to data/sf_filedata/.
+--- Deletes a temp file
+-- @param filename path The temp file name. Must be only a file and not a path
 -- @return boolean? True if successful, nil if it wasn't found
 function file_library.deleteTemp(path)
 	checkpermission (instance, path, "file.writeTemp")
