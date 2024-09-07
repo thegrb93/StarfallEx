@@ -341,6 +341,19 @@ function file_library.delete(path)
 	end
 end
 
+--- Deletes a file
+-- @param string path Filepath relative to data/sf_filedata/.
+-- @return boolean? True if successful, nil if it wasn't found
+function file_library.deleteTemp(path)
+	checkpermission (instance, path, "file.writeTemp")
+	checkluatype (path, TYPE_STRING)
+	path = "sf_filedatatemp/"..instance.player:SteamID64().."/" .. SF.NormalizePath(path)
+	if file.Exists(path, "DATA") then
+		file.Delete(path)
+		return true
+	end
+end
+
 --- Creates a directory
 -- @param string path Filepath relative to data/sf_filedata/.
 function file_library.createDir(path)
