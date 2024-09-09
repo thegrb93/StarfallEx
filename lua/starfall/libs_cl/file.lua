@@ -341,6 +341,24 @@ function file_library.delete(path)
 	end
 end
 
+--- Deletes a temp file
+-- @param string filename The temp file name. Must be only a file and not a path
+-- @return boolean? True if successful, nil if it wasn't found
+function file_library.deleteTemp(filename)
+	checkpermission (instance, nil, "file.writeTemp")
+	checkluatype (filename, TYPE_STRING)
+	
+	if #filename > 128 then SF.Throw("Filename is too long!", 2) end
+	checkExtension(filename)
+	filename = string.lower(string.GetFileFromFilename(filename))
+
+	local path = "sf_filedatatemp/"..instance.player:SteamID64().."/"..filename
+	if file.Exists(path, "DATA") then
+		file.Delete(path)
+		return true
+	end
+end
+
 --- Creates a directory
 -- @param string path Filepath relative to data/sf_filedata/.
 function file_library.createDir(path)
