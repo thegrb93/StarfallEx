@@ -21,7 +21,7 @@ SF.PreprocessData = {
 		includedata = function(self, args)
 			if #args == 0 then return "Empty includedata directive" end
 			self.includesdata[#self.includesdata + 1] = args
-			SF.PreprocessData.directives.include.process(self, args)
+			SF.PreprocessData.directives.include(self, args)
 		end,
 		
 		includedir = function(self, args)
