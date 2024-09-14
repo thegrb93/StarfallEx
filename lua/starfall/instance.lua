@@ -505,6 +505,8 @@ local function safeThrow(self, msg, nocatch, force)
 	end
 end
 
+local SysTime = SysTime
+
 function SF.Instance:checkCpu()
 	if self.run ~= self.runWithOps then return end
 	self.cpu_total = SysTime() - self.start_time
@@ -522,8 +524,6 @@ local function xpcall_callback(err)
 	end
 	return err
 end
-
-local SysTime = SysTime
 
 --- Internal function - do not call.
 -- Runs a function while incrementing the instance ops coutner.
