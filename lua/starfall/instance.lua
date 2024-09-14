@@ -6,6 +6,7 @@
 
 local dsethook, dgethook = debug.sethook, debug.gethook
 local dgetmeta = debug.getmetatable
+local SysTime = SysTime
 
 if SERVER then
 	SF.cpuQuota = CreateConVar("sf_timebuffer", 0.005, FCVAR_ARCHIVE, "The max average the CPU time can reach.")
@@ -504,8 +505,6 @@ local function safeThrow(self, msg, nocatch, force)
 		SF.Throw(msg, 3, nocatch)
 	end
 end
-
-local SysTime = SysTime
 
 function SF.Instance:checkCpu()
 	if self.run ~= self.runWithOps then return end
