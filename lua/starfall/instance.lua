@@ -6,6 +6,7 @@
 
 local dsethook, dgethook = debug.sethook, debug.gethook
 local dgetmeta = debug.getmetatable
+local SysTime = SysTime
 
 if SERVER then
 	SF.cpuQuota = CreateConVar("sf_timebuffer", 0.005, FCVAR_ARCHIVE, "The max average the CPU time can reach.")
