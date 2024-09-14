@@ -523,6 +523,8 @@ local function xpcall_callback(err)
 	return err
 end
 
+local SysTime = SysTime
+
 --- Internal function - do not call.
 -- Runs a function while incrementing the instance ops coutner.
 -- This does no setup work and shouldn't be called by client code
