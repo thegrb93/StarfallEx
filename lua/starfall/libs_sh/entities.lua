@@ -319,8 +319,7 @@ end
 -- @param number channel Default CHAN_AUTO or CHAN_WEAPON for weapons
 function ents_methods:emitSound(snd, lvl, pitch, volume, channel)
 	checkluatype(snd, TYPE_STRING)
-	if #snd>260 then SF.Throw("Sound path too long!") end
-	if string.match(snd, "[\"?]") then SF.Throw("Sound path contains invalid characters!") end
+	snd = SF.CheckSound(snd)
 
 	local ent = getent(self)
 	checkpermission(instance, ent, "entities.emitSound")

@@ -1442,13 +1442,33 @@ function SF.CheckMaterial(material)
 	return mat
 end
 
-
 function SF.CheckModel(model, player, prop)
 	if #model > 260 then SF.Throw("Model path too long!", 3) end
 	model = SF.NormalizePath(string.lower(model))
 	if string.GetExtensionFromFilename(model) ~= "mdl" or (SERVER and (not util.IsValidModel(model) or (prop and not util.IsValidProp(model)))) then SF.Throw("Invalid model: "..model, 3) end
 	if player~=SF.Superuser and hook.Run("PlayerSpawnObject", player, model)==false then SF.Throw("Not allowed to use model: "..model, 3) end
 	return model
+end
+
+function SF.CheckSound(path)
+	-- Limit length and remove invalid chars
+	if #path>260 then SF.Throw("Sound path too long!", 3) end
+	path = SF.NormalizePath(string.gsub(path, "[\"?']", ""))
+
+	-- Extract sound flags. Only allowed flags are '<', '>', '^', ')'
+	local flags
+	flags, path = string.match(path, "^([^%w_/%.]*)(.*)")
+	if #flags==0 then
+		flags = nil
+	elseif #flags>2 or string.match(flags, "[^<>%^%)]") then
+		SF.Throw("Invalid sound flags! "..flags, 3)
+	end
+
+	if not (istable(sound.GetProperties(path)) or file.Exists("sound/" .. path, "GAME")) then
+		SF.Throw("Invalid sound path! "..path, 3)
+	end
+
+	return flags and (flags..path) or path
 end
 
 function SF.CheckRagdoll(model)
