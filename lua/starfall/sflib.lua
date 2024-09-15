@@ -1456,19 +1456,18 @@ function SF.CheckSound(path)
 	path = SF.NormalizePath(string.gsub(path, "[\"?']", ""))
 
 	-- Extract sound flags. Only allowed flags are '<', '>', '^', ')'
-	local flags
-	flags, path = string.match(path, "^([^%w_/%.]*)(.*)")
+	local flags, checkpath = string.match(path, "^([^%w_/%.]*)(.*)")
 	if #flags==0 then
 		flags = nil
 	elseif #flags>2 or string.match(flags, "[^<>%^%)]") then
 		SF.Throw("Invalid sound flags! "..flags, 3)
 	end
 
-	if not (istable(sound.GetProperties(path)) or file.Exists("sound/" .. path, "GAME")) then
-		SF.Throw("Invalid sound path! "..path, 3)
+	if not (istable(sound.GetProperties(checkpath)) or file.Exists("sound/" .. checkpath, "GAME")) then
+		SF.Throw("Invalid sound path! "..checkpath, 3)
 	end
 
-	return flags and (flags..path) or path
+	return path
 end
 
 function SF.CheckRagdoll(model)
