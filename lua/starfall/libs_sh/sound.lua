@@ -116,6 +116,14 @@ function sound_library.duration(path)
     return SoundDuration(path)
 end
 
+--- Returns true if the sound exists.
+-- @param string path String path to the sound file
+-- @return boolean exists
+function sound_library.exists(path)
+    checkluatype(path, TYPE_STRING)
+    return file.Exists("sound/" .. path, "GAME")
+end
+
 --------------------------------------------------
 
 --- Starts to play the sound.
