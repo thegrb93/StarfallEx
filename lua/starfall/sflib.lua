@@ -1450,7 +1450,12 @@ function SF.CheckModel(model, player, prop)
 	return model
 end
 
-function SF.CheckSound(path)
+SF.UniqueSounds = {}
+setmetatable(SF.UniqueSounds, {["__index"]=function(t,k) local newTab = {} t[k] = {} return {} end})
+
+local maxUniqueSounds = CreateConVar("sf_sounds_unique_max"..(CLIENT and "_cl" or ""), tostring(200), FCVAR_ARCHIVE, "The maximum number of unique sounds paths allowed")
+
+function SF.CheckSound(ply, path)
 	-- Limit length and remove invalid chars
 	if #path>260 then SF.Throw("Sound path too long!", 3) end
 	path = SF.NormalizePath(string.gsub(path, "[\"?']", ""))
@@ -1461,8 +1466,13 @@ function SF.CheckSound(path)
 		SF.Throw("Invalid sound flags! "..flags, 3)
 	end
 
-	if not (istable(sound.GetProperties(checkpath)) or file.Exists("sound/" .. checkpath, "GAME")) then
-		SF.Throw("Invalid sound path! "..checkpath, 3)
+	local UserUniqueSounds = SF.UniqueSounds[ply:SteamID()]
+	if not UserUniqueSounds[checkpath] then
+		if table.Count(UserUniqueSounds) >= maxUniqueSounds:GetInt() then
+			SF.Throw("The unique sounds limit has been reached.", 3)
+		else
+			UserUniqueSounds[checkpath] = true
+		end
 	end
 
 	return path

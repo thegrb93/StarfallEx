@@ -75,7 +75,7 @@ end)
 function sound_library.create(ent, path, nofilter)
 	checkluatype(path, TYPE_STRING)
 	if nofilter~=nil then checkluatype(nofilter, TYPE_BOOL) end
-	path = SF.CheckSound(path)
+	path = SF.CheckSound(instance.player, path)
 
 	checkpermission(instance, { ent, path }, "sound.create")
 
@@ -114,6 +114,14 @@ end
 function sound_library.duration(path)
     checkluatype(path, TYPE_STRING)
     return SoundDuration(path)
+end
+
+--- Returns true if the sound or sound property exists.
+-- @param string path String path to the sound file
+-- @return boolean True if exists, false if not
+function sound_library.exists(path)
+    checkluatype(path, TYPE_STRING)
+    return istable(sound.GetProperties(path)) or file.Exists("sound/" .. path, "GAME")
 end
 
 --------------------------------------------------
