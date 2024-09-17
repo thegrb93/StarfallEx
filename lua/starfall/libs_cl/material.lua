@@ -555,7 +555,7 @@ function material_library.create(shader)
 	return wrap(m)
 end
 
-local image_params = {["nocull"] = true,["alphatest"] = true,["mips"] = true,["noclamp"] = true,["smooth"] = true}
+local image_params = {["nocull"] = true,["alphatest"] = true,["mips"] = true,["noclamp"] = true,["smooth"] = true,["ignorez"] = true,["vertexlitgeneric"] = true}
 --- Creates a .jpg or .png material from file
 --- Can't be modified
 -- @param string path The path to the image file, must be a jpg or png image
