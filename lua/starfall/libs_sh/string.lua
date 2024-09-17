@@ -241,6 +241,8 @@ string_library.split = sfstring.Split
 -- @param string str String to be checked
 -- @param string start String to check with
 -- @return boolean True if the first string starts with the second
+string_library.startsWith = sfstring.StartsWith
+
 string_library.startWith = sfstring.StartWith
 
 --- Removes the extension of a path

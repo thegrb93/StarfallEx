@@ -2023,6 +2023,7 @@ do
 	string_library.setChar = string.SetChar string_library.SetChar = string.SetChar
 	string_library.split = string.Split string_library.Split = string.Split
 	string_library.startWith = string.StartWith string_library.StartWith = string.StartWith
+	string_library.startsWith = string.StartsWith string_library.StartsWith = string.StartsWith
 	string_library.stripExtension = string.StripExtension string_library.StripExtension = string.StripExtension
 	string_library.sub = string.sub
 	string_library.toMinutesSeconds = string.ToMinutesSeconds string_library.ToMinutesSeconds = string.ToMinutesSeconds
