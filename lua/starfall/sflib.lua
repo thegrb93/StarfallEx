@@ -1450,7 +1450,7 @@ function SF.CheckModel(model, player, prop)
 	return model
 end
 
-SF.UniqueSounds = setmetatable({}, {__index=function(t,k) local r={} t[k]=r return r end})
+SF.UniqueSounds = setmetatable({}, {__index=function(t,k) local r={[1]=0} t[k]=r return r end})
 local maxUniqueSounds = CreateConVar("sf_sounds_unique_max"..(CLIENT and "_cl" or ""), "200", FCVAR_ARCHIVE, "The maximum number of unique sounds paths allowed")
 
 function SF.CheckSound(ply, path)
@@ -1466,10 +1466,11 @@ function SF.CheckSound(ply, path)
 
 	local UserUniqueSounds = SF.UniqueSounds[ply:SteamID()]
 	if not UserUniqueSounds[checkpath] then
-		if table.Count(UserUniqueSounds) >= maxUniqueSounds:GetInt() then
+		if UserUniqueSounds[1] >= maxUniqueSounds:GetInt() then
 			SF.Throw("The unique sounds limit has been reached.", 3)
 		end
 		UserUniqueSounds[checkpath] = true
+		UserUniqueSounds[1] = UserUniqueSounds[1] + 1
 	end
 
 	return path
