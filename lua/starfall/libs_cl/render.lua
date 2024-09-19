@@ -2287,12 +2287,22 @@ function render_library.getScreenInfo(e)
 	return instance.Sanitize(screen.ScreenInfo)
 end
 
---- Returns information about the current view setup,
+--- Returns information about the current view setup.
 -- This does a table copy, so avoid using this in a draw hook for performance sake
 -- @param boolean? noPlayer If true, returns the view->GetViewSetup, if false - returns view->GetPlayerViewSetup. False by default.
 -- @return table A table describing the current view setup. See https://wiki.facepunch.com/gmod/Structures/ViewSetup for more information.
 function render_library.getViewSetup(noPlayer)
 	return instance.Sanitize(render.GetViewSetup(noPlayer))
+end
+
+--- Returns only the origin and angles from getViewSetup.
+-- @param boolean? noPlayer If true, returns the view->GetViewSetup, if false - returns view->GetPlayerViewSetup. False by default.
+-- @return Vector setup.origin
+-- @return Angle setup.angles
+function render_library.getViewPosAndAngles(noPlayer)
+	local setup = render.GetViewSetup(noPlayer)
+
+	return instance.Sanitize(setup.origin), instance.Sanitize(setup.angles)
 end
 
 --- Returns the entity currently being rendered to
