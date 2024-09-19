@@ -2292,17 +2292,7 @@ end
 -- @param boolean? noPlayer If true, returns the view->GetViewSetup, if false - returns view->GetPlayerViewSetup. False by default.
 -- @return table A table describing the current view setup. See https://wiki.facepunch.com/gmod/Structures/ViewSetup for more information.
 function render_library.getViewSetup(noPlayer)
-	return instance.Sanitize(render.GetViewSetup(noPlayer))
-end
-
---- Returns only the origin and angles from getViewSetup.
--- @param boolean? noPlayer If true, returns the view->GetViewSetup, if false - returns view->GetPlayerViewSetup. False by default.
--- @return Vector setup.origin
--- @return Angle setup.angles
-function render_library.getViewPosAndAngles(noPlayer)
-	local setup = render.GetViewSetup(noPlayer)
-
-	return vwrap(setup.origin), awrap(setup.angles)
+	return SF.StructWrapper(instance, render.GetViewSetup(noPlayer), "ViewSetup")
 end
 
 --- Returns the entity currently being rendered to
