@@ -2287,6 +2287,14 @@ function render_library.getScreenInfo(e)
 	return instance.Sanitize(screen.ScreenInfo)
 end
 
+--- Returns information about the current view setup,
+-- This does a table copy, so avoid using this in a draw hook for performance sake
+-- @param boolean? noPlayer If true, returns the view->GetViewSetup, if false - returns view->GetPlayerViewSetup. False by default.
+-- @return table A table describing the current view setup. See https://wiki.facepunch.com/gmod/Structures/ViewSetup for more information.
+function render_library.getViewSetup(noPlayer)
+	return instance.Sanitize(render.GetViewSetup(noPlayer))
+end
+
 --- Returns the entity currently being rendered to
 -- @return Entity Entity of the screen or hud being rendered
 function render_library.getScreenEntity()
