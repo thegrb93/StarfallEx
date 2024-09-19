@@ -136,6 +136,19 @@ function trace_library.intersectRayWithOBB(rayStart, rayDelta, boxOrigin, boxAng
 	if pos then return vwrap(pos), vwrap(normal), fraction end
 end
 
+--- Performs a box-sphere intersection and returns whether there was an intersection or not.
+-- @param Vector boxMins The minimum extents of the World Axis-Aligned box.
+-- @param Vector boxMaxs The maximum extents of the World Axis-Aligned box.
+-- @param Vector spherePos Position of the sphere.
+-- @param number sphereRadius The radius of the sphere.
+-- @return boolean true if there is an intersection, false otherwise.
+function trace_library.isBoxIntersectingSphere(boxMins, boxMaxs, spherePos, sphereRadius)
+	vec_SetUnpacked(minbox_vec, boxMins[1], boxMins[2], boxMins[3])
+	vec_SetUnpacked(maxbox_vec, boxMaxs[1], boxMaxs[2], boxMaxs[3])
+	vec_SetUnpacked(origin_vec, spherePos[1], spherePos[2], spherePos[3])
+	return util.IsBoxIntersectingSphere(minbox_vec, maxbox_vec, origin_vec, sphereRadius)
+end
+
 --- Does a ray plane intersection returning the position hit or nil if not hit
 -- @param Vector rayStart The origin of the ray
 -- @param Vector rayDelta The direction and length of the ray
