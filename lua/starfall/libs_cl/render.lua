@@ -2302,7 +2302,7 @@ end
 function render_library.getViewPosAndAngles(noPlayer)
 	local setup = render.GetViewSetup(noPlayer)
 
-	return instance.Sanitize(setup.origin), instance.Sanitize(setup.angles)
+	return vwrap(setup.origin), awrap(setup.angles)
 end
 
 --- Returns the entity currently being rendered to
