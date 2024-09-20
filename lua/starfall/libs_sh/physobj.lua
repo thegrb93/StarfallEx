@@ -287,7 +287,7 @@ if SERVER then
 	-- @param number contents The CONTENTS enum
 	function physobj_methods:setContents(contents)
 		checkluatype(contents,TYPE_NUMBER)
-		local phys=unwrap(self)
+		local phys = unwrap(self)
 		checkpermission(instance, phys:GetEntity(), "entities.setContents")
 		phys:SetContents(contents)
 	end
