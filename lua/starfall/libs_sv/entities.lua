@@ -17,6 +17,7 @@ registerprivilege("entities.setAngles", "Set Angles", "Allows the user to rotate
 registerprivilege("entities.setEyeAngles", "Set eye angles", "Allows the user to rotate the view of an entity to another orientation", { entities = {} })
 registerprivilege("entities.setVelocity", "Set Velocity", "Allows the user to change the velocity of an entity", { entities = {} })
 registerprivilege("entities.setSolid", "Set Solid", "Allows the user to change the solidity of an entity", { entities = {} })
+registerprivilege("entities.setContents", "Set Contents", "Allows the user to change the contents flag of an entity", { entities = {} })
 registerprivilege("entities.setMass", "Set Mass", "Allows the user to change the mass of an entity", { entities = {} })
 registerprivilege("entities.setInertia", "Set Inertia", "Allows the user to change the inertia of an entity", { entities = {} })
 registerprivilege("entities.enableGravity", "Enable gravity", "Allows the user to change whether an entity is affected by gravity", { entities = {} })
@@ -662,6 +663,21 @@ function ents_methods:enableDrag(drag)
 	checkpermission(instance, ent, "entities.enableDrag")
 
 	phys:EnableDrag(drag and true or false)
+end
+
+--- Sets the contents flag of the physobject
+-- @server
+-- @param number contents The CONTENTS enum
+function ents_methods:setContents(contents)
+	local ent = getent(self)
+	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
+	local phys = ent:GetPhysicsObject()
+	if not IsValidPhys(phys) then SF.Throw("Physics object is invalid", 2) end
+
+	checkluatype(contents, TYPE_NUMBER)
+	
+	checkpermission(instance, ent, "entities.setContents")
+	phys:SetContents(contents)
 end
 
 --- Sets the entity movement state
