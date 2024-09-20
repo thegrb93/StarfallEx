@@ -282,6 +282,16 @@ if SERVER then
 		phys:SetBuoyancyRatio(ratio)
 	end
 
+	--- Sets the contents flag of the physobject
+	-- @server
+	-- @param number contents The CONTENTS enum
+	function physobj_methods:setContents(contents)
+		checkluatype(contents, TYPE_NUMBER)
+		local phys = unwrap(self)
+		checkpermission(instance, phys:GetEntity(), "entities.setContents")
+		phys:SetContents(contents)
+	end
+
 	--- Applies a force to the center of the physics object
 	-- @server
 	-- @param Vector force The force vector to apply
