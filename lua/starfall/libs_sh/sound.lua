@@ -75,7 +75,7 @@ end)
 function sound_library.create(ent, path, nofilter)
 	checkluatype(path, TYPE_STRING)
 	if nofilter~=nil then checkluatype(nofilter, TYPE_BOOL) end
-	path = SF.CheckSound(instance.player, path)
+	SF.CheckSound(instance.player, path)
 
 	checkpermission(instance, { ent, path }, "sound.create")
 

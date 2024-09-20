@@ -1456,7 +1456,7 @@ local maxUniqueSounds = CreateConVar("sf_sounds_unique_max"..(CLIENT and "_cl" o
 function SF.CheckSound(ply, path)
 	-- Limit length and remove invalid chars
 	if #path>260 then SF.Throw("Sound path too long!", 3) end
-	path = SF.NormalizePath(string.gsub(path, "[\"?']", ""))
+	if string.match(path, "[\"?']") then SF.Throw("Sound path contains invalid characters!", 3) end
 
 	-- Extract sound flags. Only allowed flags are '<', '>', '^', ')'
 	local flags, checkpath = string.match(path, "^([^%w_/%.]*)(.*)")
@@ -1472,8 +1472,6 @@ function SF.CheckSound(ply, path)
 		UserUniqueSounds[checkpath] = true
 		UserUniqueSounds[1] = UserUniqueSounds[1] + 1
 	end
-
-	return path
 end
 
 function SF.CheckRagdoll(model)
