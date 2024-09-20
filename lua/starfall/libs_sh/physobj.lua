@@ -282,7 +282,7 @@ if SERVER then
 		phys:SetBuoyancyRatio(ratio)
 	end
 
-	--- Sets the contents flag of the phsyobject
+	--- Sets the contents flag of the physobject
 	-- @server
 	-- @param number contents The CONTENTS enum
 	function physobj_methods:setContents(contents)
