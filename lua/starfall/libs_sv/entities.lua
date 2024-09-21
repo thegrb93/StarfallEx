@@ -114,7 +114,7 @@ end
 
 --- Applies damage to an entity
 -- @param number amt Damage amount
--- @param Entity? attacker Damage attacker
+-- @param Entity? attacker Damage attacker. Defaults to chip owner
 -- @param Entity? inflictor Damage inflictor
 -- @param number? dmgtype The damage type number enum
 -- @param Vector? pos The position of the damage
@@ -128,6 +128,8 @@ function ents_methods:applyDamage(amt, attacker, inflictor, dmgtype, pos)
 	dmg:SetDamage(amt)
 	if attacker~=nil then
 		dmg:SetAttacker(getent(attacker))
+	else
+		dmg:SetAttacker(instance.player)
 	end
 	if inflictor~=nil then
 		dmg:SetInflictor(getent(inflictor))
