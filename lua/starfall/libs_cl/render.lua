@@ -2287,6 +2287,13 @@ function render_library.getScreenInfo(e)
 	return instance.Sanitize(screen.ScreenInfo)
 end
 
+--- Returns information about the current view setup.
+-- @param boolean? curview If true, returns the current calculated view setup, otherwise returns original player view setup
+-- @return table A table describing the current view setup. See https://wiki.facepunch.com/gmod/Structures/ViewSetup for more information.
+function render_library.getViewSetup(curview)
+	return SF.StructWrapper(instance, render.GetViewSetup(curview), "ViewSetup")
+end
+
 --- Returns the entity currently being rendered to
 -- @return Entity Entity of the screen or hud being rendered
 function render_library.getScreenEntity()
