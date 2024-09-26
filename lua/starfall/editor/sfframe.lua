@@ -1688,36 +1688,37 @@ function Editor:LoadFile(Line, forcenewtab)
 
 	local f = file.Open(Line, "rb", "DATA")
 	if not f then
-		ErrorNoHalt("Erroring opening file: " .. Line)
-	else
-		local str = f:Read(f:Size()) or ""
-		f:Close()
-		self:SaveTabs()
-		if not forcenewtab then
-			for i = 1, self:GetNumTabs() do
-				if self:GetTabContent(i).chosenfile == Line then
-					self:SetActiveTab(i)
-					if forcenewtab ~= nil then
-						self:SetCode(str)
-						self:GetCurrentTabContent().savedCode = SF.Editor.normalizeCode(str)
-					end
-					return
+		SF.AddNotify(LocalPlayer(), "Erroring opening file: " .. Line, "ERROR", 7, "ERROR1")
+		return
+	end
+
+	local str = f:Read(f:Size()) or ""
+	f:Close()
+	self:SaveTabs()
+	if not forcenewtab then
+		for i = 1, self:GetNumTabs() do
+			if self:GetTabContent(i).chosenfile == Line then
+				self:SetActiveTab(i)
+				if forcenewtab ~= nil then
+					self:SetCode(str)
+					self:GetCurrentTabContent().savedCode = SF.Editor.normalizeCode(str)
 				end
+				return
 			end
 		end
-		local title, tabtext = getPreferredTitles(Line, str)
-		local tab
-		if self.NewTabOnOpenVar:GetBool() or forcenewtab then
-			tab = self:CreateTab(tabtext).Tab
-		else
-			tab = self:GetActiveTab()
-		end
-		self:SetActiveTab(tab)
-		self:SetCode(str)
-		self:ChosenFile(Line, self:GetCode())
-		self:UpdateTabText(tab)
-		self.C.TabHolder:InvalidateLayout()
 	end
+	local title, tabtext = getPreferredTitles(Line, str)
+	local tab
+	if self.NewTabOnOpenVar:GetBool() or forcenewtab then
+		tab = self:CreateTab(tabtext).Tab
+	else
+		tab = self:GetActiveTab()
+	end
+	self:SetActiveTab(tab)
+	self:SetCode(str)
+	self:ChosenFile(Line, self:GetCode())
+	self:UpdateTabText(tab)
+	self.C.TabHolder:InvalidateLayout()
 end
 
 ---Returns the value of the settings `ReloadBeforeUpload` of the editor.
@@ -1755,7 +1756,7 @@ function Editor:ReloadTab(tabIndex, interactive)
 	local executeReload = function()
 		local fileContent = file.Read(filepath)
 		if fileContent == nil then
-			ErrorNoHalt("Error while reloading, failed to read file: ", filepath)
+			SF.AddNotify(LocalPlayer(), "Error while reloading, failed to read file: "..filepath, 7, "ERROR1")
 			return
 		end
 
