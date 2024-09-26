@@ -62,7 +62,7 @@ net.Receive("starfall_custom_prop", function()
 	local self, data
 
 	local function applyData()
-		if not (IsValid(self) and data and not self.rendermeshloaded) then return end
+		if not (IsValid(self) and self.rendermesh:IsValid() and data and not self.rendermeshloaded) then return end
 		local stream = SF.StringStream(data)
 		local physmesh = {}
 		local mins, maxs = Vector(math.huge, math.huge, math.huge), Vector(-math.huge, -math.huge, -math.huge)
