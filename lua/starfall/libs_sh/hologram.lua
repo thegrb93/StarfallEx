@@ -391,6 +391,24 @@ function hologram_methods:setClip(index, enabled, origin, normal, entity)
 	end
 end
 
+--- Returns all of a hologram's clips
+-- @shared
+-- @return table A table of all the hologram's clips
+function hologram_methods:getClips()
+	local holo = getholo(self)
+
+	local clips = {}
+	for i, clip in pairs(holo.clips) do
+		clips[i] = {
+			normal = vwrap(clip.normal),
+			entity = ewrap(clip.entity),
+			origin = vwrap(clip.origin)
+		}
+	end
+
+	return clips
+end
+
 --- Sets the hologram scale. Basically the same as setRenderMatrix() with a scaled matrix
 -- @shared
 -- @param Vector scale Vector new scale
