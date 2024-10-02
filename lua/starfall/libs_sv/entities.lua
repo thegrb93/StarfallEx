@@ -9,6 +9,8 @@ local isentity = isentity
 local huge = math.huge
 local abs = math.abs
 
+local collisionlistenercount = SF.LimitObject("collisionlistener", "collisionlistner", 200, "The number of concurrent starfall collision listeners")
+
 -- Register privileges
 registerprivilege("entities.applyDamage", "Apply damage", "Allows the user to apply damage to an entity", { entities = {} })
 registerprivilege("entities.applyForce", "Apply force", "Allows the user to apply force to an entity", { entities = {} })
@@ -57,10 +59,13 @@ instance:AddHook("initialize", function()
 end)
 instance:AddHook("deinitialize", function()
 	for ent in pairs(collisionlisteners) do
+        
 		if IsValid(ent) then
 			if ent:IsScripted() then
 				ent.PhysicsCollide = base_physicscollide
-			else
+				collisionlistenercount:free(instance.player, 1)
+			elseif ent.SF_CollisionCallback ~= nil then
+				for _ in pairs( collisionlisteners[ent] ) do collisionlistenercount:free(instance.player, 1) end
 				ent:RemoveCallback("PhysicsCollide", ent.SF_CollisionCallback)
 				ent.SF_CollisionCallback = nil
 			end
@@ -377,39 +382,68 @@ local function addCollisions(func)
 		entity_collisions[#entity_collisions+1] = data
 	end
 end
---- Allows detecting collisions on an entity. You can only do this once for the entity's entire lifespan so use it wisely.
+
+local function callListeners(ent, data)
+	for _, listener in pairs(collisionlisteners[ent]) do
+		listener[1](data)
+	end
+end
+
+--- Allows detecting collisions on an entity. You can only do this once for a SENT's entire lifespan so use it wisely.
 -- @param function func The callback function with argument, table collsiondata, http://wiki.facepunch.com/gmod/Structures/CollisionData
+-- @return number? The index of the collision listener created, nil if the entity is a SENT
 function ents_methods:addCollisionListener(func)
 	local ent = getent(self)
-	if collisionlisteners[ent] then SF.Throw("The entity is already listening to collisions!", 2) end
 
 	checkluatype(func, TYPE_FUNCTION)
-	checkpermission(instance, ent, "entities.canTool")
 
 	local callback = addCollisions(func)
 	if ent:IsScripted() then
 		if ent.PhysicsCollide ~= base_physicscollide and ent.PhysicsCollide ~= nil then SF.Throw("The entity is already listening to collisions!", 2) end
-		function ent:PhysicsCollide( data, phys ) callback(data) end
-	else
-		ent.SF_CollisionCallback = ent:AddCallback("PhysicsCollide", function(ent, data) callback(data) end)
+		function ent:PhysicsCollide(data, phys) callback(data) end
+		return nil
 	end
-	collisionlisteners[ent] = true
+
+	ent.SF_CollisionCallback = ent.SF_CollisionCallback or ent:AddCallback("PhysicsCollide", function(other, data) callListeners(ent, data) end )
+
+	local index
+	if collisionlisteners[ent] then
+		index = table.insert(collisionlisteners[ent], {callback, instance.player})
+	else
+		collisionlisteners[ent] = {{callback, instance.player}}
+		index = 1
+	end
+
+	collisionlistenercount:use(instance.player, 1)
+
+	return index
 end
 
 --- Removes a collision listening hook from the entity so that a new one can be added
-function ents_methods:removeCollisionListener()
+-- @param number? The index of the collision listener to remove, all if nil
+function ents_methods:removeCollisionListener(index)
 	local ent = getent(self)
-	if not collisionlisteners[ent] then SF.Throw("The entity isn't listening to collisions!", 2) end
-
-	checkpermission(instance, ent, "entities.canTool")
+	local listener = collisionlisteners[ent]
+	if not listener and not ent:IsScripted() then SF.Throw("The entity isn't listening to collisions!") end
 
 	if ent:IsScripted() then
+		checkpermission(instance, ent, "entities.canTool")
 		ent.PhysicsCollide = base_physicscollide
 	else
-		ent:RemoveCallback("PhysicsCollide", ent.SF_CollisionCallback)
-		ent.SF_CollisionCallback = nil
+		if index == nil or listener[index][2] ~= instance.player then
+			checkpermission(instance, ent, "entities.canTool")
+		end
+
+		if index == nil then
+			ent:RemoveCallback("PhysicsCollide", ent.SF_CollisionCallback)
+			ent.SF_CollisionCallback = nil
+			collisionlisteners[ent] = nil
+		else
+			collisionlisteners[ent][index] = nil
+		end
 	end
-	collisionlisteners[ent] = nil
+
+	collisionlistenercount:free(instance.player, 1)
 end
 
 --- Sets whether an entity's shadow should be drawn
