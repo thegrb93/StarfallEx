@@ -226,12 +226,6 @@ simple [[i.scdn.co]]
 --- https://e-cdns-images.dzcdn.net/images/cover/dfa0fb51f7c872d87309943e17e30e81/1000x1000-000000-80-0-0.jpg
 pattern [[([%w-_]+)%.dzcdn%.net/(.+)]]
 
--- Keybase.pub (KBFS)
--- Examples:
--- https://chris.keybase.pub/photos/you_must_chill.jpg
--- https://chinodesuuu.keybase.pub/oh_the_misery.mp4
-pattern [[(%w+)%.keybase.pub/(.+)]]
-
 -- DECTalk Online
 -- Examples:
 -- https://tts.cyzon.us/tts?text=test
@@ -254,3 +248,16 @@ simple [[youtube.michaelbelgium.me]]
 --- Examples:
 ---  https://website.nekoweb.org/path/to/resource
 pattern [[([%w-_]+)%.nekoweb%.org/(.+)]]
+
+-- RawGit (raw.githack.com)
+--- Examples:
+--- https://rawcdn.githack.com/Metastruct/garrysmod-chatsounds/63658b902893e11710e51b3d94b9e57f0daaf379/sound/chatsounds/autoadd/anime/i%20love%20you.ogg
+--- https://raw.githack.com/Metastruct/garrysmod-chatsounds/master/sound/chatsounds/autoadd/anime/i%20love%20you.ogg
+simple [[raw.githack.com]]
+simple [[rawcdn.githack.com]]
+
+-- Statically CDN
+--- Examples:
+--- https://cdn.statically.io/gh/Metastruct/garrysmod-chatsounds/master/sound/chatsounds/autoadd/anime/i%20love%20you.ogg
+--- https://cdn.statically.io/img/statically.dev/w=300,h=500/cat.jpg
+simple [[cdn.statically.io]]
