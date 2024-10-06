@@ -555,6 +555,23 @@ function ents_methods:removeCollisionListener(name)
 	collisionListenerInstanceInfosPerEnt[ent] = nil
 end
 
+--- Checks if an entity has a collision listener
+--- Only checks for listeners created by this chip
+-- @param string? name The name of the collision listener to check for. If nil, will check if any listeners exist.
+function ents_methods:hasCollisionListener( name )
+	local ent = getent(self)
+	if name ~= nil then checkluatype(name, TYPE_STRING) end
+
+	local infosPerInstance = collisionListenerInstanceInfosPerEnt[ent]
+	if not infosPerInstance then return false end
+
+	local listenerInfo = infosPerInstance[instance]
+	if not listenerInfo then return false end
+	if name == nil then return true end -- When listenerInfo ~= nil, there's at least one listener
+
+	return listenerInfo.listeners[name] ~= nil
+end
+
 --- Sets whether an entity's shadow should be drawn
 -- @param boolean draw Whether the shadow should draw
 function ents_methods:setDrawShadow(draw)
