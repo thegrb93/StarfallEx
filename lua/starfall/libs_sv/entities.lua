@@ -99,7 +99,7 @@ instance:AddHook("deinitialize", function()
 		if not listenersPerInstance then continue end -- May be nil if the entity was removed before deinitialization (due to the SF.CallOnRemove())
 
 		local listeners = listenersPerInstance[instance]
-		if listeners then continue end -- Shouldn't ever be nil, but for in case
+		if listeners then continue end -- Shouldn't be nil at this point, but for in case
 
 		for name in pairs(listeners) do
 			collisionListenerLimit:free(instance.player, 1)
