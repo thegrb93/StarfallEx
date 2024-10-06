@@ -10,7 +10,7 @@ local huge = math.huge
 local abs = math.abs
 
 local collisionListenerLimit = SF.LimitObject("collisionlistener", "collisionlistner", 200, "The number of concurrent starfall collision listeners")
-local collisionListenerInstanceInfosPerEnt = {} -- { [ent] = { [instance] = { listeners = { [name/num] = function } } } }
+local instanceCollisionListenersPerEnt = {} -- { [ent] = { [instance] = { [name/num] = function } } }
 local collisionQueue = {}
 
 -- Register privileges
@@ -56,12 +56,11 @@ local function addCollisions(ent)
 					if not IsValid(thisEnt) then continue end
 
 					local thisData = collision.data
-					local infosPerInstance = collisionListenerInstanceInfosPerEnt[thisEnt]
-					if not infosPerInstance then continue end -- Could be nil if listeners were removed during the timer.Simple
+					local listenersPerInstance = instanceCollisionListenersPerEnt[thisEnt]
+					if not listenersPerInstance then continue end -- Could be nil if listeners were removed during the timer.Simple
 
-					for instance, listenerInfo in pairs(infosPerInstance) do
+					for instance, listeners in pairs(listenersPerInstance) do
 						local thisDataWrapped = SF.StructWrapper(instance, thisData, "CollisionData")
-						local listeners = listenerInfo.listeners
 
 						for _, func in pairs(listeners) do
 							instance:runFunction(func, thisDataWrapped)
@@ -96,23 +95,21 @@ instance:AddHook("initialize", function()
 end)
 instance:AddHook("deinitialize", function()
 	for ent in pairs(entsWithCollisionListeners) do
-		local infosPerInstance = collisionListenerInstanceInfosPerEnt[ent]
-		if not infosPerInstance then continue end -- May be nil if the entity was removed before deinitialization (due to the SF.CallOnRemove())
+		local listenersPerInstance = instanceCollisionListenersPerEnt[ent]
+		if not listenersPerInstance then continue end -- May be nil if the entity was removed before deinitialization (due to the SF.CallOnRemove())
 
-		local listenerInfo = infosPerInstance[instance]
-		if listenerInfo then continue end -- Shouldn't ever be nil, but for in case
-
-		local listeners = listenerInfo.listeners
+		local listeners = listenersPerInstance[instance]
+		if listeners then continue end -- Shouldn't ever be nil, but for in case
 
 		for name in pairs(listeners) do
 			collisionListenerLimit:free(instance.player, 1)
 			listeners[name] = nil -- Faster GC
 		end
 
-		infosPerInstance[instance] = nil
+		listenersPerInstance[instance] = nil
 
 		-- Ent has no more listeners across all instances, remove the callbacks/wraps
-		if next(infosPerInstance) == nil then
+		if next(listenersPerInstance) == nil then
 			if IsValid(ent) then
 				local oldPhysicsCollide = ent.SF_OldPhysicsCollide -- non-nil if the entity is scripted
 
@@ -125,7 +122,7 @@ instance:AddHook("deinitialize", function()
 				SF.RemoveCallOnRemove(ent, "RemoveCollisionListeners")
 			end
 
-			collisionListenerInstanceInfosPerEnt[ent] = nil
+			instanceCollisionListenersPerEnt[ent] = nil
 		end
 
 		entsWithCollisionListeners[ent] = nil -- Faster GC
@@ -438,23 +435,19 @@ function ents_methods:addCollisionListener(func, name)
 	checkluatype(func, TYPE_FUNCTION)
 	checkpermission(instance, ent, "entities.canTool")
 
-	local infosPerInstance = collisionListenerInstanceInfosPerEnt[ent]
-	local alreadyHasListeners = infosPerInstance ~= nil
+	local listenersPerInstance = instanceCollisionListenersPerEnt[ent]
+	local alreadyHasListeners = listenersPerInstance ~= nil
 
-	if not infosPerInstance then
-		infosPerInstance = {}
-		collisionListenerInstanceInfosPerEnt[ent] = infosPerInstance
+	if not listenersPerInstance then
+		listenersPerInstance = {}
+		instanceCollisionListenersPerEnt[ent] = listenersPerInstance
 	end
 
-	local listenerInfo = infosPerInstance[instance]
-	local listeners
+	local listeners = listenersPerInstance[instance]
 
-	if listenerInfo then
-		listeners = listenerInfo.listeners
-	else
+	if not listeners then
 		listeners = {}
-		listenerInfo = {listeners = listeners}
-		infosPerInstance[instance] = listenerInfo
+		listenersPerInstance[instance] = listeners
 	end
 
 	if name ~= nil then
@@ -489,21 +482,19 @@ function ents_methods:addCollisionListener(func, name)
 	end
 
 	SF.CallOnRemove(ent, "RemoveCollisionListeners", function()
-		local theseInfosPerInstance = collisionListenerInstanceInfosPerEnt[ent]
-		if not theseInfosPerInstance then return end
+		local theseListenersPerInstance = instanceCollisionListenersPerEnt[ent]
+		if not theseListenersPerInstance then return end
 
-		for thisInstance, thisListenerInfo in pairs(theseInfosPerInstance) do
-			local theseListeners = thisListenerInfo.listeners
-
+		for thisInstance, theseListeners in pairs(theseListenersPerInstance) do
 			for listenerName in pairs(theseListeners) do
 				collisionListenerLimit:free(thisInstance.player, 1)
 				theseListeners[listenerName] = nil -- Faster GC
 			end
 
-			theseInfosPerInstance[thisInstance] = nil -- Faster GC
+			theseListenersPerInstance[thisInstance] = nil -- Faster GC
 		end
 
-		collisionListenerInstanceInfosPerEnt[ent] = nil -- Signify that listeners have been removed
+		instanceCollisionListenersPerEnt[ent] = nil -- Signify that listeners have been removed
 	end)
 end
 
@@ -513,15 +504,13 @@ function ents_methods:removeCollisionListener(name)
 	local ent = getent(self)
 	if name ~= nil then checkluatype(name, TYPE_STRING) end
 
-	local infosPerInstance = collisionListenerInstanceInfosPerEnt[ent]
-	if not infosPerInstance then return end
+	local listenersPerInstance = instanceCollisionListenersPerEnt[ent]
+	if not listenersPerInstance then return end
 
-	local listenerInfo = infosPerInstance[instance]
-	if not listenerInfo then return end
+	local listeners = listenersPerInstance[instance]
+	if not listeners then return end
 
 	checkpermission(instance, ent, "entities.canTool")
-
-	local listeners = listenerInfo.listeners
 
 	if name ~= nil then
 		if listeners[name] then
@@ -537,10 +526,10 @@ function ents_methods:removeCollisionListener(name)
 
 	if next(listeners) ~= nil then return end
 
-	infosPerInstance[instance] = nil
+	listenersPerInstance[instance] = nil
 	entsWithCollisionListeners[ent] = nil
 
-	if next(infosPerInstance) ~= nil then return end
+	if next(listenersPerInstance) ~= nil then return end
 
 	local oldPhysicsCollide = ent.SF_OldPhysicsCollide
 
@@ -552,7 +541,7 @@ function ents_methods:removeCollisionListener(name)
 
 	SF.RemoveCallOnRemove(ent, "RemoveCollisionListeners")
 
-	collisionListenerInstanceInfosPerEnt[ent] = nil
+	instanceCollisionListenersPerEnt[ent] = nil
 end
 
 --- Checks if an entity has a collision listener
@@ -562,14 +551,14 @@ function ents_methods:hasCollisionListener( name )
 	local ent = getent(self)
 	if name ~= nil then checkluatype(name, TYPE_STRING) end
 
-	local infosPerInstance = collisionListenerInstanceInfosPerEnt[ent]
-	if not infosPerInstance then return false end
+	local listenersPerInstance = instanceCollisionListenersPerEnt[ent]
+	if not listenersPerInstance then return false end
 
-	local listenerInfo = infosPerInstance[instance]
-	if not listenerInfo then return false end
-	if name == nil then return true end -- When listenerInfo ~= nil, there's at least one listener
+	local listeners = listenersPerInstance[instance]
+	if not listeners then return false end
+	if name == nil then return true end -- When listeners ~= nil, there's at least one listener
 
-	return listenerInfo.listeners[name] ~= nil
+	return listeners[name] ~= nil
 end
 
 --- Returns a table of all collision listener names
@@ -578,13 +567,12 @@ end
 function ents_methods:getCollisionListenerNames()
 	local ent = getent(self)
 
-	local infosPerInstance = collisionListenerInstanceInfosPerEnt[ent]
-	if not infosPerInstance then return {} end
+	local listenersPerInstance = instanceCollisionListenersPerEnt[ent]
+	if not listenersPerInstance then return {} end
 
-	local listenerInfo = infosPerInstance[instance]
-	if not listenerInfo then return {} end
+	local listeners = listenersPerInstance[instance]
+	if not listeners then return {} end
 
-	local listeners = listenerInfo.listeners
 	local names = {}
 
 	for name in pairs(listeners) do
