@@ -572,6 +572,30 @@ function ents_methods:hasCollisionListener( name )
 	return listenerInfo.listeners[name] ~= nil
 end
 
+--- Returns a table of all collision listener names
+--- Only returns listeners created by this chip
+--- Nameless listeners will not be included
+function ents_methods:getCollisionListenerNames()
+	local ent = getent(self)
+
+	local infosPerInstance = collisionListenerInstanceInfosPerEnt[ent]
+	if not infosPerInstance then return {} end
+
+	local listenerInfo = infosPerInstance[instance]
+	if not listenerInfo then return {} end
+
+	local listeners = listenerInfo.listeners
+	local names = {}
+
+	for name in pairs(listeners) do
+		if type(name) == "string" then
+			names[#names + 1] = name
+		end
+	end
+
+	return names
+end
+
 --- Sets whether an entity's shadow should be drawn
 -- @param boolean draw Whether the shadow should draw
 function ents_methods:setDrawShadow(draw)
