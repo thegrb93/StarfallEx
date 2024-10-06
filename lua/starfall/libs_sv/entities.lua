@@ -9,6 +9,10 @@ local isentity = isentity
 local huge = math.huge
 local abs = math.abs
 
+local collisionListenerLimit = SF.LimitObject("collisionlistener", "collisionlistner", 200, "The number of concurrent starfall collision listeners")
+local collisionListenerInstanceInfosPerEnt = {} -- { [ent] = { [instance] = { listeners = { [name/num] = function } } } }
+local collisionQueue = {}
+
 -- Register privileges
 registerprivilege("entities.applyDamage", "Apply damage", "Allows the user to apply damage to an entity", { entities = {} })
 registerprivilege("entities.applyForce", "Apply force", "Allows the user to apply force to an entity", { entities = {} })
@@ -39,6 +43,41 @@ local function checkvector(v)
 	end
 end
 
+local function addCollisions(ent)
+	return function(data)
+		if next(collisionQueue) == nil then
+			timer.Simple(0, function() -- TODO: Is this timer necessary? It greatly overcomplicates the callback system. If so, the reason should be noted here.
+				for i = 1, #collisionQueue do
+					local collision = collisionQueue[i]
+					local thisEnt = collision.ent
+
+					collisionQueue[i] = nil
+
+					if not IsValid(thisEnt) then continue end
+
+					local thisData = collision.data
+					local infosPerInstance = collisionListenerInstanceInfosPerEnt[thisEnt]
+					if not infosPerInstance then continue end -- Could be nil if listeners were removed during the timer.Simple
+
+					for instance, listenerInfo in pairs(infosPerInstance) do
+						local thisDataWrapped = SF.StructWrapper(instance, thisData, "CollisionData")
+						local listeners = listenerInfo.listeners
+
+						for _, func in pairs(listeners) do
+							instance:runFunction(func, thisDataWrapped)
+						end
+					end
+				end
+			end)
+		end
+
+		collisionQueue[#collisionQueue + 1] = {
+			ent = ent,
+			data = data,
+		}
+	end
+end
+
 
 return function(instance)
 local base_physicscollide = baseclass.Get("base_gmodentity").PhysicsCollide
@@ -51,20 +90,45 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 local cunwrap = instance.Types.Color.Unwrap
 
 local getent
-local collisionlisteners = {}
+local entsWithCollisionListeners = {} -- Lookup for which ents this instance made collision listeners for
 instance:AddHook("initialize", function()
 	getent = ent_meta.GetEntity
 end)
 instance:AddHook("deinitialize", function()
-	for ent in pairs(collisionlisteners) do
-		if IsValid(ent) then
-			if ent:IsScripted() then
-				ent.PhysicsCollide = base_physicscollide
-			else
-				ent:RemoveCallback("PhysicsCollide", ent.SF_CollisionCallback)
-				ent.SF_CollisionCallback = nil
-			end
+	for ent in pairs(entsWithCollisionListeners) do
+		local infosPerInstance = collisionListenerInstanceInfosPerEnt[ent]
+		if not infosPerInstance then continue end -- May be nil if the entity was removed before deinitialization (due to the SF.CallOnRemove())
+
+		local listenerInfo = infosPerInstance[instance]
+		if listenerInfo then continue end -- Shouldn't ever be nil, but for in case
+
+		local listeners = listenerInfo.listeners
+
+		for name in pairs(listeners) do
+			collisionListenerLimit:free(instance.player, 1)
+			listeners[name] = nil -- Faster GC
 		end
+
+		infosPerInstance[instance] = nil
+
+		-- Ent has no more listeners across all instances, remove the callbacks/wraps
+		if next(infosPerInstance) == nil then
+			if IsValid(ent) then
+				local oldPhysicsCollide = ent.SF_OldPhysicsCollide -- non-nil if the entity is scripted
+
+				if oldPhysicsCollide then
+					ent.PhysicsCollide = oldPhysicsCollide
+				else
+					ent:RemoveCallback("PhysicsCollide", ent.SF_CollisionCallback)
+				end
+
+				SF.RemoveCallOnRemove(ent, "RemoveCollisionListeners")
+			end
+
+			collisionListenerInstanceInfosPerEnt[ent] = nil
+		end
+
+		entsWithCollisionListeners[ent] = nil -- Faster GC
 	end
 end)
 
@@ -363,53 +427,132 @@ function ents_methods:applyTorque(torque)
 	phys:ApplyTorqueCenter(torque)
 end
 
-local entity_collisions = {}
-local function addCollisions(func)
-	return function(data)
-		if next(entity_collisions)==nil then
-			timer.Simple(0, function()
-				for i=1, #entity_collisions do
-					instance:runFunction(func, SF.StructWrapper(instance, entity_collisions[i], "CollisionData"))
-					entity_collisions[i] = nil
-				end
-			end)
-		end
-		entity_collisions[#entity_collisions+1] = data
-	end
-end
---- Allows detecting collisions on an entity. You can only do this once for the entity's entire lifespan so use it wisely.
+--- Allows detecting collisions on an entity.
 -- @param function func The callback function with argument, table collsiondata, http://wiki.facepunch.com/gmod/Structures/CollisionData
-function ents_methods:addCollisionListener(func)
+-- @param string? name Optional name to distinguish multiple collision listeners and remove them individually later.
+function ents_methods:addCollisionListener(func, name)
+	collisionListenerLimit:checkuse(instance.player, 1)
+
 	local ent = getent(self)
-	if collisionlisteners[ent] then SF.Throw("The entity is already listening to collisions!", 2) end
 
 	checkluatype(func, TYPE_FUNCTION)
 	checkpermission(instance, ent, "entities.canTool")
 
-	local callback = addCollisions(func)
+	local infosPerInstance = collisionListenerInstanceInfosPerEnt[ent]
+	local alreadyHasListeners = infosPerInstance ~= nil
+
+	if not infosPerInstance then
+		infosPerInstance = {}
+		collisionListenerInstanceInfosPerEnt[ent] = infosPerInstance
+	end
+
+	local listenerInfo = infosPerInstance[instance]
+	local listeners
+
+	if listenerInfo then
+		listeners = listenerInfo.listeners
+	else
+		listeners = {}
+		listenerInfo = {listeners = listeners}
+		infosPerInstance[instance] = listenerInfo
+	end
+
+	if name ~= nil then
+		checkluatype(name, TYPE_STRING)
+
+		if listeners[name] then SF.Throw("The entity already has a collision listener with that name", 2) end
+	end
+
+	if name ~= nil then
+		listeners[name] = func
+	else
+		listeners[#listeners + 1] = func
+	end
+
+	collisionListenerLimit:free(instance.player, -1)
+	entsWithCollisionListeners[ent] = true
+
+	if alreadyHasListeners then return end
+
+	local callback = addCollisions(ent)
+
 	if ent:IsScripted() then
-		if ent.PhysicsCollide ~= base_physicscollide and ent.PhysicsCollide ~= nil then SF.Throw("The entity is already listening to collisions!", 2) end
-		function ent:PhysicsCollide( data, phys ) callback(data) end
+		local oldPhysicsCollide = ent.PhysicsCollide or base_physicscollide
+		ent.SF_OldPhysicsCollide = oldPhysicsCollide
+
+		function ent:PhysicsCollide(data, phys)
+			oldPhysicsCollide(self, data, phys)
+			callback(data)
+		end
 	else
 		ent.SF_CollisionCallback = ent:AddCallback("PhysicsCollide", function(ent, data) callback(data) end)
 	end
-	collisionlisteners[ent] = true
+
+	SF.CallOnRemove(ent, "RemoveCollisionListeners", function()
+		local theseInfosPerInstance = collisionListenerInstanceInfosPerEnt[ent]
+		if not theseInfosPerInstance then return end
+
+		for thisInstance, thisListenerInfo in pairs(theseInfosPerInstance) do
+			local theseListeners = thisListenerInfo.listeners
+
+			for listenerName in pairs(theseListeners) do
+				collisionListenerLimit:free(thisInstance.player, 1)
+				theseListeners[listenerName] = nil -- Faster GC
+			end
+
+			theseInfosPerInstance[thisInstance] = nil -- Faster GC
+		end
+
+		collisionListenerInstanceInfosPerEnt[ent] = nil -- Signify that listeners have been removed
+	end)
 end
 
---- Removes a collision listening hook from the entity so that a new one can be added
-function ents_methods:removeCollisionListener()
+--- Removes a collision listener from the entity
+-- @param string? name The name of the collision listener to remove. If nil, will remove all listeners.
+function ents_methods:removeCollisionListener(name)
 	local ent = getent(self)
-	if not collisionlisteners[ent] then SF.Throw("The entity isn't listening to collisions!", 2) end
+	if name ~= nil then checkluatype(name, TYPE_STRING) end
+
+	local infosPerInstance = collisionListenerInstanceInfosPerEnt[ent]
+	if not infosPerInstance then return end
+
+	local listenerInfo = infosPerInstance[instance]
+	if not listenerInfo then return end
 
 	checkpermission(instance, ent, "entities.canTool")
 
-	if ent:IsScripted() then
-		ent.PhysicsCollide = base_physicscollide
+	local listeners = listenerInfo.listeners
+
+	if name ~= nil then
+		if listeners[name] then
+			collisionListenerLimit:free(instance.player, 1)
+			listeners[name] = nil
+		end
+	else
+		for listenerName in pairs(listeners) do
+			collisionListenerLimit:free(instance.player, 1)
+			listeners[listenerName] = nil
+		end
+	end
+
+	if next(listeners) ~= nil then return end
+
+	infosPerInstance[instance] = nil
+	entsWithCollisionListeners[ent] = nil
+
+	if next(infosPerInstance) ~= nil then return end
+
+	local oldPhysicsCollide = ent.SF_OldPhysicsCollide
+
+	if oldPhysicsCollide then
+		ent.PhysicsCollide = oldPhysicsCollide
 	else
 		ent:RemoveCallback("PhysicsCollide", ent.SF_CollisionCallback)
-		ent.SF_CollisionCallback = nil
 	end
-	collisionlisteners[ent] = nil
+
+	SF.RemoveCallOnRemove(ent, "RemoveCollisionListeners")
+
+	collisionListenerInstanceInfosPerEnt[ent] = nil
 end
 
 --- Sets whether an entity's shadow should be drawn
