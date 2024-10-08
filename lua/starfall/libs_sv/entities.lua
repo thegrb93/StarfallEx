@@ -30,10 +30,13 @@ registerprivilege("entities.canTool", "CanTool", "Whether or not the user can us
 registerprivilege("entities.use", "Use", "Whether or not the user can use the entity", { entities = {} })
 registerprivilege("entities.getTable", "GetTable", "Allows the user to get an entity's table", { entities = {}, usergroups = { default = 1 } })
 
+local function table_find(tbl, val)
+	for i=1, #tbl do if tbl[i]==val then return i end end
+end
 
-local collisionListenerLimit = SF.LimitObject("collisionlistener", "collisionlistner", 200, "The number of concurrent starfall collision listeners")
+local collisionListenerLimit = SF.LimitObject("collisionlistener", "collisionlistner", 128, "The number of concurrent starfall collision listeners")
 local base_physicscollide
-SF.GlobalCollisionListener = {
+SF.GlobalCollisionListeners = {
 	__index = {
 		create = function(self, ent)
 			local listenertable = {}
@@ -97,7 +100,7 @@ SF.GlobalCollisionListener = {
 			local entlisteners = self.listeners[ent]
 			if entlisteners == nil then
 				entlisteners = self:create(ent)
-			elseif table.HasValue(entlisteners, listener) then
+			elseif table_find(entlisteners, listener) then
 				return
 			end
 			entlisteners[#entlisteners + 1] = listener
@@ -105,7 +108,7 @@ SF.GlobalCollisionListener = {
 		remove = function(self, ent, listener)
 			local entlisteners = self.listeners[ent]
 			if entlisteners==nil then return end
-			local i = table.HasValue(entlisteners, listener)
+			local i = table_find(entlisteners, listener)
 			if i==nil then return end
 
 			entlisteners[i] = entlisteners[#entlisteners]
@@ -119,10 +122,10 @@ SF.GlobalCollisionListener = {
 		}, p)
 	end
 }
-setmetatable(SF.GlobalCollisionListener, SF.GlobalCollisionListener)
-local globalListeners = SF.GlobalCollisionListener()
+setmetatable(SF.GlobalCollisionListeners, SF.GlobalCollisionListeners)
+local globalListeners = SF.GlobalCollisionListeners()
 
-SF.InstanceCollisionListener = {
+SF.InstanceCollisionListeners = {
 	__index = {
 		add = function(self, ent, name, func)
 			local created = false
@@ -178,7 +181,7 @@ SF.InstanceCollisionListener = {
 		}, p)
 	end
 }
-setmetatable(SF.InstanceCollisionListener, SF.InstanceCollisionListener)
+setmetatable(SF.InstanceCollisionListeners, SF.InstanceCollisionListeners)
 
 local function checkvector(v)
 	if v[1]<-1e12 or v[1]>1e12 or v[1]~=v[1] or
@@ -198,7 +201,7 @@ local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local cunwrap = instance.Types.Color.Unwrap
 
-local collisionListeners = SF.InstanceCollisionListener(instance)
+local collisionListeners = SF.InstanceCollisionListeners(instance)
 base_physicscollide = baseclass.Get("base_gmodentity").PhysicsCollide
 
 local getent
