@@ -42,24 +42,26 @@ SF.GlobalCollisionListeners = {
 			local listenertable = {}
 		
 			local queue = {}
+			local nqueue = 0
 			local function collisionQueueProcess()
 				if IsValid(ent) then
 					for _, listener in ipairs(listenertable) do
 						local instance = listener.instance
-						for i=1, #queue do
+						for i=1, nqueue do
 							listener:run(SF.StructWrapper(instance, queue[i], "CollisionData"))
 						end
 					end
 				end
-				for i=1, #queue do
+				for i=1, nqueue do
 					queue[i] = nil
 				end
+				nqueue = 0
 			end
 		
 			local function collisionQueueCallback(ent, data)
-				local i = #queue+1
-				queue[i] = data
-				if i==1 then timer.Simple(0, collisionQueueProcess) end
+				nqueue = nqueue + 1
+				queue[nqueue] = data
+				if nqueue==1 then timer.Simple(0, collisionQueueProcess) end
 			end
 		
 			if ent:IsScripted() then
