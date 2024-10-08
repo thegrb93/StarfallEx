@@ -83,7 +83,7 @@ SF.GlobalCollisionListeners = {
 			if entlisteners==nil then return end
 			self.listeners[ent] = nil
 			for _, listener in ipairs(entlisteners) do
-				listener.manager:free(ent, listener)
+				listener.manager:free(ent)
 			end
 			if IsValid(ent) then
 				local oldPhysicsCollide = ent.SF_OldPhysicsCollide
@@ -137,7 +137,7 @@ SF.InstanceCollisionListeners = {
 				listener.instance = self.instance
 				self.hooksPerEnt[ent] = listener
 
-				globalListeners:add(listener)
+				globalListeners:add(ent, listener)
 				created = true
 			elseif not listener:exists(name) then
 				collisionListenerLimit:checkuse(self.instance.player, 1)
@@ -156,21 +156,23 @@ SF.InstanceCollisionListeners = {
 				listener:remove(name)
 				collisionListenerLimit:free(self.instance.player, 1)
 				if listener:isEmpty() then
-					globalListeners:remove(listener)
 					self.hooksPerEnt[ent] = nil
+					globalListeners:remove(ent, listener)
 				end
 			end
 		end,
-		free = function(self, ent, listener)
-			collisionListenerLimit:free(self.instance.player, listener.n)
-			self.hooksPerEnt[ent] = nil
+		free = function(self, ent)
+			local listener = self.hooksPerEnt[ent]
+			if listener then
+				collisionListenerLimit:free(self.instance.player, listener.n)
+				self.hooksPerEnt[ent] = nil
+			end
 		end,
 		destroy = function(self)
 			for ent, listener in pairs(self.hooksPerEnt) do
 				collisionListenerLimit:free(self.instance.player, listener.n)
 				self.hooksPerEnt[ent] = nil
-
-				globalListeners:remove(listener)
+				globalListeners:remove(ent, listener)
 			end
 		end
 	},
