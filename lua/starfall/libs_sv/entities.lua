@@ -35,88 +35,88 @@ local collisionListenerLimit = SF.LimitObject("collisionlistener", "collisionlis
 local base_physicscollide
 SF.GlobalCollisionListener = {
 	__index = {
-        create = function(self, ent)
-            local listenertable = {}
-        
-            local queue = {}
-            local function collisionQueueProcess()
-                if IsValid(ent) then
-                    for _, listener in ipairs(listenertable) do
-                        local instance = listener.instance
-                        for i=1, #queue do
-                            listener:run(SF.StructWrapper(instance, queue[i], "CollisionData"))
-                        end
-                    end
-                end
-                for i=1, #queue do
-                    queue[i] = nil
-                end
-            end
-        
-            local function collisionQueueCallback(ent, data)
-                local i = #queue+1
-                queue[i] = data
-                if i==1 then timer.Simple(0, collisionQueueProcess) end
-            end
-        
-            if ent:IsScripted() then
-                local oldPhysicsCollide = ent.PhysicsCollide or base_physicscollide
-                ent.SF_OldPhysicsCollide = oldPhysicsCollide
-        
-                function ent:PhysicsCollide(data, phys)
-                    oldPhysicsCollide(self, data, phys)
-                    collisionQueueCallback(self, data)
-                end
-            else
-                ent.SF_CollisionCallback = ent:AddCallback("PhysicsCollide", collisionQueueCallback)
-            end
-            SF.CallOnRemove(ent, "RemoveCollisionListeners", function(e) self:destroy(e) end)
+		create = function(self, ent)
+			local listenertable = {}
+		
+			local queue = {}
+			local function collisionQueueProcess()
+				if IsValid(ent) then
+					for _, listener in ipairs(listenertable) do
+						local instance = listener.instance
+						for i=1, #queue do
+							listener:run(SF.StructWrapper(instance, queue[i], "CollisionData"))
+						end
+					end
+				end
+				for i=1, #queue do
+					queue[i] = nil
+				end
+			end
+		
+			local function collisionQueueCallback(ent, data)
+				local i = #queue+1
+				queue[i] = data
+				if i==1 then timer.Simple(0, collisionQueueProcess) end
+			end
+		
+			if ent:IsScripted() then
+				local oldPhysicsCollide = ent.PhysicsCollide or base_physicscollide
+				ent.SF_OldPhysicsCollide = oldPhysicsCollide
+		
+				function ent:PhysicsCollide(data, phys)
+					oldPhysicsCollide(self, data, phys)
+					collisionQueueCallback(self, data)
+				end
+			else
+				ent.SF_CollisionCallback = ent:AddCallback("PhysicsCollide", collisionQueueCallback)
+			end
+			SF.CallOnRemove(ent, "RemoveCollisionListeners", function(e) self:destroy(e) end)
 
-            self.listeners[ent] = listenertable
-            return listenertable
-        end,
-        destroy = function(self, ent)
-            local entlisteners = self.listeners[ent]
-            if entlisteners==nil then return end
-            self.listeners[ent] = nil
-            for _, listener in ipairs(entlisteners) do
-                listener.manager:free(ent, listener)
-            end
-            if IsValid(ent) then
-                local oldPhysicsCollide = ent.SF_OldPhysicsCollide
-                if oldPhysicsCollide then
-                    ent.PhysicsCollide = oldPhysicsCollide
-                else
-                    ent:RemoveCallback("PhysicsCollide", ent.SF_CollisionCallback)
-                end
-        
-                SF.RemoveCallOnRemove(ent, "RemoveCollisionListeners")
-            end
-        end,
-        add = function(self, ent, listener)
-            local entlisteners = self.listeners[ent]
-            if entlisteners == nil then
-                entlisteners = self:create(ent)
-            elseif table.HasValue(entlisteners, listener) then
-                return
-            end
-            entlisteners[#entlisteners + 1] = listener
-        end,
-        remove = function(self, ent, listener)
-            local entlisteners = self.listeners[ent]
-            if entlisteners==nil then return end
-            local i = table.HasValue(entlisteners, listener)
-            if i==nil then return end
+			self.listeners[ent] = listenertable
+			return listenertable
+		end,
+		destroy = function(self, ent)
+			local entlisteners = self.listeners[ent]
+			if entlisteners==nil then return end
+			self.listeners[ent] = nil
+			for _, listener in ipairs(entlisteners) do
+				listener.manager:free(ent, listener)
+			end
+			if IsValid(ent) then
+				local oldPhysicsCollide = ent.SF_OldPhysicsCollide
+				if oldPhysicsCollide then
+					ent.PhysicsCollide = oldPhysicsCollide
+				else
+					ent:RemoveCallback("PhysicsCollide", ent.SF_CollisionCallback)
+				end
+		
+				SF.RemoveCallOnRemove(ent, "RemoveCollisionListeners")
+			end
+		end,
+		add = function(self, ent, listener)
+			local entlisteners = self.listeners[ent]
+			if entlisteners == nil then
+				entlisteners = self:create(ent)
+			elseif table.HasValue(entlisteners, listener) then
+				return
+			end
+			entlisteners[#entlisteners + 1] = listener
+		end,
+		remove = function(self, ent, listener)
+			local entlisteners = self.listeners[ent]
+			if entlisteners==nil then return end
+			local i = table.HasValue(entlisteners, listener)
+			if i==nil then return end
 
-            entlisteners[i] = entlisteners[#entlisteners]
-            entlisteners[#entlisteners] = nil
-            if entlisteners[1]==nil then self:destroy(ent) end
-        end
+			entlisteners[i] = entlisteners[#entlisteners]
+			entlisteners[#entlisteners] = nil
+			if entlisteners[1]==nil then self:destroy(ent) end
+		end
 	},
 	__call = function(p)
 		return setmetatable({
-            listeners = {}
-        }, p)
+			listeners = {}
+		}, p)
 	end
 }
 setmetatable(SF.GlobalCollisionListener, SF.GlobalCollisionListener)
@@ -125,57 +125,57 @@ local globalListeners = SF.GlobalCollisionListener()
 SF.InstanceCollisionListener = {
 	__index = {
 		add = function(self, ent, name, func)
-            local created = false
-            local listener = self.hooksPerEnt[ent]
-            if listener==nil then
-                collisionListenerLimit:checkuse(self.instance.player, 1)
-                listener = SF.HookTable()
-                listener.manager = self
-                listener.instance = self.instance
-                self.hooksPerEnt[ent] = listener
+			local created = false
+			local listener = self.hooksPerEnt[ent]
+			if listener==nil then
+				collisionListenerLimit:checkuse(self.instance.player, 1)
+				listener = SF.HookTable()
+				listener.manager = self
+				listener.instance = self.instance
+				self.hooksPerEnt[ent] = listener
 
-                globalListeners:add(listener)
-                created = true
-            elseif not listener:exists(name) then
-                collisionListenerLimit:checkuse(self.instance.player, 1)
-                created = true
-            end
+				globalListeners:add(listener)
+				created = true
+			elseif not listener:exists(name) then
+				collisionListenerLimit:checkuse(self.instance.player, 1)
+				created = true
+			end
 
-            listener:add(name, func)
+			listener:add(name, func)
 
-            if created then
-                collisionListenerLimit:free(self.instance.player, -1)
-            end
+			if created then
+				collisionListenerLimit:free(self.instance.player, -1)
+			end
 		end,
-        remove = function(self, ent, name)
-            local listener = self.hooksPerEnt[ent]
-            if listener and listener:exists(name) then
-                listener:remove(name)
-                collisionListenerLimit:free(self.instance.player, 1)
-                if listener:isEmpty() then
-                    globalListeners:remove(listener)
-                    self.hooksPerEnt[ent] = nil
-                end
-            end
-        end,
-        free = function(self, ent, listener)
-            collisionListenerLimit:free(self.instance.player, listener.n)
-            self.hooksPerEnt[ent] = nil
-        end,
-        destroy = function(self)
-            for ent, listener in pairs(self.hooksPerEnt) do
-                collisionListenerLimit:free(self.instance.player, listener.n)
-                self.hooksPerEnt[ent] = nil
+		remove = function(self, ent, name)
+			local listener = self.hooksPerEnt[ent]
+			if listener and listener:exists(name) then
+				listener:remove(name)
+				collisionListenerLimit:free(self.instance.player, 1)
+				if listener:isEmpty() then
+					globalListeners:remove(listener)
+					self.hooksPerEnt[ent] = nil
+				end
+			end
+		end,
+		free = function(self, ent, listener)
+			collisionListenerLimit:free(self.instance.player, listener.n)
+			self.hooksPerEnt[ent] = nil
+		end,
+		destroy = function(self)
+			for ent, listener in pairs(self.hooksPerEnt) do
+				collisionListenerLimit:free(self.instance.player, listener.n)
+				self.hooksPerEnt[ent] = nil
 
-                globalListeners:remove(listener)
-            end
-        end
+				globalListeners:remove(listener)
+			end
+		end
 	},
 	__call = function(p, instance)
 		return setmetatable({
-            instance = instance,
-            hooksPerEnt = {}
-        }, p)
+			instance = instance,
+			hooksPerEnt = {}
+		}, p)
 	end
 }
 setmetatable(SF.InstanceCollisionListener, SF.InstanceCollisionListener)
@@ -510,12 +510,12 @@ end
 -- @param string? name Optional name to distinguish multiple collision listeners and remove them individually later. (default: "")
 function ents_methods:addCollisionListener(func, name)
 	checkluatype(func, TYPE_FUNCTION)
-    if name ~= nil then checkluatype(name, TYPE_STRING) else name = "" end
+	if name ~= nil then checkluatype(name, TYPE_STRING) else name = "" end
 
 	local ent = getent(self)
 	checkpermission(instance, ent, "entities.canTool")
 
-    collisionListeners:add(ent, name, func)
+	collisionListeners:add(ent, name, func)
 end
 
 --- Removes a collision listener from the entity
@@ -526,7 +526,7 @@ function ents_methods:removeCollisionListener(name)
 	local ent = getent(self)
 	checkpermission(instance, ent, "entities.canTool")
 
-    collisionListeners:remove(ent, name)
+	collisionListeners:remove(ent, name)
 end
 
 --- Sets whether an entity's shadow should be drawn
@@ -637,11 +637,11 @@ end
 -- @param number? usetype The USE_ enum use type. (Default: USE_ON)
 -- @param number? value The use value (Default: 0)
 function ents_methods:use(usetype, value)
-    local ent = getent(self)
-    checkpermission(instance, ent, "entities.use")
-    if usetype~=nil then checkluatype(usetype, TYPE_NUMBER) end
-    if value~=nil then checkluatype(value, TYPE_NUMBER) end
-    ent:Use(instance.player, instance.entity, usetype, value)
+	local ent = getent(self)
+	checkpermission(instance, ent, "entities.use")
+	if usetype~=nil then checkluatype(usetype, TYPE_NUMBER) end
+	if value~=nil then checkluatype(value, TYPE_NUMBER) end
+	ent:Use(instance.player, instance.entity, usetype, value)
 end
 
 --- Sets the entity to be Solid or not.
@@ -1073,19 +1073,19 @@ end
 --- Returns a copy of the entity's sanitized internal glua table.
 -- @return table The entity's table.
 function ents_methods:getTable()
-    local ent = getent(self)
-    checkpermission(instance, ent, "entities.getTable")
-    return instance.Sanitize(ent:GetTable())
+	local ent = getent(self)
+	checkpermission(instance, ent, "entities.getTable")
+	return instance.Sanitize(ent:GetTable())
 end
 
 --- Returns a variable from the entity's internal glua table.
 -- @param string key The variable's key.
 -- @return any The variable.
 function ents_methods:getVar(key)
-    local ent = getent(self)
-    checkpermission(instance, ent, "entities.getTable")
-    local var = ent:GetVar(key)
-    return istable(var) and instance.Sanitize(var) or owrap(var)
+	local ent = getent(self)
+	checkpermission(instance, ent, "entities.getTable")
+	local var = ent:GetVar(key)
+	return istable(var) and instance.Sanitize(var) or owrap(var)
 end
 
 end
