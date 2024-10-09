@@ -6,9 +6,6 @@ local IsValid = FindMetaTable("Entity").IsValid
 local IsValidPhys = FindMetaTable("PhysObj").IsValid
 local isentity = isentity
 
-local huge = math.huge
-local abs = math.abs
-
 -- Register privileges
 registerprivilege("entities.applyDamage", "Apply damage", "Allows the user to apply damage to an entity", { entities = {} })
 registerprivilege("entities.applyForce", "Apply force", "Allows the user to apply force to an entity", { entities = {} })
@@ -40,7 +37,7 @@ SF.GlobalCollisionListeners = {
 	__index = {
 		create = function(self, ent)
 			local listenertable = {}
-		
+
 			local queue = {}
 			local nqueue = 0
 			local function collisionQueueProcess()
@@ -57,17 +54,17 @@ SF.GlobalCollisionListeners = {
 				end
 				nqueue = 0
 			end
-		
+
 			local function collisionQueueCallback(ent, data)
 				nqueue = nqueue + 1
 				queue[nqueue] = data
 				if nqueue==1 then timer.Simple(0, collisionQueueProcess) end
 			end
-		
+
 			if ent:IsScripted() then
 				local oldPhysicsCollide = ent.PhysicsCollide or base_physicscollide
 				ent.SF_OldPhysicsCollide = oldPhysicsCollide
-		
+
 				function ent:PhysicsCollide(data, phys)
 					oldPhysicsCollide(self, data, phys)
 					collisionQueueCallback(self, data)
@@ -94,7 +91,7 @@ SF.GlobalCollisionListeners = {
 				else
 					ent:RemoveCallback("PhysicsCollide", ent.SF_CollisionCallback)
 				end
-		
+
 				SF.RemoveCallOnRemove(ent, "RemoveCollisionListeners")
 			end
 		end,
