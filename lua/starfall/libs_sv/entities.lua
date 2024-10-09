@@ -48,7 +48,7 @@ SF.GlobalCollisionListeners = {
 					for _, listener in ipairs(listenertable) do
 						local instance = listener.instance
 						for i=1, nqueue do
-							listener:run(SF.StructWrapper(instance, queue[i], "CollisionData"))
+							listener:run(instance, SF.StructWrapper(instance, queue[i], "CollisionData"))
 						end
 					end
 				end
