@@ -1378,7 +1378,7 @@ do
 					typeToString(hashdata, value)
 				end
 			end
-			ss:write(hashdata:getString())
+			if nhash>0 then ss:write(hashdata:getString()) end
 
 			local curpos = ss.index
 			ss.index = sizeindex
