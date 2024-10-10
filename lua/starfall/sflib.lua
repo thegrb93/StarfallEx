@@ -1334,7 +1334,7 @@ do
 		local tableLoopupCtr = 1
 		local tableLookup = {}
 
-		local function typeToString(val)
+		local function typeToString(ss, val)
 			local func = typetostringfuncs[TypeID(val)]
 			if func then func(ss, val) else error("Invalid type " .. SF.GetType(val)) end
 		end
@@ -1354,22 +1354,40 @@ do
 			
 			local lookup = tableLookup[val]
 			if lookup then
-				ss:writeInt16(lookup)
+				ss:writeInt32(lookup)
 				return
 			end
-			
 			tableLookup[val] = tableLoopupCtr
 			tableLoopupCtr = tableLoopupCtr + 1
-			ss:writeInt16(tableLoopupCtr)
-			ss:writeInt16(table.Count(val))
-			
+			ss:writeInt32(tableLoopupCtr)
+
+			local narray = 1
+			local nhash = 0
+			local hashdata = SF.StringStream()
+			local sizeindex = ss.index
+			ss:writeInt32(0)
+			ss:writeInt32(0)
+
 			for key, value in pairs(val) do
-				typeToString(key)
-				typeToString(value)
+				if key==narray then
+					narray = narray + 1
+					typeToString(ss, value)
+				else
+					nhash = nhash + 1
+					typeToString(hashdata, key)
+					typeToString(hashdata, value)
+				end
 			end
+			ss:write(hashdata:getString())
+
+			local curpos = ss.index
+			ss.index = sizeindex
+			ss:writeInt32(narray - 1)
+			ss:writeInt32(nhash)
+			ss.index = curpos
 		end
 
-		typeToString(tbl)
+		typeToString(ss, tbl)
 		local ret = ss:getString()
 		ss, tableLookup = nil, nil
 		return ret
@@ -1395,7 +1413,7 @@ do
 		end
 
 		stringtotypefuncs[TYPE_TABLE] = function(ss)
-			local index = ss:readUInt16()
+			local index = ss:readUInt32()
 			local lookup = tableLookup[index]
 			if lookup then
 				return lookup
@@ -1404,7 +1422,13 @@ do
 			local t = {}
 			tableLookup[index] = t
 			
-			for i=1, ss:readUInt16() do
+			local narray = ss:readUInt32()
+			local nhash = ss:readUInt32()
+
+			for i=1, narray do
+				t[i] = stringToType()
+			end
+			for i=1, nhash do
 				local key, val = stringToType(), stringToType()
 				t[key] = val
 			end
