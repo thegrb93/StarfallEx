@@ -359,24 +359,24 @@ end
 -- @shared
 -- @param number index Whatever number you want the clip to be
 -- @param boolean enabled Whether the clip is enabled
--- @param Vector origin The center of the clip plane in world coordinates, or local to entity if it is specified
--- @param Vector normal The the direction of the clip plane in world coordinates, or local to entity if it is specified
--- @param Entity? entity (Optional) The entity to make coordinates local to, otherwise the world is used
+-- @param Vector? origin The center of the clip plane in world coordinates, or local to entity if it is specified. Only used if enabled.
+-- @param Vector? normal The the direction of the clip plane in world coordinates, or local to entity if it is specified. Only used if enabled.
+-- @param Entity? entity (Optional) The entity to make coordinates local to, otherwise the world is used. Only used if enabled.
 function hologram_methods:setClip(index, enabled, origin, normal, entity)
 	local holo = getholo(self)
 
 	checkluatype(index, TYPE_NUMBER)
 	checkluatype(enabled, TYPE_BOOL)
 
-	if entity ~= nil then
-		entity = getent(entity)
-	end
-
-	local origin, normal = vunwrap(origin), vunwrap(normal)
-
 	checkpermission(instance, holo, "hologram.setRenderProperty")
 
 	if enabled then
+		if entity ~= nil then
+			entity = getent(entity)
+		end
+
+		origin, normal = vunwrap(origin), vunwrap(normal)
+
 		local clips = holo.clips
 		if not clips[index] then
 			local max = maxclips:GetInt()
