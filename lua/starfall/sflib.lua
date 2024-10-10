@@ -1343,7 +1343,7 @@ do
 			if instance then
 				local unwrapped = instance.UnwrapObject(val)
 				if unwrapped then
-					typeToString(unwrapped)
+					typeToString(ss, unwrapped)
 					return
 				end
 			end
