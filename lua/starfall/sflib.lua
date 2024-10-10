@@ -909,6 +909,9 @@ do
 					self.pairs = self.dirtyPairs
 				end
 			end,
+			exists = function(self, index)
+				return self.hooks[index]~=nil or self.hookstoadd[index]~=nil
+			end,
 			isEmpty = function(self)
 				return self.n==0
 			end,

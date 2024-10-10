@@ -6,9 +6,6 @@ local IsValid = FindMetaTable("Entity").IsValid
 local IsValidPhys = FindMetaTable("PhysObj").IsValid
 local isentity = isentity
 
-local huge = math.huge
-local abs = math.abs
-
 -- Register privileges
 registerprivilege("entities.applyDamage", "Apply damage", "Allows the user to apply damage to an entity", { entities = {} })
 registerprivilege("entities.applyForce", "Apply force", "Allows the user to apply force to an entity", { entities = {} })
@@ -30,6 +27,163 @@ registerprivilege("entities.canTool", "CanTool", "Whether or not the user can us
 registerprivilege("entities.use", "Use", "Whether or not the user can use the entity", { entities = {} })
 registerprivilege("entities.getTable", "GetTable", "Allows the user to get an entity's table", { entities = {}, usergroups = { default = 1 } })
 
+local function table_find(tbl, val)
+	for i=1, #tbl do if tbl[i]==val then return i end end
+end
+
+local collisionListenerLimit = SF.LimitObject("collisionlistener", "collisionlistner", 128, "The number of concurrent starfall collision listeners")
+local base_physicscollide
+SF.GlobalCollisionListeners = {
+	__index = {
+		create = function(self, ent)
+			local listenertable = {}
+
+			local queue = {}
+			local nqueue = 0
+			local function collisionQueueProcess()
+				if IsValid(ent) then
+					for _, listener in ipairs(listenertable) do
+						local instance = listener.instance
+						for i=1, nqueue do
+							listener:run(instance, SF.StructWrapper(instance, queue[i], "CollisionData"))
+						end
+					end
+				end
+				for i=1, nqueue do
+					queue[i] = nil
+				end
+				nqueue = 0
+			end
+
+			local function collisionQueueCallback(ent, data)
+				nqueue = nqueue + 1
+				queue[nqueue] = data
+				if nqueue==1 then timer.Simple(0, collisionQueueProcess) end
+			end
+
+			if ent:IsScripted() then
+				local oldPhysicsCollide = ent.PhysicsCollide or base_physicscollide
+				ent.SF_OldPhysicsCollide = oldPhysicsCollide
+
+				function ent:PhysicsCollide(data, phys)
+					oldPhysicsCollide(self, data, phys)
+					collisionQueueCallback(self, data)
+				end
+			else
+				ent.SF_CollisionCallback = ent:AddCallback("PhysicsCollide", collisionQueueCallback)
+			end
+			SF.CallOnRemove(ent, "RemoveCollisionListeners", function(e) self:destroy(e) end)
+
+			self.listeners[ent] = listenertable
+			return listenertable
+		end,
+		destroy = function(self, ent)
+			local entlisteners = self.listeners[ent]
+			if entlisteners==nil then return end
+			self.listeners[ent] = nil
+			for _, listener in ipairs(entlisteners) do
+				listener.manager:free(ent)
+			end
+			if IsValid(ent) then
+				local oldPhysicsCollide = ent.SF_OldPhysicsCollide
+				if oldPhysicsCollide then
+					ent.PhysicsCollide = oldPhysicsCollide
+				else
+					ent:RemoveCallback("PhysicsCollide", ent.SF_CollisionCallback)
+				end
+
+				SF.RemoveCallOnRemove(ent, "RemoveCollisionListeners")
+			end
+		end,
+		add = function(self, ent, listener)
+			local entlisteners = self.listeners[ent]
+			if entlisteners == nil then
+				entlisteners = self:create(ent)
+			elseif table_find(entlisteners, listener) then
+				return
+			end
+			entlisteners[#entlisteners + 1] = listener
+		end,
+		remove = function(self, ent, listener)
+			local entlisteners = self.listeners[ent]
+			if entlisteners==nil then return end
+			local i = table_find(entlisteners, listener)
+			if i==nil then return end
+
+			entlisteners[i] = entlisteners[#entlisteners]
+			entlisteners[#entlisteners] = nil
+			if entlisteners[1]==nil then self:destroy(ent) end
+		end
+	},
+	__call = function(p)
+		return setmetatable({
+			listeners = {}
+		}, p)
+	end
+}
+setmetatable(SF.GlobalCollisionListeners, SF.GlobalCollisionListeners)
+local globalListeners = SF.GlobalCollisionListeners()
+
+SF.InstanceCollisionListeners = {
+	__index = {
+		add = function(self, ent, name, func)
+			local created = false
+			local listener = self.hooksPerEnt[ent]
+			if listener==nil then
+				collisionListenerLimit:checkuse(self.instance.player, 1)
+				listener = SF.HookTable()
+				listener.manager = self
+				listener.instance = self.instance
+				self.hooksPerEnt[ent] = listener
+
+				globalListeners:add(ent, listener)
+				created = true
+			elseif not listener:exists(name) then
+				collisionListenerLimit:checkuse(self.instance.player, 1)
+				created = true
+			end
+
+			listener:add(name, func)
+
+			if created then
+				collisionListenerLimit:free(self.instance.player, -1)
+			end
+		end,
+		remove = function(self, ent, name)
+			local listener = self.hooksPerEnt[ent]
+			if listener and listener:exists(name) then
+				listener:remove(name)
+				collisionListenerLimit:free(self.instance.player, 1)
+				if listener:isEmpty() then
+					self.hooksPerEnt[ent] = nil
+					globalListeners:remove(ent, listener)
+				end
+			end
+		end,
+		free = function(self, ent)
+			local listener = self.hooksPerEnt[ent]
+			if listener then
+				collisionListenerLimit:free(self.instance.player, listener.n)
+				self.hooksPerEnt[ent] = nil
+			end
+		end,
+		destroy = function(self)
+			for ent, listener in pairs(self.hooksPerEnt) do
+				collisionListenerLimit:free(self.instance.player, listener.n)
+				self.hooksPerEnt[ent] = nil
+				globalListeners:remove(ent, listener)
+			end
+		end
+	},
+	__call = function(p, instance)
+		return setmetatable({
+			instance = instance,
+			hooksPerEnt = {}
+		}, p)
+	end
+}
+setmetatable(SF.InstanceCollisionListeners, SF.InstanceCollisionListeners)
+
 local function checkvector(v)
 	if v[1]<-1e12 or v[1]>1e12 or v[1]~=v[1] or
 	   v[2]<-1e12 or v[2]>1e12 or v[2]~=v[2] or
@@ -39,9 +193,7 @@ local function checkvector(v)
 	end
 end
 
-
 return function(instance)
-local base_physicscollide = baseclass.Get("base_gmodentity").PhysicsCollide
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
@@ -50,22 +202,16 @@ local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local cunwrap = instance.Types.Color.Unwrap
 
+local collisionListeners = SF.InstanceCollisionListeners(instance)
+base_physicscollide = baseclass.Get("base_gmodentity").PhysicsCollide
+
 local getent
-local collisionlisteners = {}
 instance:AddHook("initialize", function()
 	getent = ent_meta.GetEntity
 end)
+
 instance:AddHook("deinitialize", function()
-	for ent in pairs(collisionlisteners) do
-		if IsValid(ent) then
-			if ent:IsScripted() then
-				ent.PhysicsCollide = base_physicscollide
-			else
-				ent:RemoveCallback("PhysicsCollide", ent.SF_CollisionCallback)
-				ent.SF_CollisionCallback = nil
-			end
-		end
-	end
+	collisionListeners:destroy()
 end)
 
 -- ------------------------- Methods ------------------------- --
@@ -363,53 +509,28 @@ function ents_methods:applyTorque(torque)
 	phys:ApplyTorqueCenter(torque)
 end
 
-local entity_collisions = {}
-local function addCollisions(func)
-	return function(data)
-		if next(entity_collisions)==nil then
-			timer.Simple(0, function()
-				for i=1, #entity_collisions do
-					instance:runFunction(func, SF.StructWrapper(instance, entity_collisions[i], "CollisionData"))
-					entity_collisions[i] = nil
-				end
-			end)
-		end
-		entity_collisions[#entity_collisions+1] = data
-	end
-end
---- Allows detecting collisions on an entity. You can only do this once for the entity's entire lifespan so use it wisely.
+--- Allows detecting collisions on an entity.
 -- @param function func The callback function with argument, table collsiondata, http://wiki.facepunch.com/gmod/Structures/CollisionData
-function ents_methods:addCollisionListener(func)
-	local ent = getent(self)
-	if collisionlisteners[ent] then SF.Throw("The entity is already listening to collisions!", 2) end
-
+-- @param string? name Optional name to distinguish multiple collision listeners and remove them individually later. (default: "")
+function ents_methods:addCollisionListener(func, name)
 	checkluatype(func, TYPE_FUNCTION)
+	if name ~= nil then checkluatype(name, TYPE_STRING) else name = "" end
+
+	local ent = getent(self)
 	checkpermission(instance, ent, "entities.canTool")
 
-	local callback = addCollisions(func)
-	if ent:IsScripted() then
-		if ent.PhysicsCollide ~= base_physicscollide and ent.PhysicsCollide ~= nil then SF.Throw("The entity is already listening to collisions!", 2) end
-		function ent:PhysicsCollide( data, phys ) callback(data) end
-	else
-		ent.SF_CollisionCallback = ent:AddCallback("PhysicsCollide", function(ent, data) callback(data) end)
-	end
-	collisionlisteners[ent] = true
+	collisionListeners:add(ent, name, func)
 end
 
---- Removes a collision listening hook from the entity so that a new one can be added
-function ents_methods:removeCollisionListener()
-	local ent = getent(self)
-	if not collisionlisteners[ent] then SF.Throw("The entity isn't listening to collisions!", 2) end
+--- Removes a collision listener from the entity
+-- @param string? name The name of the collision listener to remove. (default: "")
+function ents_methods:removeCollisionListener(name)
+	if name ~= nil then checkluatype(name, TYPE_STRING) else name = "" end
 
+	local ent = getent(self)
 	checkpermission(instance, ent, "entities.canTool")
 
-	if ent:IsScripted() then
-		ent.PhysicsCollide = base_physicscollide
-	else
-		ent:RemoveCallback("PhysicsCollide", ent.SF_CollisionCallback)
-		ent.SF_CollisionCallback = nil
-	end
-	collisionlisteners[ent] = nil
+	collisionListeners:remove(ent, name)
 end
 
 --- Sets whether an entity's shadow should be drawn
@@ -520,11 +641,11 @@ end
 -- @param number? usetype The USE_ enum use type. (Default: USE_ON)
 -- @param number? value The use value (Default: 0)
 function ents_methods:use(usetype, value)
-    local ent = getent(self)
-    checkpermission(instance, ent, "entities.use")
-    if usetype~=nil then checkluatype(usetype, TYPE_NUMBER) end
-    if value~=nil then checkluatype(value, TYPE_NUMBER) end
-    ent:Use(instance.player, instance.entity, usetype, value)
+	local ent = getent(self)
+	checkpermission(instance, ent, "entities.use")
+	if usetype~=nil then checkluatype(usetype, TYPE_NUMBER) end
+	if value~=nil then checkluatype(value, TYPE_NUMBER) end
+	ent:Use(instance.player, instance.entity, usetype, value)
 end
 
 --- Sets the entity to be Solid or not.
@@ -956,19 +1077,19 @@ end
 --- Returns a copy of the entity's sanitized internal glua table.
 -- @return table The entity's table.
 function ents_methods:getTable()
-    local ent = getent(self)
-    checkpermission(instance, ent, "entities.getTable")
-    return instance.Sanitize(ent:GetTable())
+	local ent = getent(self)
+	checkpermission(instance, ent, "entities.getTable")
+	return instance.Sanitize(ent:GetTable())
 end
 
 --- Returns a variable from the entity's internal glua table.
 -- @param string key The variable's key.
 -- @return any The variable.
 function ents_methods:getVar(key)
-    local ent = getent(self)
-    checkpermission(instance, ent, "entities.getTable")
-    local var = ent:GetVar(key)
-    return istable(var) and instance.Sanitize(var) or owrap(var)
+	local ent = getent(self)
+	checkpermission(instance, ent, "entities.getTable")
+	local var = ent:GetVar(key)
+	return istable(var) and instance.Sanitize(var) or owrap(var)
 end
 
 end
