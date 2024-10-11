@@ -1401,10 +1401,10 @@ do
 	stringtotypefuncs[TYPE_TABLE] = function(ss)
 		local t = {}
 		for i=1, ss:readUInt32() do
-			t[i] = stringToType()
+			t[i] = stringToType(ss)
 		end
 		for i=1, ss:readUInt32() do
-			local key, val = stringToType(), stringToType()
+			local key, val = stringToType(ss), stringToType(ss)
 			t[key] = val
 		end
 		tableLookup[#tableLookup + 1] = t
@@ -1416,7 +1416,7 @@ do
 	stringtotypefuncs[TYPE_TABLESEQ] = function(ss)
 		local t = {}
 		for i=1, ss:readUInt32() do
-			t[i] = stringToType()
+			t[i] = stringToType(ss)
 		end
 		tableLookup[#tableLookup + 1] = t
 		return t
@@ -1424,7 +1424,7 @@ do
 	stringtotypefuncs[TYPE_TABLEHASH] = function(ss)
 		local t = {}
 		for i=1, ss:readUInt32() do
-			local key, val = stringToType(), stringToType()
+			local key, val = stringToType(ss), stringToType(ss)
 			t[key] = val
 		end
 		tableLookup[#tableLookup + 1] = t
