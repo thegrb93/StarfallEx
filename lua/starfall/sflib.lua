@@ -1316,7 +1316,7 @@ do
 		typetostringfuncs[TypeID(val)](ss, val)
 	end
 
-	for i=1, 64 do typetostringfuncs[i] = function(ss, x) error("Invalid type " .. SF.GetType(x)) end
+	for i=1, 64 do typetostringfuncs[i] = function(ss, x) error("Invalid type " .. SF.GetType(x)) end end
 	typetostringfuncs[TYPE_NUMBER] = function(ss, x) ss:writeInt8(TYPE_NUMBER) ss:writeDouble(x) end
 	typetostringfuncs[TYPE_STRING] = function(ss, x) ss:writeInt8(TYPE_STRING) ss:writeInt32(#x) ss:write(x) end
 	typetostringfuncs[TYPE_BOOL] = function(ss, x) ss:writeInt8(TYPE_BOOL) ss:writeInt8(x and 1 or 0) end
@@ -1385,7 +1385,7 @@ do
 	local stringtotypefuncs = {}
 	local stringToType
 
-	for i=1, 64 do stringtotypefuncs[i] = function(ss, x) error("Invalid type " .. i) end
+	for i=1, 64 do stringtotypefuncs[i] = function(ss, x) error("Invalid type " .. i) end end
 	stringtotypefuncs[TYPE_NUMBER] = function(ss) return ss:readDouble() end
 	stringtotypefuncs[TYPE_STRING] = function(ss) return ss:read(ss:readUInt32()) end
 	stringtotypefuncs[TYPE_BOOL] = function(ss) return ss:readUInt8() == 1 end
