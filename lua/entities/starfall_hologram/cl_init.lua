@@ -126,6 +126,10 @@ function ENT:OnSuppressEngineLightingChanged()
 	self.renderstack:makeDirty()
 end
 
+function ENT:OnCullModeChanged()
+	self.renderstack:makeDirty()
+end
+
 function ENT:OnRenderGroupChanged(name, old, group)
 	if group == -1 then
 		self.RenderGroup = nil
