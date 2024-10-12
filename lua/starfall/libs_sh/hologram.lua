@@ -500,6 +500,22 @@ function hologram_methods:setCullMode(mode)
 	holo:SetCullMode(mode==1)
 end
 
+--- Set the render group for a hologram.
+-- @shared
+-- @param number|nil group Render group. If unset, the engine will decide the render group based on the entity's materials.
+function hologram_methods:setRenderGroup(group)
+	local holo = getholo(self)
+	checkpermission(instance, holo, "entities.setRenderProperty")
+	
+	if group then
+		checkluatype(group, TYPE_NUMBER)
+
+		holo:SetRenderGroupInternal(group)
+	else
+		holo:SetRenderGroupInternal(-1)
+	end
+end
+
 --- Applies engine effects to the hologram
 -- @shared
 -- @param number effect The effects to add. See EF Enums

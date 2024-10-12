@@ -19,6 +19,7 @@ function ENT:Initialize()
 	self:SetPlayerColorInternal(VECTOR_PLAYER_COLOR_DISABLED)
 	self:SetSuppressEngineLighting(false)
 	self:SetCullMode(false)
+	self:SetRenderGroupInternal(-1)
 
 	self.updateClip = false
 	self.AutomaticFrameAdvance = false
