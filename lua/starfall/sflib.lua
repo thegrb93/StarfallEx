@@ -1305,6 +1305,12 @@ do
 	local TYPE_TABLEREF = 50
 	local TYPE_TABLESEQ = 51
 	local TYPE_TABLEHASH = 52
+	local TYPE_NUMBER8 = 53
+	local TYPE_NUMBER8NEG = 54
+	local TYPE_NUMBER16 = 55
+	local TYPE_NUMBER16NEG = 56
+	local TYPE_NUMBER32 = 57
+	local TYPE_NUMBER32NEG = 58
 	
 	local pairs_ = nil
 	local instance_ = nil
@@ -1317,7 +1323,19 @@ do
 	end
 
 	for i=1, 64 do typetostringfuncs[i] = function(ss, x) error("Invalid type " .. SF.GetType(x)) end end
-	typetostringfuncs[TYPE_NUMBER] = function(ss, x) ss:writeInt8(TYPE_NUMBER) ss:writeDouble(x) end
+	typetostringfuncs[TYPE_NUMBER] = function(ss, x)
+		if math.floor(x)==x then
+			local typeoffset
+			if x<0 then typeoffset = 1 x = -x else typeoffset = 0 end
+			if x<0x100 then ss:writeInt8(TYPE_NUMBER8 + typeoffset) ss:writeInt8(x)
+			elseif x<0x10000 then ss:writeInt8(TYPE_NUMBER16 + typeoffset) ss:writeInt16(x)
+			elseif x<0x100000000 then ss:writeInt8(TYPE_NUMBER32 + typeoffset) ss:writeInt32(x)
+			else ss:writeInt8(TYPE_NUMBER) ss:writeDouble(x)
+			end
+		else
+			ss:writeInt8(TYPE_NUMBER) ss:writeDouble(x)
+		end
+	end
 	typetostringfuncs[TYPE_STRING] = function(ss, x) ss:writeInt8(TYPE_STRING) ss:writeInt32(#x) ss:write(x) end
 	typetostringfuncs[TYPE_BOOL] = function(ss, x) ss:writeInt8(TYPE_BOOL) ss:writeInt8(x and 1 or 0) end
 	typetostringfuncs[TYPE_ENTITY] = function(ss, x) ss:writeInt8(TYPE_ENTITY) ss:writeInt16(x:EntIndex()) end
@@ -1430,6 +1448,12 @@ do
 		tableLookup[#tableLookup + 1] = t
 		return t
 	end
+	stringtotypefuncs[TYPE_NUMBER8] = function(ss) return ss:readUInt8() end
+	stringtotypefuncs[TYPE_NUMBER8NEG] = function(ss) return -ss:readUInt8() end
+	stringtotypefuncs[TYPE_NUMBER16] = function(ss) return ss:readUInt16() end
+	stringtotypefuncs[TYPE_NUMBER16NEG] = function(ss) return -ss:readUInt16() end
+	stringtotypefuncs[TYPE_NUMBER32] = function(ss) return ss:readUInt32() end
+	stringtotypefuncs[TYPE_NUMBER32NEG] = function(ss) return -ss:readUInt32() end
 	
 	--- Convert table to string data.
 	-- Only works with strings, numbers, tables, bools, 
