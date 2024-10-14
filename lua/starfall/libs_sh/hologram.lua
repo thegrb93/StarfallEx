@@ -510,7 +510,7 @@ function hologram_methods:setRenderGroup(group)
 	if group then
 		checkluatype(group, TYPE_NUMBER)
 
-		holo:SetRenderGroupInternal(group)
+		holo:SetRenderGroupInternal(math.Truncate(group))
 	else
 		holo:SetRenderGroupInternal(-1)
 	end
