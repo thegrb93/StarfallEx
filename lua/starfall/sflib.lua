@@ -1494,7 +1494,7 @@ do
 			end
 		end
 
-		local ret = stringToType(SF.StringStream(str))
+		local ret = stringToType()
 		tableLookup = nil
 		ss = nil
 		return ret
