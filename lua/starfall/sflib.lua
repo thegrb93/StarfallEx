@@ -1359,7 +1359,7 @@ do
 
 		local nseq = 1
 		local nhash = 0
-		for key, value in pairs_(val) do
+		for key, value in pairs(val) do
 			if key==nseq then nseq = nseq + 1
 			else nhash = nhash + 1
 			end
