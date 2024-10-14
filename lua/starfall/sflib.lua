@@ -1481,7 +1481,7 @@ do
 	function SF.StringToTable(str, instance)
 		instance_ = instance
 		tableLookup = {}
-		ss = SF.StringStream()
+		ss = SF.StringStream(str)
 
 		if instance then
 			function stringToType()
