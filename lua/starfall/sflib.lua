@@ -1319,7 +1319,8 @@ do
 		typetostringfuncs[TypeID(val)](val)
 	end
 
-	for i=1, 64 do typetostringfuncs[i] = function(x) error("Invalid type " .. SF.GetType(x)) end end
+	local function errorType(x) error("Invalid type " .. SF.GetType(x)) end
+	for i=0, 255 do typetostringfuncs[i] = errorType end
 	typetostringfuncs[TYPE_NUMBER] = function(x)
 		if math.floor(x)==x then
 			local typeoffset
@@ -1408,7 +1409,8 @@ do
 	local stringtotypefuncs = {}
 	local stringToType
 
-	for i=1, 64 do stringtotypefuncs[i] = function() error("Invalid type " .. i) end end
+	local function errorType() error("Invalid type while decoding!") end
+	for i=0, 255 do stringtotypefuncs[i] = errorType end
 	stringtotypefuncs[TYPE_NUMBER] = function() return ss:readDouble() end
 	stringtotypefuncs[TYPE_STRING] = function() return ss:read(ss:readUInt32()) end
 	stringtotypefuncs[TYPE_BOOL] = function() return ss:readUInt8() == 1 end
