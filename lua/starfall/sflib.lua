@@ -1302,117 +1302,203 @@ end
 
 -- Table networking
 do
-	local typetostringfuncs = {
-		[TYPE_NUMBER] = function(ss, x) ss:writeInt8(TYPE_NUMBER) ss:writeDouble(x) end,
-		[TYPE_STRING] = function(ss, x) ss:writeInt8(TYPE_STRING) ss:writeInt32(#x) ss:write(x) end,
-		[TYPE_BOOL] = function(ss, x) ss:writeInt8(TYPE_BOOL) ss:writeInt8(x and 1 or 0) end,
-		[TYPE_ENTITY] = function(ss, x) ss:writeInt8(TYPE_ENTITY) ss:writeInt16(x:EntIndex()) end,
-		[TYPE_VECTOR] = function(ss, x) ss:writeInt8(TYPE_VECTOR) for i=1, 3 do ss:writeFloat(x[i]) end end,
-		[TYPE_ANGLE] = function(ss, x) ss:writeInt8(TYPE_ANGLE) for i=1, 3 do ss:writeFloat(x[i]) end end,
-		[TYPE_COLOR] = function(ss, x) ss:writeInt8(TYPE_COLOR) ss:writeInt8(x.r) ss:writeInt8(x.g) ss:writeInt8(x.b) ss:writeInt8(x.a) end,
-		[TYPE_MATRIX] = function(ss, x) ss:writeInt8(TYPE_MATRIX) for k, v in ipairs{x:Unpack()} do ss:writeFloat(v) end end,
-	}
-	local stringtotypefuncs = {
-		[TYPE_NUMBER] = function(ss) return ss:readDouble() end,
-		[TYPE_STRING] = function(ss) return ss:read(ss:readUInt32()) end,
-		[TYPE_BOOL] = function(ss) return ss:readUInt8() == 1 end,
-		[TYPE_ENTITY] = function(ss) return Entity(ss:readUInt16()) end,
-		[TYPE_VECTOR] = function(ss) return Vector(ss:readFloat(), ss:readFloat(), ss:readFloat()) end,
-		[TYPE_ANGLE] = function(ss) return Angle(ss:readFloat(), ss:readFloat(), ss:readFloat()) end,
-		[TYPE_COLOR] = function(ss) return Color(ss:readUInt8(), ss:readUInt8(), ss:readUInt8(), ss:readUInt8()) end,
-		[TYPE_MATRIX] = function(ss)
-			local t = {} for i=1, 16 do t[i] = ss:readFloat() end
-			local m = Matrix() m:SetUnpacked(unpack(t))
-			return m
-		end,
-	}
+	local TYPE_TABLEREF = 50
+	local TYPE_TABLESEQ = 51
+	local TYPE_TABLEHASH = 52
+	local TYPE_NUMBER8 = 53
+	local TYPE_NUMBER8NEG = 54
+	local TYPE_NUMBER16 = 55
+	local TYPE_NUMBER16NEG = 56
+	local TYPE_NUMBER32 = 57
+	local TYPE_NUMBER32NEG = 58
+	
+	local pairs_, instance_, tableLoopupCtr, tableLookup, ss
+
+	local typetostringfuncs = {}
+	local function typeToString(val)
+		typetostringfuncs[TypeID(val)](val)
+	end
+
+	local function errorType(x) error("Invalid type " .. SF.GetType(x)) end
+	for i=0, 255 do typetostringfuncs[i] = errorType end
+	typetostringfuncs[TYPE_NUMBER] = function(x)
+		if math.floor(x)==x then
+			local typeoffset
+			if x<0 then typeoffset = 1 x = -x else typeoffset = 0 end
+			if x<0x100 then ss:writeInt8(TYPE_NUMBER8 + typeoffset) ss:writeInt8(x)
+			elseif x<0x10000 then ss:writeInt8(TYPE_NUMBER16 + typeoffset) ss:writeInt16(x)
+			elseif x<0x100000000 then ss:writeInt8(TYPE_NUMBER32 + typeoffset) ss:writeInt32(x)
+			else ss:writeInt8(TYPE_NUMBER) ss:writeDouble(x)
+			end
+		else
+			ss:writeInt8(TYPE_NUMBER) ss:writeDouble(x)
+		end
+	end
+	typetostringfuncs[TYPE_STRING] = function(x) ss:writeInt8(TYPE_STRING) ss:writeInt32(#x) ss:write(x) end
+	typetostringfuncs[TYPE_BOOL] = function(x) ss:writeInt8(TYPE_BOOL) ss:writeInt8(x and 1 or 0) end
+	typetostringfuncs[TYPE_ENTITY] = function(x) ss:writeInt8(TYPE_ENTITY) ss:writeInt16(x:EntIndex()) end
+	typetostringfuncs[TYPE_VECTOR] = function(x) ss:writeInt8(TYPE_VECTOR) for i=1, 3 do ss:writeFloat(x[i]) end end
+	typetostringfuncs[TYPE_ANGLE] = function(x) ss:writeInt8(TYPE_ANGLE) for i=1, 3 do ss:writeFloat(x[i]) end end
+	typetostringfuncs[TYPE_COLOR] = function(x) ss:writeInt8(TYPE_COLOR) ss:writeInt8(x.r) ss:writeInt8(x.g) ss:writeInt8(x.b) ss:writeInt8(x.a) end
+	typetostringfuncs[TYPE_MATRIX] = function(x) ss:writeInt8(TYPE_MATRIX) for k, v in ipairs{x:Unpack()} do ss:writeFloat(v) end end
+	typetostringfuncs[TYPE_TABLE] = function(val)
+		if instance_ then
+			local unwrapped = instance_.UnwrapObject(val)
+			if unwrapped then return typeToString(unwrapped) end
+		end
+
+		if IsColor(val) then return typetostringfuncs[TYPE_COLOR](val) end
+
+		local lookup = tableLookup[val]
+		if lookup then
+			ss:writeInt8(TYPE_TABLEREF)
+			ss:writeInt32(lookup)
+			return
+		end
+		tableLookup[val] = tableLoopupCtr
+		tableLoopupCtr = tableLoopupCtr + 1
+
+		local nseq = 1
+		local nhash = 0
+		for key, value in pairs(val) do
+			if key==nseq then nseq = nseq + 1
+			else nhash = nhash + 1
+			end
+		end
+
+		if nseq>1 then
+			if nhash>0 then
+				ss:writeInt8(TYPE_TABLE)
+				ss:writeInt32(nseq - 1)
+				for i=1, nseq-1 do
+					typeToString(val[i])
+				end
+				nseq = 1
+				ss:writeInt32(nhash)
+				for key, value in pairs_(val) do
+					if key==nseq then nseq = nseq + 1 else
+						typeToString(key)
+						typeToString(value)
+					end
+				end
+			else
+				ss:writeInt8(TYPE_TABLESEQ)
+				ss:writeInt32(nseq - 1)
+				for i=1, nseq-1 do
+					typeToString(val[i])
+				end
+			end
+		else
+			if nhash>0 then
+				ss:writeInt8(TYPE_TABLEHASH)
+				nseq = 1
+				ss:writeInt32(nhash)
+				for key, value in pairs_(val) do
+					if key==nseq then nseq = nseq + 1 else
+						typeToString(key)
+						typeToString(value)
+					end
+				end
+			else
+				ss:writeInt8(TYPE_TABLESEQ)
+				ss:writeInt32(0)
+			end
+		end
+	end
+
+	local stringtotypefuncs = {}
+	local stringToType
+
+	local function errorType() error("Invalid type while decoding!") end
+	for i=0, 255 do stringtotypefuncs[i] = errorType end
+	stringtotypefuncs[TYPE_NUMBER] = function() return ss:readDouble() end
+	stringtotypefuncs[TYPE_STRING] = function() return ss:read(ss:readUInt32()) end
+	stringtotypefuncs[TYPE_BOOL] = function() return ss:readUInt8() == 1 end
+	stringtotypefuncs[TYPE_ENTITY] = function() return Entity(ss:readUInt16()) end
+	stringtotypefuncs[TYPE_VECTOR] = function() return Vector(ss:readFloat(), ss:readFloat(), ss:readFloat()) end
+	stringtotypefuncs[TYPE_ANGLE] = function() return Angle(ss:readFloat(), ss:readFloat(), ss:readFloat()) end
+	stringtotypefuncs[TYPE_COLOR] = function() return Color(ss:readUInt8(), ss:readUInt8(), ss:readUInt8(), ss:readUInt8()) end
+	stringtotypefuncs[TYPE_MATRIX] = function()
+		local t = {} for i=1, 16 do t[i] = ss:readFloat() end
+		local m = Matrix() m:SetUnpacked(unpack(t))
+		return m
+	end
+	stringtotypefuncs[TYPE_TABLE] = function()
+		local t = {}
+		for i=1, ss:readUInt32() do
+			t[i] = stringToType()
+		end
+		for i=1, ss:readUInt32() do
+			local key, val = stringToType(), stringToType()
+			t[key] = val
+		end
+		tableLookup[#tableLookup + 1] = t
+		return t
+	end
+	stringtotypefuncs[TYPE_TABLEREF] = function()
+		return tableLookup[ss:readUInt32()]
+	end
+	stringtotypefuncs[TYPE_TABLESEQ] = function()
+		local t = {}
+		for i=1, ss:readUInt32() do
+			t[i] = stringToType()
+		end
+		tableLookup[#tableLookup + 1] = t
+		return t
+	end
+	stringtotypefuncs[TYPE_TABLEHASH] = function()
+		local t = {}
+		for i=1, ss:readUInt32() do
+			local key, val = stringToType(), stringToType()
+			t[key] = val
+		end
+		tableLookup[#tableLookup + 1] = t
+		return t
+	end
+	stringtotypefuncs[TYPE_NUMBER8] = function() return ss:readUInt8() end
+	stringtotypefuncs[TYPE_NUMBER8NEG] = function() return -ss:readUInt8() end
+	stringtotypefuncs[TYPE_NUMBER16] = function() return ss:readUInt16() end
+	stringtotypefuncs[TYPE_NUMBER16NEG] = function() return -ss:readUInt16() end
+	stringtotypefuncs[TYPE_NUMBER32] = function() return ss:readUInt32() end
+	stringtotypefuncs[TYPE_NUMBER32NEG] = function() return -ss:readUInt32() end
+	
 	--- Convert table to string data.
 	-- Only works with strings, numbers, tables, bools, 
 	function SF.TableToString(tbl, instance, sorted)
-		local pairs = sorted and SortedPairs or pairs
-		local ss = SF.StringStream()
-		local tableLoopupCtr = 1
-		local tableLookup = {}
-
-		local function typeToString(val)
-			local func = typetostringfuncs[TypeID(val)]
-			if func then func(ss, val) else error("Invalid type " .. SF.GetType(val)) end
-		end
-
-		typetostringfuncs[TYPE_TABLE] = function(ss, val)
-			if instance then
-				local unwrapped = instance.UnwrapObject(val)
-				if unwrapped then
-					typeToString(unwrapped)
-					return
-				end
-			end
-
-			if IsColor(val) then return typetostringfuncs[TYPE_COLOR](ss, val) end
-			
-			ss:writeInt8(TYPE_TABLE)
-			
-			local lookup = tableLookup[val]
-			if lookup then
-				ss:writeInt16(lookup)
-				return
-			end
-			
-			tableLookup[val] = tableLoopupCtr
-			tableLoopupCtr = tableLoopupCtr + 1
-			ss:writeInt16(tableLoopupCtr)
-			ss:writeInt16(table.Count(val))
-			
-			for key, value in pairs(val) do
-				typeToString(key)
-				typeToString(value)
-			end
-		end
+		pairs_ = sorted and SortedPairs or pairs
+		instance_ = instance
+		tableLoopupCtr = 1
+		tableLookup = {}
+		ss = SF.StringStream()
 
 		typeToString(tbl)
+
 		local ret = ss:getString()
-		ss, tableLookup = nil, nil
+		tableLookup = nil
+		ss = nil
 		return ret
 	end
 
 	--- Convert string data to table
 	function SF.StringToTable(str, instance)
-		local ss = SF.StringStream(str)
-		local tableLookup = {}
+		instance_ = instance
+		tableLookup = {}
+		ss = SF.StringStream(str)
 
-		local stringToType
 		if instance then
 			function stringToType()
-				local t = ss:readUInt8()
-				local val = (stringtotypefuncs[t] or error("Invalid type " .. t))(ss)
+				local val = stringtotypefuncs[ss:readUInt8()]()
 				return instance.WrapObject(val) or val
 			end
 		else
 			function stringToType()
-				local t = ss:readUInt8()
-				return (stringtotypefuncs[t] or error("Invalid type " .. t))(ss)
+				return stringtotypefuncs[ss:readUInt8()]()
 			end
-		end
-
-		stringtotypefuncs[TYPE_TABLE] = function(ss)
-			local index = ss:readUInt16()
-			local lookup = tableLookup[index]
-			if lookup then
-				return lookup
-			end
-			
-			local t = {}
-			tableLookup[index] = t
-			
-			for i=1, ss:readUInt16() do
-				local key, val = stringToType(), stringToType()
-				t[key] = val
-			end
-			return t
 		end
 
 		local ret = stringToType()
-		ss, tableLookup = nil, nil
+		tableLookup = nil
+		ss = nil
 		return ret
 	end
 end
