@@ -853,41 +853,23 @@ end
 function math_library.slerpQuaternion(quat1, quat2, t)
 	checkluatype(t, TYPE_NUMBER)
 
-        local dot = getQuatDot(q0, q1)
+	if getQuatLenSqr(quat1) == 0 then
+		return wrap({ 0, 0, 0, 0})
+	else
+		local new = clone(quat2)
+		if getQuatDot(quat1, quat2) < 0 then
+			quatFlip(new)
+		end
 
-        if dot < 0 then
-            q1 = {-q1[1], -q1[2], -q1[3], -q1[4]}
-            dot = -dot
-        end
-        
-        -- Really small theta, transcendental functions approximate to linear
-        if dot > 0.9995 then
-            local lerped = wrap({
-                q0[1] + t*(q1[1] - q0[1]),
-                q0[2] + t*(q1[2] - q0[2]),
-                q0[3] + t*(q1[3] - q0[3]),
-                q0[4] + t*(q1[4] - q0[4]),
-            })
-            quatNorm(lerped)
-            return lerped
-        end
-    
-        local theta_0 = math_acos(dot)
-        local theta = theta_0*t
-        local sin_theta = math_sin(theta)
-        local sin_theta_0 = math_sin(theta_0)
-    
-        local s0 = math_cos(theta) - dot * sin_theta / sin_theta_0
-        local s1 = sin_theta / sin_theta_0
-    
-        local slerped = wrap({
-            q0[1]*s0 + q1[1]*s1,
-            q0[2]*s0 + q1[2]*s1,
-            q0[3]*s0 + q1[3]*s1,
-            q0[4]*s0 + q1[4]*s1,
-        })
-        quatNorm(slerped)
-        return slerped
+		local out = clone(quat1)
+		quatInv(out)
+		out = getQuatMul(out, new)
+		quatLog(out)
+		quatMulNum(out, t)
+		quatExp(out)
+
+		return wrap(getQuatMul(quat1, out))
+	end
 end
 
 --- Performs normalized linear interpolation between two quaternions
