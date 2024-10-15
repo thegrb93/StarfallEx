@@ -294,8 +294,7 @@ if CLIENT then
 	-- @client
 	-- @return number Render group
 	function ents_methods:getRenderGroup()
-		local ent = getent(self)
-		return ent:GetRenderGroup()
+		return getent(self):GetRenderGroup()
 	end
 end
 
