@@ -863,7 +863,6 @@ function math_library.slerpQuaternion(quat1, quat2, t)
 
 		local out = clone(quat1)
 		quatInv(out)
-		quatConj(out)
 		out = getQuatMul(out, new)
 		quatLog(out)
 		quatMulNum(out, t)
