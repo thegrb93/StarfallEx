@@ -1,7 +1,5 @@
 include("shared.lua")
 
-ENT.RenderGroup = RENDERGROUP_BOTH
-
 function ENT:Initialize()
 	self.BaseClass.Initialize(self)
 
