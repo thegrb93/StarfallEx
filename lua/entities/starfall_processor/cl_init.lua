@@ -2,8 +2,6 @@ include("shared.lua")
 
 DEFINE_BASECLASS("base_gmodentity")
 
-ENT.RenderGroup = RENDERGROUP_BOTH
-
 local IsValid = FindMetaTable("Entity").IsValid
 local IsWorld = FindMetaTable("Entity").IsWorld
 
