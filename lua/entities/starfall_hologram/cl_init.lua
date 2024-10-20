@@ -185,12 +185,17 @@ end)
 
 -- For when the hologram matrix gets cleared
 hook.Add("NetworkEntityCreated", "starfall_hologram_rescale", function(holo)
-	if holo.IsSFHologram and holo.HoloMatrix then
-		holo:EnableMatrix("RenderMultiply", holo.HoloMatrix)
-	end
-	local sf_userrenderbounds = holo.sf_userrenderbounds
-	if sf_userrenderbounds then
-		holo:SetRenderBounds(sf_userrenderbounds[1], sf_userrenderbounds[2])
+	if holo.IsSFHologram then
+		if holo.HoloMatrix then
+			holo:EnableMatrix("RenderMultiply", holo.HoloMatrix)
+		end
+			
+		local sf_userrenderbounds = holo.sf_userrenderbounds
+		if sf_userrenderbounds then
+			holo:SetRenderBounds(sf_userrenderbounds[1], sf_userrenderbounds[2])
+		else
+			holo:OnScaleChanged(nil, nil, holo:GetScale())
+		end
 	end
 end)
 
