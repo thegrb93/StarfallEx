@@ -60,6 +60,11 @@ function ENT:Use(activator)
 			net.WriteEntity(activator)
 		net.Broadcast()
 	end
+
+	local instance = self.instance
+	if instance then
+		instance:runScriptHook("starfallused", instance.WrapObject(activator), instance.WrapObject(self))
+	end
 end
 
 function ENT:OnRemove()
