@@ -1,7 +1,5 @@
 include("shared.lua")
 
-ENT.RenderGroup = RENDERGROUP_BOTH
-
 local render = render
 local IsValid = FindMetaTable("Entity").IsValid
 

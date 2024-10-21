@@ -14,11 +14,13 @@ function ENT:SetupDataTables()
 	self:NetworkVar( "Vector", 1, "PlayerColorInternal" )
 	self:NetworkVar( "Bool", 0, "SuppressEngineLighting" )
 	self:NetworkVar( "Bool", 1, "CullMode" )
+	self:NetworkVar( "Int", 0, "RenderGroupInternal" )
 
 	if CLIENT then
 		self:NetworkVarNotify( "Scale", self.OnScaleChanged )
 		self:NetworkVarNotify( "PlayerColorInternal", self.OnPlayerColorChanged )
 		self:NetworkVarNotify( "SuppressEngineLighting", self.OnSuppressEngineLightingChanged )
 		self:NetworkVarNotify( "CullMode", self.OnCullModeChanged )
+		self:NetworkVarNotify( "RenderGroupInternal", self.OnRenderGroupChanged )
 	end
 end

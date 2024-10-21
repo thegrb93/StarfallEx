@@ -1,5 +1,4 @@
 include("shared.lua")
-ENT.RenderGroup = RENDERGROUP_OPAQUE
 
 ENT.DefaultMaterial = Material( "hunter/myplastic" )
 ENT.Material = ENT.DefaultMaterial
@@ -66,6 +65,7 @@ function ENT:Initialize()
 	self.sf_userrenderbounds = false
 	self:SetupBones()
 	self:OnScaleChanged(nil, nil, self:GetScale())
+	self:OnRenderGroupChanged(nil, nil, self:GetRenderGroupInternal())
 
 	if self:EntIndex() == -1 then
 		self:SetPlayerColorInternal(VECTOR_PLAYER_COLOR_DISABLED)
@@ -130,14 +130,15 @@ function ENT:OnCullModeChanged()
 	self.renderstack:makeDirty()
 end
 
-function ENT:Draw(flags)
-	local selfTbl = self:GetTable()
-	if self:GetColor().a ~= 255 then
-		selfTbl.RenderGroup = RENDERGROUP_BOTH
+function ENT:OnRenderGroupChanged(name, old, group)
+	if group == -1 then
+		self.RenderGroup = nil
 	else
-		selfTbl.RenderGroup = RENDERGROUP_OPAQUE
+		self.RenderGroup = group
 	end
+end
 
+function ENT:Draw(flags)
 	self.renderstack:run(flags)
 end
 

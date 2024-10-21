@@ -289,6 +289,13 @@ if CLIENT then
 		ent:SetupBones()
 		ent:DrawModel()
 	end
+	
+	--- Returns the render group of the entity.
+	-- @client
+	-- @return number Render group
+	function ents_methods:getRenderGroup()
+		return getent(self):GetRenderGroup()
+	end
 end
 
 local soundsByEntity = SF.EntityTable("emitSoundsByEntity", function(e, t)
