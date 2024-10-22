@@ -65,7 +65,6 @@ function ENT:Initialize()
 	self.sf_userrenderbounds = false
 	self:SetupBones()
 	self:OnScaleChanged(nil, nil, self:GetScale())
-	self:OnRenderGroupChanged(nil, nil, self:GetRenderGroupInternal())
 
 	if self:EntIndex() == -1 then
 		self:SetPlayerColorInternal(VECTOR_PLAYER_COLOR_DISABLED)
