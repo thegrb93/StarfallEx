@@ -500,17 +500,25 @@ function hologram_methods:setCullMode(mode)
 	holo:SetCullMode(mode==1)
 end
 
+local allowedRenderGroups = {
+[RENDERGROUP_OPAQUE]=true,
+[RENDERGROUP_TRANSLUCENT]=true,
+[RENDERGROUP_BOTH]=true,
+[RENDERGROUP_VIEWMODEL]=true,
+[RENDERGROUP_VIEWMODEL_TRANSLUCENT]=true,
+[RENDERGROUP_OPAQUE_BRUSH]=true,
+}
 --- Set the render group for a hologram.
 -- @shared
--- @param number|nil group Render group. If unset, the engine will decide the render group based on the entity's materials.
+-- @param number|nil group Render group. If unset, the engine will decide the render group based on the entity's materials. Can be RENDERGROUP.OPAQUE RENDERGROUP.TRANSLUCENT RENDERGROUP.BOTH RENDERGROUP.VIEWMODEL RENDERGROUP.VIEWMODEL.TRANSLUCENT RENDERGROUP.OPAQUE.BRUSH
 function hologram_methods:setRenderGroup(group)
 	local holo = getholo(self)
 	checkpermission(instance, holo, "entities.setRenderProperty")
 	
 	if group then
 		checkluatype(group, TYPE_NUMBER)
-
-		holo:SetRenderGroupInternal(math.Truncate(group))
+		if not allowedRenderGroups[group] then SF.Throw("Invalid rendergroup!") end
+		holo:SetRenderGroupInternal(group)
 	else
 		holo:SetRenderGroupInternal(-1)
 	end
