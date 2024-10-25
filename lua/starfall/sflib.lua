@@ -1549,7 +1549,7 @@ function SF.CheckSound(ply, path)
 
 	-- Extract sound flags. Only allowed flags are '<', '>', '^', ')'
 	local flags, checkpath = string.match(path, "^([^%w_/%.]*)(.*)")
-	if #flags>2 or string.match(flags, "[^<>%^%)]") then
+	if #flags>2 or string.match(flags, "[^@#<>%^%)]") then
 		SF.Throw("Invalid sound flags! "..flags, 3)
 	end
 
