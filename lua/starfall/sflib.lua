@@ -1547,9 +1547,9 @@ function SF.CheckSound(ply, path)
 	if #path>260 then SF.Throw("Sound path too long!", 3) end
 	if string.match(path, "[\"?']") then SF.Throw("Sound path contains invalid characters!", 3) end
 
-	-- Extract sound flags. Only allowed flags are '<', '>', '^', ')'
+	-- Extract sound flags. Only allowed flags are '@' '#' '<', '>', '^', ')'
 	local flags, checkpath = string.match(path, "^([^%w_/%.]*)(.*)")
-	if #flags>2 or string.match(flags, "[^<>%^%)]") then
+	if #flags>2 or string.match(flags, "[^@#<>%^%)]") then
 		SF.Throw("Invalid sound flags! "..flags, 3)
 	end
 
