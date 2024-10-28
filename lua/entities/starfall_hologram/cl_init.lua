@@ -129,7 +129,16 @@ function ENT:OnCullModeChanged()
 	self.renderstack:makeDirty()
 end
 
+SF.allowedRenderGroups = {
+	[RENDERGROUP_OPAQUE]=true,
+	[RENDERGROUP_TRANSLUCENT]=true,
+	[RENDERGROUP_BOTH]=true,
+	[RENDERGROUP_VIEWMODEL]=true,
+	[RENDERGROUP_VIEWMODEL_TRANSLUCENT]=true,
+	[RENDERGROUP_OPAQUE_BRUSH]=true,
+}
 function ENT:OnRenderGroupChanged(name, old, group)
+	if not SF.allowedRenderGroups[group] then return end
 	if group == -1 then
 		self.RenderGroup = nil
 	else
