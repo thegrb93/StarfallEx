@@ -1518,6 +1518,15 @@ local materialBlacklist = {
 	["debug/debugluxels"] = true,
 	["effects/ar2_altfire1"] = true,
 }
+SF.allowedRenderGroups = {
+	[RENDERGROUP_OPAQUE]=true,
+	[RENDERGROUP_TRANSLUCENT]=true,
+	[RENDERGROUP_BOTH]=true,
+	[RENDERGROUP_VIEWMODEL]=true,
+	[RENDERGROUP_VIEWMODEL_TRANSLUCENT]=true,
+	[RENDERGROUP_OPAQUE_BRUSH]=true,
+}
+
 --- Checks that the material isn't malicious
 -- @param Material The path to the material
 -- @return The material object or false if it's invalid
