@@ -1264,6 +1264,11 @@ end
 -- @class directive
 -- @param model String of the model
 
+--- Precaches models that may take a while to load (max 16). --@precachemodel models/props_junk/watermelon01.mdl
+-- @name precachemodel
+-- @class directive
+-- @param model String of the model to precache
+
 --- Set the current file to only run on the server. Shared is default. --@server
 -- @name server
 -- @class directive
