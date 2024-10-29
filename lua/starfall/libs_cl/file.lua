@@ -483,10 +483,29 @@ function file_methods:readLong()
 	return unwrap(self):ReadLong()
 end
 
+--- Reads an unsigned long and advances the file position
+-- @return number UInt32 number
+function file_methods:readULong()
+	return unwrap(self):ReadULong()
+end
+
 --- Reads a short and advances the file position
 -- @return number Int16 number
 function file_methods:readShort()
 	return unwrap(self):ReadShort()
+end
+
+--- Reads an unsigned short and advances the file position
+-- @return number UInt16 number
+function file_methods:readUShort()
+	return unwrap(self):ReadUShort()
+end
+
+--- Reads an unsigned 64-bit integer and advances the file position
+--- Note: Since Lua cannot store full 64-bit integers, this function returns a string.
+-- @return string UInt64 number
+function file_methods:readUInt64()
+	return unwrap(self):ReadUInt64()
 end
 
 --- Writes a string to the file and advances the file position
@@ -531,11 +550,33 @@ function file_methods:writeLong(x)
 	unwrap(self):WriteLong(x)
 end
 
+--- Writes an unsigned long and advances the file position
+-- @param number x The unsigned long to write
+function file_methods:writeULong(x)
+	checkluatype (x, TYPE_NUMBER)
+	unwrap(self):WriteULong(x)
+end
+
 --- Writes a short and advances the file position
 -- @param number x The short to write
 function file_methods:writeShort(x)
 	checkluatype (x, TYPE_NUMBER)
 	unwrap(self):WriteShort(x)
+end
+
+--- Writes an unsigned short and advances the file position
+-- @param number x The unsigned short to write
+function file_methods:writeUShort(x)
+	checkluatype (x, TYPE_NUMBER)
+	unwrap(self):WriteUShort(x)
+end
+
+--- Writes an unsigned 64-bit integer and advances the file position
+--- Note: Since Lua cannot store full 64-bit integers, this function takes a string.
+-- @param string x The unsigned 64-bit integer to write
+function file_methods:writeUInt64(x)
+	checkluatype (x, TYPE_STRING)
+	unwrap(self):WriteUInt64(x)
 end
 
 end
