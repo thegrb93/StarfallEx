@@ -575,7 +575,7 @@ end
 --- Note: Since Lua cannot store full 64-bit integers, this function takes a string.
 -- @param string x The unsigned 64-bit integer to write
 function file_methods:writeUInt64(x)
-	checkluatype (x, TYPE_NUMBER)
+	checkluatype (x, TYPE_STRING)
 	unwrap(self):WriteUInt64(x)
 end
 
