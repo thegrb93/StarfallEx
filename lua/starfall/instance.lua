@@ -118,16 +118,16 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 
 	local modelsPrecached = 0
 	for filename, fdata in pairs(ppdata.files) do
-		if fdata.datafile then continue end -- Don't compile data files
-		if SERVER then
-			for _, model in pairs(fdata.precachemodels) do
-				if modelsPrecached==16 then
-					return false, { message = "The max precached models is 16!", traceback = "" }
-				end
-				modelsPrecached = modelsPrecached + 1
-				util.PrecacheModel(model)
-			end
+		--includedata directive
+		if fdata.datafile then continue end
+
+		--precachemodel directive
+		for _, model in pairs(fdata.precachemodels) do
+			if modelsPrecached==16 then return false, { message = "The max precached models is 16!", traceback = "" } end
+			modelsPrecached = modelsPrecached + 1
+			util.PrecacheModel(model)
 		end
+
 		if CLIENT and fdata.owneronly and LocalPlayer() ~= player then continue end -- Don't compile owner-only files if not owner
 		local serverorclient = fdata.serverorclient
 		if (serverorclient == "server" and CLIENT) or (serverorclient == "client" and SERVER) then continue end -- Don't compile files for other realm
