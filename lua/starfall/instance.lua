@@ -125,7 +125,9 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 		for _, model in pairs(fdata.precachemodels) do
 			if modelsPrecached==16 then return false, { message = "The max precached models is 16!", traceback = "" } end
 			modelsPrecached = modelsPrecached + 1
-			util.PrecacheModel(model)
+			local ok, sanitized = pcall(SF.CheckModel, model, instance.player)
+			if not ok then return false, { message = "", traceback = sanitized } end
+			util.PrecacheModel(sanitized)
 		end
 
 		if CLIENT and fdata.owneronly and LocalPlayer() ~= player then continue end -- Don't compile owner-only files if not owner
