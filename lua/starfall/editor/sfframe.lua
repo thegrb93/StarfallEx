@@ -2094,7 +2094,7 @@ end
 function PANEL:CheckPlayersChanged()
 	local players = {}
 	for k, v in pairs(player.GetAll()) do
-		if not table.Empty(rawget(SF.playerInstances, v)) or SF.BlockedUsers:isBlocked(v:SteamID()) then
+		if not rawget(SF.playerInstances, v) or SF.BlockedUsers:isBlocked(v:SteamID()) then
 			players[v] = true
 		end
 	end
