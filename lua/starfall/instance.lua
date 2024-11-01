@@ -123,15 +123,20 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 		if fdata.datafile then continue end
 
 		--precachemodel directive
-		local startTime, lastTimeUsed = SysTime(), 0
-		for _, model in pairs(fdata.precachemodels) do
-			plyPrecacheTimeBurst:use(lastTimeUsed)
-			local ok, sanitized = pcall(SF.CheckModel, model, instance.player)
-			if not ok then return false, { message = "", traceback = sanitized } end
-			util.PrecacheModel(sanitized)
-			local newTime = SysTime()
-			lastTimeUsed = newTime - startTime
-			startTime = newTime
+		if #fdata.precachemodels>0 then
+			local startTime = SysTime()
+			for _, model in pairs(fdata.precachemodels) do
+				plyPrecacheTimeBurst:use(instance.player, 0) -- Should just check if the burst is negative
+				local ok, sanitized = pcall(SF.CheckModel, model, instance.player)
+				if not ok then return false, { message = "", traceback = sanitized } end
+				util.PrecacheModel(sanitized)
+				local newTime = SysTime()
+				local timeUsed = newTime - startTime
+				startTime = newTime
+				-- Subtract the burst amount left by the time used
+				local obj = plyPrecacheTimeBurst:get(instance.player)
+				obj.val = obj.val - timeUsed
+			end
 		end
 
 		--owneronly directive
