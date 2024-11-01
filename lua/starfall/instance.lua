@@ -126,9 +126,10 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 		if #fdata.precachemodels>0 then
 			local startTime = SysTime()
 			for _, model in pairs(fdata.precachemodels) do
-				plyPrecacheTimeBurst:use(instance.player, 0) -- Should just check if the burst is negative
-				local ok, sanitized = pcall(SF.CheckModel, model, instance.player)
-				if not ok then return false, { message = "", traceback = sanitized } end
+				local ok, err = pcall(plyPrecacheTimeBurst.use, plyPrecacheTimeBurst, instance.player, 0) -- Should just check if the burst is negative
+				if not ok then return false, { message = err, traceback = "" } end
+				ok, model = pcall(SF.CheckModel, model, instance.player)
+				if not ok then return false, { message = model, traceback = "" } end
 				util.PrecacheModel(sanitized)
 				local newTime = SysTime()
 				local timeUsed = newTime - startTime
