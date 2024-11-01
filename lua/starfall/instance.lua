@@ -30,7 +30,12 @@ SF.Instance.__index = SF.Instance
 --- A set of all instances that have been created. It has weak keys and values.
 -- Instances are put here after initialization.
 SF.allInstances = {}
-SF.playerInstances = setmetatable({}, {__index = function() return {} end})
+SF.playerInstances = SF.EntityTable("playerInstances", function(ply, instances)
+	for _, instance in pairs(instances) do
+		instance:Error("Player disconnected!")
+	end
+end)
+getmetatable(SF.playerInstances).__index = function(t,k) local r={} t[k]=r return r end
 
 --- Preprocesses and Compiles code and returns an Instance
 -- @param code Either a string of code, or a {path=source} table
@@ -583,11 +588,7 @@ function SF.Instance:initialize()
 	self.cpu_softquota = 1
 
 	SF.allInstances[self] = true
-	if rawget(SF.playerInstances, self.player) then
-		SF.playerInstances[self.player][self] = true
-	else
-		SF.playerInstances[self.player] = {[self] = true}
-	end
+	SF.playerInstances[self.player][self] = true
 
 	self:RunHook("initialize")
 
