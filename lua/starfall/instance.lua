@@ -130,7 +130,7 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 				if not ok then return false, { message = err, traceback = "" } end
 				ok, model = pcall(SF.CheckModel, model, instance.player)
 				if not ok then return false, { message = model, traceback = "" } end
-				util.PrecacheModel(sanitized)
+				util.PrecacheModel(model)
 				local newTime = SysTime()
 				local timeUsed = newTime - startTime
 				startTime = newTime
