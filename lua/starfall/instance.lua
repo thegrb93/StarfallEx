@@ -32,6 +32,8 @@ SF.Instance.__index = SF.Instance
 SF.allInstances = {}
 SF.playerInstances = setmetatable({}, {__index = function() return {} end})
 
+local plyPrecacheTimeBurst = SF.BurstObject("model_precache_time", "Model precache time", 10, 0.2, "The rate allowed model precache time regenerates.", "Amount of allowed model precache time.")
+
 --- Preprocesses and Compiles code and returns an Instance
 -- @param code Either a string of code, or a {path=source} table
 -- @param mainfile If code is a table, this specifies the first file to parse.
@@ -116,21 +118,26 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 		return false, { message = "", traceback = err }
 	end
 
-	local modelsPrecached = 0
 	for filename, fdata in pairs(ppdata.files) do
 		--includedata directive
 		if fdata.datafile then continue end
 
 		--precachemodel directive
+		local startTime, lastTimeUsed = SysTime(), 0
 		for _, model in pairs(fdata.precachemodels) do
-			if modelsPrecached==16 then return false, { message = "The max precached models is 16!", traceback = "" } end
-			modelsPrecached = modelsPrecached + 1
+			plyPrecacheTimeBurst:use(lastTimeUsed)
 			local ok, sanitized = pcall(SF.CheckModel, model, instance.player)
 			if not ok then return false, { message = "", traceback = sanitized } end
 			util.PrecacheModel(sanitized)
+			local newTime = SysTime()
+			lastTimeUsed = newTime - startTime
+			startTime = newTime
 		end
 
+		--owneronly directive
 		if CLIENT and fdata.owneronly and LocalPlayer() ~= player then continue end -- Don't compile owner-only files if not owner
+		
+		--realm directives
 		local serverorclient = fdata.serverorclient
 		if (serverorclient == "server" and CLIENT) or (serverorclient == "client" and SERVER) then continue end -- Don't compile files for other realm
 
