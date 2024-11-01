@@ -32,7 +32,7 @@ SF.Instance.__index = SF.Instance
 SF.allInstances = {}
 SF.playerInstances = setmetatable({}, {__index = function() return {} end})
 
-local plyPrecacheTimeBurst = SF.BurstObject("model_precache_time", "Model precache time", 10, 0.2, "The rate allowed model precache time regenerates.", "Amount of allowed model precache time.")
+local plyPrecacheTimeBurst = SF.BurstObject("model_precache_time", "Model precache time", 5, 0.2, "The rate allowed model precache time regenerates.", "Amount of allowed model precache time.")
 
 --- Preprocesses and Compiles code and returns an Instance
 -- @param code Either a string of code, or a {path=source} table
