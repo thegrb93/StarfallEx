@@ -32,6 +32,8 @@ SF.Instance.__index = SF.Instance
 SF.allInstances = {}
 SF.playerInstances = setmetatable({}, {__index = function() return {} end})
 
+local plyPrecacheTimeBurst = SF.BurstObject("model_precache_time", "Model precache time", 5, 0.2, "The rate allowed model precache time regenerates.", "Amount of allowed model precache time.")
+
 --- Preprocesses and Compiles code and returns an Instance
 -- @param code Either a string of code, or a {path=source} table
 -- @param mainfile If code is a table, this specifies the first file to parse.
@@ -117,8 +119,31 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 	end
 
 	for filename, fdata in pairs(ppdata.files) do
-		if fdata.datafile then continue end -- Don't compile data files
+		--includedata directive
+		if fdata.datafile then continue end
+
+		--precachemodel directive
+		if #fdata.precachemodels>0 then
+			local startTime = SysTime()
+			for _, model in pairs(fdata.precachemodels) do
+				local ok, err = pcall(plyPrecacheTimeBurst.use, plyPrecacheTimeBurst, instance.player, 0) -- Should just check if the burst is negative
+				if not ok then return false, err end
+				ok, model = pcall(SF.CheckModel, model, instance.player)
+				if not ok then return false, model end
+				util.PrecacheModel(model)
+				local newTime = SysTime()
+				local timeUsed = newTime - startTime
+				startTime = newTime
+				-- Subtract the burst amount left by the time used
+				local obj = plyPrecacheTimeBurst:get(instance.player)
+				obj.val = obj.val - timeUsed
+			end
+		end
+
+		--owneronly directive
 		if CLIENT and fdata.owneronly and LocalPlayer() ~= player then continue end -- Don't compile owner-only files if not owner
+		
+		--realm directives
 		local serverorclient = fdata.serverorclient
 		if (serverorclient == "server" and CLIENT) or (serverorclient == "client" and SERVER) then continue end -- Don't compile files for other realm
 
