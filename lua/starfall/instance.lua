@@ -31,8 +31,8 @@ SF.Instance.__index = SF.Instance
 -- Instances are put here after initialization.
 SF.allInstances = {}
 SF.playerInstances = SF.EntityTable("playerInstances", function(ply, instances)
-	for _, instance in pairs(instances) do
-		instance:Error("Player disconnected!")
+	for instance in pairs(instances) do
+		instance:Error({message = "Player disconnected!", traceback = ""})
 	end
 end)
 getmetatable(SF.playerInstances).__index = function(t,k) local r={} t[k]=r return r end
