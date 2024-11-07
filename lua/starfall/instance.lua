@@ -35,7 +35,7 @@ SF.playerInstances = SF.EntityTable("playerInstances", function(ply, instances)
 		instance:Error({message = "Player disconnected!", traceback = ""})
 	end
 end)
-getmetatable(SF.playerInstances).__index = function(t,k) local r={} t[k]=r return r end
+getmetatable(SF.playerInstances).__index = function() return {} end
 
 local plyPrecacheTimeBurst = SF.BurstObject("model_precache_time", "Model precache time", 5, 0.2, "The rate allowed model precache time regenerates.", "Amount of allowed model precache time.")
 
@@ -613,6 +613,7 @@ function SF.Instance:initialize()
 	self.cpu_softquota = 1
 
 	SF.allInstances[self] = true
+	if rawget(SF.playerInstances, self.player)==nil then SF.playerInstances[self.player]={} end
 	SF.playerInstances[self.player][self] = true
 
 	self:RunHook("initialize")
@@ -710,9 +711,7 @@ function SF.Instance:deinitialize()
 	self:RunHook("deinitialize")
 	SF.allInstances[self] = nil
 	SF.playerInstances[self.player][self] = nil
-	if next(SF.playerInstances[self.player])==nil then
-		SF.playerInstances[self.player] = nil
-	end
+	if table.Empty(SF.playerInstances[self.player]) then SF.playerInstances[self.player] = nil end
 
 	self.error = true
 	local noop = function() return {} end
@@ -750,14 +749,14 @@ hook.Add("Think", "SF_Think", function()
 	end
 
 	for pl, insts in pairs(SF.playerInstances) do
-		local plquota
+		local plquota = math.huge
 		local cputotal = 0
-		for instance, _ in pairs(insts) do
+		for instance in pairs(insts) do
 			instance.cpu_average = instance:movingCPUAverage()
 			instance.cpu_total = 0
 			instance:runScriptHook("think")
 			cputotal = cputotal + instance.cpu_average
-			plquota = instance.cpuQuota
+			plquota = math.min(plquota, instance.cpuQuota)
 		end
 
 		if cputotal>plquota then
