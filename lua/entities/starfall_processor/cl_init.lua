@@ -172,7 +172,7 @@ end)
 net.Receive("starfall_processor_kill", function()
 	local target = net.ReadEntity()
 	if IsValid(target) and target:GetClass()=="starfall_processor" then
-		target:Error({message = "Killed by admin", traceback = ""})
+		target:Error({message = "Killed", traceback = ""})
 	end
 end)
 
