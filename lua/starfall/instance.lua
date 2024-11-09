@@ -30,12 +30,21 @@ SF.Instance.__index = SF.Instance
 --- A set of all instances that have been created. It has weak keys and values.
 -- Instances are put here after initialization.
 SF.allInstances = {}
-SF.playerInstances = SF.EntityTable("playerInstances", function(ply, instances)
-	for instance in pairs(instances) do
-		instance:Error({message = "Player disconnected!", traceback = ""})
-	end
-end)
-getmetatable(SF.playerInstances).__index = function() return {} end
+if SERVER then
+	SF.playerInstances = SF.EntityTable("playerInstances", function(ply, instances)
+		for instance in pairs(instances) do
+			instance:Error({message = "Player disconnected!", traceback = ""})
+			if IsValid(instance.entity) then
+				net.Start("starfall_processor_kill")
+				net.WriteEntity(instance.entity)
+				net.Broadcast()
+			end
+		end
+	end)
+	getmetatable(SF.playerInstances).__index = function() return {} end
+else
+	SF.playerInstances = setmetatable({},{__index = function() return {} end})
+end
 
 local plyPrecacheTimeBurst = SF.BurstObject("model_precache_time", "Model precache time", 5, 0.2, "The rate allowed model precache time regenerates.", "Amount of allowed model precache time.")
 
