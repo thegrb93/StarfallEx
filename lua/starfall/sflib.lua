@@ -98,8 +98,7 @@ hook.Add("EntityRemoved","SF_CallOnRemove",function(ent)
 		end
 		if CLIENT then
 			timer.Simple(0, function()
-				-- Can't use IsValid func directly because it can return invalid for recreated entities in clientside
-				if not ent:IsValid() then
+				if not IsValid(ent) then
 					for k, v in pairs(hooks) do
 						if v[2] then v[2](ent) end
 					end
