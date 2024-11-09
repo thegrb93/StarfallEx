@@ -720,7 +720,7 @@ function SF.Instance:deinitialize()
 	self:RunHook("deinitialize")
 	SF.allInstances[self] = nil
 	SF.playerInstances[self.player][self] = nil
-	if table.Empty(SF.playerInstances[self.player]) then SF.playerInstances[self.player] = nil end
+	if table.IsEmpty(SF.playerInstances[self.player]) then SF.playerInstances[self.player] = nil end
 
 	self.error = true
 	local noop = function() return {} end
