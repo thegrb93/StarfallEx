@@ -71,6 +71,8 @@ local function processLights(curtime)
 	end
 end
 
+local projectedLights = SF.EntManager("projectedlights", "projected lights", 20, "The number of projected light objects allowed to spawn via Starfall", 1, true)
+
 --- Light library.
 -- @name light
 -- @class library
@@ -122,6 +124,7 @@ instance:AddHook("deinitialize", function()
 	for light in pairs(lights) do
 		gSFLights[light.slot] = nil
 	end
+	projectedLights:deinitialize(instance, true)
 end)
 
 --- Creates a dynamic light (make sure to draw it)
@@ -274,7 +277,12 @@ end
 --- Creates a projected texture
 -- @return Projected Texture
 function light_library.createProjected()
-	return ptwrap(ProjectedTexture())
+	projectedLights:checkuse(instance.player, 1)
+
+	local light = ProjectedTexture()
+	projectedLights:register(instance, light)
+
+	return ptwrap(light)
 end
 
 --- Gets the angles of the Projected Texture
@@ -415,7 +423,10 @@ end
 
 --- Removes the Projected Texture
 function projectedtexture_methods:remove()
-	ptunwrap(self):Remove()
+	local light = ptunwrap(self)
+	projectedLights:remove(instance, light)
+	projectedtexture_meta.sf2sensitive[self] = nil
+	projectedtexture_meta.sensitive2sf[light] = nil
 end
 
 --- Sets the Projected Texture's angles
