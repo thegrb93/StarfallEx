@@ -2524,6 +2524,7 @@ function render_library.renderView(tbl)
 	renderingView = false
 	renderdata.renderingView = false
 	renderdata.isRendering = true
+	instance:checkCpu()
 end
 
 --- Returns whether render.renderView is being executed.
