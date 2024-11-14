@@ -537,23 +537,27 @@ function SF.Instance:setCheckCpu(quotaRun)
 	if quotaRun == SF.Instance.runWithOps then
 		function self:checkCpu()
 			local ratio = cpuUpdate(self)
-			if ratio>1 then
-				safeThrow(self, "CPU Quota exceeded.", true, true)
-			elseif ratio > self.cpu_softquota then
-				safeThrow(self, "CPU Quota warning.")
+			if ratio > self.cpu_softquota then
+				if ratio>1 then
+					safeThrow(self, "CPU Quota exceeded.", true, true)
+				else
+					safeThrow(self, "CPU Quota warning.")
+				end
 			end
 		end
 
 		function self.checkCpuHook() --debug.sethook doesn't pass self, so need it as upvalue
 			local ratio = cpuUpdate(self)
-			if ratio>1 then
-				if ratio>1.5 then
-					safeThrow(self, "CPU Quota exceeded.", true, true)
+			if ratio > self.cpu_softquota then
+				if ratio>1 then
+					if ratio>1.5 then
+						safeThrow(self, "CPU Quota exceeded.", true, true)
+					else
+						safeThrow(self, "CPU Quota exceeded.", true)
+					end
 				else
-					safeThrow(self, "CPU Quota exceeded.", true)
+					safeThrow(self, "CPU Quota warning.")
 				end
-			elseif ratio > self.cpu_softquota then
-				safeThrow(self, "CPU Quota warning.")
 			end
 		end
 
