@@ -527,7 +527,7 @@ local function safeThrow(self, msg, nocatch, force)
 	end
 end
 
-local function cpuUpdate(instance)
+local function cpuRatio(instance)
 	instance.cpu_total = SysTime() - instance.start_time
 	return instance:movingCPUAverage() / instance.cpuQuota
 end
@@ -536,7 +536,7 @@ function SF.Instance:setCheckCpu(quotaRun)
 	self.run = quotaRun
 	if quotaRun == SF.Instance.runWithOps then
 		function self:checkCpu()
-			local ratio = cpuUpdate(self)
+			local ratio = cpuRatio(self)
 			if ratio > self.cpu_softquota then
 				if ratio>1 then
 					safeThrow(self, "CPU Quota exceeded.", true, true)
@@ -547,7 +547,7 @@ function SF.Instance:setCheckCpu(quotaRun)
 		end
 
 		function self.checkCpuHook() --debug.sethook doesn't pass self, so need it as upvalue
-			local ratio = cpuUpdate(self)
+			local ratio = cpuRatio(self)
 			if ratio > self.cpu_softquota then
 				if ratio>1 then
 					if ratio>1.5 then
@@ -614,7 +614,7 @@ function SF.Instance:runWithOps(func, ...)
 	self:disableCpuCheck()
 	self.stackn = self.stackn - 1
 
-	if tbl[1] and cpuUpdate(self)>1 then
+	if tbl[1] and cpuRatio(self)>1 then
 		return {false, SF.MakeError("CPU Quota exceeded.", 1, true, true)}
 	end
 
