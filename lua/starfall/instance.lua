@@ -90,31 +90,18 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 	end
 	instance.player = player
 
-	local quotaRun
 	if player == SF.Superuser then
-		quotaRun = SF.Instance.runWithoutOps
+		instance:setCheckCpu(false)
 	else
 		if SERVER then
-			if SF.softLockProtection:GetBool() then
-				quotaRun = SF.Instance.runWithOps
-			else
-				quotaRun = SF.Instance.runWithoutOps
-			end
+			instance:setCheckCpu(SF.softLockProtection:GetBool())
 		else
 			if SF.BlockedUsers:isBlocked(player:SteamID()) then
 				return false, { message = "User has blocked this player's starfalls", traceback = "" }
 			end
-
-			if SF.softLockProtection:GetBool() then
-				quotaRun = SF.Instance.runWithOps
-			elseif SF.softLockProtectionOwner:GetBool() and LocalPlayer() ~= player then
-				quotaRun = SF.Instance.runWithOps
-			else
-				quotaRun = SF.Instance.runWithoutOps
-			end
+			instance:setCheckCpu(SF.softLockProtection:GetBool() or (SF.softLockProtectionOwner:GetBool() and LocalPlayer() ~= player))
 		end
 	end
-	instance:setCheckCpu(quotaRun)
 	
 	if quotaRun == SF.Instance.runWithOps then
 		instance.cpuQuota = (SERVER or LocalPlayer() ~= player) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
@@ -532,9 +519,10 @@ local function cpuRatio(instance)
 	return instance:movingCPUAverage() / instance.cpuQuota
 end
 
-function SF.Instance:setCheckCpu(quotaRun)
-	self.run = quotaRun
-	if quotaRun == SF.Instance.runWithOps then
+function SF.Instance:setCheckCpu(runWithOps)
+	if runWithOps then
+		self.run = SF.Instance.runWithOps
+
 		function self:checkCpu()
 			local ratio = cpuRatio(self)
 			if ratio > self.cpu_softquota then
@@ -580,6 +568,7 @@ function SF.Instance:setCheckCpu(quotaRun)
 			SF.OnRunningOps(prev)
 		end
 	else
+		self.run = SF.Instance.runWithoutOps
 		function self.checkCpu() end
 		function self.checkCpuHook() end
 		function self.enableCpuCheck() end
