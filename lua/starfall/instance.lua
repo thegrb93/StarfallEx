@@ -102,18 +102,6 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 			instance:setCheckCpu(SF.softLockProtection:GetBool() or (SF.softLockProtectionOwner:GetBool() and LocalPlayer() ~= player))
 		end
 	end
-	
-	if quotaRun == SF.Instance.runWithOps then
-		instance.cpuQuota = (SERVER or LocalPlayer() ~= player) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
-		instance.cpuQuotaRatio = 1 / SF.cpuBufferN:GetInt()
-
-		if CLIENT and instance.cpuQuota <= 0 then
-			return false, { message = "Cannot execute with 0 sf_timebuffer", traceback = "" }
-		end
-	else
-		instance.cpuQuota = math.huge
-		instance.cpuQuotaRatio = 0
-	end
 
 	local ok, err = xpcall(instance.BuildEnvironment, debug.traceback, instance)
 	if not ok then
@@ -515,7 +503,9 @@ local function safeThrow(self, msg, nocatch, force)
 end
 
 local function cpuRatio(instance)
-	instance.cpu_total = SysTime() - instance.start_time
+	local t = SysTime()
+	instance.cpu_total = instance.cpu_total + t - instance.start_time
+	instance.start_time = t
 	return instance:movingCPUAverage() / instance.cpuQuota
 end
 
@@ -550,29 +540,29 @@ function SF.Instance:setCheckCpu(runWithOps)
 		end
 
 		function self:enableCpuCheck()
-			local stack, stackn = self.cpustatestack, #self.cpustatestack
-			stack[stackn+3], stack[stackn+2], stack[stackn+1] = dgethook()
-			stack[stackn+4] = SF.runningOps
-
+			self.cpustatestack[#self.cpustatestack + 1] = {SF.runningOps, dgethook()}
 			SF.runningOps = true
 			SF.OnRunningOps(true)
 			dsethook(self.checkCpuHook, "", 2000)
-			return prevHook, mask, count
 		end
 		
-		function SF.Instance:disableCpuCheck()
-			local stack = self.cpustatestack
-			local prev = table.remove(stack)
-			dsethook(table.remove(stack), table.remove(stack), table.remove(stack))
-			SF.runningOps = prev
-			SF.OnRunningOps(prev)
+		function self:disableCpuCheck()
+			local stack = table.remove(self.cpustatestack)
+			SF.runningOps = stack[1]
+			SF.OnRunningOps(stack[1])
+			dsethook(stack[2], stack[3], stack[4])
 		end
+
+		self.cpuQuota = (SERVER or LocalPlayer() ~= player) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
+		self.cpuQuotaRatio = 1 / SF.cpuBufferN:GetInt()
 	else
 		self.run = SF.Instance.runWithoutOps
 		function self.checkCpu() end
 		function self.checkCpuHook() end
 		function self.enableCpuCheck() end
 		function self.disableCpuCheck() end
+		self.cpuQuota = math.huge
+		self.cpuQuotaRatio = 0
 	end
 end
 
@@ -592,7 +582,7 @@ end
 -- @return A table of values that the hook returned
 function SF.Instance:runWithOps(func, ...)
 	if self.stackn == 0 then
-		self.start_time = SysTime() - self.cpu_total
+		self.start_time = SysTime()
 	elseif self.stackn == 128 then
 		return {false, SF.MakeError("sf stack overflow", 1, true, true)}
 	end
