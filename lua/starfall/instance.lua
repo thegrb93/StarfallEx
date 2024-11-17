@@ -66,6 +66,7 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 	local instance = setmetatable({}, SF.Instance)
 	instance.entity = entity
 	instance.data = {}
+	instance.cpustatestack = {}
 	instance.stackn = 0
 	instance.sfhooks = {}
 	instance.hooks = {}
@@ -89,42 +90,17 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 	end
 	instance.player = player
 
-	local quotaRun
 	if player == SF.Superuser then
-		quotaRun = SF.Instance.runWithoutOps
+		instance:setCheckCpu(false)
 	else
 		if SERVER then
-			if SF.softLockProtection:GetBool() then
-				quotaRun = SF.Instance.runWithOps
-			else
-				quotaRun = SF.Instance.runWithoutOps
-			end
+			instance:setCheckCpu(SF.softLockProtection:GetBool())
 		else
 			if SF.BlockedUsers:isBlocked(player:SteamID()) then
 				return false, { message = "User has blocked this player's starfalls", traceback = "" }
 			end
-
-			if SF.softLockProtection:GetBool() then
-				quotaRun = SF.Instance.runWithOps
-			elseif SF.softLockProtectionOwner:GetBool() and LocalPlayer() ~= player then
-				quotaRun = SF.Instance.runWithOps
-			else
-				quotaRun = SF.Instance.runWithoutOps
-			end
+			instance:setCheckCpu(SF.softLockProtection:GetBool() or (SF.softLockProtectionOwner:GetBool() and LocalPlayer() ~= player))
 		end
-	end
-	instance.run = quotaRun
-	
-	if quotaRun == SF.Instance.runWithOps then
-		instance.cpuQuota = (SERVER or LocalPlayer() ~= player) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
-		instance.cpuQuotaRatio = 1 / SF.cpuBufferN:GetInt()
-
-		if CLIENT and instance.cpuQuota <= 0 then
-			return false, { message = "Cannot execute with 0 sf_timebuffer", traceback = "" }
-		end
-	else
-		instance.cpuQuota = math.huge
-		instance.cpuQuotaRatio = 0
 	end
 
 	local ok, err = xpcall(instance.BuildEnvironment, debug.traceback, instance)
@@ -169,8 +145,6 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 
 		instance.scripts[filename] = func
 	end
-
-	instance.startram = collectgarbage("count")
 
 	return true, instance
 end
@@ -515,8 +489,7 @@ end
 SF.runningOps = false
 
 local function safeThrow(self, msg, nocatch, force)
-	local source = debug.getinfo(3, "S").short_src
-	if string.find(source, "SF:", 1, true) or force then
+	if force or string.find(debug.getinfo(3, "S").short_src, "SF:", 1, true) then
 		if SERVER and nocatch then
 			local consolemsg = "[Starfall] CPU Quota exceeded"
 			if self.player:IsValid() then
@@ -529,14 +502,67 @@ local function safeThrow(self, msg, nocatch, force)
 	end
 end
 
-function SF.Instance:checkCpu()
-	if self.run ~= self.runWithOps then return end
-	self.cpu_total = SysTime() - self.start_time
-	local usedRatio = self:movingCPUAverage() / self.cpuQuota
-	if usedRatio>1 then
-		safeThrow(self, "CPU Quota exceeded.", true, true)
-	elseif usedRatio > self.cpu_softquota then
-		safeThrow(self, "CPU Quota warning.")
+local function cpuRatio(instance)
+	local t = SysTime()
+	instance.cpu_total = instance.cpu_total + t - instance.start_time
+	instance.start_time = t
+	return instance:movingCPUAverage() / instance.cpuQuota
+end
+
+function SF.Instance:setCheckCpu(runWithOps)
+	if runWithOps then
+		self.run = SF.Instance.runWithOps
+
+		function self:checkCpu()
+			local ratio = cpuRatio(self)
+			if ratio > self.cpu_softquota then
+				if ratio>1 then
+					safeThrow(self, "CPU Quota exceeded.", true, true)
+				else
+					safeThrow(self, "CPU Quota warning.")
+				end
+			end
+		end
+
+		function self.checkCpuHook() --debug.sethook doesn't pass self, so need it as upvalue
+			local ratio = cpuRatio(self)
+			if ratio > self.cpu_softquota then
+				if ratio>1 then
+					if ratio>1.5 then
+						safeThrow(self, "CPU Quota exceeded.", true, true)
+					else
+						safeThrow(self, "CPU Quota exceeded.", true)
+					end
+				else
+					safeThrow(self, "CPU Quota warning.")
+				end
+			end
+		end
+
+		function self:enableCpuCheck()
+			self.cpustatestack[#self.cpustatestack + 1] = {SF.runningOps, dgethook()}
+			SF.runningOps = true
+			SF.OnRunningOps(true)
+			dsethook(self.checkCpuHook, "", 2000)
+		end
+		
+		function self:disableCpuCheck()
+			local stack = table.remove(self.cpustatestack)
+			SF.runningOps = stack[1]
+			SF.OnRunningOps(stack[1])
+			dsethook(stack[2], stack[3], stack[4])
+		end
+
+		self.cpuQuota = (SERVER or LocalPlayer() ~= player) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
+		self.cpuQuotaRatio = 1 / SF.cpuBufferN:GetInt()
+	else
+		self.run = SF.Instance.runWithoutOps
+		function self.checkCpu() end
+		function self.checkCpuHook() end
+		function self.enableCpuCheck() end
+		function self.disableCpuCheck() end
+		self.cpuQuota = math.huge
+		self.cpuQuotaRatio = 0
 	end
 end
 
@@ -556,44 +582,19 @@ end
 -- @return A table of values that the hook returned
 function SF.Instance:runWithOps(func, ...)
 	if self.stackn == 0 then
-		self.start_time = SysTime() - self.cpu_total
+		self.start_time = SysTime()
 	elseif self.stackn == 128 then
 		return {false, SF.MakeError("sf stack overflow", 1, true, true)}
 	end
 
-	local function checkCpu()
-		self.cpu_total = SysTime() - self.start_time
-		local usedRatio = self:movingCPUAverage() / self.cpuQuota
-		if usedRatio>1 then
-			if usedRatio>1.5 then
-				safeThrow(self, "CPU Quota exceeded.", true, true)
-			else
-				safeThrow(self, "CPU Quota exceeded.", true)
-			end
-		elseif usedRatio > self.cpu_softquota then
-			safeThrow(self, "CPU Quota warning.")
-		end
-	end
-
-	local prevHook, mask, count = dgethook()
-	local prev = SF.runningOps
-	SF.runningOps = true
-	SF.OnRunningOps(true)
-	dsethook(checkCpu, "", 2000)
 	self.stackn = self.stackn + 1
+	self:enableCpuCheck()
 	local tbl = { xpcall(func, xpcall_callback, ...) }
+	self:disableCpuCheck()
 	self.stackn = self.stackn - 1
-	dsethook(prevHook, mask, count)
-	SF.runningOps = prev
-	SF.OnRunningOps(prev)
 
-	if tbl[1] then
-		--Do another cpu check in case the debug hook wasn't called
-		self.cpu_total = SysTime() - self.start_time
-		local usedRatio = self:movingCPUAverage() / self.cpuQuota
-		if usedRatio>1 then
-			return {false, SF.MakeError("CPU Quota exceeded.", 1, true, true)}
-		end
+	if tbl[1] and cpuRatio(self)>1 then
+		return {false, SF.MakeError("CPU Quota exceeded.", 1, true, true)}
 	end
 
 	return tbl

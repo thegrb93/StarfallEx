@@ -305,7 +305,7 @@ end
 -- @param number quota The threshold where the soft error will be thrown. Ratio of current cpu to the max cpu usage. 0.5 is 50%
 function builtins_library.setSoftQuota(quota)
 	checkluatype(quota, TYPE_NUMBER)
-	instance.cpu_softquota = quota
+	instance.cpu_softquota = math.Clamp(quota, 0, 1)
 end
 
 --- Checks if the chip is capable of performing an action.

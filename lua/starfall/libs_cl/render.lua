@@ -2455,8 +2455,9 @@ function render_library.renderView(tbl)
 	if renderdata.renderedViews >= cv_max_maxrenderviewsperframe:GetInt() then
 		SF.Throw("Max rendered views per frame exceeded!.", 2)
 	end
-
 	renderdata.renderedViews = renderdata.renderedViews + 1
+
+	instance:disableCpuCheck()
 
 	local prevData = {
 		matrix_stack = matrix_stack,
@@ -2524,6 +2525,9 @@ function render_library.renderView(tbl)
 	renderingView = false
 	renderdata.renderingView = false
 	renderdata.isRendering = true
+
+	instance:enableCpuCheck()
+	instance:checkCpu()
 end
 
 --- Returns whether render.renderView is being executed.
