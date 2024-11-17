@@ -1516,8 +1516,7 @@ SF.allowedRenderGroups = {
 	[RENDERGROUP_TRANSLUCENT]=true,
 	[RENDERGROUP_BOTH]=true,
 	[RENDERGROUP_VIEWMODEL]=true,
-	[RENDERGROUP_VIEWMODEL_TRANSLUCENT]=true,
-	[RENDERGROUP_OPAQUE_BRUSH]=true,
+	[RENDERGROUP_VIEWMODEL_TRANSLUCENT]=true
 }
 
 --- Checks that the material isn't malicious
