@@ -1,5 +1,6 @@
 local util = util
 
+local max_json = CreateConVar("sf_json_maxsize", 16, FCVAR_ARCHIVE, "The max megabytes of json data able to be encoded/decoded.")
 
 --- JSON library
 -- @name json
@@ -17,6 +18,7 @@ local json_library = instance.Libraries.json
 -- @return string JSON encoded string representation of the table
 function json_library.encode(tbl, prettyPrint)
 	SF.CheckLuaType(tbl, TYPE_TABLE)
+	if #SF.TableToString(tbl, instance) > max_json:GetInt()*1e6 then SF.Throw("Input table data size exceeds max allowed!", 2) end
 	return util.TableToJSON(instance.Unsanitize(tbl), prettyPrint)
 end
 
@@ -25,6 +27,7 @@ end
 -- @return table Table representing the JSON object
 function json_library.decode(s)
 	SF.CheckLuaType(s, TYPE_STRING)
+	if #s > max_json:GetInt()*1e6 then SF.Throw("Input json data exceeds max allowed!", 2) end
 	return instance.Sanitize(util.JSONToTable(s))
 end
 
