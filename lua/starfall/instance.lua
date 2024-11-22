@@ -23,6 +23,8 @@ else
 	SF.RamCap = CreateConVar("sf_ram_max_cl", 1500000, FCVAR_ARCHIVE, "If ram exceeds this limit (in kB), starfalls will be terminated")
 	SF.AllowSuperUser = CreateConVar("sf_superuserallowed", 0, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Whether the starfall superuser feature is allowed")
 end
+local ramlimit = SF.RamCap:GetInt()
+cvars.AddChangeCallback(SF.RamCap, function() ramlimit = SF.RamCap:GetInt() end)
 
 SF.Instance = {}
 SF.Instance.__index = SF.Instance
@@ -491,7 +493,7 @@ SF.runningOps = false
 local function safeThrow(self, msg, nocatch, force)
 	if force or string.find(debug.getinfo(3, "S").short_src, "SF:", 1, true) then
 		if SERVER and nocatch then
-			local consolemsg = "[Starfall] CPU quota exceeded!"
+			local consolemsg = "[Starfall] CPU usage exceeded!"
 			if self.player:IsValid() then
 				consolemsg = consolemsg .. " by " .. self.player:Nick() .. " (" .. self.player:SteamID() .. ")"
 			end
@@ -514,8 +516,8 @@ SF.Instance.RamAvg = 0
 local function ramRatio()
 	local ram = collectgarbage("count")
 	SF.Instance.Ram = ram
-	SF.Instance.RamAvg = SF.Instance.RamAvg*0.999 + ram*0.001
-	return ram / SF.RamCap:GetInt()
+	SF.Instance.RamAvg = SF.Instance.RamAvg + (ram - SF.Instance.RamAvg)*0.001
+	return ram / ramlimit
 end
 
 function SF.Instance:setCheckCpu(runWithOps)
@@ -526,9 +528,9 @@ function SF.Instance:setCheckCpu(runWithOps)
 			local ratio = cpuRatio(self)
 			if ratio > self.cpu_softquota then
 				if ratio>1 then
-					safeThrow(self, "CPU quota exceeded!", true, true)
+					safeThrow(self, "CPU usage exceeded!", true, true)
 				else
-					safeThrow(self, "CPU quota warning!")
+					safeThrow(self, "CPU usage warning!")
 				end
 			end
 			if ramRatio() > 1 then
@@ -540,9 +542,9 @@ function SF.Instance:setCheckCpu(runWithOps)
 			local ratio = cpuRatio(self)
 			if ratio > self.cpu_softquota then
 				if ratio>1 then
-					safeThrow(self, "CPU quota exceeded!", true, ratio>1.5)
+					safeThrow(self, "CPU usage exceeded!", true, ratio>1.5)
 				else
-					safeThrow(self, "CPU quota warning!")
+					safeThrow(self, "CPU usage warning!")
 				end
 			end
 			local rratio = ramRatio()
@@ -607,7 +609,7 @@ function SF.Instance:runWithOps(func, ...)
 
 	if tbl[1] then
 		if cpuRatio(self)>1 then
-			return {false, SF.MakeError("CPU quota exceeded!", 1, true, true)}
+			return {false, SF.MakeError("CPU usage exceeded!", 1, true, true)}
 		end
 		if ramRatio()>1 then
 			return {false, SF.MakeError("RAM usage exceeded!", 1, true, true)}
