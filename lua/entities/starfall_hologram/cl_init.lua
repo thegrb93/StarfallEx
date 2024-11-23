@@ -130,10 +130,10 @@ function ENT:OnCullModeChanged()
 end
 
 function ENT:OnRenderGroupChanged(name, old, group)
-	if not SF.allowedRenderGroups[group] then return end
 	if group == -1 then
 		self.RenderGroup = nil
 	else
+		if not SF.allowedRenderGroups[group] then return end
 		self.RenderGroup = group
 	end
 end
