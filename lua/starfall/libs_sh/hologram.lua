@@ -238,6 +238,38 @@ else
 			sfParent:updateTransform()
 		end
 	end
+	
+	--- Sets the hologram's position local to its parent.
+	-- @shared
+	-- @param Vector vec New position
+	function hologram_methods:setPos(vec)
+		local holo = getholo(self)
+		local pos = SF.clampPos(vunwrap(vec))
+		checkpermission(instance, holo, "hologram.setRenderProperty")
+
+		holo:SetLocalPos(pos)
+
+		local sfParent = holo.sfParent
+		if sfParent and IsValid(sfParent.parent) then
+			sfParent:updateTransform()
+		end
+	end
+
+	--- Sets the hologram's angles local to its parent.
+	-- @shared
+	-- @param Angle ang New angles
+	function hologram_methods:setAngles(ang)
+		local holo = getholo(self)
+		local angle = aunwrap(ang)
+		checkpermission(instance, holo, "hologram.setRenderProperty")
+
+		holo:SetLocalAngles(angle)
+		
+		local sfParent = holo.sfParent
+		if sfParent and IsValid(sfParent.parent) then
+			sfParent:updateTransform()
+		end
+	end
 
 	--- Sets the texture filtering function when viewing a close texture
 	-- @client
