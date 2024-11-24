@@ -24,7 +24,7 @@ else
 	SF.AllowSuperUser = CreateConVar("sf_superuserallowed", 0, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Whether the starfall superuser feature is allowed")
 end
 local ramlimit = SF.RamCap:GetInt()
-cvars.AddChangeCallback(SF.RamCap, function() ramlimit = SF.RamCap:GetInt() end)
+cvars.AddChangeCallback(SF.RamCap:GetName(), function() ramlimit = SF.RamCap:GetInt() end)
 
 SF.Instance = {}
 SF.Instance.__index = SF.Instance
@@ -553,18 +553,24 @@ function SF.Instance:setCheckCpu(runWithOps)
 			end
 		end
 
-		function self:enableCpuCheck()
-			self.cpustatestack[#self.cpustatestack + 1] = {SF.runningOps, dgethook()}
-			SF.runningOps = true
-			SF.OnRunningOps(true)
-			dsethook(self.checkCpuHook, "", 2000)
+		function self:pushCpuCheck(callback)
+			self.cpustatestack[#self.cpustatestack + 1] = (dgethook() or false)
+			local enabled = callback~=nil
+			if SF.runningOps ~= enabled then
+				SF.runningOps = enabled
+				SF.OnRunningOps(enabled)
+			end
+			dsethook(callback, "", 2000)
 		end
 		
-		function self:disableCpuCheck()
-			local stack = table.remove(self.cpustatestack)
-			SF.runningOps = stack[1]
-			SF.OnRunningOps(stack[1])
-			dsethook(stack[2], stack[3], stack[4])
+		function self:popCpuCheck()
+			local callback = (table.remove(self.cpustatestack) or nil)
+			dsethook(callback, "", 2000)
+			local enabled = callback~=nil
+			if SF.runningOps ~= enabled then
+				SF.runningOps = enabled
+				SF.OnRunningOps(enabled)
+			end
 		end
 
 		self.cpuQuota = (SERVER or LocalPlayer() ~= player) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
@@ -573,8 +579,8 @@ function SF.Instance:setCheckCpu(runWithOps)
 		self.run = SF.Instance.runWithoutOps
 		function self.checkCpu() end
 		function self.checkCpuHook() end
-		function self.enableCpuCheck() end
-		function self.disableCpuCheck() end
+		function self.pushCpuCheck() end
+		function self.popCpuCheck() end
 		self.cpuQuota = math.huge
 		self.cpuQuotaRatio = 0
 	end
@@ -602,18 +608,14 @@ function SF.Instance:runWithOps(func, ...)
 	end
 
 	self.stackn = self.stackn + 1
-	self:enableCpuCheck()
+	self:pushCpuCheck(self.checkCpuHook)
 	local tbl = { xpcall(func, xpcall_callback, ...) }
-	self:disableCpuCheck()
+	self:popCpuCheck()
 	self.stackn = self.stackn - 1
 
 	if tbl[1] then
-		if cpuRatio(self)>1 then
-			return {false, SF.MakeError("CPU usage exceeded!", 1, true, true)}
-		end
-		if ramRatio()>1 then
-			return {false, SF.MakeError("RAM usage exceeded!", 1, true, true)}
-		end
+		if cpuRatio(self)>1 then return {false, SF.MakeError("CPU usage exceeded!", 1, true, true)} end
+		if ramRatio()>1 then return {false, SF.MakeError("RAM usage exceeded!", 1, true, true)} end
 	end
 
 	return tbl
