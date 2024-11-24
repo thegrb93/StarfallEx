@@ -80,6 +80,7 @@ net.Receive("starfall_custom_prop", function()
 			end
 			physmesh[i] = convex
 		end
+		self.sf_physmesh = physmesh
 		self:BuildPhysics(physmesh)
 
 		local phys = self:GetPhysicsObject()
@@ -115,4 +116,11 @@ net.Receive("starfall_custom_prop", function()
 			applyData()
 		end
 	end)
+end)
+
+hook.Add("NetworkEntityCreated", "starfall_prop_physics", function(ent)
+	local mesh = ent.sf_physmesh
+	if mesh and not IsValidPhys(ent:GetPhysicsObject()) then
+		ent:BuildPhysics(mesh)
+	end
 end)
