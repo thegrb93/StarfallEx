@@ -577,7 +577,7 @@ end
 
 --- Sets the entity's angles local to its parent
 -- @param Angle ang New angles
-function ents_methods:setAngles(ang)
+function ents_methods:setLocalAngles(ang)
 	local ent = getent(self)
 
 	ang = aunwrap(ang)
