@@ -23,6 +23,8 @@ else
 	SF.RamCap = CreateConVar("sf_ram_max_cl", 1500000, FCVAR_ARCHIVE, "If ram exceeds this limit (in kB), starfalls will be terminated")
 	SF.AllowSuperUser = CreateConVar("sf_superuserallowed", 0, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Whether the starfall superuser feature is allowed")
 end
+local ramlimit = SF.RamCap:GetInt()
+cvars.AddChangeCallback(SF.RamCap:GetName(), function() ramlimit = SF.RamCap:GetInt() end)
 
 SF.Instance = {}
 SF.Instance.__index = SF.Instance
@@ -491,7 +493,7 @@ SF.runningOps = false
 local function safeThrow(self, msg, nocatch, force)
 	if force or string.find(debug.getinfo(3, "S").short_src, "SF:", 1, true) then
 		if SERVER and nocatch then
-			local consolemsg = "[Starfall] CPU Quota exceeded"
+			local consolemsg = "[Starfall] CPU usage exceeded!"
 			if self.player:IsValid() then
 				consolemsg = consolemsg .. " by " .. self.player:Nick() .. " (" .. self.player:SteamID() .. ")"
 			end
@@ -509,6 +511,15 @@ local function cpuRatio(instance)
 	return instance:movingCPUAverage() / instance.cpuQuota
 end
 
+SF.Instance.Ram = 0
+SF.Instance.RamAvg = 0
+local function ramRatio()
+	local ram = collectgarbage("count")
+	SF.Instance.Ram = ram
+	SF.Instance.RamAvg = SF.Instance.RamAvg + (ram - SF.Instance.RamAvg)*0.001
+	return ram / ramlimit
+end
+
 function SF.Instance:setCheckCpu(runWithOps)
 	if runWithOps then
 		self.run = SF.Instance.runWithOps
@@ -517,10 +528,13 @@ function SF.Instance:setCheckCpu(runWithOps)
 			local ratio = cpuRatio(self)
 			if ratio > self.cpu_softquota then
 				if ratio>1 then
-					safeThrow(self, "CPU Quota exceeded.", true, true)
+					safeThrow(self, "CPU usage exceeded!", true, true)
 				else
-					safeThrow(self, "CPU Quota warning.")
+					safeThrow(self, "CPU usage warning!")
 				end
+			end
+			if ramRatio() > 1 then
+				safeThrow(self, "RAM usage exceeded!", true, true)
 			end
 		end
 
@@ -528,29 +542,35 @@ function SF.Instance:setCheckCpu(runWithOps)
 			local ratio = cpuRatio(self)
 			if ratio > self.cpu_softquota then
 				if ratio>1 then
-					if ratio>1.5 then
-						safeThrow(self, "CPU Quota exceeded.", true, true)
-					else
-						safeThrow(self, "CPU Quota exceeded.", true)
-					end
+					safeThrow(self, "CPU usage exceeded!", true, ratio>1.5)
 				else
-					safeThrow(self, "CPU Quota warning.")
+					safeThrow(self, "CPU usage warning!")
 				end
+			end
+			local rratio = ramRatio()
+			if rratio > 1 then
+				safeThrow(self, "RAM usage exceeded!", true, rratio > 1.05)
 			end
 		end
 
-		function self:enableCpuCheck()
-			self.cpustatestack[#self.cpustatestack + 1] = {SF.runningOps, dgethook()}
-			SF.runningOps = true
-			SF.OnRunningOps(true)
-			dsethook(self.checkCpuHook, "", 2000)
+		function self:pushCpuCheck(callback)
+			self.cpustatestack[#self.cpustatestack + 1] = (dgethook() or false)
+			local enabled = callback~=nil
+			if SF.runningOps ~= enabled then
+				SF.runningOps = enabled
+				SF.OnRunningOps(enabled)
+			end
+			dsethook(callback, "", 2000)
 		end
 		
-		function self:disableCpuCheck()
-			local stack = table.remove(self.cpustatestack)
-			SF.runningOps = stack[1]
-			SF.OnRunningOps(stack[1])
-			dsethook(stack[2], stack[3], stack[4])
+		function self:popCpuCheck()
+			local callback = (table.remove(self.cpustatestack) or nil)
+			dsethook(callback, "", 2000)
+			local enabled = callback~=nil
+			if SF.runningOps ~= enabled then
+				SF.runningOps = enabled
+				SF.OnRunningOps(enabled)
+			end
 		end
 
 		self.cpuQuota = (SERVER or LocalPlayer() ~= player) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
@@ -559,8 +579,8 @@ function SF.Instance:setCheckCpu(runWithOps)
 		self.run = SF.Instance.runWithoutOps
 		function self.checkCpu() end
 		function self.checkCpuHook() end
-		function self.enableCpuCheck() end
-		function self.disableCpuCheck() end
+		function self.pushCpuCheck() end
+		function self.popCpuCheck() end
 		self.cpuQuota = math.huge
 		self.cpuQuotaRatio = 0
 	end
@@ -588,13 +608,14 @@ function SF.Instance:runWithOps(func, ...)
 	end
 
 	self.stackn = self.stackn + 1
-	self:enableCpuCheck()
+	self:pushCpuCheck(self.checkCpuHook)
 	local tbl = { xpcall(func, xpcall_callback, ...) }
-	self:disableCpuCheck()
+	self:popCpuCheck()
 	self.stackn = self.stackn - 1
 
-	if tbl[1] and cpuRatio(self)>1 then
-		return {false, SF.MakeError("CPU Quota exceeded.", 1, true, true)}
+	if tbl[1] then
+		if cpuRatio(self)>1 then return {false, SF.MakeError("CPU usage exceeded!", 1, true, true)} end
+		if ramRatio()>1 then return {false, SF.MakeError("RAM usage exceeded!", 1, true, true)} end
 	end
 
 	return tbl
@@ -733,23 +754,6 @@ function SF.Instance:deinitialize()
 end
 
 hook.Add("Think", "SF_Think", function()
-
-	local ram = collectgarbage("count")
-	if SF.Instance.Ram then
-		if ram > SF.RamCap:GetInt() then
-			local doClean = false
-			for instance, _ in pairs(SF.allInstances) do
-				doClean = true
-				instance:Error(SF.MakeError("Global RAM usage limit exceeded!!", 1))
-			end
-			if doClean then collectgarbage() end
-		end
-		SF.Instance.Ram = ram
-		SF.Instance.RamAvg = SF.Instance.RamAvg*0.999 + ram*0.001
-	else
-		SF.Instance.Ram = ram
-		SF.Instance.RamAvg = ram
-	end
 
 	-- Check and attempt recovery from potential failures
 	if SF.runningOps then

@@ -2457,7 +2457,7 @@ function render_library.renderView(tbl)
 	end
 	renderdata.renderedViews = renderdata.renderedViews + 1
 
-	instance:disableCpuCheck()
+	instance:pushCpuCheck()
 
 	local prevData = {
 		matrix_stack = matrix_stack,
@@ -2526,7 +2526,7 @@ function render_library.renderView(tbl)
 	renderdata.renderingView = false
 	renderdata.isRendering = true
 
-	instance:enableCpuCheck()
+	instance:popCpuCheck()
 	instance:checkCpu()
 end
 
