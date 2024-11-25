@@ -132,8 +132,7 @@ end
 function ENT:OnRenderGroupChanged(name, old, group)
 	if group == -1 then
 		self.RenderGroup = nil
-	else
-		if not SF.allowedRenderGroups[group] then return end
+	elseif SF.allowedRenderGroups[group] then
 		self.RenderGroup = group
 	end
 end
