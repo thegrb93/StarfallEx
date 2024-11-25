@@ -242,7 +242,7 @@ else
 	--- Sets the hologram's position local to its parent.
 	-- @shared
 	-- @param Vector vec New position
-	function hologram_methods:setPos(vec)
+	function hologram_methods:setLocalPos(vec)
 		local holo = getholo(self)
 		local pos = SF.clampPos(vunwrap(vec))
 		checkpermission(instance, holo, "hologram.setRenderProperty")
@@ -258,7 +258,7 @@ else
 	--- Sets the hologram's angles local to its parent.
 	-- @shared
 	-- @param Angle ang New angles
-	function hologram_methods:setAngles(ang)
+	function hologram_methods:setLocalAngles(ang)
 		local holo = getholo(self)
 		local angle = aunwrap(ang)
 		checkpermission(instance, holo, "hologram.setRenderProperty")
