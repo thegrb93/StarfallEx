@@ -1041,6 +1041,13 @@ function ents_methods:getPos()
 	return vwrap(getent(self):GetPos())
 end
 
+--- Returns the position of the entity, local to its parent
+-- @shared
+-- @return Vector The position vector
+function ents_methods:getLocalPos()
+	return vwrap(getent(self):GetLocalPos())
+end
+
 --- Returns how submerged the entity is in water
 -- @shared
 -- @return number The water level. 0 none, 1 slightly, 2 at least halfway, 3 all the way
@@ -1232,6 +1239,13 @@ end
 -- @return Angle The angle
 function ents_methods:getAngles()
 	return awrap(getent(self):GetAngles())
+end
+
+--- Returns the angle of the entity, local to its parent
+-- @shared
+-- @return Angle The angle
+function ents_methods:getLocalAngles()
+	return awrap(getent(self):GetLocalAngles())
 end
 
 --- Returns the mass of the entity

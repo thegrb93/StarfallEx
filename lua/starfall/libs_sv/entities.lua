@@ -546,22 +546,32 @@ end
 -- @param Vector vec New position
 function ents_methods:setPos(vec)
 	local ent = getent(self)
-
-	vec = vunwrap(vec)
 	checkpermission(instance, ent, "entities.setPos")
-
-	ent:SetPos(SF.clampPos(vec))
+	ent:SetPos(SF.clampPos(vunwrap(vec)))
 end
 
 --- Sets the entity's angles
 -- @param Angle ang New angles
 function ents_methods:setAngles(ang)
 	local ent = getent(self)
-
-	ang = aunwrap(ang)
 	checkpermission(instance, ent, "entities.setAngles")
+	ent:SetAngles(aunwrap(ang))
+end
 
-	ent:SetAngles(ang)
+--- Sets the entity's position local to its parent
+-- @param Vector vec New position
+function ents_methods:setLocalPos(vec)
+	local ent = getent(self)
+	checkpermission(instance, ent, "entities.setPos")
+	ent:SetLocalPos(SF.clampPos(vunwrap(vec)))
+end
+
+--- Sets the entity's angles local to its parent
+-- @param Angle ang New angles
+function ents_methods:setLocalAngles(ang)
+	local ent = getent(self)
+	checkpermission(instance, ent, "entities.setAngles")
+	ent:SetLocalAngles(aunwrap(ang))
 end
 
 --- Sets the entity's linear velocity. Physics entities, use physobj:setVelocity
@@ -1090,6 +1100,14 @@ function ents_methods:getVar(key)
 	checkpermission(instance, ent, "entities.getTable")
 	local var = ent:GetVar(key)
 	return istable(var) and instance.Sanitize(var) or owrap(var)
+end
+
+--- Sets the entity to be used as the light origin position for this entity.
+-- @param Entity|nil lightOrigin The lighting entity.
+function ents_methods:setLightingOriginEntity(lightOrigin)
+	local ent = getent(self)
+	checkpermission(instance, ent, "entities.setRenderProperty")
+	ent:SetLightingOriginEntity(getent(lightOrigin))
 end
 
 end
