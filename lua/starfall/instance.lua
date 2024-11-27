@@ -573,7 +573,7 @@ function SF.Instance:setCheckCpu(runWithOps)
 			end
 		end
 
-		self.cpuQuota = (SERVER or LocalPlayer() ~= player) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
+		self.cpuQuota = (SERVER or LocalPlayer() ~= self.player) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
 		self.cpuQuotaRatio = 1 / SF.cpuBufferN:GetInt()
 	else
 		self.run = SF.Instance.runWithoutOps
