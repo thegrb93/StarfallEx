@@ -114,6 +114,19 @@ else
 	-- @param number button Number of the button
 	SF.hookAdd("PlayerButtonDown", "inputpressed", CheckButtonPerms)
 
+	--- Called when a keybind is pressed
+	-- @client
+	-- @name inputBindPressed
+	-- @class hook
+	-- @param Player ply Player pressing the keybind
+	-- @param string bind Name of keybind pressed
+	SF.hookAdd("PlayerBindPress", "inputbindpressed", function(instance, ply, bind)
+		if haspermission(instance, nil, "input") then
+			return true, {ply, bind}
+		end
+		return false
+	end)
+	
 	--- Called when a button is released
 	-- @client
 	-- @name inputReleased
@@ -164,21 +177,6 @@ function wpanel:OnMouseWheeled(delta)
 		end
 	end
 end
-
---- Called when a keybind is pressed
--- @client
--- @name playerBindPressed
--- @class hook
--- @param Player ply Player pressing the keybind
--- @param string bind Name of keybind pressed
--- @param boolean pressed If the key is pressed. This will always return true as it is a GMod bug.
-SF.hookAdd("PlayerBindPress", "playerbindpressed", function(instance, ply, bind, pressed)
-	if haspermission(instance, nil, "input") then
-		return true, {ply, bind, pressed}
-	else
-		return false
-	end
-end)
 
 --- Input library.
 -- @name input
