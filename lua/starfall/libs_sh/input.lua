@@ -165,6 +165,21 @@ function wpanel:OnMouseWheeled(delta)
 	end
 end
 
+--- Called when a keybind is pressed
+-- @client
+-- @name playerBindPressed
+-- @class hook
+-- @param Player ply Player pressing the keybind
+-- @param string bind Name of keybind pressed
+-- @param boolean pressed If the key is pressed. This will always return true as it is a GMod bug.
+SF.hookAdd("PlayerBindPress", "playerbindpressed", function(instance, ply, bind, pressed)
+	if haspermission(instance, nil, "input") then
+		return true, {ply, bind, pressed}
+	else
+		return false
+	end
+end)
+
 --- Input library.
 -- @name input
 -- @class library
