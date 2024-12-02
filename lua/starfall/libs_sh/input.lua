@@ -113,7 +113,7 @@ else
 	-- @class hook
 	-- @param number button Number of the button
 	SF.hookAdd("PlayerButtonDown", "inputpressed", CheckButtonPerms)
-
+	
 	--- Called when a button is released
 	-- @client
 	-- @name inputReleased
@@ -121,6 +121,19 @@ else
 	-- @param number button Number of the button
 	SF.hookAdd("PlayerButtonUp", "inputreleased", CheckButtonPerms)
 end
+
+--- Called when a keybind is pressed
+-- @client
+-- @name inputBindPressed
+-- @class hook
+-- @param Player ply Player pressing the keybind
+-- @param string bind Name of keybind pressed
+SF.hookAdd("PlayerBindPress", "inputbindpressed", function(instance, ply, bind)
+	if haspermission(instance, nil, "input") then
+		return true, {ply, bind}
+	end
+	return false
+end)
 
 --- Called when the mouse is moved
 -- @client
