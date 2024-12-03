@@ -620,13 +620,13 @@ function wire_library.getWirelink(ent)
 	return wlwrap(ent)
 end
 
-local function checkinput(inputs, name, converters)
+local function checkinput(inputs, k, converters)
 	if not inputs then SF.Throw("Entity has no inputs", 4) end
 	local input = inputs[k] or SF.Throw("Invalid input: "..k, 4)
 	local convert = converters[input.Type] or SF.Throw("Invalid input type: "..input.Type, 4)
 	return input, convert
 end
-local function checkoutput(outputs, name, converters)
+local function checkoutput(outputs, k, converters)
 	if not outputs then SF.Throw("Entity has no outputs", 4) end
 	local output = outputs[k] or SF.Throw("Invalid output: "..k, 4)
 	local convert = converters[output.Type] or SF.Throw("Invalid output type: "..output.Type, 3)
@@ -635,39 +635,33 @@ end
 
 local function triggerInput(ent, k, v)
 	checkpermission(instance, nil, "wire.wirelink.write")
-	local tbl = GetTable(ent)
-	local input, convert = checkinput(tbl.Inputs, k, SFToWire)
+	local input, convert = checkinput(GetTable(ent).Inputs, k, SFToWire)
 	instance:runExternal(WireLib.TriggerInput, ent, k, convert(v))
 end
 local function triggerOutput(ent, k, v)
 	checkpermission(instance, nil, "wire.wirelink.write")
-	local tbl = GetTable(ent)
-	local output, convert = checkoutput(tbl.Outputs, k, SFToWire)
+	local output, convert = checkoutput(GetTable(ent).Outputs, k, SFToWire)
 	instance:runExternal(Wire_TriggerOutput, ent, k, convert(v))
 end
 local function triggerCell(ent, k, v)
 	checkpermission(instance, nil, "wire.wirelink.write")
-	local tbl = GetTable(ent)
-	local WriteCell = tbl.WriteCell or SF.Throw("Entity does not have WriteCell capability", 3)
+	local WriteCell = GetTable(ent).WriteCell or SF.Throw("Entity does not have WriteCell capability", 3)
 	instance:runExternal(WriteCell, ent, k, v)
 end
 
 local function readInput(ent, k)
 	checkpermission(instance, nil, "wire.wirelink.read")
-	local tbl = GetTable(ent)
-	local input, convert = checkinput(tbl.Inputs, k, WireToSF)
+	local input, convert = checkinput(GetTable(ent).Inputs, k, WireToSF)
 	return convert(input.Value)
 end
 local function readOutput(ent, k)
 	checkpermission(instance, nil, "wire.wirelink.read")
-	local tbl = GetTable(ent)
-	local output, convert = checkoutput(tbl.Outputs, k, WireToSF)
+	local output, convert = checkoutput(GetTable(ent).Outputs, k, WireToSF)
 	return convert(output.Value)
 end
 local function readCell(ent, k)
 	checkpermission(instance, nil, "wire.wirelink.read")
-	local tbl = GetTable(ent)
-	local ReadCell = tbl.ReadCell or SF.Throw("Entity does not have ReadCell capability", 3)
+	local ReadCell = GetTable(ent).ReadCell or SF.Throw("Entity does not have ReadCell capability", 3)
 	return tonumber(instance:runExternal(ReadCell, ent, k))
 end
 
