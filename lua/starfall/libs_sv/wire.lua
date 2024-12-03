@@ -71,28 +71,27 @@ instance:AddHook("initialize", function()
 	end
 
 	function ent:TriggerInput(key, value)
-		local instance = self.instance
+		local tbl = GetTable(self)
+		local instance = tbl.instance
 		if instance then
-			instance:runScriptHook("input", key, instance.WireWireToSF[self.Inputs[key].Type](value))
+			instance:runScriptHook("input", key, instance.WireToSF[tbl.Inputs[key].Type](value))
 		end
 	end
 
 	function ent:ReadCell(address)
-		if self.instance then
-			local tbl = self.instance:runScriptHookForResult("readcell", address)
-			if tbl[1] then
-				return tonumber(tbl[2]) or 0
-			end
+		local instance = GetTable(self).instance
+		if instance then
+			local tbl = instance:runScriptHookForResult("readcell", address)
+			return tbl[1] and tonumber(tbl[2]) or 0
 		end
 		return 0
 	end
 
 	function ent:WriteCell(address, data)
-		if self.instance then
-			local tbl = self.instance:runScriptHookForResult("writecell", address, data)
-			if tbl[1] then
-				return tbl[2]==nil or tbl[2]==true
-			end
+		local instance = GetTable(self).instance
+		if instance then
+			local tbl = instance:runScriptHookForResult("writecell", address, data)
+			return tbl[1] and (tbl[2]==nil or tbl[2]==true)
 		end
 		return false
 	end
