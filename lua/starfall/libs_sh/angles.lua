@@ -1,6 +1,7 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local dgetmeta = debug.getmetatable
+local Unpack = FindMetaTable("Angle").Unpack
 
 --- Angle Type
 -- @name Angle
@@ -12,7 +13,7 @@ local dgetmeta = debug.getmetatable
 -- @libtbl ang_meta
 SF.RegisterType("Angle", nil, nil, FindMetaTable("Angle"), nil, function(checktype, ang_meta)
 	return function(ang)
-		return setmetatable({ ang:Unpack() }, ang_meta)
+		return setmetatable({ Unpack(ang) }, ang_meta)
 	end,
 	function(obj)
 		checktype(obj, ang_meta, 2)

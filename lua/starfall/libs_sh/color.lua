@@ -44,7 +44,7 @@ local hex_to_rgb = {
 -- @libtbl color_meta
 SF.RegisterType("Color", nil, nil, FindMetaTable("Color"), nil, function(checktype, color_meta)
 	return function(clr)
-		return setmetatable({ clr.r, clr.g, clr.b, clr.a }, color_meta)
+		return setmetatable({tonumber(clr.r), tonumber(clr.g), tonumber(clr.b), tonumber(clr.a)}, color_meta)
 	end,
 	function(obj)
 		checktype(obj, color_meta, 2)

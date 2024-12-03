@@ -253,7 +253,7 @@ function SF.Instance:CreateWrapper(metatable, typedata)
 		end
 		function unwrap(value)
 			local ret = sf2sensitive[value]
-			return ret or self.CheckType(value, metatable, 2)~=value or SF.Throw("Object no longer valid", 3)
+			return ret or self.CheckType(value, metatable, 2) or SF.Throw("Object no longer valid", 3)
 		end
 	end
 
@@ -285,9 +285,7 @@ function SF.Instance:BuildEnvironment()
 	-- @param level Level at which to error at. 2 is added to this value. Default is 1.
 	function self.CheckType(val, typ, level)
 		local meta = dgetmeta(val)
-		if meta == typ or (meta and meta.supertype == typ and object_unwrappers[meta]) then
-			return val
-		else
+		if meta ~= typ and (meta == nil or meta.supertype ~= typ or object_unwrappers[meta] == nil) then
 			assert(istable(typ) and typ.__metatable and isstring(typ.__metatable))
 			level = (level or 1) + 2
 			SF.ThrowTypeError(typ.__metatable, SF.GetType(val), level)
@@ -584,6 +582,13 @@ function SF.Instance:setCheckCpu(runWithOps)
 		self.cpuQuota = math.huge
 		self.cpuQuotaRatio = 0
 	end
+end
+
+function SF.instance:runExternal(func, ...)
+	self:pushCpuCheck()
+	local ok, err = xpcall(func, debug.traceback, ...)
+	self:popCpuCheck()
+	if ok then return err else ErrorNoHalt(err) end
 end
 
 local function xpcall_callback(err)

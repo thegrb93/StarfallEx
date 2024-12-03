@@ -1,7 +1,7 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local dgetmeta = debug.getmetatable
-
+local Unpack = FindMetaTable("Vector").Unpack
 
 --- Vector type
 -- @name Vector
@@ -13,7 +13,7 @@ local dgetmeta = debug.getmetatable
 -- @libtbl vec_meta
 SF.RegisterType("Vector", nil, nil, FindMetaTable("Vector"), nil, function(checktype, vec_meta)
 	return function(vec)
-		return setmetatable({ vec:Unpack() }, vec_meta)
+		return setmetatable({ Unpack(vec) }, vec_meta)
 	end,
 	function(obj)
 		checktype(obj, vec_meta, 2)

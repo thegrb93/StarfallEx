@@ -2,6 +2,7 @@ local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 local debug_getmetatable = debug.getmetatable
 local IsValid = FindMetaTable("Entity").IsValid
+local GetTable = FindMetaTable("Entity").GetTable
 
 -- Register privileges
 registerprivilege("wire.setOutputs", "Set outputs", "Allows the user to specify the set of outputs")
@@ -57,9 +58,6 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 local wirelink_meta, wlwrap, wlunwrap = instance.Types.Wirelink, instance.Types.Wirelink.Wrap, instance.Types.Wirelink.Unwrap
 local COLOR_WHITE = Color(255, 255, 255)
 
-local wirecache = {}
-local wirecachevals = {}
-
 local getent
 instance:AddHook("initialize", function()
 	getent = ent_meta.GetEntity
@@ -75,7 +73,7 @@ instance:AddHook("initialize", function()
 	function ent:TriggerInput(key, value)
 		local instance = self.instance
 		if instance then
-			instance:runScriptHook("input", key, instance.WireInputConverters[self.Inputs[key].Type](value))
+			instance:runScriptHook("input", key, instance.WireWireToSF[self.Inputs[key].Type](value))
 		end
 	end
 
@@ -187,8 +185,8 @@ typeToE2Type = {
 	end
 }
 
-local inputConverters
-inputConverters =
+local WireToSF
+WireToSF =
 {
 	NORMAL = function(x) return isnumber(x) and x or 0 end,
 	STRING = function(x) return isstring(x) and x or "" end,
@@ -212,7 +210,7 @@ inputConverters =
 				if typ=="t" then
 					conv[key] = completed_tables[val] or recursiveConvert(val)
 				else
-					conv[key] = inputConverters[typ] and inputConverters[typ](val)
+					conv[key] = WireToSF[typ] and WireToSF[typ](val)
 				end
 			end
 
@@ -222,7 +220,7 @@ inputConverters =
 				if typ=="t" then
 					conv[key] = completed_tables[val] or recursiveConvert(val)
 				else
-					conv[key] = inputConverters[typ] and inputConverters[typ](val)
+					conv[key] = WireToSF[typ] and WireToSF[typ](val)
 				end
 			end
 
@@ -235,9 +233,9 @@ inputConverters =
 		for i, v in ipairs(tbl) do
 			if istable(v) and isnumber(v[1] or v.x or v.p) and isnumber(v[2] or v.y) then
 				if isnumber(v[3] or v.z or v.r) then
-					ret[i] = inputConverters.VECTOR(v)
+					ret[i] = WireToSF.VECTOR(v)
 				else
-					ret[i] = inputConverters.VECTOR2(v)
+					ret[i] = WireToSF.VECTOR2(v)
 				end
 			else
 				ret[i] = owrap(v)
@@ -246,18 +244,18 @@ inputConverters =
 		return ret
 	end
 }
-inputConverters.n = inputConverters.NORMAL
-inputConverters.s = inputConverters.STRING
-inputConverters.v = inputConverters.VECTOR
-inputConverters.xv2 = inputConverters.VECTOR2
-inputConverters.a = inputConverters.ANGLE
-inputConverters.xwl = inputConverters.WIRELINK
-inputConverters.e = inputConverters.ENTITY
-inputConverters.t = inputConverters.TABLE
-inputConverters.r = inputConverters.ARRAY
-instance.WireInputConverters = inputConverters
+WireToSF.n = WireToSF.NORMAL
+WireToSF.s = WireToSF.STRING
+WireToSF.v = WireToSF.VECTOR
+WireToSF.xv2 = WireToSF.VECTOR2
+WireToSF.a = WireToSF.ANGLE
+WireToSF.xwl = WireToSF.WIRELINK
+WireToSF.e = WireToSF.ENTITY
+WireToSF.t = WireToSF.TABLE
+WireToSF.r = WireToSF.ARRAY
+instance.WireToSF = WireToSF
 
-local outputConverters =
+local SFToWire =
 {
 	NORMAL = function(data)
 		checkluatype(data, TYPE_NUMBER, 2)
@@ -327,6 +325,8 @@ local outputConverters =
 		return ret
 	end
 }
+instance.SFToWire = SFToWire
+
 
 -- ------------------------- Basic Wire Functions ------------------------- --
 
@@ -372,7 +372,7 @@ function wire_library.adjustInputs(names, types, descriptions)
 		if not isstring(porttype) then SF.Throw("Non-string input type at index " .. i, 2) end
 		porttype = string.upper(porttype)
 		porttype = sfTypeToWireTypeTable[porttype] or porttype
-		if not inputConverters[porttype] then SF.Throw("Invalid/unsupported input type: " .. porttype, 2) end
+		if not WireToSF[porttype] then SF.Throw("Invalid/unsupported input type: " .. porttype, 2) end
 		types_out[i] = porttype
 
 		if descriptions and descriptions[i] then
@@ -415,7 +415,7 @@ function wire_library.adjustOutputs(names, types, descriptions)
 		if not isstring(porttype) then SF.Throw("Non-string output type at index " .. i, 2) end
 		porttype = string.upper(porttype)
 		porttype = sfTypeToWireTypeTable[porttype] or porttype
-		if not outputConverters[porttype] then SF.Throw("Invalid/unsupported output type: " .. porttype, 2) end
+		if not SFToWire[porttype] then SF.Throw("Invalid/unsupported output type: " .. porttype, 2) end
 		types_out[i] = porttype
 
 		if descriptions and descriptions[i] then
@@ -520,41 +520,36 @@ function wire_library.create(entI, entO, inputname, outputname, width, color, ma
 	checkluatype(inputname, TYPE_STRING)
 	checkluatype(outputname, TYPE_STRING)
 
-	if width == nil then
-		width = 0
-	else
+	if width ~= nil then
 		checkluatype (width, TYPE_NUMBER)
 		width = math.Clamp(width, 0, 5)
+	else
+		width = 0
 	end
 	if color ~= nil then
+		color = cunwrap(color)
 	else
 		color = COLOR_WHITE
 	end
 	material = ValidWireMat[material] and material or "cable/rope"
 
-	local entI = eunwrap(entI)
-	local entO = eunwrap(entO)
+	entI = eunwrap(entI)
+	entO = eunwrap(entO)
 
-	if not IsValid(entI) then SF.Throw("Invalid source") end
-	if not IsValid(entO) then SF.Throw("Invalid target") end
+	if not IsValid(entI) then SF.Throw("Invalid target") end
+	if not IsValid(entO) then SF.Throw("Invalid source") end
 
 	checkpermission(instance, entI, "wire.createWire")
 	checkpermission(instance, entO, "wire.createWire")
 
-	if not entI.Inputs then SF.Throw("Source has no valid inputs") end
+	if not entI.Inputs then SF.Throw("Target has no valid inputs") end
+	if not entO.Outputs then SF.Throw("Source has no valid outputs") end
 
-	-- Initialize wirelink and entity outputs on target if present
-	if outputname == "entity" then
-		WireLib.CreateEntityOutput( nil, entO, {true} )
-	elseif outputname == "wirelink" then
-		WireLib.CreateWirelinkOutput( nil, entO, {true} )
+	if inputname == "" or not entI.Inputs[inputname] then SF.Throw("Invalid target input: " .. inputname) end
+	if outputname == "entity" then WireLib.CreateEntityOutput( nil, entO, {true} )
+	elseif outputname == "wirelink" then WireLib.CreateWirelinkOutput( nil, entO, {true} )
+	elseif outputname == "" or not entO.Outputs[outputname] then SF.Throw("Invalid source output: " .. outputname)
 	end
-
-	if inputname == "" then SF.Throw("Invalid input name") end
-	if outputname == "" then SF.Throw("Invalid output name") end
-
-	if not entI.Inputs[inputname] then SF.Throw("Invalid source input: " .. inputname) end
-	if not entO.Outputs[outputname] then SF.Throw("Invalid source output: " .. outputname) end
 
 	WireLib.Link_Start(instance.player:UniqueID(), entI, entI:WorldToLocal(entI:GetPos()), inputname, material, color, width)
 	WireLib.Link_End(instance.player:UniqueID(), entO, entO:WorldToLocal(entO:GetPos()), outputname, instance.player)
@@ -626,6 +621,112 @@ function wire_library.getWirelink(ent)
 	return wlwrap(ent)
 end
 
+local function checkinput(inputs, name, converters)
+	if not inputs then SF.Throw("Entity has no inputs", 4) end
+	local input = inputs[k] or SF.Throw("Invalid input: "..k, 4)
+	local convert = converters[input.Type] or SF.Throw("Invalid input type: "..input.Type, 4)
+	return input, convert
+end
+local function checkoutput(outputs, name, converters)
+	if not outputs then SF.Throw("Entity has no outputs", 4) end
+	local output = outputs[k] or SF.Throw("Invalid output: "..k, 4)
+	local convert = converters[output.Type] or SF.Throw("Invalid output type: "..output.Type, 3)
+	return output, convert
+end
+
+local function triggerInput(ent, k, v)
+	checkpermission(instance, nil, "wire.wirelink.write")
+	local tbl = GetTable(ent)
+	local input, convert = checkinput(tbl.Inputs, k, SFToWire)
+	instance:runExternal(WireLib.TriggerInput, ent, k, convert(v))
+end
+local function triggerOutput(ent, k, v)
+	checkpermission(instance, nil, "wire.wirelink.write")
+	local tbl = GetTable(ent)
+	local output, convert = checkoutput(tbl.Outputs, k, SFToWire)
+	instance:runExternal(Wire_TriggerOutput, ent, k, convert(v))
+end
+local function triggerCell(ent, k, v)
+	checkpermission(instance, nil, "wire.wirelink.write")
+	local tbl = GetTable(ent)
+	local WriteCell = tbl.WriteCell or SF.Throw("Entity does not have WriteCell capability", 3)
+	instance:runExternal(WriteCell, ent, k, v)
+end
+
+local function readInput(ent, k)
+	checkpermission(instance, nil, "wire.wirelink.read")
+	local tbl = GetTable(ent)
+	local input, convert = checkinput(tbl.Inputs, k, WireToSF)
+	return convert(input.Value)
+end
+local function readOutput(ent, k)
+	checkpermission(instance, nil, "wire.wirelink.read")
+	local tbl = GetTable(ent)
+	local output, convert = checkoutput(tbl.Outputs, k, WireToSF)
+	return convert(output.Value)
+end
+local function readCell(ent, k)
+	checkpermission(instance, nil, "wire.wirelink.read")
+	local tbl = GetTable(ent)
+	local ReadCell = tbl.ReadCell or SF.Throw("Entity does not have ReadCell capability", 3)
+	return tonumber(instance:runExternal(ReadCell, ent, k))
+end
+
+--- Sets the value of an entity's input, triggering it as well
+-- @param Entity ent Entity with input
+-- @param string inputname Input name
+-- @param any value The value to set the input to (must match the input type)
+function wire_library.triggerInput(ent, inputname, value)
+	checkluatype(inputname, TYPE_STRING)
+	triggerInput(getent(ent), inputname, value)
+end
+
+--- Sets the value of an entity's output, triggering it as well
+-- @param Entity ent Entity with output
+-- @param string outputname Output name
+-- @param any value The value to set the output to (must match the output type)
+function wire_library.triggerOutput(ent, outputname, value)
+	checkluatype(outputname, TYPE_STRING)
+	triggerOutput(getent(ent), outputname, value)
+end
+
+--- Sets the value of an entity's wire memory, triggering it as well
+-- @param Entity ent Entity with wire memory
+-- @param number index The cell address
+-- @param number value The value to set the cell
+function wire_library.triggerCell(ent, index, value)
+	checkluatype(index, TYPE_NUMBER)
+	checkluatype(value, TYPE_NUMBER)
+	triggerCell(getent(ent), index, value)
+end
+
+--- Gets the value of an entity's input, triggering it as well
+-- @param Entity ent Entity with input
+-- @param string inputname Input name
+-- @return any value The value to set the input to (must match the input type)
+function wire_library.readInput(ent, inputname)
+	checkluatype(inputname, TYPE_STRING)
+	return readInput(getent(ent), inputname)
+end
+
+--- Gets the value of an entity's output, triggering it as well
+-- @param Entity ent Entity with output
+-- @param string outputname Output name
+-- @return any value The value to set the output to (must match the output type)
+function wire_library.readOutput(ent, outputname)
+	checkluatype(outputname, TYPE_STRING)
+	return readOutput(getent(ent), outputname)
+end
+
+--- Gets a value from an entity's wire memory
+-- @param Entity ent Entity with wire memory
+-- @param number index The cell address
+-- @return number The value at the address
+function wire_library.readCell(ent, index)
+	checkluatype(index, TYPE_NUMBER)
+	return readCell(getent(ent), index)
+end
+
 --- Returns an entities wirelink
 -- @class function
 -- @return Wirelink Wirelink of the entity
@@ -633,39 +734,33 @@ ents_methods.getWirelink = wire_library.getWirelink
 
 -- ------------------------- Wirelink ------------------------- --
 
---- Retrieves an output. Returns nil if the output doesn't exist.
--- @param any Key to get the value at
--- @return any Value at the index
+--- Retrieves an output value or highspeed cell address value
+-- @param string|number k Name of output or index of cell
+-- @return any Value of the output or cell
 wirelink_meta.__index = function(self, k)
-	checkpermission(instance, nil, "wire.wirelink.read")
-	if wirelink_methods[k] then
-		return wirelink_methods[k]
+	local method = wirelink_methods[k]
+	if method then return method end
+
+	if isstring(k) then
+		return readOutput(getwl(self), k)
+	elseif isnumber(k) then
+		return readCell(getwl(self), k)
 	else
-		local wl = getwl(self)
-		if isnumber(k) then
-			return wl.ReadCell and wl:ReadCell(k) or nil
-		else
-			local output = wl.Outputs and wl.Outputs[k]
-			if not output or not inputConverters[output.Type] then return end
-			return inputConverters[output.Type](output.Value)
-		end
+		SF.ThrowTypeError("string or number", SF.GetType(k), 3)
 	end
 end
 
---- Writes to an input.
--- @param any key Key to set the value at
--- @param any val Value to set at the index
+--- Writes to an input or highspeed cell address
+-- @param string|number k Name of input or index of cell
+-- @param any v Value to set input or cell
 wirelink_meta.__newindex = function(self, k, v)
-	checkpermission(instance, nil, "wire.wirelink.write")
-	local wl = getwl(self)
-	if isnumber(k) then
+	if isstring(k) then
+		triggerInput(getwl(self), k, v)
+	elseif isnumber(k) then
 		checkluatype(v, TYPE_NUMBER)
-		if not wl.WriteCell then return
-		else wl:WriteCell(k, v) end
+		triggerCell(getwl(self), k, v)
 	else
-		local input = wl.Inputs and wl.Inputs[k]
-		if not input or not outputConverters[input.Type] then return end
-		WireLib.TriggerInput(wl, k, outputConverters[input.Type](v))
+		SF.ThrowTypeError("string or number", SF.GetType(k), 3)
 	end
 end
 
@@ -673,16 +768,6 @@ end
 -- @return boolean Whether the wirelink is valid
 function wirelink_methods:isValid()
 	return wlunwrap(self):IsValid()
-end
-
---- Returns current state of the specified input
--- @param string name Input name
--- @return any Input value
-function wirelink_methods:inputValue(name)
-	local wl = getwl(self)
-	local input = wl.Inputs and wl.Inputs[name]
-	if not input or not outputConverters[input.Type] then SF.Throw("Input doesn't exist or is invalid", 2) end
-	return inputConverters[input.Type](input.Value)
 end
 
 --- Returns the type of input name, or nil if it doesn't exist
@@ -789,33 +874,13 @@ end
 -- @class table
 -- @name wire_library.ports
 wire_library.ports = setmetatable({}, {
-	__index = function(self, name)
-		local input = instance.entity.Inputs[name]
-		if input then
-			local ret
-			if type(input.Value) == "table" then
-				ret = inputConverters[input.Type](input.Value)
-			else
-				if wirecache[name]==input.Value then
-					ret = wirecachevals[name]
-				else
-					ret = inputConverters[input.Type](input.Value)
-					wirecache[name] = input.Value
-					wirecachevals[name] = ret
-				end
-			end
-			return ret
-		end
+	__index = function(self, k)
+		checkluatype(k, TYPE_STRING)
+		return readInput(instance.entity, k)
 	end,
-
-	__newindex = function(self, name, value)
-		checkluatype(name, TYPE_STRING)
-
-		local ent = instance.entity
-		local output = ent.Outputs[name]
-		if output then
-			Wire_TriggerOutput(ent, name, outputConverters[output.Type](value))
-		end
+	__newindex = function(self, k, v)
+		checkluatype(k, TYPE_STRING)
+		triggerOutput(instance.entity, k, v)
 	end
 })
 
