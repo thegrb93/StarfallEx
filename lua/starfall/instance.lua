@@ -50,13 +50,6 @@ end
 
 local plyPrecacheTimeBurst = SF.BurstObject("model_precache_time", "Model precache time", 5, 0.2, "The rate allowed model precache time regenerates.", "Amount of allowed model precache time.")
 
---- Preprocesses and Compiles code and returns an Instance
--- @param code Either a string of code, or a {path=source} table
--- @param mainfile If code is a table, this specifies the first file to parse.
--- @param Player The "owner" of the instance
--- @param data The table to set instance.data to. Default is a new table.
--- @return True if no errors, false if errors occured.
--- @return The compiled instance, or the error message.
 function SF.Instance.Compile(code, mainfile, player, entity)
 	if isstring(code) then
 		mainfile = mainfile or "generic"
@@ -151,9 +144,6 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 	return true, instance
 end
 
---- Adds a hook to the instance
--- @param name The hook name
--- @param func The hook function
 function SF.Instance:AddHook(name, func)
 	local hook = self.sfhooks[name]
 	if hook then
@@ -163,9 +153,6 @@ function SF.Instance:AddHook(name, func)
 	end
 end
 
---- Runs a library hook.
--- @param name Hook to run.
--- @param ... Additional arguments.
 function SF.Instance:RunHook(name, ...)
 	local hook = self.sfhooks[name]
 	if hook then
@@ -175,24 +162,10 @@ function SF.Instance:RunHook(name, ...)
 	end
 end
 
---- Creates and registers a library.
--- @param name The library name
--- @return methods The library's methods
 function SF.RegisterLibrary(name)
 	SF.Libraries[name] = true
 end
 
---- Registers a type.
--- @param name The library name
--- @param weakwrapper Make the wrapper weak inside the internal lookup table. Default: True
--- @param weaksensitive Make the sensitive data weak inside the internal lookup table. Default: True
--- @param target_metatable (optional) The metatable of the object that will get
--- 		wrapped by these wrapper functions.  This is required if you want to
--- 		have the object be auto-recognized by the generic self.WrapObject
---		function.
--- @param super Optional type name that this will inherit from
--- @return methods The type's methods
--- @return metamethods The type's metamethods
 function SF.RegisterType(name, weakwrapper, weaksensitive, target_metatable, supertype, customwrappers)
 	SF.Types[name] = {
 		weakwrapper = weakwrapper,
@@ -203,11 +176,6 @@ function SF.RegisterType(name, weakwrapper, weaksensitive, target_metatable, sup
 	}
 end
 
---- Creates wrap/unwrap functions for sensitive values, by using a lookup table
--- (which is set to have weak keys and values)
--- @param metatable The metatable to assign the wrapped value.
--- @return The function to wrap sensitive values to a SF-safe table
--- @return The function to unwrap the SF-safe table to the sensitive table
 function SF.Instance:CreateWrapper(metatable, typedata)
 	
 	local wrap, unwrap
@@ -253,7 +221,7 @@ function SF.Instance:CreateWrapper(metatable, typedata)
 		end
 		function unwrap(value)
 			local ret = sf2sensitive[value]
-			return ret or self.CheckType(value, metatable, 2)~=value or SF.Throw("Object no longer valid", 3)
+			return ret or self.CheckType(value, metatable, 2) or SF.Throw("Object no longer valid", 3)
 		end
 	end
 
@@ -267,8 +235,6 @@ function SF.Instance:CreateWrapper(metatable, typedata)
 	return true
 end
 
---- Builds an environment table
--- @return The environment
 function SF.Instance:BuildEnvironment()
 	self.Libraries = {}
 	self.Types = {}
@@ -279,15 +245,9 @@ function SF.Instance:BuildEnvironment()
 	self.object_wrappers = object_wrappers
 	self.object_unwrappers = object_unwrappers
 
-	--- Checks the starfall type of val. Errors if the types don't match
-	-- @param val The value to be checked.
-	-- @param typ A metatable.
-	-- @param level Level at which to error at. 2 is added to this value. Default is 1.
 	function self.CheckType(val, typ, level)
 		local meta = dgetmeta(val)
-		if meta == typ or (meta and meta.supertype == typ and object_unwrappers[meta]) then
-			return val
-		else
+		if meta ~= typ and (meta == nil or meta.supertype ~= typ or object_unwrappers[meta] == nil) then
 			assert(istable(typ) and typ.__metatable and isstring(typ.__metatable))
 			level = (level or 1) + 2
 			SF.ThrowTypeError(typ.__metatable, SF.GetType(val), level)
@@ -307,12 +267,6 @@ function SF.Instance:BuildEnvironment()
 		[TYPE_NIL] = true,
 	}
 
-	--- Wraps the given object so that it is safe to pass into starfall
-	-- It will wrap it as long as we have the metatable of the object that is
-	-- getting wrapped.
-	-- @param object the object needing to get wrapped as it's passed into starfall
-	-- @return returns nil if the object doesn't have a known wrapper,
-	-- or returns the wrapped object if it does have a wrapper.
 	local function WrapObject(object)
 		local metatable = dgetmeta(object)
 		if metatable then
@@ -337,10 +291,6 @@ function SF.Instance:BuildEnvironment()
 	end
 	self.WrapObject = WrapObject
 
-	--- Takes a wrapped starfall object and returns the unwrapped version
-	-- @param object the wrapped starfall object, should work on any starfall
-	-- wrapped object.
-	-- @return the unwrapped starfall object
 	local function UnwrapObject(object)
 		local metatable = dgetmeta(object)
 		if metatable then
@@ -355,13 +305,6 @@ function SF.Instance:BuildEnvironment()
 	end
 	self.UnwrapObject = UnwrapObject
 
-	--- Sanitizes and returns its argument list.
-	-- Basic types are returned unchanged. Non-object tables will be
-	-- recursed into and their keys and values will be sanitized. Object
-	-- types will be wrapped if a wrapper is available. When a wrapper is
-	-- not available objects will be replaced with nil, so as to prevent
-	-- any possiblitiy of leakage. Functions will always be replaced with
-	-- nil as there is no way to verify that they are safe.
 	function self.Sanitize(original)
 		local completed_tables = {}
 
@@ -385,8 +328,6 @@ function SF.Instance:BuildEnvironment()
 		return RecursiveSanitize(original)
 	end
 
-	--- Takes output from starfall and does it's best to make the output
-	-- fully usable outside of starfall environment
 	function self.Unsanitize(original)
 		local completed_tables = {}
 
@@ -586,6 +527,13 @@ function SF.Instance:setCheckCpu(runWithOps)
 	end
 end
 
+function SF.Instance:runExternal(func, ...)
+	self:pushCpuCheck()
+	local ok, err = xpcall(func, debug.traceback, ...)
+	self:popCpuCheck()
+	if ok then return err else ErrorNoHalt(err) end
+end
+
 local function xpcall_callback(err)
 	if dgetmeta(err)~=SF.Errormeta then
 		return SF.MakeError(err, 1)
@@ -593,13 +541,6 @@ local function xpcall_callback(err)
 	return err
 end
 
---- Internal function - do not call.
--- Runs a function while incrementing the instance ops coutner.
--- This does no setup work and shouldn't be called by client code
--- @param func The function to run
--- @param ... Arguments to func
--- @return True if ok
--- @return A table of values that the hook returned
 function SF.Instance:runWithOps(func, ...)
 	if self.stackn == 0 then
 		self.start_time = SysTime()
@@ -621,23 +562,10 @@ function SF.Instance:runWithOps(func, ...)
 	return tbl
 end
 
---- Internal function - do not call.
--- Runs a function without incrementing the instance ops coutner.
--- This does no setup work and shouldn't be called by client code
--- @param func The function to run
--- @param ... Arguments to func
--- @return True if ok
--- @return A table of values that the hook returned
 function SF.Instance:runWithoutOps(func, ...)
 	return { xpcall(func, xpcall_callback, ...) }
 end
 
---- Runs the scripts inside of the instance. This should be called once after
--- compiling/unpacking so that scripts can register hooks and such. It should
--- not be called more than once.
--- @return True if no script errors occured
--- @return The error message, if applicable
--- @return The error traceback, if applicable
 function SF.Instance:initialize()
 	self.cpu_total = 0
 	self.cpu_average = 0
@@ -661,11 +589,6 @@ function SF.Instance:initialize()
 	return true
 end
 
---- Runs a script hook. This calls script code.
--- @param hook The hook to call.
--- @param ... Arguments to pass to the hook's registered function.
--- @return True if it executed ok, false if not or if there was no hook
--- @return If the first return value is false then the error message or nil if no hook was registered
 function SF.Instance:runScriptHook(hook, ...)
 	local hooks = self.hooks[hook]
 	if not hooks then return {} end
@@ -681,12 +604,6 @@ function SF.Instance:runScriptHook(hook, ...)
 	return tbl
 end
 
---- Runs a script hook until one of them returns a true value. Returns those values.
--- @param hook The hook to call.
--- @param ... Arguments to pass to the hook's registered function.
--- @return True if it executed ok, false if not or if there was no hook
--- @return If the first return value is false then the error message or nil if no hook was registered. Else any values that the hook returned.
--- @return The traceback if the instance errored
 function SF.Instance:runScriptHookForResult(hook, ...)
 	local hooks = self.hooks[hook]
 	if not hooks then return {} end
@@ -706,11 +623,6 @@ function SF.Instance:runScriptHookForResult(hook, ...)
 	return tbl
 end
 
---- Runs an arbitrary function under the SF instance. This can be used
--- to run your own hooks when using the integrated hook system doesn't
--- make sense (ex timers).
--- @param func Function to run
--- @param ... Arguments to pass to func
 function SF.Instance:runFunction(func, ...)
 	local tbl = self:run(func, ...)
 	if not tbl[1] then
@@ -737,7 +649,6 @@ function SF.Instance:require(path)
 	end
 end
 
---- Deinitializes the instance. After this, the instance should be discarded.
 function SF.Instance:deinitialize()
 	self:RunHook("deinitialize")
 	SF.allInstances[self] = nil
@@ -789,7 +700,6 @@ hook.Add("Think", "SF_Think", function()
 	end
 end)
 
---- Errors the instance. Should only be called from the tips of the call tree (aka from places such as the hook library, timer library, the entity's think function, etc)
 function SF.Instance:Error(err)
 	if self.runOnError then -- We have a custom error function, use that instead
 		self.runOnError(err)
