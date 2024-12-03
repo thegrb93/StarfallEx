@@ -189,9 +189,9 @@ WireToSF =
 {
 	NORMAL = function(x) return isnumber(x) and x or 0 end,
 	STRING = function(x) return isstring(x) and x or "" end,
-	VECTOR = function(vec) return setmetatable({ vec[1] or vec.x, vec[2] or vec.y, vec[3] or vec.z }, vec_meta) end,
-	VECTOR2 = function(vec) return setmetatable({ vec[1] or vec.x, vec[2] or vec.y }, vec2_meta) end,
-	ANGLE = function(ang) return setmetatable({ ang[1] or ang.p, ang[2] or ang.y, ang[3] or ang.r }, ang_meta) end,
+	VECTOR = function(vec) return setmetatable({ tonumber(vec[1] or vec.x), tonumber(vec[2] or vec.y), tonumber(vec[3] or vec.z) }, vec_meta) end,
+	VECTOR2 = function(vec) return setmetatable({ tonumber(vec[1] or vec.x), tonumber(vec[2] or vec.y) }, vec2_meta) end,
+	ANGLE = function(ang) return setmetatable({ tonumber(ang[1] or ang.p), tonumber(ang[2] or ang.y), tonumber(ang[3] or ang.r) }, ang_meta) end,
 	WIRELINK = wlwrap,
 	ENTITY = owrap,
 
@@ -256,26 +256,12 @@ instance.WireToSF = WireToSF
 
 local SFToWire =
 {
-	NORMAL = function(data)
-		checkluatype(data, TYPE_NUMBER, 2)
-		return data
-	end,
-	STRING = function(data)
-		checkluatype(data, TYPE_STRING, 2)
-		return data
-	end,
-	VECTOR = function(data)
-		return vunwrap(data)
-	end,
-	VECTOR2 = function(data)
-		return v2unwrap(data)
-	end,
-	ANGLE = function(data)
-		return aunwrap(data)
-	end,
-	ENTITY = function(data)
-		return getent(data)
-	end,
+	NORMAL = function(data) checkluatype(data, TYPE_NUMBER, 2) return data end,
+	STRING = function(data) checkluatype(data, TYPE_STRING, 2) return data end,
+	VECTOR = function(data) return vunwrap(data) end,
+	VECTOR2 = function(data) return v2unwrap(data) end,
+	ANGLE = function(data) return aunwrap(data) end,
+	ENTITY = function(data) return getent(data) end,
 	TABLE = function(data)
 		checkluatype(data, TYPE_TABLE, 2)
 		local completed_tables = {}
