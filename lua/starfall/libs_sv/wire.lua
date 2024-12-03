@@ -679,7 +679,7 @@ function wire_library.triggerCell(ent, index, value)
 	triggerCell(getent(ent), index, value)
 end
 
---- Gets the value of an entity's input, triggering it as well
+--- Gets the value of an entity's input
 -- @param Entity ent Entity with input
 -- @param string inputname Input name
 -- @return any value The value to set the input to (must match the input type)
@@ -688,7 +688,7 @@ function wire_library.readInput(ent, inputname)
 	return readInput(getent(ent), inputname)
 end
 
---- Gets the value of an entity's output, triggering it as well
+--- Gets the value of an entity's output
 -- @param Entity ent Entity with output
 -- @param string outputname Output name
 -- @return any value The value to set the output to (must match the output type)
