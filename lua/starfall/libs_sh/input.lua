@@ -126,11 +126,10 @@ end
 -- @client
 -- @name inputBindPressed
 -- @class hook
--- @param Player ply Player pressing the keybind
 -- @param string bind Name of keybind pressed
 SF.hookAdd("PlayerBindPress", "inputbindpressed", function(instance, ply, bind)
 	if haspermission(instance, nil, "input") then
-		return true, {instance.WrapObject(ply), bind}
+		return true, {bind}
 	end
 	return false
 end)
