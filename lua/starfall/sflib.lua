@@ -1532,11 +1532,11 @@ function SF.CheckMaterial(material)
 	return mat
 end
 
-function SF.CheckModel(model, player, prop)
+function SF.CheckModel(model, ply, prop)
 	if #model > 260 then SF.Throw("Model path too long!", 3) end
 	model = SF.NormalizePath(string.lower(model))
 	if string.GetExtensionFromFilename(model) ~= "mdl" or (SERVER and (not util.IsValidModel(model) or (prop and not util.IsValidProp(model)))) then SF.Throw("Invalid model: "..model, 3) end
-	if player~=SF.Superuser and hook.Run("PlayerSpawnObject", player, model)==false then SF.Throw("Not allowed to use model: "..model, 3) end
+	if ply~=SF.Superuser and hook.Run("PlayerSpawnObject", ply, model)==false then SF.Throw("Not allowed to use model: "..model, 3) end
 	return model
 end
 
@@ -1554,13 +1554,15 @@ function SF.CheckSound(ply, path)
 		SF.Throw("Invalid sound flags! "..flags, 3)
 	end
 
-	local UserUniqueSounds = SF.UniqueSounds[ply:SteamID()]
-	if not UserUniqueSounds[checkpath] then
-		if UserUniqueSounds[1] >= maxUniqueSounds:GetInt() then
-			SF.Throw("The unique sounds limit has been reached.", 3)
+	if ply~=SF.Superuser then
+		local UserUniqueSounds = SF.UniqueSounds[ply:SteamID()]
+		if not UserUniqueSounds[checkpath] then
+			if UserUniqueSounds[1] >= maxUniqueSounds:GetInt() then
+				SF.Throw("The unique sounds limit has been reached.", 3)
+			end
+			UserUniqueSounds[checkpath] = true
+			UserUniqueSounds[1] = UserUniqueSounds[1] + 1
 		end
-		UserUniqueSounds[checkpath] = true
-		UserUniqueSounds[1] = UserUniqueSounds[1] + 1
 	end
 end
 
