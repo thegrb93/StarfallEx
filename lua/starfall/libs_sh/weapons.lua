@@ -123,6 +123,20 @@ function weapon_methods:getToolMode()
 	return ent:GetClass()=="gmod_tool" and ent.Mode or ""
 end
 
+--- Returns the view model of the weapon.
+-- @shared
+-- @return string The view model of the weapon.
+function weapon_methods:getViewModel()
+	return getwep(self):GetWeaponViewModel()
+end
+
+--- Returns the world model of the weapon.
+-- @shared
+-- @return string The world model of the weapon.
+function weapon_methods:getWorldModel()
+	return getwep(self):GetWeaponWorldModel()
+end
+
 if CLIENT then
 	--- Gets Display name of weapon
 	-- @client
