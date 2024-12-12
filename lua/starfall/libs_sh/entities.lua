@@ -1068,11 +1068,11 @@ if SERVER then
 		local BulletInfo = {
 			Attacker = instance.player,
 			Callback = callback,
-			Damage = math.Clamp(bulletInfo.Damage, 1, 100),
-			Force = math.Clamp(bulletInfo.Force, 0, 100),
+			Damage = math.Clamp(bulletInfo.Damage or 1, 1, 100),
+			Force = math.Clamp(bulletInfo.Force or 0, 0, 100),
 			Distance = bulletInfo.Distance,
-			HullSize = math.min(bulletInfo.HullSize, 10),
-			Num = math.min(bulletInfo.Num, 5),
+			HullSize = math.min(bulletInfo.HullSize or 0, 10),
+			Num = math.min(bulletInfo.Num or 1, 5),
 			Tracer = bulletInfo.Tracer or 1,
 			AmmoType = (allowedAmmoType[bulletInfo.AmmoType] and bulletInfo.AmmoType) or "SMG1",
 			TracerName = (allowedTracer[bulletInfo.TracerName] and bulletInfo.TracerName) or "Tracer" ,
@@ -1094,6 +1094,8 @@ if SERVER then
 	-- @return boolean canShoot true if the given bullets can be fired or else false
 	function ents_methods:canfireBullets(bulletInfo)
 		checkluatype(bulletInfo, TYPE_TABLE)
+		bulletInfo.Damage = bulletInfo.Damage or 1
+		bulletInfo.Num = bulletInfo.Num or 1
 		return (fireBulletsBurst:check(instance.player) >= bulletInfo.Num and fireBulletsDPSBurst:check(instance.player) >= bulletInfo.Damage * bulletInfo.Num) and true or false
 	end
 end
