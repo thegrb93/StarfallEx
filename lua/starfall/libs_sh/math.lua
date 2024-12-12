@@ -351,7 +351,7 @@ end
 -- @return Angle The interpolated angle
 function math_library.lerpAngle(ratio, from, to)
 	checkluatype(ratio, TYPE_NUMBER)
-	return awrap(LerpAngle(ratio, aunwrap(from), aunwrap(to)))
+	return awrap(LerpAngle(ratio, aqunwrap1(from), aqunwrap2(to)))
 end
 
 --- Calculates point between first and second vector using given fraction and linear interpolation.
@@ -362,7 +362,7 @@ end
 -- @return Vector The interpolated vector
 function math_library.lerpVector(ratio, from, to)
 	checkluatype(ratio, TYPE_NUMBER)
-	return vwrap(LerpVector(ratio, vunwrap(from), vunwrap(to)))
+	return vwrap(LerpVector(ratio, vqunwrap1(from), vqunwrap2(to)))
 end
 
 --- Gets the distance between a line and a point in 3d space
@@ -373,7 +373,7 @@ end
 -- @return Vector Nearest point on line
 -- @return number Distance along line from start
 function math_library.distanceToLine(lineStart, lineEnd, pointPos)
-	local nearDist, nearPoint, startDist = util.DistanceToLine(vunwrap(lineStart), vunwrap(lineEnd), vunwrap(pointPos))
+	local nearDist, nearPoint, startDist = util.DistanceToLine(vqunwrap1(lineStart), vqunwrap2(lineEnd), vqunwrap3(pointPos))
 	return nearDist, vwrap(nearPoint), startDist
 end
 

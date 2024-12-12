@@ -34,7 +34,7 @@ function instance.env.Matrix(t, v)
 		checkluatype(t, TYPE_TABLE)
 		if dgetmeta(t)==ang_meta then
 			m = Matrix()
-			m:SetAngles(aunwrap(t))
+			m:SetAngles(aqunwrap1(t))
 		else
 			m = Matrix(t)
 		end
@@ -42,7 +42,7 @@ function instance.env.Matrix(t, v)
 		m = Matrix()
 	end
 	if v~=nil then
-		m:SetTranslation(vunwrap(v))
+		m:SetTranslation(vqunwrap1(v))
 	end
 	return wrap(m)
 end
@@ -83,7 +83,7 @@ end
 -- Self-Modifies. Does not return anything
 -- @param Angle ang Angle to rotate by
 function vmatrix_methods:rotate(ang)
-	unwrap(self):Rotate(aunwrap(ang))
+	unwrap(self):Rotate(aqunwrap1(ang))
 end
 
 --- Returns the input matrix rotated by an axis
@@ -130,14 +130,14 @@ end
 -- Self-Modifies. Does not return anything
 -- @param Vector vec New scale
 function vmatrix_methods:setScale(vec)
-	unwrap(self):SetScale(vunwrap(vec))
+	unwrap(self):SetScale(vqunwrap1(vec))
 end
 
 --- Scale the matrix
 -- Self-Modifies. Does not return anything
 -- @param Vector vec Vector to scale by
 function vmatrix_methods:scale(vec)
-	unwrap(self):Scale(vunwrap(vec))
+	unwrap(self):Scale(vqunwrap1(vec))
 end
 
 --- Scales the absolute translation
@@ -152,35 +152,35 @@ end
 -- Self-Modifies. Does not return anything
 -- @param Angle ang New angles
 function vmatrix_methods:setAngles(ang)
-	unwrap(self):SetAngles(aunwrap(ang))
+	unwrap(self):SetAngles(aqunwrap1(ang))
 end
 
 --- Sets the translation
 -- Self-Modifies. Does not return anything
 -- @param Vector vec New translation
 function vmatrix_methods:setTranslation(vec)
-	unwrap(self):SetTranslation(vunwrap(vec))
+	unwrap(self):SetTranslation(vqunwrap1(vec))
 end
 
 --- Sets the forward direction of the matrix. First column
 -- Self-Modifies. Does not return anything
 -- @param Vector forward The forward vector
 function vmatrix_methods:setForward(forward)
-	unwrap(self):SetForward(vunwrap(forward))
+	unwrap(self):SetForward(vqunwrap1(forward))
 end
 
 --- Sets the right direction of the matrix. Negated second column
 -- Self-Modifies. Does not return anything
 -- @param Vector right The right vector
 function vmatrix_methods:setRight(right)
-	unwrap(self):SetRight(vunwrap(right))
+	unwrap(self):SetRight(vqunwrap1(right))
 end
 
 --- Sets the up direction of the matrix. Third column
 -- Self-Modifies. Does not return anything
 -- @param Vector up The up vector
 function vmatrix_methods:setUp(up)
-	unwrap(self):SetUp(vunwrap(up))
+	unwrap(self):SetUp(vqunwrap1(up))
 end
 
 --- Sets a specific field in the matrix
@@ -252,7 +252,7 @@ end
 --- Translate the matrix
 -- @param Vector vec Vector to translate by
 function vmatrix_methods:translate(vec)
-	unwrap(self):Translate(vunwrap(vec))
+	unwrap(self):Translate(vqunwrap1(vec))
 end
 
 --- Converts the matrix to a 4x4 table
@@ -366,7 +366,7 @@ function vmatrix_meta.__mul(lhs, rhs)
 	if rhsmeta == vmatrix_meta then
 		return wrap(unwrap(lhs) * unwrap(rhs))
 	elseif rhsmeta == vec_meta then
-		return vwrap(unwrap(lhs) * vunwrap(rhs))
+		return vwrap(unwrap(lhs) * vqunwrap1(rhs))
 	else
 		SF.Throw("Matrix must be multiplied with another matrix or vector on right hand side", 2)
 	end

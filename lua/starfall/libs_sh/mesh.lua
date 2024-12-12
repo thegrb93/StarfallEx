@@ -1064,14 +1064,14 @@ if CLIENT then
 	-- @param Vector normal Normal
 	-- @client
 	function mesh_library.writeNormal(normal)
-		mesh.Normal(vunwrap(normal))
+		mesh.Normal(vqunwrap1(normal))
 	end
 
 	--- Sets the vertex position
 	-- @param Vector position Position
 	-- @client
 	function mesh_library.writePosition(pos)
-		mesh.Position(vunwrap(pos))
+		mesh.Position(vqunwrap1(pos))
 	end
 
 	--- Sets the vertex texture coordinates
@@ -1100,7 +1100,7 @@ if CLIENT then
 	-- @param Vector v4 Vertex4 position
 	-- @client
 	function mesh_library.writeQuad(v1, v2, v3, v4)
-		mesh.Quad(vunwrap(v1), vunwrap(v2), vunwrap(v3), vunwrap(v4))
+		mesh.Quad(vqunwrap1(v1), vqunwrap2(v2), vqunwrap3(v3), vqunwrap4(v4))
 	end
 
 	--- Draws a quad using a position, normal and size
@@ -1110,7 +1110,7 @@ if CLIENT then
 	-- @param number h
 	-- @client
 	function mesh_library.writeQuadEasy(position, normal, w, h)
-		mesh.QuadEasy(vunwrap(position), vunwrap(normal), w, h)
+		mesh.QuadEasy(vqunwrap1(position), vqunwrap2(normal), w, h)
 	end
 
 	--- Pushes the vertex data onto the render stack

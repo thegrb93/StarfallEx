@@ -148,7 +148,7 @@ if SERVER then
 	function npc_methods:goWalk(vec)
 		local npc = getnpc(self)
 		checkpermission(instance, npc, "npcs.modify")
-		npc:SetLastPosition(vunwrap(vec))
+		npc:SetLastPosition(vqunwrap1(vec))
 		npc:SetSchedule(SCHED_FORCED_GO)
 	end
 
@@ -158,7 +158,7 @@ if SERVER then
 	function npc_methods:goRun(vec)
 		local npc = getnpc(self)
 		checkpermission(instance, npc, "npcs.modify")
-		npc:SetLastPosition(vunwrap(vec))
+		npc:SetLastPosition(vqunwrap1(vec))
 		npc:SetSchedule(SCHED_FORCED_GO_RUN)
 	end
 end

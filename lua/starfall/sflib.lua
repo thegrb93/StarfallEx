@@ -8,7 +8,30 @@ SF.ResourceCounters = {}
 SF.Superuser = {IsValid = function() return false end, SteamID64 = function() return "Superuser" end}
 local dgetmeta = debug.getmetatable
 local TypeID = TypeID
-local IsValid = FindMetaTable("Entity").IsValid
+local math_Clamp = math.Clamp
+local ENT_META = FindMetaTable("Entity")
+local Ent_IsValid = ENT_META.IsValid
+local Ent_IsWorld = ENT_META.IsWorld
+local Ent_IsPlayer = ENT_META.IsPlayer
+local Ent_IsScripted = ENT_META.IsScripted
+local Ent_GetClass = ENT_META.GetClass
+local Ent_GetCreationID = ENT_META.GetCreationID
+local Ent_EntIndex = ENT_META.EntIndex
+local Ent_GetPos = ENT_META.GetPos
+local Ent_GetAngles = ENT_META.GetAngles
+local Ent_GetParent = ENT_META.GetParent
+local Ent_GetChildren = ENT_META.GetChildren
+local Ent_SetPos = ENT_META.SetPos
+local Ent_SetAngles = ENT_META.SetAngles
+local Ent_SetParent = ENT_META.SetParent
+local Ent_SetLocalVelocity = ENT_META.SetLocalVelocity
+local Ent_Fire = ENT_META.Fire
+local Ent_FollowBone = ENT_META.FollowBone
+local PLY_META = FindMetaTable("Player")
+local Ply_Nick = PLY_META.Nick
+local Ply_SteamID = PLY_META.SteamID
+local Ply_IsSuperAdmin = PLY_META.IsSuperAdmin
+local Ply_PrintMessage = PLY_META.PrintMessage
 
 -- Make sure this is done after metatables have been set
 hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
@@ -98,7 +121,7 @@ hook.Add("EntityRemoved","SF_CallOnRemove",function(ent)
 		end
 		if CLIENT then
 			timer.Simple(0, function()
-				if not IsValid(ent) then
+				if not Ent_IsValid(ent) then
 					for k, v in pairs(hooks) do
 						if v[2] then v[2](ent) end
 					end
@@ -198,7 +221,7 @@ SF.BurstObject = {
 			return obj.val
 		end,
 		get = function(self, ply)
-			if ply~=SF.Superuser and not IsValid(ply) then SF.Throw("Invalid starfall user", 4) end
+			if ply~=SF.Superuser and not Ent_IsValid(ply) then SF.Throw("Invalid starfall user", 4) end
 			local obj = self.objects[ply]
 			if not obj then
 				obj = {
@@ -238,7 +261,7 @@ SF.LimitObject = {
 	__index = {
 		use = function(self, ply, amount)
 			if ply==SF.Superuser then return end
-			if IsValid(ply) then
+			if Ent_IsValid(ply) then
 				local new = self.counters[ply] + amount
 				if new > self.max then
 					SF.Throw("The ".. self.name .." limit has been reached. (".. self.max ..")", 3)
@@ -250,7 +273,7 @@ SF.LimitObject = {
 		end,
 		checkuse = function(self, ply, amount)
 			if ply==SF.Superuser then return end
-			if IsValid(ply) then
+			if Ent_IsValid(ply) then
 				if self.counters[ply] + amount > self.max then
 					SF.Throw("The ".. self.name .." limit has been reached. (".. self.max ..")", 3)
 				end
@@ -260,7 +283,7 @@ SF.LimitObject = {
 		end,
 		check = function(self, ply)
 			if ply==SF.Superuser then return self.max end
-			if IsValid(ply) then
+			if Ent_IsValid(ply) then
 				return self.max - self.counters[ply]
 			else
 				SF.Throw("Invalid starfall user", 3)
@@ -268,13 +291,13 @@ SF.LimitObject = {
 		end,
 		free = function(self, ply, amount)
 			if ply==SF.Superuser then return end
-			if IsValid(ply) then
-				self.counters[ply] = math.Clamp(self.counters[ply] - amount, 0, self.max)
+			if Ent_IsValid(ply) then
+				self.counters[ply] = math_Clamp(self.counters[ply] - amount, 0, self.max)
 			end
 		end,
 		get = function(self, ply)
 			if ply==SF.Superuser then return 0 end
-			if IsValid(ply) then
+			if Ent_IsValid(ply) then
 				return self.counters[ply]
 			else
 				return 0
@@ -447,7 +470,7 @@ SF.NetValidator = {
 			end
 		end,
 		tick = function(self)
-			if IsValid(self.player) then
+			if Ent_IsValid(self.player) then
 				self.validation = math.random()
 				net.Start("starfall_net_validate")
 				net.WriteDouble(self.validation)
@@ -464,7 +487,7 @@ SF.NetValidator = {
 	__call = function(p, ply, success)
 		local t = setmetatable({
 			player = ply,
-			timername = "sf_net_validate"..ply:EntIndex(),
+			timername = "sf_net_validate"..Ent_EntIndex(ply),
 			successes = 0,
 			success = success,
 		}, p)
@@ -491,7 +514,7 @@ end
 
 local function steamIdToConsoleSafeName(steamid)
 	local ply = player.GetBySteamID(steamid)
-	return IsValid(ply) and string.gsub(ply:Nick(), '[%z\x01-\x1f\x7f;"\']', "") or ""
+	return Ent_IsValid(ply) and string.gsub(Ply_Nick(ply), '[%z\x01-\x1f\x7f;"\']', "") or ""
 end
 
 --- Returns a class that can keep a list of blocked users
@@ -592,50 +615,48 @@ setmetatable(SF.BlockedList, SF.BlockedList)
 SF.Parent = {
 	__index = {
 		updateTransform = function(self)
-			self.pos, self.ang = WorldToLocal(self.ent:GetPos(), self.ent:GetAngles(), self.parent:GetPos(), self.parent:GetAngles())
+			self.pos, self.ang = WorldToLocal(Ent_GetPos(self.ent), Ent_GetAngles(self.ent), Ent_GetPos(self.parent), Ent_GetAngles(self.parent))
 		end,
 
 		applyTransform = function(self)
-			local pos, ang = LocalToWorld(self.pos, self.ang, self.parent:GetPos(), self.parent:GetAngles())
-			self.ent:SetPos(pos)
-			self.ent:SetAngles(ang)
+			local pos, ang = LocalToWorld(self.pos, self.ang, Ent_GetPos(self.parent), Ent_GetAngles(self.parent))
+			Ent_SetPos(self.ent, pos)
+			Ent_SetAngles(self.ent, ang)
 		end,
 		
 		parentTypes = {
 			entity = {
 				function(self)
-					self.ent:SetParent(self.parent)
+					Ent_SetParent(self.ent, self.parent)
 				end,
 				function(self)
-					local ent = self.ent
-					ent:SetParent()
-					ent:SetLocalVelocity(ent.targetLocalVelocity or vector_origin)
+					Ent_SetParent(self.ent)
+					Ent_SetLocalVelocity(self.ent, Ent_GetTable(ent).targetLocalVelocity or vector_origin)
 				end
 			},
 			attachment = {
 				function(self)
-					self.ent:SetParent(self.parent)
-					self.ent:Fire("SetParentAttachmentMaintainOffset", self.param, 0.01)
+					Ent_SetParent(self.ent, self.parent)
+					Ent_Fire(self.ent, "SetParentAttachmentMaintainOffset", self.param, 0.01)
 				end,
 				function(self)
-					self.ent:SetParent()
+					Ent_SetParent(self.ent)
 				end
 			},
 			bone = {
 				function(self)
-					self.ent:FollowBone(self.parent, self.param)
+					Ent_FollowBone(self.ent, self.parent, self.param)
 				end,
 				function(self)
-					local ent = self.ent
-					ent:FollowBone(NULL, 0)
-					ent:SetLocalVelocity(ent.targetLocalVelocity or vector_origin)
+					Ent_FollowBone(self.ent, NULL, 0)
+					Ent_SetLocalVelocity(self.ent, Ent_GetTable(ent).targetLocalVelocity or vector_origin)
 				end
 			}
 		},
 
 		setParent = function(self, parent, type, param)
-			if IsValid(self.parent) then
-				self.parent.sfParent.children[self.ent] = nil
+			if Ent_IsValid(self.parent) then
+				Ent_GetTable(self.parent).sfParent.children[self.ent] = nil
 				self:removeParent()
 			end
 			if parent then
@@ -643,7 +664,7 @@ SF.Parent = {
 				self.param = param
 				self.applyParent, self.removeParent = unpack(self.parentTypes[type])
 
-				parent.sfParent.children[self.ent] = self
+				Ent_GetTable(parent).sfParent.children[self.ent] = self
 				self:updateTransform()
 				self:applyParent()
 			else
@@ -656,24 +677,25 @@ SF.Parent = {
 
 		fix = function(self)
 			local cleanup = true
-			if IsValid(self.parent) then
+			if Ent_IsValid(self.parent) then
 				cleanup = false
 			end
 			for child, data in pairs(self.children) do
-				if IsValid(child) then
+				if Ent_IsValid(child) then
 					data:applyTransform()
 					data:applyParent()
 					cleanup = false
 					
-					if child.sfParent then
-						child.sfParent:fix()
+					local sfParent = Ent_GetTable(child).sfParent
+					if sfParent then
+						sfParent:fix()
 					end
 				else
 					self.children[child] = nil
 				end
 			end
 			if cleanup then
-				self.ent.sfParent = nil
+				Ent_GetTable(self.ent).sfParent = nil
 			end
 		end,
 	},
@@ -682,27 +704,33 @@ SF.Parent = {
 		if parent then
 			if SF.ParentChainTooLong(parent, child) then SF.Throw("Parenting chain cannot exceed 16 or crash may occur", 3) end
 
-			if not parent.sfParent then
-				parent.sfParent = setmetatable({
+			local sfParent
+			sfParent = Ent_GetTable(parent).sfParent
+			if not sfParent then
+				sfParent = setmetatable({
 					ent = parent,
 					children = {}
 				}, meta)
+				Ent_GetTable(parent).sfParent = sfParent
 			end
 
-			local sfParent = child.sfParent
+			sfParent = Ent_GetTable(child).sfParent
 			if not sfParent then
 				sfParent = setmetatable({
 					ent = child,
 					children = {}
 				}, meta)
-				child.sfParent = sfParent
+				Ent_GetTable(child).sfParent = sfParent
 			end
 
 			sfParent:setParent(parent, type, param)
-		elseif child.sfParent then
-			child.sfParent:setParent()
 		else
-			child:SetParent()
+			local sfParent = Ent_GetTable(child).sfParent
+			if sfParent then
+				sfParent:setParent()
+			else
+				Ent_SetParent(child)
+			end
 		end
 	end
 }
@@ -711,7 +739,7 @@ setmetatable(SF.Parent, SF.Parent)
 if CLIENT then
 	-- When parent is retransmitted, it loses it's children
 	hook.Add("NotifyShouldTransmit", "SF_HologramParentFix", function(ent)
-		local sfParent = ent.sfParent
+		local sfParent = Ent_GetTable(ent).sfParent
 		if sfParent then sfParent:fix() end
 	end)
 end
@@ -774,11 +802,6 @@ SF.Errormeta = {
 
 
 --- Builds an error type to that contains line numbers, file name, and traceback
--- @param msg Message
--- @param level Which level in the stacktrace to blame
--- @param uncatchable Makes this exception uncatchable
--- @param prependinfo The error message needs file and line number info
--- @param userdata User's own error data that starfall's pcall will return if it exists
 function SF.MakeError(msg, level, uncatchable, prependinfo, userdata)
 	level = 1 + (level or 1)
 	local info = debug.getinfo(level, "Sl")
@@ -1038,20 +1061,20 @@ function SF.SteamIDConcommand(name, callback, helptext, findplayer, completionli
 	concommand.Add(name, function(executor, cmd, arg)
 		local retval = arg[1]
 		if not retval then
-			executor:PrintMessage( HUD_PRINTCONSOLE, "Missing steam id\n" )
+			Ply_PrintMessage( executor, HUD_PRINTCONSOLE, "Missing steam id\n" )
 			return
 		end
 		if not string.match(retval, "%D") then
 			retval = util.SteamIDFrom64(retval) or ""
 		end
 		if not string.match(retval, "^STEAM_") then
-			executor:PrintMessage( HUD_PRINTCONSOLE, "Invalid steam id\n" )
+			Ply_PrintMessage( executor, HUD_PRINTCONSOLE, "Invalid steam id\n" )
 			return
 		end
 		if findplayer then
 			retval = player.GetBySteamID( retval )
 			if not retval then
-				executor:PrintMessage( HUD_PRINTCONSOLE, "Player not found\n" )
+				Ply_PrintMessage( executor, HUD_PRINTCONSOLE, "Player not found\n" )
 				return
 			end
 		end
@@ -1061,7 +1084,7 @@ function SF.SteamIDConcommand(name, callback, helptext, findplayer, completionli
 	end, completionlist or function(cmd)
 		local tbl = {}
 		for _, ply in pairs(player.GetHumans()) do
-			local steamid = ply:SteamID()
+			local steamid = Ply_SteamID(ply)
 			table.insert(tbl, cmd.." \""..steamid.."\" // \""..steamIdToConsoleSafeName(steamid).."\"")
 		end
 		return tbl
@@ -1204,11 +1227,6 @@ function SF.TypeName(typeid)
 	return assert(SF.TYPENAME[typeid], "Type not defined")
 end
 
---- Checks the lua type of val. Errors if the types don't match
--- @param val The value to be checked.
--- @param typ A string type or metatable.
--- @param level Level at which to error at. 2 is added to this value. Default is 1.
--- @param msg Optional error message
 function SF.CheckLuaType(val, typ, level, msg)
 	if TypeID(val) ~= typ then
 		assert(isnumber(typ))
@@ -1218,30 +1236,27 @@ function SF.CheckLuaType(val, typ, level, msg)
 end
 
 --- Checks that the value is a non-nan number
--- @param val The value to be checked.
--- @param level Level at which to error at. 2 is added to this value. Default is 1.
--- @param msg Optional error message
 function SF.CheckValidNumber(val, level, msg)
 	if TypeID(val) ~= TYPE_NUMBER then SF.ThrowTypeError(SF.TypeName(TYPE_NUMBER), SF.GetType(val), (level or 1) + 2, msg) end
 	if val ~= val then SF.Throw((msg and #msg>0 and (msg .. " ") or "") .. "Input number is nan!", (level or 1) + 2) end
 end
 
 function SF.EntIsReady(ent)
-	if ent:IsWorld() then return true end
-	if not IsValid(ent) then return false end
+	if Ent_IsWorld(ent) then return true end
+	if not Ent_IsValid(ent) then return false end
 
 	-- https://github.com/Facepunch/garrysmod-issues/issues/3127
-	local class = ent:GetClass()
+	local class = Ent_GetClass(ent)
 	if class=="player" then
-		return ent:IsPlayer()
+		return Ent_IsPlayer(ent)
 	elseif class=="starfall_processor" then
-		return ent.Compile~=nil
+		return Ent_GetTable(ent).Compile~=nil
 	elseif class=="starfall_hologram" then
-		return ent.SetClip~=nil
+		return Ent_GetTable(ent).SetClip~=nil
 	elseif class=="starfall_prop" then
-		return ent.BuildPhysics~=nil
+		return Ent_GetTable(ent).BuildPhysics~=nil
 	elseif class=="starfall_screen" or class=="starfall_hud" then
-		return ent:IsScripted()
+		return Ent_IsScripted(ent)
 	else
 		return true
 	end
@@ -1275,7 +1290,7 @@ end
 function SF.WaitForEntity(index, creationIndex, callback)
 	SF.WaitForConditions(function()
 		local ent=Entity(index)
-		if SF.EntIsReady(ent) and ent:GetCreationID()==creationIndex then
+		if SF.EntIsReady(ent) and Ent_GetCreationID(ent)==creationIndex then
 			ProtectedCall(callback, ent)
 			return true
 		end
@@ -1329,7 +1344,7 @@ do
 	end
 	typetostringfuncs[TYPE_STRING] = function(x) ss:writeInt8(TYPE_STRING) ss:writeInt32(#x) ss:write(x) end
 	typetostringfuncs[TYPE_BOOL] = function(x) ss:writeInt8(TYPE_BOOL) ss:writeInt8(x and 1 or 0) end
-	typetostringfuncs[TYPE_ENTITY] = function(x) ss:writeInt8(TYPE_ENTITY) ss:writeInt16(x:EntIndex()) end
+	typetostringfuncs[TYPE_ENTITY] = function(x) ss:writeInt8(TYPE_ENTITY) ss:writeInt16(Ent_EntIndex(x)) end
 	typetostringfuncs[TYPE_VECTOR] = function(x) ss:writeInt8(TYPE_VECTOR) for i=1, 3 do ss:writeFloat(x[i]) end end
 	typetostringfuncs[TYPE_ANGLE] = function(x) ss:writeInt8(TYPE_ANGLE) for i=1, 3 do ss:writeFloat(x[i]) end end
 	typetostringfuncs[TYPE_COLOR] = function(x) ss:writeInt8(TYPE_COLOR) ss:writeInt8(x.r) ss:writeInt8(x.g) ss:writeInt8(x.b) ss:writeInt8(x.a) end
@@ -1555,7 +1570,7 @@ function SF.CheckSound(ply, path)
 	end
 
 	if ply~=SF.Superuser then
-		local UserUniqueSounds = SF.UniqueSounds[ply:SteamID()]
+		local UserUniqueSounds = SF.UniqueSounds[Ply_SteamID(ply)]
 		if not UserUniqueSounds[checkpath] then
 			if UserUniqueSounds[1] >= maxUniqueSounds:GetInt() then
 				SF.Throw("The unique sounds limit has been reached.", 3)
@@ -1584,7 +1599,7 @@ local drawEntityClasses = {
 	["prop_vehicle_prisoner_pod"] = true,
 }
 function SF.CanDrawEntity(ent)
-	return drawEntityClasses[ent:GetClass()] and not IsValid(ent:GetParent()) and ent.RenderOverride==nil
+	return drawEntityClasses[Ent_GetClass(ent)] and not Ent_IsValid(Ent_GetParent(ent)) and Ent_GetTable(ent).RenderOverride==nil
 end
 
 --- Chooses whether to use absolute or relative path
@@ -1638,16 +1653,16 @@ end
 function SF.ParentChainTooLong(parent, child)
 	local index = parent
 	local parentLength = 0
-	while IsValid(index) do
+	while Ent_IsValid(index) do
 		if index == child then return true end
 		parentLength = parentLength + 1
-		index = index:GetParent()
+		index = Ent_GetParent(index)
 	end
 
 	local function getChildLength(curchild, count)
 		if count > 16 then return count end
 		local max = count
-		for k, v in pairs(curchild:GetChildren()) do
+		for k, v in pairs(Ent_GetChildren(curchild)) do
 			if v == parent then return 17 end
 			max = math.max(max, getChildLength(v, count + 1))
 		end
@@ -1661,11 +1676,10 @@ end
 -- This function clamps the position before moving the entity
 local minx, miny, minz = -16384, -16384, -16384
 local maxx, maxy, maxz = 16384, 16384, 16384
-local clamp = math.Clamp
 function SF.clampPos(pos)
-	pos.x = clamp(pos.x, minx, maxx)
-	pos.y = clamp(pos.y, miny, maxy)
-	pos.z = clamp(pos.z, minz, maxz)
+	pos.x = math_Clamp(pos.x, minx, maxx)
+	pos.y = math_Clamp(pos.y, miny, maxy)
+	pos.z = math_Clamp(pos.z, minz, maxz)
 	return pos
 end
 
@@ -1692,7 +1706,7 @@ function SF.dumbTrace(entity, pos)
 end
 
 function SF.IsHUDActive(ent, ply)
-	local tbl = ent.ActiveHuds
+	local tbl = Ent_GetTable(ent).ActiveHuds
 	return tbl and tbl[SERVER and (ply or error("Missing player arg")) or LocalPlayer()]
 end
 
@@ -1735,7 +1749,7 @@ if SERVER then
 	util.AddNetworkString("starfall_print")
 
 	function SF.AddNotify(ply, msg, notifyType, duration, sound)
-		if not IsValid(ply) then return end
+		if not Ent_IsValid(ply) then return end
 
 		net.Start("starfall_addnotify")
 		net.WriteString(string.sub(msg, 1, 1024))
@@ -1788,8 +1802,8 @@ else
 		local plyStr
 		if ply == SF.Superuser then
 			plyStr = "Superuser"
-		elseif IsValid(ply) then
-			plyStr = ply:Nick() .. " [" .. ply:SteamID() .. "]"
+		elseif Ent_IsValid(ply) then
+			plyStr = Ply_Nick(ply) .. " [" .. Ply_SteamID(ply) .. "]"
 		else
 			plyStr = "Invalid user"
 		end
@@ -2203,7 +2217,7 @@ do
 
 		-- Command to reload the libraries
 		concommand.Add("sf_reloadlibrary", function(ply, com, arg)
-			if IsValid(ply) and not ply:IsSuperAdmin() then return end
+			if Ent_IsValid(ply) and not Ply_IsSuperAdmin(ply) then return end
 			local name = arg[1]
 			if not name then return end
 			name = string.lower(name)

@@ -1146,10 +1146,10 @@ end
 function builtins_library.worldToLocal(pos, ang, newSystemOrigin, newSystemAngles)
 
 	local localPos, localAngles = WorldToLocal(
-		vunwrap(pos),
-		aunwrap(ang),
-		vunwrap(newSystemOrigin),
-		aunwrap(newSystemAngles)
+		vqunwrap1(pos),
+		aqunwrap1(ang),
+		vqunwrap2(newSystemOrigin),
+		aqunwrap2(newSystemAngles)
 	)
 
 	return vwrap(localPos), awrap(localAngles)
@@ -1165,10 +1165,10 @@ end
 function builtins_library.localToWorld(localPos, localAng, originPos, originAngle)
 
 	local worldPos, worldAngles = LocalToWorld(
-		vunwrap(localPos),
-		aunwrap(localAng),
-		vunwrap(originPos),
-		aunwrap(originAngle)
+		vqunwrap1(localPos),
+		aqunwrap1(localAng),
+		vqunwrap2(originPos),
+		aqunwrap2(originAngle)
 	)
 
 	return vwrap(worldPos), awrap(worldAngles)

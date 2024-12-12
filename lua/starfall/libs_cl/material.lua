@@ -844,7 +844,7 @@ end
 -- @param Vector v The value to set it to
 function material_methods:setVector(key, v)
 	checkkey(key)
-	unwrap(self):SetVector(key, vunwrap(v))
+	unwrap(self):SetVector(key, vqunwrap1(v))
 end
 
 end

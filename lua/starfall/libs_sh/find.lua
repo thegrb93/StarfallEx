@@ -68,9 +68,7 @@ end
 function find_library.inBox(min, max, filter)
 	checkpermission(instance, nil, "find")
 
-	local min, max = vunwrap(min), vunwrap(max)
-
-	return convert(ents.FindInBox(min, max), filter)
+	return convert(ents.FindInBox(vqunwrap1(min), vqunwrap2(max)), filter)
 end
 
 --- Finds entities in a sphere
@@ -82,9 +80,7 @@ function find_library.inSphere(center, radius, filter)
 	checkpermission(instance, nil, "find")
 	checkluatype (radius, TYPE_NUMBER)
 
-	local center = vunwrap(center)
-
-	return convert(ents.FindInSphere(center, radius), filter)
+	return convert(ents.FindInSphere(vqunwrap1(center), radius), filter)
 end
 
 --- Finds entities in a cone
@@ -99,9 +95,7 @@ function find_library.inCone(pos, dir, distance, radius, filter)
 	checkluatype (distance, TYPE_NUMBER)
 	checkluatype (radius, TYPE_NUMBER)
 
-	local pos, dir = vunwrap(pos), vunwrap(dir)
-
-	return convert(ents.FindInCone(pos, dir, distance, radius), filter)
+	return convert(ents.FindInCone(vqunwrap1(pos), vqunwrap2(dir), distance, radius), filter)
 end
 
 --- Finds entities in a ray
@@ -114,12 +108,12 @@ end
 function find_library.inRay(startpos, endpos, mins, maxs, filter)
 	checkpermission(instance, nil, "find")
 
-	startpos = vunwrap(startpos)
-	endpos = vunwrap(endpos)
+	startpos = vqunwrap1(startpos)
+	endpos = vqunwrap2(endpos)
 
 	if mins ~= nil or maxs ~= nil then
-		mins = vunwrap(mins)
-		maxs = vunwrap(maxs)
+		mins = vqunwrap3(mins)
+		maxs = vqunwrap4(maxs)
 	end
 
 	return convert(ents.FindAlongRay(startpos, endpos, mins, maxs), filter)
@@ -166,8 +160,7 @@ if SERVER then
 	-- @return table An array of found entities
 	function find_library.inPVS(pos, filter)
 		checkpermission(instance, nil, "find")
-
-		return convert(ents.FindInPVS(vunwrap(pos)), filter)
+		return convert(ents.FindInPVS(vqunwrap1(pos)), filter)
 	end
 end
 

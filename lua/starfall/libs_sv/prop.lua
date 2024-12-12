@@ -56,8 +56,8 @@ function props_library.create(pos, ang, model, frozen)
 	checkluatype(model, TYPE_STRING)
 	if frozen~=nil then checkluatype(frozen, TYPE_BOOL) else frozen = false end
 
-	local pos = SF.clampPos(vunwrap(pos))
-	local ang = aunwrap(ang)
+	pos = SF.clampPos(vqunwrap1(pos))
+	ang = aqunwrap1(ang)
 
 	local ply = instance.player
 	model = SF.CheckModel(model, ply, true)
@@ -155,8 +155,8 @@ end
 -- @param boolean? frozen True to spawn the entity in a frozen state. Default = False
 -- @return Entity The prop object
 function props_library.createCustom(pos, ang, vertices, frozen)
-	local pos = SF.clampPos(vunwrap(pos))
-	local ang = aunwrap(ang)
+	pos = SF.clampPos(vqunwrap1(pos))
+	ang = aqunwrap1(ang)
 	checkluatype(vertices, TYPE_TABLE)
 	if frozen~=nil then checkluatype(frozen, TYPE_BOOL) else frozen = false end
 
@@ -185,7 +185,7 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 		local t = {}
 		for o, p in ipairs(v) do
 			if o>maxVerticesPerConvex then SF.Throw("Exceeded the max vertices per convex (" .. maxVerticesPerConvex .. ")", 2) end
-			local vec = vunwrap(p)
+			local vec = vqunwrap2(p)
 			if math.abs(vec.x)>max or math.abs(vec.y)>max or math.abs(vec.z)>max then SF.Throw("The custom prop cannot exceed a hull size of " .. max, 2) end
 			if vec.x~=vec.x or vec.y~=vec.y or vec.z~=vec.z then SF.Throw("Your mesh contains nan values!", 2) end
 			for i=1, o-1 do
@@ -265,8 +265,8 @@ function props_library.createComponent(pos, ang, class, model, frozen)
 
 	if not allowed_components[class] then return SF.Throw("Invalid class!", 1) end
 
-	local pos = SF.clampPos(vunwrap(pos))
-	local ang = aunwrap(ang)
+	local pos = SF.clampPos(vqunwrap1(pos))
+	local ang = aqunwrap1(ang)
 
 	local ply = instance.player
 	model = SF.CheckModel(model, ply, true)
@@ -356,8 +356,8 @@ function props_library.createSeat(pos, ang, model, frozen)
 	checkluatype(model, TYPE_STRING)
 	if frozen~=nil then checkluatype(frozen, TYPE_BOOL) else frozen = false end
 
-	local pos = SF.clampPos(vunwrap(pos))
-	local ang = aunwrap(ang)
+	local pos = SF.clampPos(vqunwrap1(pos))
+	local ang = aqunwrap1(ang)
 
 	local ply = instance.player
 	model = SF.CheckModel(model, ply, true)
@@ -416,8 +416,8 @@ function props_library.createSent(pos, ang, class, frozen, data)
 	checkluatype(class, TYPE_STRING)
 	if frozen~=nil then checkluatype(frozen, TYPE_BOOL) else frozen = false end
 
-	local pos = SF.clampPos(vunwrap(pos))
-	local ang = aunwrap(ang)
+	pos = SF.clampPos(vqunwrap1(pos))
+	ang = aqunwrap1(ang)
 
 	local ply = instance.player
 	plyPropBurst:use(ply, 1)

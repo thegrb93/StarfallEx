@@ -1,9 +1,8 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
-local IsValid = FindMetaTable("Entity").IsValid
-local IsValidPhys = FindMetaTable("PhysObj").IsValid
-local IsWorld = FindMetaTable("Entity").IsWorld
+local ENT_META = FindMetaTable("Entity")
+local PHYS_META = FindMetaTable("PhysObj")
 
 registerprivilege("entities.setParent", "Parent", "Allows the user to parent an entity to another entity", { entities = {} })
 registerprivilege("entities.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { client = (CLIENT and {} or nil), entities = {} })
@@ -16,42 +15,25 @@ registerprivilege("entities.doNotDuplicate", "DoNotDuplicate", "Allows the user 
 
 local emitSoundBurst = SF.BurstObject("emitSound", "emitsound", 180, 200, " sounds can be emitted per second", "Number of sounds that can be emitted in a short time")
 local manipulations = SF.EntityTable("boneManipulations")
+getmetatable(manipulations).__index = function(t, k) local r = {Position = {}, Scale = {}, Angle = {}, Jiggle = {}} t[k] = r return r end
 
 hook.Add("PAC3ResetBones","SF_BoneManipulations",function(ent)
 	local manips = manipulations[ent]
 	if manips then
 		for bone, v in pairs(manips.Position) do
-			ent:ManipulateBonePosition(bone, v)
+			Ent_ManipulateBonePosition(ent, bone, v)
 		end
 		for bone, v in pairs(manips.Scale) do
-			ent:ManipulateBoneScale(bone, v)
+			Ent_ManipulateBoneScale(ent, bone, v)
 		end
 		for bone, v in pairs(manips.Angle) do
-			ent:ManipulateBoneAngles(bone, v)
+			Ent_ManipulateBoneAngles(ent, bone, v)
 		end
 		for bone, v in pairs(manips.Jiggle) do
-			ent:ManipulateBoneJiggle(bone, v)
+			Ent_ManipulateBoneJiggle(ent, bone, v)
 		end
 	end
 end)
-local function setManipulation(ent, type, bone, val)
-	if val then
-		local manips = manipulations[ent]
-		if not manips then
-			manips = {Position = {}, Scale = {}, Angle = {}, Jiggle = {}}
-			manipulations[ent] = manips
-		end
-		manips[type][bone] = val
-	else
-		local manips = manipulations[ent]
-		if manips then
-			manips[type][bone] = nil
-			if next(manips.Position)==nil and next(manips.Scale)==nil and next(manips.Angle)==nil and next(manips.Jiggle)==nil then
-				manipulations[ent] = nil
-			end
-		end
-	end
-end
 
 
 --- Entity type
@@ -59,7 +41,7 @@ end
 -- @class type
 -- @libtbl ents_methods
 -- @libtbl ent_meta
-SF.RegisterType("Entity", false, true, FindMetaTable("Entity"))
+SF.RegisterType("Entity", false, true, ENT_META)
 
 
 return function(instance)
@@ -75,9 +57,16 @@ local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.
 local plywrap = instance.Types.Player.Wrap
 local swrap, sunwrap = instance.Types.SurfaceInfo.Wrap, instance.Types.SurfaceInfo.Unwrap
 
+local vqunwrap1
+local aqunwrap1
+instance:AddHook("initialize", function()
+	vqunwrap1 = vec_meta.QuickUnwrap1
+	aqunwrap1 = ang_meta.QuickUnwrap1
+end)
+
 local function getent(self)
 	local ent = ent_meta.sf2sensitive[self]
-	if IsValid(ent) or IsWorld(ent) then
+	if Ent_IsValid(ent) or Ent_IsWorld(ent) then
 		return ent
 	else
 		SF.Throw("Entity is not valid.", 3)
@@ -89,13 +78,13 @@ instance.Types.Entity.GetEntity = getent
 -- @return string String representation of the entity
 function ent_meta:__tostring()
 	local ent = eunwrap(self)
-	return IsValid(ent) and tostring(ent) or "(null entity)"
+	return Ent_IsValid(ent) and tostring(ent) or "(null entity)"
 end
 
 -- ------------------------- Methods ------------------------- --
 
 --- Gets the owner of the entity
--- @return Entity Owner
+-- @return Entity? Owner or nil if no owner
 function ents_methods:getOwner()
 	local ent = getent(self)
 
@@ -115,12 +104,18 @@ if CLIENT then
 		local ent = getent(self)
 		checkluatype(bone, TYPE_NUMBER)
 		bone = math.floor(bone)
-		if bone<0 or bone>=ent:GetBoneCount() then SF.Throw("Invalid bone "..bone, 2) end
+		if bone<0 or bone>=Ent_GetBoneCount(ent) then SF.Throw("Invalid bone "..bone, 2) end
 
-		vec = vunwrap(vec)
+		vec = vqunwrap1(vec)
 		checkpermission(instance, ent, "entities.setRenderProperty")
-		setManipulation(ent, "Position", bone, (vec[1]~=0 or vec[2]~=0 or vec[3]~=0) and vec)
-		ent:ManipulateBonePosition(bone, vec)
+
+		if vec ~= vector_origin then
+			local manip = manipulations[ent].Position
+			if manip[bone] then manip[bone]:Set(vec) else manip[bone] = Vector(vec) end
+		else
+			manipulations[ent].Position[bone] = nil
+		end
+		Ent_ManipulateBonePosition(ent, bone, vec)
 	end
 
 	--- Allows manipulation of an entity's bones' scale
@@ -131,12 +126,17 @@ if CLIENT then
 		local ent = getent(self)
 		checkluatype(bone, TYPE_NUMBER)
 		bone = math.floor(bone)
-		if bone<0 or bone>=ent:GetBoneCount() then SF.Throw("Invalid bone "..bone, 2) end
+		if bone<0 or bone>=Ent_GetBoneCount(ent) then SF.Throw("Invalid bone "..bone, 2) end
 
-		vec = vunwrap(vec)
+		vec = vqunwrap1(vec)
 		checkpermission(instance, ent, "entities.setRenderProperty")
-		setManipulation(ent, "Scale", bone, (vec[1]~=0 or vec[2]~=0 or vec[3]~=0) and vec)
-		ent:ManipulateBoneScale(bone, vec)
+		if vec ~= vector_origin then
+			local manip = manipulations[ent].Scale
+			if manip[bone] then manip[bone]:Set(vec) else manip[bone] = Vector(vec) end
+		else
+			manipulations[ent].Scale[bone] = nil
+		end
+		Ent_ManipulateBoneScale(ent, bone, vec)
 	end
 
 	--- Allows manipulation of an entity's bones' angles
@@ -147,12 +147,17 @@ if CLIENT then
 		local ent = getent(self)
 		checkluatype(bone, TYPE_NUMBER)
 		bone = math.floor(bone)
-		if bone<0 or bone>=ent:GetBoneCount() then SF.Throw("Invalid bone "..bone, 2) end
+		if bone<0 or bone>=Ent_GetBoneCount(ent) then SF.Throw("Invalid bone "..bone, 2) end
 
-		ang = aunwrap(ang)
+		ang = aqunwrap1(ang)
 		checkpermission(instance, ent, "entities.setRenderProperty")
-		setManipulation(ent, "Angle", bone, (ang[1]~=0 or ang[2]~=0 or ang[3]~=0) and ang)
-		ent:ManipulateBoneAngles(bone, ang)
+		if ang[1]~=0 or ang[2]~=0 or ang[3]~=0 then
+			local manip = manipulations[ent].Angle
+			if manip[bone] then manip[bone]:Set(ang) else manip[bone] = Angle(ang) end
+		else
+			manipulations[ent].Angle[bone] = nil
+		end
+		Ent_ManipulateBoneAngles(ent, bone, ang)
 	end
 
 	--- Allows manipulation of an entity's bones' jiggle status
@@ -163,12 +168,13 @@ if CLIENT then
 		local ent = getent(self)
 		checkluatype(bone, TYPE_NUMBER)
 		bone = math.floor(bone)
-		if bone<0 or bone>=ent:GetBoneCount() then SF.Throw("Invalid bone "..bone, 2) end
+		if bone<0 or bone>=Ent_GetBoneCount(ent) then SF.Throw("Invalid bone "..bone, 2) end
 
 		checkluatype(state, TYPE_BOOL)
 		checkpermission(instance, ent, "entities.setRenderProperty")
-		setManipulation(ent, "Jiggle", bone, state and 1)
-		ent:ManipulateBoneJiggle(bone, state and 1 or 0)
+		state = state and 1 or 0
+		manipulations[ent].Jiggle[bone] = state
+		Ent_ManipulateBoneJiggle(ent, bone, state)
 	end
 
 	--- Sets a hologram or custom_prop model to a custom Mesh
@@ -176,15 +182,16 @@ if CLIENT then
 	-- @param Mesh? mesh The mesh to set it to or nil to set back to normal
 	function ents_methods:setMesh(mesh)
 		local ent = getent(self)
-		if not ent.IsSFHologram and not ent.IsSFProp then SF.Throw("The entity isn't a hologram or custom-prop", 2) end
+		local ent_tbl = Ent_GetTable(ent)
+		if not ent_tbl.IsSFHologram and not ent_tbl.IsSFProp then SF.Throw("The entity isn't a hologram or custom-prop", 2) end
 
 		checkpermission(instance, nil, "mesh")
 		checkpermission(instance, ent, "entities.setRenderProperty")
 		if mesh then
-			ent.custom_mesh = instance.Types.Mesh.Unwrap(mesh)
-			ent.custom_mesh_data = instance.data.meshes
+			ent_tbl.custom_mesh = instance.Types.Mesh.Unwrap(mesh)
+			ent_tbl.custom_mesh_data = instance.data.meshes
 		else
-			ent.custom_mesh = nil
+			ent_tbl.custom_mesh = nil
 		end
 	end
 
@@ -193,14 +200,15 @@ if CLIENT then
 	-- @param Material? material The material to set it to or nil to set back to default
 	function ents_methods:setMeshMaterial(material)
 		local ent = getent(self)
-		if not ent.IsSFHologram and not ent.IsSFProp then SF.Throw("The entity isn't a hologram or custom-prop", 2) end
+		local ent_tbl = Ent_GetTable(ent)
+		if not ent_tbl.IsSFHologram and not ent_tbl.IsSFProp then SF.Throw("The entity isn't a hologram or custom-prop", 2) end
 
 		checkpermission(instance, ent, "entities.setRenderProperty")
 
 		if material then
-			ent.Material = instance.Types.LockedMaterial.Unwrap(material)
+			ent_tbl.Material = instance.Types.LockedMaterial.Unwrap(material)
 		else
-			ent.Material = ent.DefaultMaterial
+			ent_tbl.Material = ent_tbl.DefaultMaterial
 		end
 	end
 
@@ -220,10 +228,10 @@ if CLIENT then
 		clr = cunwrap(clr)
 		local vec = Vector(clr.r / 255, clr.g / 255, clr.b / 255)
 
-		if ent:IsPlayer() then
-			ent:SetPlayerColor(vec)
-		elseif playerColorWhitelist[ent:GetClass()] then
-			ent.GetPlayerColor = function() return vec end
+		if Ent_IsPlayer(ent) then
+			Ent_SetPlayerColor(ent, vec)
+		elseif playerColorWhitelist[Ent_GetClass(ent)] then
+			Ent_GetTable(ent).GetPlayerColor = function() return vec end
 		else
 			SF.Throw("The entity isn't whitelisted", 2)
 		end
@@ -235,13 +243,14 @@ if CLIENT then
 	-- @param Vector maxs The upper bounding corner coordinate local to the hologram
 	function ents_methods:setRenderBounds(mins, maxs)
 		local ent = getent(self)
-		if not ent.IsSFHologram and not ent.IsSFProp then SF.Throw("The entity isn't a hologram or custom-prop", 2) end
+		local ent_tbl = Ent_GetTable(ent)
+		if not ent_tbl.IsSFHologram and not ent_tbl.IsSFProp then SF.Throw("The entity isn't a hologram or custom-prop", 2) end
 
 		checkpermission(instance, ent, "entities.setRenderProperty")
 
 		mins, maxs = vunwrap(mins), vunwrap(maxs)
-		ent:SetRenderBounds(mins, maxs)
-		ent.sf_userrenderbounds = {mins, maxs}
+		Ent_SetRenderBounds(ent, mins, maxs)
+		ent_tbl.sf_userrenderbounds = {mins, maxs}
 	end
 
 	--- Returns render bounds of the entity as local vectors
@@ -250,8 +259,7 @@ if CLIENT then
 	-- @return Vector The minimum vector of the bounds
 	-- @return Vector The maximum vector of the bounds
 	function ents_methods:getRenderBounds()
-		local ent = getent(self)
-		local mins, maxs = ent:GetRenderBounds()
+		local mins, maxs = getent(self):GetRenderBounds()
 		return vwrap(mins), vwrap(maxs)
 	end
 
@@ -264,7 +272,7 @@ if CLIENT then
 		local ent = getent(self)
 		checkluatype(num, TYPE_NUMBER)
 		checkpermission(instance, ent, "entities.setRenderProperty")
-		ent:SetLOD(num)
+		Ent_SetLOD(ent, math.Clamp(num, 0, 8))
 	end
 
 	local canDrawEntity = SF.CanDrawEntity
@@ -286,36 +294,37 @@ if CLIENT then
 
 		local ent = getent(self)
 		if not canDrawEntity(ent) then SF.Throw("Can't draw this entity.", 2) end
-		ent:SetupBones()
-		ent:DrawModel()
+		Ent_SetupBones(ent)
+		Ent_DrawModel(ent)
 	end
 	
 	--- Returns the render group of the entity.
 	-- @client
 	-- @return number Render group
 	function ents_methods:getRenderGroup()
-		return getent(self):GetRenderGroup()
+		return Ent_GetRenderGroup(getent(self))
 	end
 end
 
 local soundsByEntity = SF.EntityTable("emitSoundsByEntity", function(e, t)
 	for snd, _ in pairs(t) do
-		e:StopSound(snd)
+		Ent_StopSound(e, snd)
 	end
 end, true)
 
 local sound_library = instance.Libraries.sound
+if sound_library then
+	--- Returns if a sound is able to be emitted from an entity
+	-- @return boolean If it is possible to emit a sound
+	function sound_library.canEmitSound()
+		return emitSoundBurst:check(instance.player) >= 1
+	end
 
---- Returns if a sound is able to be emitted from an entity
--- @return boolean If it is possible to emit a sound
-function sound_library.canEmitSound()
-	return emitSoundBurst:check(instance.player) >= 1
-end
-
---- Returns the number of sound emits left
--- @return number The number of sounds left
-function sound_library:emitSoundsLeft()
-	return emitSoundBurst:check(instance.player)
+	--- Returns the number of sound emits left
+	-- @return number The number of sounds left
+	function sound_library:emitSoundsLeft()
+		return emitSoundBurst:check(instance.player)
+	end
 end
 
 --- Plays a sound on the entity
@@ -335,7 +344,7 @@ function ents_methods:emitSound(snd, lvl, pitch, volume, channel)
 	local snds = soundsByEntity[ent]
 	if not snds then snds = {} soundsByEntity[ent] = snds end
 	snds[snd] = true
-	ent:EmitSound(snd, lvl, pitch, volume, channel)
+	Ent_EmitSound(ent, snd, lvl, pitch, volume, channel)
 end
 
 --- Stops a sound on the entity
@@ -350,7 +359,7 @@ function ents_methods:stopSound(snd)
 		soundsByEntity[ent][snd] = nil
 	end
 
-	ent:StopSound(snd)
+	Ent_StopSound(ent, snd)
 end
 
 --- Returns a list of components linked to a processor. Can also return vehicles linked to a HUD, but only through the server.
@@ -358,14 +367,14 @@ end
 function ents_methods:getLinkedComponents()
 	local ent = getent(self)
 	local list = {}
-	if ent:GetClass() == "starfall_processor" then
+	if Ent_GetClass(ent) == "starfall_processor" then
 		for k, v in ipairs(ents.FindByClass("starfall_screen")) do
-			if v.link == ent then list[#list+1] = ewrap(v) end
+			if Ent_GetTable(v).link == ent then list[#list+1] = ewrap(v) end
 		end
 		for k, v in ipairs(ents.FindByClass("starfall_hud")) do
-			if v.link == ent then list[#list+1] = ewrap(v) end
+			if Ent_GetTable(v).link == ent then list[#list+1] = ewrap(v) end
 		end
-	elseif ent:GetClass() == "starfall_hud" then
+	elseif Ent_GetClass(ent) == "starfall_hud" then
 		if SERVER then
 			for k, huds in pairs(SF.HudVehicleLinks) do if huds[ent] then list[#list+1] = owrap(k) end end
 		else
@@ -389,11 +398,11 @@ function ents_methods:setParent(parent, attachment, bone)
 	if attachment ~= nil and bone ~= nil then SF.Throw("Arguments `attachment` and `bone` are mutually exclusive!", 2) end
 	if parent ~= nil then
 		parent = getent(parent)
-		if parent:IsPlayer() and not child.IsSFHologram then SF.Throw("Only holograms can be parented to players!", 2) end
+		if Ent_IsPlayer(parent) and not Ent_GetTable(child).IsSFHologram then SF.Throw("Only holograms can be parented to players!", 2) end
 		local param, type
 		if bone ~= nil then
 			if isstring(bone) then
-				bone = parent:LookupBone(bone) or -1
+				bone = Ent_LookupBone(parent, bone) or -1
 			elseif not isnumber(bone) then
 				SF.ThrowTypeError("string or number", SF.GetType(bone), 2)
 			end
@@ -403,9 +412,9 @@ function ents_methods:setParent(parent, attachment, bone)
 		elseif attachment ~= nil then
 			if CLIENT then SF.Throw("Parenting to an attachment is not supported in clientside!", 2) end
 			if isstring(attachment) then
-				if parent:LookupAttachment(attachment) < 1 then SF.Throw("Invalid attachment provided!", 2) end
+				if Ent_LookupAttachment(parent, attachment) < 1 then SF.Throw("Invalid attachment provided!", 2) end
 			elseif isnumber(attachment) then
-				local attachments = parent:GetAttachments()
+				local attachments = Ent_GetAttachments(parent)
 				if attachments and attachments[attachment] then
 					attachment = attachments[attachment].name
 				else
@@ -430,7 +439,6 @@ end
 -- @shared
 -- @param Color clr New color
 function ents_methods:setColor(clr)
-
 	local ent = getent(self)
 	if SERVER and ent == instance.player then
 		checkpermission(instance, ent, "entities.setPlayerRenderProperty")
@@ -439,8 +447,8 @@ function ents_methods:setColor(clr)
 	end
 
 	local rendermode = (clr.a == 255 and RENDERMODE_NORMAL or RENDERMODE_TRANSALPHA)
-	ent:SetColor(clr)
-	ent:SetRenderMode(rendermode)
+	Ent_SetColor(ent, clr)
+	Ent_SetRenderMode(ent, rendermode)
 	if SERVER then duplicator.StoreEntityModifier(ent, "colour", { Color = {r = clr[1], g = clr[2], b = clr[3], a = clr[4]}, RenderMode = rendermode }) end
 end
 
@@ -451,14 +459,14 @@ function ents_methods:setNoDraw(draw)
 	local ent = getent(self)
 	checkpermission(instance, ent, "entities.setRenderProperty")
 
-	ent:SetNoDraw(draw and true or false)
+	Ent_SetNoDraw(ent, draw and true or false)
 end
 
 --- Checks whether the entity should be drawn
 -- @shared
 -- @return boolean True if should draw, False otherwise
 function ents_methods:getNoDraw()
-	return getent(self):GetNoDraw()
+	return Ent_GetNoDraw(getent(self))
 end
 
 --- Sets the material of the entity
@@ -475,7 +483,7 @@ function ents_methods:setMaterial(material)
 		checkpermission(instance, ent, "entities.setRenderProperty")
 	end
 
-	ent:SetMaterial(material)
+	Ent_SetMaterial(ent, material)
 	if SERVER then duplicator.StoreEntityModifier(ent, "material", { MaterialOverride = material }) end
 end
 
@@ -484,10 +492,12 @@ end
 -- @param number index Submaterial index.
 -- @param string material New material name.
 function ents_methods:setSubMaterial(index, material)
+	checkluatype(index, TYPE_NUMBER)
+	index = math.Clamp(index, 0, 255)
+
 	checkluatype(material, TYPE_STRING)
 	if SF.CheckMaterial(material) == false then SF.Throw("This material is invalid", 2) end
 
-	index = math.Clamp(index, 0, 255)
 	local ent = getent(self)
 	if SERVER and ent == instance.player then
 		checkpermission(instance, ent, "entities.setPlayerRenderProperty")
@@ -495,7 +505,7 @@ function ents_methods:setSubMaterial(index, material)
 		checkpermission(instance, ent, "entities.setRenderProperty")
 	end
 
-	ent:SetSubMaterial(index, material)
+	Ent_SetSubMaterial(ent, index, material)
 	if SERVER then
 		duplicator.StoreEntityModifier( ent, "submaterial", {["SubMaterialOverride_"..index] = material} )
 	end
@@ -530,7 +540,7 @@ function ents_methods:setBodygroup(bodygroup, value)
 		checkpermission(instance, ent, "entities.setRenderProperty")
 	end
 
-	ent:SetBodygroup(bodygroup, value)
+	Ent_SetBodygroup(ent, bodygroup, value)
 end
 
 --- Returns the bodygroup value of the entity with given index
@@ -540,14 +550,14 @@ end
 function ents_methods:getBodygroup(id)
 	checkluatype(id, TYPE_NUMBER)
 	checkbodygroup(id)
-	return getent(self):GetBodygroup(id)
+	return Ent_GetBodygroup(getent(self), id)
 end
 
 --- Returns a list of all bodygroups of the entity
 -- @shared
 -- @return table Bodygroups as a table of BodyGroupDatas. https://wiki.facepunch.com/gmod/Structures/BodyGroupData
 function ents_methods:getBodygroups()
-	return getent(self):GetBodyGroups()
+	return Ent_GetBodygroups(getent(self))
 end
 
 --- Returns the bodygroup index of the entity with given name
@@ -556,7 +566,7 @@ end
 -- @return number The bodygroup index
 function ents_methods:lookupBodygroup(name)
 	checkluatype(name, TYPE_STRING)
-	return getent(self):FindBodygroupByName(name)
+	return Ent_FindBodygroupByName(getent(self), name)
 end
 
 --- Returns the bodygroup name of the entity with given index
@@ -566,7 +576,7 @@ end
 function ents_methods:getBodygroupName(id)
 	checkluatype(id, TYPE_NUMBER)
 	checkbodygroup(id)
-	return getent(self):GetBodygroupName(id)
+	return Ent_GetBodygroupName(getent(self), id)
 end
 
 --- Returns the number of possible values for this bodygroup.
@@ -576,7 +586,7 @@ end
 function ents_methods:getBodygroupCount(id)
 	checkluatype(id, TYPE_NUMBER)
 	checkbodygroup(id)
-	return getent(self):GetBodygroupCount(id)
+	return Ent_GetBodygroupCount(getent(self), id)
 end
 
 --- Sets the skin of the entity
@@ -592,21 +602,21 @@ function ents_methods:setSkin(skinIndex)
 		checkpermission(instance, ent, "entities.setRenderProperty")
 	end
 
-	ent:SetSkin(skinIndex)
+	Ent_SetSkin(ent, skinIndex)
 end
 
 --- Gets the skin number of the entity
 -- @shared
 -- @return number Skin number
 function ents_methods:getSkin()
-	return getent(self):GetSkin()
+	return Ent_GetSkin(getent(self))
 end
 
 --- Returns the amount of skins of the entity
 -- @shared
 -- @return number The amount of skins
 function ents_methods:getSkinCount()
-	return getent(self):SkinCount()
+	return Ent_SkinCount(getent(self))
 end
 
 --- Sets the render mode of the entity
@@ -623,7 +633,7 @@ function ents_methods:setRenderMode(rendermode)
 		checkpermission(instance, ent, "entities.setRenderProperty")
 	end
 
-	ent:SetRenderMode(rendermode)
+	Ent_SetRenderMode(ent, rendermode)
 	if SERVER then duplicator.StoreEntityModifier(ent, "colour", { RenderMode = rendermode }) end
 end
 
@@ -632,7 +642,7 @@ end
 -- @class function
 -- @return number rendermode https://wiki.facepunch.com/gmod/Enums/RENDERMODE
 function ents_methods:getRenderMode()
-	return getent(self):GetRenderMode()
+	return Ent_GetRenderMode(getent(self))
 end
 
 --- Sets the renderfx of the entity, most effects require entity's alpha to be less than 255 to take effect
@@ -649,7 +659,7 @@ function ents_methods:setRenderFX(renderfx)
 		checkpermission(instance, ent, "entities.setRenderProperty")
 	end
 
-	ent:SetRenderFX(renderfx)
+	Ent_SetRenderFX(ent, renderfx)
 	if SERVER then duplicator.StoreEntityModifier(ent, "colour", { RenderFX = renderfx }) end
 end
 
@@ -658,28 +668,28 @@ end
 -- @class function
 -- @return number Renderfx, https://wiki.facepunch.com/gmod/Enums/kRenderFx
 function ents_methods:getRenderFX()
-	return getent(self):GetRenderFX()
+	return Ent_GetRenderFX(getent(self))
 end
 
 --- Gets the parent of an entity
 -- @shared
 -- @return Entity? Entity's parent or nil if not parented
 function ents_methods:getParent()
-	return ewrap(getent(self):GetParent())
+	return ewrap(Ent_GetParent(getent(self)))
 end
 
 --- Gets the children (the parented entities) of an entity
 -- @shared
 -- @return table Table of parented children
 function ents_methods:getChildren()
-	return instance.Sanitize(getent(self):GetChildren())
+	return instance.Sanitize(Ent_GetChildren(getent(self)))
 end
 
 --- Gets the attachment index the entity is parented to
 -- @shared
 -- @return number Index of the attachment the entity is parented to or 0
 function ents_methods:getAttachmentParent()
-	return getent(self):GetParentAttachment()
+	return Ent_GetParentAttachment(getent(self))
 end
 
 --- Gets the attachment index via the entity and it's attachment name
@@ -687,7 +697,7 @@ end
 -- @param string name of the attachment to lookup
 -- @return number Number of the attachment index, or 0 if it doesn't exist
 function ents_methods:lookupAttachment(name)
-	return getent(self):LookupAttachment(name)
+	return Ent_LookupAttachment(getent(self), name)
 end
 
 --- Gets the position and angle of an attachment
@@ -696,75 +706,73 @@ end
 -- @return Vector? Position, nil if the attachment doesn't exist
 -- @return Angle? Orientation, nil if the attachment doesn't exist
 function ents_methods:getAttachment(index)
-	local t = getent(self):GetAttachment(index)
-	if t then
-		return vwrap(t.Pos), awrap(t.Ang)
-	end
+	local t = Ent_GetAttachment(getent(self), index)
+	if t then return vwrap(t.Pos), awrap(t.Ang) end
 end
 
 --- Returns a table of attachments
 -- @shared
 -- @return table? Table of attachment id and attachment name or nil
 function ents_methods:getAttachments()
-	return getent(self):GetAttachments()
+	return Ent_GetAttachments(getent(self))
 end
 
 --- Gets the collision group enum of the entity
 -- @return number The collision group enum of the entity. https://wiki.facepunch.com/gmod/Enums/COLLISION_GROUP
 function ents_methods:getCollisionGroup()
-	return getent(self):GetCollisionGroup()
+	return Ent_GetCollisionGroup(getent(self))
 end
 
 --- Gets the solid enum of the entity
 -- @return number The solid enum of the entity. https://wiki.facepunch.com/gmod/Enums/SOLID
 function ents_methods:getSolid()
-	return getent(self):GetSolid()
+	return Ent_GetSolid(getent(self))
 end
 
 --- Gets the solid flag enum of the entity
 -- @return number The solid flag enum of the entity. https://wiki.facepunch.com/gmod/Enums/FSOLID
 function ents_methods:getSolidFlags()
-	return getent(self):GetSolidFlags()
+	return Ent_GetSolidFlags(getent(self))
 end
 
 --- Gets whether an entity is solid or not
 -- @return boolean whether an entity is solid or not
 function ents_methods:isSolid()
-	return getent(self):IsSolid()
+	return Ent_IsSolid(getent(self))
 end
 
 --- Gets the movetype enum of the entity
 -- @return number The movetype enum of the entity. https://wiki.facepunch.com/gmod/Enums/MOVETYPE
 function ents_methods:getMoveType()
-	return getent(self):GetMoveType()
+	return Ent_GetMoveType(getent(self))
 end
 
 --- Converts a ragdoll bone id to the corresponding physobject id
 -- @param number boneid The ragdoll boneid
 -- @return number The physobj id
 function ents_methods:translateBoneToPhysBone(boneid)
-	return getent(self):TranslateBoneToPhysBone(boneid)
+	return Ent_TranslateBoneToPhysBone(getent(self), boneid)
 end
 
 --- Converts a physobject id to the corresponding ragdoll bone id
 -- @param number boneid The physobject id
 -- @return number The ragdoll bone id
 function ents_methods:translatePhysBoneToBone(boneid)
-	return getent(self):TranslatePhysBoneToBone(boneid)
+	return Ent_TranslatePhysBoneToBone(getent(self), boneid)
 end
 
 --- Gets the number of physicsobjects of an entity
 -- @return number The number of physics objects on the entity
 function ents_methods:getPhysicsObjectCount()
-	return getent(self):GetPhysicsObjectCount()
+	return Ent_GetPhysicsObjectCount(getent(self))
 end
 
 --- Gets the main physics objects of an entity
 -- @return PhysObj The main physics object of the entity
 function ents_methods:getPhysicsObject()
 	local ent = getent(self)
-	if IsWorld(ent) then SF.Throw("Cannot get the world physobj.", 2) end
-	return pwrap(ent:GetPhysicsObject())
+	if Ent_IsWorld(ent) then SF.Throw("Cannot get the world physobj.", 2) end
+	return pwrap(Ent_GetPhysicsObject(ent))
 end
 
 --- Gets a physics objects of an entity
@@ -772,20 +780,20 @@ end
 -- @return PhysObj The physics object of the entity
 function ents_methods:getPhysicsObjectNum(id)
 	checkluatype(id, TYPE_NUMBER)
-	return pwrap(getent(self):GetPhysicsObjectNum(id))
+	return pwrap(Ent_GetPhysicsObjectNum(getent(self), id))
 end
 
 --- Returns the elasticity of the entity
 -- @return number Elasticity
 function ents_methods:getElasticity()
-	return getent(self):GetElasticity()
+	return Ent_GetElasticity(getent(self))
 end
 
 --- Gets the color of an entity
 -- @shared
 -- @return Color Color
 function ents_methods:getColor()
-	return cwrap(getent(self):GetColor())
+	return cwrap(Ent_GetColor(getent(self)))
 end
 
 --- Gets the clipping of an entity
@@ -793,12 +801,13 @@ end
 -- @return table Table containing the clipdata
 function ents_methods:getClipping()
 	local ent = getent(self)
+	local ent_tbl = Ent_GetTable(ent)
 
 	local clips = {}
 
 	-- Clips from visual clip tool
-	if ent.ClipData then
-		for i, clip in pairs(ent.ClipData) do
+	if ent_tbl.ClipData then
+		for i, clip in pairs(ent_tbl.ClipData) do
 			local normal = (clip[1] or clip.n):Forward()
 
 			table.insert(clips, {
@@ -810,8 +819,8 @@ function ents_methods:getClipping()
 	end
 
 	-- Clips from Starfall and E2 holograms
-	if ent.clips then
-		for i, clip in pairs(ent.clips) do
+	if ent_tbl.clips then
+		for i, clip in pairs(ent_tbl.clips) do
 			if clip.enabled ~= false then
 				local local_ent = false
 
@@ -831,8 +840,8 @@ function ents_methods:getClipping()
 	end
 
 	-- Clips from Lemongate and ExpAdv holograms
-	if ent.CLIPS then
-		for i, clip in pairs(ent.CLIPS) do
+	if ent_tbl.CLIPS then
+		for i, clip in pairs(ent_tbl.CLIPS) do
 			if clip.ENABLED then
 				table.insert(clips, {
 					local_ent = not clip.Global and self or false,
@@ -850,57 +859,58 @@ end
 -- @shared
 -- @return boolean True if valid, false if not
 function ents_methods:isValid()
-	return IsValid(ent_meta.sf2sensitive[self])
+	return Ent_IsValid(ent_meta.sf2sensitive[self])
 end
 
 --- Checks if an entity is a player.
 -- @shared
 -- @return boolean True if player, false if not
 function ents_methods:isPlayer()
-	return getent(self):IsPlayer()
+	return Ent_IsPlayer(getent(self))
 end
 
 --- Checks if an entity is a weapon.
 -- @shared
 -- @return boolean True if weapon, false if not
 function ents_methods:isWeapon()
-	return getent(self):IsWeapon()
+	return Ent_IsWeapon(getent(self))
 end
 
 --- Checks if an entity is a vehicle.
 -- @shared
 -- @return boolean True if vehicle, false if not
 function ents_methods:isVehicle()
-	return getent(self):IsVehicle()
+	return Ent_IsVehicle(getent(self))
 end
 
 --- Checks if an entity is an npc.
 -- @shared
 -- @return boolean True if npc, false if not
 function ents_methods:isNPC()
-	return getent(self):IsNPC()
+	return Ent_IsNPC(getent(self))
 end
 
 --- Checks if the entity ONGROUND flag is set
 -- @shared
 -- @return boolean If it's flag is set or not
 function ents_methods:isOnGround()
-	return getent(self):IsOnGround()
+	return Ent_IsOnGround(getent(self))
 end
 
 --- Returns if the entity is ignited
 -- @shared
 -- @return boolean If the entity is on fire or not
 function ents_methods:isOnFire()
-	return getent(self):IsOnFire()
+	return Ent_IsOnFire(getent(self))
 end
 
 --- Returns the starfall or expression2's name
 -- @return string The name of the chip
 function ents_methods:getChipName()
 	local ent = getent(self)
-	if ent.GetGateName then
-		return ent:GetGateName()
+	local GetGateName = Ent_GetTable(ent).GetGateName
+	if GetGateName then
+		return GetGateName(ent)
 	else
 		SF.Throw("The entity is not a starfall or expression2!", 2)
 	end
@@ -910,10 +920,10 @@ end
 -- @shared
 -- @return string The author of the starfall chip.
 function ents_methods:getChipAuthor()
-	local ent = getent(self)
-	if not ent.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
+	local ent_tbl = Ent_GetTable(getent(self))
+	if not ent_tbl.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
 
-	return ent.author
+	return ent_tbl.author
 end
 
 --- Returns the current count for this Think's CPU Time of the specified starfall.
@@ -922,10 +932,10 @@ end
 -- @shared
 -- @return number Current quota used this Think
 function ents_methods:getQuotaUsed()
-	local ent = getent(self)
-	if not ent.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
+	local ent_tbl = Ent_GetTable(getent(self))
+	if not ent_tbl.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
 
-	return ent.instance and ent.instance.cpu_total or 0
+	return ent_tbl.instance and ent_tbl.instance.cpu_total or 0
 end
 
 --- Gets the Average CPU Time in the buffer of the specified starfall or expression2.
@@ -933,10 +943,11 @@ end
 -- @return number Average CPU Time of the buffer of the specified starfall or expression2.
 function ents_methods:getQuotaAverage()
 	local ent = getent(self)
-	if ent.Starfall then
-		return ent.instance and ent.instance:movingCPUAverage() or 0
-	elseif ent:GetClass()=="gmod_wire_expression2" then
-		return SERVER and ent.context.timebench or ent:GetOverlayData().timebench
+	local ent_tbl = Ent_GetTable(ent)
+	if ent_tbl.Starfall then
+		return ent_tbl.instance and ent_tbl.instance:movingCPUAverage() or 0
+	elseif Ent_GetClass(ent)=="gmod_wire_expression2" then
+		return SERVER and ent_tbl.context.timebench or ent_tbl.GetOverlayData(ent).timebench
 	else
 		SF.Throw("The entity isn't a starfall or expression2 chip", 2)
 	end
@@ -948,9 +959,11 @@ end
 -- @return number Max SysTime allowed to take for execution of the chip in a Think.
 function ents_methods:getQuotaMax()
 	local ent = getent(self)
-	if ent.Starfall then
-		return ent.instance and ent.instance.cpuQuota or 0
-	elseif ent:GetClass()=="gmod_wire_expression2" then
+	local ent_tbl = Ent_GetTable(ent)
+
+	if ent_tbl.Starfall then
+		return ent_tbl.instance and ent_tbl.instance.cpuQuota or 0
+	elseif Ent_GetClass(ent)=="gmod_wire_expression2" then
 		return GetConVarNumber("wire_expression2_quotatime")
 	else
 		SF.Throw("The entity isn't a starfall or expression2 chip", 2)
@@ -962,11 +975,12 @@ end
 -- @return boolean if has starfall instance or E2 instance
 function ents_methods:hasInstance()
 	local ent = getent(self)
+	local ent_tbl = Ent_GetTable(ent)
 
-	if ent.Starfall then
-		return ent.instance~=nil
-	elseif ent:GetClass()=="gmod_wire_expression2" then
-		return SERVER and not ent.error
+	if ent_tbl.Starfall then
+		return ent_tbl.instance~=nil
+	elseif Ent_GetClass(ent)=="gmod_wire_expression2" then
+		return SERVER and not ent_tbl.error
 	end
 
 	return false
@@ -979,11 +993,12 @@ if SERVER then
 	-- @return table A table containing the errored players.
 	function ents_methods:getErroredPlayers()
 		local ent = getent(self)
-		if not ent.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
+		local ent_tbl = Ent_GetTable(ent)
+		if not ent_tbl.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
 
 		local plys = {}
-		for ply, _ in pairs(ent.ErroredPlayers) do
-			if IsValid(ply) then
+		for ply, _ in pairs(ent_tbl.ErroredPlayers) do
+			if Ent_IsValid(ply) then
 				table.insert(plys, plywrap(ply))
 			end
 		end
@@ -998,7 +1013,7 @@ if SERVER then
 		local ent = getent(self)
 		checkpermission(instance, ent, "entities.setHealth")
 		checkluatype(val, TYPE_NUMBER)
-		ent:SetHealth(val)
+		Ent_SetHealth(ent, val)
 	end
 		
 	--- Sets the maximum health for entity. Note, that you can still set entity's health above this amount with Entity:setHealth.
@@ -1008,7 +1023,7 @@ if SERVER then
 		local ent = getent(self)
 		checkpermission(instance, ent, "entities.setMaxHealth")
 		checkluatype(val, TYPE_NUMBER)
-		ent:SetMaxHealth(val)
+		Ent_SetMaxHealth(ent, val)
 	end
 		
 	--- Stops the entity from being saved on duplication or map save.
@@ -1016,43 +1031,43 @@ if SERVER then
 	function ents_methods:doNotDuplicate()
 		local ent = getent(self)
 		checkpermission(instance, ent, "entities.doNotDuplicate")
-		ent.DoNotDuplicate = true
+		Ent_GetTable(ent).DoNotDuplicate = true
 	end
 end
 
---- Returns the EntIndex of the entity
+--- Returns the id of the entity shared between server and client
 -- @shared
 -- @return number The numerical index of the entity
 function ents_methods:entIndex()
-	return getent(self):EntIndex()
+	return Ent_EntIndex(getent(self))
 end
 
 --- Returns the class of the entity
 -- @shared
 -- @return string The string class name
 function ents_methods:getClass()
-	return getent(self):GetClass()
+	return Ent_GetClass(getent(self))
 end
 
 --- Returns the position of the entity
 -- @shared
 -- @return Vector The position vector
 function ents_methods:getPos()
-	return vwrap(getent(self):GetPos())
+	return vwrap(Ent_GetPos(getent(self)))
 end
 
 --- Returns the position of the entity, local to its parent
 -- @shared
 -- @return Vector The position vector
 function ents_methods:getLocalPos()
-	return vwrap(getent(self):GetLocalPos())
+	return vwrap(Ent_GetLocalPos(getent(self)))
 end
 
 --- Returns how submerged the entity is in water
 -- @shared
 -- @return number The water level. 0 none, 1 slightly, 2 at least halfway, 3 all the way
 function ents_methods:getWaterLevel()
-	return getent(self):WaterLevel()
+	return Ent_WaterLevel(getent(self))
 end
 
 --- Returns the ragdoll bone index given a bone name
@@ -1061,7 +1076,7 @@ end
 -- @return number The bone index
 function ents_methods:lookupBone(name)
 	checkluatype(name, TYPE_STRING)
-	return getent(self):LookupBone(name)
+	return Ent_LookupBone(getent(self), name)
 end
 
 --- Returns the matrix of the entity's bone. Note: this method is slow/doesnt work well if the entity isn't animated.
@@ -1071,7 +1086,7 @@ end
 function ents_methods:getBoneMatrix(bone)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
 
-	return mwrap(getent(self):GetBoneMatrix(bone))
+	return mwrap(Ent_GetBoneMatrix(getent(self), bone))
 end
 
 --- Sets the bone matrix of given bone to given matrix. See also Entity:getBoneMatrix.
@@ -1085,21 +1100,21 @@ function ents_methods:setBoneMatrix(bone, matrix)
 	checkluatype(bone, TYPE_NUMBER)
 	checkpermission(instance, ent, "entities.setRenderProperty")
 
-	ent:SetBoneMatrix(bone, matrix)
+	Ent_SetBoneMatrix(ent, bone, matrix)
 end
 
 --- Returns the world transform matrix of the entity
 -- @shared
 -- @return VMatrix The matrix
 function ents_methods:getMatrix()
-	return mwrap(getent(self):GetWorldTransformMatrix())
+	return mwrap(Ent_GetWorldTransformMatrix(getent(self)))
 end
 
 --- Returns the number of an entity's bones
 -- @shared
 -- @return number Number of bones
 function ents_methods:getBoneCount()
-	return getent(self):GetBoneCount()
+	return Ent_GetBoneCount(getent(self))
 end
 
 --- Returns the name of an entity's bone
@@ -1108,7 +1123,7 @@ end
 -- @return string Name of the bone
 function ents_methods:getBoneName(bone)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
-	return getent(self):GetBoneName(bone)
+	return Ent_GetBoneName(getent(self), bone)
 end
 
 --- Returns the parent index of an entity's bone
@@ -1117,7 +1132,7 @@ end
 -- @return number Parent index of the bone. Returns -1 on error
 function ents_methods:getBoneParent(bone)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
-	return getent(self):GetBoneParent(bone)
+	return Ent_GetBoneParent(getent(self), bone)
 end
 
 --- Returns the bone's position and angle in world coordinates
@@ -1127,7 +1142,7 @@ end
 -- @return Angle Angle of the bone
 function ents_methods:getBonePosition(bone)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
-	local pos, ang = getent(self):GetBonePosition(bone)
+	local pos, ang = Ent_GetBonePosition(getent(self), bone)
 	if not pos then SF.Throw("Invalid bone ("..bone..")!",2) end
 	return vwrap(pos), awrap(ang)
 end
@@ -1138,7 +1153,7 @@ end
 -- @return Angle Manipulate angle of the bone
 function ents_methods:getManipulateBoneAngles(bone)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
-	return awrap(getent(self):GetManipulateBoneAngles(bone))
+	return awrap(Ent_GetManipulateBoneAngles(getent(self), bone))
 end
 
 --- Returns the number manipulate jiggle of the bone (0 - 255)
@@ -1147,7 +1162,7 @@ end
 -- @return number Manipulate jiggle of the bone
 function ents_methods:getManipulateBoneJiggle(bone)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
-	return getent(self):GetManipulateBoneJiggle(bone)
+	return Ent_GetManipulateBoneJiggle(getent(self), bone)
 end
 
 --- Returns the vector manipulate position of the bone (relative to its default position)
@@ -1156,7 +1171,7 @@ end
 -- @return Vector Manipulate position of the bone
 function ents_methods:getManipulateBonePosition(bone)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
-	return vwrap(getent(self):GetManipulateBonePosition(bone))
+	return vwrap(Ent_GetManipulateBonePosition(getent(self), bone))
 end
 
 --- Returns the vector manipulate scale of the bone
@@ -1165,7 +1180,7 @@ end
 -- @return Vector Manipulate scale of the bone
 function ents_methods:getManipulateBoneScale(bone)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
-	return vwrap(getent(self):GetManipulateBoneScale(bone))
+	return vwrap(Ent_GetManipulateBoneScale(getent(self), bone))
 end
 
 --- Returns the x, y, z size of the entity's outer bounding box (local to the entity)
@@ -1173,14 +1188,14 @@ end
 -- @return Vector The outer bounding box size
 function ents_methods:obbSize()
 	local ent = getent(self)
-	return vwrap(ent:OBBMaxs() - ent:OBBMins())
+	return vwrap(Ent_OBBMaxs(ent) - Ent_OBBMins(ent))
 end
 
 --- Returns the local position of the entity's outer bounding box
 -- @shared
 -- @return Vector The position vector of the outer bounding box center
 function ents_methods:obbCenter()
-	return vwrap(getent(self):OBBCenter())
+	return vwrap(Ent_OBBCenter(getent(self)))
 end
 
 --- Returns the world position of the entity's outer bounding box
@@ -1188,21 +1203,21 @@ end
 -- @return Vector The position vector of the outer bounding box center
 function ents_methods:obbCenterW()
 	local ent = getent(self)
-	return vwrap(ent:LocalToWorld(ent:OBBCenter()))
+	return vwrap(Ent_LocalToWorld(ent, Ent_OBBCenter(ent)))
 end
 
 --- Returns min local bounding box vector of the entity
 -- @shared
 -- @return Vector The min bounding box vector
 function ents_methods:obbMins()
-	return vwrap(getent(self):OBBMins())
+	return vwrap(Ent_OBBMins(getent(self)))
 end
 
 --- Returns max local bounding box vector of the entity
 -- @shared
 -- @return Vector The max bounding box vector
 function ents_methods:obbMaxs()
-	return vwrap(getent(self):OBBMaxs())
+	return vwrap(Ent_OBBMaxs(getent(self)))
 end
 
 --- Returns Entity axis aligned bounding box in world coordinates
@@ -1210,7 +1225,7 @@ end
 -- @return Vector The min bounding box vector
 -- @return Vector The max bounding box vector
 function ents_methods:worldSpaceAABB()
-	local a, b = getent(self):WorldSpaceAABB()
+	local a, b = Ent_WorldSpaceAABB(getent(self))
 	return vwrap(a), vwrap(b)
 end
 
@@ -1218,63 +1233,57 @@ end
 -- @shared
 -- @return Vector The position vector of the mass center
 function ents_methods:getMassCenter()
-	local ent = getent(self)
-	local phys = ent:GetPhysicsObject()
-	if not IsValidPhys(phys) then SF.Throw("Physics object is invalid", 2) end
-	return vwrap(phys:GetMassCenter())
+	local phys = Ent_GetPhysicsObject(getent(self))
+	if not Phys_IsValid(phys) then SF.Throw("Physics object is invalid", 2) end
+	return vwrap(Phys_GetMassCenter(phys))
 end
 
 --- Returns the world position of the entity's mass center
 -- @shared
 -- @return Vector The position vector of the mass center
 function ents_methods:getMassCenterW()
-	local ent = getent(self)
-	local phys = ent:GetPhysicsObject()
-	if not IsValidPhys(phys) then SF.Throw("Physics object is invalid", 2) end
-	return vwrap(ent:LocalToWorld(phys:GetMassCenter()))
+	local phys = Ent_GetPhysicsObject(getent(self))
+	if not Phys_IsValid(phys) then SF.Throw("Physics object is invalid", 2) end
+	return vwrap(Ent_LocalToWorld(ent, Phys_GetMassCenter(phys)))
 end
 
 --- Returns the angle of the entity
 -- @shared
 -- @return Angle The angle
 function ents_methods:getAngles()
-	return awrap(getent(self):GetAngles())
+	return awrap(Ent_GetAngles(getent(self)))
 end
 
 --- Returns the angle of the entity, local to its parent
 -- @shared
 -- @return Angle The angle
 function ents_methods:getLocalAngles()
-	return awrap(getent(self):GetLocalAngles())
+	return awrap(Ent_GetLocalAngles(getent(self)))
 end
 
 --- Returns the mass of the entity
 -- @shared
 -- @return number The numerical mass
 function ents_methods:getMass()
-	local ent = getent(self)
-	local phys = ent:GetPhysicsObject()
-	if not IsValidPhys(phys) then SF.Throw("Physics object is invalid", 2) end
-
-	return phys:GetMass()
+	local phys = Ent_GetPhysicsObject(getent(self))
+	if not Phys_IsValid(phys) then SF.Throw("Physics object is invalid", 2) end
+	return Phys_GetMass(phys)
 end
 
 --- Returns the principle moments of inertia of the entity
 -- @shared
 -- @return Vector The principle moments of inertia as a vector
 function ents_methods:getInertia()
-	local ent = getent(self)
-	local phys = ent:GetPhysicsObject()
-	if not IsValidPhys(phys) then SF.Throw("Physics object is invalid", 2) end
-
-	return vwrap(phys:GetInertia())
+	local phys = Ent_GetPhysicsObject(getent(self))
+	if not Phys_IsValid(phys) then SF.Throw("Physics object is invalid", 2) end
+	return vwrap(Phys_GetInertia(phys))
 end
 
 --- Returns the velocity of the entity
 -- @shared
 -- @return Vector The velocity vector
 function ents_methods:getVelocity()
-	return vwrap(getent(self):GetVelocity())
+	return vwrap(Ent_GetVelocity(getent(self)))
 end
 
 --- Gets the velocity of the entity in its local coordinate system
@@ -1282,25 +1291,25 @@ end
 -- @return Vector Vector velocity of the physics object local to itself
 function ents_methods:getLocalVelocity()
 	local ent = getent(self)
-	return vwrap(ent:WorldToLocal(ent:GetVelocity() + ent:GetPos()))
+	return vwrap(Ent_WorldToLocal(ent, Ent_GetVelocity(ent) + Ent_GetPos(ent)))
 end
 
 --- Returns the angular velocity of the entity
 -- @shared
 -- @return Vector The angular velocity as a vector
 function ents_methods:getAngleVelocity()
-	local phys = getent(self):GetPhysicsObject()
-	if not IsValidPhys(phys) then SF.Throw("Physics object is invalid", 2) end
-	return vwrap(phys:GetAngleVelocity())
+	local phys = Ent_GetPhysicsObject(getent(self))
+	if not Phys_IsValid(phys) then SF.Throw("Physics object is invalid", 2) end
+	return vwrap(Phys_GetAngleVelocity(phys))
 end
 
 --- Returns the angular velocity of the entity
 -- @shared
 -- @return Angle The angular velocity as an angle
 function ents_methods:getAngleVelocityAngle()
-	local phys = getent(self):GetPhysicsObject()
-	if not IsValidPhys(phys) then SF.Throw("Physics object is invalid", 2) end
-	local vec = phys:GetAngleVelocity()
+	local phys = Ent_GetPhysicsObject(getent(self))
+	if not Phys_IsValid(phys) then SF.Throw("Physics object is invalid", 2) end
+	local vec = Phys_GetAngleVelocity(phys)
 	return awrap(Angle(vec.y, vec.z, vec.x))
 end
 
@@ -1309,7 +1318,7 @@ end
 -- @param Vector data Local space vector
 -- @return Vector data as world space vector
 function ents_methods:localToWorld(data)
-	return vwrap(getent(self):LocalToWorld(vunwrap(data)))
+	return vwrap(Ent_LocalToWorld(getent(self), vqunwrap1(data)))
 end
 
 --- Converts a direction vector in entity local space to world space
@@ -1317,7 +1326,7 @@ end
 -- @param Vector data Local space vector direction
 -- @return Vector data as world space vector direction
 function ents_methods:localToWorldVector(data)
-	return vwrap(getent(self):GetPhysicsObject():LocalToWorldVector(vunwrap(data)))
+	return vwrap(Phys_LocalToWorldVector(Ent_GetPhysicsObject(getent(self)), vqunwrap1(data)))
 end
 
 --- Converts an angle in entity local space to world space
@@ -1325,7 +1334,7 @@ end
 -- @param Angle data Local space angle
 -- @return Angle data as world space angle
 function ents_methods:localToWorldAngles(data)
-	return awrap(getent(self):LocalToWorldAngles(aunwrap(data)))
+	return awrap(Ent_LocalToWorldAngles(getent(self), aqunwrap1(data)))
 end
 
 --- Converts a vector in world space to entity local space
@@ -1333,7 +1342,7 @@ end
 -- @param Vector data World space vector
 -- @return Vector data as local space vector
 function ents_methods:worldToLocal(data)
-	return vwrap(getent(self):WorldToLocal(vunwrap(data)))
+	return vwrap(Ent_WorldToLocal(getent(self), vqunwrap1(data)))
 end
 
 --- Converts a direction vector in world space to entity local space
@@ -1341,7 +1350,7 @@ end
 -- @param Vector data World space direction vector
 -- @return Vector data as local space direction vector
 function ents_methods:worldToLocalVector(data)
-	return vwrap(getent(self):GetPhysicsObject():WorldToLocalVector(vunwrap(data)))
+	return vwrap(Phys_WorldToLocalVector(Ent_GetPhysicsObject(getent(self)), vqunwrap1(data)))
 end
 
 --- Converts an angle in world space to entity local space
@@ -1349,7 +1358,7 @@ end
 -- @param Angle data World space angle
 -- @return Angle data as local space angle
 function ents_methods:worldToLocalAngles(data)
-	return awrap(getent(self):WorldToLocalAngles(aunwrap(data)))
+	return awrap(Ent_WorldToLocalAngles(getent(self), aqunwrap1(data)))
 end
 
 --- Gets the animation number from the animation name
@@ -1357,14 +1366,13 @@ end
 -- @return number Animation index or -1 if invalid
 function ents_methods:lookupSequence(animation)
 	checkluatype(animation, TYPE_STRING)
-
-	return getent(self):LookupSequence(animation)
+	return Ent_LookupSequence(getent(self), animation)
 end
 
 --- Gets the current playing sequence
 -- @return number The sequence number
 function ents_methods:getSequence()
-	return getent(self):GetSequence()
+	return Ent_GetSequence(getent(self))
 end
 
 --- Gets the name of a sequence
@@ -1372,7 +1380,7 @@ end
 -- @return string The sequence name
 function ents_methods:getSequenceName(id)
 	checkluatype(id, TYPE_NUMBER)
-	return getent(self):GetSequenceName(id)
+	return Ent_GetSequenceName(getent(self), id)
 end
 
 --- Gets various information about the specified animation
@@ -1381,8 +1389,8 @@ end
 function ents_methods:getSequenceInfo(id)
 	local ent = getent(self)
 	checkluatype(id, TYPE_NUMBER)
-	if id < 0 or id > ent:GetSequenceCount() - 1 then SF.Throw("Sequence ID out of bounds", 2) end
-	local info = getent(self):GetSequenceInfo(id)
+	if id < 0 or id > Ent_GetSequenceCount(ent) - 1 then SF.Throw("Sequence ID out of bounds", 2) end
+	local info = Ent_GetSequenceInfo(getent(self), id)
 	info.bbmin = vwrap(info.bbmin)
 	info.bbmax = vwrap(info.bbmax)
 	return info
@@ -1391,19 +1399,19 @@ end
 --- Returns all animations of the entity
 -- @return table List of animations, starts at index 0 where value is the animation's name
 function ents_methods:getSequenceList()
-	return getent(self):GetSequenceList()
+	return Ent_GetSequenceList(getent(self))
 end
 
 --- Gets the number of animations the entity has
 -- @return number Count of entity's animations
 function ents_methods:getSequenceCount()
-	return getent(self):GetSequenceCount()
+	return Ent_GetSequenceCount(getent(self))
 end
 
 --- Checks whether the animation is playing
 -- @return boolean True if the animation is currently playing, False otherwise
 function ents_methods:isSequenceFinished()
-	return getent(self):IsSequenceFinished()
+	return Ent_IsSequenceFinished(getent(self))
 end
 
 --- Get the length of an animation
@@ -1413,7 +1421,7 @@ function ents_methods:sequenceDuration(id)
 	local ent = getent(self)
 	if id~=nil then checkluatype(id, TYPE_NUMBER) end
 
-	return ent:SequenceDuration(id)
+	return Ent_SequenceDuration(ent, id)
 end
 
 --- Set the pose value of an animation. Turret/Head angles for example.
@@ -1423,34 +1431,34 @@ function ents_methods:setPose(pose, value)
 	local ent = getent(self)
 	checkpermission(instance, ent, "entities.setRenderProperty")
 
-	ent:SetPoseParameter(pose, value)
+	Ent_SetPoseParameter(ent, pose, value)
 end
 
 --- Get the pose value of an animation
 -- @param string pose Pose parameter name
 -- @return number Value of the pose parameter
 function ents_methods:getPose(pose)
-	return getent(self):GetPoseParameter(pose)
+	return Ent_GetPoseParameter(getent(self), pose)
 end
 
 --- Returns the amount of pose parameters the entity has
 -- @return number Amount of poses
 function ents_methods:getPoseCount()
-	return getent(self):GetNumPoseParameters()
+	return Ent_GetNumPoseParameters(getent(self))
 end
 
 --- Returns pose index corresponding to the given name
 -- @param string pose Pose name
 -- @return number Pose index or -1 if not found
 function ents_methods:getPoseIndex(pose)
-	return getent(self):LookupPoseParameter(pose)
+	return Ent_LookupPoseParameter(getent(self), pose)
 end
 
 --- Returns pose name corresponding to the given index
 -- @param number id Pose index (starting from 0)
 -- @return string Pose name or empty string if not found
 function ents_methods:getPoseName(id)
-	return getent(self):GetPoseParameterName(id)
+	return Ent_GetPoseParameterName(getent(self), id)
 end
 
 --- Returns pose value range
@@ -1458,7 +1466,7 @@ end
 -- @return number? Minimum pose value or nil if pose not found
 -- @return number? Maximum pose value or nil if pose not found
 function ents_methods:getPoseRange(id)
-	return getent(self):GetPoseParameterRange(id)
+	return Ent_GetPoseParameterRange(getent(self), id)
 end
 
 --- Returns a table of flexname -> flexid pairs for use in flex functions.
@@ -1466,8 +1474,8 @@ end
 function ents_methods:getFlexes()
 	local ent = getent(self)
 	local flexes = {}
-	for i = 0, ent:GetFlexNum()-1 do
-		flexes[ent:GetFlexName(i)] = i
+	for i = 0, Ent_GetFlexNum(ent)-1 do
+		flexes[Ent_GetFlexName(ent, i)] = i
 	end
 	return flexes
 end
@@ -1476,25 +1484,22 @@ end
 -- @param string flexname The name of the flex to get the ID of. Case sensitive.
 -- @return number The ID of the flex based on given name.
 function ents_methods:getFlexByName(name)
-	local ent = getent(self)
 	checkluatype(name, TYPE_STRING)
-	return ent:GetFlexIDByName(name)
+	return Ent_GetFlexIDByName(getent(self), name)
 end
 
 --- Returns flex name.
 -- @param number flexid The flex id to look up name of.
 -- @return string The flex name
 function ents_methods:getFlexName(id)
-	local ent = getent(self)
 	checkluatype(id, TYPE_NUMBER)
-	return ent:GetFlexName(id)
+	return Ent_GetFlexName(getent(self), id)
 end
 
 --- Returns whether or not the the entity has had flex manipulations performed with Entity:setFlexWeight or Entity:setFlexScale.
 -- @return boolean True if the entity has flex manipulations, false otherwise.
 function ents_methods:hasFlexManipulations()
-	local ent = getent(self)
-	return ent:HasFlexManipulatior()
+	return Ent_HasFlexManipulatior(getent(self))
 end
 
 --- Gets the weight (value) of a flex.
@@ -1506,11 +1511,11 @@ function ents_methods:getFlexWeight(flexid)
 	checkluatype(flexid, TYPE_NUMBER)
 	flexid = math.floor(flexid)
 
-	if flexid < 0 or flexid >= ent:GetFlexNum() then
+	if flexid < 0 or flexid >= Ent_GetFlexNum(ent) then
 		SF.Throw("Invalid flex: "..flexid, 2)
 	end
 
-	return ent:GetFlexWeight(flexid)
+	return Ent_GetFlexWeight(ent, flexid)
 end
 
 --- Sets the weight (value) of a flex.
@@ -1529,17 +1534,17 @@ function ents_methods:setFlexWeight(flexid, weight)
 		checkpermission(instance, ent, "entities.setRenderProperty")
 	end
 
-	if flexid < 0 or flexid >= ent:GetFlexNum() then
+	if flexid < 0 or flexid >= Ent_GetFlexNum(ent) then
 		SF.Throw("Invalid flex: "..flexid, 2)
 	end
 
-	ent:SetFlexWeight(flexid, weight)
+	Ent_SetFlexWeight(ent, flexid, weight)
 end
 
 --- Gets the scale of the entity flexes
 -- @return number The scale of the flexes
 function ents_methods:getFlexScale()
-	return getent(self):GetFlexScale()
+	return Ent_GetFlexScale(getent(self))
 end
 
 --- Sets the scale of the entity flexes
@@ -1554,14 +1559,14 @@ function ents_methods:setFlexScale(scale)
 		checkpermission(instance, ent, "entities.setRenderProperty")
 	end
 
-	ent:SetFlexScale(scale)
+	Ent_SetFlexScale(ent, scale)
 end
 
 --- Gets the model of an entity
 -- @shared
 -- @return string Model of the entity
 function ents_methods:getModel()
-	return getent(self):GetModel()
+	return Ent_GetModel(getent(self))
 end
 
 --- Returns the entity's model bounds. This is different than the collision bounds/hull.
@@ -1570,7 +1575,7 @@ end
 -- @return Vector Minimum vector of the bounds
 -- @return Vector Maximum vector of the bounds
 function ents_methods:getModelBounds()
-	local minvec, maxvec = getent(self):GetModelBounds()
+	local minvec, maxvec = Ent_GetModelBounds(getent(self))
 	return vwrap(minvec), vwrap(maxvec)
 end
 
@@ -1578,42 +1583,42 @@ end
 -- @shared
 -- @return number Contents of the entity's model. https://wiki.facepunch.com/gmod/Enums/CONTENTS
 function ents_methods:getModelContents()
-	return getent(self):GetModelContents()
+	return Ent_GetModelContents(getent(self))
 end
 
 --- Returns the model's radius
 -- @shared
 -- @return number Radius of the model
 function ents_methods:getModelRadius()
-	return getent(self):GetModelRadius()
+	return Ent_GetModelRadius(getent(self))
 end
 
 --- Returns the model's scale
 -- @shared
 -- @return number Scale of the model
 function ents_methods:getModelScale()
-	return getent(self):GetModelScale()
+	return Ent_GetModelScale(getent(self))
 end
 
 --- Gets the max health of an entity
 -- @shared
 -- @return number Max Health of the entity
 function ents_methods:getMaxHealth()
-	return getent(self):GetMaxHealth()
+	return Ent_GetMaxHealth(getent(self))
 end
 
 --- Gets the health of an entity
 -- @shared
 -- @return number Health of the entity
 function ents_methods:getHealth()
-	return getent(self):Health()
+	return Ent_Health(getent(self))
 end
 
 --- Gets the entity's eye angles
 -- @shared
 -- @return Angle Angles of the entity's eyes
 function ents_methods:getEyeAngles()
-	return awrap(getent(self):EyeAngles())
+	return awrap(Ent_EyeAngles(getent(self)))
 end
 
 --- Gets the entity's eye position
@@ -1621,7 +1626,7 @@ end
 -- @return Vector Eye position of the entity
 -- @return Vector? In case of a ragdoll, the position of the second eye
 function ents_methods:getEyePos()
-	local pos1, pos2 = getent(self):EyePos()
+	local pos1, pos2 = Ent_EyePos(getent(self))
 	if pos2 then
 		return vwrap(pos1), vwrap(pos2)
 	end
@@ -1633,7 +1638,7 @@ end
 -- @class function
 -- @return string String material
 function ents_methods:getMaterial()
-	return getent(self):GetMaterial() or ""
+	return Ent_GetMaterial(getent(self)) or ""
 end
 
 --- Gets an entities' submaterial
@@ -1645,7 +1650,7 @@ function ents_methods:getSubMaterial(index)
 	checkluatype(index, TYPE_NUMBER)
 	if index<0 or index>31 then SF.Throw("Index must be an int in range 0 - 31") end
 
-	return getent(self):GetSubMaterial(index) or ""
+	return Ent_GetSubMaterial(getent(self), index) or ""
 end
 
 --- Gets an entities' material list
@@ -1653,35 +1658,35 @@ end
 -- @class function
 -- @return table Material
 function ents_methods:getMaterials()
-	return getent(self):GetMaterials() or {}
+	return Ent_GetMaterials(getent(self)) or {}
 end
 
 --- Gets the entity's up vector
 -- @shared
 -- @return Vector Vector up
 function ents_methods:getUp()
-	return vwrap(getent(self):GetUp())
+	return vwrap(Ent_GetUp(getent(self)))
 end
 
 --- Gets the entity's right vector
 -- @shared
 -- @return Vector Vector right
 function ents_methods:getRight()
-	return vwrap(getent(self):GetRight())
+	return vwrap(Ent_GetRight(getent(self)))
 end
 
 --- Gets the entity's forward vector
 -- @shared
 -- @return Vector Vector forward
 function ents_methods:getForward()
-	return vwrap(getent(self):GetForward())
+	return vwrap(Ent_GetForward(getent(self)))
 end
 
 --- Returns the timer.curtime() time the entity was created on
 -- @shared
 -- @return number Seconds relative to server map start
 function ents_methods:getCreationTime()
-	return getent(self):GetCreationTime()
+	return Ent_GetCreationTime(getent(self))
 end
 
 --- Checks if an engine effect is applied to the entity
@@ -1690,8 +1695,7 @@ end
 -- @return boolean True or false
 function ents_methods:isEffectActive(effect)
 	checkluatype(effect, TYPE_NUMBER)
-
-	return getent(self):IsEffectActive(effect)
+	return Ent_IsEffectActive(getent(self), effect)
 end
 
 --- Marks entity as persistent, disallowing players from physgunning it. Persistent entities save on server shutdown when sbox_persist is set
@@ -1701,14 +1705,14 @@ function ents_methods:setPersistent(persist)
 	checkluatype(persist, TYPE_BOOL)
 	local ent = getent(self)
 	checkpermission(instance, ent, "entities.setPersistent")
-	ent:SetPersistent(persist)
+	Ent_SetPersistent(ent, persist)
 end
 
 --- Checks if entity is marked as persistent
 -- @shared
 -- @return boolean True if the entity is persistent
 function ents_methods:getPersistent()
-	return getent(self):GetPersistent()
+	return Ent_GetPersistent(getent(self))
 end
 
 --- Returns the game assigned owner of an entity. This doesn't take CPPI into account and will return nil for most standard entities.
@@ -1716,7 +1720,7 @@ end
 -- @shared
 -- @return Entity Owner
 function ents_methods:entOwner()
-	return owrap(getent(self):GetOwner())
+	return owrap(Ent_GetOwner(getent(self)))
 end
 
 --- Gets the bounds (min and max corners) of a hit box.
@@ -1728,7 +1732,7 @@ end
 function ents_methods:getHitBoxBounds(hitbox, group)
 	checkluatype(hitbox, TYPE_NUMBER)
 	checkluatype(group, TYPE_NUMBER)
-	local mins, maxs = getent(self):GetHitBoxBounds(hitbox, group)
+	local mins, maxs = Ent_GetHitBoxBounds(getent(self), hitbox, group)
 	if mins and maxs then
 		return vwrap(mins), vwrap(maxs)
 	end
@@ -1740,7 +1744,7 @@ end
 -- @return number Number of hitboxes
 function ents_methods:getHitBoxCount(group)
 	checkluatype(group, TYPE_NUMBER)
-	return getent(self):GetHitBoxCount(group)
+	return Ent_GetHitBoxCount(getent(self), group)
 end
 
 --- Gets the bone the given hitbox is attached to.
@@ -1751,7 +1755,7 @@ end
 function ents_methods:getHitBoxBone(hitbox, group)
 	checkluatype(hitbox, TYPE_NUMBER)
 	checkluatype(group, TYPE_NUMBER)
-	return getent(self):GetHitBoxBone(hitbox, group)
+	return Ent_GetHitBoxBone(getent(self), hitbox, group)
 end
 
 --- Returns entity's current hit box set.
@@ -1759,14 +1763,14 @@ end
 -- @return number? Hitbox set number, nil if entity has no hitboxes.
 -- @return string? Hitbox set name, nil if entity has no hitboxes.
 function ents_methods:getHitBoxSet()
-	return getent(self):GetHitboxSet()
+	return Ent_GetHitboxSet(getent(self))
 end
 
 --- Returns entity's number of hitbox sets.
 -- @shared
 -- @return number Number of hitbox sets.
 function ents_methods:getHitBoxSetCount()
-	return getent(self):GetHitboxSetCount()
+	return Ent_GetHitboxSetCount(getent(self))
 end
 
 --- Gets the hit group of a given hitbox in a given hitbox set.
@@ -1777,14 +1781,14 @@ end
 function ents_methods:getHitBoxHitGroup(hitbox, hitboxset)
 	checkluatype(hitbox, TYPE_NUMBER)
 	checkluatype(hitboxset, TYPE_NUMBER)
-	return getent(self):GetHitBoxHitGroup(hitbox, hitboxset)
+	return Ent_GetHitBoxHitGroup(getent(self), hitbox, hitboxset)
 end
 
 --- Returns a table of brushes surfaces for brush model entities.
 -- @shared
 -- @return table Table of SurfaceInfos if the entity has a brush model, or no value otherwise.
 function ents_methods:getBrushSurfaces()
-	local t = getent(self):GetBrushSurfaces()
+	local t = Ent_GetBrushSurfaces(getent(self))
 	if not t then return end
 	local out = {}
 	for k,surface in ipairs(t) do
@@ -1801,7 +1805,7 @@ end
 -- @return number The distance to the plane
 function ents_methods:getBrushPlane(id)
 	checkluatype(id, TYPE_NUMBER)
-	local origin, normal, distance = getent(self):GetBrushPlane(id)
+	local origin, normal, distance = Ent_GetBrushPlane(getent(self), id)
 	return vwrap(origin), vwrap(normal), distance
 end
 
@@ -1809,7 +1813,7 @@ end
 -- @shared
 -- @return number The amount of brush planes
 function ents_methods:getBrushPlaneCount()
-	return getent(self):GetBrushPlaneCount()
+	return Ent_GetBrushPlaneCount(getent(self))
 end
 
 --- Gets a datatable angle
@@ -1819,7 +1823,7 @@ end
 function ents_methods:getDTAngle(key)
 	checkluatype(key, TYPE_NUMBER)
 	if key<0 or key>31 then SF.Throw("Key must be a int in range 0 - 31") end
-	return awrap(getent(self):GetDTAngle(key))
+	return awrap(Ent_GetDTAngle(getent(self), key))
 end
 
 --- Gets a datatable boolean
@@ -1829,7 +1833,7 @@ end
 function ents_methods:getDTBool(key)
 	checkluatype(key, TYPE_NUMBER)
 	if key<0 or key>31 then SF.Throw("Key must be a int in range 0 - 31") end
-	return getent(self):GetDTBool(key)
+	return Ent_GetDTBool(getent(self), key)
 end
 
 --- Gets a datatable entity
@@ -1839,7 +1843,7 @@ end
 function ents_methods:getDTEntity(key)
 	checkluatype(key, TYPE_NUMBER)
 	if key<0 or key>31 then SF.Throw("Key must be a int in range 0 - 31") end
-	return owrap(getent(self):GetDTEntity(key))
+	return owrap(Ent_GetDTEntity(getent(self), key))
 end
 
 --- Gets a datatable float
@@ -1849,7 +1853,7 @@ end
 function ents_methods:getDTFloat(key)
 	checkluatype(key, TYPE_NUMBER)
 	if key<0 or key>31 then SF.Throw("Key must be a int in range 0 - 31") end
-	return getent(self):GetDTFloat(key)
+	return Ent_GetDTFloat(getent(self), key)
 end
 
 --- Gets a datatable int
@@ -1859,7 +1863,7 @@ end
 function ents_methods:getDTInt(key)
 	checkluatype(key, TYPE_NUMBER)
 	if key<0 or key>31 then SF.Throw("Key must be a int in range 0 - 31") end
-	return getent(self):GetDTInt(key)
+	return Ent_GetDTInt(getent(self), key)
 end
 
 --- Gets a datatable string
@@ -1869,7 +1873,7 @@ end
 function ents_methods:getDTString(key)
 	checkluatype(key, TYPE_NUMBER)
 	if key<0 or key>31 then SF.Throw("Key must be a int in range 0 - 31") end
-	return getent(self):GetDTString(key)
+	return Ent_GetDTString(getent(self), key)
 end
 
 --- Gets a datatable vector
@@ -1879,7 +1883,7 @@ end
 function ents_methods:getDTVector(key)
 	checkluatype(key, TYPE_NUMBER)
 	if key<0 or key>31 then SF.Throw("Key must be a int in range 0 - 31") end
-	return vwrap(getent(self):GetDTVector(key))
+	return vwrap(Ent_GetDTVector(getent(self), key))
 end
 
 --- Gets a networked variable of an entity
@@ -1889,7 +1893,7 @@ end
 function ents_methods:getNWVar(key)
 	checkluatype(key, TYPE_STRING)
 	-- GetNW* returns whatever the key is tied to regardless of the function name
-	local result = getent(self):GetNWEntity(key)
+	local result = Ent_GetNWEntity(getent(self), key)
 	if result == NULL then return end
 	return owrap(result)
 end
@@ -1898,14 +1902,14 @@ end
 -- @shared
 -- @return table The table of networked objects
 function ents_methods:getNWVarTable()
-	return instance.Sanitize(getent(self):GetNWVarTable())
+	return instance.Sanitize(Ent_GetNWVarTable(getent(self)))
 end
 
 --- Returns the distance between the center of the entity's bounding box and whichever corner of the bounding box is farthest away.
 -- @shared
 -- @return number The radius of the bounding box, or 0 for some entities such as worldspawn
 function ents_methods:getBoundingRadius()
-	return getent(self):BoundingRadius()
+	return Ent_BoundingRadius(getent(self))
 end
 
 --- Returns whether the entity is dormant or not, i.e. whether or not information about the entity is being sent to your client. Not to be confused with PhysObj:isAsleep
@@ -1914,7 +1918,7 @@ end
 -- @shared
 -- @return boolean Whether entity is dormant or not.
 function ents_methods:isDormant()
-	return getent(self):IsDormant()
+	return Ent_IsDormant(getent(self))
 end
 
 --- Performs a Ray-Orientated Bounding Box intersection from the given position to the origin of the OBBox with the entity and returns the hit position on the OBBox.
@@ -1923,7 +1927,7 @@ end
 -- @param Vector The vector to start the intersection from.
 -- @return Vector The nearest hit point of the entity's bounding box in world coordinates, or Vector(0, 0, 0) for some entities such as worldspawn.
 function ents_methods:getNearestPoint(pos)
-	return vwrap(getent(self):NearestPoint(vunwrap(pos)))
+	return vwrap(Ent_NearestPoint(getent(self), vqunwrap1(pos)))
 end
 
 --- Returns a table of save values for an entity.
@@ -1932,7 +1936,7 @@ end
 -- @param boolean showAll If set, shows all variables, not just the ones for save.
 -- @return table A table containing all save values in key/value format. The value may be a sequential table (starting to 1) if the field in question is an array in engine.
 function ents_methods:getSaveTable(showAll)
-	return instance.Sanitize(getent(self):GetSaveTable(showAll and true or false))
+	return instance.Sanitize(Ent_GetSaveTable(getent(self), showAll and true or false))
 end
 
 --- Returns a variable from the entity's save table.
@@ -1941,7 +1945,7 @@ end
 -- @return any The internal variable associated with the name.
 function ents_methods:getInternalVariable(variableName)
 	checkluatype(variableName, TYPE_STRING)
-	local result = getent(self):GetInternalVariable(variableName)
+	local result = Ent_GetInternalVariable(getent(self), variableName)
 	return istable(result) and instance.Sanitize(result) or owrap(result)
 end
 
@@ -1949,7 +1953,7 @@ end
 -- @shared
 -- @return number The map creation ID or -1 if the entity is not compiled into the map.
 function ents_methods:mapCreationID()
-	return getent(self):MapCreationID()
+	return Ent_MapCreationID(getent(self))
 end
 
 --- Returns entity's networked variables table (data table).
@@ -1957,7 +1961,7 @@ end
 -- @return table? The networked variables table of the entity or nil if it doesn't have one.
 function ents_methods:getNetworkVars()
     local ent = getent(self)
-    return istable(ent.dt) and instance.Sanitize(ent:GetNetworkVars()) or nil
+    return istable(Ent_GetTable(ent).dt) and instance.Sanitize(Ent_GetNetworkVars(ent)) or nil
 end
 
 	

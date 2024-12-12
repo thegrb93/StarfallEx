@@ -148,7 +148,7 @@ return function(instance)
 		checkpermission(instance, nil, "navarea.create")
 		entList:checkuse(instance.player, 1)
 
-		local area = navmesh.CreateNavArea( vunwrap(corner), vunwrap(opposite_corner) )
+		local area = navmesh.CreateNavArea( vqunwrap1(corner), vqunwrap2(opposite_corner) )
 		if area then
 			entList:register(instance, area)
 			return navwrap(area)
@@ -156,7 +156,7 @@ return function(instance)
 	end
 
 	function navmesh_library.getGroundHeight(pos)
-		local height, normal = navmesh.GetGroundHeight( vunwrap(pos) )
+		local height, normal = navmesh.GetGroundHeight( vqunwrap1(pos) )
 		return height, vwrap(normal)
 	end
 
@@ -188,7 +188,7 @@ return function(instance)
 		stepup = math.Clamp(stepup, 0, 50000)
 
 		local out = {}
-		for idx, navarea in ipairs( navmesh.Find( vunwrap(pos), radius, stepdown, stepup ) ) do
+		for idx, navarea in ipairs( navmesh.Find( vqunwrap1(pos), radius, stepdown, stepup ) ) do
 			out[idx] = lnavwrap(navarea)
 		end
 		return out
@@ -215,7 +215,7 @@ return function(instance)
 	-- @return NavArea The NavArea.
 	function navmesh_library.getNavArea(pos, limit)
 		checkluatype(limit, TYPE_NUMBER)
-		return lnavwrap( navmesh.GetNavArea( vunwrap(pos), limit ) )
+		return lnavwrap( navmesh.GetNavArea( vqunwrap1(pos), limit ) )
 	end
 
 	--- Returns the closest NavArea to given position at the same height, or beneath it.
@@ -227,7 +227,7 @@ return function(instance)
 	-- @param boolean checkGround If checkGround is true then this function will internally call navmesh.getNavArea to check if there is a CNavArea directly below the position, and return it if so, before checking anywhere else. (Default true)
 	-- @return NavArea The closest NavArea found with the given parameters, or a NULL NavArea if one was not found.
 	function navmesh_library.getNearestNavArea(pos, maxDist, checkLOS, checkGround)
-		return lnavwrap( navmesh.GetNearestNavArea( vunwrap(pos), nil, maxDist, checkLOS, checkGround ) )
+		return lnavwrap( navmesh.GetNearestNavArea( vqunwrap1(pos), nil, maxDist, checkLOS, checkGround ) )
 	end
 
 	--- Returns the position of the edit cursor when nav_edit is set to 1.
@@ -273,7 +273,7 @@ return function(instance)
 	-- @param Vector v The position to check
 	-- @return boolean If the vector is inside the area
 	function lnavarea_methods:contains(v)
-		return lnavunwrap(self):Contains( vunwrap(v) )
+		return lnavunwrap(self):Contains( vqunwrap1(v) )
 	end
 
 	--- Returns whether this Nav Area is flat within the tolerance of the nav_coplanar_slope_limit_displacement and nav_coplanar_slope_limit convars.
@@ -315,7 +315,7 @@ return function(instance)
 	-- @param Vector pos The position to compute direction towards.
 	-- @return number The direction the vector is in relation to this NavArea. See NAV_DIR enums
 	function lnavarea_methods:computeDirection(pos)
-		return lnavunwrap(self):ComputeDirection( vunwrap(pos) )
+		return lnavunwrap(self):ComputeDirection( vqunwrap1(pos) )
 	end
 
 	--- Returns the height difference on the Z axis of the two CNavAreas. This is calculated from the center most point on both CNavAreas.
@@ -399,7 +399,7 @@ return function(instance)
 	-- @param Vector pos The given position, can be outside of the NavArea bounds.
 	-- @return Vector The closest point on the NavArea.
 	function lnavarea_methods:getClosestPointOnArea(pos)
-		return vwrap( lnavunwrap(self):GetClosestPointOnArea( vunwrap(pos) ) )
+		return vwrap( lnavunwrap(self):GetClosestPointOnArea( vqunwrap1(pos) ) )
 	end
 
 	--- Returns the vector position of the corner for the given CNavArea.
@@ -541,7 +541,7 @@ return function(instance)
 	-- @param Vector The position to get the elevation from, the z value from this position is ignored and only the X and Y values are used to this task.
 	-- @return number Elevation
 	function lnavarea_methods:getZ(pos)
-		return lnavunwrap(self):GetZ( vunwrap(pos) )
+		return lnavunwrap(self):GetZ( vqunwrap1(pos) )
 	end
 
 	--- Returns true if the given CNavArea has this attribute flag set.
@@ -588,7 +588,7 @@ return function(instance)
 	function lnavarea_methods:isOverlapping(pos, tolerance)
 		checkluatype(tolerance, TYPE_NUMBER)
 
-		return lnavunwrap(self):IsOverlapping( vunwrap(pos), tolerance )
+		return lnavunwrap(self):IsOverlapping( vqunwrap1(pos), tolerance )
 	end
 
 	--- Returns true if this CNavArea is overlapping the given CNavArea.
@@ -605,7 +605,7 @@ return function(instance)
 	-- @param Entity? ignoreEnt If set, the given entity will be ignored when doing LOS tests (Default NULL)
 	-- @return boolean Whether the given position is visible from this area
 	function lnavarea_methods:isPartiallyVisible(pos, ignoreEnt)
-		return lnavunwrap(self):IsPartiallyVisible( vunwrap(pos), eunwrap(ignoreEnt) )
+		return lnavunwrap(self):IsPartiallyVisible( vqunwrap1(pos), eunwrap(ignoreEnt) )
 	end
 
 	--- Returns whether this CNavArea can potentially see the given CNavArea.
@@ -629,7 +629,7 @@ return function(instance)
 	-- @return boolean Whether we can be seen or not.
 	-- @return Vector If we can be seen, this is returned with either the center or one of the corners of the Nav Area.
 	function lnavarea_methods:isVisible(pos)
-		local a, b = lnavunwrap(self):IsVisible( vunwrap(pos) )
+		local a, b = lnavunwrap(self):IsVisible( vqunwrap1(pos) )
 		return a, vwrap(b)
 	end
 
@@ -674,7 +674,7 @@ return function(instance)
 	-- @param Vector pos The new position to set.
 	function navarea_methods:setCorner(corner, pos)
 		checkluatype(corner, TYPE_NUMBER)
-		navunwrap(self):SetCorner(corner, vunwrap(pos))
+		navunwrap(self):SetCorner(corner, vqunwrap1(pos))
 	end
 
 	--- Sets the cost from starting area this area when pathfinding.
@@ -731,7 +731,7 @@ return function(instance)
 	-- @param number flags Flags describing what kind of hiding spot this is.
 	function navarea_methods:addHidingSpot(pos, flags)
 		checkluatype(flags, TYPE_NUMBER)
-		navunwrap(self):AddHidingSpot( vunwrap(pos), flags )
+		navunwrap(self):AddHidingSpot( vqunwrap1(pos), flags )
 	end
 
 	--- Adds this CNavArea to the closed list, a list of areas that have been checked by A* pathfinding algorithm.

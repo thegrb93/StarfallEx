@@ -131,7 +131,7 @@ if SERVER then
 	-- @param number damage The amount of damage to be applied
 	function game_library.blastDamage(damageOrigin, damageRadius, damage)
 		checkpermission(instance, nil, "blast.create")
-		util.BlastDamage(instance.entity, instance.player, vunwrap(damageOrigin), math.Clamp(damageRadius, 0, 1500), damage)
+		util.BlastDamage(instance.entity, instance.player, vqunwrap1(damageOrigin), math.Clamp(damageRadius, 0, 1500), damage)
 	end
 
 else
@@ -157,7 +157,7 @@ else
 	-- @param Vector position The position to check the skybox visibility from
 	-- @return boolean Whether the skybox is visible from the position
 	function game_library.isSkyboxVisibleFromPoint(position)
-		return util.IsSkyboxVisibleFromPoint(vunwrap(position))
+		return util.IsSkyboxVisibleFromPoint(vqunwrap1(position))
 	end
 
 	--- Returns the server's frame time and standard deviation

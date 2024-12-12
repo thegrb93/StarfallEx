@@ -556,8 +556,8 @@ if SERVER then
 		local ply = getply(self)
 		checkpermission(instance, ply, "player.dropweapon")
 
-		if target~=nil then target = vunwrap(target) end
-		if velocity~=nil then velocity = vunwrap(velocity) end
+		if target~=nil then target = vqunwrap1(target) end
+		if velocity~=nil then velocity = vqunwrap2(velocity) end
 
 		if isstring(weapon) then
 			ply:DropNamedWeapon(weapon, target, velocity)
@@ -621,11 +621,8 @@ if SERVER then
 	-- @param Angle ang New angles
 	function player_methods:setEyeAngles(ang)
 		local ent = getent(self)
-		local ang = aunwrap(ang)
-
 		checkpermission(instance, ent, "entities.setEyeAngles")
-
-		ent:SetEyeAngles(ang)
+		ent:SetEyeAngles(aqunwrap1(ang))
 	end
 
 	--- Returns the packet loss of the client

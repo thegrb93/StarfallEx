@@ -174,7 +174,7 @@ end
 --- Sets the effect's angles
 -- @param Angle ang The angles
 function effect_methods:setAngles(ang)
-	unwrap(self):SetAngles(aunwrap(ang))
+	unwrap(self):SetAngles(aqunwrap1(ang))
 end
 
 --- Sets the effect's attachment
@@ -243,13 +243,13 @@ end
 --- Sets the effect's normal
 -- @param Vector normal The vector normal
 function effect_methods:setNormal(normal)
-	unwrap(self):SetNormal(vunwrap(normal))
+	unwrap(self):SetNormal(vqunwrap1(normal))
 end
 
 --- Sets the effect's origin
 -- @param Vector origin The vector origin
 function effect_methods:setOrigin(origin)
-	unwrap(self):SetOrigin(vunwrap(origin))
+	unwrap(self):SetOrigin(vqunwrap1(origin))
 end
 
 --- Sets the effect's radius
@@ -270,7 +270,7 @@ end
 -- Limited to world bounds (+-16386 on every axis) and has horrible networking precision. (17 bit float per component)
 -- @param Vector start The vector start
 function effect_methods:setStart(start)
-	unwrap(self):SetStart(vunwrap(start))
+	unwrap(self):SetStart(vqunwrap1(start))
 end
 
 --- Sets the effect's surface property

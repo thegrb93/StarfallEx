@@ -297,7 +297,7 @@ end
 --- Sets the position of the sound in 3D space. Must have `3d` flag for this to have any effect.
 -- @param Vector pos Where to position the sound.
 function bass_methods:setPos(pos)
-	getsnd(self):SetPos(vunwrap(pos))
+	getsnd(self):SetPos(vqunwrap1(pos))
 end
 
 --- Gets the position of the sound in 3D space.

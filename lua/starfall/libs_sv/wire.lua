@@ -1,8 +1,8 @@
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 local debug_getmetatable = debug.getmetatable
-local IsValid = FindMetaTable("Entity").IsValid
-local GetTable = FindMetaTable("Entity").GetTable
+local ENT_META = FindMetaTable("Entity")
+local Ent_GetTable, Ent_IsValid = ENT_META.GetTable, ENT_META.IsValid
 
 -- Register privileges
 registerprivilege("wire.setOutputs", "Set outputs", "Allows the user to specify the set of outputs")
@@ -71,7 +71,7 @@ instance:AddHook("initialize", function()
 	end
 
 	function ent:TriggerInput(key, value)
-		local tbl = GetTable(self)
+		local tbl = Ent_GetTable(self)
 		local instance = tbl.instance
 		if instance then
 			instance:runScriptHook("input", key, instance.WireToSF[tbl.Inputs[key].Type](value))
@@ -79,7 +79,7 @@ instance:AddHook("initialize", function()
 	end
 
 	function ent:ReadCell(address)
-		local instance = GetTable(self).instance
+		local instance = Ent_GetTable(self).instance
 		if instance then
 			local tbl = instance:runScriptHookForResult("readcell", address)
 			return tbl[1] and tonumber(tbl[2]) or 0
@@ -88,7 +88,7 @@ instance:AddHook("initialize", function()
 	end
 
 	function ent:WriteCell(address, data)
-		local instance = GetTable(self).instance
+		local instance = Ent_GetTable(self).instance
 		if instance then
 			local tbl = instance:runScriptHookForResult("writecell", address, data)
 			return tbl[1] and (tbl[2]==nil or tbl[2]==true)
@@ -99,7 +99,7 @@ end)
 
 local function getwl(self)
 	local wl = wlunwrap(self)
-	if IsValid(wl) then
+	if Ent_IsValid(wl) then
 		return wl
 	else
 		SF.Throw("Wirelink is not valid", 3)
@@ -342,7 +342,7 @@ function wire_library.adjustInputs(names, types, descriptions)
 	end
 
 	local ent = instance.entity
-	if not IsValid(ent) then SF.Throw("No entity to create inputs on", 2) end
+	if not Ent_IsValid(ent) then SF.Throw("No entity to create inputs on", 2) end
 	if #names ~= #types then SF.Throw("Table lengths not equal", 2) end
 
 	local names_out, types_out, descriptions_out = {}, {}, {}
@@ -385,7 +385,7 @@ function wire_library.adjustOutputs(names, types, descriptions)
 	end
 
 	local ent = instance.entity
-	if not IsValid(ent) then SF.Throw("No entity to create outputs on", 2) end
+	if not Ent_IsValid(ent) then SF.Throw("No entity to create outputs on", 2) end
 	if #names ~= #types then SF.Throw("Table lengths not equal", 2) end
 
 	local names_out, types_out, descriptions_out = {}, {}, {}
@@ -521,8 +521,8 @@ function wire_library.create(entI, entO, inputname, outputname, width, color, ma
 	entI = eunwrap(entI)
 	entO = eunwrap(entO)
 
-	if not IsValid(entI) then SF.Throw("Invalid target") end
-	if not IsValid(entO) then SF.Throw("Invalid source") end
+	if not Ent_IsValid(entI) then SF.Throw("Invalid target") end
+	if not Ent_IsValid(entO) then SF.Throw("Invalid source") end
 
 	checkpermission(instance, entI, "wire.createWire")
 	checkpermission(instance, entO, "wire.createWire")
@@ -621,33 +621,33 @@ end
 
 local function triggerInput(ent, k, v)
 	checkpermission(instance, nil, "wire.wirelink.write")
-	local input, convert = checkinput(GetTable(ent).Inputs, k, SFToWire)
+	local input, convert = checkinput(Ent_GetTable(ent).Inputs, k, SFToWire)
 	instance:runExternal(WireLib.TriggerInput, ent, k, convert(v))
 end
 local function triggerOutput(ent, k, v)
 	checkpermission(instance, nil, "wire.wirelink.write")
-	local output, convert = checkoutput(GetTable(ent).Outputs, k, SFToWire)
+	local output, convert = checkoutput(Ent_GetTable(ent).Outputs, k, SFToWire)
 	instance:runExternal(Wire_TriggerOutput, ent, k, convert(v))
 end
 local function triggerCell(ent, k, v)
 	checkpermission(instance, nil, "wire.wirelink.write")
-	local WriteCell = GetTable(ent).WriteCell or SF.Throw("Entity does not have WriteCell capability", 3)
+	local WriteCell = Ent_GetTable(ent).WriteCell or SF.Throw("Entity does not have WriteCell capability", 3)
 	instance:runExternal(WriteCell, ent, k, v)
 end
 
 local function readInput(ent, k)
 	checkpermission(instance, nil, "wire.wirelink.read")
-	local input, convert = checkinput(GetTable(ent).Inputs, k, WireToSF)
+	local input, convert = checkinput(Ent_GetTable(ent).Inputs, k, WireToSF)
 	return convert(input.Value)
 end
 local function readOutput(ent, k)
 	checkpermission(instance, nil, "wire.wirelink.read")
-	local output, convert = checkoutput(GetTable(ent).Outputs, k, WireToSF)
+	local output, convert = checkoutput(Ent_GetTable(ent).Outputs, k, WireToSF)
 	return convert(output.Value)
 end
 local function readCell(ent, k)
 	checkpermission(instance, nil, "wire.wirelink.read")
-	local ReadCell = GetTable(ent).ReadCell or SF.Throw("Entity does not have ReadCell capability", 3)
+	local ReadCell = Ent_GetTable(ent).ReadCell or SF.Throw("Entity does not have ReadCell capability", 3)
 	return tonumber(instance:runExternal(ReadCell, ent, k))
 end
 
@@ -746,7 +746,7 @@ end
 --- Checks if a wirelink is valid. (ie. doesn't point to an invalid entity)
 -- @return boolean Whether the wirelink is valid
 function wirelink_methods:isValid()
-	return wlunwrap(self):IsValid()
+	return wlunwrap(self):Ent_IsValid()
 end
 
 --- Returns the type of input name, or nil if it doesn't exist
@@ -820,7 +820,7 @@ function wirelink_methods:isWired(name)
 	checkluatype(name, TYPE_STRING)
 	local wl = getwl(self)
 	local input = wl.Inputs[name]
-	if input and IsValid(input.Src) then return true
+	if input and Ent_IsValid(input.Src) then return true
 	else return false end
 end
 
@@ -831,7 +831,7 @@ function wirelink_methods:getWiredTo(name)
 	checkluatype(name, TYPE_STRING)
 	local wl = getwl(self)
 	local input = wl.Inputs[name]
-	if input and IsValid(input.Src) then
+	if input and Ent_IsValid(input.Src) then
 		return owrap(input.Src)
 	end
 end
@@ -843,7 +843,7 @@ function wirelink_methods:getWiredToName(name)
 	checkluatype(name, TYPE_STRING)
 	local wl = getwl(self)
 	local input = wl.Inputs[name]
-	if input and IsValid(input.Src) then
+	if input and Ent_IsValid(input.Src) then
 		return input.SrcId
 	end
 end

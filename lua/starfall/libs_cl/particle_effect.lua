@@ -163,7 +163,7 @@ function particleef_methods:setSortOrigin(origin)
 
 	checkValid(uw)
 
-	uw:SetSortOrgin(vunwrap(origin))
+	uw:SetSortOrgin(vqunwrap1(origin))
 end
 
 
@@ -177,7 +177,7 @@ function particleef_methods:setControlPoint(id,value)
 
 	checkValid(uw)
 
-	uw:SetControlPoint(id,vunwrap(value))
+	uw:SetControlPoint(id,vqunwrap1(value))
 end
 
 
@@ -206,7 +206,7 @@ function particleef_methods:setForwardVector(id,value)
 
 	checkValid(uw)
 
-	uw:SetControlPointForwardVector(id,vunwrap(value))
+	uw:SetControlPointForwardVector(id,vqunwrap1(value))
 end
 
 --- Sets the right direction for given control point.
@@ -219,7 +219,7 @@ function particleef_methods:setRightVector(id,value)
 
 	checkValid(uw)
 
-	uw:SetControlPointRightVector(id,vunwrap(value))
+	uw:SetControlPointRightVector(id,vqunwrap1(value))
 end
 
 
@@ -233,7 +233,7 @@ function particleef_methods:setUpVector(id,value)
 
 	checkValid(uw)
 
-	uw:SetControlPointUpVector(id,vunwrap(value))
+	uw:SetControlPointUpVector(id,vqunwrap1(value))
 
 end
 
