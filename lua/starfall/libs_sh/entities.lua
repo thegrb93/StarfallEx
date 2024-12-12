@@ -106,7 +106,7 @@ end
 
 if CLIENT then
 	instance.object_wrappers[FindMetaTable("NextBot")] = ewrap
-		
+
 	--- Allows manipulation of an entity's bones' positions
 	-- @client
 	-- @param number bone The bone ID
@@ -289,7 +289,7 @@ if CLIENT then
 		ent:SetupBones()
 		ent:DrawModel()
 	end
-	
+
 	--- Returns the render group of the entity.
 	-- @client
 	-- @return number Render group
@@ -990,7 +990,7 @@ if SERVER then
 
 		return plys
 	end
-	
+
 	--- Sets the health of the entity.
 	-- @server
 	-- @param number newhealth New health value.
@@ -1000,7 +1000,7 @@ if SERVER then
 		checkluatype(val, TYPE_NUMBER)
 		ent:SetHealth(val)
 	end
-		
+
 	--- Sets the maximum health for entity. Note, that you can still set entity's health above this amount with Entity:setHealth.
 	-- @server
 	-- @param number newmaxhealth New max health value.
@@ -1010,7 +1010,7 @@ if SERVER then
 		checkluatype(val, TYPE_NUMBER)
 		ent:SetMaxHealth(val)
 	end
-		
+
 	--- Stops the entity from being saved on duplication or map save.
 	-- @server
 	function ents_methods:doNotDuplicate()
@@ -1956,9 +1956,9 @@ end
 -- @shared
 -- @return table? The networked variables table of the entity or nil if it doesn't have one.
 function ents_methods:getNetworkVars()
-    local ent = getent(self)
-    return istable(ent.dt) and instance.Sanitize(ent:GetNetworkVars()) or nil
+	local ent = getent(self)
+	return istable(ent.dt) and instance.Sanitize(ent:GetNetworkVars()) or nil
 end
 
-	
+
 end
