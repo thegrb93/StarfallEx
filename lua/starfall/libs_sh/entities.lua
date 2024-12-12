@@ -13,9 +13,35 @@ registerprivilege("entities.emitSound", "Emitsound", "Allows the user to play so
 registerprivilege("entities.setHealth", "SetHealth", "Allows the user to change an entity's health", { entities = {} })
 registerprivilege("entities.setMaxHealth", "SetMaxHealth", "Allows the user to change an entity's max health", { entities = {} })
 registerprivilege("entities.doNotDuplicate", "DoNotDuplicate", "Allows the user to set whether an entity will be saved on dupes or map saves", { entities = {} })
+registerprivilege("entities.fireBullets", "FireBullets", "Allows the user to fire bullets from an entity", { entities = {} })
+
 
 local emitSoundBurst = SF.BurstObject("emitSound", "emitsound", 180, 200, " sounds can be emitted per second", "Number of sounds that can be emitted in a short time")
 local manipulations = SF.EntityTable("boneManipulations")
+local fireBulletsBurst = SERVER and SF.BurstObject("fireBullets", "firebullets", 20, 20, " bullets can be fired per second", "Number of bullets that can be fired in a short time")
+local fireBulletsDPSBurst = SERVER and SF.BurstObject("fireBulletsDPS", "bullets dps", 100, 100, " maximum damage bullets damage per second", "Damage per second bullets can deal in a short time")
+
+local allowedAmmoType = SERVER and {
+	["AR2"] = true,
+	["Pistol"] = true,
+	["SMG1"] = true,
+	["357"] = true,
+	["Buckshot"] = true,
+}
+
+local allowedTracer = SERVER and { -- took from wiremod turret
+	["Tracer"] = true,
+	["AR2Tracer"] = true,
+	["ToolTracer"] = true,
+	["GaussTracer"] = true,
+	["LaserTracer"] = true,
+	["StriderTracer"] = true,
+	["GunshipTracer"] = true,
+	["HelicopterTracer"] = true,
+	["AirboatGunTracer"] = true,
+	["AirboatGunHeavyTracer"] = true,
+	[""] = true
+}
 
 hook.Add("PAC3ResetBones","SF_BoneManipulations",function(ent)
 	local manips = manipulations[ent]
@@ -1017,6 +1043,58 @@ if SERVER then
 		local ent = getent(self)
 		checkpermission(instance, ent, "entities.doNotDuplicate")
 		ent.DoNotDuplicate = true
+	end
+
+	--- Fires a bullet.
+	-- @server
+	-- @param table bulletInfo The bullet data to be used. See https://wiki.facepunch.com/gmod/Structures/Bullet
+	-- @param function? callback Function to be called with attacker, traceResult after the bullet was fired but before the damage is applied (the callback is called even if no damage is applied).
+	function ents_methods:fireBullets(bulletInfo, cb)
+		local ent = getent(self)
+		checkpermission(instance, ent, "entities.fireBullets")
+		checkluatype(bulletInfo, TYPE_TABLE)
+		if cb then
+			checkluatype(cb, TYPE_FUNCTION)
+		end
+
+		local callback = function(attacker, tr, dmginfo)
+			dmginfo:SetInflictor(instance.entity)
+
+			if cb then
+				instance:runFunction(cb, instance.WrapObject(attacker), SF.StructWrapper(instance, tr, "TraceResult"))
+			end
+		end
+
+		local BulletInfo = {
+			Attacker = instance.player,
+			Callback = callback,
+			Damage = math.Clamp(bulletInfo.Damage, 1, 100),
+			Force = math.Clamp(bulletInfo.Force, 0, 100),
+			Distance = bulletInfo.Distance,
+			HullSize = math.min(bulletInfo.HullSize, 10),
+			Num = math.min(bulletInfo.Num, 5),
+			Tracer = bulletInfo.Tracer or 1,
+			AmmoType = (allowedAmmoType[bulletInfo.AmmoType] and bulletInfo.AmmoType) or "SMG1",
+			TracerName = (allowedTracer[bulletInfo.TracerName] and bulletInfo.TracerName) or "Tracer" ,
+			Dir = vunwrap(bulletInfo.Dir),
+			Spread = vunwrap(bulletInfo.Spread),
+			Src = ent:LocalToWorld(ent:OBBCenter()),
+			IgnoreEntity = ent,
+		}
+
+		fireBulletsBurst:use(instance.player, BulletInfo.Num)
+		fireBulletsDPSBurst:use(instance.player, BulletInfo.Damage * BulletInfo.Num)
+
+		ent:FireBullets(BulletInfo)
+	end
+
+	--- Return if the given bullet can be fired from the entity.
+	-- @server
+	-- @param table bulletInfo The bullet data to be used.
+	-- @return boolean canShoot true if the given bullets can be fired or else false
+	function ents_methods:canfireBullets(bulletInfo)
+		checkluatype(bulletInfo, TYPE_TABLE)
+		return (fireBulletsBurst:check(instance.player) >= bulletInfo.Num and fireBulletsDPSBurst:check(instance.player) >= bulletInfo.Damage * bulletInfo.Num) and true or false
 	end
 end
 
