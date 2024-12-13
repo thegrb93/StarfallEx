@@ -1423,4 +1423,48 @@ env.GMOD_CHANNEL = {
 	STALLED = 3
 }
 
+--- ENUMs of AMMO_TYPE for use with game.fireBullets
+-- @name builtins_library.AMMO_TYPE
+-- @class table
+-- @field AR2
+-- @field Pistol
+-- @field SMG1
+-- @field 357
+-- @field Buckshot
+env.AMMO_TYPE = {
+	["AR2"] = true,
+	["Pistol"] = true,
+	["SMG1"] = true,
+	["357"] = true,
+	["Buckshot"] = true,
+}
+
+--- ENUMs of TRACER_NAME for use with game.fireBullets
+-- @name builtins_library.TRACER_NAME
+-- @class table
+-- @field Tracer
+-- @field AR2Tracer
+-- @field ToolTracer
+-- @field GaussTracer
+-- @field LaserTracer
+-- @field StriderTracer
+-- @field GunshipTracer
+-- @field HelicopterTracer
+-- @field AirboatGunTracer
+-- @field AirboatGunHeavyTracer
+-- @field  
+env.TRACER_NAME = {
+	["Tracer"] = true,
+	["AR2Tracer"] = true,
+	["ToolTracer"] = true,
+	["GaussTracer"] = true,
+	["LaserTracer"] = true,
+	["StriderTracer"] = true,
+	["GunshipTracer"] = true,
+	["HelicopterTracer"] = true,
+	["AirboatGunTracer"] = true,
+	["AirboatGunHeavyTracer"] = true,
+	[""] = true
+}
+
 end
