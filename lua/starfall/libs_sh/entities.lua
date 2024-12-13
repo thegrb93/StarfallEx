@@ -1062,7 +1062,7 @@ if SERVER then
 	-- @param function? callback Function to be called with attacker, traceResult after the bullet was fired but before the damage is applied (the callback is called even if no damage is applied).
 	function ents_methods:fireBullets(damage, force, distance, hullSize, num, tracer, ammoType, tracerName, dir, spread, src, ignoreEntity, cb)
 		local ent = getent(self)
-		checkpermission(instance, ent, "bullets.fire")
+		checkpermission(instance, ent, "entities.fireBullets")
 		checkluatype(damage, TYPE_NUMBER)
 		checkluatype(force, TYPE_NUMBER)
 		checkluatype(distance, TYPE_NUMBER)
