@@ -1099,7 +1099,16 @@ function SF.CompileString(script, identifier, handle_error)
 	if string.match(script, "%f[%w_]repeat%f[^%w_].*%f[%w_]continue%f[^%w_].*%f[%w_]until%f[^%w_]") then
 		return "Using 'continue' in a repeat-until loop has been banned due to a glua bug."
 	end
-	return CompileString(script, identifier, handle_error)
+
+	local compiledFunctions = {}
+	jit.attach(function(func)
+		table.insert(compiledFunctions, jit.util.funcinfo(func))
+	end, "bc")
+
+	local func = CompileString(script, identifier, handle_error)
+	jit.attach(function() end, "bc")
+
+	return func, compiledFunctions
 end
 
 --- The safest write file function

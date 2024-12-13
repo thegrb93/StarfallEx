@@ -132,16 +132,165 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 		local serverorclient = fdata.serverorclient
 		if (serverorclient == "server" and CLIENT) or (serverorclient == "client" and SERVER) then continue end -- Don't compile files for other realm
 
-		local func = SF.CompileString(fdata.code, "SF:"..filename, false)
+		local func, compiledfuncs = SF.CompileString(fdata.code, "SF:"..filename, false)
 		if isstring(func) then
 			return false, { message = func, traceback = "" }
 		end
 		debug.setfenv(func, instance.env)
 
+		SF.Instance.CompileHighPerformance(instance, func, fdata.code, compiledfuncs)
 		instance.scripts[filename] = func
 	end
 
 	return true, instance
+end
+
+local function ValidateHighPerformanceFunction(func, code, startPos)
+	local scope = 1
+	local currentPos = startPos
+	local invalidPos = 9999999999999999999999
+	--[[
+		What are we doing here?
+		Were going thru the code to figure out which part of the file belongs to our function.
+		Then we check if the code qualifies as a valid performance function.
+		In the case that this fails / the scope breaks it will most likely end up including the entire file meaning it will most likely return false as it deems it invalid.
+	]]
+	for k=1, 100 do -- More than 100? We just say it's too big for a performance function
+		local thenPos = string.find(code, "then", currentPos + 1) or invalidPos
+		local doPos = string.find(code, "do", currentPos + 1) or invalidPos
+		local endPos = string.find(code, "end", currentPos + 1) or -1 -- Failed to find an end? stop immediately.
+
+		-- BUG: I need to account for comments later....
+
+		if endPos == -1 then return false end
+
+		if doPos > endPos and thenPos > endPos then
+			currentPos = endPos + 2
+			scope = scope - 1
+			if scope <= 0 then break end
+			continue
+		end
+
+		if thenPos != invalidPos and (thenPos < doPos or doPos == invalidPos) then
+			currentPos = thenPos + 3
+			scope = scope + 1
+			continue
+		end
+
+		if doPos != invalidPos and (doPos < thenPos or thenPos == invalidPos) then
+			currentPos = doPos + 1
+			scope = scope + 1
+			continue
+		end
+	end
+
+	if scope != 0 then return false end
+
+	local funcCode = string.sub(code, startPos, currentPos) -- We now determined which part of the code belongs to the function. Now it's time for judgement
+	local blacklist = { -- A performance function can't have these since they could be abused.
+		"%s+for%s+",
+		"%s+while%s+",
+		"%s+repeat",
+		"%s+goto",
+		"%a%s*%(", -- Don't allow any function call
+		[[%s*([%w]*)%s*"]], -- Don't allow function calls like: print "lol"
+		[[%s*([%w]*)%s*']], -- Don't allow function calls like: print 'lol'
+		[[%s*([%w]*)%s*\[]], -- Don't allow function calls like: print [[lol]]
+		[[%s*([%w]*)%s*{]], -- Don't allow function calls like: print {}
+	}
+
+	local allowedKeywords = {
+		["or"] = true,
+		["and"] = true,
+		["="] = true,
+	}
+
+	for _, regex in ipairs(blacklist) do
+		local match = string.match(funcCode, regex)
+		if match and not allowedKeywords[match] then
+			return false
+		end
+	end
+
+	return true
+end
+
+function SF.Instance.CompileHighPerformance(instance, func, code, compiledFuncs)
+	--[[
+		Merging the list of compiled jit functions with all function inside the file.
+		We aren't allowed to continue if this fails.
+	]]
+	for _, tbl in ipairs(compiledFuncs) do
+		if tbl.children and tbl.linedefined != 0 then return end -- No Children allowed! (BUG: Currently they break this mapping process)
+	end
+
+	local _, pos = 0, 0
+	local i = 0
+	local assignedFuncs = {}
+	while true do
+		_, pos, funcName = string.find(code, "function%s+([%w_.]+)%(", pos + 1)
+		if !pos then break end
+
+		if funcName:StartsWith("_G.") then -- I don't know why somebody would do this, but we'll allow it.
+			funcName = funcName:sub(4)
+		end
+
+		i = i + 1
+		assignedFuncs[funcName] = compiledFuncs[i]
+	end
+
+	--[[
+		Finding all functions and validating that they are valid to be a performance function.
+	]]
+	_, pos = 0, 0
+	local hasfuncs = false
+	local perfFuncs = {}
+	while true do
+		_, pos = string.find(code, "--@performant", pos + 1)
+		if !pos then break end
+
+		local funcPos, funcEndPos, funcName = string.find(code, "function%s+([%w_.]+)%(", pos + 1)
+		if !funcName then continue end -- Could happen if missused?
+		
+		if funcName:StartsWith("_G.") then -- I don't know why somebody would do this, but we'll allow it.
+			funcName = funcName:sub(4)
+		end
+
+		if perfFuncs[funcName] then continue end -- Who would use the same function name multiple times....
+
+		local validPerfFunc = ValidateHighPerformanceFunction(func, code, funcEndPos + 1)
+		if !validPerfFunc then continue end
+
+		perfFuncs[funcName] = true
+		hasfuncs = true
+	end
+
+	if not hasfuncs then return end
+
+	--[[
+		ToDO: Validate the code below since that most likely will be the most exploitable part.
+	]]
+
+	debug.setmetatable(instance.env, {
+		__newindex = function(self, key, val)
+			rawset(self, key, val)
+			if perfFuncs[key] and isfunction(val) then
+				local compileinfo = assignedFuncs[key]
+				if not compileinfo then return end
+
+				local info = jit.util.funcinfo(val)
+				if info.bytecodes != compileinfo.bytecodes or info.loc != compileinfo.loc or info.linedefined != compileinfo.linedefined or info.lastlinedefined != compileinfo.lastlinedefined then return end
+				
+				local function Wrapper(...)
+					dsethook()
+					val(...)
+					instance:readdCpuCheck()
+				end
+
+				rawset(self, key, Wrapper)
+			end
+		end,
+	})
 end
 
 function SF.Instance:AddHook(name, func)
@@ -494,6 +643,12 @@ function SF.Instance:setCheckCpu(runWithOps)
 			end
 		end
 
+		function self:readdCpuCheck()
+			local callback = self.cpustatestack[#self.cpustatestack]
+			if not callback then return end
+			dsethook(callback, "", 2000)
+		end
+
 		function self:pushCpuCheck(callback)
 			self.cpustatestack[#self.cpustatestack + 1] = (dgethook() or false)
 			local enabled = callback~=nil
@@ -520,6 +675,7 @@ function SF.Instance:setCheckCpu(runWithOps)
 		self.run = SF.Instance.runWithoutOps
 		function self.checkCpu() end
 		function self.checkCpuHook() end
+		function self.readdCpuCheck() end
 		function self.pushCpuCheck() end
 		function self.popCpuCheck() end
 		self.cpuQuota = math.huge
