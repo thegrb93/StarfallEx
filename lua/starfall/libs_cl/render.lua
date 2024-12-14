@@ -846,8 +846,9 @@ function render_library.setBackgroundColor(col, screen)
 		SF.Throw("Invalid rendering entity.", 2)
 	end
 
-	if screen.SetBackgroundColor then --Fail silently on HUD etc
-		screen:SetBackgroundColor(col.r, col.g, col.b, col.a)
+	local SetBackgroundColor = Ent_GetTable(screen).SetBackgroundColor
+	if SetBackgroundColor then --Fail silently on HUD etc
+		SetBackgroundColor(screen, col.r, col.g, col.b, col.a)
 	end
 end
 
@@ -2216,7 +2217,7 @@ function render_library.cursorPos(ply, screen)
 
 	if screen~=nil then screen = getent(screen) else screen = renderdata.renderEnt end
 	if not screen then SF.Throw("Invalid screen", 2) end
-	local screenTransform = screen.Transform
+	local screenTransform = Ent_GetTable(screen).Transform
 	if not screenTransform then SF.Throw("Invalid screen", 2) end
 
 	local transform, transforminv = screenTransform:get()
@@ -2329,8 +2330,10 @@ end
 -- @return number the X size of the current render context
 -- @return number the Y size of the current render context
 function render_library.getResolution()
-	if renderdata.renderEnt and renderdata.renderEnt.GetResolution then
-		return renderdata.renderEnt:GetResolution()
+	local screen = renderdata.renderEnt
+	if screen then
+		local GetResolution = Ent_GetTable(screen).GetResolution
+		if GetResolution then return GetResolution(screen) end
 	end
 	return ScrW(), ScrH()
 end

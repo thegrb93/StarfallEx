@@ -1,7 +1,9 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
-local IsValid = FindMetaTable("Entity").IsValid
+local ENT_META = FindMetaTable("Entity")
+local Ent_IsValid = ENT_META.IsValid
+local VEH_META = FindMetaTable("Vehicle")
 
 if SERVER then
 	-- Register privileges
@@ -17,7 +19,7 @@ end
 -- @class type
 -- @libtbl vehicle_methods
 -- @libtbl vehicle_meta
-SF.RegisterType("Vehicle", false, true, FindMetaTable("Vehicle"), "Entity")
+SF.RegisterType("Vehicle", false, true, VEH_META, "Entity")
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
@@ -32,7 +34,7 @@ end)
 
 local function getveh(self)
 	local ent = vehicle_meta.sf2sensitive[self]
-	if IsValid(ent) then
+	if Ent_IsValid(ent) then
 		return ent
 	else
 		SF.Throw("Entity is not valid.", 3)
@@ -42,7 +44,7 @@ end
 --- Returns the driver of the vehicle
 -- @return Player Driver of vehicle
 function vehicle_methods:getDriver()
-	return pwrap(getveh(self):GetDriver())
+	return pwrap(Veh_GetDriver(getveh(self)))
 end
 
 --- Returns a passenger of a vehicle
@@ -50,7 +52,7 @@ end
 -- @return Player The passenger or NULL if empty
 function vehicle_methods:getPassenger(n)
 	checkluatype(n, TYPE_NUMBER)
-	return pwrap(getveh(self):GetPassenger(n))
+	return pwrap(Veh_GetPassenger(getveh(self), n))
 end
 
 if SERVER then
@@ -58,8 +60,8 @@ if SERVER then
 	-- @server
 	function vehicle_methods:ejectDriver()
 		local driver = getveh(self):GetDriver()
-		if IsValid(driver) then
-			driver:ExitVehicle()
+		if Ent_IsValid(driver) then
+			Veh_ExitVehicle(driver)
 		end
 	end
 
@@ -68,9 +70,9 @@ if SERVER then
 	function vehicle_methods:killDriver()
 		local ent = getveh(self)
 		checkpermission(instance, ent, "vehicle.kill")
-		local driver = ent:GetDriver()
-		if IsValid(driver) then
-			driver:Kill()
+		local driver = Veh_GetDriver(ent)
+		if Ent_IsValid(driver) then
+			Ply_Kill(driver)
 		end
 	end
 
@@ -81,12 +83,12 @@ if SERVER then
 		if class ~= nil then checkluatype(class, TYPE_STRING) end
 		local ent = getveh(self)
 		checkpermission(instance, ent, "vehicle.strip")
-		local driver = ent:GetDriver()
-		if IsValid(driver) then
+		local driver = Veh_GetDriver(ent)
+		if Ent_IsValid(driver) then
 			if class then
-				driver:StripWeapon(class)
+				Ply_StripWeapon(driver, class)
 			else
-				driver:StripWeapons()
+				Ply_StripWeapons(driver)
 			end
 		end
 	end
@@ -99,7 +101,7 @@ if SERVER then
 		local n = "SF_CanExitVehicle"..ent:EntIndex()
 		hook.Add("CanExitVehicle", n, function(v) if v==ent then return false end end)
 		SF.CallOnRemove(ent, n, function() hook.Remove("CanExitVehicle", n) end)
-		ent:Fire("Lock")
+		Ent_Fire(ent, "Lock")
 	end
 
 	--- Will unlock the vehicle.
@@ -108,7 +110,7 @@ if SERVER then
 		local ent = getveh(self)
 		checkpermission(instance, ent, "vehicle.lock")
 		hook.Remove("CanExitVehicle", "SF_CanExitVehicle"..ent:EntIndex())
-		ent:Fire("Unlock")
+		Ent_Fire(ent, "Unlock")
 	end
 end
 
