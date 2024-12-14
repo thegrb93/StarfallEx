@@ -13,35 +13,10 @@ registerprivilege("entities.emitSound", "Emitsound", "Allows the user to play so
 registerprivilege("entities.setHealth", "SetHealth", "Allows the user to change an entity's health", { entities = {} })
 registerprivilege("entities.setMaxHealth", "SetMaxHealth", "Allows the user to change an entity's max health", { entities = {} })
 registerprivilege("entities.doNotDuplicate", "DoNotDuplicate", "Allows the user to set whether an entity will be saved on dupes or map saves", { entities = {} })
-registerprivilege("entities.fireBullets", "FireBullets", "Allows the user to fire bullets from an entity", { entities = {} })
 
 
 local emitSoundBurst = SF.BurstObject("emitSound", "emitsound", 180, 200, " sounds can be emitted per second", "Number of sounds that can be emitted in a short time")
 local manipulations = SF.EntityTable("boneManipulations")
-local fireBulletsBurst = SERVER and SF.BurstObject("fireBullets", "firebullets", 40, 40, " bullets can be fired per second", "Number of bullets that can be fired in a short time")
-local fireBulletsDPSBurst = SERVER and SF.BurstObject("fireBulletsDPS", "bullets dps", 100, 100, " maximum bullets damage per second", "Damage per second bullets can deal")
-
-local allowedAmmoType = SERVER and {
-	["AR2"] = true,
-	["Pistol"] = true,
-	["SMG1"] = true,
-	["357"] = true,
-	["Buckshot"] = true,
-}
-
-local allowedTracer = SERVER and { -- took from wiremod turret
-	["Tracer"] = true,
-	["AR2Tracer"] = true,
-	["ToolTracer"] = true,
-	["GaussTracer"] = true,
-	["LaserTracer"] = true,
-	["StriderTracer"] = true,
-	["GunshipTracer"] = true,
-	["HelicopterTracer"] = true,
-	["AirboatGunTracer"] = true,
-	["AirboatGunHeavyTracer"] = true,
-	[""] = true
-}
 
 hook.Add("PAC3ResetBones","SF_BoneManipulations",function(ent)
 	local manips = manipulations[ent]
@@ -1045,78 +1020,6 @@ if SERVER then
 		ent.DoNotDuplicate = true
 	end
 
-	--- Fires a bullet.
-	-- @server
-	-- @param number damage The damage dealt by the bullet. (1-100)
-	-- @param number froce The force of the bullets. (0-100)
-	-- @param number distance Maximum distance the bullet can travel.
-	-- @param number hullSize The hull size of the bullet. (0-10)
-	-- @param number num The amount of bullets to fire. (1-5)
-	-- @param number tracer Show tracer for every x bullets.
-	-- @param string ammoType The ammunition name. See enum AMMO_TYPE
-	-- @param string tracerName The tracer name. See enum TRACER_NAME
-	-- @param Vector Dir The fire direction.
-	-- @param Vector Spread The spread, only x and y are needed.
-	-- @param Vector? src The position to fire the bullets from.
-	-- @param Entity? ignoreEntity The entity that the bullet will ignore when it will be shot.
-	-- @param function? callback Function to be called with attacker, traceResult after the bullet was fired but before the damage is applied (the callback is called even if no damage is applied).
-	function ents_methods:fireBullets(damage, force, distance, hullSize, num, tracer, ammoType, tracerName, dir, spread, src, ignoreEntity, cb)
-		local ent = getent(self)
-		checkpermission(instance, ent, "entities.fireBullets")
-		checkluatype(damage, TYPE_NUMBER)
-		checkluatype(force, TYPE_NUMBER)
-		checkluatype(distance, TYPE_NUMBER)
-		checkluatype(hullSize, TYPE_NUMBER)
-		checkluatype(num, TYPE_NUMBER)
-		checkluatype(tracer, TYPE_NUMBER)
-		checkluatype(ammoType, TYPE_STRING)
-		checkluatype(tracerName, TYPE_STRING)
-
-		if cb then
-			checkluatype(cb, TYPE_FUNCTION)
-		end
-
-		local callback = function(attacker, tr, dmginfo)
-			dmginfo:SetInflictor(instance.entity)
-
-			if cb then
-				instance:runFunction(cb, instance.WrapObject(attacker), SF.StructWrapper(instance, tr, "TraceResult"))
-			end
-		end
-
-		local BulletInfo = {
-			Attacker = instance.player,
-			Callback = callback,
-			Damage = math.Clamp(damage, 1, 100),
-			Force = math.Clamp(force, 0, 100),
-			Distance = distance,
-			HullSize = math.min(hullSize, 10),
-			Num = math.min(num, 5),
-			Tracer = tracer,
-			AmmoType = (allowedAmmoType[ammoType] and ammoType) or "SMG1",
-			TracerName = (allowedTracer[tracerName] and tracerName) or "Tracer",
-			Dir = vunwrap(dir),
-			Spread = vunwrap(spread),
-			Src = (src and vunwrap(src)) or ent:LocalToWorld(ent:OBBCenter()),
-			IgnoreEntity = (ignoreEntity and eunwrap(ignoreEntity)) or ent,
-		}
-
-		fireBulletsBurst:use(instance.player, BulletInfo.Num)
-		fireBulletsDPSBurst:use(instance.player, BulletInfo.Damage * BulletInfo.Num)
-
-		ent:FireBullets(BulletInfo)
-	end
-
-	--- Return if the given bullet can be fired from the entity.
-	-- @server
-	-- @param number damage The damage dealt by the bullet. (1-100)
-	-- @param number num The amount of bullets to fire. (1-4)
-	-- @return boolean canShoot true if the given bullets can be fired or else false
-	function ents_methods:canfireBullets(damage, num)
-		checkluatype(damage, TYPE_NUMBER)
-		checkluatype(num, TYPE_NUMBER)
-		return (fireBulletsBurst:check(instance.player) >= num and fireBulletsDPSBurst:check(instance.player) >= damage * num) and true or false
-	end
 end
 
 --- Returns the EntIndex of the entity

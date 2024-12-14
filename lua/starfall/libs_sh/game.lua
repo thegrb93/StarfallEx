@@ -1,7 +1,22 @@
 -- Global to all starfalls
+local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 
-if SERVER then registerprivilege("blast.create", "Blast damage", "Allows the user to create explosions", { usergroups = { default = 1 } }) end
+if SERVER then
+	registerprivilege("blast.create", "Blast damage", "Allows the user to create explosions", { usergroups = { default = 1 } })
+	registerprivilege("bullets.fire", "FireBullets", "Allows the user to fire bullets", {})
+end
+
+local fireBulletsBurst = SERVER and SF.BurstObject("fireBullets", "firebullets", 40, 40, " bullets can be fired per second", "Number of bullets that can be fired in a short time")
+local fireBulletsDPSBurst = SERVER and SF.BurstObject("fireBulletsDPS", "bullets dps", 100, 100, " maximum bullets damage per second", "Damage per second bullets can deal")
+
+local allowedAmmoType = SERVER and {
+	["AR2"] = true,
+	["Pistol"] = true,
+	["SMG1"] = true,
+	["357"] = true,
+	["Buckshot"] = true,
+}
 
 --- Game functions
 -- @name game
@@ -132,6 +147,89 @@ if SERVER then
 	function game_library.blastDamage(damageOrigin, damageRadius, damage)
 		checkpermission(instance, nil, "blast.create")
 		util.BlastDamage(instance.entity, instance.player, vunwrap(damageOrigin), math.Clamp(damageRadius, 0, 1500), damage)
+	end
+
+	--- Fires a bullet. Bullet made with this function will not have any tracer, you will have to make them yourself.
+	-- @server
+	-- @param number damage The damage dealt by the bullet. (1-100)
+	-- @param number froce The force of the bullets. (0-100)
+	-- @param number distance Maximum distance the bullet can travel.
+	-- @param number hullSize The hull size of the bullet. (0-10)
+	-- @param number num The amount of bullets to fire. (1-5)
+	-- @param string? ammoType The ammunition name. See enum AMMO_TYPE
+	-- @param Vector Dir The fire direction.
+	-- @param Vector Spread The spread, only x and y are needed.
+	-- @param Vector src The position to fire the bullets from.
+	-- @param Entity? ignoreEntity The entity that the bullet will ignore when it will be shot.
+	-- @param function? callback Function to be called with attacker, traceResult after the bullet was fired but before the damage is applied (the callback is called even if no damage is applied).
+	function game_library.bulletDamage(damage, force, distance, hullSize, num, ammoType, dir, spread, src, ignoreEntity, cb)
+		local ent = instance.entity
+		checkpermission(instance, nil, "bullets.fire")
+		checkluatype(damage, TYPE_NUMBER)
+		checkluatype(force, TYPE_NUMBER)
+		checkluatype(distance, TYPE_NUMBER)
+		checkluatype(hullSize, TYPE_NUMBER)
+		checkluatype(num, TYPE_NUMBER)
+
+		if ammoType then
+			checkluatype(ammoType, TYPE_STRING)
+		end
+
+		local callback
+
+		if cb then
+			checkluatype(cb, TYPE_FUNCTION)
+			callback = function(attacker, tr, dmginfo)
+				instance:runFunction(cb, instance.WrapObject(attacker), SF.StructWrapper(instance, tr, "TraceResult"))
+			end
+		end
+
+		local BulletInfo = {
+			Attacker = instance.player,
+			Callback = callback,
+			Damage = math.Clamp(damage, 0, 100),
+			Force = math.Clamp(force, 0, 100),
+			Distance = distance,
+			HullSize = math.min(hullSize, 10),
+			Num = math.min(num or 1, 5),
+			Tracer = 0,
+			AmmoType = (allowedAmmoType[ammoType] and ammoType) or "SMG1",
+			TracerName = "",
+			Dir = vunwrap(dir),
+			Spread = vunwrap(spread),
+			Src = vunwrap(src),
+			IgnoreEntity = ignoreEntity and eunwrap(ignoreEntity),
+		}
+
+		fireBulletsBurst:use(instance.player, BulletInfo.Num)
+		fireBulletsDPSBurst:use(instance.player, BulletInfo.Damage * BulletInfo.Num)
+
+		ent:FireBullets(BulletInfo)
+	end
+
+	--- Return if the given bullets can be fired.
+	-- @server
+	-- @param number damage The damage dealt by the bullet. (1-100)
+	-- @param number num The amount of bullets to fire. (1-5)
+	-- @return boolean true if the given bullets can be fired or else false
+	function game_library.canfireBullets(damage, num)
+		checkluatype(damage, TYPE_NUMBER)
+		checkluatype(num, TYPE_NUMBER)
+		return (fireBulletsBurst:check(instance.player) >= num and fireBulletsDPSBurst:check(instance.player) >= damage * num) and true or false
+	end
+
+	--- Return the amount of bullets left to fire
+	-- @server
+	-- @return number Number of bullets left to fire
+	function game_library.bulletsLeft()
+		return fireBulletsBurst:check(instance.player)
+	end
+
+	--- Return the amount of damage left bullets can deal
+	-- @server
+	-- @return number Damage left bullets can deal
+	function game_library.bulletsDPSLeft()
+		return fireBulletsDPSBurst:check(instance.player)
 	end
 
 else
