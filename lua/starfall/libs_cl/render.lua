@@ -2295,7 +2295,7 @@ function render_library.getViewSetup(curview)
 end
 
 --- Returns the entity currently being rendered to
--- @return Entity Entity of the screen or hud being rendered
+-- @return Entity Entity of the screen being rendered
 function render_library.getScreenEntity()
 	return ewrap(renderdata.renderEnt)
 end
