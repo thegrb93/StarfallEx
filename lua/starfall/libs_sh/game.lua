@@ -65,11 +65,17 @@ game_library.isMounted = IsMounted
 -- @return number Time scale
 game_library.getTimeScale = game.GetTimeScale
 
---- Returns the number of seconds between each gametick
+--- Returns the expected number of seconds between each gametick
 -- @name game_library.getTickInterval
 -- @class function
--- @return number Interval
+-- @return number Time interval in seconds
 game_library.getTickInterval = engine.TickInterval
+
+--- Returns the measured number of seconds between each gametick
+-- @name game_library.getRealTickInterval
+-- @class function
+-- @return number Time interval in seconds
+game_library.getRealTickInterval = engine.AbsoluteFrameTime
 
 --- Returns the number of ticks since the game started
 -- @name game_library.getTickCount
