@@ -187,7 +187,7 @@ if SERVER then
 		local BulletInfo = {
 			Attacker = instance.player,
 			Callback = callback,
-			Damage = math.Clamp(damage, 0, 100),
+			Damage = math.Clamp(damage, 1, 100),
 			Force = math.Clamp(force, 0, 100),
 			Distance = distance,
 			HullSize = math.min(hullSize, 10),
