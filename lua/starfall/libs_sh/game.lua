@@ -10,6 +10,11 @@ end
 local fireBulletsBurst = SERVER and SF.BurstObject("fireBullets", "firebullets", 40, 40, " bullets can be fired per second", "Number of bullets that can be fired in a short time")
 local fireBulletsDPSBurst = SERVER and SF.BurstObject("fireBulletsDPS", "bullets dps", 100, 100, " maximum bullets damage per second", "Damage per second bullets can deal")
 
+local maxBulletDamage = SERVER and CreateConVar("sf_bullets_maxdamage", 100, FCVAR_ARCHIVE, "Maximum amount of damage a bullet can deal", 1)
+local maxBulletForce = SERVER and CreateConVar("sf_bullets_maxforce", 100, FCVAR_ARCHIVE, "Maximum amount of force a bullet can have", 0)
+local maxBulletHull = SERVER and CreateConVar("sf_bullets_maxhull", 10, FCVAR_ARCHIVE, "Maximum hull size a bullet can have", 0)
+local maxBulletNum = SERVER and CreateConVar("sf_bullets_maxnum", 5, FCVAR_ARCHIVE, "Maximum amount of bullets that can be fired at the same time", 1)
+
 local allowedAmmoType = SERVER and {
 	["AR2"] = true,
 	["Pistol"] = true,
@@ -187,11 +192,11 @@ if SERVER then
 		local BulletInfo = {
 			Attacker = instance.player,
 			Callback = callback,
-			Damage = math.Clamp(damage, 1, 100),
-			Force = math.Clamp(force, 0, 100),
+			Damage = math.Clamp(damage, 1, maxBulletDamage:GetInt()),
+			Force = math.Clamp(force, 0, maxBulletForce:GetInt()),
 			Distance = distance,
-			HullSize = math.min(hullSize, 10),
-			Num = math.min(num or 1, 5),
+			HullSize = math.min(hullSize, maxBulletHull:GetInt()),
+			Num = math.min(num or 1, maxBulletNum:GetInt()),
 			Tracer = 0,
 			AmmoType = (allowedAmmoType[ammoType] and ammoType) or "SMG1",
 			TracerName = "",
