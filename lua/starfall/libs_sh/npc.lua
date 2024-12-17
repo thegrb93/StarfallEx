@@ -101,7 +101,7 @@ if SERVER then
 			Ent_Remove(weapon)
 		end
 
-		Ent_Give(npc, "ai_weapon_" .. wep)
+		Npc_Give(npc, "ai_weapon_" .. wep)
 	end
 
 	--- Tell the npc to fight this

@@ -53,7 +53,7 @@ if CLIENT then
 					end
 				end
 
-				Ply_SetCycle(ply, anim.min + anim.progress * anim.range)
+				Ent_SetCycle(ply, anim.min + anim.progress * anim.range)
 
 				local seq = anim.sequence
 				return anim.activity or seq, seq
@@ -213,7 +213,7 @@ end
 -- @shared
 -- @return number Friction value
 function player_methods:getFriction()
-	return Ply_GetFriction(getply(self)) * cvars.Number("sv_friction")
+	return Ent_GetFriction(getply(self)) * cvars.Number("sv_friction")
 end
 
 --- Returns the players Step Size
@@ -248,7 +248,7 @@ end
 -- @shared
 -- @return boolean True if the player is noclipped
 function player_methods:isNoclipped()
-	return Ply_GetMoveType(getply(self)) == MOVETYPE_NOCLIP
+	return Ent_GetMoveType(getply(self)) == MOVETYPE_NOCLIP
 end
 
 --- Returns the amount of kills of the player
@@ -473,7 +473,7 @@ end
 -- @shared
 -- @return Entity Ground entity
 function player_methods:getGroundEntity()
-	return owrap(Ply_GetGroundEntity(getply(self)))
+	return owrap(Ent_GetGroundEntity(getply(self)))
 end
 
 --- Gets the amount of ammo the player has.
@@ -522,7 +522,7 @@ if SERVER then
 		checkvalidnumber(scale)
 		local ply = getply(self)
 		checkpermission(instance, ply, "entities.setRenderProperty")
-		Ply_SetModelScale(ply, math.Clamp(math.Truncate(scale, 2), 0.01, playerMaxScale:GetFloat()))
+		Ent_SetModelScale(ply, math.Clamp(math.Truncate(scale, 2), 0.01, playerMaxScale:GetFloat()))
 	end
 
 	--- Checks if the player is connected to a HUD component that's linked to this chip
@@ -804,7 +804,7 @@ if SERVER then
 		local ent = getply(self)
 		checkpermission(instance, ent, "player.modifyMovementProperties")
 		checkvalidnumber(val)
-		Ply_SetFriction(ent, math.Clamp(val/cvars.Number("sv_friction"),0,10))
+		Ent_SetFriction(ent, math.Clamp(val/cvars.Number("sv_friction"),0,10))
 	end
 	
 	--- Kills the target.
@@ -878,7 +878,7 @@ if CLIENT then
 		if weight == nil then weight = 1 else checkvalidnumber(weight) end
 
 		if isstring(animation) then
-			animation = Ply_GetSequenceActivity(ply, Ply_LookupSequence(ply, animation))
+			animation = Ent_GetSequenceActivity(ply, Ent_LookupSequence(ply, animation))
 		elseif not isnumber(animation) then
 			SF.ThrowTypeError("number or string", SF.GetType(animation), 2)
 		end
@@ -927,7 +927,7 @@ if CLIENT then
 		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		if isstring(seq) then
-			seq = Ply_LookupSequence(ply, seq)
+			seq = Ent_LookupSequence(ply, seq)
 		elseif not isnumber(seq) then
 			SF.ThrowTypeError("number or string", SF.GetType(seq), 2)
 		end
@@ -939,13 +939,13 @@ if CLIENT then
 
 		if act ~= nil then
 			if isstring(act) then
-				act = Ply_LookupSequence(ply, act)
+				act = Ent_LookupSequence(ply, act)
 			elseif not isnumber(act) then
 				SF.ThrowTypeError("number, string or nil", SF.GetType(act), 2)
 			end
 		end
 
-		Ply_SetCycle(ply, progress)
+		Ent_SetCycle(ply, progress)
 
 		local anim = playerAnimAdd(ply, {})
 		anim.sequence = seq
@@ -959,7 +959,7 @@ if CLIENT then
 
 		anim.range = 1
 		anim.progress = progress
-		anim.duration = Ply_SequenceDuration(ply, seq)
+		anim.duration = Ent_SequenceDuration(ply, seq)
 	end
 
 	--- Resets the animation
@@ -982,7 +982,7 @@ if CLIENT then
 		if not anim then SF.Throw("No animation is playing.", 2) end
 
 		if isstring(act) then
-			act = Ply_LookupSequence(ply, act)
+			act = Ent_LookupSequence(ply, act)
 		elseif act ~= nil and not isnumber(act) then
 			SF.ThrowTypeError("number, string or nil", SF.GetType(act), 2)
 		end

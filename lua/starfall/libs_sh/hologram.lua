@@ -370,7 +370,7 @@ function hologram_methods:setPlayerColor(color)
 	local holo = getholo(self)
 	checkpermission(instance, holo, "hologram.setRenderProperty")
 	color = color ~= nil and vqunwrap1(color) or VECTOR_PLAYER_COLOR_DISABLED
-	Ent_SetPlayerColorInternal(holo, color)
+	Ent_GetTable(holo).SetPlayerColorInternal(holo, color)
 end
 
 --- Gets the player color of a hologram
@@ -380,7 +380,7 @@ end
 -- @return Vector? color The player color to use, or nil if disabled
 function hologram_methods:getPlayerColor()
 	local holo = getholo(self)
-	local color = Ent_GetPlayerColorInternal(holo)
+	local color = Ent_GetTable(holo).GetPlayerColorInternal(holo)
 	if color == VECTOR_PLAYER_COLOR_DISABLED then return nil end
 	return vwrap(color)
 end

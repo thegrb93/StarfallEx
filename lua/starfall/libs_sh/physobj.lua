@@ -442,7 +442,7 @@ if SERVER then
 	function physobj_methods:enableGravity(grav)
 		local phys = unwrap(self)
 		checkpermission(instance, Phys_GetEntity(phys), "entities.enableGravity")
-		Phys_EnableGravityphys, grav and true or false)
+		Phys_EnableGravity(phys, grav and true or false)
 		Phys_Wake(phys)
 	end
 

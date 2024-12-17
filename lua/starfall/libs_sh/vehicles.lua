@@ -61,7 +61,7 @@ if SERVER then
 	function vehicle_methods:ejectDriver()
 		local driver = getveh(self):GetDriver()
 		if Ent_IsValid(driver) then
-			Veh_ExitVehicle(driver)
+			Ply_ExitVehicle(driver)
 		end
 	end
 
