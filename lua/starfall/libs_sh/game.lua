@@ -15,14 +15,6 @@ local maxBulletForce = SERVER and CreateConVar("sf_bullets_maxforce", 100, FCVAR
 local maxBulletHull = SERVER and CreateConVar("sf_bullets_maxhull", 10, FCVAR_ARCHIVE, "Maximum hull size a bullet can have", 0)
 local maxBulletNum = SERVER and CreateConVar("sf_bullets_maxnum", 5, FCVAR_ARCHIVE, "Maximum amount of bullets that can be fired at the same time", 1)
 
-local allowedAmmoType = SERVER and {
-	["AR2"] = true,
-	["Pistol"] = true,
-	["SMG1"] = true,
-	["357"] = true,
-	["Buckshot"] = true,
-}
-
 --- Game functions
 -- @name game
 -- @class library
@@ -156,29 +148,24 @@ if SERVER then
 
 	--- Fires a bullet. Bullet made with this function will not have any tracer, you will have to make them yourself.
 	-- @server
-	-- @param number damage The damage dealt by the bullet. (1-100)
-	-- @param number froce The force of the bullets. (0-100)
-	-- @param number distance Maximum distance the bullet can travel.
-	-- @param number hullSize The hull size of the bullet. (0-10)
-	-- @param number num The amount of bullets to fire. (1-5)
-	-- @param string? ammoType The ammunition name. See enum AMMO_TYPE
+	-- @param number? damage The damage dealt by the bullet. (1-100)
+	-- @param number? force The force of the bullets. (0-100)
+	-- @param number? distance Maximum distance the bullet can travel.
+	-- @param number? hullSize The hull size of the bullet. (0-10)
+	-- @param number? num The amount of bullets to fire. (1-5)
 	-- @param Vector Dir The fire direction.
 	-- @param Vector Spread The spread, only x and y are needed.
 	-- @param Vector src The position to fire the bullets from.
 	-- @param Entity? ignoreEntity The entity that the bullet will ignore when it will be shot.
 	-- @param function? callback Function to be called with attacker, traceResult after the bullet was fired but before the damage is applied (the callback is called even if no damage is applied).
-	function game_library.bulletDamage(damage, force, distance, hullSize, num, ammoType, dir, spread, src, ignoreEntity, cb)
+	function game_library.bulletDamage(damage, force, distance, hullSize, num, dir, spread, src, ignoreEntity, cb)
 		local ent = instance.entity
 		checkpermission(instance, nil, "bullets.fire")
-		checkluatype(damage, TYPE_NUMBER)
-		checkluatype(force, TYPE_NUMBER)
-		checkluatype(distance, TYPE_NUMBER)
-		checkluatype(hullSize, TYPE_NUMBER)
-		checkluatype(num, TYPE_NUMBER)
-
-		if ammoType then
-			checkluatype(ammoType, TYPE_STRING)
-		end
+		if damage ~= nil then checkluatype(damage, TYPE_NUMBER) damage = math.Clamp(damage, 1, maxBulletDamage:GetInt()) else damage = 1 end
+		if force ~= nil then checkluatype(force, TYPE_NUMBER) force = math.Clamp(force, 0, maxBulletForce:GetInt()) else force = 0 end
+		if distance ~= nil then checkluatype(distance, TYPE_NUMBER) distance = math.Clamp(distance, 0, 32768) else distance = 32768 end
+		if hullSize ~= nil then checkluatype(hullSize, TYPE_NUMBER) hullSize = math.Clamp(hullSize, 0, maxBulletHull:GetInt()) else hullSize = 0 end
+		if num ~= nil then checkluatype(num, TYPE_NUMBER) num = math.Clamp(num, 1, maxBulletNum:GetInt()) else num = 1 end
 
 		local callback
 
@@ -198,7 +185,6 @@ if SERVER then
 			HullSize = math.min(hullSize, maxBulletHull:GetInt()),
 			Num = math.min(num or 1, maxBulletNum:GetInt()),
 			Tracer = 0,
-			AmmoType = (allowedAmmoType[ammoType] and ammoType) or "SMG1",
 			TracerName = "",
 			Dir = vunwrap(dir),
 			Spread = vunwrap(spread),
@@ -217,7 +203,7 @@ if SERVER then
 	-- @param number damage The damage dealt by the bullet. (1-100)
 	-- @param number num The amount of bullets to fire. (1-5)
 	-- @return boolean true if the given bullets can be fired or else false
-	function game_library.canfireBullets(damage, num)
+	function game_library.canFireBullets(damage, num)
 		checkluatype(damage, TYPE_NUMBER)
 		checkluatype(num, TYPE_NUMBER)
 		return (fireBulletsBurst:check(instance.player) >= num and fireBulletsDPSBurst:check(instance.player) >= damage * num) and true or false

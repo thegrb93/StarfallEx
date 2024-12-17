@@ -1423,20 +1423,4 @@ env.GMOD_CHANNEL = {
 	STALLED = 3
 }
 
---- ENUMs of AMMO_TYPE for use with game.fireBullets
--- @name builtins_library.AMMO_TYPE
--- @class table
--- @field AR2
--- @field Pistol
--- @field SMG1
--- @field 357
--- @field Buckshot
-env.AMMO_TYPE = {
-	["AR2"] = true,
-	["Pistol"] = true,
-	["SMG1"] = true,
-	["357"] = true,
-	["Buckshot"] = true,
-}
-
 end
