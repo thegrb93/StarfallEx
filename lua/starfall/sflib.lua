@@ -10,28 +10,9 @@ local dgetmeta = debug.getmetatable
 local TypeID = TypeID
 local math_Clamp = math.Clamp
 local ENT_META = FindMetaTable("Entity")
-local Ent_IsValid = ENT_META.IsValid
-local Ent_IsWorld = ENT_META.IsWorld
-local Ent_IsPlayer = ENT_META.IsPlayer
-local Ent_IsScripted = ENT_META.IsScripted
-local Ent_GetClass = ENT_META.GetClass
-local Ent_GetCreationID = ENT_META.GetCreationID
-local Ent_EntIndex = ENT_META.EntIndex
-local Ent_GetPos = ENT_META.GetPos
-local Ent_GetAngles = ENT_META.GetAngles
-local Ent_GetParent = ENT_META.GetParent
-local Ent_GetChildren = ENT_META.GetChildren
-local Ent_SetPos = ENT_META.SetPos
-local Ent_SetAngles = ENT_META.SetAngles
-local Ent_SetParent = ENT_META.SetParent
-local Ent_SetLocalVelocity = ENT_META.SetLocalVelocity
-local Ent_Fire = ENT_META.Fire
-local Ent_FollowBone = ENT_META.FollowBone
+local Ent_EntIndex,Ent_Fire,Ent_FollowBone,Ent_GetAngles,Ent_GetChildren,Ent_GetClass,Ent_GetCreationID,Ent_GetParent,Ent_GetPos,Ent_GetTable,Ent_IsPlayer,Ent_IsScripted,Ent_IsValid,Ent_IsWorld,Ent_SetAngles,Ent_SetLocalVelocity,Ent_SetParent,Ent_SetPos = ENT_META.EntIndex,ENT_META.Fire,ENT_META.FollowBone,ENT_META.GetAngles,ENT_META.GetChildren,ENT_META.GetClass,ENT_META.GetCreationID,ENT_META.GetParent,ENT_META.GetPos,ENT_META.GetTable,ENT_META.IsPlayer,ENT_META.IsScripted,ENT_META.IsValid,ENT_META.IsWorld,ENT_META.SetAngles,ENT_META.SetLocalVelocity,ENT_META.SetParent,ENT_META.SetPos
 local PLY_META = FindMetaTable("Player")
-local Ply_Nick = PLY_META.Nick
-local Ply_SteamID = PLY_META.SteamID
-local Ply_IsSuperAdmin = PLY_META.IsSuperAdmin
-local Ply_PrintMessage = PLY_META.PrintMessage
+local Ply_IsSuperAdmin,Ply_Nick,Ply_PrintMessage,Ply_SteamID = PLY_META.IsSuperAdmin,PLY_META.Nick,PLY_META.PrintMessage,PLY_META.SteamID
 
 -- Make sure this is done after metatables have been set
 hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
