@@ -1,7 +1,6 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local ENT_META = FindMetaTable("Entity")
-local Ent_IsValid = ENT_META.IsValid
 local WEP_META = FindMetaTable("Weapon")
 
 
@@ -15,6 +14,8 @@ SF.RegisterType("Weapon", false, true, WEP_META, "Entity")
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
+local Ent_GetClass,Ent_GetTable,Ent_IsValid = ENT_META.GetClass,ENT_META.GetTable,ENT_META.IsValid
+local Wep_Clip1,Wep_Clip2,Wep_GetActivity,Wep_GetHoldType,Wep_GetMaxClip1,Wep_GetMaxClip2,Wep_GetNextPrimaryFire,Wep_GetNextSecondaryFire,Wep_GetPrimaryAmmoType,Wep_GetPrintName,Wep_GetSecondaryAmmoType,Wep_GetWeaponViewModel,Wep_GetWeaponWorldModel,Wep_IsCarriedByLocalPlayer,Wep_IsWeaponVisible,Wep_LastShootTime = WEP_META.Clip1,WEP_META.Clip2,WEP_META.GetActivity,WEP_META.GetHoldType,WEP_META.GetMaxClip1,WEP_META.GetMaxClip2,WEP_META.GetNextPrimaryFire,WEP_META.GetNextSecondaryFire,WEP_META.GetPrimaryAmmoType,WEP_META.GetPrintName,WEP_META.GetSecondaryAmmoType,WEP_META.GetWeaponViewModel,WEP_META.GetWeaponWorldModel,WEP_META.IsCarriedByLocalPlayer,WEP_META.IsWeaponVisible,WEP_META.LastShootTime
 
 local weapon_methods, weapon_meta, wrap, unwrap = instance.Types.Weapon.Methods, instance.Types.Weapon, instance.Types.Weapon.Wrap, instance.Types.Weapon.Unwrap
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap

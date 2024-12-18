@@ -3,8 +3,9 @@ local checkluatype = SF.CheckLuaType
 local checkvalidnumber = SF.CheckValidNumber
 local registerprivilege = SF.Permissions.registerPrivilege
 local ENT_META = FindMetaTable("Entity")
-local Ent_IsValid = ENT_META.IsValid
 local PLY_META = FindMetaTable("Player")
+
+local Ent_SetCycle = ENT_META.SetCycle
 
 local playerMaxScale
 if SERVER then
@@ -89,6 +90,8 @@ SF.RegisterType("Player", false, true, PLY_META, "Entity")
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
+local Ent_GetFriction,Ent_GetGroundEntity,Ent_GetMoveType,Ent_GetSequenceActivity,Ent_IsValid,Ent_LookupSequence,Ent_SequenceDuration,Ent_SetCycle,Ent_SetFriction,Ent_SetModelScale = ENT_META.GetFriction,ENT_META.GetGroundEntity,ENT_META.GetMoveType,ENT_META.GetSequenceActivity,ENT_META.IsValid,ENT_META.LookupSequence,ENT_META.SequenceDuration,ENT_META.SetCycle,ENT_META.SetFriction,ENT_META.SetModelScale
+local Ply_Alive,Ply_AnimResetGestureSlot,Ply_AnimRestartGesture,Ply_AnimSetGestureWeight,Ply_Armor,Ply_Crouching,Ply_Deaths,Ply_DropNamedWeapon,Ply_DropWeapon,Ply_FlashlightIsOn,Ply_Frags,Ply_GetActiveWeapon,Ply_GetAimVector,Ply_GetAmmoCount,Ply_GetCrouchedWalkSpeed,Ply_GetDuckSpeed,Ply_GetEntityInUse,Ply_GetEyeTrace,Ply_GetFOV,Ply_GetFriendStatus,Ply_GetJumpPower,Ply_GetLadderClimbSpeed,Ply_GetMaxArmor,Ply_GetMaxSpeed,Ply_GetName,Ply_GetPlayerColor,Ply_GetRagdollEntity,Ply_GetRunSpeed,Ply_GetShootPos,Ply_GetSlowWalkSpeed,Ply_GetStepSize,Ply_GetTimeoutSeconds,Ply_GetUnDuckSpeed,Ply_GetUserGroup,Ply_GetVehicle,Ply_GetViewEntity,Ply_GetViewModel,Ply_GetViewPunchAngles,Ply_GetWalkSpeed,Ply_GetWeapon,Ply_GetWeaponColor,Ply_GetWeapons,Ply_HasGodMode,Ply_InVehicle,Ply_IsAdmin,Ply_IsBot,Ply_IsConnected,Ply_IsFrozen,Ply_IsMuted,Ply_IsSpeaking,Ply_IsSprinting,Ply_IsSuperAdmin,Ply_IsTimingOut,Ply_IsTyping,Ply_IsUserGroup,Ply_IsWalking,Ply_KeyDown,Ply_Kill,Ply_LastHitGroup,Ply_OwnerSteamID64,Ply_PacketLoss,Ply_Ping,Ply_Say,Ply_SetAmmo,Ply_SetArmor,Ply_SetCrouchedWalkSpeed,Ply_SetDuckSpeed,Ply_SetEyeAngles,Ply_SetJumpPower,Ply_SetLadderClimbSpeed,Ply_SetMaxArmor,Ply_SetMaxSpeed,Ply_SetRunSpeed,Ply_SetSlowWalkSpeed,Ply_SetStepSize,Ply_SetUnDuckSpeed,Ply_SetViewEntity,Ply_SetWalkSpeed,Ply_ShouldDrawLocalPlayer,Ply_SteamID,Ply_SteamID64,Ply_StripAmmo,Ply_StripWeapon,Ply_StripWeapons,Ply_Team,Ply_TimeConnected,Ply_UserID,Ply_VoiceVolume = PLY_META.Alive,PLY_META.AnimResetGestureSlot,PLY_META.AnimRestartGesture,PLY_META.AnimSetGestureWeight,PLY_META.Armor,PLY_META.Crouching,PLY_META.Deaths,PLY_META.DropNamedWeapon,PLY_META.DropWeapon,PLY_META.FlashlightIsOn,PLY_META.Frags,PLY_META.GetActiveWeapon,PLY_META.GetAimVector,PLY_META.GetAmmoCount,PLY_META.GetCrouchedWalkSpeed,PLY_META.GetDuckSpeed,PLY_META.GetEntityInUse,PLY_META.GetEyeTrace,PLY_META.GetFOV,PLY_META.GetFriendStatus,PLY_META.GetJumpPower,PLY_META.GetLadderClimbSpeed,PLY_META.GetMaxArmor,PLY_META.GetMaxSpeed,PLY_META.GetName,PLY_META.GetPlayerColor,PLY_META.GetRagdollEntity,PLY_META.GetRunSpeed,PLY_META.GetShootPos,PLY_META.GetSlowWalkSpeed,PLY_META.GetStepSize,PLY_META.GetTimeoutSeconds,PLY_META.GetUnDuckSpeed,PLY_META.GetUserGroup,PLY_META.GetVehicle,PLY_META.GetViewEntity,PLY_META.GetViewModel,PLY_META.GetViewPunchAngles,PLY_META.GetWalkSpeed,PLY_META.GetWeapon,PLY_META.GetWeaponColor,PLY_META.GetWeapons,PLY_META.HasGodMode,PLY_META.InVehicle,PLY_META.IsAdmin,PLY_META.IsBot,PLY_META.IsConnected,PLY_META.IsFrozen,PLY_META.IsMuted,PLY_META.IsSpeaking,PLY_META.IsSprinting,PLY_META.IsSuperAdmin,PLY_META.IsTimingOut,PLY_META.IsTyping,PLY_META.IsUserGroup,PLY_META.IsWalking,PLY_META.KeyDown,PLY_META.Kill,PLY_META.LastHitGroup,PLY_META.OwnerSteamID64,PLY_META.PacketLoss,PLY_META.Ping,PLY_META.Say,PLY_META.SetAmmo,PLY_META.SetArmor,PLY_META.SetCrouchedWalkSpeed,PLY_META.SetDuckSpeed,PLY_META.SetEyeAngles,PLY_META.SetJumpPower,PLY_META.SetLadderClimbSpeed,PLY_META.SetMaxArmor,PLY_META.SetMaxSpeed,PLY_META.SetRunSpeed,PLY_META.SetSlowWalkSpeed,PLY_META.SetStepSize,PLY_META.SetUnDuckSpeed,PLY_META.SetViewEntity,PLY_META.SetWalkSpeed,PLY_META.ShouldDrawLocalPlayer,PLY_META.SteamID,PLY_META.SteamID64,PLY_META.StripAmmo,PLY_META.StripWeapon,PLY_META.StripWeapons,PLY_META.Team,PLY_META.TimeConnected,PLY_META.UserID,PLY_META.VoiceVolume
 
 local player_methods, player_meta, wrap, unwrap = instance.Types.Player.Methods, instance.Types.Player, instance.Types.Player.Wrap, instance.Types.Player.Unwrap
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
@@ -99,9 +102,13 @@ local wep_meta, wwrap, wunwrap = instance.Types.Weapon, instance.Types.Weapon.Wr
 local veh_meta, vhwrap, vhunwrap = instance.Types.Vehicle, instance.Types.Vehicle.Wrap, instance.Types.Vehicle.Unwrap
 
 local getent
+local vunwrap1, vunwrap2
+local aunwrap1
 instance:AddHook("initialize", function()
 	getent = ent_meta.GetEntity
 	player_meta.__tostring = ent_meta.__tostring
+	vunwrap1, vunwrap2 = vec_meta.QuickUnwrap1, vec_meta.QuickUnwrap2
+	aunwrap1 = ang_meta.QuickUnwrap1
 end)
 
 if SERVER then
@@ -558,8 +565,8 @@ if SERVER then
 		local ply = getply(self)
 		checkpermission(instance, ply, "player.dropweapon")
 
-		if target~=nil then target = vqunwrap1(target) end
-		if velocity~=nil then velocity = vqunwrap2(velocity) end
+		if target~=nil then target = vunwrap1(target) end
+		if velocity~=nil then velocity = vunwrap2(velocity) end
 
 		if isstring(weapon) then
 			Ply_DropNamedWeapon(ply, weapon, target, velocity)
@@ -624,7 +631,7 @@ if SERVER then
 	function player_methods:setEyeAngles(ang)
 		local ent = getent(self)
 		checkpermission(instance, ent, "entities.setEyeAngles")
-		Ply_SetEyeAngles(ent, aqunwrap1(ang))
+		Ply_SetEyeAngles(ent, aunwrap1(ang))
 	end
 
 	--- Returns the packet loss of the client

@@ -218,10 +218,10 @@ local collisionListeners = SF.InstanceCollisionListeners(instance)
 base_physicscollide = baseclass.Get("base_gmodentity").PhysicsCollide
 
 local getent
-local vqunwrap1, vqunwrap2, aqunwrap1
+local vunwrap1, vunwrap2, aunwrap1
 instance:AddHook("initialize", function()
 	getent = ent_meta.GetEntity
-	vqunwrap1, vqunwrap2, aqunwrap1 = vec_meta.QuickUnwrap1, vec_meta.QuickUnwrap2, ang_meta.QuickUnwrap1
+	vunwrap1, vunwrap2, aunwrap1 = vec_meta.QuickUnwrap1, vec_meta.QuickUnwrap2, ang_meta.QuickUnwrap1
 end)
 
 instance:AddHook("deinitialize", function()
@@ -299,7 +299,7 @@ function ents_methods:applyDamage(amt, attacker, inflictor, dmgtype, pos)
 		dmg:SetDamageType(dmgtype)
 	end
 	if pos~=nil then
-		pos = vqunwrap1(pos)
+		pos = vunwrap1(pos)
 		checkvector(pos)
 		dmg:SetDamagePosition(pos)
 	end
@@ -321,9 +321,9 @@ function ents_methods:setCustomPropForces(ang, lin, mode)
 	if mode == 0 then
 		ent_tbl.EnableCustomPhysics(ent, false)
 	elseif mode == 1 or mode == 2 or mode == 3 or mode == 4 then
-		ang = vqunwrap1(ang)
+		ang = vunwrap1(ang)
 		checkvector(ang)
-		lin = vqunwrap2(lin)
+		lin = vunwrap2(lin)
 		checkvector(lin)
 
 		ent_tbl.customForceMode = mode
@@ -347,9 +347,9 @@ function ents_methods:setCustomPropShadowForce(data)
 	checkpermission(instance, ent, "entities.applyForce")
 
 	if data then
-		local pos = vqunwrap1(data.pos)
+		local pos = vunwrap1(data.pos)
 		checkvector(pos)
-		local ang = aqunwrap1(data.angle)
+		local ang = aunwrap1(data.angle)
 		checkvector(ang)
 
 		checkluatype(data.teleportdistance, TYPE_NUMBER)
@@ -387,7 +387,7 @@ end
 -- @param Vector angvel The local angvel vector to set
 function ents_methods:setAngleVelocity(angvel)
 	local ent = getent(self)
-	angvel = vqunwrap1(angvel)
+	angvel = vunwrap1(angvel)
 	checkvector(angvel)
 
 	local phys = Ent_GetPhysicsObject(ent)
@@ -403,7 +403,7 @@ end
 -- @param Vector angvel The local angvel vector to apply
 function ents_methods:addAngleVelocity(angvel)
 	local ent = getent(self)
-	angvel = vqunwrap1(angvel)
+	angvel = vunwrap1(angvel)
 	checkvector(angvel)
 
 	local phys = Ent_GetPhysicsObject(ent)
@@ -442,7 +442,7 @@ end
 -- @param Vector vec The force vector
 function ents_methods:applyForceCenter(vec)
 	local ent = getent(self)
-	vec = vqunwrap1(vec)
+	vec = vunwrap1(vec)
 	checkvector(vec)
 
 	local phys = Ent_GetPhysicsObject(ent)
@@ -459,9 +459,9 @@ end
 function ents_methods:applyForceOffset(force, position)
 	local ent = getent(self)
 
-	force = vqunwrap1(force)
+	force = vunwrap1(force)
 	checkvector(force)
-	position = vqunwrap2(position)
+	position = vunwrap2(position)
 	checkvector(position)
 
 	local phys = Ent_GetPhysicsObject(ent)
@@ -477,7 +477,7 @@ end
 function ents_methods:applyAngForce(ang)
 	local ent = getent(self)
 
-	ang = aqunwrap1(ang)
+	ang = aunwrap1(ang)
 	checkvector(ang)
 
 	local phys = Ent_GetPhysicsObject(ent)
@@ -517,7 +517,7 @@ end
 function ents_methods:applyTorque(torque)
 	local ent = getent(self)
 
-	torque = vqunwrap1(torque)
+	torque = vunwrap1(torque)
 	checkvector(torque)
 
 	local phys = Ent_GetPhysicsObject(ent)
@@ -566,7 +566,7 @@ end
 function ents_methods:setPos(vec)
 	local ent = getent(self)
 	checkpermission(instance, ent, "entities.setPos")
-	Ent_SetPos(ent, SF.clampPos(vqunwrap1(vec)))
+	Ent_SetPos(ent, SF.clampPos(vunwrap1(vec)))
 end
 
 --- Sets the entity's angles
@@ -574,7 +574,7 @@ end
 function ents_methods:setAngles(ang)
 	local ent = getent(self)
 	checkpermission(instance, ent, "entities.setAngles")
-	Ent_SetAngles(ent, aqunwrap1(ang))
+	Ent_SetAngles(ent, aunwrap1(ang))
 end
 
 --- Sets the entity's position local to its parent
@@ -582,7 +582,7 @@ end
 function ents_methods:setLocalPos(vec)
 	local ent = getent(self)
 	checkpermission(instance, ent, "entities.setPos")
-	Ent_SetLocalPos(ent, SF.clampPos(vqunwrap1(vec)))
+	Ent_SetLocalPos(ent, SF.clampPos(vunwrap1(vec)))
 end
 
 --- Sets the entity's angles local to its parent
@@ -590,7 +590,7 @@ end
 function ents_methods:setLocalAngles(ang)
 	local ent = getent(self)
 	checkpermission(instance, ent, "entities.setAngles")
-	Ent_SetLocalAngles(ent, aqunwrap1(ang))
+	Ent_SetLocalAngles(ent, aunwrap1(ang))
 end
 
 --- Sets the entity's linear velocity. Physics entities, use physobj:setVelocity
@@ -598,7 +598,7 @@ end
 function ents_methods:setVelocity(vel)
 	local ent = getent(self)
 
-	vel = vqunwrap1(vel)
+	vel = vunwrap1(vel)
 	checkvector(vel)
 
 	checkpermission(instance, ent, "entities.setVelocity")
@@ -610,7 +610,7 @@ end
 -- @param Vector vel The world velocity vector to apply
 function ents_methods:addVelocity(vel)
 	local ent = getent(self)
-	vel = vqunwrap1(vel)
+	vel = vunwrap1(vel)
 	checkvector(vel)
 
 	local phys = Ent_GetPhysicsObject(ent)
@@ -734,7 +734,7 @@ function ents_methods:setInertia(vec)
 	local phys = Ent_GetPhysicsObject(ent)
 	if not Phys_IsValid(phys) then SF.Throw("Physics object is invalid", 2) end
 
-	vec = vqunwrap1(vec)
+	vec = vunwrap1(vec)
 	checkvector(vec)
 	vec[1] = math.Clamp(vec[1], 1, 100000)
 	vec[2] = math.Clamp(vec[2], 1, 100000)
@@ -1053,7 +1053,7 @@ function ents_methods:testPVS(other)
 
 	local meta = debug.getmetatable(other)
 	if meta==vec_meta then
-		other = vqunwrap1(other)
+		other = vunwrap1(other)
 	elseif meta==ent_meta then
 		other = getent(other)
 	else

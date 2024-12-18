@@ -185,8 +185,10 @@ local function clone(q)
 end
 
 local getent
+local vunwrap1, vunwrap2
 instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
+	vunwrap1, vunwrap2 = vec_meta.QuickUnwrap1, vec_meta.QuickUnwrap2
 end)
 instance.Types.Quaternion.QuaternionMultiply = getQuatMul
 
@@ -783,8 +785,8 @@ end
 -- @return Quaternion Quaternion from the given vector
 function vec_methods:getQuaternion(up)
 	if up then
-		local x = vqunwrap1(self)
-		local z = vqunwrap2(up)
+		local x = vunwrap1(self)
+		local z = vunwrap2(up)
 		local y = z:Cross(x)
 		y:Normalize()
 
@@ -810,7 +812,7 @@ end
 -- @param number ang Number rotation angle in degrees
 -- @return Quaternion Rotated quaternion
 function vec_methods:getQuaternionFromAxis(ang)
-	local axis = vqunwrap1(self)
+	local axis = vunwrap1(self)
 	axis:Normalize()
 	local rang = math_rad(ang) * 0.5
 

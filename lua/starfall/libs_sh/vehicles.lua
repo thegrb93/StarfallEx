@@ -2,7 +2,7 @@
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 local ENT_META = FindMetaTable("Entity")
-local Ent_IsValid = ENT_META.IsValid
+local PLY_META = FindMetaTable("Player")
 local VEH_META = FindMetaTable("Vehicle")
 
 if SERVER then
@@ -23,6 +23,9 @@ SF.RegisterType("Vehicle", false, true, VEH_META, "Entity")
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
+local Ent_Fire,Ent_IsValid = ENT_META.Fire,ENT_META.IsValid
+local Ply_ExitVehicle,Ply_Kill,Ply_StripWeapon,Ply_StripWeapons = PLY_META.ExitVehicle,PLY_META.Kill,PLY_META.StripWeapon,PLY_META.StripWeapons
+local Veh_GetDriver,Veh_GetPassenger = VEH_META.GetDriver,VEH_META.GetPassenger
 
 local vehicle_methods, vehicle_meta, wrap, unwrap = instance.Types.Vehicle.Methods, instance.Types.Vehicle, instance.Types.Vehicle.Wrap, instance.Types.Vehicle.Unwrap
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap

@@ -3,8 +3,6 @@ local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 local ENT_META = FindMetaTable("Entity")
 local Ent_GetTable = ENT_META.GetTable
-local Ent_IsValid = ENT_META.IsValid
-local PHYS_META = FindMetaTable("PhysObj")
 
 registerprivilege("hologram.modify", "Modify holograms", "Allows the user to modify holograms", { entities = {} })
 registerprivilege("hologram.create", "Create hologram", "Allows the user to create holograms", CLIENT and { client = {} } or nil)
@@ -50,7 +48,7 @@ SF.RegisterType("Hologram", true, false, nil, "Entity")
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
-
+local Ent_AddEffects,Ent_CPPISetOwner,Ent_DisableMatrix,Ent_DrawModel,Ent_EnableMatrix,Ent_GetColor4Part,Ent_GetTable,Ent_IsValid,Ent_LookupSequence,Ent_OBBMaxs,Ent_OBBMins,Ent_RemoveEffects,Ent_ResetSequence,Ent_SetAngles,Ent_SetCycle,Ent_SetLocalAngles,Ent_SetLocalAngularVelocity,Ent_SetLocalPos,Ent_SetLocalVelocity,Ent_SetModel,Ent_SetMoveType,Ent_SetPlaybackRate,Ent_SetPos,Ent_SetupBones,Ent_Spawn = ENT_META.AddEffects,ENT_META.CPPISetOwner,ENT_META.DisableMatrix,ENT_META.DrawModel,ENT_META.EnableMatrix,ENT_META.GetColor4Part,ENT_META.GetTable,ENT_META.IsValid,ENT_META.LookupSequence,ENT_META.OBBMaxs,ENT_META.OBBMins,ENT_META.RemoveEffects,ENT_META.ResetSequence,ENT_META.SetAngles,ENT_META.SetCycle,ENT_META.SetLocalAngles,ENT_META.SetLocalAngularVelocity,ENT_META.SetLocalPos,ENT_META.SetLocalVelocity,ENT_META.SetModel,ENT_META.SetMoveType,ENT_META.SetPlaybackRate,ENT_META.SetPos,ENT_META.SetupBones,ENT_META.Spawn
 
 local hologram_library = instance.Libraries.hologram
 local hologram_methods, hologram_meta, wrap, unwrap = instance.Types.Hologram.Methods, instance.Types.Hologram, instance.Types.Hologram.Wrap, instance.Types.Hologram.Unwrap
@@ -62,9 +60,13 @@ local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.
 local VECTOR_PLAYER_COLOR_DISABLED = Vector(-1, -1, -1)
 
 local getent
+local vunwrap1, vunwrap2
+local aunwrap1
 instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
 	hologram_meta.__tostring = ent_meta.__tostring
+	vunwrap1, vunwrap2 = vec_meta.QuickUnwrap1, vec_meta.QuickUnwrap2
+	aunwrap1 = ang_meta.QuickUnwrap1
 end)
 
 instance:AddHook("deinitialize", function()
@@ -108,10 +110,10 @@ function hologram_library.create(pos, ang, model, scale)
 	checkluatype(model, TYPE_STRING)
 
 	local ply = instance.player
-	pos = SF.clampPos(vqunwrap1(pos))
-	ang = aqunwrap1(ang)
+	pos = SF.clampPos(vunwrap1(pos))
+	ang = aunwrap1(ang)
 	model = SF.CheckModel(model, ply)
-	if scale~=nil then scale = vqunwrap2(scale) end
+	if scale~=nil then scale = vunwrap2(scale) end
 
 	entList:checkuse(ply, 1)
 
@@ -180,7 +182,7 @@ if SERVER then
 		local ent_tbl = Ent_GetTable(holo)
 		checkpermission(instance, holo, "hologram.setRenderProperty")
 
-		vel = vqunwrap1(vel)
+		vel = vunwrap1(vel)
 		Ent_SetLocalVelocity(holo, vel)
 		if vel ~= vector_origin then
 			if ent_tbl.targetLocalVelocity then ent_tbl.targetLocalVelocity:Set(vel) else ent_tbl.targetLocalVelocity = Vector(vec) end
@@ -197,7 +199,7 @@ if SERVER then
 		local holo = getholo(self)
 		checkpermission(instance, holo, "hologram.setRenderProperty")
 
-		Ent_SetLocalAngularVelocity(holo, aqunwrap1(angvel))
+		Ent_SetLocalAngularVelocity(holo, aunwrap1(angvel))
 	end
 	hologram_methods.setAngVel = hologram_methods.setLocalAngularVelocity
 
@@ -221,7 +223,7 @@ else
 		local holo = getholo(self)
 		checkpermission(instance, holo, "hologram.setRenderProperty")
 
-		Ent_SetPos(holo, SF.clampPos(vqunwrap1(vec)))
+		Ent_SetPos(holo, SF.clampPos(vunwrap1(vec)))
 
 		local sfParent = Ent_GetTable(holo).sfParent
 		if sfParent and Ent_IsValid(sfParent.parent) then
@@ -236,7 +238,7 @@ else
 		local holo = getholo(self)
 		checkpermission(instance, holo, "hologram.setRenderProperty")
 
-		Ent_SetAngles(holo, aqunwrap1(ang))
+		Ent_SetAngles(holo, aunwrap1(ang))
 		
 		local sfParent = Ent_GetTable(holo).sfParent
 		if sfParent and Ent_IsValid(sfParent.parent) then
@@ -251,7 +253,7 @@ else
 		local holo = getholo(self)
 		checkpermission(instance, holo, "hologram.setRenderProperty")
 
-		Ent_SetLocalPos(holo, SF.clampPos(vqunwrap1(vec)))
+		Ent_SetLocalPos(holo, SF.clampPos(vunwrap1(vec)))
 
 		local sfParent = Ent_GetTable(holo).sfParent
 		if sfParent and Ent_IsValid(sfParent.parent) then
@@ -266,7 +268,7 @@ else
 		local holo = getholo(self)
 		checkpermission(instance, holo, "hologram.setRenderProperty")
 
-		Ent_SetLocalAngles(holo, aqunwrap1(ang))
+		Ent_SetLocalAngles(holo, aunwrap1(ang))
 		
 		local sfParent = Ent_GetTable(holo).sfParent
 		if sfParent and Ent_IsValid(sfParent.parent) then
@@ -369,7 +371,7 @@ end
 function hologram_methods:setPlayerColor(color)
 	local holo = getholo(self)
 	checkpermission(instance, holo, "hologram.setRenderProperty")
-	color = color ~= nil and vqunwrap1(color) or VECTOR_PLAYER_COLOR_DISABLED
+	color = color ~= nil and vunwrap1(color) or VECTOR_PLAYER_COLOR_DISABLED
 	Ent_GetTable(holo).SetPlayerColorInternal(holo, color)
 end
 
@@ -406,7 +408,7 @@ function hologram_methods:setClip(index, enabled, origin, normal, entity)
 			entity = getent(entity)
 		end
 
-		origin, normal = vqunwrap1(origin), vqunwrap2(normal)
+		origin, normal = vunwrap1(origin), vunwrap2(normal)
 
 		local clips = holo.clips
 		if not clips[index] then
@@ -428,7 +430,7 @@ end
 function hologram_methods:setScale(scale)
 	local holo = getholo(self)
 	checkpermission(instance, holo, "hologram.setRenderProperty")
-	Ent_GetTable(holo).SetScale(holo, vqunwrap1(scale))
+	Ent_GetTable(holo).SetScale(holo, vunwrap1(scale))
 end
 
 --- Sets the hologram size in game units
@@ -438,7 +440,7 @@ function hologram_methods:setSize(size)
 	local holo = getholo(self)
 	checkpermission(instance, holo, "hologram.setRenderProperty")
 
-	size = vqunwrap1(size)
+	size = vunwrap1(size)
 	local bounds = Ent_OBBMaxs(holo) - Ent_OBBMins(holo)
 	local scale = Vector(size[1] / bounds[1], size[2] / bounds[2], size[3] / bounds[3])
 	Ent_GetTable(holo).SetScale(holo, scale)

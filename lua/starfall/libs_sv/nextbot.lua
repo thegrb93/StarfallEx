@@ -1,9 +1,7 @@
 local registerprivilege = SF.Permissions.registerPrivilege
 local checkluatype = SF.CheckLuaType
-
 local ENT_META = FindMetaTable("Entity")
-local Ent_GetTable = ENT_META.GetTable
-local Ent_IsValid = ENT_META.IsValid
+
 
 --- NextBot type
 -- @name NextBot
@@ -67,6 +65,7 @@ local entList = SF.EntManager("nextbots", "nextbots", 30, "The number of props a
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
+local Ent_GetTable,Ent_IsValid = ENT_META.GetTable,ENT_META.IsValid
 
 local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local nextbot_library, nb_meta, nb_methods = instance.Libraries.nextbot, instance.Types.NextBot, instance.Types.NextBot.Methods
@@ -74,8 +73,10 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 local navarea_methods, navarea_meta, navwrap, navunwrap = instance.Types.NavArea.Methods, instance.Types.NavArea, instance.Types.NavArea.Wrap, instance.Types.NavArea.Unwrap
 local nbwrap, nbunwrap = instance.Types.NextBot.Wrap, instance.Types.NextBot.Unwrap
 
+local vunwrap1, vunwrap2
 instance:AddHook("initialize", function()
 	nb_meta.__tostring = ent_meta.__tostring
+	vunwrap1, vunwrap2 = vec_meta.QuickUnwrap1, vec_meta.QuickUnwrap2
 end)
 
 instance:AddHook("deinitialize", function()
@@ -90,7 +91,7 @@ end)
 function nextbot_library.create(pos, mdl)
 	checkpermission(instance, nil, "nextbot.create")
 	checkluatype(mdl, TYPE_STRING)
-	pos = SF.clampPos(vqunwrap1(pos))
+	pos = SF.clampPos(vunwrap1(pos))
 
 	local ply = instance.player
 	mdl = SF.CheckModel(mdl, ply)
@@ -203,7 +204,7 @@ end
 function nb_methods:faceTowards(pos)	
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.faceTowards")
-	Ent_GetTable(nb).loco:FaceTowards(vqunwrap1(pos))
+	Ent_GetTable(nb).loco:FaceTowards(vunwrap1(pos))
 end
 
 --- Sets the activity the nextbot uses for running.
@@ -252,7 +253,7 @@ end
 function nb_methods:setVelocity(vel)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setVelocity")
-	Ent_GetTable(nb).loco:SetVelocity(vqunwrap1(vel))
+	Ent_GetTable(nb).loco:SetVelocity(vunwrap1(vel))
 end
 
 --- Gets the nextbot's velocity as a vector.
@@ -692,7 +693,7 @@ end
 function nb_methods:jumpAcrossGap(landGoal, landForward)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.jumpAcrossGap")
-	Ent_GetTable(nb).loco:JumpAcrossGap(vqunwrap1(landGoal), vqunwrap2(landForward))
+	Ent_GetTable(nb).loco:JumpAcrossGap(vunwrap1(landGoal), vunwrap2(landForward))
 end
 
 end

@@ -2,8 +2,8 @@
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 local ENT_META = FindMetaTable("Entity")
-local Ent_IsValid = ENT_META.IsValid
 local NPC_META = FindMetaTable("NPC")
+
 
 if SERVER then
 	-- Register privileges
@@ -21,6 +21,8 @@ SF.RegisterType("Npc", false, true, NPC_META, "Entity")
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
+local Ent_GetClass,Ent_IsValid,Ent_Remove = ENT_META.GetClass,ENT_META.IsValid,ENT_META.Remove
+local Npc_AddEntityRelationship,Npc_AddRelationship,Npc_GetEnemy,Npc_Give,Npc_SetLastPosition,Npc_SetSchedule,Npc_SetTarget = NPC_META.AddEntityRelationship,NPC_META.AddRelationship,NPC_META.GetEnemy,NPC_META.Give,NPC_META.SetLastPosition,NPC_META.SetSchedule,NPC_META.SetTarget
 
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local npc_methods, npc_meta, wrap, unwrap = instance.Types.Npc.Methods, instance.Types.Npc, instance.Types.Npc.Wrap, instance.Types.Npc.Unwrap
@@ -28,9 +30,11 @@ local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wr
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 
 local getent
+local vunwrap1
 instance:AddHook("initialize", function()
 	getent = ent_meta.GetEntity
 	npc_meta.__tostring = ent_meta.__tostring
+	vunwrap1 = vec_meta.QuickUnwrap1
 end)
 
 local function getnpc(self)
@@ -150,7 +154,7 @@ if SERVER then
 	function npc_methods:goWalk(vec)
 		local npc = getnpc(self)
 		checkpermission(instance, npc, "npcs.modify")
-		Npc_SetLastPosition(npc, vqunwrap1(vec))
+		Npc_SetLastPosition(npc, vunwrap1(vec))
 		Npc_SetSchedule(npc, SCHED_FORCED_GO)
 	end
 
@@ -160,7 +164,7 @@ if SERVER then
 	function npc_methods:goRun(vec)
 		local npc = getnpc(self)
 		checkpermission(instance, npc, "npcs.modify")
-		Npc_SetLastPosition(npc, vqunwrap1(vec))
+		Npc_SetLastPosition(npc, vunwrap1(vec))
 		Npc_SetSchedule(npc, SCHED_FORCED_GO_RUN)
 	end
 end

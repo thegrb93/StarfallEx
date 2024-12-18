@@ -25,9 +25,11 @@ return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 local getent
+local vunwrap1
 local particleEffects = {}
 instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
+	vunwrap1 = vec_meta.QuickUnwrap1
 end)
 
 instance:AddHook("deinitialize", function()
@@ -163,7 +165,7 @@ function particleef_methods:setSortOrigin(origin)
 
 	checkValid(uw)
 
-	uw:SetSortOrgin(vqunwrap1(origin))
+	uw:SetSortOrgin(vunwrap1(origin))
 end
 
 
@@ -177,7 +179,7 @@ function particleef_methods:setControlPoint(id,value)
 
 	checkValid(uw)
 
-	uw:SetControlPoint(id,vqunwrap1(value))
+	uw:SetControlPoint(id,vunwrap1(value))
 end
 
 
@@ -206,7 +208,7 @@ function particleef_methods:setForwardVector(id,value)
 
 	checkValid(uw)
 
-	uw:SetControlPointForwardVector(id,vqunwrap1(value))
+	uw:SetControlPointForwardVector(id,vunwrap1(value))
 end
 
 --- Sets the right direction for given control point.
@@ -219,7 +221,7 @@ function particleef_methods:setRightVector(id,value)
 
 	checkValid(uw)
 
-	uw:SetControlPointRightVector(id,vqunwrap1(value))
+	uw:SetControlPointRightVector(id,vunwrap1(value))
 end
 
 
@@ -233,7 +235,7 @@ function particleef_methods:setUpVector(id,value)
 
 	checkValid(uw)
 
-	uw:SetControlPointUpVector(id,vqunwrap1(value))
+	uw:SetControlPointUpVector(id,vunwrap1(value))
 
 end
 

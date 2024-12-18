@@ -10,12 +10,14 @@ local dgetmeta = debug.getmetatable
 local checkluatype = SF.CheckLuaType
 local haspermission = SF.Permissions.hasAccess
 local registerprivilege = SF.Permissions.registerPrivilege
-local col_meta = getmetatable(Color(255, 255, 255, 255))
-local col_SetUnpacked = col_meta.SetUnpacked
-local col_Unpack = col_meta.Unpack
-local vec_meta = getmetatable(Vector(0, 0, 0))
-local vec_SetUnpacked = vec_meta.SetUnpacked
-local vec_Unpack = vec_meta.Unpack
+local COL_META = getmetatable(Color())
+local col_SetUnpacked = COL_META.SetUnpacked
+local col_Unpack = COL_META.Unpack
+local VEC_META = getmetatable(Vector())
+local vec_SetUnpacked = VEC_META.SetUnpacked
+local vec_Unpack = VEC_META.Unpack
+local ENT_META = FindMetaTable("Entity")
+local Ent_GetTable = ENT_META.GetTable
 
 registerprivilege("render.screen", "Render Screen", "Allows the user to render to a starfall screen", { client = {} })
 registerprivilege("render.hud", "Render Hud", "Allows the user to render to your hud", { client = {} })
@@ -441,16 +443,22 @@ instance.data.render = renderdata
 local render_library = instance.Libraries.render
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
-local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
-local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
+local VEC_META, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local COL_META, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 local matrix_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
 local markup_methods, markwrap, markunwrap = instance.Types.Markup.Methods, instance.Types.Markup.Wrap, instance.Types.Markup.Unwrap
 local mtlunwrap = instance.Types.LockedMaterial.Unwrap
 
 
 local getent
+local vunwrap1, vunwrap2, vunwrap3
+local aunwrap1
+local cunwrap1
 instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
+	vunwrap1, vunwrap2, vunwrap3, vunwrap4 = vec_meta.QuickUnwrap1, vec_meta.QuickUnwrap2, vec_meta.QuickUnwrap3, vec_meta.QuickUnwrap4
+	aunwrap1 = ang_meta.QuickUnwrap1
+	cunwrap1 = col_meta.QuickUnwrap1
 end)
 
 instance:AddHook("deinitialize", function ()
@@ -776,8 +784,8 @@ function render_library.pushViewMatrix(tbl)
 	checkluatype(tbl, TYPE_TABLE)
 
 	local newtbl = {}
-	if tbl.origin ~= nil then newtbl.origin = vqunwrap1(tbl.origin) end
-	if tbl.angles ~= nil then newtbl.angles = aqunwrap1(tbl.angles) end
+	if tbl.origin ~= nil then newtbl.origin = vunwrap1(tbl.origin) end
+	if tbl.angles ~= nil then newtbl.angles = aunwrap1(tbl.angles) end
 
 	for k, v in pairs(tbl) do
 		local check = viewmatrix_checktypes[k]
@@ -908,7 +916,7 @@ function render_library.getTint()
 	local r, g, b = render.GetColorModulation()
 	local a = render.GetBlend()
 
-	return setmetatable({ r * 255, g * 255, b * 255, a * 255 }, col_meta)
+	return setmetatable({ r * 255, g * 255, b * 255, a * 255 }, COL_META)
 end
 
 --- Gets the drawing tint. Internally, calls render.getColorModulation and render.getBlend, multiplies the values by 255, then returns a color object.
@@ -1984,7 +1992,7 @@ end
 -- @param number height Height of the sprite.
 -- @param Color? Color tint to give the sprite. Default: white
 function render_library.draw3DSprite(pos, width, height, color)
-	render.DrawSprite(vqunwrap1(pos), width, height, color)
+	render.DrawSprite(vunwrap1(pos), width, height, color)
 end
 
 --- Draws a sphere
@@ -1996,7 +2004,7 @@ function render_library.draw3DSphere(pos, radius, longitudeSteps, latitudeSteps)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	longitudeSteps = clamp(longitudeSteps, 3, 50)
 	latitudeSteps = clamp(latitudeSteps, 3, 50)
-	render.DrawSphere(vqunwrap1(pos), radius, longitudeSteps, latitudeSteps, currentcolor, true)
+	render.DrawSphere(vunwrap1(pos), radius, longitudeSteps, latitudeSteps, currentcolor, true)
 end
 
 --- Draws a wireframe sphere
@@ -2010,7 +2018,7 @@ function render_library.draw3DWireframeSphere(pos, radius, longitudeSteps, latit
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	longitudeSteps = clamp(longitudeSteps, 3, 50)
 	latitudeSteps = clamp(latitudeSteps, 3, 50)
-	render.DrawWireframeSphere(vqunwrap1(pos), radius, longitudeSteps, latitudeSteps, currentcolor, writeZ)
+	render.DrawWireframeSphere(vunwrap1(pos), radius, longitudeSteps, latitudeSteps, currentcolor, writeZ)
 end
 
 --- Draws a 3D Line
@@ -2020,7 +2028,7 @@ end
 function render_library.draw3DLine(startPos, endPos, writeZ)
 	if writeZ == nil then writeZ = true end
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	render.DrawLine(vqunwrap1(startPos), vqunwrap2(endPos), currentcolor, writeZ)
+	render.DrawLine(vunwrap1(startPos), vunwrap2(endPos), currentcolor, writeZ)
 end
 
 --- Draws a box in 3D space
@@ -2030,7 +2038,7 @@ end
 -- @param Vector maxs End position of the box, relative to origin.
 function render_library.draw3DBox(origin, angle, mins, maxs)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	render.DrawBox(vqunwrap1(origin), aqunwrap1(angle), vqunwrap2(mins), vqunwrap3(maxs), currentcolor, true)
+	render.DrawBox(vunwrap1(origin), aunwrap1(angle), vunwrap2(mins), vunwrap3(maxs), currentcolor, true)
 end
 
 --- Draws a wireframe box in 3D space
@@ -2042,7 +2050,7 @@ end
 function render_library.draw3DWireframeBox(origin, angle, mins, maxs, writeZ)
 	if writeZ == nil then writeZ = true end
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	render.DrawWireframeBox(vqunwrap1(origin), aqunwrap1(angle), vqunwrap2(mins), vqunwrap3(maxs), currentcolor, writeZ)
+	render.DrawWireframeBox(vunwrap1(origin), aunwrap1(angle), vunwrap2(mins), vunwrap3(maxs), currentcolor, writeZ)
 end
 
 --- Draws textured beam.
@@ -2053,7 +2061,7 @@ end
 -- @param number textureEnd The end coordinate of the texture used.
 function render_library.draw3DBeam(startPos, endPos, width, textureStart, textureEnd)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	render.DrawBeam(vqunwrap1(startPos), vqunwrap2(endPos), width, textureStart, textureEnd, currentcolor)
+	render.DrawBeam(vunwrap1(startPos), vunwrap2(endPos), width, textureStart, textureEnd, currentcolor)
 end
 
 --- Begin drawing a multi-segment beam.
@@ -2070,7 +2078,7 @@ end
 -- @param Color color The color to be used.
 function render_library.add3DBeam(startPos, width, textureEnd, color)
     if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-    render.AddBeam(vqunwrap1(startPos), width, textureEnd, cqunwrap1(color))
+    render.AddBeam(vunwrap1(startPos), width, textureEnd, cunwrap1(color))
 end
 
 --- Ends the beam mesh of a beam started with render.start3DBeam.
@@ -2086,7 +2094,7 @@ end
 -- @param Vector vert4 The fourth vertex.
 function render_library.draw3DQuad(vert1, vert2, vert3, vert4)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	render_DrawQuad(vqunwrap1(vert1), vqunwrap2(vert2), vqunwrap3(vert3), vqunwrap4(vert4), currentcolor)
+	render_DrawQuad(vunwrap1(vert1), vunwrap2(vert2), vunwrap3(vert3), vunwrap4(vert4), currentcolor)
 end
 
 local pos_vec, norm_vec = Vector(0, 0, 0), Vector(0, 0, 0)
@@ -2310,7 +2318,7 @@ end
 -- @return Color Color object with ( r, g, b, a ) from the specified pixel.
 function render_library.readPixel(x, y)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	return setmetatable({render.ReadPixel(x, y)}, col_meta)
+	return setmetatable({render.ReadPixel(x, y)}, COL_META)
 end
 
 --- Reads the color of the specified pixel.
@@ -2356,7 +2364,7 @@ function render_library.traceSurfaceColor(startpos, endpos)
 	vec_SetUnpacked(startpos_vec, startpos[1], startpos[2], startpos[3])
 	vec_SetUnpacked(endpos_vec, endpos[1], endpos[2], endpos[3])
 	local r, g, b = vec_Unpack(render.GetSurfaceColor(startpos_vec, endpos_vec))
-	return setmetatable({r * 255, g * 255, b * 255, 255}, col_meta)
+	return setmetatable({r * 255, g * 255, b * 255, 255}, COL_META)
 end
 
 --- Checks if the client is connected to a HUD component that's linked to this chip
@@ -2371,8 +2379,8 @@ function render_library.renderView(tbl)
 	checkluatype(tbl, TYPE_TABLE)
 
 	local origin, angles, w, h, ortho, offcenter
-	if tbl.origin~=nil then origin = vqunwrap1(tbl.origin) end
-	if tbl.angles~=nil then angles = aqunwrap1(tbl.angles) end
+	if tbl.origin~=nil then origin = vunwrap1(tbl.origin) end
+	if tbl.angles~=nil then angles = aunwrap1(tbl.angles) end
 	if tbl.aspectratio~=nil then checkluatype(tbl.aspectratio, TYPE_NUMBER) end
 	if tbl.x~=nil then checkluatype(tbl.x, TYPE_NUMBER) end
 	if tbl.y~=nil then checkluatype(tbl.y, TYPE_NUMBER) end
@@ -2718,7 +2726,7 @@ end
 -- @param number radius
 -- @return number Percentage visible, from 0-1
 function render_library.pixelVisible(position, radius)
-	position = vqunwrap1(position)
+	position = vunwrap1(position)
 	checkluatype(radius, TYPE_NUMBER)
 	
 	local PixVis = pixhandle_bank:use(instance.player)

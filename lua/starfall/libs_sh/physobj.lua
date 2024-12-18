@@ -1,6 +1,5 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
-local ENT_META = FindMetaTable("Entity")
 local PHYS_META = FindMetaTable("PhysObj")
 
 local function checknumber(n)
@@ -29,6 +28,7 @@ SF.RegisterType("PhysObj", true, false, PHYS_META)
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
+local Phys_AddAngleVelocity,Phys_AddGameFlag,Phys_AddVelocity,Phys_ApplyForceCenter,Phys_ApplyForceOffset,Phys_ApplyTorqueCenter,Phys_CalculateForceOffset,Phys_CalculateVelocityOffset,Phys_ClearGameFlag,Phys_EnableDrag,Phys_EnableGravity,Phys_EnableMotion,Phys_GetAABB,Phys_GetAngleVelocity,Phys_GetAngles,Phys_GetDamping,Phys_GetEntity,Phys_GetFrictionSnapshot,Phys_GetInertia,Phys_GetMass,Phys_GetMassCenter,Phys_GetMaterial,Phys_GetMesh,Phys_GetMeshConvexes,Phys_GetPos,Phys_GetPositionMatrix,Phys_GetStress,Phys_GetSurfaceArea,Phys_GetVelocity,Phys_GetVelocityAtPoint,Phys_GetVolume,Phys_HasGameFlag,Phys_IsAsleep,Phys_IsDragEnabled,Phys_IsGravityEnabled,Phys_IsMoveable,Phys_IsValid,Phys_LocalToWorld,Phys_LocalToWorldVector,Phys_SetAngleDragCoefficient,Phys_SetAngleVelocity,Phys_SetAngles,Phys_SetBuoyancyRatio,Phys_SetContents,Phys_SetDamping,Phys_SetDragCoefficient,Phys_SetInertia,Phys_SetMass,Phys_SetMaterial,Phys_SetPos,Phys_SetVelocity,Phys_Sleep,Phys_Wake,Phys_WorldToLocal,Phys_WorldToLocalVector = PHYS_META.AddAngleVelocity,PHYS_META.AddGameFlag,PHYS_META.AddVelocity,PHYS_META.ApplyForceCenter,PHYS_META.ApplyForceOffset,PHYS_META.ApplyTorqueCenter,PHYS_META.CalculateForceOffset,PHYS_META.CalculateVelocityOffset,PHYS_META.ClearGameFlag,PHYS_META.EnableDrag,PHYS_META.EnableGravity,PHYS_META.EnableMotion,PHYS_META.GetAABB,PHYS_META.GetAngleVelocity,PHYS_META.GetAngles,PHYS_META.GetDamping,PHYS_META.GetEntity,PHYS_META.GetFrictionSnapshot,PHYS_META.GetInertia,PHYS_META.GetMass,PHYS_META.GetMassCenter,PHYS_META.GetMaterial,PHYS_META.GetMesh,PHYS_META.GetMeshConvexes,PHYS_META.GetPos,PHYS_META.GetPositionMatrix,PHYS_META.GetStress,PHYS_META.GetSurfaceArea,PHYS_META.GetVelocity,PHYS_META.GetVelocityAtPoint,PHYS_META.GetVolume,PHYS_META.HasGameFlag,PHYS_META.IsAsleep,PHYS_META.IsDragEnabled,PHYS_META.IsGravityEnabled,PHYS_META.IsMoveable,PHYS_META.IsValid,PHYS_META.LocalToWorld,PHYS_META.LocalToWorldVector,PHYS_META.SetAngleDragCoefficient,PHYS_META.SetAngleVelocity,PHYS_META.SetAngles,PHYS_META.SetBuoyancyRatio,PHYS_META.SetContents,PHYS_META.SetDamping,PHYS_META.SetDragCoefficient,PHYS_META.SetInertia,PHYS_META.SetMass,PHYS_META.SetMaterial,PHYS_META.SetPos,PHYS_META.SetVelocity,PHYS_META.Sleep,PHYS_META.Wake,PHYS_META.WorldToLocal,PHYS_META.WorldToLocalVector
 
 
 local physobj_methods, physobj_meta, wrap, unwrap = instance.Types.PhysObj.Methods, instance.Types.PhysObj, instance.Types.PhysObj.Wrap, instance.Types.PhysObj.Unwrap
@@ -37,11 +37,11 @@ local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
 
-local vqunwrap1, vqunwrap2, vqunwrap3
-local aqunwrap1
+local vunwrap1, vunwrap2
+local aunwrap1
 instance:AddHook("initialize", function()
-	vqunwrap1, vqunwrap2, vqunwrap3 = vec_meta.QuickUnwrap1, vec_meta.QuickUnwrap2, vec_meta.QuickUnwrap3
-	aqunwrap1 = ang_meta.QuickUnwrap1
+	vunwrap1, vunwrap2 = vec_meta.QuickUnwrap1, vec_meta.QuickUnwrap2
+	aunwrap1 = ang_meta.QuickUnwrap1
 end)
 
 --- Checks if the physics object is valid
@@ -109,7 +109,7 @@ end
 -- @param Vector vec The point to get velocity of in local reference frame
 -- @return Vector Vector Local velocity of the physics object at the point
 function physobj_methods:getVelocityAtPoint(vec)
-	return vwrap(Phys_GetVelocityAtPoint(unwrap(self), vqunwrap1(vec)))
+	return vwrap(Phys_GetVelocityAtPoint(unwrap(self), vunwrap1(vec)))
 end
 
 --- Gets the angular velocity of the physics object
@@ -151,28 +151,28 @@ end
 -- @param Vector vec The vector to transform
 -- @return Vector The transformed vector
 function physobj_methods:worldToLocal(vec)
-	return vwrap(Phys_WorldToLocal(unwrap(self), vqunwrap1(vec)))
+	return vwrap(Phys_WorldToLocal(unwrap(self), vunwrap1(vec)))
 end
 
 --- Returns a vector in the reference frame of the world from the local frame of the physicsobject
 -- @param Vector vec The vector to transform
 -- @return Vector The transformed vector
 function physobj_methods:localToWorld(vec)
-	return vwrap(Phys_LocalToWorld(unwrap(self), vqunwrap1(vec)))
+	return vwrap(Phys_LocalToWorld(unwrap(self), vunwrap1(vec)))
 end
 
 --- Returns a normal vector in the local reference frame of the physicsobject from the world frame
 -- @param Vector vec The normal vector to transform
 -- @return Vector The transformed vector
 function physobj_methods:worldToLocalVector(vec)
-	return vwrap(Phys_WorldToLocalVector(unwrap(self), vqunwrap1(vec)))
+	return vwrap(Phys_WorldToLocalVector(unwrap(self), vunwrap1(vec)))
 end
 
 --- Returns a normal vector in the reference frame of the world from the local frame of the physicsobject
 -- @param Vector vec The normal vector to transform
 -- @return Vector The transformed vector
 function physobj_methods:localToWorldVector(vec)
-	return vwrap(Phys_LocalToWorldVector(unwrap(self), vqunwrap1(vec)))
+	return vwrap(Phys_LocalToWorldVector(unwrap(self), vunwrap1(vec)))
 end
 
 --- Returns a table of MeshVertex structures where each 3 vertices represent a triangle. See: http://wiki.facepunch.com/gmod/Structures/MeshVertex
@@ -225,7 +225,7 @@ if SERVER then
 	-- @server
 	-- @param Vector pos The position vector to set it to
 	function physobj_methods:setPos(pos)
-		pos = vqunwrap1(pos)
+		pos = vunwrap1(pos)
 		checkvector(pos)
 
 		local phys = unwrap(self)
@@ -237,7 +237,7 @@ if SERVER then
 	-- @server
 	-- @param Angle ang The angle to set it to
 	function physobj_methods:setAngles(ang)
-		ang = aqunwrap1(ang)
+		ang = aunwrap1(ang)
 		checkvector(ang)
 
 		local phys = unwrap(self)
@@ -249,7 +249,7 @@ if SERVER then
 	-- @server
 	-- @param Vector vel The velocity vector to set it to
 	function physobj_methods:setVelocity(vel)
-		vel = vqunwrap1(vel)
+		vel = vunwrap1(vel)
 		checkvector(vel)
 
 		local phys = unwrap(self)
@@ -261,7 +261,7 @@ if SERVER then
     -- @server
     -- @param Vector vel The world velocity vector to apply
     function physobj_methods:addVelocity(vel)
-        vel = vqunwrap1(vel)
+        vel = vunwrap1(vel)
         checkvector(vel)
 
         local phys = unwrap(self)
@@ -295,7 +295,7 @@ if SERVER then
 	-- @server
 	-- @param Vector force The force vector to apply
 	function physobj_methods:applyForceCenter(force)
-		force = vqunwrap1(force)
+		force = vunwrap1(force)
 		checkvector(force)
 
 		local phys = unwrap(self)
@@ -308,9 +308,9 @@ if SERVER then
 	-- @param Vector force The force vector in world coordinates
 	-- @param Vector position The force position in world coordinates
 	function physobj_methods:applyForceOffset(force, position)
-		force = vqunwrap1(force)
+		force = vunwrap1(force)
 		checkvector(force)
-		position = vqunwrap2(position)
+		position = vunwrap2(position)
 		checkvector(position)
 
 		local phys = unwrap(self)
@@ -322,7 +322,7 @@ if SERVER then
 	-- @server
 	-- @param Vector angvel The local angvel vector to set
 	function physobj_methods:setAngleVelocity(angvel)
-		angvel = vqunwrap1(angvel)
+		angvel = vunwrap1(angvel)
 		checkvector(angvel)
 
 		local phys = unwrap(self)
@@ -335,7 +335,7 @@ if SERVER then
 	-- @server
 	-- @param Vector angvel The local angvel vector to apply
 	function physobj_methods:addAngleVelocity(angvel)
-		angvel = vqunwrap1(angvel)
+		angvel = vunwrap1(angvel)
 		checkvector(angvel)
 
 		local phys = unwrap(self)
@@ -348,7 +348,7 @@ if SERVER then
 	-- @server
 	-- @param Vector torque The world torque vector to apply
 	function physobj_methods:applyTorque(torque)
-		torque = vqunwrap1(torque)
+		torque = vunwrap1(torque)
 		checkvector(torque)
 
 		local phys = unwrap(self)
@@ -377,7 +377,7 @@ if SERVER then
 		local phys = unwrap(self)
 		checkpermission(instance, Phys_GetEntity(phys), "entities.setInertia")
 
-		local vec = vqunwrap1(inertia)
+		local vec = vunwrap1(inertia)
 		checkvector(vec)
 		vec[1] = math.Clamp(vec[1], 1, 100000)
 		vec[2] = math.Clamp(vec[2], 1, 100000)
@@ -575,8 +575,8 @@ if SERVER then
 	-- @return Vector The calculated linear impulse on the physics object's center of mass in kg*source_unit/s. (World frame)
 	-- @return Vector The calculated angular impulse on the physics object's center of mass in kg*m^2*degrees/s. (Local frame)
 	function physobj_methods:calculateForceOffset(impulse, position)
-		impulse = vqunwrap1(impulse)
-		position = vqunwrap2(position)
+		impulse = vunwrap1(impulse)
+		position = vunwrap2(position)
 
 		checkvector(impulse)
 		checkvector(position)
@@ -594,8 +594,8 @@ if SERVER then
 	-- @return Vector The calculated linear velocity from the impulse on the physics object's center of mass in source_unit/s. (World frame)
 	-- @return Vector The calculated angular velocity from the impulse on the physics object's center of mass in degrees/s. (Local frame)
 	function physobj_methods:calculateVelocityOffset(impulse, position)
-		impulse = vqunwrap1(impulse)
-		position = vqunwrap2(position)
+		impulse = vunwrap1(impulse)
+		position = vunwrap2(position)
 
 		checkvector(impulse)
 		checkvector(position)

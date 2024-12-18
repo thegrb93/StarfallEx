@@ -32,6 +32,11 @@ local function wrap(tbl)
 	return setmetatable(tbl, ang_meta)
 end
 
+local vunwrap1
+instance:AddHook("initialize", function()
+	vunwrap1 = vec_meta.QuickUnwrap1
+end)
+
 local function QuickUnwrapper()
 	local Ang = Angle()
 	return function(v) SetUnpacked(Ang, v[1], v[2], v[3]) return Ang end
@@ -199,7 +204,7 @@ function ang_methods:rotateAroundAxis(v, deg, rad)
 	end
 
 	local ret = Angle(qunwrap1(self))
-	ret:RotateAroundAxis(vqunwrap1(v), deg)
+	ret:RotateAroundAxis(vunwrap1(v), deg)
 
 	return awrap(ret)
 end

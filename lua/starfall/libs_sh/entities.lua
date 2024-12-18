@@ -60,11 +60,11 @@ local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.
 local plywrap = instance.Types.Player.Wrap
 local swrap, sunwrap = instance.Types.SurfaceInfo.Wrap, instance.Types.SurfaceInfo.Unwrap
 
-local vqunwrap1
-local aqunwrap1
+local vunwrap1
+local aunwrap1
 instance:AddHook("initialize", function()
-	vqunwrap1 = vec_meta.QuickUnwrap1
-	aqunwrap1 = ang_meta.QuickUnwrap1
+	vunwrap1 = vec_meta.QuickUnwrap1
+	aunwrap1 = ang_meta.QuickUnwrap1
 end)
 
 local function getent(self)
@@ -109,7 +109,7 @@ if CLIENT then
 		bone = math.floor(bone)
 		if bone<0 or bone>=Ent_GetBoneCount(ent) then SF.Throw("Invalid bone "..bone, 2) end
 
-		vec = vqunwrap1(vec)
+		vec = vunwrap1(vec)
 		checkpermission(instance, ent, "entities.setRenderProperty")
 
 		if vec ~= vector_origin then
@@ -131,7 +131,7 @@ if CLIENT then
 		bone = math.floor(bone)
 		if bone<0 or bone>=Ent_GetBoneCount(ent) then SF.Throw("Invalid bone "..bone, 2) end
 
-		vec = vqunwrap1(vec)
+		vec = vunwrap1(vec)
 		checkpermission(instance, ent, "entities.setRenderProperty")
 		if vec ~= vector_origin then
 			local manip = manipulations[ent].Scale
@@ -152,7 +152,7 @@ if CLIENT then
 		bone = math.floor(bone)
 		if bone<0 or bone>=Ent_GetBoneCount(ent) then SF.Throw("Invalid bone "..bone, 2) end
 
-		ang = aqunwrap1(ang)
+		ang = aunwrap1(ang)
 		checkpermission(instance, ent, "entities.setRenderProperty")
 		if ang[1]~=0 or ang[2]~=0 or ang[3]~=0 then
 			local manip = manipulations[ent].Angle
@@ -1321,7 +1321,7 @@ end
 -- @param Vector data Local space vector
 -- @return Vector data as world space vector
 function ents_methods:localToWorld(data)
-	return vwrap(Ent_LocalToWorld(getent(self), vqunwrap1(data)))
+	return vwrap(Ent_LocalToWorld(getent(self), vunwrap1(data)))
 end
 
 --- Converts a direction vector in entity local space to world space
@@ -1329,7 +1329,7 @@ end
 -- @param Vector data Local space vector direction
 -- @return Vector data as world space vector direction
 function ents_methods:localToWorldVector(data)
-	return vwrap(Phys_LocalToWorldVector(Ent_GetPhysicsObject(getent(self)), vqunwrap1(data)))
+	return vwrap(Phys_LocalToWorldVector(Ent_GetPhysicsObject(getent(self)), vunwrap1(data)))
 end
 
 --- Converts an angle in entity local space to world space
@@ -1337,7 +1337,7 @@ end
 -- @param Angle data Local space angle
 -- @return Angle data as world space angle
 function ents_methods:localToWorldAngles(data)
-	return awrap(Ent_LocalToWorldAngles(getent(self), aqunwrap1(data)))
+	return awrap(Ent_LocalToWorldAngles(getent(self), aunwrap1(data)))
 end
 
 --- Converts a vector in world space to entity local space
@@ -1345,7 +1345,7 @@ end
 -- @param Vector data World space vector
 -- @return Vector data as local space vector
 function ents_methods:worldToLocal(data)
-	return vwrap(Ent_WorldToLocal(getent(self), vqunwrap1(data)))
+	return vwrap(Ent_WorldToLocal(getent(self), vunwrap1(data)))
 end
 
 --- Converts a direction vector in world space to entity local space
@@ -1353,7 +1353,7 @@ end
 -- @param Vector data World space direction vector
 -- @return Vector data as local space direction vector
 function ents_methods:worldToLocalVector(data)
-	return vwrap(Phys_WorldToLocalVector(Ent_GetPhysicsObject(getent(self)), vqunwrap1(data)))
+	return vwrap(Phys_WorldToLocalVector(Ent_GetPhysicsObject(getent(self)), vunwrap1(data)))
 end
 
 --- Converts an angle in world space to entity local space
@@ -1361,7 +1361,7 @@ end
 -- @param Angle data World space angle
 -- @return Angle data as local space angle
 function ents_methods:worldToLocalAngles(data)
-	return awrap(Ent_WorldToLocalAngles(getent(self), aqunwrap1(data)))
+	return awrap(Ent_WorldToLocalAngles(getent(self), aunwrap1(data)))
 end
 
 --- Gets the animation number from the animation name
@@ -1930,7 +1930,7 @@ end
 -- @param Vector The vector to start the intersection from.
 -- @return Vector The nearest hit point of the entity's bounding box in world coordinates, or Vector(0, 0, 0) for some entities such as worldspawn.
 function ents_methods:getNearestPoint(pos)
-	return vwrap(Ent_NearestPoint(getent(self), vqunwrap1(pos)))
+	return vwrap(Ent_NearestPoint(getent(self), vunwrap1(pos)))
 end
 
 --- Returns a table of save values for an entity.

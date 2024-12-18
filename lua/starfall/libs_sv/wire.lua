@@ -2,7 +2,6 @@ local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 local debug_getmetatable = debug.getmetatable
 local ENT_META = FindMetaTable("Entity")
-local Ent_GetTable, Ent_IsValid = ENT_META.GetTable, ENT_META.IsValid
 
 -- Register privileges
 registerprivilege("wire.setOutputs", "Set outputs", "Allows the user to specify the set of outputs")
@@ -45,6 +44,7 @@ end)
 return function(instance)
 if not (WireLib and WireLib.CreateInputs) then return end
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
+local Ent_GetTable,Ent_IsValid = ENT_META.GetTable,ENT_META.IsValid
 
 local wire_library = instance.Libraries.wire
 

@@ -18,6 +18,13 @@ local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local plywrap = instance.Types.Player.Wrap
 
+local vunwrap1, vunwrap2, vunwrap3, vunwrap4
+local aunwrap1
+instance:AddHook("initialize", function()
+	vunwrap1, vunwrap2, vunwrap3, vunwrap4 = vec_meta.QuickUnwrap1, vec_meta.QuickUnwrap2, vec_meta.QuickUnwrap3, vec_meta.QuickUnwrap4
+	aunwrap1 = ang_meta.QuickUnwrap1
+end)
+
 local function convert(results, func)
 	local t = {}
 	if func~=nil then
@@ -68,7 +75,7 @@ end
 function find_library.inBox(min, max, filter)
 	checkpermission(instance, nil, "find")
 
-	return convert(ents.FindInBox(vqunwrap1(min), vqunwrap2(max)), filter)
+	return convert(ents.FindInBox(vunwrap1(min), vunwrap2(max)), filter)
 end
 
 --- Finds entities in a sphere
@@ -80,7 +87,7 @@ function find_library.inSphere(center, radius, filter)
 	checkpermission(instance, nil, "find")
 	checkluatype (radius, TYPE_NUMBER)
 
-	return convert(ents.FindInSphere(vqunwrap1(center), radius), filter)
+	return convert(ents.FindInSphere(vunwrap1(center), radius), filter)
 end
 
 --- Finds entities in a cone
@@ -95,7 +102,7 @@ function find_library.inCone(pos, dir, distance, radius, filter)
 	checkluatype (distance, TYPE_NUMBER)
 	checkluatype (radius, TYPE_NUMBER)
 
-	return convert(ents.FindInCone(vqunwrap1(pos), vqunwrap2(dir), distance, radius), filter)
+	return convert(ents.FindInCone(vunwrap1(pos), vunwrap2(dir), distance, radius), filter)
 end
 
 --- Finds entities in a ray
@@ -108,12 +115,12 @@ end
 function find_library.inRay(startpos, endpos, mins, maxs, filter)
 	checkpermission(instance, nil, "find")
 
-	startpos = vqunwrap1(startpos)
-	endpos = vqunwrap2(endpos)
+	startpos = vunwrap1(startpos)
+	endpos = vunwrap2(endpos)
 
 	if mins ~= nil or maxs ~= nil then
-		mins = vqunwrap3(mins)
-		maxs = vqunwrap4(maxs)
+		mins = vunwrap3(mins)
+		maxs = vunwrap4(maxs)
 	end
 
 	return convert(ents.FindAlongRay(startpos, endpos, mins, maxs), filter)
@@ -160,7 +167,7 @@ if SERVER then
 	-- @return table An array of found entities
 	function find_library.inPVS(pos, filter)
 		checkpermission(instance, nil, "find")
-		return convert(ents.FindInPVS(vqunwrap1(pos)), filter)
+		return convert(ents.FindInPVS(vunwrap1(pos)), filter)
 	end
 end
 
