@@ -3,8 +3,8 @@ local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 
 if SERVER then
-	registerprivilege("blast.create", "Blast damage", "Allows the user to create explosions", { usergroups = { default = 1 } })
-	registerprivilege("bullets.fire", "FireBullets", "Allows the user to fire bullets", {})
+	registerprivilege("game.blastDamage", "Create explosions", "Allows the user to create explosions", { usergroups = { default = 1 } })
+	registerprivilege("game.bulletDamage", "Fire bullets", "Allows the user to fire bullets", {})
 end
 
 local fireBulletsBurst = SERVER and SF.BurstObject("fireBullets", "firebullets", 40, 40, " bullets can be fired per second", "Number of bullets that can be fired in a short time")
@@ -13,7 +13,7 @@ local fireBulletsDPSBurst = SERVER and SF.BurstObject("fireBulletsDPS", "bullets
 local maxBulletDamage = SERVER and CreateConVar("sf_bullets_maxdamage", 100, FCVAR_ARCHIVE, "Maximum amount of damage a bullet can deal", 1)
 local maxBulletForce = SERVER and CreateConVar("sf_bullets_maxforce", 100, FCVAR_ARCHIVE, "Maximum amount of force a bullet can have", 0)
 local maxBulletHull = SERVER and CreateConVar("sf_bullets_maxhull", 10, FCVAR_ARCHIVE, "Maximum hull size a bullet can have", 0)
-local maxBulletNum = SERVER and CreateConVar("sf_bullets_maxnum", 5, FCVAR_ARCHIVE, "Maximum amount of bullets that can be fired at the same time", 1)
+local maxBulletNum = SERVER and CreateConVar("sf_bullets_maxnum", 40, FCVAR_ARCHIVE, "Maximum amount of bullets that can be fired at the same time", 1)
 
 --- Game functions
 -- @name game
@@ -142,30 +142,31 @@ if SERVER then
 	-- @param number damageRadius The radius in which entities will be damaged (0 - 1500)
 	-- @param number damage The amount of damage to be applied
 	function game_library.blastDamage(damageOrigin, damageRadius, damage)
-		checkpermission(instance, nil, "blast.create")
+		checkpermission(instance, nil, "game.blastDamage")
 		util.BlastDamage(instance.entity, instance.player, vunwrap(damageOrigin), math.Clamp(damageRadius, 0, 1500), damage)
 	end
 
 	--- Fires a bullet. Bullet made with this function will not have any tracer, you will have to make them yourself.
 	-- @server
-	-- @param number? damage The damage dealt by the bullet. (1-100)
-	-- @param number? force The force of the bullets. (0-100)
-	-- @param number? distance Maximum distance the bullet can travel.
-	-- @param number? hullSize The hull size of the bullet. (0-10)
-	-- @param number? num The amount of bullets to fire. (1-5)
-	-- @param Vector Dir The fire direction.
-	-- @param Vector Spread The spread, only x and y are needed.
 	-- @param Vector src The position to fire the bullets from.
+	-- @param Vector Dir The fire direction.
+	-- @param number? damage The damage dealt by the bullet. Default: (1-100)
+	-- @param number? num The amount of bullets to fire. Default: (1-40)
+	-- @param number? force The force of the bullets. Default: (0-100)
+	-- @param number? distance Maximum distance the bullet can travel.
+	-- @param Vector? Spread The spread, only x and y are needed.
+	-- @param number? hullSize The hull size of the bullet. Default: (0-10)
 	-- @param Entity? ignoreEntity The entity that the bullet will ignore when it will be shot.
 	-- @param function? callback Function to be called with attacker, traceResult after the bullet was fired but before the damage is applied (the callback is called even if no damage is applied).
-	function game_library.bulletDamage(damage, force, distance, hullSize, num, dir, spread, src, ignoreEntity, cb)
-		local ent = instance.entity
-		checkpermission(instance, nil, "bullets.fire")
+	function game_library.bulletDamage(src, dir, damage, num, force, distance, spread, hullSize, ignoreEntity, cb)
+		checkpermission(instance, nil, "game.bulletDamage")
 		if damage ~= nil then checkluatype(damage, TYPE_NUMBER) damage = math.Clamp(damage, 1, maxBulletDamage:GetInt()) else damage = 1 end
 		if force ~= nil then checkluatype(force, TYPE_NUMBER) force = math.Clamp(force, 0, maxBulletForce:GetInt()) else force = 0 end
 		if distance ~= nil then checkluatype(distance, TYPE_NUMBER) distance = math.Clamp(distance, 0, 32768) else distance = 32768 end
 		if hullSize ~= nil then checkluatype(hullSize, TYPE_NUMBER) hullSize = math.Clamp(hullSize, 0, maxBulletHull:GetInt()) else hullSize = 0 end
 		if num ~= nil then checkluatype(num, TYPE_NUMBER) num = math.Clamp(num, 1, maxBulletNum:GetInt()) else num = 1 end
+		if spread ~= nil then spread = vunwrap(spread) end
+		if ignoreEntity ~= nil then ignoreEntity = eunwrap(ignoreEntity) end
 
 		local callback
 
@@ -187,15 +188,15 @@ if SERVER then
 			Tracer = 0,
 			TracerName = "",
 			Dir = vunwrap(dir),
-			Spread = vunwrap(spread),
+			Spread = spread,
 			Src = vunwrap(src),
-			IgnoreEntity = ignoreEntity and eunwrap(ignoreEntity),
+			IgnoreEntity = ignoreEntity,
 		}
 
 		fireBulletsBurst:use(instance.player, BulletInfo.Num)
 		fireBulletsDPSBurst:use(instance.player, BulletInfo.Damage * BulletInfo.Num)
 
-		ent:FireBullets(BulletInfo)
+		instance.entity:FireBullets(BulletInfo)
 	end
 
 	--- Return if the given bullets can be fired.
@@ -206,7 +207,7 @@ if SERVER then
 	function game_library.canFireBullets(damage, num)
 		checkluatype(damage, TYPE_NUMBER)
 		checkluatype(num, TYPE_NUMBER)
-		return (fireBulletsBurst:check(instance.player) >= num and fireBulletsDPSBurst:check(instance.player) >= damage * num) and true or false
+		return (fireBulletsBurst:check(instance.player) >= num and fireBulletsDPSBurst:check(instance.player) >= damage * num)
 	end
 
 	--- Return the amount of bullets left to fire
