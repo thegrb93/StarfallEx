@@ -71,6 +71,8 @@ local function processLights(curtime)
 	end
 end
 
+local projectedLights = SF.EntManager("projectedlights", "projected lights", 20, "The number of projected light objects allowed to spawn via Starfall", 1, true)
+
 --- Light library.
 -- @name light
 -- @class library
@@ -83,14 +85,24 @@ SF.RegisterLibrary("light")
 -- @libtbl light_methods
 SF.RegisterType("Light", true, false)
 
+--- Projected Texture type
+-- @name ProjectedTexture
+-- @class type
+-- @libtbl projectedtexture_methods
+SF.RegisterType("ProjectedTexture", true, false)
+
+
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 local light_library = instance.Libraries.light
 local light_methods, light_meta, wrap, unwrap = instance.Types.Light.Methods, instance.Types.Light, instance.Types.Light.Wrap, instance.Types.Light.Unwrap
+local projectedtexture_methods, projectedtexture_meta, ptwrap, ptunwrap = instance.Types.ProjectedTexture.Methods, instance.Types.ProjectedTexture, instance.Types.ProjectedTexture.Wrap, instance.Types.ProjectedTexture.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
+local ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 
 local numlights = 0
 local lights = {}
@@ -112,6 +124,7 @@ instance:AddHook("deinitialize", function()
 	for light in pairs(lights) do
 		gSFLights[light.slot] = nil
 	end
+	projectedLights:deinitialize(instance, true)
 end)
 
 --- Creates a dynamic light (make sure to draw it)
@@ -258,6 +271,333 @@ function light_methods:destroy()
 	destroyLight(light)
 	light_meta.sf2sensitive[self] = nil
 	light_meta.sensitive2sf[light] = nil
+end
+
+
+--- Creates a projected texture
+-- @return Projected Texture
+function light_library.createProjected()
+	projectedLights:checkuse(instance.player, 1)
+
+	local light = ProjectedTexture()
+	projectedLights:register(instance, light)
+
+	return ptwrap(light)
+end
+
+--- Gets the angles of the Projected Texture
+-- @return Angle Angles
+function projectedtexture_methods:getAngles()
+	return awrap(ptunwrap(self):GetAngles())
+end
+
+--- Gets the brightness of the Projected Texture
+-- @return number brightness
+function projectedtexture_methods:getBrightness()
+	return ptunwrap(self):GetBrightness()
+end
+
+--- Gets the color of the Projected Texture
+-- @return Color col
+function projectedtexture_methods:getColor()
+	return cwrap(ptunwrap(self):GetColor())
+end
+
+--- Gets the constant attenuation of the Projected Texture
+-- @return number attenuation
+function projectedtexture_methods:getConstantAttenuation()
+	return ptunwrap(self):GetConstantAttenuation()
+end
+
+--- Gets if the Projected Texture is casting shadows
+-- @return boolean enabled
+function projectedtexture_methods:getEnableShadows()
+	return ptunwrap(self):GetEnableShadows()
+end
+
+--- Gets the distance at which the Projected Texture ends
+-- @return number farZ
+function projectedtexture_methods:getFarZ()
+	return ptunwrap(self):GetFarZ()
+end
+
+--- Gets the horizontal FOV of the Projected Texture
+-- @return number fov
+function projectedtexture_methods:getHorizontalFOV()
+	return ptunwrap(self):GetHorizontalFOV()
+end
+
+--- Gets whether the Projected Texture is lighting world geometry or not
+-- @return boolean Lighting
+function projectedtexture_methods:getLightWorld()
+	return ptunwrap(self):GetLightWorld()
+end
+
+--- Gets the linear attenuation of the Projected Texture
+-- @return number attenuation
+function projectedtexture_methods:getLinearAttentuation()
+	return ptunwrap(self):GetLinearAttentuation()
+end
+
+--- Gets the linear attenuation of the Projected Texture
+-- @return number attenuation
+function projectedtexture_methods:getLinearAttentuation()
+	return ptunwrap(self):GetLinearAttentuation()
+end
+
+--- Gets the near z of the Projected Texture
+-- @return number nearZ
+function projectedtexture_methods:getNearZ()
+	return ptunwrap(self):GetNearZ()
+end
+
+--- Gets the culling of the Projected Texture
+-- @return boolean nocull
+function projectedtexture_methods:getNoCull()
+	return ptunwrap(self):GetNoCull()
+end
+
+--- Gets the orthographic settings of the Projected Texture
+-- @return boolean orthograhpic Whether or not the Projected Texture is actually orthographic. If false, then the other value are not returned.
+-- @return number left
+-- @return number top
+-- @return number right
+-- @return number botom
+function projectedtexture_methods:getOrthographic()
+	return ptunwrap(self):GetOrthographic()
+end
+
+--- Gets the position of the Projected Texture
+-- @return Vector Pos
+function projectedtexture_methods:getPos()
+	return vwrap(ptunwrap(self):GetPos())
+end
+
+--- Gets the quadratic attenuation of the Projected Texture
+-- @return number Attenuation
+function projectedtexture_methods:getQuadraticAttentuation()
+	return ptunwrap(self):GetQuadraticAttentuation()
+end
+
+--- Gets the shadow depth bias of the Projected Texture
+-- @return number bias
+function projectedtexture_methods:getShadowDepthBias()
+	return ptunwrap(self):GetShadowDepthBias()
+end
+
+--- Gets the shadow filter size of the Projected Texture
+-- @return number filter
+function projectedtexture_methods:getShadowFilter()
+	return ptunwrap(self):GetShadowFilter()
+end
+
+--- Gets the Projected Texture's shadow depth slope scale bias
+-- @return number bias
+function projectedtexture_methods:getShadowSlopeScaleDepthBias()
+	return ptunwrap(self):GetShadowSlopeScaleDepthBias()
+end
+
+--- Gets the target entity of the Projected Texture
+-- @return Entity target
+function projectedtexture_methods:getTargetEntity()
+	return ewrap(ptunwrap(self):GetTargetEntity())
+end
+
+--- Gets the texture frame of the Projected Texture
+-- @return number frame
+function projectedtexture_methods:getTextureFrame()
+	return ptunwrap(self):GetTextureFrame()
+end
+
+--- Gets the vertical FOV of the Projected Texture
+-- @return number fov
+function projectedtexture_methods:getVerticalFOV()
+	return ptunwrap(self):GetVerticalFOV()
+end
+
+--- Returns whether this Projected Texture is valid or not.
+-- @return boolean valid
+function projectedtexture_methods:isValid()
+	return ptunwrap(self):IsValid()
+end
+
+--- Removes the Projected Texture
+function projectedtexture_methods:remove()
+	local light = ptunwrap(self)
+	projectedLights:remove(instance, light)
+	projectedtexture_meta.sf2sensitive[self] = nil
+	projectedtexture_meta.sensitive2sf[light] = nil
+end
+
+--- Sets the Projected Texture's angles
+-- Will not take effect until ProjectedTexture:update() is called.
+--@param Angle ang New angles
+function projectedtexture_methods:setAngles(ang)
+	ptunwrap(self):SetAngles(aunwrap(ang))
+end
+
+--- Sets the Projected Texture's brightness
+-- Will not take effect until ProjectedTexture:update() is called.
+--@param number brightness
+function projectedtexture_methods:setBrightness(brightness)
+	ptunwrap(self):SetBrightness(brightness)
+end
+
+--- Sets the Projected Texture's color
+-- Will not take effect until ProjectedTexture:update() is called.
+--@param Color col
+function projectedtexture_methods:setColor(col)
+	ptunwrap(self):SetColor(cunwrap(col))
+end
+
+--- Sets the Projected Texture's constant attenuation
+-- Will not take effect until ProjectedTexture:update() is called.
+--@param number attenuation
+function projectedtexture_methods:setConstantAttenuation(attenuation)
+	ptunwrap(self):SetConstantAttenuation(attenuation)
+end
+
+--- Sets if the Projected Texture should draw shadows
+-- Will not take effect until ProjectedTexture:update() is called.
+-- Enabling shadows is expensive. Use sparingly.
+--@param boolean enabled
+function projectedtexture_methods:setEnableShadows(enabled)
+	ptunwrap(self):SetEnableShadows(enabled)
+end
+
+--- Sets the distance at which the Projected Texture ends
+-- Will not take effect until ProjectedTexture:update() is called.
+--@param number farZ
+function projectedtexture_methods:setFarZ(farZ)
+	ptunwrap(self):SetFarZ(farZ)
+end
+
+--- Sets the FOV of the Projected texture
+-- Clamped between 0 and 180
+-- Will not take effect until ProjectedTexture:update() is called.
+--@param number fov
+function projectedtexture_methods:setFOV(fov)
+	ptunwrap(self):SetFOV(fov)
+end
+
+--- Sets the horizontal FOV of the Projected texture
+-- Clamped between 0 and 180
+-- Will not take effect until ProjectedTexture:update() is called.
+--@param number fov
+function projectedtexture_methods:setHorizontalFOV(fov)
+	ptunwrap(self):SetHorizontalFOV(fov)
+end
+
+--- Sets whether or not the Projected Texture lights world geometry
+-- Will not take effect until ProjectedTexture:update() is called.
+--@param boolean enable
+function projectedtexture_methods:setLightWorld(enable)
+	ptunwrap(self):SetLightWorld(enable)
+end
+
+--- Sets the Projected Texture's linear attenuation
+-- Will not take effect until ProjectedTexture:update() is called.
+--@param number attenuation
+function projectedtexture_methods:setLinearAttenuation(attenuation)
+	ptunwrap(self):SetLinearAttenuation(attenuation)
+end
+
+--- Sets the distance at which the Projected Texture ends
+-- A value of 0 will disable the Projected Texture
+-- Will not take effect until ProjectedTexture:update() is called.
+--@param number nearZ
+function projectedtexture_methods:setNearZ(nearZ)
+	ptunwrap(self):SetNearZ(nearZ)
+end
+
+--- Sets the view-frustum culling of the Projected Texture
+-- Will not take effect until ProjectedTexture:update() is called.
+--@param boolean enable
+function projectedtexture_methods:setNoCull(enable)
+	ptunwrap(self):SetNoCull(enable)
+end
+
+--- Sets the orthograhpic settings of the Projected Texture
+-- Does not work with shadows
+-- Will not take effect until ProjectedTexture:update() is called.
+--@param boolean orthograhpic
+--@param number left
+--@param number top
+--@param number right
+--@param number bottom
+function projectedtexture_methods:setNoCull(orthograhpic, left, top, right, bottom)
+	ptunwrap(self):SetOrthographic(orthograhpic, left, top, right, bottom)
+end
+
+--- Sets the Projected Texture's position
+-- Will not take effect until ProjectedTexture:update() is called.
+--@param Vector pos
+function projectedtexture_methods:setPos(pos)
+	ptunwrap(self):SetPos(SF.clampPos(vunwrap(pos)))
+end
+
+--- Sets the Projected Texture's quadratic attenuation
+-- Will not take effect until ProjectedTexture:update() is called.
+--@param number attenuation
+function projectedtexture_methods:setQuadraticAttenuation(attenuation)
+	ptunwrap(self):SetQuadraticAttenuation(attenuation)
+end
+
+--- Sets the Projected Texture's shadow depth bias
+-- Will not take effect until ProjectedTexture:update() is called.
+--@param number bias
+function projectedtexture_methods:setShadowDepthBias(bias)
+	ptunwrap(self):SetShadowDepthBias(bias)
+end
+
+--- Sets the Projected Texture's shadow filter size
+-- 0 looks pixelated, higher values increase blur
+-- Will not take effect until ProjectedTexture:update() is called.
+--@param number filter
+function projectedtexture_methods:setShadowFilter(filter)
+	ptunwrap(self):SetShadowFilter(filter)
+end
+
+--- Sets the Projected Texture's shadow slope scale depth bias
+-- Will not take effect until ProjectedTexture:update() is called.
+--@param number bias
+function projectedtexture_methods:setShadowSlopeScaleDepthBias(bias)
+	ptunwrap(self):SetShadowSlopeScaleDepthBias(bias)
+end
+
+--- Sets the Projected Texture's target entity
+-- If set, this will be the only entity that is lit, as well as the world
+-- Will not take effect until ProjectedTexture:update() is called.
+--@param Entity ent
+function projectedtexture_methods:setTargetEntity(ent)
+	ptunwrap(self):SetTargetEntity(eunwrap(ent))
+end
+
+--- Sets the Projected Texture's texture
+-- Will not take effect until ProjectedTexture:update() is called.
+--@param string texture
+function projectedtexture_methods:setTexture(texture)
+	ptunwrap(self):SetTexture(texture)
+end
+
+--- Sets the Projected Texture's texture frame
+-- Will not take effect until ProjectedTexture:update() is called.
+--@param number frame
+function projectedtexture_methods:setTextureFrame(frame)
+	ptunwrap(self):SetTextureFrame(frame)
+end
+
+--- Sets the Projected Texture's vertical FOV
+-- Clamped between 0 and 180
+-- Will not take effect until ProjectedTexture:update() is called.
+--@param number fov
+function projectedtexture_methods:setVerticalFOV(fov)
+	ptunwrap(self):SetVerticalFOV(fov)
+end
+
+--- Updates the Projected Texture with whatever paremeters were previously set
+function projectedtexture_methods:update()
+	ptunwrap(self):Update()
 end
 
 end
