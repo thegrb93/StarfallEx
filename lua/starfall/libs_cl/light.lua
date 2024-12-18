@@ -533,7 +533,7 @@ end
 -- Will not take effect until ProjectedTexture:update() is called.
 --@param Vector pos
 function projectedtexture_methods:setPos(pos)
-	ptunwrap(self):SetPos(vunwrap(pos))
+	ptunwrap(self):SetPos(SF.clampPos(vunwrap(pos)))
 end
 
 --- Sets the Projected Texture's quadratic attenuation
