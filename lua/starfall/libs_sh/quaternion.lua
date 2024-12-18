@@ -185,8 +185,10 @@ local function clone(q)
 end
 
 local getent
+local vunwrap1, vunwrap2
 instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
+	vunwrap1, vunwrap2 = vec_meta.QuickUnwrap1, vec_meta.QuickUnwrap2
 end)
 instance.Types.Quaternion.QuaternionMultiply = getQuatMul
 
@@ -783,9 +785,10 @@ end
 -- @return Quaternion Quaternion from the given vector
 function vec_methods:getQuaternion(up)
 	if up then
-		local x = vunwrap(self)
-		local z = vunwrap(up)
-		local y = z:Cross(x):GetNormalized()
+		local x = vunwrap1(self)
+		local z = vunwrap2(up)
+		local y = z:Cross(x)
+		y:Normalize()
 
 		local ang = x:Angle()
 		if ang[1] > 180 then ang[1] = ang[1] - 360 end
@@ -805,11 +808,12 @@ function vec_methods:getQuaternion(up)
 	end
 end
 
---- Returns quaternion for rotation about axis represented by the vector by an angle
--- @param number ang Number rotation angle
+--- Returns quaternion for rotation about axis represented by the vector by an angle in degrees
+-- @param number ang Number rotation angle in degrees
 -- @return Quaternion Rotated quaternion
 function vec_methods:getQuaternionFromAxis(ang)
-	local axis = vunwrap(self):GetNormalized()
+	local axis = vunwrap1(self)
+	axis:Normalize()
 	local rang = math_rad(ang) * 0.5
 
 	return wrap({ math_cos(rang), axis[1] * math_sin(rang), axis[2] * math_sin(rang), axis[3] * math_sin(rang) })
@@ -835,14 +839,13 @@ end
 --- Converts angle to a quaternion
 -- @return Quaternion Constructed quaternion
 function ang_methods:getQuaternion()
-	return wrap(quatFromAngle(aunwrap(self)))
+	return wrap(quatFromAngleComponents(self[1], self[2], self[3]))
 end
 
 --- Converts entity angles to a quaternion
 -- @return Quaternion Constructed quaternion
 function ents_methods:getQuaternion()
-	local ang = getent(self):GetAngles()
-	return wrap(quatFromAngle(ang))
+	return wrap(quatFromAngle(getent(self):GetAngles()))
 end
 
 --- Performs spherical linear interpolation between two quaternions

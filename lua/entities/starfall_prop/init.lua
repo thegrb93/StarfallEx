@@ -4,6 +4,9 @@ include('shared.lua')
 
 util.AddNetworkString("starfall_custom_prop")
 
+local ENT_META = FindMetaTable("Entity")
+local Ent_GetTable = ENT_META.GetTable
+
 function ENT:Initialize()
 	self.BaseClass.Initialize(self)
 	self:PhysicsInitMultiConvex(self.Mesh)
@@ -12,36 +15,49 @@ function ENT:Initialize()
 	self:EnableCustomCollisions(true)
 	self:DrawShadow(false)
 
+	self.customForceMode = 0
+	self.customForceLinear = Vector()
+	self.customForceAngular = Vector()
+	self.customShadowForce = {
+		pos = Vector(),
+		angle = Angle(),
+		secondstoarrive = 1,
+		dampfactor = 0.2,
+		maxangular = 1000,
+		maxangulardamp = 1000,
+		maxspeed = 1000,
+		maxspeeddamp = 1000,
+		teleportdistance = 1000,
+	}
+
 	self:AddEFlags( EFL_FORCE_CHECK_TRANSMIT )
 end
 
 function ENT:EnableCustomPhysics(mode)
+	local ent_tbl = Ent_GetTable(self)
 	if mode then
-		self.customPhysicsMode = mode
-		if not self.hasMotionController then
+		ent_tbl.customPhysicsMode = mode
+		if not ent_tbl.hasMotionController then
 			self:StartMotionController()
-			self.hasMotionController = true
+			ent_tbl.hasMotionController = true
 		end
 	else
-		self.customPhysicsMode = nil
-		self.customForceMode = nil
-		self.customForceLinear = nil
-		self.customForceAngular = nil
-		self.customShadowForce = nil
-		if self.hasMotionController then
+		ent_tbl.customPhysicsMode = nil
+		if ent_tbl.hasMotionController then
 			self:StopMotionController()
-			self.hasMotionController = false
+			ent_tbl.hasMotionController = false
 		end
 	end
 end
 
 function ENT:PhysicsSimulate(physObj, dt)
-	local mode = self.customPhysicsMode
+	local ent_tbl = Ent_GetTable(self)
+	local mode = ent_tbl.customPhysicsMode
 	if mode == 1 then
-		return self.customForceAngular, self.customForceLinear, self.customForceMode
+		return ent_tbl.customForceAngular, ent_tbl.customForceLinear, ent_tbl.customForceMode
 	elseif mode == 2 then
-		self.customShadowForce.deltatime = dt
-		physObj:ComputeShadowControl(self.customShadowForce)
+		ent_tbl.customShadowForce.deltatime = dt
+		physObj:ComputeShadowControl(ent_tbl.customShadowForce)
 		return SIM_NOTHING
 	else
 		return SIM_NOTHING

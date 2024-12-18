@@ -16,6 +16,13 @@ local game_library = instance.Libraries.game
 local ewrap, eunwrap = instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local vwrap, vunwrap = instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 
+local vunwrap1
+local aunwrap1
+instance:AddHook("initialize", function()
+	vunwrap1 = vec_meta.QuickUnwrap1
+	aunwrap1 = ang_meta.QuickUnwrap1
+end)
+
 --- Returns the map name
 -- @name game_library.getMap
 -- @class function
@@ -137,7 +144,7 @@ if SERVER then
 	-- @param number damage The amount of damage to be applied
 	function game_library.blastDamage(damageOrigin, damageRadius, damage)
 		checkpermission(instance, nil, "blast.create")
-		util.BlastDamage(instance.entity, instance.player, vunwrap(damageOrigin), math.Clamp(damageRadius, 0, 1500), damage)
+		util.BlastDamage(instance.entity, instance.player, vunwrap1(damageOrigin), math.Clamp(damageRadius, 0, 1500), damage)
 	end
 
 else
@@ -163,7 +170,7 @@ else
 	-- @param Vector position The position to check the skybox visibility from
 	-- @return boolean Whether the skybox is visible from the position
 	function game_library.isSkyboxVisibleFromPoint(position)
-		return util.IsSkyboxVisibleFromPoint(vunwrap(position))
+		return util.IsSkyboxVisibleFromPoint(vunwrap1(position))
 	end
 
 	--- Returns the server's frame time and standard deviation

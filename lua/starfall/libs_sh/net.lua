@@ -42,6 +42,7 @@ SF.RegisterLibrary("net")
 return function(instance)
 
 local getent
+local vunwrap1
 local netStarted = false
 local netSize = 0
 local netData
@@ -49,6 +50,7 @@ local netReceives = {}
 instance.data.net = {receives = netReceives}
 instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
+	vunwrap1 = vec_meta.QuickUnwrap1
 end)
 
 local net_library = instance.Libraries.net
@@ -133,12 +135,10 @@ if SERVER then
 	-- @param boolean? unreliable Optional choose whether it's more important for the message to actually reach its destination (false) or reach it as fast as possible (true).
 	function net_library.sendPVS(pos, unreliable)
 		if not netStarted then SF.Throw("net message not started", 2) end
-		pos = vunwrap(pos)
-
 		netBurst:use(instance.player, netSize)
 		net_write(unreliable)
 
-		net.SendPVS(pos)
+		net.SendPVS(vunwrap1(pos))
 
 		instance:checkCpu()
 	end

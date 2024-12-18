@@ -695,11 +695,13 @@ local mwrap = instance.Types.VMatrix.Wrap
 
 local thread_yield
 local vector, angle, worldtolocal
+local vunwrap1, vunwrap2, vunwrap3, vunwrap4
 instance:AddHook("initialize", function()
 	vector = instance.env.Vector
 	angle = instance.env.Angle
 	worldtolocal = instance.env.worldToLocal
 	thread_yield = instance.Libraries.coroutine.yield
+	vunwrap1, vunwrap2, vunwrap3, vunwrap4 = vec_meta.QuickUnwrap1, vec_meta.QuickUnwrap2, vec_meta.QuickUnwrap3, vec_meta.QuickUnwrap4
 end)
 
 --- Parses obj data into a table of vertices, normals, texture coordinates, colors, and tangents
@@ -1064,14 +1066,14 @@ if CLIENT then
 	-- @param Vector normal Normal
 	-- @client
 	function mesh_library.writeNormal(normal)
-		mesh.Normal(vunwrap(normal))
+		mesh.Normal(vunwrap1(normal))
 	end
 
 	--- Sets the vertex position
 	-- @param Vector position Position
 	-- @client
 	function mesh_library.writePosition(pos)
-		mesh.Position(vunwrap(pos))
+		mesh.Position(vunwrap1(pos))
 	end
 
 	--- Sets the vertex texture coordinates
@@ -1100,7 +1102,7 @@ if CLIENT then
 	-- @param Vector v4 Vertex4 position
 	-- @client
 	function mesh_library.writeQuad(v1, v2, v3, v4)
-		mesh.Quad(vunwrap(v1), vunwrap(v2), vunwrap(v3), vunwrap(v4))
+		mesh.Quad(vunwrap1(v1), vunwrap2(v2), vunwrap3(v3), vunwrap4(v4))
 	end
 
 	--- Draws a quad using a position, normal and size
@@ -1110,7 +1112,7 @@ if CLIENT then
 	-- @param number h
 	-- @client
 	function mesh_library.writeQuadEasy(position, normal, w, h)
-		mesh.QuadEasy(vunwrap(position), vunwrap(normal), w, h)
+		mesh.QuadEasy(vunwrap1(position), vunwrap2(normal), w, h)
 	end
 
 	--- Pushes the vertex data onto the render stack
