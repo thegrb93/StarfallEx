@@ -275,7 +275,7 @@ end
 
 
 --- Creates a projected texture
--- @return Projected Texture
+-- @return ProjectedTexture Projected Texture
 function light_library.createProjected()
 	projectedLights:checkuse(instance.player, 1)
 
