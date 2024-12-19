@@ -8,7 +8,7 @@ if SERVER then
 end
 
 local fireBulletsBurst = SERVER and SF.BurstObject("bullets", "bullets", 40, 40, " bullets fired per second", "Number of bullets that can be fired in a short time")
-local fireBulletsDPSBurst = SERVER and SF.BurstObject("bullet_damage", "bullet damage", 100, 100, " bullets damage per second", "Damage per second bullets can deal")
+local fireBulletsDPSBurst = SERVER and SF.BurstObject("bullets_damage", "bullet damage", 100, 100, " bullets damage per second", "Damage per second bullets can deal")
 
 local maxBulletForce = SERVER and CreateConVar("sf_bullets_maxforce", 100, FCVAR_ARCHIVE, "Maximum amount of force a bullet can have", 0)
 local maxBulletHull = SERVER and CreateConVar("sf_bullets_maxhull", 10, FCVAR_ARCHIVE, "Maximum hull size a bullet can have", 0)
