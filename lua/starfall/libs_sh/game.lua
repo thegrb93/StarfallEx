@@ -10,10 +10,8 @@ end
 local fireBulletsBurst = SERVER and SF.BurstObject("fireBullets", "firebullets", 40, 40, " bullets can be fired per second", "Number of bullets that can be fired in a short time")
 local fireBulletsDPSBurst = SERVER and SF.BurstObject("fireBulletsDPS", "bullets dps", 100, 100, " maximum bullets damage per second", "Damage per second bullets can deal")
 
-local maxBulletDamage = SERVER and CreateConVar("sf_bullets_maxdamage", 100, FCVAR_ARCHIVE, "Maximum amount of damage a bullet can deal", 1)
 local maxBulletForce = SERVER and CreateConVar("sf_bullets_maxforce", 100, FCVAR_ARCHIVE, "Maximum amount of force a bullet can have", 0)
 local maxBulletHull = SERVER and CreateConVar("sf_bullets_maxhull", 10, FCVAR_ARCHIVE, "Maximum hull size a bullet can have", 0)
-local maxBulletNum = SERVER and CreateConVar("sf_bullets_maxnum", 40, FCVAR_ARCHIVE, "Maximum amount of bullets that can be fired at the same time", 1)
 
 --- Game functions
 -- @name game
@@ -160,11 +158,11 @@ if SERVER then
 	-- @param function? callback Function to be called with attacker, traceResult after the bullet was fired but before the damage is applied (the callback is called even if no damage is applied).
 	function game_library.bulletDamage(src, dir, damage, num, force, distance, spread, hullSize, ignoreEntity, cb)
 		checkpermission(instance, nil, "game.bulletDamage")
-		if damage ~= nil then checkluatype(damage, TYPE_NUMBER) damage = math.Clamp(damage, 1, maxBulletDamage:GetInt()) else damage = 1 end
+		if damage ~= nil then checkluatype(damage, TYPE_NUMBER) damage = math.Clamp(damage, 1, fireBulletsDPSBurst.max) else damage = 1 end
 		if force ~= nil then checkluatype(force, TYPE_NUMBER) force = math.Clamp(force, 0, maxBulletForce:GetInt()) else force = 0 end
 		if distance ~= nil then checkluatype(distance, TYPE_NUMBER) distance = math.Clamp(distance, 0, 32768) else distance = 32768 end
 		if hullSize ~= nil then checkluatype(hullSize, TYPE_NUMBER) hullSize = math.Clamp(hullSize, 0, maxBulletHull:GetInt()) else hullSize = 0 end
-		if num ~= nil then checkluatype(num, TYPE_NUMBER) num = math.Clamp(num, 1, maxBulletNum:GetInt()) else num = 1 end
+		if num ~= nil then checkluatype(num, TYPE_NUMBER) num = math.Clamp(num, 1, fireBulletsBurst.max) else num = 1 end
 		if spread ~= nil then spread = vunwrap(spread) end
 		if ignoreEntity ~= nil then ignoreEntity = eunwrap(ignoreEntity) end
 
