@@ -14,6 +14,7 @@ registerprivilege("entities.setHealth", "SetHealth", "Allows the user to change 
 registerprivilege("entities.setMaxHealth", "SetMaxHealth", "Allows the user to change an entity's max health", { entities = {} })
 registerprivilege("entities.doNotDuplicate", "DoNotDuplicate", "Allows the user to set whether an entity will be saved on dupes or map saves", { entities = {} })
 
+
 local emitSoundBurst = SF.BurstObject("emitSound", "emitsound", 180, 200, " sounds can be emitted per second", "Number of sounds that can be emitted in a short time")
 local manipulations = SF.EntityTable("boneManipulations")
 
@@ -106,7 +107,7 @@ end
 
 if CLIENT then
 	instance.object_wrappers[FindMetaTable("NextBot")] = ewrap
-		
+
 	--- Allows manipulation of an entity's bones' positions
 	-- @client
 	-- @param number bone The bone ID
@@ -289,7 +290,7 @@ if CLIENT then
 		ent:SetupBones()
 		ent:DrawModel()
 	end
-	
+
 	--- Returns the render group of the entity.
 	-- @client
 	-- @return number Render group
@@ -990,7 +991,7 @@ if SERVER then
 
 		return plys
 	end
-	
+
 	--- Sets the health of the entity.
 	-- @server
 	-- @param number newhealth New health value.
@@ -1000,7 +1001,7 @@ if SERVER then
 		checkluatype(val, TYPE_NUMBER)
 		ent:SetHealth(val)
 	end
-		
+
 	--- Sets the maximum health for entity. Note, that you can still set entity's health above this amount with Entity:setHealth.
 	-- @server
 	-- @param number newmaxhealth New max health value.
@@ -1010,7 +1011,7 @@ if SERVER then
 		checkluatype(val, TYPE_NUMBER)
 		ent:SetMaxHealth(val)
 	end
-		
+
 	--- Stops the entity from being saved on duplication or map save.
 	-- @server
 	function ents_methods:doNotDuplicate()
@@ -1018,6 +1019,7 @@ if SERVER then
 		checkpermission(instance, ent, "entities.doNotDuplicate")
 		ent.DoNotDuplicate = true
 	end
+
 end
 
 --- Returns the EntIndex of the entity
@@ -1956,9 +1958,9 @@ end
 -- @shared
 -- @return table? The networked variables table of the entity or nil if it doesn't have one.
 function ents_methods:getNetworkVars()
-    local ent = getent(self)
-    return istable(ent.dt) and instance.Sanitize(ent:GetNetworkVars()) or nil
+	local ent = getent(self)
+	return istable(ent.dt) and instance.Sanitize(ent:GetNetworkVars()) or nil
 end
 
-	
+
 end
