@@ -358,7 +358,7 @@ function projectedtexture_methods:getNoCull()
 end
 
 --- Gets the orthographic settings of the Projected Texture
--- @return boolean orthograhpic Whether or not the Projected Texture is actually orthographic. If false, then the other value are not returned.
+-- @return boolean orthographic Whether or not the Projected Texture is actually orthographic. If false, then the other value are not returned.
 -- @return number left
 -- @return number top
 -- @return number right
@@ -517,16 +517,16 @@ function projectedtexture_methods:setNoCull(enable)
 	ptunwrap(self):SetNoCull(enable)
 end
 
---- Sets the orthograhpic settings of the Projected Texture
+--- Sets the orthographic settings of the Projected Texture
 -- Does not work with shadows
 -- Will not take effect until ProjectedTexture:update() is called.
---@param boolean orthograhpic
+--@param boolean orthographic
 --@param number left
 --@param number top
 --@param number right
 --@param number bottom
-function projectedtexture_methods:setNoCull(orthograhpic, left, top, right, bottom)
-	ptunwrap(self):SetOrthographic(orthograhpic, left, top, right, bottom)
+function projectedtexture_methods:setNoCull(orthographic, left, top, right, bottom)
+	ptunwrap(self):SetOrthographic(orthographic, left, top, right, bottom)
 end
 
 --- Sets the Projected Texture's position
