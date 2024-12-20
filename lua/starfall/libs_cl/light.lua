@@ -525,7 +525,7 @@ end
 --@param number top
 --@param number right
 --@param number bottom
-function projectedtexture_methods:setNoCull(orthographic, left, top, right, bottom)
+function projectedtexture_methods:setOrthographic(orthographic, left, top, right, bottom)
 	ptunwrap(self):SetOrthographic(orthographic, left, top, right, bottom)
 end
 
