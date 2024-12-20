@@ -23,14 +23,12 @@ return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 local game_library = instance.Libraries.game
-local ewrap, eunwrap = instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
-local vwrap, vunwrap = instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local ent_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local vec_methods, vec_meta, vwrap, vunwrap = instance.Types.Vector.Methods, instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 
 local vunwrap1, vunwrap2, vunwrap3
-local aunwrap1
 instance:AddHook("initialize", function()
 	vunwrap1, vunwrap2, vunwrap3 = vec_meta.QuickUnwrap1, vec_meta.QuickUnwrap2, vec_meta.QuickUnwrap3
-	aunwrap1 = ang_meta.QuickUnwrap1
 end)
 
 --- Returns the map name

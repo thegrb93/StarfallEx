@@ -19,10 +19,8 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 local plywrap = instance.Types.Player.Wrap
 
 local vunwrap1, vunwrap2, vunwrap3, vunwrap4
-local aunwrap1
 instance:AddHook("initialize", function()
 	vunwrap1, vunwrap2, vunwrap3, vunwrap4 = vec_meta.QuickUnwrap1, vec_meta.QuickUnwrap2, vec_meta.QuickUnwrap3, vec_meta.QuickUnwrap4
-	aunwrap1 = ang_meta.QuickUnwrap1
 end)
 
 local function convert(results, func)
