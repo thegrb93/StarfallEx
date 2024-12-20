@@ -98,13 +98,13 @@ function ents_methods:toHologram()
 	return wrap(ent)
 end
 
-
+local scale_identity = Vector(1,1,1)
 --- Creates a hologram.
 -- @param Vector pos The position to create the hologram
 -- @param Angle ang The angle to create the hologram
 -- @param string model The model to give the hologram
 -- @param Vector? scale (Optional) The scale to give the hologram
--- @return Hologram The hologram object
+-- @return Hologram? The hologram object or nil if it failed to create
 function hologram_library.create(pos, ang, model, scale)
 	checkpermission(instance, nil, "hologram.create")
 	checkluatype(model, TYPE_STRING)
@@ -113,49 +113,35 @@ function hologram_library.create(pos, ang, model, scale)
 	pos = SF.clampPos(vunwrap1(pos))
 	ang = aunwrap1(ang)
 	model = SF.CheckModel(model, ply)
-	if scale~=nil then scale = vunwrap2(scale) end
+	if scale~=nil then scale = vunwrap(scale) else scale = scale_identity end
 
 	entList:checkuse(ply, 1)
 
 	local holoent
 	if SERVER then
 		holoent = ents.Create("starfall_hologram")
-		if Ent_IsValid(holoent) then
-			local ent_tbl = Ent_GetTable(holoent)
-			Ent_SetPos(holoent, pos)
-			Ent_SetAngles(holoent, ang)
-			Ent_SetModel(holoent, model)
-			Ent_Spawn(holoent)
-
-			if CPPI then Ent_CPPISetOwner(holoent, ply == SF.Superuser and NULL or ply) end
-
-			if scale~=nil then
-				ent_tbl.SetScale(holoent, scale)
-			end
-			entList:register(instance, holoent)
-			return wrap(holoent)
-		end
 	else
 		if instance.data.render.isRendering then SF.Throw("Can't create hologram while rendering!", 2) end
 		holoent = ents.CreateClientside("starfall_hologram")
-		if Ent_IsValid(holoent) then
-			local ent_tbl = Ent_GetTable(holoent)
+		debug.setmetatable(holoent, cl_hologram_meta)
+	end
+
+	if Ent_IsValid(holoent) then
+		local ent_tbl = Ent_GetTable(holoent)
+		Ent_SetPos(holoent, pos)
+		Ent_SetAngles(holoent, ang)
+		Ent_SetModel(holoent, model)
+		Ent_Spawn(holoent)
+		ent_tbl.SetScale(holoent, scale)
+
+		if SERVER then
+			if CPPI then Ent_CPPISetOwner(holoent, ply == SF.Superuser and NULL or ply) end
+		else
 			ent_tbl.SFHoloOwner = ply
-			Ent_SetPos(holoent, pos)
-			Ent_SetAngles(holoent, ang)
-			Ent_SetModel(holoent, model)
-			debug.setmetatable(holoent, cl_hologram_meta)
-			Ent_Spawn(holoent)
-
-			if scale~=nil then
-				ent_tbl.SetScale(holoent, scale)
-			else
-				ent_tbl.SetScale(holoent, Vector(1,1,1))
-			end
-
-			entList:register(instance, holoent)
-			return wrap(holoent)
 		end
+
+		entList:register(instance, holoent)
+		return wrap(holoent)
 	end
 end
 

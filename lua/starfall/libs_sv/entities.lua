@@ -6,7 +6,7 @@ local ENT_META = FindMetaTable("Entity")
 local PHYS_META = FindMetaTable("PhysObj")
 local isentity = isentity
 
-local Ent_AddCallback,Ent_GetTable,Ent_IsValid,Ent_RemoveCallback = ENT_META.AddCallback,ENT_META.GetTable,ENT_META.IsValid,ENT_META.RemoveCallback
+local Ent_AddCallback,Ent_GetTable,Ent_IsScripted,Ent_IsValid,Ent_RemoveCallback = ENT_META.AddCallback,ENT_META.GetTable,ENT_META.IsScripted,ENT_META.IsValid,ENT_META.RemoveCallback
 
 -- Register privileges
 registerprivilege("entities.applyDamage", "Apply damage", "Allows the user to apply damage to an entity", { entities = {} })
@@ -369,13 +369,13 @@ function ents_methods:setCustomPropShadowForce(data)
 		local customShadowForce = ent_tbl.customShadowForce
 		customShadowForce.pos:Set(pos)
 		customShadowForce.angle:Set(ang)
-		customShadowForce.secondstoarrive = data.secondstoarrive,
-		customShadowForce.dampfactor = data.dampfactor,
-		customShadowForce.maxangular = data.maxangular,
-		customShadowForce.maxangulardamp = data.maxangulardamp,
-		customShadowForce.maxspeed = data.maxspeed,
-		customShadowForce.maxspeeddamp = data.maxspeeddamp,
-		customShadowForce.teleportdistance = data.teleportdistance,
+		customShadowForce.secondstoarrive = data.secondstoarrive
+		customShadowForce.dampfactor = data.dampfactor
+		customShadowForce.maxangular = data.maxangular
+		customShadowForce.maxangulardamp = data.maxangulardamp
+		customShadowForce.maxspeed = data.maxspeed
+		customShadowForce.maxspeeddamp = data.maxspeeddamp
+		customShadowForce.teleportdistance = data.teleportdistance
 
 		ent_tbl.EnableCustomPhysics(ent, 2)
 	else

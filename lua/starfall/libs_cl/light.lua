@@ -119,6 +119,11 @@ local function destroyLight(light)
 	end
 end
 
+local vunwrap1
+instance:AddHook("initialize", function()
+	vunwrap1 = vec_meta.QuickUnwrap1
+end)
+
 instance.data.light = {lights = lights}
 instance:AddHook("deinitialize", function()
 	for light in pairs(lights) do
@@ -531,7 +536,7 @@ end
 -- Will not take effect until ProjectedTexture:update() is called.
 --@param Vector pos
 function projectedtexture_methods:setPos(pos)
-	ptunwrap(self):SetPos(SF.clampPos(vunwrap(pos)))
+	ptunwrap(self):SetPos(SF.clampPos(vunwrap1(pos)))
 end
 
 --- Sets the Projected Texture's quadratic attenuation
