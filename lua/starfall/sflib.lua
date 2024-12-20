@@ -10,7 +10,7 @@ local dgetmeta = debug.getmetatable
 local TypeID = TypeID
 local math_Clamp = math.Clamp
 local ENT_META = FindMetaTable("Entity")
-local Ent_EntIndex,Ent_Fire,Ent_FollowBone,Ent_GetAngles,Ent_GetChildren,Ent_GetClass,Ent_GetCreationID,Ent_GetParent,Ent_GetPos,Ent_GetTable,Ent_IsPlayer,Ent_IsScripted,Ent_IsValid,Ent_IsWorld,Ent_SetAngles,Ent_SetParent,Ent_SetPos = ENT_META.EntIndex,ENT_META.Fire,ENT_META.FollowBone,ENT_META.GetAngles,ENT_META.GetChildren,ENT_META.GetClass,ENT_META.GetCreationID,ENT_META.GetParent,ENT_META.GetPos,ENT_META.GetTable,ENT_META.IsPlayer,ENT_META.IsScripted,ENT_META.IsValid,ENT_META.IsWorld,ENT_META.SetAngles,ENT_META.SetParent,ENT_META.SetPos
+local Ent_EntIndex,Ent_Fire,Ent_FollowBone,Ent_GetAngles,Ent_GetChildren,Ent_GetClass,Ent_GetCreationID,Ent_GetParent,Ent_GetPos,Ent_GetTable,Ent_IsScripted,Ent_IsValid,Ent_IsWorld,Ent_SetAngles,Ent_SetParent,Ent_SetPos = ENT_META.EntIndex,ENT_META.Fire,ENT_META.FollowBone,ENT_META.GetAngles,ENT_META.GetChildren,ENT_META.GetClass,ENT_META.GetCreationID,ENT_META.GetParent,ENT_META.GetPos,ENT_META.GetTable,ENT_META.IsScripted,ENT_META.IsValid,ENT_META.IsWorld,ENT_META.SetAngles,ENT_META.SetParent,ENT_META.SetPos
 local PLY_META = FindMetaTable("Player")
 local Ply_IsSuperAdmin,Ply_Nick,Ply_PrintMessage,Ply_SteamID = PLY_META.IsSuperAdmin,PLY_META.Nick,PLY_META.PrintMessage,PLY_META.SteamID
 
@@ -1227,7 +1227,7 @@ function SF.EntIsReady(ent)
 	-- https://github.com/Facepunch/garrysmod-issues/issues/3127
 	local class = Ent_GetClass(ent)
 	if class=="player" then
-		return Ent_IsPlayer(ent)
+		return dgetmeta(ent)==PLY_META
 	elseif class=="starfall_processor" then
 		return Ent_GetTable(ent).Compile~=nil
 	elseif class=="starfall_hologram" then
