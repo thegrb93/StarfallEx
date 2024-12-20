@@ -2,8 +2,8 @@
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 local haspermission = SF.Permissions.hasAccess
-local ENT_META = FindMetaTable("Entity")
-local PHYS_META = FindMetaTable("PhysObj")
+local dgetmeta = debug.getmetatable
+local ENT_META,NPC_META,PHYS_META,PLY_META,VEH_META,WEP_META = FindMetaTable("Entity"),FindMetaTable("Npc"),FindMetaTable("PhysObj"),FindMetaTable("Player"),FindMetaTable("Vehicle"),FindMetaTable("Weapon")
 local isentity = isentity
 
 local Ent_AddCallback,Ent_GetTable,Ent_IsScripted,Ent_IsValid,Ent_RemoveCallback = ENT_META.AddCallback,ENT_META.GetTable,ENT_META.IsScripted,ENT_META.IsValid,ENT_META.RemoveCallback
@@ -206,6 +206,11 @@ end
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 local Ent_AddCallback,Ent_DrawShadow,Ent_Extinguish,Ent_Fire,Ent_GetChildren,Ent_GetClass,Ent_GetCreationID,Ent_GetForward,Ent_GetFriction,Ent_GetMoveType,Ent_GetParent,Ent_GetPhysicsObject,Ent_GetRight,Ent_GetTable,Ent_GetUp,Ent_GetVar,Ent_Ignite,Ent_IsConstraint,Ent_IsPlayer,Ent_IsPlayerHolding,Ent_IsScripted,Ent_IsValid,Ent_IsVehicle,Ent_IsWorld,Ent_OBBMaxs,Ent_OBBMins,Ent_PhysicsInit,Ent_PhysicsInitSphere,Ent_Remove,Ent_RemoveCallback,Ent_SetAngles,Ent_SetCollisionBounds,Ent_SetCollisionGroup,Ent_SetElasticity,Ent_SetFriction,Ent_SetLightingOriginEntity,Ent_SetLocalAngles,Ent_SetLocalPos,Ent_SetMoveType,Ent_SetNotSolid,Ent_SetPos,Ent_SetSolid,Ent_SetVelocity,Ent_TestPVS,Ent_Use = ENT_META.AddCallback,ENT_META.DrawShadow,ENT_META.Extinguish,ENT_META.Fire,ENT_META.GetChildren,ENT_META.GetClass,ENT_META.GetCreationID,ENT_META.GetForward,ENT_META.GetFriction,ENT_META.GetMoveType,ENT_META.GetParent,ENT_META.GetPhysicsObject,ENT_META.GetRight,ENT_META.GetTable,ENT_META.GetUp,ENT_META.GetVar,ENT_META.Ignite,ENT_META.IsConstraint,ENT_META.IsPlayer,ENT_META.IsPlayerHolding,ENT_META.IsScripted,ENT_META.IsValid,ENT_META.IsVehicle,ENT_META.IsWorld,ENT_META.OBBMaxs,ENT_META.OBBMins,ENT_META.PhysicsInit,ENT_META.PhysicsInitSphere,ENT_META.Remove,ENT_META.RemoveCallback,ENT_META.SetAngles,ENT_META.SetCollisionBounds,ENT_META.SetCollisionGroup,ENT_META.SetElasticity,ENT_META.SetFriction,ENT_META.SetLightingOriginEntity,ENT_META.SetLocalAngles,ENT_META.SetLocalPos,ENT_META.SetMoveType,ENT_META.SetNotSolid,ENT_META.SetPos,ENT_META.SetSolid,ENT_META.SetVelocity,ENT_META.TestPVS,ENT_META.Use
+local function Ent_IsNPC(ent) return dgetmeta(ent)==NPC_META end
+local function Ent_IsPlayer(ent) return dgetmeta(ent)==PLY_META end
+local function Ent_IsVehicle(ent) return dgetmeta(ent)==VEH_META end
+local function Ent_IsWeapon(ent) return dgetmeta(ent)==WEP_META end
+
 local Phys_AddAngleVelocity,Phys_AddVelocity,Phys_ApplyForceCenter,Phys_ApplyForceOffset,Phys_ApplyTorqueCenter,Phys_EnableDrag,Phys_EnableGravity,Phys_EnableMotion,Phys_GetAngleVelocity,Phys_GetMass,Phys_GetMaterial,Phys_IsMoveable,Phys_IsValid,Phys_SetContents,Phys_SetInertia,Phys_SetMass,Phys_Wake = PHYS_META.AddAngleVelocity,PHYS_META.AddVelocity,PHYS_META.ApplyForceCenter,PHYS_META.ApplyForceOffset,PHYS_META.ApplyTorqueCenter,PHYS_META.EnableDrag,PHYS_META.EnableGravity,PHYS_META.EnableMotion,PHYS_META.GetAngleVelocity,PHYS_META.GetMass,PHYS_META.GetMaterial,PHYS_META.IsMoveable,PHYS_META.IsValid,PHYS_META.SetContents,PHYS_META.SetInertia,PHYS_META.SetMass,PHYS_META.Wake
 
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
