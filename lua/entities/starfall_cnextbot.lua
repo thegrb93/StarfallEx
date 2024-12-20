@@ -41,67 +41,69 @@ local function addPerf(instance, startPerfTime)
 	instance.cpu_total = instance.cpu_total + (SysTime() - startPerfTime)
 end
 
-function ENT:ChasePos(options)
+function ENT:GotoBehavior()
 	local ent_tbl = Ent_GetTable(self)
-	local startPerfTime = SysTime()
 
-	local options = options or {}
+	local startPerfTime = SysTime()
+	
+	self:StartActivity(ent_tbl.RUNACT)
+	ent_tbl.loco:SetDesiredSpeed(ent_tbl.MoveSpeed)
+
 	local path = Path( "Follow" )
-	path:SetMinLookAheadDistance( options.lookahead or 300 )
-	path:SetGoalTolerance( options.tolerance or 20 )
+	path:SetMinLookAheadDistance( 300 )
+	path:SetGoalTolerance( 20 )
 	-- Compute the path towards the enemy's position
 	path:Compute( self, ent_tbl.goTo )
-
 	addPerf(ent_tbl.instance, startPerfTime)
-	if ( !path:IsValid() ) then return "failed" end
 
-	while ( path:IsValid() and ent_tbl.goTo ) do
-		startPerfTime = SysTime()
+	if path:IsValid() then
+		while ( path:IsValid() and ent_tbl.goTo ) do
+			startPerfTime = SysTime()
 
-		-- Since we are following the player we have to constantly remake the path
-		if ( path:GetAge() > 0.1 ) then
-			-- Compute the path towards the enemy's position again
-			path:Compute(self, ent_tbl.goTo)
-		end
-		-- This function moves the bot along the path
-		path:Update( self )
-		
-		if ( options.draw ) then path:Draw() end
-		-- If we're stuck then call the HandleStuck function and abandon
-		if ( ent_tbl.loco:IsStuck() ) then
-			self:HandleStuck()
+			if ( path:GetAge() > 1 ) then
+				-- Compute the path towards the enemy's position again
+				path:Compute(self, ent_tbl.goTo)
+			end
+
+			-- This function moves the bot along the path
+			path:Update( self )
 			addPerf(ent_tbl.instance, startPerfTime)
-			return "stuck"
-		end
 
-		addPerf(ent_tbl.instance, startPerfTime)
+			-- If we're stuck then call the HandleStuck function and abandon
+			if ( ent_tbl.loco:IsStuck() ) then break end
+			coroutine.yield()
+		end
+	end
+
+	self:StartActivity(ent_tbl.IDLEACT)
+end
+
+function ENT:ApproachBehavior()
+	local ent_tbl = Ent_GetTable(self)
+
+	self:StartActivity(ent_tbl.RUNACT)
+	ent_tbl.loco:SetDesiredSpeed(ent_tbl.MoveSpeed)
+
+	while ent_tbl.approachPos and self:GetPos():DistToSqr(ent_tbl.approachPos) > 500 do
+		ent_tbl.loco:Approach(ent_tbl.approachPos, 1)
 		coroutine.yield()
 	end
 
-	return "ok"
+	self:StartActivity(ent_tbl.IDLEACT)
 end
 
 function ENT:RunBehaviour()
 	local ent_tbl = Ent_GetTable(self)
 	while true do
 		if ent_tbl.playSeq then
-			self:PlaySequenceAndWait( ent_tbl.playSeq )
+			self:PlaySequenceAndWait(ent_tbl.playSeq)
 			ent_tbl.playSeq = nil
 		elseif ent_tbl.goTo then
-			ent_tbl.loco:SetDesiredSpeed(ent_tbl.MoveSpeed)
-			self:StartActivity(ent_tbl.RUNACT)
-			self:ChasePos()
-			self:StartActivity(ent_tbl.IDLEACT)
+			ent_tbl.GotoBehavior(self)
 			ent_tbl.goTo = nil
 			ent_tbl.ReachCallbacks:run(ent_tbl.instance)
 		elseif ent_tbl.approachPos then
-			ent_tbl.loco:SetDesiredSpeed(ent_tbl.MoveSpeed)
-			self:StartActivity(ent_tbl.RUNACT)
-			while ent_tbl.approachPos and self:GetPos():DistToSqr(ent_tbl.approachPos) > 500 do
-				ent_tbl.loco:Approach(ent_tbl.approachPos, 1)
-				coroutine.yield()
-			end
-			self:StartActivity(ent_tbl.IDLEACT)
+			ent_tbl.ApproachBehavior(self)
 			ent_tbl.approachPos = nil
 			ent_tbl.ReachCallbacks:run(ent_tbl.instance)
 		end

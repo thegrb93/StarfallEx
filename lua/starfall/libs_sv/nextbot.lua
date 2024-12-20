@@ -130,8 +130,14 @@ end
 -- @server
 -- @param Vector goal The vector we want to get to.
 function nb_methods:setApproachPos(goal, goalweight)
+	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setApproachPos")
-	Ent_GetTable(nbunwrap(self)).approachPos:SetUnpacked(goal[1], goal[2], goal[3])
+	local approachPos = Ent_GetTable(nb).approachPos
+	if approachPos then
+		approachPos:SetUnpacked(pos[1], pos[2], pos[3])
+	else
+		Ent_GetTable(nb).approachPos = vunwrap(pos)
+	end
 end
 
 --- Removes the "approach" position from the NextBot.
@@ -139,18 +145,15 @@ end
 function nb_methods:removeApproachPos()
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.removeApproachPos")
-	nb.approachPos = nil
+	Ent_GetTable(nb).approachPos = nil
 end
 
 --- Returns the Vector the nextbot is trying to go to, set by setApproachPos
 -- @server
 -- @return Vector? Where the nextbot is trying to go to if it exists, else returns nil.
 function nb_methods:getApproachPos()
-	local nb = nbunwrap(self)
-	if nb.approachPos then
-		return vwrap(nb.approachPos)
-	else return nil 
-	end
+	local approachPos = Ent_GetTable(nbunwrap(self)).approachPos
+	if approachPos then return vwrap(approachPos) end
 end
 
 --- Makes the nextbot try to go to a specified position using navmesh pathfinding.
@@ -159,7 +162,12 @@ end
 function nb_methods:setGotoPos(pos)
 		local nb = nbunwrap(self)
 		checkpermission(instance, nb, "nextbot.setGotoPos")
-		Ent_GetTable(nb).goTo:SetUnpacked(pos[1], pos[2], pos[3])
+		local goTo = Ent_GetTable(nb).goTo
+		if goTo then
+			goTo:SetUnpacked(pos[1], pos[2], pos[3])
+		else
+			Ent_GetTable(nb).goTo = vunwrap(pos)
+		end
 end
 
 --- Removes the "go to" position from the NextBot.
@@ -174,8 +182,7 @@ end
 -- @server
 -- @return Vector? Where the nextbot is trying to go to if it exists, else returns nil.
 function nb_methods:getGotoPos()
-	local nb = nbunwrap(self)
-	local goTo = Ent_GetTable(nb).goTo
+	local goTo = Ent_GetTable(nbunwrap(self)).goTo
 	if goTo then return vwrap(goTo) end
 end
 
@@ -215,7 +222,7 @@ function nb_methods:setRunAct(act)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setRunAct")
 	nb.RUNACT = act
-	if !nb.goTo or !nb.approachPos then return end
+	if not (nb.goTo or nb.approachPos) then return end
 	nb:StartActivity(act)
 end
 

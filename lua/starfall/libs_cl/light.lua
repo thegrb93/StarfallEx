@@ -126,14 +126,11 @@ function light_library.create(pos, size, brightness, color)
 	checkpermission(instance, nil, "light.create")
 	checkluatype(size, TYPE_NUMBER)
 	checkluatype(brightness, TYPE_NUMBER)
-	checkluatype(color[1], TYPE_NUMBER)
-	checkluatype(color[2], TYPE_NUMBER)
-	checkluatype(color[3], TYPE_NUMBER)
 	local slot = getFreeSlot()
 	if not slot then SF.Throw("Failed to allocate slot for the light", 2) end
 
 	local light = {
-		data = {pos = vunwrap(pos), size = math.Clamp(size, 0, maxSize:GetFloat()), brightness = brightness, r=color[1], g=color[2], b=color[3], decay = 1000, dir=Vector()},
+		data = {pos = vunwrap(pos), size = math.Clamp(size, 0, maxSize:GetFloat()), brightness = brightness, r=tonumber(color[1]), g=tonumber(color[2]), b=tonumber(color[3]), decay = 1000, dir=Vector()},
 		slot = slot,
 		dietime = 1
 	}
@@ -246,11 +243,11 @@ end
 
 --- Sets the color of the light
 -- @param Color col The color of the light
-function light_methods:setColor(color)
+function light_methods:setColor(col)
 	local data = unwrap(self).data
-	data.r = col[1]
-	data.g = col[2]
-	data.b = col[3]
+	data.r = tonumber(col[1])
+	data.g = tonumber(col[2])
+	data.b = tonumber(col[3])
 end
 
 --- Destroys the light object freeing up whatever slot it was using

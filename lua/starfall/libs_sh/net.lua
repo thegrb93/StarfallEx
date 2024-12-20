@@ -135,11 +135,11 @@ if SERVER then
 	-- @param boolean? unreliable Optional choose whether it's more important for the message to actually reach its destination (false) or reach it as fast as possible (true).
 	function net_library.sendPVS(pos, unreliable)
 		if not netStarted then SF.Throw("net message not started", 2) end
+		pos = vunwrap1(pos)
+
 		netBurst:use(instance.player, netSize)
 		net_write(unreliable)
-
-		net.SendPVS(vunwrap1(pos))
-
+		net.SendPVS(pos)
 		instance:checkCpu()
 	end
 end

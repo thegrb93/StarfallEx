@@ -182,13 +182,7 @@ if SERVER then
 		local ent_tbl = Ent_GetTable(holo)
 		checkpermission(instance, holo, "hologram.setRenderProperty")
 
-		vel = vunwrap1(vel)
-		Ent_SetLocalVelocity(holo, vel)
-		if vel ~= vector_origin then
-			if ent_tbl.targetLocalVelocity then ent_tbl.targetLocalVelocity:Set(vel) else ent_tbl.targetLocalVelocity = Vector(vec) end
-		else
-			ent_tbl.targetLocalVelocity = nil
-		end
+		Ent_SetLocalVelocity(holo, vunwrap1(vel))
 	end
 	hologram_methods.setVel = hologram_methods.setLocalVelocity
 
@@ -371,7 +365,7 @@ end
 function hologram_methods:setPlayerColor(color)
 	local holo = getholo(self)
 	checkpermission(instance, holo, "hologram.setRenderProperty")
-	color = color ~= nil and vunwrap1(color) or VECTOR_PLAYER_COLOR_DISABLED
+	color = color ~= nil and vunwrap(color) or VECTOR_PLAYER_COLOR_DISABLED
 	Ent_GetTable(holo).SetPlayerColorInternal(holo, color)
 end
 
@@ -408,7 +402,7 @@ function hologram_methods:setClip(index, enabled, origin, normal, entity)
 			entity = getent(entity)
 		end
 
-		origin, normal = vunwrap1(origin), vunwrap2(normal)
+		origin, normal = vunwrap(origin), vunwrap(normal)
 
 		local clips = holo.clips
 		if not clips[index] then
@@ -430,7 +424,7 @@ end
 function hologram_methods:setScale(scale)
 	local holo = getholo(self)
 	checkpermission(instance, holo, "hologram.setRenderProperty")
-	Ent_GetTable(holo).SetScale(holo, vunwrap1(scale))
+	Ent_GetTable(holo).SetScale(holo, vunwrap(scale))
 end
 
 --- Sets the hologram size in game units

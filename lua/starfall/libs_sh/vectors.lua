@@ -47,6 +47,7 @@ end
 vec_meta.QuickUnwrap1 = QuickUnwrapper()
 vec_meta.QuickUnwrap2 = QuickUnwrapper()
 vec_meta.QuickUnwrap3 = QuickUnwrapper()
+vec_meta.QuickUnwrap4 = QuickUnwrapper()
 
 
 --- Creates a Vector struct.

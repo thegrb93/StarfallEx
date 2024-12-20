@@ -443,15 +443,15 @@ instance.data.render = renderdata
 local render_library = instance.Libraries.render
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
-local VEC_META, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
-local COL_META, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 local matrix_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
 local markup_methods, markwrap, markunwrap = instance.Types.Markup.Methods, instance.Types.Markup.Wrap, instance.Types.Markup.Unwrap
 local mtlunwrap = instance.Types.LockedMaterial.Unwrap
 
 
 local getent
-local vunwrap1, vunwrap2, vunwrap3
+local vunwrap1, vunwrap2, vunwrap3, vunwrap4
 local aunwrap1
 local cunwrap1
 instance:AddHook("initialize", function()
@@ -916,7 +916,7 @@ function render_library.getTint()
 	local r, g, b = render.GetColorModulation()
 	local a = render.GetBlend()
 
-	return setmetatable({ r * 255, g * 255, b * 255, a * 255 }, COL_META)
+	return setmetatable({ r * 255, g * 255, b * 255, a * 255 }, col_meta)
 end
 
 --- Gets the drawing tint. Internally, calls render.getColorModulation and render.getBlend, multiplies the values by 255, then returns a color object.
@@ -2318,7 +2318,7 @@ end
 -- @return Color Color object with ( r, g, b, a ) from the specified pixel.
 function render_library.readPixel(x, y)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	return setmetatable({render.ReadPixel(x, y)}, COL_META)
+	return setmetatable({render.ReadPixel(x, y)}, col_meta)
 end
 
 --- Reads the color of the specified pixel.
@@ -2364,7 +2364,7 @@ function render_library.traceSurfaceColor(startpos, endpos)
 	vec_SetUnpacked(startpos_vec, startpos[1], startpos[2], startpos[3])
 	vec_SetUnpacked(endpos_vec, endpos[1], endpos[2], endpos[3])
 	local r, g, b = vec_Unpack(render.GetSurfaceColor(startpos_vec, endpos_vec))
-	return setmetatable({r * 255, g * 255, b * 255, 255}, COL_META)
+	return setmetatable({r * 255, g * 255, b * 255, 255}, col_meta)
 end
 
 --- Checks if the client is connected to a HUD component that's linked to this chip
