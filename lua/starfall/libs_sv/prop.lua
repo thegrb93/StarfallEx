@@ -40,10 +40,10 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 local propConfig = {clean = true, undo = false, propList = entList}
 instance.data.props = propConfig
 
-local vunwrap1, vunwrap2
+local vunwrap1
 local aunwrap1
 instance:AddHook("initialize", function()
-	vunwrap1, vunwrap2 = vec_meta.QuickUnwrap1, vec_meta.QuickUnwrap2
+	vunwrap1 = vec_meta.QuickUnwrap1
 	aunwrap1 = ang_meta.QuickUnwrap1
 end)
 
@@ -193,7 +193,7 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 		local t = {}
 		for o, p in ipairs(v) do
 			if o>maxVerticesPerConvex then SF.Throw("Exceeded the max vertices per convex (" .. maxVerticesPerConvex .. ")", 2) end
-			local vec = vunwrap2(p)
+			local vec = vunwrap(p)
 			if math.abs(vec.x)>max or math.abs(vec.y)>max or math.abs(vec.z)>max then SF.Throw("The custom prop cannot exceed a hull size of " .. max, 2) end
 			if vec.x~=vec.x or vec.y~=vec.y or vec.z~=vec.z then SF.Throw("Your mesh contains nan values!", 2) end
 			for i=1, o-1 do
