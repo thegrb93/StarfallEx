@@ -1689,10 +1689,8 @@ function SF.dumbTrace(entity, pos)
 end
 
 function SF.IsHUDActive(ent, ply)
-	local tbl = Ent_GetTable(ent)
-	if tbl==nil then return end
-	tbl = tbl.ActiveHuds
-	if tbl==nil then return end
+	local tbl = Ent_GetTable(ent) if tbl==nil then return end
+	tbl = tbl.ActiveHuds if tbl==nil then return end
 	return tbl[SERVER and (ply or error("Missing player arg")) or LocalPlayer()]
 end
 
