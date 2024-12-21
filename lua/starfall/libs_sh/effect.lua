@@ -38,8 +38,12 @@ local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 
 local getent
+local vunwrap1
+local aunwrap1
 instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
+	vunwrap1 = vec_meta.QuickUnwrap1
+	aunwrap1 = ang_meta.QuickUnwrap1
 end)
 
 --- Creates an effect data structure
@@ -174,7 +178,7 @@ end
 --- Sets the effect's angles
 -- @param Angle ang The angles
 function effect_methods:setAngles(ang)
-	unwrap(self):SetAngles(aunwrap(ang))
+	unwrap(self):SetAngles(aunwrap1(ang))
 end
 
 --- Sets the effect's attachment
@@ -243,13 +247,13 @@ end
 --- Sets the effect's normal
 -- @param Vector normal The vector normal
 function effect_methods:setNormal(normal)
-	unwrap(self):SetNormal(vunwrap(normal))
+	unwrap(self):SetNormal(vunwrap1(normal))
 end
 
 --- Sets the effect's origin
 -- @param Vector origin The vector origin
 function effect_methods:setOrigin(origin)
-	unwrap(self):SetOrigin(vunwrap(origin))
+	unwrap(self):SetOrigin(vunwrap1(origin))
 end
 
 --- Sets the effect's radius
@@ -270,7 +274,7 @@ end
 -- Limited to world bounds (+-16386 on every axis) and has horrible networking precision. (17 bit float per component)
 -- @param Vector start The vector start
 function effect_methods:setStart(start)
-	unwrap(self):SetStart(vunwrap(start))
+	unwrap(self):SetStart(vunwrap1(start))
 end
 
 --- Sets the effect's surface property

@@ -2,6 +2,7 @@
 local checkluatype = SF.CheckLuaType
 local dgetmeta = debug.getmetatable
 local Unpack = FindMetaTable("Vector").Unpack
+local SetUnpacked = FindMetaTable("Vector").SetUnpacked
 
 --- Vector type
 -- @name Vector
@@ -38,6 +39,15 @@ local quatMul
 instance:AddHook("initialize", function()
 	quatMul = instance.Types.Quaternion.QuaternionMultiply
 end)
+
+local function QuickUnwrapper()
+	local Vec = Vector()
+	return function(v) SetUnpacked(Vec, v[1], v[2], v[3]) return Vec end
+end
+vec_meta.QuickUnwrap1 = QuickUnwrapper()
+vec_meta.QuickUnwrap2 = QuickUnwrapper()
+vec_meta.QuickUnwrap3 = QuickUnwrapper()
+vec_meta.QuickUnwrap4 = QuickUnwrapper()
 
 
 --- Creates a Vector struct.

@@ -23,8 +23,13 @@ return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 local game_library = instance.Libraries.game
-local ewrap, eunwrap = instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
-local vwrap, vunwrap = instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local ent_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local vec_methods, vec_meta, vwrap, vunwrap = instance.Types.Vector.Methods, instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+
+local vunwrap1, vunwrap2, vunwrap3
+instance:AddHook("initialize", function()
+	vunwrap1, vunwrap2, vunwrap3 = vec_meta.QuickUnwrap1, vec_meta.QuickUnwrap2, vec_meta.QuickUnwrap3
+end)
 
 --- Returns the map name
 -- @name game_library.getMap
@@ -147,7 +152,7 @@ if SERVER then
 	-- @param number damage The amount of damage to be applied
 	function game_library.blastDamage(damageOrigin, damageRadius, damage)
 		checkpermission(instance, nil, "game.blastDamage")
-		util.BlastDamage(instance.entity, instance.player, vunwrap(damageOrigin), math.Clamp(damageRadius, 0, 1500), damage)
+		util.BlastDamage(instance.entity, instance.player, vunwrap1(damageOrigin), math.Clamp(damageRadius, 0, 1500), damage)
 	end
 
 	--- Fires a bullet. Bullet made with this function will not have any tracer, you will have to make them yourself.
@@ -164,12 +169,14 @@ if SERVER then
 	-- @param function? callback Function to be called with attacker, traceResult after the bullet was fired but before the damage is applied (the callback is called even if no damage is applied).
 	function game_library.bulletDamage(src, dir, damage, num, force, distance, spread, hullSize, ignoreEntity, cb)
 		checkpermission(instance, nil, "game.bulletDamage")
-		if damage ~= nil then checkluatype(damage, TYPE_NUMBER) damage = math.Clamp(damage, 1, fireBulletsDPSBurst.max) else damage = 1 end
+		src = vunwrap1(src)
+		dir = vunwrap2(dir)
+		if spread ~= nil then spread = vunwrap3(spread) end
+		if damage ~= nil then checkluatype(damage, TYPE_NUMBER) damage = math.Clamp(damage, 1, fireBulletsDPSBurst.max) end
 		if force ~= nil then checkluatype(force, TYPE_NUMBER) force = math.Clamp(force, 0, maxBulletForce:GetInt()) else force = 0 end
-		if distance ~= nil then checkluatype(distance, TYPE_NUMBER) distance = math.Clamp(distance, 0, 32768) else distance = 32768 end
-		if hullSize ~= nil then checkluatype(hullSize, TYPE_NUMBER) hullSize = math.Clamp(hullSize, 0, maxBulletHull:GetInt()) else hullSize = 0 end
-		if num ~= nil then checkluatype(num, TYPE_NUMBER) num = math.Clamp(num, 1, fireBulletsBurst.max) else num = 1 end
-		if spread ~= nil then spread = vunwrap(spread) end
+		if distance ~= nil then checkluatype(distance, TYPE_NUMBER) distance = math.Clamp(distance, 0, 56756) end
+		if hullSize ~= nil then checkluatype(hullSize, TYPE_NUMBER) hullSize = math.Clamp(hullSize, 0, maxBulletHull:GetInt()) end
+		if num ~= nil then checkluatype(num, TYPE_NUMBER) num = math.Clamp(num, 1, fireBulletsBurst.max) end
 		if ignoreEntity ~= nil then ignoreEntity = eunwrap(ignoreEntity) end
 
 		local callback
@@ -182,19 +189,19 @@ if SERVER then
 		end
 
 		local BulletInfo = {
+			Src = src,
+			Dir = dir,
 			Attacker = instance.player,
-			Callback = callback,
 			Damage = damage,
 			Force = force,
 			Distance = distance,
-			HullSize = hullSize,
 			Num = num,
 			Tracer = 0,
 			TracerName = "",
-			Dir = vunwrap(dir),
 			Spread = spread,
-			Src = vunwrap(src),
+			HullSize = hullSize,
 			IgnoreEntity = ignoreEntity,
+			Callback = callback,
 		}
 
 		fireBulletsBurst:use(instance.player, BulletInfo.Num)
@@ -251,7 +258,7 @@ else
 	-- @param Vector position The position to check the skybox visibility from
 	-- @return boolean Whether the skybox is visible from the position
 	function game_library.isSkyboxVisibleFromPoint(position)
-		return util.IsSkyboxVisibleFromPoint(vunwrap(position))
+		return util.IsSkyboxVisibleFromPoint(vunwrap1(position))
 	end
 
 	--- Returns the server's frame time and standard deviation

@@ -119,6 +119,11 @@ local function destroyLight(light)
 	end
 end
 
+local vunwrap1
+instance:AddHook("initialize", function()
+	vunwrap1 = vec_meta.QuickUnwrap1
+end)
+
 instance.data.light = {lights = lights}
 instance:AddHook("deinitialize", function()
 	for light in pairs(lights) do
@@ -142,9 +147,8 @@ function light_library.create(pos, size, brightness, color)
 	local slot = getFreeSlot()
 	if not slot then SF.Throw("Failed to allocate slot for the light", 2) end
 
-	local col = cunwrap(color)
 	local light = {
-		data = {pos = vunwrap(pos), size = math.Clamp(size, 0, maxSize:GetFloat()), brightness = brightness, r=col.r, g=col.g, b=col.b, decay = 1000},
+		data = {pos = vunwrap(pos), size = math.Clamp(size, 0, maxSize:GetFloat()), brightness = brightness, r=tonumber(color[1]), g=tonumber(color[2]), b=tonumber(color[3]), decay = 1000, dir=Vector()},
 		slot = slot,
 		dietime = 1
 	}
@@ -197,7 +201,7 @@ end
 --- Sets the light direction (used with setInnerAngle and setOuterAngle)
 -- @param Vector dir Direction of the light
 function light_methods:setDirection(dir)
-	unwrap(self).data.dir = vunwrap(dir)
+	unwrap(self).data.dir:SetUnpacked(dir[1], dir[2], dir[3])
 end
 
 --- Sets the light inner angle (used with setDirection and setOuterAngle)
@@ -238,7 +242,7 @@ end
 --- Sets the light position
 -- @param Vector pos The position of the light
 function light_methods:setPos(pos)
-	unwrap(self).data.pos = vunwrap(pos)
+	unwrap(self).data.pos:SetUnpacked(pos[1], pos[2], pos[3])
 end
 
 --- Sets the size of the light (max is sf_light_maxsize)
@@ -257,12 +261,11 @@ end
 
 --- Sets the color of the light
 -- @param Color col The color of the light
-function light_methods:setColor(color)
-	local col = cunwrap(color)
+function light_methods:setColor(col)
 	local data = unwrap(self).data
-	data.r = col.r
-	data.g = col.g
-	data.b = col.b
+	data.r = tonumber(col[1])
+	data.g = tonumber(col[2])
+	data.b = tonumber(col[3])
 end
 
 --- Destroys the light object freeing up whatever slot it was using
@@ -533,7 +536,7 @@ end
 -- Will not take effect until ProjectedTexture:update() is called.
 --@param Vector pos
 function projectedtexture_methods:setPos(pos)
-	ptunwrap(self):SetPos(SF.clampPos(vunwrap(pos)))
+	ptunwrap(self):SetPos(SF.clampPos(vunwrap1(pos)))
 end
 
 --- Sets the Projected Texture's quadratic attenuation

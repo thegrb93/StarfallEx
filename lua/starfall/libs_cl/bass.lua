@@ -136,18 +136,21 @@ SF.RegisterType("Bass", true, false)
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
+local bass_library = instance.Libraries.bass
+local bass_methods, bass_meta, wrap, unwrap = instance.Types.Bass.Methods, instance.Types.Bass, instance.Types.Bass.Wrap, instance.Types.Bass.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+
 local instanceSounds = {} -- A lookup table of sounds created by this instance.
 
+local vunwrap1
+instance:AddHook("initialize", function()
+	vunwrap1 = vec_meta.QuickUnwrap1
+end)
 instance:AddHook("deinitialize", function()
 	for snd in pairs(instanceSounds) do
 		deleteSound(instance.player, snd)
 	end
 end)
-
-
-local bass_library = instance.Libraries.bass
-local bass_methods, bass_meta, wrap, unwrap = instance.Types.Bass.Methods, instance.Types.Bass, instance.Types.Bass.Wrap, instance.Types.Bass.Unwrap
-local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 
 local function getsnd(self)
 	local snd = unwrap(self)
@@ -297,7 +300,7 @@ end
 --- Sets the position of the sound in 3D space. Must have `3d` flag for this to have any effect.
 -- @param Vector pos Where to position the sound.
 function bass_methods:setPos(pos)
-	getsnd(self):SetPos(vunwrap(pos))
+	getsnd(self):SetPos(vunwrap1(pos))
 end
 
 --- Gets the position of the sound in 3D space.

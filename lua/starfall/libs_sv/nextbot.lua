@@ -1,5 +1,7 @@
 local registerprivilege = SF.Permissions.registerPrivilege
 local checkluatype = SF.CheckLuaType
+local ENT_META = FindMetaTable("Entity")
+
 
 --- NextBot type
 -- @name NextBot
@@ -63,6 +65,7 @@ local entList = SF.EntManager("nextbots", "nextbots", 30, "The number of props a
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
+local Ent_GetTable,Ent_IsValid = ENT_META.GetTable,ENT_META.IsValid
 
 local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local nextbot_library, nb_meta, nb_methods = instance.Libraries.nextbot, instance.Types.NextBot, instance.Types.NextBot.Methods
@@ -70,8 +73,10 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 local navarea_methods, navarea_meta, navwrap, navunwrap = instance.Types.NavArea.Methods, instance.Types.NavArea, instance.Types.NavArea.Wrap, instance.Types.NavArea.Unwrap
 local nbwrap, nbunwrap = instance.Types.NextBot.Wrap, instance.Types.NextBot.Unwrap
 
+local vunwrap1, vunwrap2
 instance:AddHook("initialize", function()
 	nb_meta.__tostring = ent_meta.__tostring
+	vunwrap1, vunwrap2 = vec_meta.QuickUnwrap1, vec_meta.QuickUnwrap2
 end)
 
 instance:AddHook("deinitialize", function()
@@ -86,14 +91,14 @@ end)
 function nextbot_library.create(pos, mdl)
 	checkpermission(instance, nil, "nextbot.create")
 	checkluatype(mdl, TYPE_STRING)
-	local upos = vunwrap(pos)
+	pos = SF.clampPos(vunwrap1(pos))
 
 	local ply = instance.player
 	mdl = SF.CheckModel(mdl, ply)
 	entList:checkuse(ply, 1)
 
 	local nb = ents.Create("starfall_cnextbot")
-	nb:SetPos(upos)
+	nb:SetPos(pos)
 	nb:SetModel(mdl)
 	nb.instance = instance
 	nb:Spawn()
@@ -125,8 +130,14 @@ end
 -- @server
 -- @param Vector goal The vector we want to get to.
 function nb_methods:setApproachPos(goal, goalweight)
+	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setApproachPos")
-	nbunwrap(self).approachPos = vunwrap(goal)
+	local approachPos = Ent_GetTable(nb).approachPos
+	if approachPos then
+		approachPos:SetUnpacked(pos[1], pos[2], pos[3])
+	else
+		Ent_GetTable(nb).approachPos = vunwrap(pos)
+	end
 end
 
 --- Removes the "approach" position from the NextBot.
@@ -134,18 +145,15 @@ end
 function nb_methods:removeApproachPos()
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.removeApproachPos")
-	nb.approachPos = nil
+	Ent_GetTable(nb).approachPos = nil
 end
 
 --- Returns the Vector the nextbot is trying to go to, set by setApproachPos
 -- @server
 -- @return Vector? Where the nextbot is trying to go to if it exists, else returns nil.
 function nb_methods:getApproachPos()
-	local nb = nbunwrap(self)
-	if nb.approachPos then
-		return vwrap(nb.approachPos)
-	else return nil 
-	end
+	local approachPos = Ent_GetTable(nbunwrap(self)).approachPos
+	if approachPos then return vwrap(approachPos) end
 end
 
 --- Makes the nextbot try to go to a specified position using navmesh pathfinding.
@@ -154,7 +162,12 @@ end
 function nb_methods:setGotoPos(pos)
 		local nb = nbunwrap(self)
 		checkpermission(instance, nb, "nextbot.setGotoPos")
-		nb.goTo = vunwrap(pos)
+		local goTo = Ent_GetTable(nb).goTo
+		if goTo then
+			goTo:SetUnpacked(pos[1], pos[2], pos[3])
+		else
+			Ent_GetTable(nb).goTo = vunwrap(pos)
+		end
 end
 
 --- Removes the "go to" position from the NextBot.
@@ -162,18 +175,15 @@ end
 function nb_methods:removeGotoPos()
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.removeGotoPos")
-	nb.goTo = nil
+	Ent_GetTable(nb).goTo = nil
 end
 
 --- Returns the Vector the nextbot is trying to go to, set by setGotoPos
 -- @server
 -- @return Vector? Where the nextbot is trying to go to if it exists, else returns nil.
 function nb_methods:getGotoPos()
-	local nb = nbunwrap(self)
-	if nb.goTo then
-		return vwrap(nb.goTo)
-	else return nil 
-	end
+	local goTo = Ent_GetTable(nbunwrap(self)).goTo
+	if goTo then return vwrap(goTo) end
 end
 
 --- Makes the nextbot play a sequence. This takes priority over movement. Will go to set pos after animation plays.
@@ -201,7 +211,7 @@ end
 function nb_methods:faceTowards(pos)	
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.faceTowards")
-	nb.loco:FaceTowards(vunwrap(pos))
+	Ent_GetTable(nb).loco:FaceTowards(vunwrap1(pos))
 end
 
 --- Sets the activity the nextbot uses for running.
@@ -212,7 +222,7 @@ function nb_methods:setRunAct(act)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setRunAct")
 	nb.RUNACT = act
-	if !nb.goTo or !nb.approachPos then return end
+	if not (nb.goTo or nb.approachPos) then return end
 	nb:StartActivity(act)
 end
 
@@ -250,7 +260,7 @@ end
 function nb_methods:setVelocity(vel)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setVelocity")
-	nb.loco:SetVelocity(vunwrap(vel))
+	Ent_GetTable(nb).loco:SetVelocity(vunwrap1(vel))
 end
 
 --- Gets the nextbot's velocity as a vector.
@@ -258,7 +268,7 @@ end
 -- @return Vector NB's velocity.
 function nb_methods:getVelocity()
 	local nb = nbunwrap(self)
-	return vwrap(nb.loco:GetVelocity())
+	return vwrap(Ent_GetTable(nb).loco:GetVelocity())
 end
 
 --- Forces the nextbot to jump.
@@ -268,7 +278,7 @@ function nb_methods:jump(jact)
 	if jact ~= nil then checkluatype(jact, TYPE_NUMBER) end
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.jump")
-	nb.loco:Jump(jact)
+	Ent_GetTable(nb).loco:Jump(jact)
 end
 
 --- Adds a callback function that will be run when this nextbot reaches a destination set by setApproachPos or setGotoPos.
@@ -465,7 +475,7 @@ function nb_methods:setMoveSpeed(val)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setMoveSpeed")
 	nb.MoveSpeed = val
-	nb.loco:SetDesiredSpeed(val)
+	Ent_GetTable(nb).loco:SetDesiredSpeed(val)
 end
 
 --- Gets the move speed of the NextBot.
@@ -483,7 +493,7 @@ function nb_methods:setAcceleration(val)
 	checkluatype(val, TYPE_NUMBER)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setAcceleration")
-	nb.loco:SetAcceleration(val)
+	Ent_GetTable(nb).loco:SetAcceleration(val)
 end
 
 --- Gets the acceleration speed of the NextBot.
@@ -491,7 +501,7 @@ end
 -- @return number NB's acceleration value.
 function nb_methods:getAcceleration()
 	local nb = nbunwrap(self)
-	return nb.loco:GetAcceleration()
+	return Ent_GetTable(nb).loco:GetAcceleration()
 end
 
 --- Sets the deceleration speed of the NextBot.
@@ -501,7 +511,7 @@ function nb_methods:setDeceleration(val)
 	checkluatype(val, TYPE_NUMBER)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setDeceleration")
-	nb.loco:SetDeceleration(val)
+	Ent_GetTable(nb).loco:SetDeceleration(val)
 end
 
 --- Gets the deceleration speed of the NextBot.
@@ -509,7 +519,7 @@ end
 -- @return number NB's deceleration value.
 function nb_methods:getDeceleration()
 	local nb = nbunwrap(self)
-	return nb.loco:GetDeceleration()
+	return Ent_GetTable(nb).loco:GetDeceleration()
 end
 
 --- Gets the max rate at which the NextBot can visually rotate.
@@ -517,7 +527,7 @@ end
 -- @param number The NextBot's max yaw rate.
 function nb_methods:getMaxYawRate()
 	local nb = nbunwrap(self)
-	return nb.loco:GetMaxYawRate()
+	return Ent_GetTable(nb).loco:GetMaxYawRate()
 end
 
 --- Sets the max rate at which the NextBot can visually rotate. This will not affect moving or pathing.
@@ -527,7 +537,7 @@ function nb_methods:setMaxYawRate(val)
 	checkluatype(val, TYPE_NUMBER)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setMaxYawRate")
-	nb.loco:SetMaxYawRate(val)
+	Ent_GetTable(nb).loco:SetMaxYawRate(val)
 end
 
 --- Gets the gravity of the NextBot.
@@ -535,7 +545,7 @@ end
 -- @return number The nextbot's current gravity value.
 function nb_methods:getGravity()
 	local nb = nbunwrap(self)
-	return nb.loco:GetGravity()
+	return Ent_GetTable(nb).loco:GetGravity()
 end
 
 --- Sets the gravity of the NextBot.
@@ -545,7 +555,7 @@ function nb_methods:setGravity(val)
 	checkluatype(val, TYPE_NUMBER)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setGravity")
-	nb.loco:SetGravity(val)
+	Ent_GetTable(nb).loco:SetGravity(val)
 end
 
 --- Sets the height the nextbot is scared to fall from.
@@ -555,7 +565,7 @@ function nb_methods:setDeathDropHeight(val)
 	checkluatype(val, TYPE_NUMBER)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setDeathDropHeight")
-	nb.loco:SetDeathDropHeight(val)
+	Ent_GetTable(nb).loco:SetDeathDropHeight(val)
 end
 
 --- Gets the height the nextbot is scared to fall from.
@@ -563,7 +573,7 @@ end
 -- @return number Height nextbot is afraid of.
 function nb_methods:getDeathDropHeight()
 	local nb = nbunwrap(self)
-	return nb.loco:GetDeathDropHeight()
+	return Ent_GetTable(nb).loco:GetDeathDropHeight()
 end
 
 --- Sets the max height the bot can step up.
@@ -573,7 +583,7 @@ function nb_methods:setStepHeight(val)
 	checkluatype(val, TYPE_NUMBER)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setStepHeight")
-	nb.loco:SetStepHeight(val)
+	Ent_GetTable(nb).loco:SetStepHeight(val)
 end
 
 --- Gets the max height the bot can step up.
@@ -581,7 +591,7 @@ end
 -- @return number The max height the bot can step up.
 function nb_methods:getStepHeight()
 	local nb = nbunwrap(self)
-	return nb.loco:GetStepHeight()
+	return Ent_GetTable(nb).loco:GetStepHeight()
 end
 
 --- Return unit vector in XY plane describing our direction of motion - even if we are currently not moving
@@ -589,7 +599,7 @@ end
 -- @return Vector A vector representing the X and Y movement.
 function nb_methods:getGroundMotionVector()
 	local nb = nbunwrap(self)
-	return vwrap(nb.loco:GetGroundMotionVector())
+	return vwrap(Ent_GetTable(nb).loco:GetGroundMotionVector())
 end
 
 --- Returns whether the nextbot this locomotion is attached to is on ground or not.
@@ -597,7 +607,7 @@ end
 -- @return boolean Whether the nextbot is on ground or not.
 function nb_methods:isOnGround()
 	local nb = nbunwrap(self)
-	return nb.loco:IsOnGround()
+	return Ent_GetTable(nb).loco:IsOnGround()
 end
 
 --- Returns whether this nextbot can reach and/or traverse/move in given NavArea.
@@ -608,7 +618,7 @@ function nb_methods:isAreaTraversable(nav)
 	local nb = nbunwrap(self)
 	local unav = navunwrap(nav)
 	
-	return nb.loco:IsAreaTraversable(unav)
+	return Ent_GetTable(nb).loco:IsAreaTraversable(unav)
 end
 
 --- Sets whether the Nextbot is allowed try to to avoid obstacles or not. This is used during path generation. Works similarly to nb_allow_avoiding convar. By default bots are allowed to try to avoid obstacles.
@@ -618,7 +628,7 @@ function nb_methods:setAvoidAllowed(val)
 	checkluatype(val, TYPE_BOOL)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setAvoidAllowed")
-	nb.loco:SetAvoidAllowed(val)
+	Ent_GetTable(nb).loco:SetAvoidAllowed(val)
 end
 
 --- Returns whether the Nextbot is allowed to avoid obstacles or not.
@@ -626,7 +636,7 @@ end
 -- @return boolean Whether this bot is allowed to try to avoid obstacles.
 function nb_methods:getAvoidAllowed()
 	local nb = nbunwrap(self)
-	return nb.loco:GetAvoidAllowed()
+	return Ent_GetTable(nb).loco:GetAvoidAllowed()
 end
 
 --- Sets whether the Nextbot is allowed to climb or not. This is used during path generation. Works similarly to nb_allow_climbing convar. By default bots are allowed to climb.
@@ -636,7 +646,7 @@ function nb_methods:setClimbAllowed(val)
 	checkluatype(val, TYPE_BOOL)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setClimbAllowed")
-	nb.loco:SetClimbAllowed(val)
+	Ent_GetTable(nb).loco:SetClimbAllowed(val)
 end
 
 --- Returns whether the Nextbot is allowed to climb or not.
@@ -644,7 +654,7 @@ end
 -- @return boolean Whether this bot is allowed to climb.
 function nb_methods:getClimbAllowed()
 	local nb = nbunwrap(self)
-	return nb.loco:GetClimbAllowed()
+	return Ent_GetTable(nb).loco:GetClimbAllowed()
 end
 
 --- Sets whether the Nextbot is allowed to jump gaps or not. This is used during path generation. Works similarly to nb_allow_gap_jumping convar. By default bots are allowed to jump gaps.
@@ -654,7 +664,7 @@ function nb_methods:setJumpGapsAllowed(val)
 	checkluatype(val, TYPE_BOOL)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setJumpGapsAllowed")
-	nb.loco:SetJumpGapsAllowed(val)
+	Ent_GetTable(nb).loco:SetJumpGapsAllowed(val)
 end
 
 --- Returns whether the Nextbot is allowed to jump gaps or not.
@@ -662,7 +672,7 @@ end
 -- @return boolean Whether this bot is allowed to jump gaps.
 function nb_methods:getJumpGapsAllowed()
 	local nb = nbunwrap(self)
-	return nb.loco:GetJumpGapsAllowed()
+	return Ent_GetTable(nb).loco:GetJumpGapsAllowed()
 end
 
 --- Sets the height of the bot's jump
@@ -672,7 +682,7 @@ function nb_methods:setJumpHeight(val)
 	checkluatype(val, TYPE_NUMBER)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setJumpHeight")
-	nb.loco:SetJumpHeight(val)
+	Ent_GetTable(nb).loco:SetJumpHeight(val)
 end
 
 --- Gets the height of the bot's jump
@@ -680,7 +690,7 @@ end
 -- @return number Jump height
 function nb_methods:getJumpHeight()
 	local nb = nbunwrap(self)
-	return nb.loco:GetJumpHeight()
+	return Ent_GetTable(nb).loco:GetJumpHeight()
 end
 
 --- Makes the bot jump across a gap. The bot must be on ground (Entity:isOnGround). Its model must have the ACT_JUMP activity for proper animation.
@@ -689,9 +699,8 @@ end
 -- @param Vector landForward Presumably the direction vector the entity should be aiming in when landing.
 function nb_methods:jumpAcrossGap(landGoal, landForward)
 	local nb = nbunwrap(self)
-	local v1, v2 = vunwrap(landGoal), vunwrap(landForward)
 	checkpermission(instance, nb, "nextbot.jumpAcrossGap")
-	nb.loco:JumpAcrossGap(v1, v2)
+	Ent_GetTable(nb).loco:JumpAcrossGap(vunwrap1(landGoal), vunwrap2(landForward))
 end
 
 end

@@ -392,6 +392,10 @@ local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap
 local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 local matrix_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
 
+local vunwrap1
+instance:AddHook("initialize", function()
+	vunwrap1 = vec_meta.QuickUnwrap1
+end)
 local usermaterials = {}
 instance:AddHook("deinitialize", function()
 	for k in pairs(usermaterials) do
@@ -844,7 +848,7 @@ end
 -- @param Vector v The value to set it to
 function material_methods:setVector(key, v)
 	checkkey(key)
-	unwrap(self):SetVector(key, vunwrap(v))
+	unwrap(self):SetVector(key, vunwrap1(v))
 end
 
 end

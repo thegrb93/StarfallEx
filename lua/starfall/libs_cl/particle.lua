@@ -40,6 +40,13 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 
+local vunwrap1, vunwrap2
+local aunwrap1
+instance:AddHook("initialize", function()
+	vunwrap1, vunwrap2 = vec_meta.QuickUnwrap1, vec_meta.QuickUnwrap2
+	aunwrap1 = ang_meta.QuickUnwrap1
+end)
+
 local emitters = {}
 instance:AddHook("deinitialize", function()
 	for emitter in pairs(emitters) do
@@ -56,7 +63,7 @@ function particle_library.create(position, use3D)
 	checkluatype(use3D, TYPE_BOOL)
 	checkpermission(instance, nil, "particle.create")
 	plyEmitterCount:use(instance.player, 1)
-	local emitter = ParticleEmitter(vunwrap(position), use3D)
+	local emitter = ParticleEmitter(vunwrap1(position), use3D)
 	emitters[emitter] = true
 	return pewrap(emitter)
 end
@@ -94,7 +101,7 @@ function particleem_methods:add(material, position, startSize, endSize, startLen
 	checkluatype(dieTime, TYPE_NUMBER)
 	if dieTime < 0 or dieTime > 60 then SF.Throw("Die time must be between 0 and 60", 2) end
 
-	local particle = self:Add(munwrap(material), vunwrap(position))
+	local particle = self:Add(munwrap(material), vunwrap1(position))
 
 	particle:SetStartSize(startSize)
 	particle:SetEndSize(endSize)
@@ -155,7 +162,7 @@ end
 -- @param Vector mins Min vector
 -- @param Vector maxs Max vector
 function particleem_methods:setBBox(mins, maxs)
-	peunwrap(self):SetBBox(vunwrap(mins), vunwrap(maxs))
+	peunwrap(self):SetBBox(vunwrap1(mins), vunwrap2(maxs))
 end
 
 --- This function sets the the distance between the render camera and the emitter at which the particles should start fading and at which distance fade ends ( alpha becomes 0 ).
@@ -186,7 +193,7 @@ end
 --- Sets the position of the particle emitter.
 -- @param Vector position The position
 function particleem_methods:setPos( position )
-	 peunwrap(self):SetPos(vunwrap(position))
+	 peunwrap(self):SetPos(vunwrap1(position))
 end
 
 
@@ -229,13 +236,13 @@ end
 --- Sets the angles of the particle.
 -- @param Angle ang Angles to set the particle's angles to
 function particle_methods:setAngles(ang)
-	punwrap(self):SetAngles(aunwrap(ang))
+	punwrap(self):SetAngles(aunwrap1(ang))
 end
 
 --- Sets the angular velocity of the the particle.
 -- @param Angle angVel Angular velocity to set the particle's to
 function particle_methods:setAngleVelocity(angVel)
-	punwrap(self):SetAngleVelocity(aunwrap(angVel))
+	punwrap(self):SetAngleVelocity(aunwrap1(angVel))
 end
 
 --- Sets the 'bounciness' of the the particle.
@@ -275,7 +282,7 @@ end
 --- Sets the absolute position of the particle.
 -- @param Vector pos Vector position to set to
 function particle_methods:setPos(pos)
-	punwrap(self):SetPos(vunwrap(pos))
+	punwrap(self):SetPos(vunwrap1(pos))
 end
 
 --- Sets the roll of the particle in radians. This should only be used for 2D particles.
@@ -295,7 +302,7 @@ end
 --- Sets the velocity of the particle.
 -- @param Vector vel Velocity to set to
 function particle_methods:setVelocity(vel)
-	punwrap(self):SetVelocity(vunwrap(vel))
+	punwrap(self):SetVelocity(vunwrap1(vel))
 end
 
 --- Sets the air resistance of the the particle.
@@ -308,7 +315,7 @@ end
 --- Sets the directional gravity aka. acceleration of the particle.
 -- @param Vector gravity Directional gravity
 function particle_methods:setGravity(gravity)
-	punwrap(self):SetGravity(vunwrap(gravity))
+	punwrap(self):SetGravity(vunwrap1(gravity))
 end
 
 --- Scales the velocity based on the particle speed.
