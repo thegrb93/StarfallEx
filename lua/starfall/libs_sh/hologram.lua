@@ -19,10 +19,7 @@ local cl_hologram_meta_overrides = {
 	CPPICanPhysgun = function(ent, pl) return Ent_GetTable(ent).SFHoloOwner==pl end
 }
 local cl_hologram_meta = {
-	__index = function(ent, k)
-		local f = cl_hologram_meta_overrides[k]
-		return f and f(ent,k) or ENT_META.__index(ent,k)
-	end,
+	__index = function(ent, k) return cl_hologram_meta_overrides[k] or ENT_META.__index(ent, k) end,
 	__newindex = ENT_META.__newindex,
 	__concat = ENT_META.__concat,
 	__tostring = ENT_META.__tostring,

@@ -15,10 +15,10 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 
 local vunwrap1, vunwrap2, vunwrap3
-local aunwrap1
+local aunwrap1, aunwrap2
 instance:AddHook("initialize", function()
 	vunwrap1, vunwrap2, vunwrap3 = vec_meta.QuickUnwrap1, vec_meta.QuickUnwrap2, vec_meta.QuickUnwrap3
-	aunwrap1 = ang_meta.QuickUnwrap1
+	aunwrap1, aunwrap2 = ang_meta.QuickUnwrap1, ang_meta.QuickUnwrap2
 end)
 
 local math_library = instance.Libraries.math

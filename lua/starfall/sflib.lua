@@ -1225,24 +1225,7 @@ function SF.CheckValidNumber(val, level, msg)
 end
 
 function SF.EntIsReady(ent)
-	if Ent_IsWorld(ent) then return true end
-	if not Ent_IsValid(ent) then return false end
-
-	-- https://github.com/Facepunch/garrysmod-issues/issues/3127
-	local class = Ent_GetClass(ent)
-	if class=="player" then
-		return Ent_IsPlayer(ent)
-	elseif class=="starfall_processor" then
-		return Ent_GetTable(ent).Compile~=nil
-	elseif class=="starfall_hologram" then
-		return Ent_GetTable(ent).SetClip~=nil
-	elseif class=="starfall_prop" then
-		return Ent_GetTable(ent).BuildPhysics~=nil
-	elseif class=="starfall_screen" or class=="starfall_hud" then
-		return Ent_IsScripted(ent)
-	else
-		return true
-	end
+	return Ent_IsWorld(ent) or Ent_GetTable(ent)~=nil
 end
 
 local waitingConditions = {}
@@ -1689,8 +1672,11 @@ function SF.dumbTrace(entity, pos)
 end
 
 function SF.IsHUDActive(ent, ply)
-	local tbl = Ent_GetTable(ent).ActiveHuds
-	return tbl and tbl[SERVER and (ply or error("Missing player arg")) or LocalPlayer()]
+	local tbl = Ent_GetTable(ent)
+	if tbl==nil then return end
+	tbl = tbl.ActiveHuds
+	if tbl==nil then return end
+	return tbl[SERVER and (ply or error("Missing player arg")) or LocalPlayer()]
 end
 
 -- ------------------------------------------------------------------------- --
