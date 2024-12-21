@@ -88,6 +88,11 @@ pattern [[(%w+)%.backblazeb2%.com/(.+)]]
 ---  http://i.imgur.com/abcd123.xxx
 simple [[i.imgur.com]]
 
+-- Gyazo
+--- Examples:
+--- https://i.gyazo.com/c3eb33a90ada4de716100e7491fa1a8d.png
+simple [[i.gyazo.com]]
+
 -- pastebin
 --- Examples:
 ---  http://pastebin.com/abcdef
