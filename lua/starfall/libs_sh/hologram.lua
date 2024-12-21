@@ -13,13 +13,16 @@ local maxclips = CreateConVar("sf_holograms_maxclips", "8", { FCVAR_ARCHIVE, FCV
 
 SF.ResourceCounters.Holograms = {icon = "icon16/bricks.png", count = function(ply) return entList:get(ply) end}
 
-local cl_hologram_meta_overrides = setmetatable({
+local cl_hologram_meta_overrides = {
 	CPPIGetOwner = function(ent) return Ent_GetTable(ent).SFHoloOwner end,
 	CPPICanTool = function(ent, pl) return Ent_GetTable(ent).SFHoloOwner==pl end,
 	CPPICanPhysgun = function(ent, pl) return Ent_GetTable(ent).SFHoloOwner==pl end
-}, {__index = ENT_META.__index})
+}
 local cl_hologram_meta = {
-	__index = cl_hologram_meta_overrides,
+	__index = function(ent, k)
+		local f = cl_hologram_meta_overrides[k]
+		return f and f(ent,k) or ENT_META.__index(ent,k)
+	end,
 	__newindex = ENT_META.__newindex,
 	__concat = ENT_META.__concat,
 	__tostring = ENT_META.__tostring,
