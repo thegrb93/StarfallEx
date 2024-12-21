@@ -1225,7 +1225,24 @@ function SF.CheckValidNumber(val, level, msg)
 end
 
 function SF.EntIsReady(ent)
-	return Ent_IsWorld(ent) or Ent_GetTable(ent)~=nil
+	if Ent_IsWorld(ent) then return true end
+	if not Ent_IsValid(ent) then return false end
+
+	-- https://github.com/Facepunch/garrysmod-issues/issues/3127
+	local class = Ent_GetClass(ent)
+	if class=="player" then
+		return Ent_IsPlayer(ent)
+	elseif class=="starfall_processor" then
+		return Ent_GetTable(ent).Compile~=nil
+	elseif class=="starfall_hologram" then
+		return Ent_GetTable(ent).SetClip~=nil
+	elseif class=="starfall_prop" then
+		return Ent_GetTable(ent).BuildPhysics~=nil
+	elseif class=="starfall_screen" or class=="starfall_hud" then
+		return Ent_IsScripted(ent)
+	else
+		return true
+	end
 end
 
 local waitingConditions = {}
