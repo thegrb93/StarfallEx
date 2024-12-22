@@ -48,7 +48,7 @@ SF.RegisterType("Hologram", true, false, nil, "Entity")
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
-local Ent_AddEffects,Ent_CPPISetOwner,Ent_DisableMatrix,Ent_DrawModel,Ent_EnableMatrix,Ent_GetColor4Part,Ent_GetTable,Ent_IsValid,Ent_LookupSequence,Ent_OBBMaxs,Ent_OBBMins,Ent_RemoveEffects,Ent_ResetSequence,Ent_SetAngles,Ent_SetCycle,Ent_SetLocalAngles,Ent_SetLocalAngularVelocity,Ent_SetLocalPos,Ent_SetLocalVelocity,Ent_SetModel,Ent_SetMoveType,Ent_SetPlaybackRate,Ent_SetPos,Ent_SetupBones,Ent_Spawn = ENT_META.AddEffects,ENT_META.CPPISetOwner,ENT_META.DisableMatrix,ENT_META.DrawModel,ENT_META.EnableMatrix,ENT_META.GetColor4Part,ENT_META.GetTable,ENT_META.IsValid,ENT_META.LookupSequence,ENT_META.OBBMaxs,ENT_META.OBBMins,ENT_META.RemoveEffects,ENT_META.ResetSequence,ENT_META.SetAngles,ENT_META.SetCycle,ENT_META.SetLocalAngles,ENT_META.SetLocalAngularVelocity,ENT_META.SetLocalPos,ENT_META.SetLocalVelocity,ENT_META.SetModel,ENT_META.SetMoveType,ENT_META.SetPlaybackRate,ENT_META.SetPos,ENT_META.SetupBones,ENT_META.Spawn
+local Ent_AddEffects,Ent_DisableMatrix,Ent_DrawModel,Ent_EnableMatrix,Ent_GetColor4Part,Ent_GetTable,Ent_IsValid,Ent_LookupSequence,Ent_OBBMaxs,Ent_OBBMins,Ent_RemoveEffects,Ent_ResetSequence,Ent_SetAngles,Ent_SetCycle,Ent_SetLocalAngles,Ent_SetLocalAngularVelocity,Ent_SetLocalPos,Ent_SetLocalVelocity,Ent_SetModel,Ent_SetMoveType,Ent_SetPlaybackRate,Ent_SetPos,Ent_SetupBones,Ent_Spawn = ENT_META.AddEffects,ENT_META.DisableMatrix,ENT_META.DrawModel,ENT_META.EnableMatrix,ENT_META.GetColor4Part,ENT_META.GetTable,ENT_META.IsValid,ENT_META.LookupSequence,ENT_META.OBBMaxs,ENT_META.OBBMins,ENT_META.RemoveEffects,ENT_META.ResetSequence,ENT_META.SetAngles,ENT_META.SetCycle,ENT_META.SetLocalAngles,ENT_META.SetLocalAngularVelocity,ENT_META.SetLocalPos,ENT_META.SetLocalVelocity,ENT_META.SetModel,ENT_META.SetMoveType,ENT_META.SetPlaybackRate,ENT_META.SetPos,ENT_META.SetupBones,ENT_META.Spawn
 
 local hologram_library = instance.Libraries.hologram
 local hologram_methods, hologram_meta, wrap, unwrap = instance.Types.Hologram.Methods, instance.Types.Hologram, instance.Types.Hologram.Wrap, instance.Types.Hologram.Unwrap
@@ -135,7 +135,7 @@ function hologram_library.create(pos, ang, model, scale)
 		ent_tbl.SetScale(holoent, scale)
 
 		if SERVER then
-			if CPPI then Ent_CPPISetOwner(holoent, ply == SF.Superuser and NULL or ply) end
+			if CPPI then holoent:CPPISetOwner(ply == SF.Superuser and NULL or ply) end
 		else
 			ent_tbl.SFHoloOwner = ply
 		end
