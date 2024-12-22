@@ -749,6 +749,14 @@ function wirelink_methods:isValid()
 	return wlunwrap(self):Ent_IsValid()
 end
 
+--- Returns current state of the specified input
+-- @param string name Input name
+-- @return any Input value
+function wirelink_methods:inputValue(name)
+	checkluatype(k, TYPE_STRING)
+	return readInput(getwl(self), k)
+end
+
 --- Returns the type of input name, or nil if it doesn't exist
 -- @param string name Input name to search for
 -- @return string Type of input
