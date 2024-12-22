@@ -16,12 +16,12 @@ SF.Permissions.registerProvider(P)
 
 hook.Add("Initialize","SF_PPInitialize",function()
 	local ENT_META,PLY_META = FindMetaTable("Entity"),FindMetaTable("Player")
-	local Ent_CPPICanPhysgun,Ent_CPPICanTool,Ent_CPPIGetOwner,Ent_GetNWEntity,Ent_GetTable,Ent_IsValid,Ent_SetNWEntity = ENT_META.CPPICanPhysgun,ENT_META.CPPICanTool,ENT_META.CPPIGetOwner,ENT_META.GetNWEntity,ENT_META.GetTable,ENT_META.IsValid,ENT_META.SetNWEntity
+	local Ent_GetNWEntity,Ent_GetTable,Ent_IsValid,Ent_SetNWEntity = ENT_META.GetNWEntity,ENT_META.GetTable,ENT_META.IsValid,ENT_META.SetNWEntity
 	local Ply_IsSuperAdmin,Ply_SteamID64 = PLY_META.IsSuperAdmin,PLY_META.SteamID64
 
 	if CPPI then
 		function SF.Permissions.getOwner(ent)
-			return Ent_CPPIGetOwner(ent)
+			return ent:CPPIGetOwner()
 		end
 
 		if SERVER then
@@ -30,7 +30,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 					if Ent_IsValid(target) then
 						if target == instance.player and owneraccess:GetBool() then return true end
 						if Ply_IsSuperAdmin(instance.player) then return true end
-						if Ent_CPPIGetOwner(target)==instance.player then
+						if target:CPPIGetOwner()==instance.player then
 							return true
 						else
 							return false, "You're not the owner of this prop"
@@ -42,7 +42,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 				function(instance, target)
 					if Ent_IsValid(target) then
 						if target == instance.player and owneraccess:GetBool() then return true end
-						if Ent_CPPICanTool(target, instance.player, "starfall_ent_lib") then
+						if target:CPPICanTool(instance.player, "starfall_ent_lib") then
 							return true
 						else
 							return false, "You can't toolgun this entity"
@@ -54,7 +54,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 				function(instance, target)
 					if Ent_IsValid(target) then
 						if target == instance.player and owneraccess:GetBool() then return true end
-						if Ent_CPPICanPhysgun(target, instance.player) then
+						if target:CPPICanPhysgun(instance.player) then
 							return true
 						else
 							return false, "You can't physgun this entity"
@@ -70,7 +70,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 				function(instance, target)
 					if Ent_IsValid(target) then
 						if target==instance.player or LocalPlayer()==instance.player or Ply_IsSuperAdmin(instance.player) then return true end
-						if Ent_CPPIGetOwner(target)==instance.player then
+						if target:CPPIGetOwner()==instance.player then
 							return true
 						else
 							return false, "You're not the owner of this prop"
@@ -82,7 +82,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 				function(instance, target)
 					if Ent_IsValid(target) then
 						if target==instance.player or LocalPlayer()==instance.player or Ply_IsSuperAdmin(instance.player) then return true end
-						if Ent_CPPICanTool(target, instance.player, "starfall_ent_lib") then
+						if target:CPPICanTool(instance.player, "starfall_ent_lib") then
 							return true
 						else
 							return false, "You can't toolgun this entity"
@@ -94,7 +94,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 				function(instance, target)
 					if Ent_IsValid(target) then
 						if target==instance.player or LocalPlayer()==instance.player or Ply_IsSuperAdmin(instance.player) then return true end
-						if Ent_CPPICanPhysgun(target, instance.player) then
+						if target:CPPICanPhysgun(instance.player) then
 							return true
 						else
 							return false, "You can't physgun this entity"
@@ -105,8 +105,8 @@ hook.Add("Initialize","SF_PPInitialize",function()
 				end,
 				"allow"
 			}
-			if not Ent_CPPICanTool then P.checks[2] = P.checks[1] end
-			if not Ent_CPPICanPhysgun then P.checks[3] = P.checks[1] end
+			if not ENT_META.CPPICanTool then P.checks[2] = P.checks[1] end
+			if not ENT_META.CPPICanPhysgun then P.checks[3] = P.checks[1] end
 		end
 	else
 		if SERVER then
