@@ -753,8 +753,8 @@ end
 -- @param string name Input name
 -- @return any Input value
 function wirelink_methods:inputValue(name)
-	checkluatype(k, TYPE_STRING)
-	return readInput(getwl(self), k)
+	checkluatype(name, TYPE_STRING)
+	return readInput(getwl(self), name)
 end
 
 --- Returns the type of input name, or nil if it doesn't exist
