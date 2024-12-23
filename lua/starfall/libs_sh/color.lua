@@ -67,6 +67,8 @@ local function wrap(tbl)
 end
 
 local function QuickUnwrapper()
+	-- Colors don't sanitize their member types so tonumber needed
+	-- https://github.com/Facepunch/garrysmod-issues/issues/6131
 	local Col = Color(255,255,255)
 	return function(v) Col_SetUnpacked(Col, tonumber(v[1]) or 255, tonumber(v[2]) or 255, tonumber(v[3]) or 255, tonumber(v[4]) or 255) return Col end
 end
