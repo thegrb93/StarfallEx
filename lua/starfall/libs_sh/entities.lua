@@ -2,7 +2,7 @@
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 local dgetmeta = debug.getmetatable
-local ENT_META,NPC_META,PHYS_META,PLY_META,VEH_META,WEP_META = FindMetaTable("Entity"),FindMetaTable("Npc"),FindMetaTable("PhysObj"),FindMetaTable("Player"),FindMetaTable("Vehicle"),FindMetaTable("Weapon")
+local ENT_META,NPC_META,PHYS_META,PLY_META,VEH_META,WEP_META = FindMetaTable("Entity"),FindMetaTable("NPC"),FindMetaTable("PhysObj"),FindMetaTable("Player"),FindMetaTable("Vehicle"),FindMetaTable("Weapon")
 local Ent_ManipulateBoneAngles,Ent_ManipulateBoneJiggle,Ent_ManipulateBonePosition,Ent_ManipulateBoneScale = ENT_META.ManipulateBoneAngles,ENT_META.ManipulateBoneJiggle,ENT_META.ManipulateBonePosition,ENT_META.ManipulateBoneScale
 
 registerprivilege("entities.setParent", "Parent", "Allows the user to parent an entity to another entity", { entities = {} })

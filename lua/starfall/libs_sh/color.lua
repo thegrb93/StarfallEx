@@ -1,6 +1,8 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local dgetmeta = debug.getmetatable
+local COL_META = FindMetaTable("Color")
+local Col_SetUnpacked,Col_Unpack = COL_META.SetUnpacked,COL_META.Unpack
 
 local math_Clamp = math.Clamp
 local clamp = function(v) return math_Clamp(v, 0, 255) end
@@ -44,7 +46,10 @@ local hex_to_rgb = {
 -- @libtbl color_meta
 SF.RegisterType("Color", nil, nil, FindMetaTable("Color"), nil, function(checktype, color_meta)
 	return function(clr)
-		return setmetatable({tonumber(clr.r), tonumber(clr.g), tonumber(clr.b), tonumber(clr.a)}, color_meta)
+		-- Colors don't sanitize their member types so tonumber needed
+		-- https://github.com/Facepunch/garrysmod-issues/issues/6131
+		local r,g,b,a = Col_Unpack(clr)
+		return setmetatable({tonumber(r) or 255, tonumber(g) or 255, tonumber(b) or 255, tonumber(a) or 255}, color_meta)
 	end,
 	function(obj)
 		checktype(obj, color_meta, 2)
@@ -60,6 +65,14 @@ local color_methods, color_meta, cwrap, unwrap = instance.Types.Color.Methods, i
 local function wrap(tbl)
 	return setmetatable(tbl, color_meta)
 end
+
+local function QuickUnwrapper()
+	-- Colors don't sanitize their member types so tonumber needed
+	-- https://github.com/Facepunch/garrysmod-issues/issues/6131
+	local Col = Color(255,255,255)
+	return function(v) Col_SetUnpacked(Col, tonumber(v[1]) or 255, tonumber(v[2]) or 255, tonumber(v[3]) or 255, tonumber(v[4]) or 255) return Col end
+end
+color_meta.QuickUnwrap1 = QuickUnwrapper()
 
 --- Creates a table struct that resembles a Color
 -- @name builtins_library.Color
