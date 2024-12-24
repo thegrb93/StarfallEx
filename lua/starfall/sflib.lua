@@ -15,10 +15,8 @@ local function Ent_IsNPC(ent) return dgetmeta(ent)==NPC_META end
 local function Ent_IsPlayer(ent) return dgetmeta(ent)==PLY_META end
 local function Ent_IsVehicle(ent) return dgetmeta(ent)==VEH_META end
 local function Ent_IsWeapon(ent) return dgetmeta(ent)==WEP_META end
-hook.Add("Initialize","SF_init_detours",function()
-	-- Fixes case where addon detours SetParent and SF doesn't use the detour
-	Ent_SetParent=ENT_META.SetParent
-end)
+-- Fixes case where addon detours SetParent and SF doesn't use the detour
+function Ent_SetParent(x,y) Ent_SetParent=ENT_META.SetParent return Ent_SetParent(x,y) end
 
 local Ply_IsSuperAdmin,Ply_Nick,Ply_PrintMessage,Ply_SteamID = PLY_META.IsSuperAdmin,PLY_META.Nick,PLY_META.PrintMessage,PLY_META.SteamID
 
