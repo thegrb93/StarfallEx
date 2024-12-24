@@ -10,7 +10,7 @@ local dgetmeta = debug.getmetatable
 local TypeID = TypeID
 local math_Clamp = math.Clamp
 local ENT_META,NPC_META,PHYS_META,PLY_META,VEH_META,WEP_META = FindMetaTable("Entity"),FindMetaTable("NPC"),FindMetaTable("PhysObj"),FindMetaTable("Player"),FindMetaTable("Vehicle"),FindMetaTable("Weapon")
-local Ent_EntIndex,Ent_Fire,Ent_FollowBone,Ent_GetAngles,Ent_GetChildren,Ent_GetClass,Ent_GetCreationID,Ent_GetParent,Ent_GetPos,Ent_GetTable,Ent_IsScripted,Ent_IsValid,Ent_IsWorld,Ent_SetAngles,Ent_SetParent,Ent_SetPos = ENT_META.EntIndex,ENT_META.Fire,ENT_META.FollowBone,ENT_META.GetAngles,ENT_META.GetChildren,ENT_META.GetClass,ENT_META.GetCreationID,ENT_META.GetParent,ENT_META.GetPos,ENT_META.GetTable,ENT_META.IsScripted,ENT_META.IsValid,ENT_META.IsWorld,ENT_META.SetAngles,ENT_META.SetParent,ENT_META.SetPos
+local Ent_EntIndex,Ent_Fire,Ent_FollowBone,Ent_GetAngles,Ent_GetChildren,Ent_GetClass,Ent_GetCreationID,Ent_GetParent,Ent_GetPos,Ent_GetTable,Ent_IsScripted,Ent_IsValid,Ent_IsWorld,Ent_SetAngles,Ent_SetLocalAngularVelocity,Ent_SetLocalVelocity,Ent_SetParent,Ent_SetPos = ENT_META.EntIndex,ENT_META.Fire,ENT_META.FollowBone,ENT_META.GetAngles,ENT_META.GetChildren,ENT_META.GetClass,ENT_META.GetCreationID,ENT_META.GetParent,ENT_META.GetPos,ENT_META.GetTable,ENT_META.IsScripted,ENT_META.IsValid,ENT_META.IsWorld,ENT_META.SetAngles,ENT_META.SetLocalAngularVelocity,ENT_META.SetLocalVelocity,ENT_META.SetParent,ENT_META.SetPos
 local function Ent_IsNPC(ent) return dgetmeta(ent)==NPC_META end
 local function Ent_IsPlayer(ent) return dgetmeta(ent)==PLY_META end
 local function Ent_IsVehicle(ent) return dgetmeta(ent)==VEH_META end
@@ -658,6 +658,8 @@ SF.Parent = {
 				self.applyParent = nil
 				self.removeParent = nil
 			end
+			Ent_SetLocalVelocity(self.ent, self.localVel)
+			Ent_SetLocalAngularVelocity(self.ent, self.localAngVel)
 		end,
 
 		fix = function(self)
@@ -685,37 +687,28 @@ SF.Parent = {
 		end,
 	},
 
+	Get = function(ent, create)
+		local sfParent = Ent_GetTable(ent).sfParent
+		if not sfParent and create then
+			sfParent = setmetatable({
+				ent = ent,
+				children = {},
+				localVel = Vector(),
+				localAngVel = Angle()
+			}, SF.Parent)
+			Ent_GetTable(ent).sfParent = sfParent
+		end
+		return sfParent
+	end,
+
 	__call = function(meta, child, parent, type, param)
 		if parent then
 			if SF.ParentChainTooLong(parent, child) then SF.Throw("Parenting chain cannot exceed 16 or crash may occur", 3) end
-
-			local sfParent
-			sfParent = Ent_GetTable(parent).sfParent
-			if not sfParent then
-				sfParent = setmetatable({
-					ent = parent,
-					children = {}
-				}, meta)
-				Ent_GetTable(parent).sfParent = sfParent
-			end
-
-			sfParent = Ent_GetTable(child).sfParent
-			if not sfParent then
-				sfParent = setmetatable({
-					ent = child,
-					children = {}
-				}, meta)
-				Ent_GetTable(child).sfParent = sfParent
-			end
-
-			sfParent:setParent(parent, type, param)
+			SF.Parent.Get(parent, true)
+			SF.Parent.Get(child, true):setParent(parent, type, param)
 		else
 			local sfParent = Ent_GetTable(child).sfParent
-			if sfParent then
-				sfParent:setParent()
-			else
-				Ent_SetParent(child)
-			end
+			if sfParent then sfParent:setParent() else Ent_SetParent(child) end
 		end
 	end
 }
