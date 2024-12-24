@@ -165,10 +165,13 @@ if SERVER then
 	-- @param Vector vel New local velocity
 	function hologram_methods:setLocalVelocity(vel)
 		local holo = getholo(self)
-		local ent_tbl = Ent_GetTable(holo)
+		vel = vunwrap1(vel)
 		checkpermission(instance, holo, "hologram.setRenderProperty")
 
-		Ent_SetLocalVelocity(holo, vunwrap1(vel))
+		Ent_SetLocalVelocity(holo, vel)
+
+		local sfParent = SF.Parent.Get(holo)
+		if sfParent then sfParent.localVel:Set(vel) end
 	end
 	hologram_methods.setVel = hologram_methods.setLocalVelocity
 
@@ -177,9 +180,13 @@ if SERVER then
 	-- @param Angle angvel *Vector* local angular velocity.
 	function hologram_methods:setLocalAngularVelocity(angvel)
 		local holo = getholo(self)
+		angvel = aunwrap1(angvel)
 		checkpermission(instance, holo, "hologram.setRenderProperty")
 
-		Ent_SetLocalAngularVelocity(holo, aunwrap1(angvel))
+		Ent_SetLocalAngularVelocity(holo, angvel)
+
+		local sfParent = SF.Parent.Get(holo)
+		if sfParent then sfParent.localAngVel:Set(angvel) end
 	end
 	hologram_methods.setAngVel = hologram_methods.setLocalAngularVelocity
 
@@ -205,10 +212,8 @@ else
 
 		Ent_SetPos(holo, SF.clampPos(vunwrap1(vec)))
 
-		local sfParent = Ent_GetTable(holo).sfParent
-		if sfParent and Ent_IsValid(sfParent.parent) then
-			sfParent:updateTransform()
-		end
+		local sfParent = SF.Parent.Get(holo)
+		if sfParent and Ent_IsValid(sfParent.parent) then sfParent:updateTransform() end
 	end
 
 	--- Sets the hologram's angles.
@@ -220,10 +225,8 @@ else
 
 		Ent_SetAngles(holo, aunwrap1(ang))
 		
-		local sfParent = Ent_GetTable(holo).sfParent
-		if sfParent and Ent_IsValid(sfParent.parent) then
-			sfParent:updateTransform()
-		end
+		local sfParent = SF.Parent.Get(holo)
+		if sfParent and Ent_IsValid(sfParent.parent) then sfParent:updateTransform() end
 	end
 	
 	--- Sets the hologram's position local to its parent.
@@ -235,10 +238,8 @@ else
 
 		Ent_SetLocalPos(holo, SF.clampPos(vunwrap1(vec)))
 
-		local sfParent = Ent_GetTable(holo).sfParent
-		if sfParent and Ent_IsValid(sfParent.parent) then
-			sfParent:updateTransform()
-		end
+		local sfParent = SF.Parent.Get(holo)
+		if sfParent and Ent_IsValid(sfParent.parent) then sfParent:updateTransform() end
 	end
 
 	--- Sets the hologram's angles local to its parent.
@@ -250,10 +251,8 @@ else
 
 		Ent_SetLocalAngles(holo, aunwrap1(ang))
 		
-		local sfParent = Ent_GetTable(holo).sfParent
-		if sfParent and Ent_IsValid(sfParent.parent) then
-			sfParent:updateTransform()
-		end
+		local sfParent = SF.Parent.Get(holo)
+		if sfParent and Ent_IsValid(sfParent.parent) then sfParent:updateTransform() end
 	end
 
 	--- Sets the texture filtering function when viewing a close texture
