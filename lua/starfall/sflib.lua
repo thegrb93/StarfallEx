@@ -9,12 +9,14 @@ SF.Superuser = {IsValid = function() return false end, SteamID64 = function() re
 local dgetmeta = debug.getmetatable
 local TypeID = TypeID
 local math_Clamp = math.Clamp
-local ENT_META,NPC_META,PHYS_META,PLY_META,VEH_META,WEP_META = FindMetaTable("Entity"),FindMetaTable("Npc"),FindMetaTable("PhysObj"),FindMetaTable("Player"),FindMetaTable("Vehicle"),FindMetaTable("Weapon")
+local ENT_META,NPC_META,PHYS_META,PLY_META,VEH_META,WEP_META = FindMetaTable("Entity"),FindMetaTable("NPC"),FindMetaTable("PhysObj"),FindMetaTable("Player"),FindMetaTable("Vehicle"),FindMetaTable("Weapon")
 local Ent_EntIndex,Ent_Fire,Ent_FollowBone,Ent_GetAngles,Ent_GetChildren,Ent_GetClass,Ent_GetCreationID,Ent_GetParent,Ent_GetPos,Ent_GetTable,Ent_IsScripted,Ent_IsValid,Ent_IsWorld,Ent_SetAngles,Ent_SetParent,Ent_SetPos = ENT_META.EntIndex,ENT_META.Fire,ENT_META.FollowBone,ENT_META.GetAngles,ENT_META.GetChildren,ENT_META.GetClass,ENT_META.GetCreationID,ENT_META.GetParent,ENT_META.GetPos,ENT_META.GetTable,ENT_META.IsScripted,ENT_META.IsValid,ENT_META.IsWorld,ENT_META.SetAngles,ENT_META.SetParent,ENT_META.SetPos
 local function Ent_IsNPC(ent) return dgetmeta(ent)==NPC_META end
 local function Ent_IsPlayer(ent) return dgetmeta(ent)==PLY_META end
 local function Ent_IsVehicle(ent) return dgetmeta(ent)==VEH_META end
 local function Ent_IsWeapon(ent) return dgetmeta(ent)==WEP_META end
+-- Fixes case where addon detours SetParent and SF doesn't use the detour
+function Ent_SetParent(x,y) Ent_SetParent=ENT_META.SetParent return Ent_SetParent(x,y) end
 
 local Ply_IsSuperAdmin,Ply_Nick,Ply_PrintMessage,Ply_SteamID = PLY_META.IsSuperAdmin,PLY_META.Nick,PLY_META.PrintMessage,PLY_META.SteamID
 
