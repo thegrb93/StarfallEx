@@ -48,13 +48,12 @@ hook.Add("NetworkEntityCreated","SF_TrackLights",function(e)
 	end
 end)
 
+local ENT_META = FindMetaTable("Entity")
+local Ent_EntIndex = ENT_META.EntIndex
 hook.Add("EntityRemoved","SF_TrackLights",function(e)
-	local EntIndex = e.EntIndex
-	if EntIndex then
-		local index = EntIndex(e)
-		gGmodLights[index] = nil
-		gGmodWireLights[index] = nil
-	end
+	local index = Ent_EntIndex(e)
+	gGmodLights[index] = nil
+	gGmodWireLights[index] = nil
 end)
 
 local lastProcess
