@@ -1059,7 +1059,7 @@ function ents_methods:testPVS(other)
 	local meta = debug.getmetatable(other)
 	if meta==vec_meta then
 		other = vunwrap1(other)
-	elseif meta==ent_meta then
+	elseif meta==ent_meta or (meta and meta.supertype == ent_meta) then
 		other = getent(other)
 	else
 		SF.ThrowTypeError("Entity or Vector", SF.GetType(other), 2)
