@@ -1252,7 +1252,8 @@ end
 -- @shared
 -- @return Vector The position vector of the mass center
 function ents_methods:getMassCenterW()
-	local phys = Ent_GetPhysicsObject(getent(self))
+	local ent = getent(self)
+	local phys = Ent_GetPhysicsObject(ent)
 	if not Phys_IsValid(phys) then SF.Throw("Physics object is invalid", 2) end
 	return vwrap(Ent_LocalToWorld(ent, Phys_GetMassCenter(phys)))
 end
