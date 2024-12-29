@@ -20,20 +20,22 @@ local Privilege = {
 			local overridable = false
 			for providerid in pairs(self.providerconfig) do
 				local provider = P.providers[providerid]
-				local check = provider.checks[P.settings[self.id][providerid]]
-				if provider.overridable then overridable = true end
-				if check == "block" then
-					if overridable then
-						check = function() return false, "This function's permission is blocked!" end
-					else
-						allAllow = false
-						anyBlock = true
-						break
+				if provider then
+					local check = provider.checks[P.settings[self.id][providerid]]
+					if provider.overridable then overridable = true end
+					if check == "block" then
+						if overridable then
+							check = function() return false, "This function's permission is blocked!" end
+						else
+							allAllow = false
+							anyBlock = true
+							break
+						end
 					end
-				end
-				if check ~= "allow" then
-					allAllow = false
-					checks[#checks+1] = check
+					if check ~= "allow" then
+						allAllow = false
+						checks[#checks+1] = check
+					end
 				end
 			end
 
@@ -74,10 +76,13 @@ local Privilege = {
 		initSettings = function(self)
 			local saveSettings = false
 			for providerid, config in pairs(self.providerconfig) do
-				local setting = P.settings[self.id][providerid]
-				if not setting or not P.providers[providerid].checks[setting] then
-					P.settings[self.id][providerid] = config.default or P.providers[providerid].defaultsetting
-					saveSettings = true
+				local provider = P.providers[providerid]
+				if provider then
+					local setting = P.settings[self.id][providerid]
+					if not setting or not provider.checks[setting] then
+						P.settings[self.id][providerid] = config.default or provider.defaultsetting
+						saveSettings = true
+					end
 				end
 			end
 			self:buildcheck()
@@ -87,12 +92,6 @@ local Privilege = {
 	__call = function(p, id, name, description, providerconfig)
 		if not providerconfig then providerconfig = {} end
 		if not providerconfig.usergroups then providerconfig.usergroups = {} end
-
-		for providerid in pairs(providerconfig) do
-			if not P.providers[providerid] then
-				providerconfig[providerid] = nil
-			end
-		end
 
 		return setmetatable({
 			id = id,
