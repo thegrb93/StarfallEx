@@ -13,6 +13,61 @@ local checkpattern = SF.CheckPattern
 local registerprivilege = SF.Permissions.registerPrivilege
 local IsValid = FindMetaTable("Entity").IsValid
 
+hook.Add("StarfallProcessDocs", "DarkRP", function(docs)
+	if DarkRP then return end
+	docs.Libraries.darkrp = nil
+
+	local ent_methods = docs.Types.Entity.methods
+	ent_methods.doorIndex = nil
+	ent_methods.isLocked = nil
+	ent_methods.getDoorOwner = nil
+	ent_methods.getKeysTitle = nil
+	ent_methods.isDoor = nil
+	ent_methods.isKeysOwned = nil
+	ent_methods.isKeysOwnedBy = nil
+	ent_methods.isMoneyBag = nil
+	ent_methods.getMoneyAmount = nil
+	ent_methods.getShipmentCount = nil
+	ent_methods.getShipmentContentsIndex = nil
+	ent_methods.getShipmentContents = nil
+
+	local ply_methods = docs.Types.Player.methods
+	ply_methods.keysUnOwnAll = nil
+	ply_methods.teamBanTimeLeft = nil
+	ply_methods.requestMoney = nil
+	ply_methods.giveMoney = nil
+	ply_methods.isInRoom = nil
+	ply_methods.canAfford = nil
+	ply_methods.canKeysLock = nil
+	ply_methods.canKeysUnlock = nil
+	ply_methods.getDarkRPVar = nil
+	ply_methods.getJobTable = nil
+	ply_methods.getPocketItems = nil
+	ply_methods.getWantedReason = nil
+	ply_methods.hasDarkRPPrivilege = nil
+	ply_methods.isArrested = nil
+	ply_methods.isChief = nil
+	ply_methods.isCook = nil
+	ply_methods.isCP = nil
+	ply_methods.isHitman = nil
+	ply_methods.isMayor = nil
+	ply_methods.isMedic = nil
+	ply_methods.isWanted = nil
+	ply_methods.getMoney = nil
+
+	docs.Hooks.moneyPrinterCatchFire = nil
+	docs.Hooks.moneyPrinterPrinted = nil
+	docs.Hooks.moneyPrinterPrintMoney = nil
+	docs.Hooks.playerWalletChanged = nil
+	docs.Hooks.lockdownEnded = nil
+	docs.Hooks.lockdownStarted = nil
+	docs.Hooks.addLaw = nil
+	docs.Hooks.removeLaw = nil
+	docs.Hooks.resetLaws = nil
+	docs.Hooks.lockpickStarted = nil
+	docs.Hooks.onLockpickCompleted = nil
+end)
+
 -- Under normal circumstances, an API change could introduce security
 -- vulnerabilities. Suppose a DarkRP function changes to also return a Player
 -- or Entity object, whereas before it only returned safe types like numbers
@@ -870,7 +925,7 @@ end
 --- Get the amount of money in a "money bag" or cheque, or number of items in a dropped item stack. DarkRP only.
 -- Equivalent to GLua Entity:Getamount.
 -- @return number? Amount of money or number of items
-function ents_methods:getAmount()
+function ents_methods:getMoneyAmount()
 	self = getent(self)
 	return self.Getamount and assertsafety(self:Getamount()) or nil
 end
@@ -878,7 +933,7 @@ end
 --- Get the number of items remaining in a shipment. DarkRP only.
 -- Equivalent to GLua Entity:Getcount.
 -- @return number? Number of items remaining, or nil if not a shipment
-function ents_methods:getCount()
+function ents_methods:getShipmentCount()
 	self = getent(self)
 	return self.Getcount and assertsafety(self:Getcount()) or nil
 end

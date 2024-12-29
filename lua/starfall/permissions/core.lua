@@ -189,7 +189,7 @@ function P.loadPermissionsSafe()
 end
 
 -- Find and include all provider files.
-do
+function P.includePermissions()
 	local sv_dir = "starfall/permissions/providers_sv/"
 	local sv_files = file.Find(sv_dir.."*.lua", "LUA")
 	local sh_dir = "starfall/permissions/providers_sh/"
