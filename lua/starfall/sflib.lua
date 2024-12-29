@@ -2183,16 +2183,24 @@ do
 		end
 	end
 
-	loadModules("starfall/libs_sh/", SERVER or CLIENT)
-	loadModules("starfall/libs_sv/", SERVER)
-	loadModules("starfall/libs_cl/", CLIENT)
-	SF.Permissions.loadPermissions()
+	hook.Add("Initialize","SF",function()
+		loadModules("starfall/libs_sh/", SERVER or CLIENT)
+		loadModules("starfall/libs_sv/", SERVER)
+		loadModules("starfall/libs_cl/", CLIENT)
+		SF.Permissions.includePermissions()
+		SF.Permissions.loadPermissions()
+
+		if SERVER then
+			include("starfall/editor/docs.lua")
+			hook.Run("StarfallProcessDocs", SF.Docs)
+			SF.Docs = util.Compress(SF.TableToString(SF.Docs, nil, true))
+			SF.DocsCRC = util.CRC(SF.Docs)
+		end
+		hook.Remove("Initialize","SF")
+	end)
 
 	if SERVER then
 		util.AddNetworkString("sf_receivelibrary")
-		include("starfall/editor/docs.lua")
-		SF.Docs = util.Compress(SF.TableToString(SF.Docs, nil, true))
-		SF.DocsCRC = util.CRC(SF.Docs)
 
 		-- Command to reload the libraries
 		concommand.Add("sf_reloadlibrary", function(ply, com, arg)
