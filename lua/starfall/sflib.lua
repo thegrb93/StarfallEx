@@ -954,33 +954,27 @@ do
 		hookname = hookname or realname:lower()
 		registered_instances[hookname] = {}
 		if gmoverride then
-			local function override(again)
-				local hookfunc = getHookFunc(registered_instances[hookname], hookname, customargfunc, customretfunc)
+			local hookfunc = getHookFunc(registered_instances[hookname], hookname, customargfunc, customretfunc)
 
-				local gmfunc
-				if again then
-					gmfunc = GAMEMODE["SF"..realname]
-				else
-					gmfunc = GAMEMODE[realname]
-					GAMEMODE["SF"..realname] = gmfunc
-				end
-
-				if gmfunc then
-					GAMEMODE[realname] = function(gm, ...)
-						local a,b,c,d,e,f = hookfunc(...)
-						if a~= nil then return a,b,c,d,e,f
-						else return gmfunc(gm, ...) end
-					end
-				else
-					GAMEMODE[realname] = function(gm, ...)
-						return hookfunc(...)
-					end
-				end
-			end
-			if GAMEMODE then
-				override(true)
+			local gmfunc
+			local originalfunc = GAMEMODE["SF"..realname]
+			if originalfunc then
+				gmfunc = originalfunc
 			else
-				hook.Add("Initialize", "SF_Hook_Override"..hookname, override)
+				gmfunc = GAMEMODE[realname]
+				GAMEMODE["SF"..realname] = gmfunc
+			end
+
+			if gmfunc then
+				GAMEMODE[realname] = function(gm, ...)
+					local a,b,c,d,e,f = hookfunc(...)
+					if a~= nil then return a,b,c,d,e,f
+					else return gmfunc(gm, ...) end
+				end
+			else
+				GAMEMODE[realname] = function(gm, ...)
+					return hookfunc(...)
+				end
 			end
 		else
 			gmod_hooks[hookname] = { realname, customargfunc, customretfunc }
