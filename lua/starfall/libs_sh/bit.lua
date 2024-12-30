@@ -536,8 +536,8 @@ local function readEntity(self, instance, callback)
 	local index = self:readUInt16()
 	local creationindex = self:readUInt32()
 	if callback ~= nil and CLIENT then
-		checkluatype(callback, creationindex, TYPE_FUNCTION)
-		SF.WaitForEntity(index, function(ent)
+		checkluatype(callback, TYPE_FUNCTION)
+		SF.WaitForEntity(index, creationindex, function(ent)
 			if ent ~= nil then ent = instance.WrapObject(ent) end
 			instance:runFunction(callback, ent)
 		end)
