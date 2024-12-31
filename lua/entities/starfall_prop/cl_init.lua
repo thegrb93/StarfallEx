@@ -1,11 +1,11 @@
 include("shared.lua")
-ENT.RenderGroup = RENDERGROUP_OPAQUE
 
 ENT.DefaultMaterial = Material( "models/wireframe" )
 ENT.Material = ENT.DefaultMaterial
 
-local IsValid = FindMetaTable("Entity").IsValid
-local IsValidPhys = FindMetaTable("PhysObj").IsValid
+local Ent_IsValid = FindMetaTable("Entity").IsValid
+local Phys_IsValid = FindMetaTable("PhysObj").IsValid
+local Ent_GetTable = FindMetaTable("Entity").GetTable
 
 function ENT:Initialize()
 	self.rendermesh = Mesh(self.Material)
@@ -28,7 +28,7 @@ end
 
 function ENT:Think()
 	local physobj = self:GetPhysicsObject()
-	if IsValidPhys(physobj) then
+	if Phys_IsValid(physobj) then
 		physobj:SetPos( self:GetPos() )
 		physobj:SetAngles( self:GetAngles() )
 		physobj:EnableMotion(false)
@@ -36,25 +36,20 @@ function ENT:Think()
 	end
 end
 
-function ENT:Draw()
-	if self:GetColor().a ~= 255 then
-		self.RenderGroup = RENDERGROUP_BOTH
-	else
-		self.RenderGroup = RENDERGROUP_OPAQUE
-	end
-	
-	self:DrawModel()
+function ENT:Draw(flags)
+	self:DrawModel(flags)
 end
 
 function ENT:GetRenderMesh()
-	if self.custom_mesh then
-		if self.custom_mesh_data[self.custom_mesh] then
-			return { Mesh = self.custom_mesh, Material = self.Material--[[, Matrix = self.render_matrix]] }
+	local ent_tbl = Ent_GetTable(self)
+	if ent_tbl.custom_mesh then
+		if ent_tbl.custom_mesh_data[ent_tbl.custom_mesh] then
+			return { Mesh = ent_tbl.custom_mesh, Material = ent_tbl.Material--[[, Matrix = ent_tbl.render_matrix]] }
 		else
-			self.custom_mesh = nil
+			ent_tbl.custom_mesh = nil
 		end
 	else
-		return { Mesh = self.rendermesh, Material = self.Material--[[, Matrix = self.render_matrix]] }
+		return { Mesh = ent_tbl.rendermesh, Material = ent_tbl.Material--[[, Matrix = ent_tbl.render_matrix]] }
 	end
 end
 
@@ -62,7 +57,8 @@ net.Receive("starfall_custom_prop", function()
 	local self, data
 
 	local function applyData()
-		if not (IsValid(self) and self.rendermesh:IsValid() and data and not self.rendermeshloaded) then return end
+		local ent_tbl = Ent_GetTable(self)
+		if not (ent_tbl and ent_tbl.rendermesh:IsValid() and data and not ent_tbl.rendermeshloaded) then return end
 		local stream = SF.StringStream(data)
 		local physmesh = {}
 		local mins, maxs = Vector(math.huge, math.huge, math.huge), Vector(-math.huge, -math.huge, -math.huge)
@@ -80,11 +76,11 @@ net.Receive("starfall_custom_prop", function()
 			end
 			physmesh[i] = convex
 		end
-		self.sf_physmesh = physmesh
-		self:BuildPhysics(physmesh)
+		ent_tbl.sf_physmesh = physmesh
+		ent_tbl.BuildPhysics(self, physmesh)
 
 		local phys = self:GetPhysicsObject()
-		if IsValidPhys(phys) then
+		if Phys_IsValid(phys) then
 			local convexes = phys:GetMeshConvexes()
 			local rendermesh = convexes[1]
 			for i=2, #convexes do
@@ -95,12 +91,12 @@ net.Receive("starfall_custom_prop", function()
 
 			-- less than 3 can crash
 			if #rendermesh >= 3 then
-				self.rendermesh:BuildFromTriangles(rendermesh)
+				ent_tbl.rendermesh:BuildFromTriangles(rendermesh)
 			end
 			self:SetRenderBounds(mins, maxs)
 			self:SetCollisionBounds(mins, maxs)
 		end
-		self.rendermeshloaded = true
+		ent_tbl.rendermeshloaded = true
 	end
 
 	net.ReadReliableEntity(function(e)
@@ -119,8 +115,9 @@ net.Receive("starfall_custom_prop", function()
 end)
 
 hook.Add("NetworkEntityCreated", "starfall_prop_physics", function(ent)
-	local mesh = ent.sf_physmesh
-	if mesh and not IsValidPhys(ent:GetPhysicsObject()) then
-		ent:BuildPhysics(mesh)
+	local ent_tbl = Ent_GetTable(ent)
+	local mesh = ent_tbl.sf_physmesh
+	if mesh and not Phys_IsValid(ent:GetPhysicsObject()) then
+		ent_tbl.BuildPhysics(ent, mesh)
 	end
 end)
