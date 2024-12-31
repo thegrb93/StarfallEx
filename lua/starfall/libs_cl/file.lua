@@ -6,6 +6,7 @@ registerprivilege("file.read", "Read files", "Allows the user to read files from
 registerprivilege("file.write", "Write files", "Allows the user to write files to data/sf_filedata directory", { client = { default = 1 } })
 registerprivilege("file.writeTemp", "Write temporary files", "Allows the user to write temp files to data/sf_filedatatemp directory", { client = {} })
 registerprivilege("file.exists", "File existence check", "Allows the user to determine whether a file in data/sf_filedata exists", { client = { default = 1 } })
+registerprivilege("file.existsInGame", "File existence check", "Allows the user to determine whether a file in game dir exists", { client = { default = 1 } })
 registerprivilege("file.isDir", "Directory check", "Allows the user to determine whether a file in data/sf_filedata is a directory", { client = { default = 1 } })
 registerprivilege("file.find", "File find", "Allows the user to see what files are in data/sf_filedata", { client = { default = 1 } })
 registerprivilege("file.findInGame", "File find in garrysmod", "Allows the user to see what files are in garrysmod", { client = { default = 1 } })
@@ -317,6 +318,15 @@ function file_library.exists(path)
 	checkpermission (instance, path, "file.exists")
 	checkluatype (path, TYPE_STRING)
 	return file.Exists("sf_filedata/" .. SF.NormalizePath(path), "DATA")
+end
+
+--- Checks if a file exists in path relative to gmod
+-- @param string path Filepath in game folder
+-- @return boolean? True if exists, false if not, nil if error
+function file_library.existsInGame(path)
+	checkpermission (instance, path, "file.existsInGame")
+	checkluatype (path, TYPE_STRING)
+	return file.Exists(SF.NormalizePath(path), "GAME")
 end
 
 --- Checks if a given file is a directory or not

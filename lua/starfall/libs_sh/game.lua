@@ -98,6 +98,16 @@ game_library.getRealTickInterval = engine.AbsoluteFrameTime
 -- @return number Ticks
 game_library.getTickCount = engine.TickCount
 
+--- Checks if a model exists in the game files
+-- @param string path Filepath in game folder
+-- @return boolean? True if exists, false if not, nil if error
+function game_library.modelExists(path)
+	checkluatype (path, TYPE_STRING)
+	path = SF.NormalizePath(path)
+	if string.find(path, "models/", 1, true)~=1 then return false end
+	return file.Exists(path, "GAME")
+end
+
 --- Returns AmmoData for given id
 -- @param number id See https://wiki.facepunch.com/gmod/Default_Ammo_Types
 -- @return table AmmoData, see https://wiki.facepunch.com/gmod/Structures/AmmoData
