@@ -128,8 +128,8 @@ end
 --- Makes the nextbot try to go to a specified position without using navmesh pathfinding (in a straight line).
 --- setGotoPos takes priority.
 -- @server
--- @param Vector goal The vector we want to get to.
-function nb_methods:setApproachPos(goal, goalweight)
+-- @param Vector pos The vector we want to get to.
+function nb_methods:setApproachPos(pos)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setApproachPos")
 	local approachPos = Ent_GetTable(nb).approachPos

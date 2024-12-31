@@ -4,16 +4,16 @@ ENT.Base 		= "base_nextbot"
 ENT.Spawnable		= false
 
 local ENT_META = FindMetaTable("Entity")
-local Ent_GetTable = ENT_META.GetTable
+local Ent_GetPos,Ent_GetTable,Ent_InvalidateBoneCache,Ent_SetPoseParameter,Ent_WorldToLocal = ENT_META.GetPos,ENT_META.GetTable,ENT_META.InvalidateBoneCache,ENT_META.SetPoseParameter,ENT_META.WorldToLocal
 
 function ENT:BodyUpdate()
 	self:BodyMoveXY()
 
-	local localVel = self:WorldToLocal(self.loco:GetVelocity() + self:GetPos())
-	self:SetPoseParameter("move_yaw", math.deg(math.atan2(localVel.y, localVel.x)))
+	local localVel = Ent_WorldToLocal(self, self.loco:GetVelocity() + Ent_GetPos(self))
+	Ent_SetPoseParameter(self, "move_yaw", math.deg(math.atan2(localVel.y, localVel.x)))
 
 	if CLIENT then
-		self:InvalidateBoneCache()
+		Ent_InvalidateBoneCache(self)
 	end
 end
 
@@ -84,7 +84,7 @@ function ENT:ApproachBehavior()
 	self:StartActivity(ent_tbl.RUNACT)
 	ent_tbl.loco:SetDesiredSpeed(ent_tbl.MoveSpeed)
 
-	while ent_tbl.approachPos and self:GetPos():DistToSqr(ent_tbl.approachPos) > 500 do
+	while ent_tbl.approachPos and Ent_GetPos(self):DistToSqr(ent_tbl.approachPos) > 20 do
 		ent_tbl.loco:Approach(ent_tbl.approachPos, 1)
 		coroutine.yield()
 	end
