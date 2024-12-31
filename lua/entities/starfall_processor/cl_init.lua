@@ -2,8 +2,9 @@ include("shared.lua")
 
 DEFINE_BASECLASS("base_gmodentity")
 
-local IsValid = FindMetaTable("Entity").IsValid
-local IsWorld = FindMetaTable("Entity").IsWorld
+local Ent_GetTable = FindMetaTable("Entity").GetTable
+local Ent_IsValid = FindMetaTable("Entity").IsValid
+local Ent_IsWorld = FindMetaTable("Entity").IsWorld
 
 function ENT:Initialize()
 	self.name = "Generic ( No-Name )"
@@ -25,12 +26,14 @@ function ENT:Initialize()
 end
 
 function ENT:GetOverlayText()
+	local ent_tbl = Ent_GetTable(self)
 	local state = self:GetNWInt("State", 1)
+
 	local clientstr, serverstr
-	if self.instance then
-		local bufferAvg = self.instance.cpu_average
-		clientstr = tostring(math.Round(bufferAvg * 1000000)) .. "us. (" .. tostring(math.floor(bufferAvg / self.instance.cpuQuota * 100)) .. "%)"
-	elseif self.error then
+	if ent_tbl.instance then
+		local bufferAvg = ent_tbl.instance.cpu_average
+		clientstr = tostring(math.Round(bufferAvg * 1000000)) .. "us. (" .. tostring(math.floor(bufferAvg / ent_tbl.instance.cpuQuota * 100)) .. "%)"
+	elseif ent_tbl.error then
 		clientstr = "Errored / Terminated"
 	else
 		clientstr = "None"
@@ -43,19 +46,20 @@ function ENT:GetOverlayText()
 		serverstr = "None"
 	end
 
-	local authorstr =  self.author and self.author:Trim() ~= "" and "\nAuthor: " .. self.author or ""
+	local authorstr =  ent_tbl.author and string.Trim(ent_tbl.author) ~= "" and "\nAuthor: " .. ent_tbl.author or ""
 
-	return "- Starfall Processor -\n[ " .. self.name .. " ]"..authorstr.."\nServer CPU: " .. serverstr .. "\nClient CPU: " .. clientstr
+	return "- Starfall Processor -\n[ " .. ent_tbl.name .. " ]"..authorstr.."\nServer CPU: " .. serverstr .. "\nClient CPU: " .. clientstr
 end
 
 function ENT:Think()
-	local lookedAt = self:BeingLookedAtByLocalPlayer()
-	self.lookedAt = lookedAt
+	local ent_tbl = Ent_GetTable(self)
+	local lookedAt = ent_tbl.BeingLookedAtByLocalPlayer(self)
+	ent_tbl.lookedAt = lookedAt
 
 	if lookedAt then
-		if self.CustomOverlay then
+		if ent_tbl.CustomOverlay then
 			halo.Add( { self }, color_white, 1, 1, 1, true, true )
-		elseif not self:GetNoDraw() and self:GetColor().a > 0 then
+		elseif not self:GetNoDraw() and select(4, self:GetColor4Part()) > 0 then
 			AddWorldTip( self:EntIndex(), self:GetOverlayText(), 0.5, self:GetPos(), self )
 			halo.Add( { self }, color_white, 1, 1, 1, true, true )
 		end
@@ -73,17 +77,18 @@ function ENT:SetCustomOverlay(rt)
 end
 
 function ENT:DrawCustomOverlay()
-	if self.lookedAt then
-		self.OverlayFade = math.min(self.OverlayFade + FrameTime()*2, 1)
+	local ent_tbl = Ent_GetTable(self)
+	if ent_tbl.lookedAt then
+		ent_tbl.OverlayFade = math.min(ent_tbl.OverlayFade + FrameTime()*2, 1)
 	else
-		self.OverlayFade = math.max(self.OverlayFade - FrameTime()*2, 0)
+		ent_tbl.OverlayFade = math.max(ent_tbl.OverlayFade - FrameTime()*2, 0)
 	end
-	if self.OverlayFade > 0 then
+	if ent_tbl.OverlayFade > 0 then
 		local pos = self:GetPos():ToScreen()
 
-		SF.RT_Material:SetTexture("$basetexture", self.CustomOverlay)
+		SF.RT_Material:SetTexture("$basetexture", ent_tbl.CustomOverlay)
 		render.SetMaterial( SF.RT_Material )
-		render.DrawQuad( Vector(pos.x-128,pos.y-300,0), Vector(pos.x+128,pos.y-300,0), Vector(pos.x+128,pos.y-44,0), Vector(pos.x-128,pos.y-44,0), Color(255,255,255,self.OverlayFade*255) )
+		render.DrawQuad( Vector(pos.x-128,pos.y-300,0), Vector(pos.x+128,pos.y-300,0), Vector(pos.x+128,pos.y-44,0), Vector(pos.x-128,pos.y-44,0), Color(255,255,255,ent_tbl.OverlayFade*255) )
 	end
 end
 
@@ -114,21 +119,21 @@ function ENT:SetReuploadOnReload(enabled)
 end
 
 if WireLib then
-	function ENT:DrawTranslucent()
-		self:DrawModel()
+	function ENT:DrawTranslucent(flags)
+		self:DrawModel(flags)
 		Wire_Render(self)
 	end
 else
-	function ENT:DrawTranslucent()
-		self:DrawModel()
+	function ENT:DrawTranslucent(flags)
+		self:DrawModel(flags)
 	end
 end
 
 hook.Add("StarfallError", "StarfallErrorReport", function(_, owner, client, main_file, message, traceback, should_notify)
-	if not IsValid(owner) then return end
+	if not Ent_IsValid(owner) then return end
 	local local_player = LocalPlayer()
 	if owner == local_player then
-		if client:IsWorld() or client == owner then
+		if Ent_IsWorld(client) or client == owner then
 			SF.AddNotify(owner, message, "ERROR", 7, "ERROR1")
 		elseif client then
 			if should_notify then
@@ -149,9 +154,9 @@ end)
 
 net.Receive("starfall_processor_download", function(len)
 	net.ReadStarfall(nil, function(ok, sfdata, err)
-		if ok and IsValid(sfdata.proc) and (IsValid(sfdata.owner) or IsWorld(sfdata.owner)) then
+		if ok and Ent_IsValid(sfdata.proc) and (Ent_IsValid(sfdata.owner) or Ent_IsWorld(sfdata.owner)) then
 			sfdata.proc:Compile(sfdata)
-		elseif IsValid(sfdata.proc) and IsValid(sfdata.owner) then
+		elseif Ent_IsValid(sfdata.proc) and Ent_IsValid(sfdata.owner) then
 			sfdata.proc.owner = sfdata.owner
 			sfdata.proc:Error({message = "Failed to download and initialize client: " .. tostring(err), traceback = "" })
 		end
@@ -171,7 +176,7 @@ end)
 
 net.Receive("starfall_processor_kill", function()
 	local target = net.ReadEntity()
-	if IsValid(target) and target:GetClass()=="starfall_processor" then
+	if Ent_IsValid(target) and target:GetClass()=="starfall_processor" then
 		target:Error({message = "Killed", traceback = ""})
 	end
 end)
@@ -180,8 +185,8 @@ net.Receive("starfall_processor_used", function(len)
 	local chip = net.ReadEntity()
 	local used = net.ReadEntity()
 	local activator = net.ReadEntity()
-	if not IsValid(chip) then return end
-	if not IsValid(used) then return end
+	if not Ent_IsValid(chip) then return end
+	if not Ent_IsValid(used) then return end
 	local instance = chip.instance
 	if not instance then return end
 

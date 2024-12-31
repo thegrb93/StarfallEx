@@ -63,8 +63,7 @@ function ENT:Compile(sfdata)
 
 	if SERVER then
 		self.ErroredPlayers = {}
-		local clr = self:GetColor()
-		self:SetColor(Color(255, 255, 255, clr.a))
+		self:SetColor4Part(255, 255, 255, select(4, self:GetColor4Part()))
 		self:SetNWInt("State", self.States.Normal)
 
 		if self.Inputs then
@@ -118,7 +117,7 @@ function ENT:Error(err)
 
 	if SERVER then
 		self:SetNWInt("State", self.States.Error)
-		self:SetColor(Color(255, 0, 0, 255))
+		self:SetColor4Part(255, 0, 0, 255)
 	end
 
 	hook.Run("StarfallError", self, self.owner, CLIENT and LocalPlayer() or Entity(0), self.sfdata and self.sfdata.mainfile or "", msg, traceback)

@@ -14,7 +14,7 @@ function ENT:Initialize()
 	self:AddEFlags( EFL_FORCE_CHECK_TRANSMIT )
 
 	self:SetNWInt("State", self.States.None)
-	self:SetColor(Color(255, 0, 0, self:GetColor().a))
+	self:SetColor4Part(255, 0, 0, select(4, self:GetColor4Part()))
 	self.ErroredPlayers = {}
 	self.ActiveHuds = {}
 end
