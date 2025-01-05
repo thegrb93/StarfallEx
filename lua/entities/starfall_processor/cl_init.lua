@@ -102,11 +102,10 @@ end
 ---@param enabled boolean
 function ENT:SetReuploadOnReload(enabled)
 	if enabled and not self.reuploadOnReload then
-		hook.Add("StarfallEditorFileReload", self, function(_, mainfile)
-			if not self:DependsOnFile(mainfile) then return end
-
-			SF.Editor.BuildIncludesTable(self.sfdata.mainfile, function(list)
-				SF.PushStarfall(self, {files = list.files, mainfile = list.mainfile})
+		hook.Add("StarfallEditorFileReload", self, function(_, reloaded_file)
+			if not self:DependsOnFile(reloaded_file) then return end
+			SF.Editor.BuildIncludesTable(self.sfdata.mainfile, function(files, mainfile)
+				SF.PushStarfall(self, {files = files, mainfile = mainfile})
 			end,
 			function(err)
 				SF.AddNotify(LocalPlayer(), err, "ERROR", 7, "ERROR1")
