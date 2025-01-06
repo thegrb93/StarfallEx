@@ -107,7 +107,6 @@ function ENT:RunBehaviour()
 			ent_tbl.approachPos = nil
 			ent_tbl.ReachCallbacks:run(ent_tbl.instance)
 		end
-		coroutine.wait( 1 )
 		coroutine.yield()
 	end
 end
