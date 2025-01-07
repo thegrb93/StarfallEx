@@ -283,7 +283,7 @@ end
 -- @shared
 -- @return number Field of view as a float
 function player_methods:getFOV()
-	return getply(Ply_GetFOV(self))
+	return Ply_GetFOV(getply(self))
 end
 
 --- Returns the player's name
