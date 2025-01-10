@@ -12,6 +12,7 @@ if SERVER then
 	-- Register privileges
 	registerprivilege("player.dropweapon", "DropWeapon", "Drops a weapon from the player", { entities = {} })
 	registerprivilege("player.setammo", "SetAmmo", "Whether a player can set their ammo", { usergroups = { default = 1 }, entities = {} })
+	registerprivilege("player.enterVehicle", "EnterVehicle", "Whether a player can be forced into a vehicle", { usergroups = { default = 1 }, entities = {} })
 
 	playerMaxScale = CreateConVar("sf_player_model_scale_max", "10", { FCVAR_ARCHIVE }, "Maximum player model scale the user is allowed to set using Player.setModelScale", 1, 100)
 else
@@ -823,6 +824,18 @@ if SERVER then
 		if Ply_Alive(ent) then
 			Ply_Kill(ent)
 		end
+	end
+	
+	--- Attempts to force the target into a vehicle.
+	--- Requires 'player.enterVehicle' permission on the player and the vehicle.
+	-- @server
+	-- @param Vehicle vehicle
+	function player_methods:enterVehicle(vehicle)
+		local ent = getply(self)
+		local veh = vhunwrap(vehicle)
+		checkpermission(instance, ent, "player.enterVehicle")
+		checkpermission(instance, veh, "player.enterVehicle")
+		ent:EnterVehicle(veh)
 	end
 end
 
