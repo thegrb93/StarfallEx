@@ -827,15 +827,13 @@ if SERVER then
 	end
 	
 	--- Attempts to force the target into a vehicle.
-	--- Requires 'player.enterVehicle' permission on the player and the vehicle.
+	--- Requires 'player.enterVehicle' permission on the player.
 	-- @server
 	-- @param Vehicle vehicle
 	function player_methods:enterVehicle(vehicle)
 		local ent = getply(self)
-		local veh = vhunwrap(vehicle)
 		checkpermission(instance, ent, "player.enterVehicle")
-		checkpermission(instance, veh, "player.enterVehicle")
-		ent:EnterVehicle(veh)
+		ent:EnterVehicle(vhunwrap(vehicle))
 	end
 end
 
