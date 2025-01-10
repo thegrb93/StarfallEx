@@ -389,5 +389,12 @@ function input_library.canLockControls()
 	return SF.IsHUDActive(instance.entity) and lockedControlCooldown + inputLockCooldown:GetFloat() <= CurTime()
 end
 
+--- Returns whether the game menu overlay ( main menu ) is open or not.
+-- @client
+-- @return boolean Whether the game menu overlay ( main menu ) is open or not
+function input_library.isGameUIVisible()
+	return gui.IsGameUIVisible()
+end
+
 
 end
