@@ -401,7 +401,6 @@ end
 -- @param number axis The analog axis to poll. See https://wiki.facepunch.com/gmod/Enums/ANALOG
 -- @return number The digital value.
 function input_library.getAnalogValue(axis)
-	checkluatype(axis, TYPE_NUMBER)
 	return input.GetAnalogValue(axis)
 end
 
