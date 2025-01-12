@@ -396,5 +396,12 @@ function input_library.isGameUIVisible()
 	return gui.IsGameUIVisible()
 end
 
+--- Returns the digital value of an analog stick on the current (set up via convars) controller.
+-- @name input_library.getAnalogValue
+-- @class function
+-- @client
+-- @param number axis The analog axis to poll. See https://wiki.facepunch.com/gmod/Enums/ANALOG
+-- @return number The digital value.
+input_library.getAnalogValue = input.GetAnalogValue
 
 end
