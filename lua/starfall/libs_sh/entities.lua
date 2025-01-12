@@ -456,7 +456,7 @@ function ents_methods:setColor(clr)
 		checkpermission(instance, ent, "entities.setRenderProperty")
 	end
 
-	local r,g,b,a = tonumber(clr[1]) or 255, tonumber(clr[2]) or 255, tonumber(clr[3]) or 255, tonumber(clr[4]) or 255
+	local r,g,b,a = tonumber(clr.r) or 255, tonumber(clr.g) or 255, tonumber(clr.b) or 255, tonumber(clr.a) or 255
 	local rendermode = (a == 255 and RENDERMODE_NORMAL or RENDERMODE_TRANSALPHA)
 	Ent_SetColor4Part(ent, r, g, b, a)
 	Ent_SetRenderMode(ent, rendermode)
