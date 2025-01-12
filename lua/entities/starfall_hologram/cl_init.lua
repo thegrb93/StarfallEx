@@ -72,9 +72,6 @@ function ENT:Initialize()
 		self:OnPlayerColorChanged(nil, nil, self:GetPlayerColorInternal())
 	end
 
-	-- Fixes future SetParent calls not keeping offset from the parent
-	self:SetParent(Entity(0))
-	self:SetParent()
 	self.renderstack = HoloRenderStack:create(self)
 end
 
