@@ -54,7 +54,8 @@ do
 		self.entries = entries
 	end
 
-	function TempFileCache:Write(plyid, filename, data)
+	function TempFileCache:Write(ply, filename, data)
+		local plyid = ply:SteamID64()
 		local dir = "sf_filedatatemp/"..plyid
 		local path = dir.."/"..filename
 		local ok, reason = self:CheckSize(plyid, path, #data)
@@ -65,7 +66,7 @@ do
 			end
 			self.entries[path] = {path = path, plyid = plyid, time = os.time(), size = #data}
 			file.CreateDir(dir)
-			print("[SF] Writing temp file: " .. path)
+			print("[SF owner=\""..tostring(ply).."\"] Writing temp file: " .. path)
 			local f = file.Open(path, "wb", "DATA")
 			if not f then SF.Throw("Couldn't open file for writing!", 3) end
 			f:Write(data)
@@ -276,7 +277,7 @@ function file_library.writeTemp(filename, data)
 	checkExtension(filename)
 	filename = string.lower(string.GetFileFromFilename(filename))
 
-	local path = TempFileCache:Write(instance.player:SteamID64(), filename, data)
+	local path = TempFileCache:Write(instance.player, filename, data)
 	tempfilewrites = tempfilewrites + 1
 	return path
 end
