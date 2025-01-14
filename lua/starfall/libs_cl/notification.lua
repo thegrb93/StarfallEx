@@ -35,11 +35,7 @@ local notification_library = instance.Libraries.notification
 ---NOTIFY.CLEANUP
 -- @param number length Time in seconds to display the notification (Max length of 30)
 function notification_library.addLegacy(text, type, length)
-	if SF.IsHUDActive(instance.entity) then
-		checkpermission(instance, nil, "notification.hud")
-	else
-		checkpermission(instance, nil, "notification")
-	end
+	if SF.IsHUDActive(instance.entity) then checkpermission(instance, nil, "notification.hud") else checkpermission(instance, nil, "notification") end
 	checkluatype(text, TYPE_STRING)
 	checkluatype(type, TYPE_NUMBER)
 	checkluatype(length, TYPE_NUMBER)
@@ -47,17 +43,22 @@ function notification_library.addLegacy(text, type, length)
 	notification.AddLegacy( text, type, length )
 end
 
+local function getID(id)
+	if instance.player == SF.Superuser then
+		return "SF:Superuser"..id
+	elseif instance.player:IsValid() then
+		return "SF:"..instance.player:SteamID64()..id
+	else
+		SF.Throw("Invalid chip owner", 3)
+	end
+end
 
 --- Displays a notification with an animated progress bar, will persist unless killed or chip is removed.
 -- @param string id String index of the notification
 -- @param string text The text to display
 -- @param number? progress An optional progress val 0-1 indicating progress.
 function notification_library.addProgress(id, text, progress)
-	if SF.IsHUDActive(instance.entity) then
-		checkpermission(instance, nil, "notification.hud")
-	else
-		checkpermission(instance, nil, "notification")
-	end
+	if SF.IsHUDActive(instance.entity) then checkpermission(instance, nil, "notification.hud") else checkpermission(instance, nil, "notification") end
 	checkluatype(id, TYPE_STRING)
 	checkluatype(text, TYPE_STRING)
 	if progress~=nil then
@@ -68,14 +69,7 @@ function notification_library.addProgress(id, text, progress)
 	if #id > 256 then SF.Throw("ID is greater than 256 limit!", 2) end
 	if #text > 256 then SF.Throw("Text is greater than 256 limit!", 2) end
 
-	--Keep the ID unique to each player
-	if instance.player == SF.Superuser then
-		id = "SF:Superuser"..id
-	elseif instance.player:IsValid() then
-		id = "SF:"..instance.player:SteamID64()..id
-	else
-		SF.Throw("Invalid chip owner", 2)
-	end
+	id = getID(id)
 
 	notification.AddProgress( id, text, progress )
 	notifications[id] = true
@@ -84,19 +78,29 @@ end
 --- Removes the notification with the given index after 0.8 seconds
 -- @param string id String index of the notification to kill
 function notification_library.kill(id)
-	if SF.IsHUDActive(instance.entity) then
-		checkpermission(instance, nil, "notification.hud")
-	else
-		checkpermission(instance, nil, "notification")
-	end
+	if SF.IsHUDActive(instance.entity) then checkpermission(instance, nil, "notification.hud") else checkpermission(instance, nil, "notification") end
 	checkluatype(id, TYPE_STRING)
 
-	id = "SF:"..instance.player:SteamID64()..id
+	id = getID(id)
 
 	if notifications[id] then
 		notification.Kill( id )
 		notifications[id] = nil
 	end
+end
+
+--- Source engine's notifications. Adds source captions to the screen. Requires console command closecaption 1.
+-- @param string text The text to add to the screen
+-- @param number duration Time in seconds to display the caption (Max length of 30)
+-- @param boolean? altColor Whether to use the alternate caption color (Default false)
+function notification_library.addCaption(text, duration, altColor)
+	if SF.IsHUDActive(instance.entity) then checkpermission(instance, nil, "notification.hud") else checkpermission(instance, nil, "notification") end
+	checkluatype(text, TYPE_STRING)
+	checkluatype(duration, TYPE_NUMBER)
+	
+	if #text > 256 then SF.Throw("Text is greater than 256 limit!", 2) end
+
+	gui.AddCaption(text, math.Clamp(duration, 0.1, 30), altColor)
 end
 
 end
