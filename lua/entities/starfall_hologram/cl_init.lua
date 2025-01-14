@@ -68,13 +68,13 @@ function ENT:Initialize()
 
 	if self:EntIndex() == -1 then
 		self:SetPlayerColorInternal(VECTOR_PLAYER_COLOR_DISABLED)
+		-- Hack to fix parenting issues
+		self:SetParent(Entity(0))
+		self:SetParent()
 	else
 		self:OnPlayerColorChanged(nil, nil, self:GetPlayerColorInternal())
 	end
 
-	-- Fixes future SetParent calls not keeping offset from the parent
-	self:SetParent(Entity(0))
-	self:SetParent()
 	self.renderstack = HoloRenderStack:create(self)
 end
 
