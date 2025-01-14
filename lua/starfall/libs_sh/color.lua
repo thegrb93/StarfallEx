@@ -75,9 +75,10 @@ end
 color_meta.QuickUnwrap1 = QuickUnwrapper()
 
 --- Creates a table struct that resembles a Color
+-- E.g. Color(255,0,0) Color("#FF0000") Color()
 -- @name builtins_library.Color
 -- @class function
--- @param number|string? r Red component or string hexadecimal color. Defaults to 255.
+-- @param number|string|nil r Red component or string hexadecimal color. Defaults to 255.
 -- @param number? g Green component. Defaults to 255.
 -- @param number? b Blue component. Defaults to 255.
 -- @param number? a Alpha component. Defaults to 255.
