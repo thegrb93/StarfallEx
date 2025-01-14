@@ -68,6 +68,9 @@ function ENT:Initialize()
 
 	if self:EntIndex() == -1 then
 		self:SetPlayerColorInternal(VECTOR_PLAYER_COLOR_DISABLED)
+		-- Hack to fix parenting issues
+		self:SetParent(Entity(0))
+		self:SetParent()
 	else
 		self:OnPlayerColorChanged(nil, nil, self:GetPlayerColorInternal())
 	end
