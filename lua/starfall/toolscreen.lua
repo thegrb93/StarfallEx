@@ -116,7 +116,7 @@ local star_canvas, star_canvas_material
 hook.Add("PreRender", "StarfallToolscreenPrepare", function()
 	star_canvas = GetRenderTarget("starfall_tool_canvas", 256, 256)
 	star_canvas_material = CreateMaterial("starfall_tool_material", "UnlitGeneric", { ["$basetexture"] = star_canvas:GetName() })
-	star_canvas_material:SetInt("$flags", 0x8000 + 0x0020 + 0x0010)
+	star_canvas_material:SetInt("$flags", 0x8000 + 0x0010)
 	render.ClearRenderTarget(star_canvas, color_background)
 	hook.Remove("PreRender", "StarfallToolscreenPrepare")
 end)
