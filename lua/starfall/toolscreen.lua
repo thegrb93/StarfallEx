@@ -14,7 +14,7 @@ cvars.AddChangeCallback("starfall_toolscreen_fps", function(_, _, value)
 end)
 
 -- Tuning vars
-local color_background       = Color(41, 38, 52)                  -- Background color, alpha controls how fast the stars fade out
+local color_background       = Color(41, 38, 52)                  -- Background color
 local color_text             = Color(240, 240, 253, 255)          -- Text color for subtitle and scrolling text
 local color_text_outline     = ColorAlpha(color_background, 80)   -- Outline text color for subtitle and scrolling text
 local star_count             = 8                                  -- Amount of stars to render
