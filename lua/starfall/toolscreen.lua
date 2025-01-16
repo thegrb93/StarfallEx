@@ -152,7 +152,7 @@ function SF.DrawToolgunScreen(w, h, title, scroll_text)
 		local blur = math_clamp(8 + 600 * dt, 12, 30)
 		render.BlurRenderTarget(star_canvas, blur, blur, 1)
 
-		surface.SetDrawColor(color_background.r, color_background.g, color_background.b, math_clamp(3000 * dt + 20, 20, 90))
+		surface.SetDrawColor(color_background.r, color_background.g, color_background.b, math_clamp(2500 * dt + 20, 30, 100))
 		surface.DrawRect(0, 0, w, h)
 
 		surface.SetMaterial(star_material)
