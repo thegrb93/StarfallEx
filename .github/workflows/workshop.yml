@@ -14,7 +14,7 @@ jobs:
 
       - uses: vurv78/gmod-upload@v0.1.4
         with:
-          id: 2273610511
+          id: 3408355478
           changelog: ${{ github.event.head_commit.message }}
         env:
           STEAM_USERNAME: ${{ secrets.WORKSHOP_USERNAME }}
