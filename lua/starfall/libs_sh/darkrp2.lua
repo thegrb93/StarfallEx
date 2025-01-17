@@ -455,7 +455,7 @@ if SERVER then
 	--- Called when a money printer is about to catch fire. DarkRP only. Called between moneyPrinterPrintMoney and moneyPrinterPrinted.
 	-- Not guaranteed to work for non-vanilla money printers.
 	-- Only works if the owner of the chip also owns the money printer, or if the chip is running in superuser mode.
-	-- @name moneyPrinterCatchFire
+	-- @name MoneyPrinterCatchFire
 	-- @class hook
 	-- @server
 	-- @param Entity moneyprinter The money printer that is about to catch fire
@@ -471,7 +471,7 @@ if SERVER then
 	--- Called after a money printer is has printed money. DarkRP only.
 	-- Not guaranteed to work for non-vanilla money printers.
 	-- Only works if the owner of the chip also owns the money printer, or if the chip is running in superuser mode.
-	-- @name moneyPrinterPrinted
+	-- @name MoneyPrinterPrinted
 	-- @class hook
 	-- @server
 	-- @param Entity moneyprinter The money printer
@@ -489,7 +489,7 @@ if SERVER then
 	-- Not guaranteed to work for non-vanilla money printers.
 	-- You should use moneyPrinterPrinted instead, as the printer is not guaranteed to print money even if this hook is called.
 	-- Only works if the owner of the chip also owns the money printer, or if the chip is running in superuser mode.
-	-- @name moneyPrinterPrintMoney
+	-- @name MoneyPrinterPrintMoney
 	-- @class hook
 	-- @server
 	-- @param Entity moneyprinter The money printer
@@ -506,7 +506,7 @@ if SERVER then
 	
 	--- Called when a player receives money. DarkRP only.
 	-- Will only be called if the recipient is the owner of the chip, or if the chip is running in superuser mode.
-	-- @name playerWalletChanged
+	-- @name PlayerWalletChanged
 	-- @class hook
 	-- @server
 	-- @param Player ply The player who is getting money.
@@ -522,7 +522,7 @@ if SERVER then
 	end)
 	
 	--- Called when a lockdown has ended. DarkRP only.
-	-- @name lockdownEnded
+	-- @name LockdownEnded
 	-- @class hook
 	-- @server
 	-- @param Player? actor The player who ended the lockdown, or nil.
@@ -532,7 +532,7 @@ if SERVER then
 	end)
 
 	--- Called when a lockdown has started. DarkRP only.
-	-- @name lockdownStarted
+	-- @name LockdownStarted
 	-- @class hook
 	-- @server
 	-- @param Player? actor The player who started the lockdown, or nil.
@@ -542,7 +542,7 @@ if SERVER then
 	end)
 
 	--- Called when a law is added. DarkRP only.
-	-- @name addLaw
+	-- @name AddLaw
 	-- @class hook
 	-- @param number index Index of the law
 	-- @param string law Law string
@@ -554,7 +554,7 @@ if SERVER then
 	end)
 
 	--- Called when a law is removed. DarkRP only. Not usually called when /resetlaws is used.
-	-- @name removeLaw
+	-- @name RemoveLaw
 	-- @class hook
 	-- @server
 	-- @param number index Index of the law
@@ -567,7 +567,7 @@ if SERVER then
 	end)
 
 	--- Called when laws are reset. DarkRP only. Usually the only hook called when /resetlaws is used.
-	-- @name resetLaws
+	-- @name ResetLaws
 	-- @class hook
 	-- @server
 	-- @param Player? player The player resetting the laws.
@@ -578,7 +578,7 @@ if SERVER then
 
 	--- Called when a player is about to pick a lock. DarkRP only.
 	-- Will only be called if the lockpicker is the owner of the chip, or if the chip is running in superuser mode.
-	-- @name lockpickStarted
+	-- @name LockpickStarted
 	-- @class hook
 	-- @server
 	-- @param Player ply The player that is about to pick a lock.
@@ -598,7 +598,7 @@ if SERVER then
 
 	--- Called when a player has finished picking a lock, successfully or otherwise. DarkRP only.
 	-- Will only be called if the lockpicker is the owner of the chip, or if the chip is running in superuser mode.
-	-- @name onLockpickCompleted
+	-- @name OnLockpickCompleted
 	-- @class hook
 	-- @server
 	-- @param Player ply The player attempting to lockpick the entity.
