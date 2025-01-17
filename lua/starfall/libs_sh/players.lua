@@ -115,7 +115,7 @@ end)
 if SERVER then
 	instance:AddHook("deinitialize", function()
 		for k, ply in pairs(player.GetAll()) do
-			if SF.IsHUDActive(instance.entity, ply) then
+			if instance.data.viewEntityChanged then
 				Ply_SetViewEntity(ply)
 			end
 		end
@@ -547,6 +547,7 @@ if SERVER then
 		local ply = getply(self)
 		if ent~=nil then ent = getent(ent) end
 		if not SF.IsHUDActive(instance.entity, ply) then SF.Throw("Player isn't connected to HUD!", 2) end
+		instance.data.viewEntityChanged = ent ~= nil and ent ~= ply
 		Ply_SetViewEntity(ply, ent)
 	end
 

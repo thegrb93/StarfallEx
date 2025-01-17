@@ -236,7 +236,10 @@ if SERVER then
 			local function disconnect(sync)
 				huds[ply] = nil
 				hook.Remove("EntityRemoved", n)
-				ply:SetViewEntity()
+				if chip.instance and chip.instance.data.viewEntityChanged then
+					chip.instance.data.viewEntityChanged = false
+					ply:SetViewEntity()
+				end
 				if IsValid(lockController) and IsValid(lockController.link) then
 					net.Start("starfall_lock_control")
 						net.WriteEntity(lockController.link)
@@ -261,7 +264,10 @@ if SERVER then
 				disconnect(false)
 			end
 		else
-			if not enabled then ply:SetViewEntity() end
+			if not enabled and chip.instance.data.viewEntityChanged then
+				chip.instance.data.viewEntityChanged = false
+				ply:SetViewEntity()
+			end
 			huds[ply] = enabled or nil
 		end
 		runHudHooks(ply, chip, activator, enabled)
