@@ -14,8 +14,7 @@ cvars.AddChangeCallback("starfall_toolscreen_fps", function(_, _, value)
 end)
 
 -- Tuning vars
-local color_background       = Color(33, 33, 40, 30)              -- Background color, alpha controls how fast the stars fade out
-local color_background_solid = ColorAlpha(color_background, 255)  -- Solid version of the background color for the Linux fix
+local color_background       = Color(41, 38, 52)                  -- Background color
 local color_text             = Color(240, 240, 253, 255)          -- Text color for subtitle and scrolling text
 local color_text_outline     = ColorAlpha(color_background, 80)   -- Outline text color for subtitle and scrolling text
 local star_count             = 8                                  -- Amount of stars to render
@@ -117,7 +116,8 @@ local star_canvas, star_canvas_material
 hook.Add("PreRender", "StarfallToolscreenPrepare", function()
 	star_canvas = GetRenderTarget("starfall_tool_canvas", 256, 256)
 	star_canvas_material = CreateMaterial("starfall_tool_material", "UnlitGeneric", { ["$basetexture"] = star_canvas:GetName() })
-	star_canvas_material:SetInt("$flags", 0x8000 + 0x0020 + 0x0010)
+	star_canvas_material:SetInt("$flags", 0x8000 + 0x0010)
+	render.ClearRenderTarget(star_canvas, color_background)
 	hook.Remove("PreRender", "StarfallToolscreenPrepare")
 end)
 
@@ -130,7 +130,6 @@ end)
 
 -------------------------------------------
 
-local is_linux = system.IsLinux()
 local ply_eye_ang_prev = Angle()
 function SF.DrawToolgunScreen(w, h, title, scroll_text)
 	curtime = RealTime()
@@ -153,20 +152,14 @@ function SF.DrawToolgunScreen(w, h, title, scroll_text)
 		local blur = math_clamp(8 + 600 * dt, 12, 30)
 		render.BlurRenderTarget(star_canvas, blur, blur, 1)
 
-		surface.SetMaterial(star_canvas_material)
-		surface.SetDrawColor(color_background.r, color_background.g, color_background.b, math_clamp(3000 * dt + 20, 40, 120))
-		surface.DrawTexturedRect(0, 0, w, h)
+		surface.SetDrawColor(color_background.r, color_background.g, color_background.b, math_clamp(2500 * dt + 20, 30, 100))
+		surface.DrawRect(0, 0, w, h)
 
 		surface.SetMaterial(star_material)
 		for _, star in ipairs(stars) do
 			star_update_and_draw(star)
 		end
 		render.PopRenderTarget()
-	end
-
-	if is_linux then -- On Linux the original tool background is still visible
-		surface.SetDrawColor(color_background_solid)
-		surface.DrawRect(0, 0, w, h)
 	end
 
 	surface.SetDrawColor(255, 255, 255, 255)
