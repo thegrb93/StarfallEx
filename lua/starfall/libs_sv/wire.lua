@@ -874,20 +874,20 @@ wire_library.ports = setmetatable({}, {
 -- ------------------------- Hook Documentation ------------------------- --
 
 --- Called when an input on a wired SF chip is written to
--- @name input
+-- @name Input
 -- @class hook
 -- @param string input The input name
 -- @param any value The value of the input
 
 --- Called when a high speed device reads from a wired SF chip
--- @name readcell
+-- @name ReadCell
 -- @class hook
 -- @server
 -- @param any address The address requested
 -- @return any The value read
 
 --- Called when a high speed device writes to a wired SF chip
--- @name writecell
+-- @name WriteCell
 -- @class hook
 -- @param any address The address written to
 -- @param table data The data being written

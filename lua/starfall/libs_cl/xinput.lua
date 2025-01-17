@@ -4,7 +4,7 @@ local checkluatype = SF.CheckLuaType
 
 --- Called when a controller has been connected. Client must have XInput Lua binary installed.
 -- @client
--- @name xinputConnected
+-- @name XInputConnected
 -- @class hook
 -- @param number id Controller number. Starts at 0
 -- @param number when The timer.realtime() at which this event occurred.
@@ -12,7 +12,7 @@ SF.hookAdd("xinputConnected", "xinputconnected")
 
 --- Called when a controller has been disconnected. Client must have XInput Lua binary installed.
 -- @client
--- @name xinputDisconnected
+-- @name XInputDisconnected
 -- @class hook
 -- @param number id Controller number. Starts at 0
 -- @param number when The timer.realtime() at which this event occurred.
@@ -20,7 +20,7 @@ SF.hookAdd("xinputDisconnected", "xinputdisconnected")
 
 --- Called when a controller button has been pressed. Client must have XInput Lua binary installed.
 -- @client
--- @name xinputPressed
+-- @name XInputPressed
 -- @class hook
 -- @param number id Controller number. Starts at 0
 -- @param number button The button that was pushed. See https://github.com/mitterdoo/garrysmod-xinput#xinput_gamepad_
@@ -29,7 +29,7 @@ SF.hookAdd("xinputPressed", "xinputpressed")
 
 --- Called when a controller button has been released. Client must have XInput Lua binary installed.
 -- @client
--- @name xinputReleased
+-- @name XInputReleased
 -- @class hook
 -- @param number id Controller number. Starts at 0
 -- @param number button The button that was released. See https://github.com/mitterdoo/garrysmod-xinput#xinput_gamepad_
@@ -38,7 +38,7 @@ SF.hookAdd("xinputReleased", "xinputreleased")
 
 --- Called when a trigger on the controller has moved. Client must have XInput Lua binary installed.
 -- @client
--- @name xinputTrigger
+-- @name XInputTrigger
 -- @class hook
 -- @param number id Controller number. Starts at 0
 -- @param number value The position of the trigger. 0-255 inclusive
@@ -48,7 +48,7 @@ SF.hookAdd("xinputTrigger", "xinputtrigger")
 
 --- Called when a stick on the controller has moved. Client must have XInput Lua binary installed.
 -- @client
--- @name xinputStick
+-- @name XInputStick
 -- @class hook
 -- @param number id Controller number. Starts at 0
 -- @param number x The X coordinate of the trigger. -32768 - 32767 inclusive

@@ -27,7 +27,7 @@ end)
 --- Event hook for midi devices.  
 -- Everytime a midi device outputs a signal, the callback function on the hook is called.
 -- Read up on the MIDI protocol to make better sense of everything -> https://ccrma.stanford.edu/~craig/articles/linuxmidi/misc/essenmidi.html
--- @name midi
+-- @name MIDI
 -- @class hook
 -- @client
 -- @libtbl midi_library

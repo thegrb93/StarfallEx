@@ -518,7 +518,7 @@ end
 end
 
 --- Called when a net message arrives
--- @name net
+-- @name Net
 -- @class hook
 -- @param string name Name of the arriving net message
 -- @param number len Length of the arriving net message in bits

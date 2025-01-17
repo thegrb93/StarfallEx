@@ -562,7 +562,7 @@ add("EndEntityDriving")
 add("StartEntityDriving")
 
 --- Tick hook. Called each game tick on both the server and client.
--- @name tick
+-- @name Tick
 -- @class hook
 -- @shared
 add("Tick")
@@ -684,7 +684,7 @@ end
 
 --- Remote hook.
 -- This hook can be called from other instances
--- @name remote
+-- @name Remote
 -- @class hook
 -- @shared
 -- @param Entity sender The entity that caused the hook to run
@@ -754,7 +754,7 @@ end
 -- Hooks below are not simple gmod hooks and are called by other events in other files.
 
 --- Think hook. Called each frame on the client and each game tick on the server.
--- @name think
+-- @name Think
 -- @class hook
 -- @shared
 
@@ -788,27 +788,27 @@ end
 -- @param Entity ent The component entity
 
 --- Called when the player disconnects from a HUD component linked to the Starfall Chip
--- @name huddisconnected
+-- @name HUDDisconnected
 -- @class hook
 -- @shared
 -- @param Entity ent The hud component entity
 -- @param Player ply The player who disconnected
 
 --- Called when the player connects to a HUD component linked to the Starfall Chip
--- @name hudconnected
+-- @name HUDConnected
 -- @class hook
 -- @shared
 -- @param Entity ent The hud component entity
 -- @param Player ply The player who connected
 
 --- Called when a player uses the screen
--- @name starfallUsed
+-- @name StarfallUsed
 -- @class hook
 -- @param Player activator Player who used the screen or chip
 -- @param Entity used The screen or chip entity that was used
 
 --- Called when a frame is requested to be drawn on screen. (2D/3D Context)
--- @name render
+-- @name Render
 -- @class hook
 -- @client
 
