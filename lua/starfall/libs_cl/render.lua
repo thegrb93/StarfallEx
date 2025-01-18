@@ -260,7 +260,11 @@ end)
 -- @param boolean depth Whether the current draw is writing depth
 -- @param boolean skybox Whether the current draw is drawing the skybox
 -- @param boolean skybox3d Whether the current draw is drawing the 3D skybox
-SF.hookAdd("PreDrawOpaqueRenderables", nil, hudPrepareSafeArgs, cleanupRender)
+-- @return boolean Return true to prevent opaque entities from drawing
+SF.hookAdd("PreDrawOpaqueRenderables", nil, hudPrepareSafeArgs, function(instance, args)
+	instance:cleanupRender()
+	if args[1] and args[2]==true then return true end
+end)
 
 --- Called after opaque entities are drawn. (Only works with HUD) (3D context)
 -- @name PostDrawOpaqueRenderables
@@ -278,7 +282,11 @@ SF.hookAdd("PostDrawOpaqueRenderables", nil, hudPrepareSafeArgs, cleanupRender)
 -- @param boolean depth Whether the current draw is writing depth
 -- @param boolean skybox Whether the current draw is drawing the skybox
 -- @param boolean skybox3d Whether the current draw is drawing the 3D skybox
-SF.hookAdd("PreDrawTranslucentRenderables", nil, hudPrepareSafeArgs, cleanupRender)
+-- @return boolean Return true to prevent translucent entities from drawing
+SF.hookAdd("PreDrawTranslucentRenderables", nil, hudPrepareSafeArgs, function(instance, args)
+	instance:cleanupRender()
+	if args[1] and args[2]==true then return true end
+end)
 
 --- Called after translucent entities are drawn. (Only works with HUD) (3D context)
 -- @name PostDrawTranslucentRenderables
@@ -322,6 +330,7 @@ end, function(instance, args)
 	instance:cleanupRender()
 	if args[1] and args[2]==true then return true end
 end)
+
 --- Called before drawing the viewmodel rendergroup (3D Context)
 -- @name PreDrawViewModels
 -- @class hook
