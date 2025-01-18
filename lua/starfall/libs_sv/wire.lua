@@ -746,7 +746,7 @@ end
 --- Checks if a wirelink is valid. (ie. doesn't point to an invalid entity)
 -- @return boolean Whether the wirelink is valid
 function wirelink_methods:isValid()
-	return wlunwrap(self):Ent_IsValid()
+	return Ent_IsValid(wlunwrap(self))
 end
 
 --- Returns current state of the specified input
