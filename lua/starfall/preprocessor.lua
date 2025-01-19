@@ -73,7 +73,9 @@ SF.PreprocessData = {
 			
 			for _, incdata in ipairs(self.includesdata) do
 				incdata = processor:ResolvePath(incdata, self.path) or error("Bad --@includedata "..incdata.." in file "..self.path)
-				processor.files[incdata].datafile = true
+				local fdata = processor.files[incdata]
+				fdata.datafile = true
+				fdata.serverorclient = self.serverorclient
 			end
 		end
 	},
