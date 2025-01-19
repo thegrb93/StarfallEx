@@ -1016,8 +1016,16 @@ registerSent("starfall_processor", {
 	_preFactory = function(ply, self)
 	end,
 	_postFactory = function( ply, self, enttbl )
+		local Files = {
+			["main"] = enttbl.Code
+		}
+		for path, code in pairs(enttbl.Files) do
+			checkluatype(path, TYPE_STRING, 3, "Parameter: Files[" .. path .. "]")
+			checkluatype(code, TYPE_STRING, 3, "Parameter: Files[" .. path .. "]")
+			Files[path] = code
+		end
 		local Data = {
-			["files"] = {["main"] = enttbl.Code},
+			["files"] = Files,
 			["mainfile"] = "main",
 			["owner"] = ply
 		}
@@ -1026,6 +1034,7 @@ registerSent("starfall_processor", {
 	{
 		["Model"] = {TYPE_STRING, "models/spacecode/sfchip_medium.mdl"},
 		["Code"] = {TYPE_STRING},
+		["Files"] = {TYPE_TABLE, {}}
 	}
 })
 
@@ -1330,6 +1339,7 @@ return function() end
 -- > starfall_processor
 -- string Model = "models/spacecode/sfchip_medium.mdl"
 -- string Code
+-- table Files = {main = Code}
 -- 
 -- > gmod_wire_extbus
 -- string Model = "models/jaanus/wiretool/wiretool_gate.mdl"
