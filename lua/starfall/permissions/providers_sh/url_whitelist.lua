@@ -9,7 +9,7 @@ local function checkWhitelist(instance, url, key)
 		url = "http://"..url
 	end
 
-	local result = gamemode.Call("CanAccessUrl", url)
+	local result = hook.Call("CanAccessUrl", url)
 	if result==true then return true
 	elseif result==false then return false, "The url was blocked"
 	end
