@@ -180,6 +180,11 @@ local function cleanupRender(instance)
 	instance:cleanupRender()
 end
 
+local function cleanupRenderAllowTrueReturn(instance, args)
+	instance:cleanupRender()
+	if args[1] and args[2]==true then return true end
+end
+
 local function canRenderHud(instance)
 	return SF.IsHUDActive(instance.entity) and (haspermission(instance, nil, "render.hud") or instance.player == SF.Superuser)
 end
@@ -260,7 +265,8 @@ end)
 -- @param boolean depth Whether the current draw is writing depth
 -- @param boolean skybox Whether the current draw is drawing the skybox
 -- @param boolean skybox3d Whether the current draw is drawing the 3D skybox
-SF.hookAdd("PreDrawOpaqueRenderables", nil, hudPrepareSafeArgs, cleanupRender)
+-- @return boolean Return true to prevent opaque entities from drawing
+SF.hookAdd("PreDrawOpaqueRenderables", nil, hudPrepareSafeArgs, cleanupRenderAllowTrueReturn)
 
 --- Called after opaque entities are drawn. (Only works with HUD) (3D context)
 -- @name PostDrawOpaqueRenderables
@@ -278,7 +284,8 @@ SF.hookAdd("PostDrawOpaqueRenderables", nil, hudPrepareSafeArgs, cleanupRender)
 -- @param boolean depth Whether the current draw is writing depth
 -- @param boolean skybox Whether the current draw is drawing the skybox
 -- @param boolean skybox3d Whether the current draw is drawing the 3D skybox
-SF.hookAdd("PreDrawTranslucentRenderables", nil, hudPrepareSafeArgs, cleanupRender)
+-- @return boolean Return true to prevent translucent entities from drawing
+SF.hookAdd("PreDrawTranslucentRenderables", nil, hudPrepareSafeArgs, cleanupRenderAllowTrueReturn)
 
 --- Called after translucent entities are drawn. (Only works with HUD) (3D context)
 -- @name PostDrawTranslucentRenderables
@@ -305,6 +312,20 @@ SF.hookAdd("PostDrawHUD", nil, function(instance)
 		return true, {}
 	end
 end, cleanupRender)
+
+--- Called before drawing the player. (Only works with HUD) (3D Context)
+-- @name PreDrawPlayer
+-- @class hook
+-- @client
+-- @param Player ply Player that's about to be drawn
+-- @param number flags STUDIO flags for the render operation
+-- @return boolean Return true to prevent the player from drawing
+SF.hookAdd("PrePlayerDraw", "predrawplayer", function(instance, ply, flags)
+	if canRenderHud(instance) then
+		return true, { instance.Types.Player.Wrap(ply), flags }
+	end
+	return false
+end, cleanupRenderAllowTrueReturn)
 
 --- Called before drawing the viewmodel rendergroup (3D Context)
 -- @name PreDrawViewModels
@@ -350,10 +371,7 @@ end)
 -- @class hook
 -- @client
 -- @return boolean Return true to not predraw the skybox both 2d and 3d
-SF.hookAdd("PreDrawSkyBox", nil, hudPrepareSafeArgs, function(instance, args)
-	instance:cleanupRender()
-    if args[1] and args[2]==true then return true end
-end)
+SF.hookAdd("PreDrawSkyBox", nil, hudPrepareSafeArgs, cleanupRenderAllowTrueReturn)
 
 --- Called right after the 2D skybox has been drawn - allowing you to draw over it.
 -- @name PostDraw2DSkyBox
