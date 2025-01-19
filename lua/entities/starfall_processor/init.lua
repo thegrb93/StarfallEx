@@ -87,6 +87,7 @@ function ENT:SendCode(recipient)
 	if self.sfownerdata then -- Send specific data for owner if there are owner-only files
 		local others = {}
 		for _, ply in ipairs(recipient and (istable(recipient) and recipient or { recipient }) or player.GetHumans()) do
+			if ply:GetInfoNum("sf_enabled_cl", 0)==0 then continue end
 			if ply==self.owner then
 				SF.SendStarfall("starfall_processor_download", self.sfownerdata, self.owner)
 			else
