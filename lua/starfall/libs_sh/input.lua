@@ -8,7 +8,9 @@ if CLIENT then
 end
 
 -- This should manage the player button hooks for singleplayer games.
+local PlayerButtonDown, PlayerButtonUp
 if game.SinglePlayer() then
+	PlayerButtonDown, PlayerButtonUp = "SF_PlayerButtonDown", "SF_PlayerButtonUp"
 	if SERVER then
 		util.AddNetworkString("sf_relayinput")
 
@@ -37,6 +39,8 @@ if game.SinglePlayer() then
 			end
 		end)
 	end
+else
+	PlayerButtonDown, PlayerButtonUp = "PlayerButtonDown", "PlayerButtonUp"
 end
 if SERVER then
 	util.AddNetworkString("starfall_lock_control")
@@ -47,9 +51,6 @@ registerprivilege("input", "Input", "Allows the user to see what buttons you're 
 registerprivilege("input.chat", "Input", "Allows the user to see your chat keypresses.", { client = { default = 1 } })
 registerprivilege("input.bindings", "Input", "Allows the user to see your bindings.", { client = { default = 1 } })
 registerprivilege("input.emulate", "Input", "Allows starfall to emulate user input.", { client = { default = 1 } })
-
-local PlayerButtonDown = game.SinglePlayer() and "SF_PlayerButtonDown" or "PlayerButtonDown"
-local PlayerButtonUp = game.SinglePlayer() and "SF_PlayerButtonUp" or "PlayerButtonUp"
 
 local controlsLocked = false
 local function unlockControls(instance)
