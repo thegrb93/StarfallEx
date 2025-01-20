@@ -879,7 +879,7 @@ end
 -- @param Entity ent The door
 -- @param Player ply The player to query.
 -- @return boolean Whether this door is (co-)owned by the player.
-function darkrp_library.isKeysOwnedBy(ply)
+function darkrp_library.isKeysOwnedBy(ent, ply)
 	ply = getply(ply)
 	return assertsafety(getent(ent):isKeysOwnedBy(ply))
 end
@@ -887,7 +887,7 @@ end
 --- Get whether this entity is a "money bag", i.e. dropped money from a money printer or /dropmoney. DarkRP only.
 -- @param Entity ent The entity
 -- @return boolean Whether this entity is a money bag.
-function darkrp_library.isMoneyBag()
+function darkrp_library.isMoneyBag(ent)
 	return assertsafety(getent(ent):isMoneyBag())
 end
 
