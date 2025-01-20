@@ -446,7 +446,7 @@ if CLIENT then
 			end
 
 			if table.Count(spawnmenu.GetPropTable()) == 0 then
-				hook.Call("PopulatePropMenu", GAMEMODE)
+				hook.Run("PopulatePropMenu")
 			end
 
 			fillNavBar(spawnmenu.GetPropTable(), root)
