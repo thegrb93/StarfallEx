@@ -22,6 +22,7 @@ else
 	SF.softLockProtectionOwner = CreateConVar("sf_timebuffersoftlock_cl_owner", 1, FCVAR_ARCHIVE, "If sf_timebuffersoftlock_cl is 0, this enabled will make it only your own chips will be affected.")
 	SF.RamCap = CreateConVar("sf_ram_max_cl", 1500000, FCVAR_ARCHIVE, "If ram exceeds this limit (in kB), starfalls will be terminated")
 	SF.AllowSuperUser = CreateConVar("sf_superuserallowed", 0, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Whether the starfall superuser feature is allowed")
+	SF.CvarEnabled = CreateConVar( "sf_enabled_cl", "1", { FCVAR_ARCHIVE, FCVAR_USERINFO, FCVAR_DONTRECORD }, "Enable clientside starfall" )
 end
 local ramlimit = SF.RamCap:GetInt()
 cvars.AddChangeCallback(SF.RamCap:GetName(), function() ramlimit = SF.RamCap:GetInt() end)
@@ -57,6 +58,7 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 	end
 	local ok, message = hook.Run("StarfallCanCompile", code, mainfile, player, entity)
 	if ok == false then return false, { message = message, traceback = "" } end
+	if CLIENT and not SF.CvarEnabled:GetBool() then return false, { message = "Clientside disabled", traceback = "" } end
 
 	local instance = setmetatable({}, SF.Instance)
 	instance.entity = entity
