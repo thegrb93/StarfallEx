@@ -2,14 +2,19 @@
 
 local urlrestrictor = SF.StringRestrictor(false)
 
-local function checkWhitelist(instance, target, key)
-	if TypeID(target) ~= TYPE_STRING then return false, "The url is not a string" end
-	local prefix = string.match(target,"^(%w-)://") -- Check if protocol was given
-	if not prefix then -- If not, add http://
-		target = "http://"..target
+local function checkWhitelist(instance, url, key)
+	if TypeID(url) ~= TYPE_STRING then return false, "The url is not a string" end
+
+	if not string.match(url,"^(%w-)://") then
+		url = "http://"..url
 	end
 
-	local prefix, site, data = string.match(target,"^(%w-)://([^/]*)/?(.*)")
+	local result = hook.Run("CanAccessUrl", url)
+	if result==true then return true
+	elseif result==false then return false, "The url was blocked"
+	end
+
+	local prefix, site, data = string.match(url,"^(%w-)://([^/]*)/?(.*)")
 	if not site then return false, "This url is malformed" end
 	site = site.."/"..(data or "") -- Make sure there is / at the end of site
 	return urlrestrictor:check(site), "This url is not whitelisted. See https://github.com/thegrb93/StarfallEx/wiki/Whitelist for more information."
@@ -27,9 +32,9 @@ P.checks = {
 
 if CLIENT then
 	P.settingsoptions[3] = "Disabled for owner"
-	P.checks[3] = function(instance, target, player)
+	P.checks[3] = function(instance, url, player)
 		if instance.player == LocalPlayer() then return true end
-		return checkWhitelist(instance, target, player)
+		return checkWhitelist(instance, url, player)
 	end
 end
 
