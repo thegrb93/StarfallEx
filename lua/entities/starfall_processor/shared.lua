@@ -303,8 +303,9 @@ else
 			if v.ActiveHuds[ply] then
 				SF.EnableHud(ply, v, nil, false)
 
-				if v.instance.permissionOverrides then
-					v.instance.permissionOverrides.enablehud = nil
+				local instance = v.instance
+				if instance and instance.permissionOverrides then
+					instance.permissionOverrides.enablehud = nil
 				end
 			end
 		end
