@@ -531,7 +531,7 @@ function SF.Instance:runExternal(func, ...)
 	self:pushCpuCheck()
 	local ok, err = xpcall(func, debug.traceback, ...)
 	self:popCpuCheck()
-	if ok then return err else ErrorNoHalt(err) end
+	return ok, err
 end
 
 local function xpcall_callback(err)
