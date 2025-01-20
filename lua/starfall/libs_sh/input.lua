@@ -10,6 +10,7 @@ end
 -- This should manage the player button hooks for singleplayer games.
 local PlayerButtonDown, PlayerButtonUp
 if game.SinglePlayer() then
+	PlayerButtonDown, PlayerButtonUp = "SF_PlayerButtonDown", "SF_PlayerButtonUp"
 	if SERVER then
 		util.AddNetworkString("sf_relayinput")
 
@@ -38,6 +39,8 @@ if game.SinglePlayer() then
 			end
 		end)
 	end
+else
+	PlayerButtonDown, PlayerButtonUp = "PlayerButtonDown", "PlayerButtonUp"
 end
 if SERVER then
 	util.AddNetworkString("starfall_lock_control")
@@ -54,7 +57,7 @@ local function unlockControls(instance)
 	instance.data.input.controlsLocked = false
 	controlsLocked = false
 	hook.Remove("PlayerBindPress", "sf_keyboard_blockinput")
-	hook.Remove("PlayerButtonDown", "sf_keyboard_unblockinput")
+	hook.Remove(PlayerButtonDown, "sf_keyboard_unblockinput")
 end
 
 local function lockControls(instance)
@@ -65,7 +68,7 @@ local function lockControls(instance)
 	hook.Add("PlayerBindPress", "sf_keyboard_blockinput", function(ply, bind, pressed)
 		if bind ~= "+attack" and bind ~= "+attack2" then return true end
 	end)
-	hook.Add("PlayerButtonDown", "sf_keyboard_unblockinput", function(ply, but)
+	hook.Add(PlayerButtonDown, "sf_keyboard_unblockinput", function(ply, but)
 		if but == KEY_LALT or but == KEY_RALT then
 			unlockControls(instance)
 		end
@@ -103,24 +106,19 @@ local function CheckButtonPerms(instance, ply, button)
 	return true, { button }
 end
 
-if game.SinglePlayer() then
-	SF.hookAdd("SF_PlayerButtonDown", "inputpressed", CheckButtonPerms)
-	SF.hookAdd("SF_PlayerButtonUp", "inputreleased", CheckButtonPerms)
-else
-	--- Called when a button is pressed
-	-- @client
-	-- @name InputPressed
-	-- @class hook
-	-- @param number button Number of the button
-	SF.hookAdd("PlayerButtonDown", "inputpressed", CheckButtonPerms)
-	
-	--- Called when a button is released
-	-- @client
-	-- @name InputReleased
-	-- @class hook
-	-- @param number button Number of the button
-	SF.hookAdd("PlayerButtonUp", "inputreleased", CheckButtonPerms)
-end
+--- Called when a button is pressed
+-- @client
+-- @name InputPressed
+-- @class hook
+-- @param number button Number of the button
+SF.hookAdd(PlayerButtonDown, "inputpressed", CheckButtonPerms)
+
+--- Called when a button is released
+-- @client
+-- @name InputReleased
+-- @class hook
+-- @param number button Number of the button
+SF.hookAdd(PlayerButtonUp, "inputreleased", CheckButtonPerms)
 
 --- Called when a keybind is pressed
 -- @client
