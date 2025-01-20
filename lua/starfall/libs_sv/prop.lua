@@ -605,14 +605,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		enttbl.Pos = pos
 		enttbl.Angle = ang
 
-		-- Temporarily disable SF runningOps, because SENT like E2 rely on string metatable methods!
-		-- E2 calls string:find with colon sugar syntax, this means E2 code ended up calling into string __index metamethod (see sflib.lua where SF does metatable patching).
-		-- In case of E2, it usually results in obscure errors being thrown (such as "error in error handling", random things being nil, etc).
-		local runningOpsBackup = SF.runningOps
-		SF.runningOps = nil
-
-		-- Better be safe, pcall this to ensure we continue running our code, in case these external functions cause an error...
-		local isOk, errorMsg = pcall(function()
+		local isOk, errorMsg = instance:runExternal(function()
 			if sent2._preFactory then
 				sent2._preFactory(ply, enttbl)
 			end
@@ -638,7 +631,6 @@ function props_library.createSent(pos, ang, class, frozen, data)
 			end
 		end)
 
-		SF.runningOps = runningOpsBackup -- Restore back runningOps to SF control, and everything is fine :)
 		if not isOk then
 			if IsValid(entity) then
 				entity:Remove()

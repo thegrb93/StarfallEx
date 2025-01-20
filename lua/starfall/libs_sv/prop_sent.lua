@@ -1011,6 +1011,8 @@ registerSent("gmod_wire_expression2", {
 		["inc_files"] = {TYPE_TABLE, {}},
 	}
 })
+end
+end)
 
 registerSent("starfall_processor", {
 	_preFactory = function(ply, self)
@@ -1037,9 +1039,6 @@ registerSent("starfall_processor", {
 		["Files"] = {TYPE_TABLE, {}}
 	}
 })
-
-end
-end)
 
 function SF.PrintCustomSENTDocs()
 	local tostr = {
