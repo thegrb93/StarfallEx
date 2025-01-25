@@ -116,12 +116,12 @@ end
 -- @param string name The name of userinfo variable.
 -- @return string|nil Returns the value of the given client-side userinfo ConVar (truncated to 31 bytes).
 function convar_library.getUserInfo(name)
+	if CLIENT then
+		checkpermission(instance, name, "convar.userinfo")
+	end
 	checkluatype(name, TYPE_STRING)
 	local ply = SERVER and instance.player or LocalPlayer()
 	if IsValid(ply) then
-		if CLIENT then
-			checkpermission(instance, name, "convar.userinfo")
-		end
 		return tostring(Ply_GetInfo(ply, name) or "")
 	end
 end
