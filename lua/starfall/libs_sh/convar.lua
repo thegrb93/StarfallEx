@@ -19,6 +19,11 @@ local Ply_GetInfo = PLY_META.GetInfo
 
 local convar_library = instance.Libraries.convar
 
+local getply
+instance:AddHook("initialize", function()
+	getply = instance.Types.Player.GetPlayer
+end)
+
 if CLIENT then
 
 	local function getValidConVar(name)
@@ -114,12 +119,11 @@ end
 -- @param string name The name of userinfo variable.
 -- @return string Returns the value of the given client-side userinfo ConVar (truncated to 31 bytes).
 function convar_library.getUserInfo(name)
+	checkluatype(name, TYPE_STRING)
 	if CLIENT then
 		checkpermission(instance, name, "convar")
 	end
-	checkluatype(name, TYPE_STRING)
-	local ply = SERVER and instance.player or LocalPlayer()
-	return IsValid(ply) and Ply_GetInfo(ply, name) or ""
+	return Ply_GetInfo(getply(instance.player), name)
 end
 
 end
