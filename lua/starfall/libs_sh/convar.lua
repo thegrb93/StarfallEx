@@ -19,11 +19,6 @@ local Ply_GetInfo = PLY_META.GetInfo
 
 local convar_library = instance.Libraries.convar
 
-local getply
-instance:AddHook("initialize", function()
-	getply = instance.Types.Player.GetPlayer
-end)
-
 if CLIENT then
 
 	local function getValidConVar(name)
@@ -123,7 +118,8 @@ function convar_library.getUserInfo(name)
 	if CLIENT then
 		checkpermission(instance, name, "convar")
 	end
-	return Ply_GetInfo(getply(instance.player), name)
+	local ply = SERVER and instance.player or LocalPlayer()
+	return IsValid(ply) and Ply_GetInfo(ply, name) or ""
 end
 
 end
