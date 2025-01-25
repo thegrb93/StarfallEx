@@ -401,7 +401,7 @@ function builtins_library.getUserInfo(name)
 	local ply = SERVER and instance.player or LocalPlayer()
 	if IsValid(ply) then
 		if CLIENT then
-			checkpermission(instance, nil, "convar.userinfo")
+			checkpermission(instance, name, "convar.userinfo")
 		end
 		return tostring(Ply_GetInfo(ply, name) or "")
 	end
