@@ -1,9 +1,15 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local dgetmeta = debug.getmetatable
+local registerprivilege = SF.Permissions.registerPrivilege
 local IsValid = FindMetaTable("Entity").IsValid
+local PLY_META = FindMetaTable("Player")
 
-SF.Permissions.registerPrivilege("console.command", "Console command", "Allows the starfall to run console commands")
+-- Register privileges
+registerprivilege("console.command", "Console command", "Allows the starfall to run console commands")
+if CLIENT then
+	registerprivilege("convar.userinfo", "Retrieves userinfo associated with client-side ConVar (with `getUserInfo`).", "Allows users to retrieve value of userinfo ConVars.", { client = { default = 1 } })
+end
 
 local userdataLimit, restartCooldown, printBurst, concmdBurst
 if SERVER then
@@ -12,7 +18,7 @@ if SERVER then
 	printBurst = SF.BurstObject("print", "print", 3000, 10000, "The print burst regen rate in Bytes/sec.", "The print burst limit in Bytes")
 	concmdBurst = SF.BurstObject("concmd", "concmd", 1000, 1000, "The concmd burst regen rate in Bytes/sec.", "The concmd burst limit in Bytes")
 else
-	SF.Permissions.registerPrivilege("enablehud", "Allow enabling hud", "Allows the starfall to enable hud rendering", { client = { default = 1 } })
+	registerprivilege("enablehud", "Allow enabling hud", "Allows the starfall to enable hud rendering", { client = { default = 1 } })
 	restartCooldown = CreateConVar("sf_restart_cooldown_cl", 5, FCVAR_ARCHIVE, "The cooldown for using restart() on the same chip.", 0.1, 60)
 end
 
@@ -32,6 +38,7 @@ SF.RegisterLibrary("debug")
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 local haspermission = instance.player ~= SF.Superuser and SF.Permissions.hasAccess or function() return true end
+local Ply_GetInfo = PLY_META.GetInfo
 
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
@@ -384,6 +391,20 @@ if CLIENT then
 		end
 	end
 
+end
+
+--- Retrieves the value of a client-side userinfo ConVar.
+-- @param string name The name of userinfo variable.
+-- @return string|nil Returns the value of the given client-side userinfo ConVar (truncated to 31 bytes).
+function builtins_library.getUserInfo(name)
+	checkluatype(name, TYPE_STRING)
+	local ply = SERVER and instance.player or LocalPlayer()
+	if IsValid(ply) then
+		if CLIENT then
+			checkpermission(instance, nil, "convar.userinfo")
+		end
+		return tostring(Ply_GetInfo(ply, name) or "")
+	end
 end
 
 
