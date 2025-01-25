@@ -1,11 +1,9 @@
 
 local checkluatype = SF.CheckLuaType
-local registerprivilege = SF.Permissions.registerPrivilege
 local PLY_META = FindMetaTable("Player")
 
 if CLIENT then
-	registerprivilege("convar", "Read ConVars", "Allows Starfall to read your game settings", { client = {} })
-	registerprivilege("convar.userinfo", "Retrieves userinfo associated with client-side ConVar (with `getUserInfo`).", "Allows users to retrieve value of userinfo ConVars.", { client = { default = 1 } })
+	SF.Permissions.registerPrivilege("convar", "Read ConVars", "Allows Starfall to read your game settings", { client = {} })
 end
 
 
@@ -117,7 +115,7 @@ end
 -- @return string|nil Returns the value of the given client-side userinfo ConVar (truncated to 31 bytes).
 function convar_library.getUserInfo(name)
 	if CLIENT then
-		checkpermission(instance, name, "convar.userinfo")
+		checkpermission(instance, name, "convar")
 	end
 	checkluatype(name, TYPE_STRING)
 	local ply = SERVER and instance.player or LocalPlayer()
