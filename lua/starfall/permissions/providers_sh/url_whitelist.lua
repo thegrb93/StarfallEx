@@ -149,7 +149,7 @@ simple [[puu.sh]]
 ---  http://images.akamai.steamusercontent.com/ugc/367407720941694853/74457889F41A19BD66800C71663E9077FA440664/
 ---  https://steamuserimages-a.akamaihd.net/ugc/1475443067859980096/685F2468519E31C5C214959EC3AA0B0757B01E1B/
 ---  https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/4000/dca12980667e32ab072d79f5dbe91884056a03a2.jpg
-simple [[https://steamcommunity.com/profiles/]]
+simple [[steamcommunity.com/profiles]]
 simple [[steamuserimages-a.akamaihd.net]]
 simple [[steamcdn-a.akamaihd.net]]
 pattern [[images%.[%w-_]+%.steamusercontent%.com/(.+)]]
