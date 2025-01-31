@@ -125,11 +125,15 @@ SF.hookAdd(PlayerButtonUp, "inputreleased", CheckButtonPerms)
 -- @name InputBindPressed
 -- @class hook
 -- @param string bind Name of keybind pressed
+-- @return boolean Returning true will block the binding from being pressed for the chip owner
 SF.hookAdd("PlayerBindPress", "inputbindpressed", function(instance, ply, bind)
 	if haspermission(instance, nil, "input") then
 		return true, {bind}
 	end
 	return false
+end,
+function(instance, args, ply)
+	if args[1] and args[2] and instance.player == LocalPlayer() then return true end
 end)
 
 --- Called when the mouse is moved
