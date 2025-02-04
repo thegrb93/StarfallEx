@@ -16,45 +16,6 @@ local IsValid = FindMetaTable("Entity").IsValid
 hook.Add("StarfallProcessDocs", "DarkRP", function(docs)
 	if DarkRP then return end
 	docs.Libraries.darkrp = nil
-
-	local ent_methods = docs.Types.Entity.methods
-	ent_methods.doorIndex = nil
-	ent_methods.isLocked = nil
-	ent_methods.getDoorOwner = nil
-	ent_methods.getKeysTitle = nil
-	ent_methods.isDoor = nil
-	ent_methods.isKeysOwned = nil
-	ent_methods.isKeysOwnedBy = nil
-	ent_methods.isMoneyBag = nil
-	ent_methods.getMoneyAmount = nil
-	ent_methods.getShipmentCount = nil
-	ent_methods.getShipmentContentsIndex = nil
-	ent_methods.getShipmentContents = nil
-
-	local ply_methods = docs.Types.Player.methods
-	ply_methods.keysUnOwnAll = nil
-	ply_methods.teamBanTimeLeft = nil
-	ply_methods.requestMoney = nil
-	ply_methods.giveMoney = nil
-	ply_methods.isInRoom = nil
-	ply_methods.canAfford = nil
-	ply_methods.canKeysLock = nil
-	ply_methods.canKeysUnlock = nil
-	ply_methods.getDarkRPVar = nil
-	ply_methods.getJobTable = nil
-	ply_methods.getPocketItems = nil
-	ply_methods.getWantedReason = nil
-	ply_methods.hasDarkRPPrivilege = nil
-	ply_methods.isArrested = nil
-	ply_methods.isChief = nil
-	ply_methods.isCook = nil
-	ply_methods.isCP = nil
-	ply_methods.isHitman = nil
-	ply_methods.isMayor = nil
-	ply_methods.isMedic = nil
-	ply_methods.isWanted = nil
-	ply_methods.getMoney = nil
-
 	docs.Hooks.moneyPrinterCatchFire = nil
 	docs.Hooks.moneyPrinterPrinted = nil
 	docs.Hooks.moneyPrinterPrintMoney = nil
@@ -869,91 +830,103 @@ end
 if SERVER then
 	--- Get the DarkRP door index of a door. Use this to store door information in the database.
 	-- @server
+	-- @param Entity ent The door
 	-- @return number? The door index, or nil if not a door.
-	function ents_methods:doorIndex()
-		return assertsafety(getent(self):doorIndex())
+	function darkrp_library.doorIndex(ent)
+		return assertsafety(getent(ent):doorIndex())
 	end
 
 	--- Get whether this door/vehicle is locked. DarkRP only.
 	-- @server
+	-- @param Entity ent The door
 	-- @return boolean Whether it's locked.
-	function ents_methods:isLocked()
-		return assertsafety(getent(self):isLocked())
+	function darkrp_library.isLocked(ent)
+		return assertsafety(getent(ent):isLocked())
 	end
 end
 
 --- Get the owner of a door. DarkRP only.
+-- @param Entity ent The door
 -- @return Player? The owner of the door, or nil if the door is unowned.
-function ents_methods:getDoorOwner()
-	local owner = getent(self):getDoorOwner()
+function darkrp_library.getDoorOwner(ent)
+	local owner = getent(ent):getDoorOwner()
 	if owner then return plywrap(owner) end
 end
 
 --- Get the title of this door or vehicle. DarkRP only.
 -- If you don't know what this is referring to, that's because it's not a commonly used feature. Press F2 on a door and click "Set Door Title".
+-- @param Entity ent The door
 -- @return string? The title of the door or vehicle, or nil if none is set.
-function ents_methods:getKeysTitle()
-	return assertsafety(getent(self):getKeysTitle())
+function darkrp_library.getKeysTitle(ent)
+	return assertsafety(getent(ent):getKeysTitle())
 end
 
 --- Get whether this entity is considered a door by DarkRP.
+-- @param Entity ent The entity
 -- @return boolean Whether it's a door.
-function ents_methods:isDoor()
-	return assertsafety(getent(self):isDoor())
+function darkrp_library.isDoor(ent)
+	return assertsafety(getent(ent):isDoor())
 end
 
 --- Get whether this door is owned by someone.
+-- @param Entity ent The door
 -- @return boolean Whether it's owned.
-function ents_methods:isKeysOwned()
-	return assertsafety(getent(self):isKeysOwned())
+function darkrp_library.isKeysOwned(ent)
+	return assertsafety(getent(ent):isKeysOwned())
 end
 
 --- Get whether this door is owned or co-owned by this player.
+-- @param Entity ent The door
 -- @param Player ply The player to query.
 -- @return boolean Whether this door is (co-)owned by the player.
-function ents_methods:isKeysOwnedBy(ply)
+function darkrp_library.isKeysOwnedBy(ent, ply)
 	ply = getply(ply)
-	return assertsafety(getent(self):isKeysOwnedBy(ply))
+	return assertsafety(getent(ent):isKeysOwnedBy(ply))
 end
 
 --- Get whether this entity is a "money bag", i.e. dropped money from a money printer or /dropmoney. DarkRP only.
+-- @param Entity ent The entity
 -- @return boolean Whether this entity is a money bag.
-function ents_methods:isMoneyBag()
-	return assertsafety(getent(self):isMoneyBag())
+function darkrp_library.isMoneyBag(ent)
+	return assertsafety(getent(ent):isMoneyBag())
 end
 
 --- Get the amount of money in a "money bag" or cheque, or number of items in a dropped item stack. DarkRP only.
 -- Equivalent to GLua Entity:Getamount.
+-- @param Entity ent The money
 -- @return number? Amount of money or number of items
-function ents_methods:getMoneyAmount()
-	self = getent(self)
-	return self.Getamount and assertsafety(self:Getamount()) or nil
+function darkrp_library.getMoneyAmount(ent)
+	ent = getent(ent)
+	return ent.Getamount and assertsafety(ent:Getamount()) or nil
 end
 
 --- Get the number of items remaining in a shipment. DarkRP only.
 -- Equivalent to GLua Entity:Getcount.
+-- @param Entity ent The shipment
 -- @return number? Number of items remaining, or nil if not a shipment
-function ents_methods:getShipmentCount()
-	self = getent(self)
-	return self.Getcount and assertsafety(self:Getcount()) or nil
+function darkrp_library.getShipmentCount(ent)
+	ent = getent(ent)
+	return ent.Getcount and assertsafety(ent:Getcount()) or nil
 end
 
 --- Get the index of the contents of the shipment, which should then be looked up in the output of "darkrp.getCustomShipments". DarkRP only.
 -- Equivalent to GLua Entity:Getcontents.
 -- You may prefer to use Entity:getShipmentContents instead, although that function is slightly slower.
+-- @param Entity ent The shipment
 -- @return number? Index of contents, or nil if not a shipment
-function ents_methods:getShipmentContentsIndex()
-	self = getent(self)
-	return self.Getcontents and assertsafety(self:Getcontents()) or nil
+function darkrp_library.getShipmentContentsIndex(ent)
+	ent = getent(ent)
+	return ent.Getcontents and assertsafety(ent:Getcontents()) or nil
 end
 
 --- Get the info for the contents of the shipment. DarkRP only.
 -- Equivalent to "darkrp.getCustomShipments()[ent:getShipmentContentsIndex()]"
+-- @param Entity ent The shipment
 -- @return table? Contents, or nil if not a shipment
-function ents_methods:getShipmentContents()
-	self = getent(self)
-	if not CustomShipments or not self.Getcontents then return end
-	return instance.Sanitize(CustomShipments[self:Getcontents()])
+function darkrp_library.getShipmentContents(ent)
+	ent = getent(ent)
+	if not CustomShipments or not ent.Getcontents then return end
+	return instance.Sanitize(CustomShipments[ent:Getcontents()])
 end
 
 -- Player methods
@@ -961,51 +934,39 @@ end
 if SERVER then
 	--- Unown every door and vehicle owned by this player. DarkRP only.
 	-- @server
-	function player_methods:keysUnOwnAll()
-		self = getply(self)
-		if instance.player ~= SF.Superuser and instance.player ~= self then SF.Throw("may not use this function on anyone other than owner", 2) return end
-		assertsafety(self:keysUnOwnAll())
+	-- @param Player ply The player
+	function darkrp_library.keysUnOwnAll(ply)
+		ply = getply(ply)
+		if instance.player ~= SF.Superuser and instance.player ~= ply then SF.Throw("may not use this function on anyone other than owner", 2) return end
+		assertsafety(ply:keysUnOwnAll())
 	end
-	player_methods.keysUnownAll = player_methods.keysUnOwnAll
 	
 	--- Returns the time left on a player's team ban. DarkRP only.
 	-- Only works if the player is the owner of the chip, or if the chip is running in superuser mode.
 	-- @server
+	-- @param Player ply The player
 	-- @param number? team The number of the job (e.g. TEAM_MEDIC). Uses the player's team if nil.
 	-- @return number? The time left on the team ban in seconds, or nil if not banned.
-	function player_methods:teamBanTimeLeft(team)
+	function darkrp_library.teamBanTimeLeft(ply, team)
 		if team ~= nil then checkluatype(team, TYPE_NUMBER) end
-		self = getply(self)
-		if instance.player ~= SF.Superuser and instance.player ~= self then SF.Throw("may not use this function on anyone other than owner", 2) return end
-		return assertsafety(self:teamBanTimeLeft())
-	end
-
-	local requestMoney = darkrp_library.requestMoney
-	--- Request money from a player.
-	-- This is subject to a burst limit. Use the darkrp.canMakeMoneyRequest function to check if you can request money that tick.
-	-- @server
-	-- @param string? message An optional custom message that will be shown in the money request prompt. May not exceed 60 bytes in length.
-	-- @param number amount The amount of money to ask for.
-	-- @param function? callbackSuccess Optional function to call if request succeeds.
-	-- @param function? callbackFailure Optional function to call if request fails.
-	-- @param Player? receiver The player who may or may not receive the money, or the owner of the chip if not specified. Superuser only.
-	function player_methods:requestMoney(message, amount, callbackSuccess, callbackFailure, receiver)
-		-- Argument order is different for purposes of compatibility with https://github.com/loganlearner/starfall-darkrp-library
-		return requestMoney(self, amount, message, callbackSuccess, callbackFailure, receiver)
+		ply = getply(ply)
+		if instance.player ~= SF.Superuser and instance.player ~= ply then SF.Throw("may not use this function on anyone other than owner", 2) return end
+		return assertsafety(ply:teamBanTimeLeft())
 	end
 	
 	--- Give this player money.
 	-- This is subject to a burst limit. Use the darkrp.canGiveMoney function to check if you can request money that tick.
 	-- @server
+	-- @param Player ply The player
 	-- @param number amount The amount of money to give.
-	function player_methods:giveMoney(amount)
+	function darkrp_library.giveMoney(ply, amount)
 		checkluatype(amount, TYPE_NUMBER)
 		amount = math.ceil(amount)
 		if amount <= 0 then SF.Throw("amount must be positive", 2) return end
 		checkpermission(instance, nil, "darkrp.giveMoney")
 		if instance.player:canAfford(amount) then
 			givemoneyBurst:use(instance.player, 1)
-			DarkRP.payPlayer(instance.player, getply(self), amount)
+			DarkRP.payPlayer(instance.player, getply(ply), amount)
 		else
 			SF.Throw("you can't afford to pay "..DarkRP.formatMoney(amount), 2)
 		end
@@ -1013,127 +974,145 @@ if SERVER then
 else
 	--- Whether this player is in the same room as the LocalPlayer. DarkRP only.
 	-- @client
+	-- @param Player ply The player
 	-- @return boolean Whether this player is in the same room.
-	function player_methods:isInRoom()
-		local bool = getply(self):isInRoom()
+	function darkrp_library.isInRoom(ply)
+		local bool = getply(ply):isInRoom()
 		instance:checkCpu() -- This function could potentially be expensive, so this check is a good idea.
 		return assertsafety(bool)
 	end
 end
 
 --- Get whether the player can afford the given amount of money. DarkRP only.
+-- @param Player ply The player
 -- @param number amount The amount of money
 -- @return boolean Whether the player can afford it
-function player_methods:canAfford(amount)
+function darkrp_library.canAfford(ply, amount)
 	checkluatype(amount, TYPE_NUMBER)
-	return assertsafety(getply(self):canAfford(amount))
+	return assertsafety(getply(ply):canAfford(amount))
 end
 
 --- Get whether the player can lock a given door. DarkRP only.
+-- @param Player ply The player
 -- @param Entity door The door
 -- @return boolean? Whether the player is allowed to lock the door. May be nil instead of false.
-function player_methods:canKeysLock(door)
-	return assertsafety(getply(self):canKeysLock(eunwrap(door)))
+function darkrp_library.canKeysLock(ply, door)
+	return assertsafety(getply(ply):canKeysLock(eunwrap(door)))
 end
 
 --- Get whether the player can unlock a given door. DarkRP only.
+-- @param Player ply The player
 -- @param Entity door The door
 -- @return boolean? Whether the player is allowed to unlock the door. May be nil instead of false.
-function player_methods:canKeysUnlock(door)
-	return assertsafety(getply(self):canKeysUnlock(eunwrap(door)))
+function darkrp_library.canKeysUnlock(ply, door)
+	return assertsafety(getply(ply):canKeysUnlock(eunwrap(door)))
 end
 
 --- Get the value of a DarkRPVar, which is shared between server and client. Case-sensitive.
 -- Possible variables include (but are not limited to): AFK, AFKDemoted, money, salaryRL, rpname, job, HasGunlicense, Arrested, wanted, wantedReason, agenda, zombieToggle, hitTarget, hitPrice, lastHitTime, Energy
 -- For money specifically, you may optionally use Player:getMoney instead.
 -- Some variables may be blacklisted so that you can't read their value.
+-- @param Player ply The player
 -- @param string var The name of the variable.
 -- @return any The value of the DarkRP var.
-function player_methods:getDarkRPVar(k)
+function darkrp_library.getDarkRPVar(ply, k)
 	checkluatype(k, TYPE_STRING)
 	if instance.player ~= SF.Superuser and SF.BlacklistedDarkRPVars[k] then return end
-	return assertsafety(getply(self):getDarkRPVar(k))
+	return assertsafety(getply(ply):getDarkRPVar(k))
 end
 
 --- Get the job table of a player. DarkRP only.
+-- @param Player ply The player
 -- @return table Table with the job information.
-function player_methods:getJobTable()
-	return instance.Sanitize(getply(self):getJobTable())
+function darkrp_library.getJobTable(ply)
+	return instance.Sanitize(getply(ply):getJobTable())
 end
 
 --- Get a player's pocket items. DarkRP only.
+-- @param Player ply The player
 -- @return table A table containing information about the items in the pocket.
-function player_methods:getPocketItems()
-	return instance.Sanitize(getply(self):getPocketItems())
+function darkrp_library.getPocketItems(ply)
+	return instance.Sanitize(getply(ply):getPocketItems())
 end
 
 --- Get the reason why someone is wanted. DarkRP only.
+-- @param Player ply The player
 -- @return string? The reason, or nil if not wanted
-function player_methods:getWantedReason()
-	return assertsafety(getply(self):getWantedReason())
+function darkrp_library.getWantedReason(ply)
+	return assertsafety(getply(ply):getWantedReason())
 end
 
 --- Whether the player has a certain DarkRP privilege.
+-- @param Player ply The player
 -- @return boolean Whether the player has the privilege.
-function player_methods:hasDarkRPPrivilege(priv)
+function darkrp_library.hasDarkRPPrivilege(ply, priv)
 	checkluatype(priv, TYPE_STRING)
-	return assertsafety(getply(self):hasDarkRPPrivilege(priv))
+	return assertsafety(getply(ply):hasDarkRPPrivilege(priv))
 end
 
 --- Whether this player is arrested. DarkRP only.
+-- @param Player ply The player
 -- @return boolean? Whether this player is arrested. May be nil instead of false.
-function player_methods:isArrested()
-	return assertsafety(getply(self):isArrested())
+function darkrp_library.isArrested(ply)
+	return assertsafety(getply(ply):isArrested())
 end
 
 --- Whether this player is a Chief. DarkRP only.
+-- @param Player ply The player
 -- @return boolean? Whether this player is a Chief. May be nil instead of false.
-function player_methods:isChief()
-	return assertsafety(getply(self):isChief())
+function darkrp_library.isChief(ply)
+	return assertsafety(getply(ply):isChief())
 end
 
 --- Whether this player is a cook. DarkRP only. Only works if hungermod is enabled.
+-- @param Player ply The player
 -- @return boolean? Whether this player is a cook. May be nil instead of false.
-function player_methods:isCook()
-	return assertsafety(getply(self):isCook())
+function darkrp_library.isCook(ply)
+	return assertsafety(getply(ply):isCook())
 end
 
 --- Whether this player is part of the police force (Mayor, CP, Chief). DarkRP only.
+-- @param Player ply The player
 -- @return boolean Whether this player is a part of the police force.
-function player_methods:isCP()
-	return assertsafety(getply(self):isCP())
+function darkrp_library.isCP(ply)
+	return assertsafety(getply(ply):isCP())
 end
 
 --- Whether this player is a hitman. DarkRP only.
+-- @param Player ply The player
 -- @return boolean? Whether this player is a hitman. May be nil instead of false.
-function player_methods:isHitman()
-	return assertsafety(getply(self):isHitman())
+function darkrp_library.isHitman(ply)
+	return assertsafety(getply(ply):isHitman())
 end
 
 --- Whether this player is the Mayor. DarkRP only.
+-- @param Player ply The player
 -- @return boolean? Whether this player is the Mayor. May be nil instead of false.
-function player_methods:isMayor()
-	return assertsafety(getply(self):isMayor())
+function darkrp_library.isMayor(ply)
+	return assertsafety(getply(ply):isMayor())
 end
 
 --- Whether this player is a medic. DarkRP only.
+-- @param Player ply The player
 -- @return boolean? Whether this player is a medic. May be nil instead of false.
-function player_methods:isMedic()
-	return assertsafety(getply(self):isMedic())
+function darkrp_library.isMedic(ply)
+	return assertsafety(getply(ply):isMedic())
 end
 
 --- Whether this player is wanted. DarkRP only. Use Player:getWantedReason if you want to know the reason.
+-- @param Player ply The player
 -- @return boolean? Whether this player is wanted. May be nil instead of false.
-function player_methods:isWanted()
-	return assertsafety(getply(self):isWanted())
+function darkrp_library.isWanted(ply)
+	return assertsafety(getply(ply):isWanted())
 end
 
 --- Get the amount of money this player has. DarkRP only.
 -- Equivalent to "ply:getDarkRPVar('money')"
+-- @param Player ply The player
 -- @return number? The amount of money, or nil if not accessible.
-function player_methods:getMoney()
+function darkrp_library.getMoney(ply)
 	if instance.player ~= SF.Superuser and SF.BlacklistedDarkRPVars.money then return end
-	return assertsafety(getply(self):getDarkRPVar("money"))
+	return assertsafety(getply(ply):getDarkRPVar("money"))
 end
 
 end
