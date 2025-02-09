@@ -2010,8 +2010,9 @@ end
 -- @shared
 -- @return table? The networked variables table of the entity or nil if it doesn't have one.
 function ents_methods:getNetworkVars()
-    local ent_tbl = Ent_GetTable(getent(self))
-    return istable(ent_tbl.dt) and instance.Sanitize(ent_tbl.GetNetworkVars(ent)) or nil
+	local ent = getent(self)
+	local ent_tbl = Ent_GetTable(ent)
+	return istable(ent_tbl.dt) and instance.Sanitize(ent_tbl.GetNetworkVars(ent)) or nil
 end
 
 
