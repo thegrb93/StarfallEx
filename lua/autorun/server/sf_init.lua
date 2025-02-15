@@ -6,7 +6,7 @@ AddCSLuaFile("starfall/permissions/core.lua")
 AddCSLuaFile("starfall/transfer.lua")
 AddCSLuaFile("starfall/editor/editor.lua")
 
-resource.AddWorkshop("2273610511")
+resource.AddWorkshop("3412004213")
 
 SF = {}
 SF.Version = "StarfallEx"
