@@ -317,9 +317,10 @@ function constraint_library.elastic(index, e1, e2, bone1, bone2, v1, v2, const, 
 	if ent then
 		entList:register(instance, ent)
 
-		ent1.Elastics[index] = ent
-		ent2.Elastics[index] = ent
-		return cwrap(ent)
+		local ret = cwrap(ent)
+		e1.Elastics[index] = ret
+		e2.Elastics[index] = ret
+		return ret
 	end
 end
 
@@ -375,9 +376,10 @@ function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, ad
 	if ent then
 		entList:register(instance, ent)
 
-		ent1.Ropes[index] = ent
-		ent2.Ropes[index] = ent
-		return cwrap(ent)
+		local ret = cwrap(ent)
+		e1.Ropes[index] = ret
+		e2.Ropes[index] = ret
+		return ret
 	end
 end
 
@@ -490,8 +492,8 @@ function constraint_library.setElasticLength(index, e, length)
 	checkluatype(length, TYPE_NUMBER)
 	length = math.max(length, 0)
 
-	if ent1.Elastics then
-		local con = ent1.Elastics[index]
+	if e.Elastics then
+		local con = cunwrap(e.Elastics[index])
 		if IsValid(con) then
 			con:Fire("SetSpringLength", length, 0)
 		end
@@ -512,8 +514,8 @@ function constraint_library.setElasticDamping(index, e, damping)
 	checkluatype(damping, TYPE_NUMBER)
 	damping = math.max(damping, 0)
 
-	if ent1.Elastics then
-		local con = ent1.Elastics[index]
+	if e.Elastics then
+		local con = cunwrap(e.Elastics[index])
 		if IsValid(con) then
 			con:Fire("SetSpringDamping", damping, 0)
 		end
@@ -534,8 +536,8 @@ function constraint_library.setElasticConstant(index, e, constant)
 	checkluatype(constant, TYPE_NUMBER)
 	constant = math.max(constant, 0)
 
-	if ent1.Elastics then
-		local con = ent1.Elastics[index]
+	if e.Elastics then
+		local con = cunwrap(e.Elastics[index])
 		if IsValid(con) then
 			con:Fire("SetSpringConstant", constant, 0)
 		end
