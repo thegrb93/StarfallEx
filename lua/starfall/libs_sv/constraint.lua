@@ -375,8 +375,8 @@ function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, ad
 	if ent then
 		entList:register(instance, ent)
 
-		e1.Ropes[index] = ent
-		e2.Ropes[index] = ent
+		e1.Ropes[index] = cwrap(ent)
+		e2.Ropes[index] = cwrap(ent)
 		return cwrap(ent)
 	end
 end
