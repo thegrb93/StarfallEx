@@ -317,8 +317,8 @@ function constraint_library.elastic(index, e1, e2, bone1, bone2, v1, v2, const, 
 	if ent then
 		entList:register(instance, ent)
 
-		e1.Elastics[index] = ent
-		e2.Elastics[index] = ent
+		e1.Elastics[index] = cwrap(ent)
+		e2.Elastics[index] = cwrap(ent)
 		return cwrap(ent)
 	end
 end
