@@ -1104,6 +1104,55 @@ function ents_methods:setPhysicsUpdateListener(func)
 	end
 end
 
+--- Marks an entity as a trigger, setting callback functions to run whenever other objects enter or leave the bounds of the first entity.
+--- The entity will still invoke the callbacks even if not solid and no physical collision occurs, unlike Entity:addCollisionListener.
+--- Set both functiions to nil to unmark this entity as a trigger.
+--- https://developer.valvesoftware.com/wiki/Triggers
+---
+--- You can only use this function on these classes:
+--- - starfall_prop
+--- - starfall_processor
+-- @param function|nil func The StartTouch callback function. Arguments: (Entity object), the object entering our entity's bounds.
+-- @param function|nil func The EndTouch callback function. Arguments: (Entity object), the object leaving our entity's bounds.
+function ents_methods:setTriggerListener(startTouchCB, endTouchCB)
+	local ent = getent(self)
+	checkpermission(instance, ent, "entities.canTool")
+
+	local class = Ent_GetClass(ent)
+	if not physUpdateWhitelist[class] then SF.Throw("Cannot use trigger listener on " .. class, 2) end
+
+	local entTable = Ent_GetTable(ent)
+
+	if not startTouchCB and not endTouchCB then
+		ent:SetTrigger(false)
+		entTable.StartTouch = nil
+		entTable.EndTouch = nil
+		return
+	end
+
+	if startTouchCB then
+		checkluatype(startTouchCB, TYPE_FUNCTION)
+		ent:SetTrigger(true)
+
+		entTable.StartTouch = function(_, touchingEnt)
+			instance:runFunction(startTouchCB, owrap(touchingEnt))
+		end
+	else
+		entTable.StartTouch = nil
+	end
+
+	if endTouchCB then
+		checkluatype(endTouchCB, TYPE_FUNCTION)
+		ent:SetTrigger(true)
+
+		entTable.EndTouch = function(_, touchingEnt)
+			instance:runFunction(endTouchCB, owrap(touchingEnt))
+		end
+	else
+		entTable.EndTouch = nil
+	end
+end
+
 --- Returns a copy of the entity's sanitized internal glua table.
 -- @return table The entity's table.
 function ents_methods:getTable()
