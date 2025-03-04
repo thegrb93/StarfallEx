@@ -948,7 +948,7 @@ function ents_methods:getChipName()
 	local ent = getent(self)
 	local GetGateName = Ent_GetTable(ent).GetGateName
 	if GetGateName then
-		return GetGateName(ent)
+		return tostring(GetGateName(ent))
 	else
 		SF.Throw("The entity is not a starfall or expression2!", 2)
 	end
@@ -961,7 +961,7 @@ function ents_methods:getChipAuthor()
 	local ent_tbl = Ent_GetTable(getent(self))
 	if not ent_tbl.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
 
-	return ent_tbl.author
+	return tostring(ent_tbl.author)
 end
 
 --- Returns the current count for this Think's CPU Time of the specified starfall.

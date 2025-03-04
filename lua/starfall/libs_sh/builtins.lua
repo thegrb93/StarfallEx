@@ -605,7 +605,7 @@ if SERVER then
 	-- @server
 	-- @return string String data
 	function builtins_library.getUserdata()
-		return instance.entity.starfalluserdata or ""
+		return tostring(instance.entity.starfalluserdata or "")
 	end
 else
 	--- Sets the chip's display name
