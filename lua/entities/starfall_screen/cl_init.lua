@@ -471,7 +471,92 @@ ENT.Monitor_Offsets = {
 		y1	=	-96,
 		y2	=	96,
 		z	=	192,
-	}
+	},
+
+	["models/hunter/plates/plate075x1.mdl"] = {
+		Name 	= "Plate (0.75x1)",
+		RS 		= 0.07,
+		RatioX 	= 0.76,
+		offset 	= Vector(-5.9, 0, 1.65),
+		rot		= Angle(0, 90, 180),
+		x1		= -23.5,
+		y1		= -18,
+		x2		= 23.5,
+		y2		= 18,
+		z		= 0.5
+	},
+	["models/hunter/plates/plate2x3.mdl"] = {
+		Name 	= "Plate (2x3)",
+		RS 		= 0.185,
+		RatioX 	= 0.67,
+		offset 	= Vector(0, 0, 1.65),
+		rot		= Angle(0, 90, 180),
+		x1		= -70.5,
+		y1		= -47.5,
+		x2		= 70.5,
+		y2		= 47.5,
+		z		= 0.5
+	},
+	["models/hunter/plates/plate3x5.mdl"] = {
+		Name	= "Plate (3x5)",
+		RS 		= 0.277,
+		RatioX 	= 0.598,
+		offset 	= Vector(0, 0, 1.65),
+		rot		= Angle(0, 90, 180),
+		x1		= -118.5,
+		y1		= -71,
+		x2		= 118.5,
+		y2		= 71,
+		z		= 0.5
+	},
+	["models/hunter/plates/plate4x6.mdl"] = {
+		Name 	= "Plate (4x6)",
+		RS 		= 0.37,
+		RatioX 	= 0.666,
+		offset 	= Vector(0, 0, 1.65),
+		rot		= Angle(0, 90, 180),
+		x1		= -142,
+		y1		= -94.5,
+		x2		= 142,
+		y2		= 94.5,
+		z		= 0.5
+	},
+	["models/hunter/plates/plate5x8.mdl"] = {
+		Name 	= "Plate (5x8)",
+		RS 		= 0.463,
+		RatioX 	= 0.626,
+		offset 	= Vector(0, 0, 1.65),
+		rot		= Angle(0, 90, 180),
+		x1		= -189,
+		y1		= -118.3,
+		x2		= 189,
+		y2		= 118.3,
+		z		= 0.5
+	},
+	["models/hunter/plates/plate6x8.mdl"] = {
+		Name 	= "Plate (6x8)",
+		RS 		= 0.555,
+		RatioX 	= 0.75,
+		offset 	= Vector(0, 0, 1.65),
+		rot		= Angle(0, 90, 180),
+		x1		= -189.3,
+		y1		= -142,
+		x2		= 189.3,
+		y2		= 142,
+		z		= 0.5
+	},
+	["models/hunter/plates/plate16x24.mdl"] = {
+		Name 	= "Plate (16x24)",
+		RS 		= 1.482,
+		RatioX 	= 0.666,
+		offset 	= Vector(0, 0, 2),
+		rot		= Angle(0, 90, 180),
+		x1		= -569.5,
+		y1		= -379,
+		x2		= 569.5,
+		y2		= 379,
+		z		= 0.5
+	},
 }
 
 SF.CustomScreenInfo = {
