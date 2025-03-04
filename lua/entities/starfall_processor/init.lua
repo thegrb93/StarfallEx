@@ -134,22 +134,24 @@ function ENT:PostEntityPaste(ply, ent, CreatedEntities)
 			WireLib.ApplyDupeInfo(ply, ent, info, EntityLookup(CreatedEntities))
 		end
 
-		if info.starfall then
+		if istable(info.starfall) then
 			local ver = tonumber(info.starfall.ver)
-			if ver then
-				if ver > 4.3 then
-					error("This server's starfall is too out of date to paste")
-				else
-					-- 4.3 case
-					local files = SF.DecompressFiles(info.starfall.files)
-					self.starfalluserdata = info.starfall.udata
-					self.sfdata = {owner = ply, files = files, mainfile = info.starfall.mainfile, proc = self}
-				end
-			else
+			if ver == 4.3 then
+				if not isstring(info.starfall.files) then error("Corrupt starfall dupe data") end
+				local files = SF.DecompressFiles(info.starfall.files)
+				self.starfalluserdata = info.starfall.udata and tostring(info.starfall.udata) or nil
+				self.sfdata = {owner = ply, files = files, mainfile = tostring(info.starfall.mainfile), proc = self}
+			elseif ver==nil then
 				-- Legacy duplications
-				local files, mainfile = SF.LegacyDeserializeCode(info.starfall)
-				self.starfalluserdata = info.starfalluserdata
-				self.sfdata = {owner = ply, files = files, mainfile = mainfile, proc = self}
+				if not istable(info.starfall.source) then error("Corrupt starfall dupe data") end
+				local files = {}
+				for filename, source in pairs(info.starfall.source) do
+					files[tostring(filename)] = string.gsub(source, "[" .. string.char(5) .. string.char(4) .. "]", { [string.char(5)[1]] = "\n", [string.char(4)[1]] = '"' })
+				end
+				self.starfalluserdata = info.starfalluserdata and tostring(info.starfalluserdata) or nil
+				self.sfdata = {owner = ply, files = files, mainfile = tostring(info.starfall.mainfile), proc = self}
+			else
+				error("This server's starfall is too out of date to paste")
 			end
 		end
 	end

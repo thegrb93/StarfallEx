@@ -1683,18 +1683,6 @@ function SF.IsHUDActive(ent, ply)
 	return tbl[SERVER and (ply or error("Missing player arg")) or LocalPlayer()]
 end
 
--- ------------------------------------------------------------------------- --
---- Legacy deserializes an instance's code.
--- @return The table of filename = source entries
--- @return The main filename
-function SF.LegacyDeserializeCode(tbl)
-	local sources = {}
-	for filename, source in pairs(tbl.source) do
-		sources[filename] = string.gsub(source, "[" .. string.char(5) .. string.char(4) .. "]", { [string.char(5)[1]] = "\n", [string.char(4)[1]] = '"' })
-	end
-	return sources, tbl.mainfile
-end
-
 local soundsMap = {
 	["DRIP1"] = 0, [0] = "ambient/water/drip1.wav",
 	["DRIP2"] = 1,	[1] = "ambient/water/drip2.wav",
