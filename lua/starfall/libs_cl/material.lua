@@ -150,9 +150,7 @@ local material_bank = SF.ResourceHandler("render_usermaterials", "user materials
 )
 
 local blacklisted_keys = {
-	["$flags2"] = true,
-	["$frame"] = true,
-	["$frame2"] = true,
+	["$flags2"] = true
 }
 local function checkkey(key)
 	checkluatype(key, TYPE_STRING, 2)
