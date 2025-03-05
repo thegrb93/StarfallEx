@@ -191,11 +191,6 @@ simple [[i.redditmedia.com]]
 simple [[i.redd.it]]
 simple [[preview.redd.it]]
 
--- Furry things
---- Examples:
---- https://static1.e621.net/data/8f/db/8fdbc9af34698d470c90ca6cb69c5529.jpg
-simple [[static1.e621.net]]
-
 -- ipfs
 --- Examples:
 --- https://ipfs.io/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/I/m/Ellis_Sigil.jpg
