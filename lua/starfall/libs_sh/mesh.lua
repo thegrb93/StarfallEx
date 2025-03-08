@@ -1103,7 +1103,7 @@ if CLIENT then
 	-- @param Color col The color for the vertices.
 	-- @client
 	function mesh_library.writeQuad(v1, v2, v3, v4, col)
-		mesh.Quad(vunwrap1(v1), vunwrap2(v2), vunwrap3(v3), vunwrap4(v4), col and cunwrap(col))
+		mesh.Quad(vunwrap1(v1), vunwrap2(v2), vunwrap3(v3), vunwrap4(v4), col)
 	end
 
 	--- Draws a quad using a position, normal and size
@@ -1114,7 +1114,7 @@ if CLIENT then
 	-- @param Color col The color for the vertices.
 	-- @client
 	function mesh_library.writeQuadEasy(position, normal, w, h, col)
-		mesh.QuadEasy(vunwrap1(position), vunwrap2(normal), w, h, col and cunwrap(col))
+		mesh.QuadEasy(vunwrap1(position), vunwrap2(normal), w, h, col)
 	end
 
 	--- Pushes the vertex data onto the render stack
