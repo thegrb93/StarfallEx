@@ -191,10 +191,14 @@ simple [[i.redditmedia.com]]
 simple [[i.redd.it]]
 simple [[preview.redd.it]]
 
--- Furry things
+-- Furry things :3d 😽
 --- Examples:
---- https://static1.e621.net/data/8f/db/8fdbc9af34698d470c90ca6cb69c5529.jpg
+--- e621 - https://static1.e621.net/data/8f/db/8fdbc9af34698d470c90ca6cb69c5529.jpg
 simple [[static1.e621.net]]
+--- Fur affinity - https://d.furaffinity.net/art/leo-wolf/1665345394/1665345394.leo-wolf_riding_a_wolf.jpg
+simple [[d.furaffinity.net]]
+--- Deviant art - https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/6641bbbc-78c6-4cce-912f-9ce3ed931446/d9su1ex-94570701-2092-4299-8aa7-19b5f0bd3906.jpg/v1/fit/w_600,h_789,q_70,strp/where_light_and_darkness_meet____video_process__by_jojoesart_d9su1ex-375w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9Nzg5IiwicGF0aCI6IlwvZlwvNjY0MWJiYmMtNzhjNi00Y2NlLTkxMmYtOWNlM2VkOTMxNDQ2XC9kOXN1MWV4LTk0NTcwNzAxLTIwOTItNDI5OS04YWE3LTE5YjVmMGJkMzkwNi5qcGciLCJ3aWR0aCI6Ijw9NjAwIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.Pa6ozcWJesGRb3FNHPZ9aMbFbSU_EpGsUDq1AGE0U_4
+pattern [[([%w-_]+)%.wixmp%.com/(.+)]]
 
 -- ipfs
 --- Examples:
