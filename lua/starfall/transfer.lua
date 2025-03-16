@@ -1,5 +1,6 @@
 
 local IsValid = FindMetaTable("Entity").IsValid
+local IsWorld = FindMetaTable("Entity").IsWorld
 
 function net.WriteReliableEntity(ent)
 	net.WriteUInt(ent:EntIndex(), 16)
@@ -62,7 +63,7 @@ function net.WriteStarfall(sfdata, callback)
 		else
 			net.WriteBool(false)
 		end
-		if IsValid(sfdata.owner) then
+		if IsValid(sfdata.owner) or IsWorld(sfdata.owner) then
 			net.WriteBool(true)
 			net.WriteReliableEntity(sfdata.owner)
 		else
