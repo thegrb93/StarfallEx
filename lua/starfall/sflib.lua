@@ -2218,7 +2218,7 @@ do
 					files[name..":"..path] = file.Read(path, "LUA")
 				end
 				net.Start("sf_receivelibrary")
-				net.WriteStarfall({files = files, mainfile = name, proc = Entity(0), owner = Entity(0)})
+				net.WriteStarfall({files = files, mainfile = name})
 				net.Broadcast()
 			end
 		end)
