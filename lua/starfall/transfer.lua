@@ -1,5 +1,6 @@
 
 local IsValid = FindMetaTable("Entity").IsValid
+local IsWorld = FindMetaTable("Entity").IsWorld
 
 function net.WriteReliableEntity(ent)
 	net.WriteUInt(ent:EntIndex(), 16)
@@ -38,8 +39,16 @@ function net.ReadStarfall(ply, callback)
 	end
 
 	if CLIENT then
-		net.ReadReliableEntity(setupProc)
-		net.ReadReliableEntity(setupOwner)
+		if net.ReadBool() then
+			net.ReadReliableEntity(setupProc)
+		else
+			setup()
+		end
+		if net.ReadBool() then
+			net.ReadReliableEntity(setupOwner)
+		else
+			setup()
+		end
 	end
 	sfdata.mainfile = net.ReadString()
 	net.ReadStream(ply, setupFiles)
@@ -48,8 +57,18 @@ end
 function net.WriteStarfall(sfdata, callback)
 	if #sfdata.mainfile > 255 then error("Main file name too large: " .. #sfdata.mainfile .. " (max is 255)") end
 	if SERVER then
-		net.WriteReliableEntity(sfdata.proc)
-		net.WriteReliableEntity(sfdata.owner)
+		if IsValid(sfdata.proc) then
+			net.WriteBool(true)
+			net.WriteReliableEntity(sfdata.proc)
+		else
+			net.WriteBool(false)
+		end
+		if IsValid(sfdata.owner) or IsWorld(sfdata.owner) then
+			net.WriteBool(true)
+			net.WriteReliableEntity(sfdata.owner)
+		else
+			net.WriteBool(false)
+		end
 	end
 	net.WriteString(sfdata.mainfile)
 
