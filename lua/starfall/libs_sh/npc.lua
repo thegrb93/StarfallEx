@@ -5,10 +5,13 @@ local ENT_META = FindMetaTable("Entity")
 local NPC_META = FindMetaTable("NPC")
 
 
+local lagCompensated
 if SERVER then
 	-- Register privileges
 	registerprivilege("npcs.modify", "Modify", "Allows the user to modify npcs", { entities = {} })
 	registerprivilege("npcs.giveweapon", "Give weapon", "Allows the user to give npcs weapons", { entities = {} })
+
+	lagCompensated = SF.EntManager("npcs_lag_compensated", "lag compensated npcs", 40, "The number of npcs allowed to be lag compensated")
 end
 
 
@@ -21,7 +24,7 @@ SF.RegisterType("Npc", false, true, NPC_META, "Entity")
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
-local Ent_GetClass,Ent_IsValid,Ent_Remove = ENT_META.GetClass,ENT_META.IsValid,ENT_META.Remove
+local Ent_GetClass,Ent_IsLagCompensated,Ent_IsValid,Ent_Remove,Ent_SetLagCompensated = ENT_META.GetClass,ENT_META.IsLagCompensated,ENT_META.IsValid,ENT_META.Remove,ENT_META.SetLagCompensated
 local Npc_AddEntityRelationship,Npc_AddRelationship,Npc_GetEnemy,Npc_Give,Npc_SetLastPosition,Npc_SetSchedule,Npc_SetTarget = NPC_META.AddEntityRelationship,NPC_META.AddRelationship,NPC_META.GetEnemy,NPC_META.Give,NPC_META.SetLastPosition,NPC_META.SetSchedule,NPC_META.SetTarget
 
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
@@ -37,6 +40,10 @@ instance:AddHook("initialize", function()
 	vunwrap1 = vec_meta.QuickUnwrap1
 end)
 
+instance:AddHook("deinitialize", function()
+	lagCompensated:deinitialize(instance)
+end)
+
 local function getnpc(self)
 	local ent = npc_meta.sf2sensitive[self]
 	if Ent_IsValid(ent) then
@@ -47,6 +54,30 @@ local function getnpc(self)
 end
 
 if SERVER then
+
+	--- Sets an npc's hitboxes to compensate for lag, but limited number of npcs can be set due to high processing needed
+	-- @server
+	-- @param boolean compensate Whether to make an npc's hitboxes compensate lag
+	function npc_methods:setLagCompensated(compensate)
+		local npc = getnpc(self)
+		checkpermission(instance, npc, "npcs.modify")
+		if compensate and not Ent_IsLagCompensated(npc) then
+			lagCompensated:checkuse(instance.player, 1)
+			lagCompensated:register(instance, npc)
+			Ent_SetLagCompensated(npc, true)
+		elseif not compensate and Ent_IsLagCompensated(npc) then
+			lagCompensated:unregister(instance, npc)
+			Ent_SetLagCompensated(npc, false)
+		end
+	end
+
+	--- Gets whether an npc is lag compensated
+	-- @server
+	-- @return boolean Whether the npc is lag compensated
+	function npc_methods:isLagCompensated()
+		return Ent_IsLagCompensated(getnpc(self))
+	end
+
 	--- Adds a relationship to the npc
 	-- @server
 	-- @param string str The relationship string. http://wiki.facepunch.com/gmod/NPC:AddRelationship

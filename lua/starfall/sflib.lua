@@ -124,8 +124,10 @@ function SF.CallOnRemove(ent, key, func, deferedfunc)
 	removedHooks[ent][key] = {func, deferedfunc}
 end
 function SF.RemoveCallOnRemove(ent, key)
+	local ret = removedHooks[ent][key]
 	removedHooks[ent][key] = nil
 	if next(removedHooks[ent])==nil then removedHooks[ent] = nil end
+	return ret
 end
 
 -------------------------------------------------------------------------------
@@ -317,17 +319,22 @@ setmetatable(SF.LimitObject, SF.LimitObject)
 SF.EntManager = {
 	__index = {
 		register = function(self, instance, ent, onremove)
+			if self.entsByInstance[instance][ent] then return end
 			if not self.nocallonremove then
-				local function sf_on_remove()
+				SF.CallOnRemove(ent, self.removeCbName, function(ent)
 					self:onremove(instance, ent)
 					if onremove then onremove() end
-				end
-				ent.sf_on_remove = sf_on_remove
-				SF.CallOnRemove(ent, "entmanager", sf_on_remove)
+				end)
 			end
 
 			self.entsByInstance[instance][ent] = true
 			self:free(instance.player, -1)
+		end,
+		unregister = function(self, instance, ent)
+			if not (ent and ent:IsValid()) then return end
+			local entsTbl = rawget(self.entsByInstance, instance)
+			if not (entsTbl and entsTbl[ent]) then return end
+			SF.RemoveCallOnRemove(ent, self.removeCbName)[1](ent)
 		end,
 		remove = function(self, instance, ent)
 			-- ent:IsValid() used since not all types this class supports are entity
@@ -336,8 +343,7 @@ SF.EntManager = {
 				self:onremove(instance, ent)
 			else
 				-- The die function is called the next frame after 'Remove' which is too slow so call it ourself
-				SF.RemoveCallOnRemove(ent, "entmanager")
-				ent.sf_on_remove()
+				SF.RemoveCallOnRemove(ent, self.removeCbName)[1](ent)
 			end
 			ent:Remove()
 		end,
@@ -361,6 +367,7 @@ SF.EntManager = {
 		local t = SF.LimitObject(cvarname, limitname, max, maxhelp, scale)
 		t.nocallonremove = nocallonremove or false
 		t.entsByInstance = setmetatable({},{__index = function(t,k) local r = {} t[k]=r return r end})
+		t.removeCbName = "entmanager"..cvarname
 		return setmetatable(t, p)
 	end
 }
