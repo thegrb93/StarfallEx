@@ -320,39 +320,32 @@ SF.EntManager = {
 	__index = {
 		register = function(self, instance, ent, onremove)
 			if self.registryByEnt[ent] then return end
-			if not self.nocallonremove then
-				SF.CallOnRemove(ent, self.removeCbName, function(ent) self:onremove(ent) end)
-			end
+			if self.removeCb then SF.CallOnRemove(ent, self.removeCbName, self.removeCb) end
 			self.entsByInstance[instance][ent] = true
 			self.registryByEnt[ent] = {player = instance.player, instance = instance, onremove = onremove}
 			self:free(instance.player, -1)
 		end,
-		unregister = function(self, instance, ent)
-			-- ent:IsValid() used since not all types this class supports are entity
-			if not (ent and self.registryByEnt[ent] and ent:IsValid()) then return end
-			if not self.nocallonremove then
-				SF.RemoveCallOnRemove(ent, self.removeCbName)
-			end
-			self:onremove(ent)
-		end,
-		remove = function(self, instance, ent)
-			self:unregister(instance, ent)
-			ent:Remove()
-		end,
-		onremove = function(self, ent)
+		unregister = function(self, ent)
 			local register = self.registryByEnt[ent]
+			if not register then return end
 			self.registryByEnt[ent] = nil
+			if self.removeCb then SF.RemoveCallOnRemove(ent, self.removeCbName) end
+			self:free(register.player, 1)
+
 			if register.instance then
 				self.entsByInstance[register.instance][ent] = nil
 			end
-			self:free(register.player, 1)
 			if register.onremove then
 				register.onremove(ent)
 			end
 		end,
+		remove = function(self, ent)
+			self:unregister(ent)
+			ent:Remove()
+		end,
 		clear = function(self, instance)
 			for ent in pairs(self.entsByInstance[instance]) do
-				self:remove(instance, ent)
+				self:remove(ent)
 			end
 		end,
 		deinitialize = function(self, instance, shouldclear)
@@ -369,10 +362,14 @@ SF.EntManager = {
 	},
 	__call = function(p, cvarname, limitname, max, maxhelp, scale, nocallonremove)
 		local t = SF.LimitObject(cvarname, limitname, max, maxhelp, scale)
-		t.nocallonremove = nocallonremove or false
 		t.entsByInstance = setmetatable({},{__index = function(t,k) local r = {} t[k]=r return r end})
 		t.registryByEnt = {}
-		t.removeCbName = "entmanager"..cvarname
+		if nocallonremove then
+			t.removeCb = false
+		else
+			t.removeCb = function(ent) t:unregister(ent) end
+			t.removeCbName = "entmanager"..cvarname
+		end
 		return setmetatable(t, p)
 	end
 }

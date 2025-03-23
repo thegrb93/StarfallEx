@@ -426,7 +426,7 @@ end
 --- Removes the Projected Texture
 function projectedtexture_methods:remove()
 	local light = ptunwrap(self)
-	projectedLights:remove(instance, light)
+	projectedLights:remove(light)
 	projectedtexture_meta.sf2sensitive[self] = nil
 	projectedtexture_meta.sensitive2sf[light] = nil
 end

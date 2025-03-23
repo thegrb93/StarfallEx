@@ -118,7 +118,7 @@ end
 function nextbot_library:remove()
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.remove")
-	entList:remove(instance, nb)
+	entList:remove(nb)
 end
 
 --- Checks if a user can spawn anymore nextbots.
