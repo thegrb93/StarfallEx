@@ -1995,11 +1995,11 @@ function render_library.setBlend(alpha)
 end
 
 --- Resets the depth buffer
-function render_library.clearDepth()
+-- @param boolean? clearStencil Also clears the stencil buffer. Default: true
+function render_library.clearDepth( clearStencil )
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
-	if renderdata.usingRT then
-		render.ClearDepth()
-	end
+
+	render.ClearDepth( clearStencil )
 end
 
 --- Draws a sprite in 3d space.
