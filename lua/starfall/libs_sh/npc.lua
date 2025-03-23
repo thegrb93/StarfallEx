@@ -41,7 +41,7 @@ instance:AddHook("initialize", function()
 end)
 
 instance:AddHook("deinitialize", function()
-	lagCompensated:deinitialize(instance)
+	if SERVER then lagCompensated:deinitialize(instance) end
 end)
 
 local function getnpc(self)
