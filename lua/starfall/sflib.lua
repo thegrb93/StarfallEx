@@ -319,37 +319,36 @@ setmetatable(SF.LimitObject, SF.LimitObject)
 SF.EntManager = {
 	__index = {
 		register = function(self, instance, ent, onremove)
-			if self.entsByInstance[instance][ent] then return end
+			if self.registryByEnt[ent] then return end
 			if not self.nocallonremove then
-				SF.CallOnRemove(ent, self.removeCbName, function(ent)
-					self:onremove(instance, ent)
-					if onremove then onremove() end
-				end)
+				SF.CallOnRemove(ent, self.removeCbName, function(ent) self:onremove(ent) end)
 			end
-
 			self.entsByInstance[instance][ent] = true
+			self.registryByEnt[ent] = {player = instance.player, instance = instance, onremove = onremove}
 			self:free(instance.player, -1)
 		end,
 		unregister = function(self, instance, ent)
-			if not (ent and ent:IsValid()) then return end
-			local entsTbl = rawget(self.entsByInstance, instance)
-			if not (entsTbl and entsTbl[ent]) then return end
-			SF.RemoveCallOnRemove(ent, self.removeCbName)[1](ent)
+			-- ent:IsValid() used since not all types this class supports are entity
+			if not (ent and self.registryByEnt[ent] and ent:IsValid()) then return end
+			if not self.nocallonremove then
+				SF.RemoveCallOnRemove(ent, self.removeCbName)
+			end
+			self:onremove(ent)
 		end,
 		remove = function(self, instance, ent)
-			-- ent:IsValid() used since not all types this class supports are entity
-			if not (ent and ent:IsValid()) then return end
-			if self.nocallonremove then
-				self:onremove(instance, ent)
-			else
-				-- The die function is called the next frame after 'Remove' which is too slow so call it ourself
-				SF.RemoveCallOnRemove(ent, self.removeCbName)[1](ent)
-			end
+			self:unregister(instance, ent)
 			ent:Remove()
 		end,
-		onremove = function(self, instance, ent)
-			self.entsByInstance[instance][ent] = nil
-			self:free(instance.player, 1)
+		onremove = function(self, ent)
+			local register = self.registryByEnt[ent]
+			self.registryByEnt[ent] = nil
+			if register.instance then
+				self.entsByInstance[register.instance][ent] = nil
+			end
+			self:free(register.player, 1)
+			if register.onremove then
+				register.onremove(ent)
+			end
 		end,
 		clear = function(self, instance)
 			for ent in pairs(self.entsByInstance[instance]) do
@@ -357,8 +356,13 @@ SF.EntManager = {
 			end
 		end,
 		deinitialize = function(self, instance, shouldclear)
+			if not rawget(self.entsByInstance, instance) then return end
 			if shouldclear then
 				self:clear(instance)
+			else
+				for ent in pairs(self.entsByInstance[instance]) do
+					self.registryByEnt[ent].instance = nil
+				end
 			end
 			self.entsByInstance[instance] = nil
 		end
@@ -367,6 +371,7 @@ SF.EntManager = {
 		local t = SF.LimitObject(cvarname, limitname, max, maxhelp, scale)
 		t.nocallonremove = nocallonremove or false
 		t.entsByInstance = setmetatable({},{__index = function(t,k) local r = {} t[k]=r return r end})
+		t.registryByEnt = {}
 		t.removeCbName = "entmanager"..cvarname
 		return setmetatable(t, p)
 	end
