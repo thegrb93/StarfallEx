@@ -73,7 +73,7 @@ end
 function constr_methods:remove()
 	local ent = cunwrap(self)
 	check_constr_perms(ent)
-	entList:remove(instance, ent)
+	entList:remove(ent)
 end
 
 --- Removes all constraints created by the calling chip

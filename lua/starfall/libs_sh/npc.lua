@@ -66,7 +66,7 @@ if SERVER then
 			lagCompensated:register(instance, npc)
 			Ent_SetLagCompensated(npc, true)
 		elseif not compensate and Ent_IsLagCompensated(npc) then
-			lagCompensated:unregister(instance, npc)
+			lagCompensated:unregister(npc)
 			Ent_SetLagCompensated(npc, false)
 		end
 	end

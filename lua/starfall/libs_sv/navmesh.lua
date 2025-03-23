@@ -654,7 +654,7 @@ return function(instance)
 	--- Removes the given NavArea.
 	function navarea_methods:remove()
 		local nav = navunwrap(self)
-		entList:remove(instance, nav)
+		entList:remove(nav)
 		navarea_meta.sf2sensitive[self] = nil
 		navarea_meta.sensitive2sf[nav] = nil
 	end

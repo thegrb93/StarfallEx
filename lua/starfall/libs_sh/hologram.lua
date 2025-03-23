@@ -553,7 +553,7 @@ function hologram_methods:remove()
 	local holo = getholo(self)
 	checkpermission(instance, holo, "hologram.create")
 
-	entList:remove(instance, holo)
+	entList:remove(holo)
 end
 
 --- Removes all holograms created by the calling chip
