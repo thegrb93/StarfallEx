@@ -1994,11 +1994,13 @@ function render_library.setBlend(alpha)
 	render.SetBlend(alpha)
 end
 
---- Resets the depth buffer
-function render_library.clearDepth()
+--- Resets the depth buffer. (Only works in a render target or with a connected HUD)
+-- @param boolean? clearStencil Also clears the stencil buffer. Default: true
+function render_library.clearDepth( clearStencil )
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
-	if renderdata.usingRT then
-		render.ClearDepth()
+
+	if renderdata.usingRT or SF.IsHUDActive(instance.entity) then
+		render.ClearDepth( clearStencil )
 	end
 end
 
