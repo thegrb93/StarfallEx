@@ -341,7 +341,7 @@ SF.EntManager = {
 		end,
 		remove = function(self, ent)
 			self:unregister(ent)
-			ent:Remove()
+			if ent:IsValid() then ent:Remove() end
 		end,
 		clear = function(self, instance)
 			for ent in pairs(self.entsByInstance[instance]) do
