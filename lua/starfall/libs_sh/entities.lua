@@ -15,7 +15,8 @@ registerprivilege("entities.setMaxHealth", "SetMaxHealth", "Allows the user to c
 registerprivilege("entities.doNotDuplicate", "DoNotDuplicate", "Allows the user to set whether an entity will be saved on dupes or map saves", { entities = {} })
 
 
-local ManipulateBoneBurst = SF.BurstObject("ManipulateBone", "ManipulateBone", 30, 30, "Rate bones can be manipulated per second.", "Amount of manipulations that can happen in a short time")
+local manipulateBoneBurst = SF.BurstObject("manipulateBone", "manipulateBone", 30, 30, "Rate bones can be manipulated per second.", "Amount of manipulations that can happen in a short time")
+
 local emitSoundBurst = SF.BurstObject("emitSound", "emitsound", 180, 200, " sounds can be emitted per second", "Number of sounds that can be emitted in a short time")
 local manipulations = SF.EntityTable("boneManipulations")
 getmetatable(manipulations).__index = function(t, k) local r = {Position = {}, Scale = {}, Angle = {}, Jiggle = {}} t[k] = r return r end
@@ -243,6 +244,7 @@ local soundsByEntity = SF.EntityTable("emitSoundsByEntity", function(e, t)
 end, true)
 
 local sound_library = instance.Libraries.sound
+
 if sound_library then
 	--- Returns if a sound is able to be emitted from an entity
 	-- @return boolean If it is possible to emit a sound
@@ -365,6 +367,22 @@ function ents_methods:setParent(parent, attachment, bone)
 	end
 end
 
+local props_library = instance.Libraries.prop
+if props_library then
+	--- Checks if a user can manipulate bones.
+	-- @server
+	-- @return boolean True if user can manipulate bones, False if not.
+	function props_library.canManipulateBones()
+		return manipulateBoneBurst:check(instance.player) >= 1
+	end
+
+	--- Returns how many bone manipulations per second the user can do
+	-- @server
+	-- @return number Number of props per second the user can spawn
+	function props_library.bonemanipulateRate()
+		return manipulateBoneBurst.rate
+	end
+end
 --- Allows manipulation of an entity's bones' positions
 -- @shared
 -- @param number bone The bone ID
@@ -378,16 +396,18 @@ function ents_methods:manipulateBonePosition(bone, vec)
 	vec = vunwrap1(vec)
 	checkpermission(instance, ent, "entities.setRenderProperty")
 
+	if SERVER then
+		manipulateBoneBurst:use(instance.player, 1)
+	end
+
 	if vec ~= vector_origin then
 		local manip = manipulations[ent].Position
 		if manip[bone] then manip[bone]:Set(vec) else manip[bone] = Vector(vec) end
 	else
 		manipulations[ent].Position[bone] = nil
 	end
+
 	Ent_ManipulateBonePosition(ent, bone, vec)
-	if SERVER then
-		ManipulateBoneBurst:use(instance.player, 1)
-	end
 end
 
 --- Allows manipulation of an entity's bones' scale
@@ -402,17 +422,19 @@ function ents_methods:manipulateBoneScale(bone, vec)
 
 	vec = vunwrap1(vec)
 	checkpermission(instance, ent, "entities.setRenderProperty")
-		
+	
+	if SERVER then
+		manipulateBoneBurst:use(instance.player, 1)
+	end
+
 	if vec ~= vector_origin then
 		local manip = manipulations[ent].Scale
 		if manip[bone] then manip[bone]:Set(vec) else manip[bone] = Vector(vec) end
 	else
 		manipulations[ent].Scale[bone] = nil
 	end
+
 	Ent_ManipulateBoneScale(ent, bone, vec)
-	if SERVER then
-		ManipulateBoneBurst:use(instance.player, 1)
-	end
 end
 
 --- Allows manipulation of an entity's bones' angles
@@ -428,16 +450,18 @@ function ents_methods:manipulateBoneAngles(bone, ang)
 	ang = aunwrap1(ang)
 	checkpermission(instance, ent, "entities.setRenderProperty")
 
+	if SERVER then
+		manipulateBoneBurst:use(instance.player, 1)
+	end
+
 	if ang[1]~=0 or ang[2]~=0 or ang[3]~=0 then
 		local manip = manipulations[ent].Angle
 		if manip[bone] then manip[bone]:Set(ang) else manip[bone] = Angle(ang) end
 	else
 		manipulations[ent].Angle[bone] = nil
 	end
+
 	Ent_ManipulateBoneAngles(ent, bone, ang)
-	if SERVER then
-		ManipulateBoneBurst:use(instance.player, 1)
-	end
 end
 
 --- Allows manipulation of an entity's bones' jiggle status
@@ -453,12 +477,14 @@ function ents_methods:manipulateBoneJiggle(bone, state)
 	checkluatype(state, TYPE_BOOL)
 	checkpermission(instance, ent, "entities.setRenderProperty")
 
+	if SERVER then
+		manipulateBoneBurst:use(instance.player, 1)
+	end
+
 	state = state and 1 or 0
 	manipulations[ent].Jiggle[bone] = state
+
 	Ent_ManipulateBoneJiggle(ent, bone, state)
-	if SERVER then
-		ManipulateBoneBurst:use(instance.player, 1)
-	end
 end
 
 --- Sets the color of the entity
