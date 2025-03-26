@@ -17,8 +17,13 @@ registerprivilege("entities.doNotDuplicate", "DoNotDuplicate", "Allows the user 
 
 local emitSoundBurst = SF.BurstObject("emitSound", "emitsound", 180, 200, " sounds can be emitted per second", "Number of sounds that can be emitted in a short time")
 
-local manipulateBoneBurst = SF.BurstObject("manipulateBone", "manipulateBone", 30, 30, "Rate bones can be manipulated per second.", "Amount of manipulations that can happen in a short time")
+local manipulateBoneBurst
 local manipulations = SF.EntityTable("boneManipulations")
+
+if SERVER then
+	manipulateBoneBurst = SF.BurstObject("manipulateBone", "manipulateBone", 60, 20, "Rate bones can be manipulated per second.", "Amount of manipulations that can happen in a short time")
+end
+
 getmetatable(manipulations).__index = function(t, k) local r = {Position = {}, Scale = {}, Angle = {}, Jiggle = {}} t[k] = r return r end
 
 hook.Add("PAC3ResetBones","SF_BoneManipulations",function(ent)
@@ -370,17 +375,24 @@ end
 if SERVER then
 	local props_library = instance.Libraries.prop
 	if props_library then
+		--- Checks if a user can manipulate anymore bones. 
+		-- @server
+		-- @return boolean True if user can manipulate bones, False if not.
+		function props_library.canManipulateBones()
+			return manipulateBoneBurst:check(instance.player) >= 1
+		end
+
 		--- Returns the current number of calls to bone manipuation functions the player is allowed
 		-- @server
 		-- @return number Amount of manipulate bones calls remaining
-		function props_library.manipulateBoneLeft()
+		function props_library.manipulateBonesLeft()
 			return manipulateBoneBurst:check(instance.player)
 		end
 
 		--- Returns how many bone manipulations per second the user can do
 		-- @server
 		-- @return number Number of props per second the user can spawn
-		function props_library.manipulateBoneRate()
+		function props_library.manipulateBonesRate()
 			return manipulateBoneBurst.rate
 		end
 	end
