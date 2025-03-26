@@ -15,9 +15,9 @@ registerprivilege("entities.setMaxHealth", "SetMaxHealth", "Allows the user to c
 registerprivilege("entities.doNotDuplicate", "DoNotDuplicate", "Allows the user to set whether an entity will be saved on dupes or map saves", { entities = {} })
 
 
-local manipulateBoneBurst = SF.BurstObject("manipulateBone", "manipulateBone", 30, 30, "Rate bones can be manipulated per second.", "Amount of manipulations that can happen in a short time")
-
 local emitSoundBurst = SF.BurstObject("emitSound", "emitsound", 180, 200, " sounds can be emitted per second", "Number of sounds that can be emitted in a short time")
+
+local manipulateBoneBurst = SF.BurstObject("manipulateBone", "manipulateBone", 30, 30, "Rate bones can be manipulated per second.", "Amount of manipulations that can happen in a short time")
 local manipulations = SF.EntityTable("boneManipulations")
 getmetatable(manipulations).__index = function(t, k) local r = {Position = {}, Scale = {}, Angle = {}, Jiggle = {}} t[k] = r return r end
 
@@ -367,22 +367,25 @@ function ents_methods:setParent(parent, attachment, bone)
 	end
 end
 
-local props_library = instance.Libraries.prop
-if props_library then
-	--- Checks if a user can manipulate bones.
-	-- @server
-	-- @return boolean True if user can manipulate bones, False if not.
-	function props_library.canManipulateBones()
-		return manipulateBoneBurst:check(instance.player) >= 1
-	end
+if SERVER then
+	local props_library = instance.Libraries.prop
+	if props_library then
+		--- Returns the current number of calls to bone manipuation functions the player is allowed
+		-- @server
+		-- @return number Amount of manipulate bones calls remaining
+		function props_library.manipulateBoneLeft()
+			return manipulateBoneBurst:check(instance.player)
+		end
 
-	--- Returns how many bone manipulations per second the user can do
-	-- @server
-	-- @return number Number of props per second the user can spawn
-	function props_library.bonemanipulateRate()
-		return manipulateBoneBurst.rate
+		--- Returns how many bone manipulations per second the user can do
+		-- @server
+		-- @return number Number of props per second the user can spawn
+		function props_library.manipulateBoneRate()
+			return manipulateBoneBurst.rate
+		end
 	end
 end
+
 --- Allows manipulation of an entity's bones' positions
 -- @shared
 -- @param number bone The bone ID
