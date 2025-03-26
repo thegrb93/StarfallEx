@@ -16,7 +16,14 @@ registerprivilege("entities.doNotDuplicate", "DoNotDuplicate", "Allows the user 
 
 
 local emitSoundBurst = SF.BurstObject("emitSound", "emitsound", 180, 200, " sounds can be emitted per second", "Number of sounds that can be emitted in a short time")
+
+local manipulateBoneBurst
 local manipulations = SF.EntityTable("boneManipulations")
+
+if SERVER then
+	manipulateBoneBurst = SF.BurstObject("manipulateBone", "manipulateBone", 60, 20, "Rate bones can be manipulated per second.", "Amount of manipulations that can happen in a short time")
+end
+
 getmetatable(manipulations).__index = function(t, k) local r = {Position = {}, Scale = {}, Angle = {}, Jiggle = {}} t[k] = r return r end
 
 hook.Add("PAC3ResetBones","SF_BoneManipulations",function(ent)
@@ -105,87 +112,6 @@ end
 
 if CLIENT then
 	instance.object_wrappers[FindMetaTable("NextBot")] = ewrap
-
-	--- Allows manipulation of an entity's bones' positions
-	-- @client
-	-- @param number bone The bone ID
-	-- @param Vector vec The position it should be manipulated to
-	function ents_methods:manipulateBonePosition(bone, vec)
-		local ent = getent(self)
-		checkluatype(bone, TYPE_NUMBER)
-		bone = math.floor(bone)
-		if bone<0 or bone>=Ent_GetBoneCount(ent) then SF.Throw("Invalid bone "..bone, 2) end
-
-		vec = vunwrap1(vec)
-		checkpermission(instance, ent, "entities.setRenderProperty")
-
-		if vec ~= vector_origin then
-			local manip = manipulations[ent].Position
-			if manip[bone] then manip[bone]:Set(vec) else manip[bone] = Vector(vec) end
-		else
-			manipulations[ent].Position[bone] = nil
-		end
-		Ent_ManipulateBonePosition(ent, bone, vec)
-	end
-
-	--- Allows manipulation of an entity's bones' scale
-	-- @client
-	-- @param number bone The bone ID
-	-- @param Vector vec The scale it should be manipulated to
-	function ents_methods:manipulateBoneScale(bone, vec)
-		local ent = getent(self)
-		checkluatype(bone, TYPE_NUMBER)
-		bone = math.floor(bone)
-		if bone<0 or bone>=Ent_GetBoneCount(ent) then SF.Throw("Invalid bone "..bone, 2) end
-
-		vec = vunwrap1(vec)
-		checkpermission(instance, ent, "entities.setRenderProperty")
-		if vec ~= vector_origin then
-			local manip = manipulations[ent].Scale
-			if manip[bone] then manip[bone]:Set(vec) else manip[bone] = Vector(vec) end
-		else
-			manipulations[ent].Scale[bone] = nil
-		end
-		Ent_ManipulateBoneScale(ent, bone, vec)
-	end
-
-	--- Allows manipulation of an entity's bones' angles
-	-- @client
-	-- @param number bone The bone ID
-	-- @param Angle ang The angle it should be manipulated to
-	function ents_methods:manipulateBoneAngles(bone, ang)
-		local ent = getent(self)
-		checkluatype(bone, TYPE_NUMBER)
-		bone = math.floor(bone)
-		if bone<0 or bone>=Ent_GetBoneCount(ent) then SF.Throw("Invalid bone "..bone, 2) end
-
-		ang = aunwrap1(ang)
-		checkpermission(instance, ent, "entities.setRenderProperty")
-		if ang[1]~=0 or ang[2]~=0 or ang[3]~=0 then
-			local manip = manipulations[ent].Angle
-			if manip[bone] then manip[bone]:Set(ang) else manip[bone] = Angle(ang) end
-		else
-			manipulations[ent].Angle[bone] = nil
-		end
-		Ent_ManipulateBoneAngles(ent, bone, ang)
-	end
-
-	--- Allows manipulation of an entity's bones' jiggle status
-	-- @client
-	-- @param number bone The bone ID
-	-- @param boolean enabled Whether to make the bone jiggly or not
-	function ents_methods:manipulateBoneJiggle(bone, state)
-		local ent = getent(self)
-		checkluatype(bone, TYPE_NUMBER)
-		bone = math.floor(bone)
-		if bone<0 or bone>=Ent_GetBoneCount(ent) then SF.Throw("Invalid bone "..bone, 2) end
-
-		checkluatype(state, TYPE_BOOL)
-		checkpermission(instance, ent, "entities.setRenderProperty")
-		state = state and 1 or 0
-		manipulations[ent].Jiggle[bone] = state
-		Ent_ManipulateBoneJiggle(ent, bone, state)
-	end
 
 	--- Sets a hologram or custom_prop model to a custom Mesh
 	-- @client
@@ -323,6 +249,7 @@ local soundsByEntity = SF.EntityTable("emitSoundsByEntity", function(e, t)
 end, true)
 
 local sound_library = instance.Libraries.sound
+
 if sound_library then
 	--- Returns if a sound is able to be emitted from an entity
 	-- @return boolean If it is possible to emit a sound
@@ -443,6 +370,136 @@ function ents_methods:setParent(parent, attachment, bone)
 	else
 		SF.Parent(child)
 	end
+end
+
+if SERVER then
+	local props_library = instance.Libraries.prop
+	if props_library then
+		--- Checks if a user can manipulate anymore bones. 
+		-- @server
+		-- @return boolean True if user can manipulate bones, False if not.
+		function props_library.canManipulateBones()
+			return manipulateBoneBurst:check(instance.player) >= 1
+		end
+
+		--- Returns the current number of calls to bone manipuation functions the player is allowed
+		-- @server
+		-- @return number Amount of manipulate bones calls remaining
+		function props_library.manipulateBonesLeft()
+			return manipulateBoneBurst:check(instance.player)
+		end
+
+		--- Returns how many bone manipulations per second the user can do
+		-- @server
+		-- @return number Number of props per second the user can spawn
+		function props_library.manipulateBonesRate()
+			return manipulateBoneBurst.rate
+		end
+	end
+end
+
+--- Allows manipulation of an entity's bones' positions
+-- @shared
+-- @param number bone The bone ID
+-- @param Vector vec The position it should be manipulated to
+function ents_methods:manipulateBonePosition(bone, vec)
+	local ent = getent(self)
+	checkluatype(bone, TYPE_NUMBER)
+	bone = math.floor(bone)
+	if bone<0 or bone>=Ent_GetBoneCount(ent) then SF.Throw("Invalid bone "..bone, 2) end
+
+	vec = vunwrap1(vec)
+	checkpermission(instance, ent, "entities.setRenderProperty")
+
+	if SERVER then
+		manipulateBoneBurst:use(instance.player, 1)
+	end
+
+	if vec ~= vector_origin then
+		local manip = manipulations[ent].Position
+		if manip[bone] then manip[bone]:Set(vec) else manip[bone] = Vector(vec) end
+	else
+		manipulations[ent].Position[bone] = nil
+	end
+
+	Ent_ManipulateBonePosition(ent, bone, vec)
+end
+
+--- Allows manipulation of an entity's bones' scale
+-- @shared
+-- @param number bone The bone ID
+-- @param Vector vec The scale it should be manipulated to
+function ents_methods:manipulateBoneScale(bone, vec)
+	local ent = getent(self)
+	checkluatype(bone, TYPE_NUMBER)
+	bone = math.floor(bone)
+	if bone<0 or bone>=Ent_GetBoneCount(ent) then SF.Throw("Invalid bone "..bone, 2) end
+
+	vec = vunwrap1(vec)
+	checkpermission(instance, ent, "entities.setRenderProperty")
+	
+	if SERVER then
+		manipulateBoneBurst:use(instance.player, 1)
+	end
+
+	if vec ~= vector_origin then
+		local manip = manipulations[ent].Scale
+		if manip[bone] then manip[bone]:Set(vec) else manip[bone] = Vector(vec) end
+	else
+		manipulations[ent].Scale[bone] = nil
+	end
+
+	Ent_ManipulateBoneScale(ent, bone, vec)
+end
+
+--- Allows manipulation of an entity's bones' angles
+-- @shared
+-- @param number bone The bone ID
+-- @param Angle ang The angle it should be manipulated to
+function ents_methods:manipulateBoneAngles(bone, ang)
+	local ent = getent(self)
+	checkluatype(bone, TYPE_NUMBER)
+	bone = math.floor(bone)
+	if bone<0 or bone>=Ent_GetBoneCount(ent) then SF.Throw("Invalid bone "..bone, 2) end
+
+	ang = aunwrap1(ang)
+	checkpermission(instance, ent, "entities.setRenderProperty")
+
+	if SERVER then
+		manipulateBoneBurst:use(instance.player, 1)
+	end
+
+	if ang[1]~=0 or ang[2]~=0 or ang[3]~=0 then
+		local manip = manipulations[ent].Angle
+		if manip[bone] then manip[bone]:Set(ang) else manip[bone] = Angle(ang) end
+	else
+		manipulations[ent].Angle[bone] = nil
+	end
+
+	Ent_ManipulateBoneAngles(ent, bone, ang)
+end
+
+--- Allows manipulation of an entity's bones' jiggle status
+-- @shared
+-- @param number bone The bone ID
+-- @param boolean enabled Whether to make the bone jiggly or not
+function ents_methods:manipulateBoneJiggle(bone, state)
+	local ent = getent(self)
+	checkluatype(bone, TYPE_NUMBER)
+	bone = math.floor(bone)
+	if bone<0 or bone>=Ent_GetBoneCount(ent) then SF.Throw("Invalid bone "..bone, 2) end
+
+	checkluatype(state, TYPE_BOOL)
+	checkpermission(instance, ent, "entities.setRenderProperty")
+
+	if SERVER then
+		manipulateBoneBurst:use(instance.player, 1)
+	end
+
+	state = state and 1 or 0
+	manipulations[ent].Jiggle[bone] = state
+
+	Ent_ManipulateBoneJiggle(ent, bone, state)
 end
 
 --- Sets the color of the entity
