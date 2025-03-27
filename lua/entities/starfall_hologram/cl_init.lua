@@ -101,6 +101,7 @@ function ENT:OnScaleChanged(name, old, scale)
 		self.HoloMatrix = scalematrix
 		self:EnableMatrix("RenderMultiply", scalematrix)
 	end
+	self:SetupBones()
 	if not self.sf_userrenderbounds then
 		local mins, maxs = self:GetModelBounds()
 		if mins then
