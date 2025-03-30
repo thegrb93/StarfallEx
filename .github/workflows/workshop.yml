@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
 
-      - uses: vurv78/gmod-upload@v0.1.4
+      - uses: wiremod/gmod-upload@master
         with:
           id: 3412004213
           changelog: ${{ github.event.head_commit.message }}
