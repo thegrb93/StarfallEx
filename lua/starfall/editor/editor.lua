@@ -216,7 +216,7 @@ if CLIENT then
 			if #mainfile == 0 then err("Invalid main file") return end
 			openfiles[mainfile] = SF.Editor.getCode()
 		end
-		
+
 		SF.FileLoader(mainfile, openfiles, success, err)
 	end
 
