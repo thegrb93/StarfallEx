@@ -145,21 +145,6 @@ if CLIENT then
 		end
 	end
 
-	function SF.Editor.getOpenFiles()
-		local files = {}
-		for i = 1, SF.Editor.editor:GetNumTabs() do
-			local tab = SF.Editor.editor:GetTabContent(i)
-			local path = tab.chosenfile
-			if path and tab.GetCode then
-				if SF.Editor.editor:ShouldReloadBeforeUpload() then
-					SF.Editor.editor:ReloadTabs(false)
-				end
-				files[path:match("starfall/(.+)") or path] = tab:GetCode()
-			end
-		end
-		return files
-	end
-
 	function SF.Editor.createEditor()
 		local editor = vgui.Create("StarfallEditorFrame") --Should define own frame later
 
@@ -212,8 +197,21 @@ if CLIENT then
 	function SF.Editor.BuildIncludesTable(mainfile, success, err)
 		if not SF.Editor.initialized then SF.Editor.init() end
 
-		local openfiles = SF.Editor.getOpenFiles()
-		if not (mainfile and (openfiles[mainfile] or file.Exists("starfall/" .. mainfile, "DATA"))) then
+		local opentabs = {}
+		for i = 1, SF.Editor.editor:GetNumTabs() do
+			local tab = SF.Editor.editor:GetTabContent(i)
+			local path = tab.chosenfile
+			if path and tab.GetCode then
+				if SF.Editor.editor:ShouldReloadBeforeUpload() then
+					SF.Editor.editor:ReloadTab(i, false)
+				end
+				opentabs[string.match(path, "starfall/(.+)") or path] = tab
+			end
+		end
+
+		local openfiles = setmetatable({},{__index = function(t,k) if opentabs[k] then local r=opentabs[k]:GetCode() t[k]=r return r end end})
+
+		if not (mainfile and (opentabs[mainfile] or file.Exists("starfall/" .. mainfile, "DATA"))) then
 			mainfile = SF.Editor.getOpenFile() or "main"
 			if #mainfile == 0 then err("Invalid main file") return end
 			openfiles[mainfile] = SF.Editor.getCode()
