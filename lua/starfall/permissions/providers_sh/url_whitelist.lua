@@ -105,7 +105,7 @@ local function runWhitelist(filename, code)
 	return true
 end
 
-function SF.ReloadWhitelist()
+function SF.ReloadUrlWhitelist()
 	local filename = SERVER and "sf_url_whitelist.txt" or "starfall/cl_url_whitelist.txt"
 	local code
 	if file.Exists(filename, "DATA") then
@@ -119,5 +119,5 @@ function SF.ReloadWhitelist()
 		runWhitelist("starfall_whitelist_default.txt", loadDefaultWhitelist())
 	end
 end
-SF.ReloadWhitelist()
+SF.ReloadUrlWhitelist()
 

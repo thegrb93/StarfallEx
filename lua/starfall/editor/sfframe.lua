@@ -86,7 +86,7 @@ function SF.DefaultCode()
 	elseif file.Exists("starfall/default.lua", "DATA") then
 		return file.Read("starfall/default.lua", "DATA")
 	else
-		local code = string.gsub(file.Read("data_static/starfall_default.txt", "GAME"), "@author", "@author "..LocalPlayer():Nick())
+		local code = string.gsub(file.Read("data_static/starfall_default.txt", "GAME"), "@author", "@author "..string.gsub(LocalPlayer():Nick(), "[^%w%s%p_]", ""))
 		file.Write("starfall/default.txt", code)
 		return code
 	end
@@ -1653,7 +1653,7 @@ function Editor:SaveFile(path, close, SaveAs, Func)
 
 	path = SF.NormalizePath(path)
 	if SF.FileWrite(path, self:GetCode()) then
-		if path=="starfall/cl_url_whitelist.txt" then SF.ReloadWhitelist() end
+		if path=="starfall/cl_url_whitelist.txt" then SF.ReloadUrlWhitelist() end
 
 		local panel = self.C.Val
 		timer.Simple(0, function() panel.SetText(panel, " Saved as " .. path) end)
