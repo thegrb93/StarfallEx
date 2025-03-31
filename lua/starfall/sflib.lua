@@ -1108,7 +1108,6 @@ end
 
 --- The safest write file function
 function SF.FileWrite(path, data)
-	path = SF.NormalizePath(path)
 	file.CreateDir(string.GetPathFromFilename( path ))
 	file.Write(path, data)
 	return file.Read(path)==data

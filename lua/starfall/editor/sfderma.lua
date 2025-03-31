@@ -468,7 +468,7 @@ function PANEL:DoRightClick(node)
 					function (text)
 						if text == "" then return end
 						text = string.GetFileFromFilename(string.gsub(text, ".", invalid_filename_chars))
-						local saveFile = node:GetFolder().."/"..text
+						local saveFile = SF.NormalizePath(node:GetFolder().."/"..text)
 						if not string.match(saveFile, "%.txt$") then saveFile = saveFile .. ".txt" end
 						SF.FileWrite(saveFile, SF.DefaultCode())
 						SF.AddNotify(LocalPlayer(), "New file: " .. saveFile, "GENERIC", 7, "DRIP3")
