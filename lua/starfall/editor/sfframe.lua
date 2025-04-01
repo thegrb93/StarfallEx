@@ -86,22 +86,7 @@ function SF.DefaultCode()
 	elseif file.Exists("starfall/default.lua", "DATA") then
 		return file.Read("starfall/default.lua", "DATA")
 	else
-		local code = [=[
---@name Untitled
---@author ]=] .. string.gsub(LocalPlayer():Nick(), "[^%w%s%p_]", "") ..[=[
-
---@shared
-
---[[
-Starfall Scripting Environment
-
-StarfallEx Addon: https://github.com/thegrb93/StarfallEx
-Documentation: http://thegrb93.github.io/StarfallEx
-
-This default code can be edited via the 'default.txt' file
-]]
-]=]
-		code = string.gsub(code, "\r", "")
+		local code = string.gsub(file.Read("data_static/starfall_default.txt", "GAME"), "@author", "@author "..string.gsub(LocalPlayer():Nick(), "[^%w%s%p_]", ""))
 		file.Write("starfall/default.txt", code)
 		return code
 	end
@@ -1616,10 +1601,10 @@ function Editor:Open(Line, code, forcenewtab, checkFileExists)
 	hook.Run("StarfallEditorOpen")
 end
 
-function Editor:SaveFile(Line, close, SaveAs, Func)
+function Editor:SaveFile(path, close, SaveAs, Func)
 	self:ExtractName()
 
-	if not Line or SaveAs or Line == self.Location .. "/" .. ".txt" then
+	if not path or SaveAs or path == self.Location .. "/" .. ".txt" then
 		local str
 		if self.C.Browser.File then
 			str = self.C.Browser.File.FileDir -- Get FileDir
@@ -1666,20 +1651,23 @@ function Editor:SaveFile(Line, close, SaveAs, Func)
 		return
 	end
 
-	if SF.FileWrite(Line, self:GetCode()) then
+	path = SF.NormalizePath(path)
+	if SF.FileWrite(path, self:GetCode()) then
+		if path=="starfall/cl_url_whitelist.txt" then SF.ReloadUrlWhitelist() end
+
 		local panel = self.C.Val
-		timer.Simple(0, function() panel.SetText(panel, " Saved as " .. Line) end)
+		timer.Simple(0, function() panel.SetText(panel, " Saved as " .. path) end)
 		surface.PlaySound("ambient/water/drip3.wav")
 
-		self:ChosenFile(Line, self:GetCode())
+		self:ChosenFile(path, self:GetCode())
 		self:UpdateTabText(self:GetActiveTab())
 		if close then
 
-			GAMEMODE:AddNotify("Source code saved as " .. Line .. ".", NOTIFY_GENERIC, 7)
+			GAMEMODE:AddNotify("Source code saved as " .. path .. ".", NOTIFY_GENERIC, 7)
 			self:Close()
 		end
 	else
-		SF.AddNotify(LocalPlayer(), "Failed to save " .. Line, "ERROR", 7, "ERROR1")
+		SF.AddNotify(LocalPlayer(), "Failed to save " .. path, "ERROR", 7, "ERROR1")
 	end
 end
 
