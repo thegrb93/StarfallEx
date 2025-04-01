@@ -77,6 +77,13 @@ TabHandler.ScrollSpeedConVar = CreateClientConVar("sf_editor_wire_scrollmultipli
 TabHandler.LinesHiddenFormatConVar = CreateClientConVar("sf_editor_wire_lines_hidden_format", "< %d lines hidden >", true, false)
 TabHandler.AutoValidateConVar = CreateClientConVar("sf_editor_wire_validateontextchange", "0", true, false)
 TabHandler.CacheDebug = CreateClientConVar("sf_editor_wire_cachedebug", "0", true, false)
+TabHandler.HtmlBackgroundConvar = CreateClientConVar("sf_editor_wire_htmlbackground", "", true, false)
+TabHandler.HtmlBackgroundOpacityConvar = CreateClientConVar("sf_editor_wire_htmlbackgroundopacity", "5", true, false)
+
+cvars.AddChangeCallback("sf_editor_wire_htmlbackground",function(_,_,url)
+	TabHandler:UpdateHtmlBackground()
+end)
+
 ---------------------
 -- Colors
 ---------------------
@@ -155,6 +162,22 @@ function TabHandler:Init()
 	TabHandler.Modes.Starfall = include("starfall/editor/syntaxmodes/starfall.lua")
 	colors = SF.Editor.Themes.CurrentTheme
 	self:LoadSyntaxColors()
+	self:UpdateHtmlBackground()
+end
+
+function TabHandler:UpdateHtmlBackground()
+	local url = self.HtmlBackgroundConvar:GetString()
+	if url=="" then self.HtmlBackground = false return end
+	self.HtmlBackground = true
+
+	local Loader = self.HtmlBackgroundLoader
+	if not Loader then
+		Loader = SF.HttpTextureLoader()
+		self.HtmlBackgroundLoader = Loader
+		self.HtmlBackgroundMaterial = CreateMaterial("starfall_editor_html_background", "UnlitGeneric")
+		self.HtmlBackgroundMaterial:SetInt("$flags", 0x20)
+	end
+	Loader:request(SF.HttpTextureRequest(url,nil,nil,function(_,_,fn) fn(0,0,1024,1024) end, function() self.HtmlBackgroundMaterial:SetTexture("$basetexture",Loader.Panel:GetHTMLMaterial():GetTexture("$basetexture")) end))
 end
 
 function TabHandler:RegisterTabMenu(menu, content)
@@ -277,6 +300,10 @@ function TabHandler:RegisterSettings()
 	local scrollSpeed = form:NumSlider("Scroll Speed","sf_editor_wire_scrollmultiplier", 0.01, 4, 4)
 	scrollSpeed:SetPaintBackgroundEnabled( true )
 	scrollSpeed.TextArea.m_colText = Color(255,255,255)
+
+	local htmlbackground = form:TextEntry("Custom background image url:", "sf_editor_wire_htmlbackground")
+	local htmlbackgroundopacity = form:NumSlider("Custom background image opacity","sf_editor_wire_htmlbackgroundopacity", 0, 255, 1)
+
 	return form, "Wire", "icon16/pencil.png", "Options for wire tabs."
 end
 
@@ -1166,6 +1193,12 @@ function PANEL:Paint()
 
 	surface_SetDrawColor(colors.background)
 	surface_DrawRect(self.LineNumberWidth + 5, 0, self:GetWide() - (self.LineNumberWidth + 5), self:GetTall())
+
+	if TabHandler.HtmlBackground then
+		surface_SetMaterial(TabHandler.HtmlBackgroundMaterial)
+		surface_SetDrawColor(Color(255,255,255,TabHandler.HtmlBackgroundOpacityConvar:GetInt()))
+		surface_DrawTexturedRect(self.LineNumberWidth + 5, 0, self:GetWide() - (self.LineNumberWidth + 5), self:GetTall())
+	end
 
 	local scr  = math_floor(self.ScrollBar:GetScroll() + 1)
 	if scr ~= prevScroll then

@@ -780,6 +780,212 @@ SF.RenderStack = {
 }
 setmetatable(SF.RenderStack, SF.RenderStack)
 
+local USE_AWESOMIUM_HACK = BRANCH == "unknown" or BRANCH == "dev" or BRANCH == "prerelease"
+SF.HttpTextureRequest = {
+	__index = {
+		INIT=function(self, new) return new~=self.LOAD and new~=self.DESTROY end,
+		LOAD=function(self, new) return new~=self.FETCH and new~=self.LAYOUT and new~=self.DESTROY end,
+		FETCH=function(self, new) return new~=self.LOAD and new~=self.DESTROY end,
+		LAYOUT=function(self, new) return new~=self.RENDER and new~=self.LAYOUT and new~=self.DESTROY end,
+		RENDER=function(self, new) return new~=self.DESTROY end,
+		DESTROY=function(self, new) return true end,
+
+		badnewstate = function(self, new)
+			if (self.instance and self.instance.error) and new~=self.DESTROY then self:destroy() return true end
+			if self:state(new) then return true end
+			self.state = new
+			return false
+		end,
+
+		load = function(self, textureloader)
+			if textureloader then self.textureloader = textureloader end
+			if self:badnewstate(self.LOAD) then return end
+
+			if USE_AWESOMIUM_HACK and not string.match(self.url, "^data:") then
+				self:loadAwesomium()
+				return
+			end
+
+			self.textureloader.Panel:AddFunction("sf", "imageLoaded", function(w, h)
+				timer.Simple(0, function() self:layout(w, h) end)
+			end)
+			self.textureloader.Panel:AddFunction("sf", "imageErrored", function()
+				timer.Simple(0, function() self:destroy() end)
+			end)
+			self.textureloader.Panel:RunJavascript(
+			[[img.removeAttribute("width");
+			img.removeAttribute("height");
+			img.style.left="0px";
+			img.style.top="0px";
+			img.src="]] .. string.JavascriptSafe(self.url) .. [[";]]..
+			(BRANCH == "unknown" and "\nif(img.complete)renderImage();" or ""))
+		end,
+
+		loadAwesomium = function(self)
+			if self:badnewstate(self.FETCH) then return end
+
+			http.Fetch(self.url, function(body, _, headers, code)
+				if code >= 300 then self:destroy() return end
+
+				local content_type = headers["Content-Type"] or headers["content-type"]
+				local data = util.Base64Encode(body, true)
+				
+				self.url = table.concat({"data:", content_type, ";base64,", data})
+
+				self:load()
+			end, function() self:destroy() end)
+		end,
+
+		layout = function(self, w, h)
+			if self:badnewstate(self.LAYOUT) then return end
+
+			if self.usedlayout then self:render() return end
+
+			if self.callback then
+				self.callback(w, h, function(x,y,w,h,pixelated)
+					self:applyLayout(x,y,w,h,pixelated)
+				end)
+			end
+
+			if not self.usedlayout then
+				self.usedlayout = true
+				if self.texture then
+					self:render()
+				else
+					timer.Simple(0, function() self:destroy(true) end)
+				end
+			end
+		end,
+
+		applyLayout = function(self,x,y,w,h,pixelated)
+			if self.usedlayout then SF.Throw("You can only use layout once", 3) end
+			SF.CheckLuaType(x, TYPE_NUMBER, 2)
+			SF.CheckLuaType(y, TYPE_NUMBER, 2)
+			SF.CheckLuaType(w, TYPE_NUMBER, 2)
+			SF.CheckLuaType(h, TYPE_NUMBER, 2)
+			if pixelated~=nil then SF.CheckLuaType(pixelated, TYPE_BOOL, 2) end
+			self.usedlayout = true
+			self.textureloader.Panel:RunJavascript([[
+				img.style.left=']]..x..[[px';img.style.top=']]..y..[[px';img.width=]]..w..[[;img.height=]]..h..[[;img.style.imageRendering=']]..(pixelated and "pixelated" or "auto")..[[';
+				renderImage();
+			]])
+		end,
+
+		render = function(self)
+			if self:badnewstate(self.RENDER) then return end
+			local frame = 0
+			hook.Add("PreRender",self.renderstr,function()
+				self.textureloader.Panel:UpdateHTMLTexture()
+				-- Running UpdateHTMLTexture a few times seems to fix materials not rendering
+				if frame<2 then frame = frame + 1 return end
+				local mat = self.textureloader.Panel:GetHTMLMaterial()
+				if mat then
+					render.PushRenderTarget(self.texture)
+						render.Clear(0, 0, 0, 0, false, false)
+						cam.Start2D()
+						surface.SetMaterial(mat)
+						surface.SetDrawColor(255, 255, 255)
+						surface.DrawTexturedRect(0, 0, 1024, 1024)
+						cam.End2D()
+					render.PopRenderTarget()
+				end
+				hook.Remove("PreRender", self.renderstr)
+				timer.Simple(0, function() self:destroy(true) end)
+			end)
+		end,
+		
+		destroy = function(self, success)
+			if self:badnewstate(self.DESTROY) then return end
+			if success then
+				if self.donecallback then self.donecallback() end
+			else
+				if self.callback then self.callback() end
+			end
+			self.textureloader:pop()
+		end,
+	},
+	__call = function(t, url, instance, texture, callback, donecallback)
+		local ret = setmetatable({
+			url = url or error("Expected url input!"),
+			instance = instance or false,
+			texture = texture or false,
+			callback = callback or false,
+			donecallback = donecallback or false,
+			usedlayout = false,
+			state = t.INIT,
+		}, t)
+		ret.renderstr = "SF_HTMLPanelCopyTexture"..string.format("%p",ret)
+		return ret
+	end
+}
+setmetatable(SF.HttpTextureRequest, SF.HttpTextureRequest)
+
+SF.HttpTextureLoader = {
+	__index = {
+		initialize = function(self, request)
+			local Panel = vgui.Create("DHTML")
+			Panel:SetSize(1024, 1024)
+			Panel:SetMouseInputEnabled(false)
+			Panel:SetHTML(
+			[[<html style="overflow:hidden"><body><script>
+			if (!requestAnimationFrame)
+				var requestAnimationFrame = webkitRequestAnimationFrame;
+			function renderImage(){
+				requestAnimationFrame(function(){
+					requestAnimationFrame(function(){
+						document.body.offsetWidth
+						requestAnimationFrame(function(){
+							sf.imageLoaded(img.width, img.height);
+						});
+					});
+				});
+			}
+			var img = new Image();
+			img.style.position="absolute";
+			img.onload = renderImage;
+			img.onerror = function (){sf.imageErrored();}
+			document.body.appendChild(img);
+			</script></body></html>]])
+			Panel:Hide()
+			Panel.OnFinishLoadingDocument = function() self:nextRequest() end
+			self.Panel = Panel
+
+			self.queue[1] = request
+			self.request = self.request_postInit
+		end,
+		
+		request_postInit = function(self, request)
+			local len = #self.queue
+			self.queue[len + 1] = request
+			if len==0 then timer.Simple(0, function() self:nextRequest() end) end
+		end,
+
+		nextRequest = function(self)
+			local request = self.queue[1]
+			request:load(self)
+			timer.Create(self.timeoutstr, 10, 1, function() request:destroy() end)
+		end,
+
+		pop = function(self)
+			table.remove(self.queue, 1)
+			if #self.queue > 0 then
+				self:nextRequest()
+			else
+				timer.Remove(self.timeoutstr)
+			end
+		end
+	},
+	__call = function(p)
+		local ret = setmetatable({
+			queue = {},
+		}, p)
+		ret.request = ret.initialize
+		ret.timeoutstr = "SF_URLTextureTimeout"..string.format("%p",ret)
+		return ret
+	end
+}
+setmetatable(SF.HttpTextureLoader, SF.HttpTextureLoader)
+
 
 -- Error type containing error info
 SF.Errormeta = {
