@@ -29,7 +29,7 @@ end
 function json_library.encode(tbl, prettyPrint)
 	SF.CheckLuaType(tbl, TYPE_TABLE)
 	if #SF.TableToString(tbl, instance) > max_json:GetInt()*1e6 then SF.Throw("Input table data size exceeds max allowed!", 2) end
-	CheckCyclic(tbl, {})
+	CheckCyclic(tbl, {}) --https://github.com/Facepunch/garrysmod-issues/issues/6259
 
 	return util.TableToJSON(instance.Unsanitize(tbl), prettyPrint)
 end
