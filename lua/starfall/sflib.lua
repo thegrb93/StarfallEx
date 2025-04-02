@@ -724,12 +724,11 @@ SF.Parent = {
 setmetatable(SF.Parent, SF.Parent)
 
 if CLIENT then
-	-- When parent is retransmitted, it loses it's children
-	hook.Add("NotifyShouldTransmit", "SF_HologramParentFix", function(ent)
-		local sfParent = Ent_GetTable(ent).sfParent
-		if sfParent then sfParent:fix() end
-	end)
-end
+-- When parent is retransmitted, it loses it's children
+hook.Add("NotifyShouldTransmit", "SF_HologramParentFix", function(ent)
+	local sfParent = Ent_GetTable(ent).sfParent
+	if sfParent then sfParent:fix() end
+end)
 
 SF.RenderStack = {
 	__index = {
@@ -986,7 +985,8 @@ SF.HttpTextureLoader = {
 }
 setmetatable(SF.HttpTextureLoader, SF.HttpTextureLoader)
 
-if CLIENT then SF.G_HttpTextureLoader = SF.HttpTextureLoader() end
+SF.G_HttpTextureLoader = SF.HttpTextureLoader()
+end
 
 -- Error type containing error info
 SF.Errormeta = {
