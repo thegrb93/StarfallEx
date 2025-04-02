@@ -986,6 +986,7 @@ SF.HttpTextureLoader = {
 }
 setmetatable(SF.HttpTextureLoader, SF.HttpTextureLoader)
 
+if CLIENT then SF.G_HttpTextureLoader = SF.HttpTextureLoader() end
 
 -- Error type containing error info
 SF.Errormeta = {

@@ -170,14 +170,15 @@ function TabHandler:UpdateHtmlBackground()
 	if url=="" then self.HtmlBackground = false return end
 	self.HtmlBackground = true
 
-	local Loader = self.HtmlBackgroundLoader
-	if not Loader then
-		Loader = SF.HttpTextureLoader()
-		self.HtmlBackgroundLoader = Loader
-		self.HtmlBackgroundMaterial = CreateMaterial("starfall_editor_html_background", "UnlitGeneric")
-		self.HtmlBackgroundMaterial:SetInt("$flags", 0x20)
+	if not self.HtmlBackgroundMaterial then
+		self.HtmlBackgroundRT = GetRenderTarget("starfall_editor_background_rt", 1024, 1024)
+		self.HtmlBackgroundMaterial = CreateMaterial("starfall_editor_html_background", "UnlitGeneric", {
+			["$translucent"] = 1,
+  			["$vertexalpha"] = 1,
+			["$basetexture"] = "starfall_editor_background_rt"
+		})
 	end
-	Loader:request(SF.HttpTextureRequest(url,nil,nil,function(_,_,fn) fn(0,0,1024,1024) end, function() self.HtmlBackgroundMaterial:SetTexture("$basetexture",Loader.Panel:GetHTMLMaterial():GetTexture("$basetexture")) end))
+	SF.G_HttpTextureLoader:request(SF.HttpTextureRequest(url,nil,self.HtmlBackgroundRT,function(_,_,fn) fn(0,0,1024,1024) end))
 end
 
 function TabHandler:RegisterTabMenu(menu, content)

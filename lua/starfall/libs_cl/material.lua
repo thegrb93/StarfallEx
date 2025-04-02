@@ -169,8 +169,6 @@ local function tex2str(t)
 	return t
 end
 
-local HttpTextureLoader = SF.HttpTextureLoader()
-
 --- `material` library is allows creating material objects which are used for controlling shaders in rendering.
 -- @name material
 -- @class library
@@ -626,7 +624,7 @@ function material_methods:setTextureURL(key, url, cb, done)
 		end
 	end
 	
-	HttpTextureLoader:request(SF.HttpTextureRequest(url, instance, texture, callback, donecallback))
+	SF.G_HttpTextureLoader:request(SF.HttpTextureRequest(url, instance, texture, callback, donecallback))
 end
 
 --- Sets a rendertarget texture to the specified texture key
