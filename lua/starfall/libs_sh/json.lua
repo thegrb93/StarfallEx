@@ -12,6 +12,16 @@ SF.RegisterLibrary("json")
 return function(instance)
 local json_library = instance.Libraries.json
 
+local function CheckCyclic(tbl, parents)
+    parents[tbl] = true
+    for _, v in pairs(tbl) do
+        if type(v) == "table" then
+            if parents[v] then SF.Throw("Cannot encode a table with cyclic references", 2) end
+            CheckCyclic(v, parents)
+        end
+    end
+    parents[tbl] = nil
+end
 --- Convert table to JSON string
 -- @param table tbl Table to encode
 -- @param boolean? prettyPrint Optional. If true, formats and indents the resulting JSON
@@ -19,6 +29,8 @@ local json_library = instance.Libraries.json
 function json_library.encode(tbl, prettyPrint)
 	SF.CheckLuaType(tbl, TYPE_TABLE)
 	if #SF.TableToString(tbl, instance) > max_json:GetInt()*1e6 then SF.Throw("Input table data size exceeds max allowed!", 2) end
+	CheckCyclic(tbl, {}) --https://github.com/Facepunch/garrysmod-issues/issues/6259
+
 	return util.TableToJSON(instance.Unsanitize(tbl), prettyPrint)
 end
 
