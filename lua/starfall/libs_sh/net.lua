@@ -312,7 +312,7 @@ end
 
 --- Writes an unsigned 64-bit integer to the net message
 -- @shared
--- @param string t The integer to be written. Must be a string
+-- @param string t The 64-bit integer written as a string because lua numbers can't hold 64-bit ints
 function net_library.writeUInt64(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
 
