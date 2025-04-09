@@ -325,7 +325,7 @@ end
 -- @shared
 -- @return string The unsigned integer that was read, as a string
 function net_library.readUInt64()
-	return net.ReadUInt64(n)
+	return net.ReadUInt64()
 end
 
 --- Writes a bit to the net message
