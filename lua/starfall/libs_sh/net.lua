@@ -310,6 +310,24 @@ function net_library.readUInt(n)
 	return net.ReadUInt(n)
 end
 
+--- Writes an unsigned 64-bit integer to the net message
+-- @shared
+-- @param string t The integer to be written. Must be a string
+function net_library.writeUInt64(t)
+	if not netStarted then SF.Throw("net message not started", 2) end
+
+	checkluatype (t, TYPE_STRING)
+
+	write{net.WriteUInt64, 64, t}
+end
+
+--- Reads an unsigned 64-bit integer from the net message
+-- @shared
+-- @return string The unsigned integer that was read, as a string
+function net_library.readUInt64()
+	return net.ReadUInt64(n)
+end
+
 --- Writes a bit to the net message
 -- @shared
 -- @param number t The bit to be written. (0 for false, 1 (or anything) for true)
