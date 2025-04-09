@@ -243,17 +243,9 @@ function net_library.readStream(cb)
 	checkluatype (cb, TYPE_FUNCTION)
 	if streams[instance.player] then SF.Throw("The previous stream must finish before reading another.", 2) end
 
-	local streamOwner, target
-	if instance.player ~= SF.Superuser then
-		streamOwner = instance.player
-		target = instance.player
-	else
-		streamOwner = SF.Superuser
-		target = instance.data.net.ply
-	end
-	streams[streamOwner] = net.ReadStream((SERVER and target or nil), function(data)
+	streams[instance.player] = net.ReadStream((SERVER and instance.data.net.ply or nil), function(data)
 		instance:runFunction(cb, data)
-		streams[streamOwner] = nil
+		streams[instance.player] = nil
 	end)
 end
 
