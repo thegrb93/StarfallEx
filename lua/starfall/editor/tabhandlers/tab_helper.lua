@@ -124,7 +124,7 @@ function PANEL:Undock()
 			local menu = DermaMenu()
 			menu:AddOption("Dock",function()
 				local editor = SF.Editor.editor
-				local sheet = editor:CreateTab("","helper")
+				local sheet = editor:CreateTab("helper")
 				local content = sheet.Tab.content
 				editor:SetActiveTab(sheet.Tab)
 				htmlSetup(helper, content)

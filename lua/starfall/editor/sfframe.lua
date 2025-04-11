@@ -72,7 +72,6 @@ end
 -- ----------------------------------------------------------------------
 --ConVars
 Editor.SaveTabsVar = CreateClientConVar("sf_editor_savetabs", "1", true, false)
-Editor.NewTabOnOpenVar = CreateClientConVar("sf_editor_new_tab_on_open", "1", true, false)
 Editor.OpenOldTabsVar = CreateClientConVar("sf_editor_openoldtabs", "1", true, false)
 Editor.WorldClickerVar = CreateClientConVar("sf_editor_worldclicker", "0", true, false)
 Editor.LayoutVar = CreateClientConVar("sf_editor_layout", "0", true, false)
@@ -412,9 +411,10 @@ function Editor:AddComponent(panel, x, y, w, h)
 	return panel
 end
 
--- TODO: Fix this function
 local function extractNameFromCode(str)
-	return str:match("@name +([^\r\n]+)")
+	str = string.match(str, "%-%-@name[^\r\n]*")
+	if str==nil then return nil end
+	return string.match(str, "%-%-@name%s+(.+)")
 end
 
 local function getPreferredTitles(Line, code)
@@ -519,15 +519,6 @@ function Editor:SetActiveTabIndex(index)
 	self:SetActiveTab(tab)
 end
 
-local function extractNameFromFilePath(str)
-	local found = str:reverse():find("/", 1, true)
-	if found then
-		return str:Right(found - 1)
-	else
-		return str
-	end
-end
-
 local old
 function Editor:FixTabFadeTime()
 	if old ~= nil then return end -- It's already being fixed
@@ -536,14 +527,13 @@ function Editor:FixTabFadeTime()
 	timer.Simple(old, function() self.C.TabHolder:SetFadeTime(old) old = nil end)
 end
 
-function Editor:CreateTab(chosenfile, forcedTabHandler)
+function Editor:CreateTab(forcedTabHandler)
 	local th = GetTabHandler(forcedTabHandler)
 	local content = vgui.Create(th.ControlName)
 	content.parentpanel = self -- That's going to be Deprecated
 	content.GetTabHandler = function() return th end -- add :GetTabHandler()
 	content.IsSaved = function(self) return (not th.IsEditor) or self:GetCode() == self.savedCode or self:GetCode() == SF.DefaultCode() or self:GetCode() == "" end
-	local sheet = self.C.TabHolder:AddSheet(extractNameFromFilePath(chosenfile), content)
-	content.chosenfile = chosenfile
+	local sheet = self.C.TabHolder:AddSheet("", content)
 	sheet.Tab.content = content -- For easy access
 
 	sheet.Tab.Paint = function(button, w, h)
@@ -683,9 +673,7 @@ function Editor:GetNextAvailableTab()
 end
 
 function Editor:NewTab()
-	local sheet = self:CreateTab("Generic")
-	self:SetActiveTab(sheet.Tab)
-	self:NewScript(true)
+	self:OpenCode(nil, SF.DefaultCode())
 end
 
 function Editor:CloseTab(_tab,dontask)
@@ -1074,13 +1062,6 @@ function Editor:GetSettings()
 	label:SetText("\nOther settings:")
 	label:SizeToContents()
 
-	local NewTabOnOpen = vgui.Create("DCheckBoxLabel")
-	dlist:AddItem(NewTabOnOpen)
-	NewTabOnOpen:SetConVar("sf_editor_new_tab_on_open")
-	NewTabOnOpen:SetText("New tab on open")
-	NewTabOnOpen:SizeToContents()
-	NewTabOnOpen:SetTooltip("Enable/disable loaded files opening in a new tab.\nIf disabled, loaded files will be opened in the current tab.")
-
 	local SaveTabsOnClose = vgui.Create("DCheckBoxLabel")
 	dlist:AddItem(SaveTabsOnClose)
 	SaveTabsOnClose:SetConVar("sf_editor_savetabs")
@@ -1320,28 +1301,39 @@ function Editor:TranslateValues(panel, x, y)
 	return x, y
 end
 
-function Editor:NewScript(incurrent)
-	if not incurrent and self.NewTabOnOpenVar:GetBool() then
-		self:NewTab()
-	else
-		self:SaveTabs()
-		self:ChosenFile()
-		-- Set title
-		self:GetActiveTab():SetText("Generic")
-		self.C.TabHolder:InvalidateLayout()
+function Editor:OpenCode(path, code, codeOnDisk, forcenewtab, checkFileExists)
+	code = SF.Editor.normalizeCode(code)
 
-		self:SetCode(SF.DefaultCode())
-		self:GetCurrentTabContent().savedCode = self:GetCurrentTabContent():GetCode() -- It may return different line endings etc
+	if path and checkFileExists and file.Exists("starfall/" .. path, "DATA") then
+		if codeOnDisk==nil then codeOnDisk = SF.Editor.normalizeCode(file.Read("starfall/" .. path, "DATA") or "") end
+		if code==codeOnDisk then return end
 	end
+
+	if not forcenewtab then
+		for i = 1, self:GetNumTabs() do
+			if (path==nil or path==self:GetTabContent(i).chosenfile) and self:GetTabContent(i):GetCode() == code then
+				self:SetActiveTab(i)
+				return
+			end
+		end
+	end
+
+	local tab = self:CreateTab().Tab
+	self:SetActiveTab(tab)
+	self:SetCode(code)
+	self:ChosenFile(path, codeOnDisk)
+	self:UpdateTabText(tab)
+
+	self:SaveTabs()
 end
 
 function Editor:InitShutdownHook()
 	-- save code when shutting down
 	hook.Add("ShutDown", "sf_editor_shutdown", function()
-			if Editor.SaveTabsVar:GetBool() then
-				self:SaveTabs()
-			end
-		end)
+		if Editor.SaveTabsVar:GetBool() then
+			self:SaveTabs()
+		end
+	end)
 end
 
 function Editor:SaveTabs()
@@ -1376,34 +1368,26 @@ function Editor:SaveTabs()
 end
 
 function Editor:OpenOldTabs()
-	if not file.Exists("sf_tabs.txt", "DATA") then 	self.TabsLoaded = true; return end
-
 	local tabs = util.JSONToTable(file.Read("sf_tabs.txt") or "")
-	if not tabs or #tabs == 0 then self.TabsLoaded = true; return end
 
-	-- Temporarily remove fade time
-	self:FixTabFadeTime()
+	if istable(tabs) and tabs[1]~=nil then
+		-- Temporarily remove fade time
+		self:FixTabFadeTime()
 
-	local is_first = true
-	for k, v in pairs(tabs) do
-		if not istable(v) then continue end
-		if v.filename then v.filename = "starfall/"..v.filename end
-		if is_first then -- Remove initial tab
-			timer.Simple(0, function()
-				self:CloseTab(1, true)
-				self:SetActiveTabIndex(tabs.selectedTab or 1)
-			end)
-			is_first = false
+		local tabsloaded = false
+		for k, v in pairs(tabs) do
+			if not (istable(v) and isstring(v.filename) and isstring(v.code)) then continue end
+			if v.filename then v.filename = "starfall/"..v.filename end
+			tabsloaded = true
+			self:OpenCode(v.filename, v.code, nil, true)
 		end
-		self:NewTab()
-		self:ChosenFile(v.filename)
-		self:SetCode(v.code)
-		self:UpdateTabText(self:GetActiveTab())
-		self.C.TabHolder:InvalidateLayout()
-
+		if tabsloaded then
+			self:CloseTab(1, true)
+			self:SetActiveTabIndex(tabs.selectedTab or 1)
+		end
 	end
-	self.TabsLoaded = true
 
+	self.TabsLoaded = true
 end
 
 function Editor:Validate(gotoerror)
@@ -1460,9 +1444,12 @@ function Editor:GetChosenFile()
 end
 
 function Editor:ChosenFile(Line, code)
+	if not Line and code then
+		Line = extractNameFromCode(code)
+	end
 	self:GetCurrentTabContent().chosenfile = Line
-	if not code then
-		code = Line and file.Read(Line)
+	if Line and not code then
+		code = file.Read(Line)
 		if code then
 			code = SF.Editor.normalizeCode(code)
 		end
@@ -1497,7 +1484,7 @@ function Editor:OpenTabOnlyOnce(name)
 	if tab then
 		self:SetActiveTabIndex(tab)
 	else
-		local sheet = self:CreateTab("", name)
+		local sheet = self:CreateTab(name)
 		self:SetActiveTab(sheet.Tab)
 	end
 	return self:GetActiveTab()
@@ -1563,41 +1550,17 @@ function Editor:GetCode()
 end
 
 function Editor:Open(Line, code, forcenewtab, checkFileExists)
-	timer.Create("sfautosave", 5, 0, function()
-		self:SaveTabs()
-	end)
-	if self:IsVisible() and not Line and not code then self:Close() end
-	self:SetV(true)
-	if code then
-		if not forcenewtab then
-			local normalizedCode = SF.Editor.normalizeCode(code)
-			for i = 1, self:GetNumTabs() do
-				if self:GetTabContent(i):GetCode() == normalizedCode then
-					self:SetActiveTab(i)
-					return
-				end
-			end
-			if checkFileExists and file.Exists("starfall/" .. Line, "DATA") and file.Read("starfall/" .. Line, "DATA")==code then
-				return
-			end
-		end
-		local title, tabtext = getPreferredTitles(Line, code)
-		local tab
-		if self.NewTabOnOpenVar:GetBool() or forcenewtab then
-			tab = self:CreateTab(tabtext).Tab
-		else
-			tab = self:GetActiveTab()
-			self:UpdateTabText(tab)
-			self.C.TabHolder:InvalidateLayout()
-		end
-		self:SetActiveTab(tab)
+	if Line==nil and code==nil and self:IsVisible() then self:Close() return end
 
-		self:ChosenFile()
-		self:SetCode(code)
-		if Line then self:SubTitle("Editing: " .. Line) end
-		return
+	timer.Create("sfautosave", 5, 0, function() self:SaveTabs() end)
+	self:SetV(true)
+
+	if code then
+		self:OpenCode(Line, code, nil, forcenewtab, checkFileExists)
+	elseif Line then
+		self:LoadFile(Line, forcenewtab)
 	end
-	if Line then self:LoadFile(Line, forcenewtab) return end
+
 	hook.Run("StarfallEditorOpen")
 end
 
@@ -1674,39 +1637,13 @@ end
 function Editor:LoadFile(Line, forcenewtab)
 	if not Line or file.IsDir(Line, "DATA") then return end
 
-	local f = file.Open(Line, "rb", "DATA")
-	if not f then
-		SF.AddNotify(LocalPlayer(), "Erroring opening file: " .. Line, "ERROR", 7, "ERROR1")
-		return
-	end
-
-	local str = f:Read(f:Size()) or ""
-	f:Close()
-	self:SaveTabs()
-	if not forcenewtab then
-		for i = 1, self:GetNumTabs() do
-			if self:GetTabContent(i).chosenfile == Line then
-				self:SetActiveTab(i)
-				if forcenewtab ~= nil then
-					self:SetCode(str)
-					self:GetCurrentTabContent().savedCode = SF.Editor.normalizeCode(str)
-				end
-				return
-			end
-		end
-	end
-	local title, tabtext = getPreferredTitles(Line, str)
-	local tab
-	if self.NewTabOnOpenVar:GetBool() or forcenewtab then
-		tab = self:CreateTab(tabtext).Tab
+	local str = file.Read(Line, "DATA")
+	if str then
+		str = SF.Editor.normalizeCode(str)
+		self:OpenCode(Line, str, str, forcenewtab)
 	else
-		tab = self:GetActiveTab()
+		SF.AddNotify(LocalPlayer(), "Erroring opening file: " .. Line, "ERROR", 7, "ERROR1")
 	end
-	self:SetActiveTab(tab)
-	self:SetCode(str)
-	self:ChosenFile(Line, self:GetCode())
-	self:UpdateTabText(tab)
-	self.C.TabHolder:InvalidateLayout()
 end
 
 ---Returns the value of the settings `ReloadBeforeUpload` of the editor.
@@ -1859,7 +1796,7 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
 		else
 			local th = GetTabHandler("helper")
 			if th.htmldata then
-				local sheet = self:CreateTab("", "helper")
+				local sheet = self:CreateTab("helper")
 				self:SetActiveTab(sheet.Tab)
 				if Editor.StartHelperUndocked:GetBool() then
 					sheet.Tab.content:Undock()
