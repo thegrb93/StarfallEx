@@ -360,9 +360,10 @@ function wire_library.adjustInputs(names, types, descriptions)
 		if not WireToSF[porttype] then SF.Throw("Invalid/unsupported input type: " .. porttype, 2) end
 		types_out[i] = porttype
 
-		if descriptions and descriptions[i] then
-			if not isstring(descriptions[i]) then SF.Throw("Non-string input description at index " .. i, 2) end
-			descriptions_out[i] = descriptions[i]
+		if descriptions then
+			local desc = descriptions[i]
+			if not isstring(desc) then SF.Throw("Non-string input description at index " .. i, 2) end
+			descriptions_out[i] = desc
 		end
 	end
 
@@ -403,9 +404,10 @@ function wire_library.adjustOutputs(names, types, descriptions)
 		if not SFToWire[porttype] then SF.Throw("Invalid/unsupported output type: " .. porttype, 2) end
 		types_out[i] = porttype
 
-		if descriptions and descriptions[i] then
-			if not isstring(descriptions[i]) then SF.Throw("Non-string input description at index " .. i, 2) end
-			descriptions_out[i] = descriptions[i]
+		if descriptions then
+			local desc = descriptions[i]
+			if not isstring(desc) then SF.Throw("Non-string input description at index " .. i, 2) end
+			descriptions_out[i] = desc
 		end
 	end
 
@@ -567,7 +569,7 @@ local function parseEntity(ent, io)
 
 	local names, types = {}, {}
 	for k, v in pairs(ent[io]) do
-		if k ~= "" then
+		if isstring(k) and isstring(v) and k ~= "" then
 			table.insert(names, k)
 			table.insert(types, v.Type)
 		end
@@ -762,18 +764,22 @@ end
 -- @param string name Input name to search for
 -- @return string Type of input
 function wirelink_methods:inputType(name)
+	checkluatype(name, TYPE_STRING)
 	local wl = getwl(self)
 	local input = wl.Inputs[name]
-	return input and input.Type
+	if not (input and isstring(input.Type)) then SF.Throw("Invalid input name: "..name, 2) end
+	return input.Type
 end
 
 --- Returns the type of output name, or nil if it doesn't exist
 -- @param string name Output name to search for
 -- @return string Type of output
 function wirelink_methods:outputType(name)
+	checkluatype(name, TYPE_STRING)
 	local wl = getwl(self)
 	local output = wl.Outputs[name]
-	return output and output.Type
+	if not (output and isstring(output.Type)) then SF.Throw("Invalid output name: "..name, 2) end
+	return output.Type
 end
 
 --- Returns the entity that the wirelink represents
@@ -790,8 +796,8 @@ function wirelink_methods:inputs()
 	if not Inputs then return {} end
 
 	local inputNames = {}
-	for _, port in pairs(Inputs) do
-		inputNames[#inputNames + 1] = port.Name
+	for name, port in pairs(Inputs) do
+		if isstring(name) then inputNames[#inputNames + 1] = name end
 	end
 
 	local function portsSorter(a, b)
@@ -810,8 +816,8 @@ function wirelink_methods:outputs()
 	if not Outputs then return {} end
 
 	local outputNames = {}
-	for _, port in pairs(Outputs) do
-		outputNames[#outputNames + 1] = port.Name
+	for name, port in pairs(Outputs) do
+		if isstring(name) then outputNames[#outputNames + 1] = name end
 	end
 
 	local function portsSorter(a, b)
@@ -829,8 +835,7 @@ function wirelink_methods:isWired(name)
 	checkluatype(name, TYPE_STRING)
 	local wl = getwl(self)
 	local input = wl.Inputs[name]
-	if input and Ent_IsValid(input.Src) then return true
-	else return false end
+	if input and Ent_IsValid(input.Src) then return true else return false end
 end
 
 --- Returns what an input of the wirelink is wired to.
@@ -853,7 +858,7 @@ function wirelink_methods:getWiredToName(name)
 	local wl = getwl(self)
 	local input = wl.Inputs[name]
 	if input and Ent_IsValid(input.Src) then
-		return input.SrcId
+		return tostring(input.SrcId)
 	end
 end
 
