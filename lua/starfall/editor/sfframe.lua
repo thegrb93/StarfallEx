@@ -1305,7 +1305,7 @@ function Editor:OpenCode(path, code, codeOnDisk, forcenewtab, checkFileExists)
 	code = SF.Editor.normalizeCode(code)
 
 	if path and checkFileExists and file.Exists("starfall/" .. path, "DATA") then
-		if codeOnDisk==nil then codeOnDisk = SF.Editor.normalizeCode(file.Read("starfall/" .. Line, "DATA") or "") end
+		if codeOnDisk==nil then codeOnDisk = SF.Editor.normalizeCode(file.Read("starfall/" .. path, "DATA") or "") end
 		if code==codeOnDisk then return end
 	end
 
