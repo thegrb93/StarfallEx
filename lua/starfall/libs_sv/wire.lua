@@ -569,9 +569,9 @@ local function parseEntity(ent, io)
 
 	local names, types = {}, {}
 	for k, v in pairs(ent[io]) do
-		if k ~= "" then
-			table.insert(names, tostring(k))
-			table.insert(types, tostring(v.Type))
+		if isstring(k) and isstring(v) and k ~= "" then
+			table.insert(names, k)
+			table.insert(types, v.Type)
 		end
 	end
 
