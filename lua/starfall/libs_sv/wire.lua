@@ -795,7 +795,11 @@ function wirelink_methods:inputs()
 	local Inputs = wl.Inputs
 	if not Inputs then return {} end
 
-	local inputNames = table.GetKeys(Inputs)
+	local inputNames = {}
+	for name, port in pairs(Inputs) do
+		if isstring(name) then inputNames[#inputNames + 1] = name end
+	end
+
 	local function portsSorter(a, b)
 		return Inputs[a].Num < Inputs[b].Num
 	end
@@ -811,7 +815,11 @@ function wirelink_methods:outputs()
 	local Outputs = wl.Outputs
 	if not Outputs then return {} end
 
-	local outputNames = table.GetKeys(Outputs)
+	local outputNames = {}
+	for name, port in pairs(Outputs) do
+		if isstring(name) then outputNames[#outputNames + 1] = name end
+	end
+
 	local function portsSorter(a, b)
 		return Outputs[a].Num < Outputs[b].Num
 	end
