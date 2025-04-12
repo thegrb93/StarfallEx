@@ -6,7 +6,8 @@ local dgetmeta = debug.getmetatable
 local ENT_META,NPC_META,PHYS_META,PLY_META,VEH_META,WEP_META = FindMetaTable("Entity"),FindMetaTable("NPC"),FindMetaTable("PhysObj"),FindMetaTable("Player"),FindMetaTable("Vehicle"),FindMetaTable("Weapon")
 local isentity = isentity
 
-local Ent_AddCallback,Ent_GetTable,Ent_InVehicle,Ent_IsScripted,Ent_IsValid,Ent_IsVehicle,Ent_RemoveCallback = ENT_META.AddCallback,ENT_META.GetTable,ENT_META.InVehicle,ENT_META.IsScripted,ENT_META.IsValid,ENT_META.IsVehicle,ENT_META.RemoveCallback
+local Ent_AddCallback,Ent_GetTable,Ent_IsScripted,Ent_IsValid,Ent_RemoveCallback = ENT_META.AddCallback,ENT_META.GetTable,ENT_META.IsScripted,ENT_META.IsValid,ENT_META.RemoveCallback
+local Ply_InVehicle = PLY_META.InVehicle
 
 -- Register privileges
 registerprivilege("entities.applyDamage", "Apply damage", "Allows the user to apply damage to an entity", { entities = {} })
@@ -679,7 +680,7 @@ function ents_methods:use(usetype, value)
 	checkpermission(instance, ent, "entities.use")
 	if usetype~=nil then checkluatype(usetype, TYPE_NUMBER) end
 	if value~=nil then checkluatype(value, TYPE_NUMBER) end
-	if Ent_InVehicle(instance.player) and Ent_IsVehicle(ent) then return end -- Prevent source engine bug when using vehicle while in a vehicle
+	if Ply_InVehicle(instance.player) and Ent_IsVehicle(ent) then return end -- Prevent source engine bug when using vehicle while in a vehicle
 	Ent_Use(ent, instance.player, instance.entity, usetype, value)
 end
 
