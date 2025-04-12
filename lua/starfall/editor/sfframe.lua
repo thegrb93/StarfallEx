@@ -1376,8 +1376,8 @@ function Editor:OpenOldTabs()
 
 		local tabsloaded = false
 		for k, v in pairs(tabs) do
-			if not (istable(v) and isstring(v.filename) and isstring(v.code)) then continue end
-			if v.filename then v.filename = "starfall/"..v.filename end
+			if not (istable(v) and isstring(v.code)) then continue end
+			if isstring(v.filename) then v.filename = "starfall/"..v.filename else v.filename=nil end
 			tabsloaded = true
 			self:OpenCode(v.filename, v.code, nil, true)
 		end
