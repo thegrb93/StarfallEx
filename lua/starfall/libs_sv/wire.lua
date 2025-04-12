@@ -360,7 +360,7 @@ function wire_library.adjustInputs(names, types, descriptions)
 		if not WireToSF[porttype] then SF.Throw("Invalid/unsupported input type: " .. porttype, 2) end
 		types_out[i] = porttype
 
-		if descriptions then
+		if descriptions and descriptions[i] then
 			local desc = descriptions[i]
 			if not isstring(desc) then SF.Throw("Non-string input description at index " .. i, 2) end
 			descriptions_out[i] = desc
@@ -404,7 +404,7 @@ function wire_library.adjustOutputs(names, types, descriptions)
 		if not SFToWire[porttype] then SF.Throw("Invalid/unsupported output type: " .. porttype, 2) end
 		types_out[i] = porttype
 
-		if descriptions then
+		if descriptions and descriptions[i] then
 			local desc = descriptions[i]
 			if not isstring(desc) then SF.Throw("Non-string input description at index " .. i, 2) end
 			descriptions_out[i] = desc
