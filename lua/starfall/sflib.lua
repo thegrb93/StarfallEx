@@ -10,7 +10,7 @@ local dgetmeta = debug.getmetatable
 local TypeID = TypeID
 local math_Clamp = math.Clamp
 local ENT_META,NPC_META,PHYS_META,PLY_META,VEH_META,WEP_META = FindMetaTable("Entity"),FindMetaTable("NPC"),FindMetaTable("PhysObj"),FindMetaTable("Player"),FindMetaTable("Vehicle"),FindMetaTable("Weapon")
-local Ent_EntIndex,Ent_Fire,Ent_FollowBone,Ent_GetAngles,Ent_GetChildren,Ent_GetClass,Ent_GetCreationID,Ent_GetParent,Ent_GetPos,Ent_GetTable,Ent_IsScripted,Ent_IsValid,Ent_IsWorld,Ent_SetAngles,Ent_SetLocalAngularVelocity,Ent_SetLocalVelocity,Ent_SetParent,Ent_SetPos = ENT_META.EntIndex,ENT_META.Fire,ENT_META.FollowBone,ENT_META.GetAngles,ENT_META.GetChildren,ENT_META.GetClass,ENT_META.GetCreationID,ENT_META.GetParent,ENT_META.GetPos,ENT_META.GetTable,ENT_META.IsScripted,ENT_META.IsValid,ENT_META.IsWorld,ENT_META.SetAngles,ENT_META.SetLocalAngularVelocity,ENT_META.SetLocalVelocity,ENT_META.SetParent,ENT_META.SetPos
+local Ent_EntIndex,Ent_Fire,Ent_FollowBone,Ent_GetAngles,Ent_GetAttachment,Ent_GetBonePosition,Ent_GetChildren,Ent_GetClass,Ent_GetCreationID,Ent_GetParent,Ent_GetPos,Ent_GetTable,Ent_IsScripted,Ent_IsValid,Ent_IsWorld,Ent_SetAngles,Ent_SetLocalAngularVelocity,Ent_SetLocalAngles,Ent_SetLocalPos,Ent_SetLocalVelocity,Ent_SetParent,Ent_SetPos = ENT_META.EntIndex,ENT_META.Fire,ENT_META.FollowBone,ENT_META.GetAngles,ENT_META.GetAttachment,ENT_META.GetBonePosition,ENT_META.GetChildren,ENT_META.GetClass,ENT_META.GetCreationID,ENT_META.GetParent,ENT_META.GetPos,ENT_META.GetTable,ENT_META.IsScripted,ENT_META.IsValid,ENT_META.IsWorld,ENT_META.SetAngles,ENT_META.SetLocalAngularVelocity,ENT_META.SetLocalAngles,ENT_META.SetLocalPos,ENT_META.SetLocalVelocity,ENT_META.SetParent,ENT_META.SetPos
 local function Ent_IsNPC(ent) return dgetmeta(ent)==NPC_META end
 local function Ent_IsPlayer(ent) return dgetmeta(ent)==PLY_META end
 local function Ent_IsVehicle(ent) return dgetmeta(ent)==VEH_META end
@@ -610,41 +610,58 @@ setmetatable(SF.BlockedList, SF.BlockedList)
 
 SF.Parent = {
 	__index = {
-		updateTransform = function(self)
-			self.pos, self.ang = WorldToLocal(Ent_GetPos(self.ent), Ent_GetAngles(self.ent), Ent_GetPos(self.parent), Ent_GetAngles(self.parent))
-		end,
-
-		applyTransform = function(self)
-			local pos, ang = LocalToWorld(self.pos, self.ang, Ent_GetPos(self.parent), Ent_GetAngles(self.parent))
-			Ent_SetPos(self.ent, pos)
-			Ent_SetAngles(self.ent, ang)
-		end,
-		
 		parentTypes = {
 			entity = {
-				function(self)
+				applyParent = function(self)
 					Ent_SetParent(self.ent, self.parent)
 				end,
-				function(self)
+				removeParent = function(self)
 					Ent_SetParent(self.ent)
-				end
+				end,
+				updateTransform = function(self)
+					self.pos, self.ang = WorldToLocal(Ent_GetPos(self.ent), Ent_GetAngles(self.ent), Ent_GetPos(self.parent), Ent_GetAngles(self.parent))
+				end,
+				applyTransform = function(self)
+					local pos, ang = LocalToWorld(self.pos, self.ang, Ent_GetPos(self.parent), Ent_GetAngles(self.parent))
+					Ent_SetPos(self.ent, pos)
+					Ent_SetAngles(self.ent, ang)
+				end,
 			},
 			attachment = {
-				function(self)
+				applyParent = function(self)
 					Ent_SetParent(self.ent, self.parent)
 					Ent_Fire(self.ent, "SetParentAttachmentMaintainOffset", self.param, 0.01)
 				end,
-				function(self)
+				removeParent = function(self)
 					Ent_SetParent(self.ent)
-				end
+				end,
+				updateTransform = function(self)
+					local attach = Ent_GetAttachment(self.parent, self.param)
+					self.pos, self.ang = WorldToLocal(Ent_GetPos(self.ent), Ent_GetAngles(self.ent), attach.Pos, attach.Ang)
+				end,
+				applyTransform = function(self)
+					local attach = Ent_GetAttachment(self.parent, self.param)
+					local pos, ang = LocalToWorld(self.pos, self.ang, attach.Pos, attach.Ang)
+					Ent_SetPos(self.ent, pos)
+					Ent_SetAngles(self.ent, ang)
+				end,
 			},
 			bone = {
-				function(self)
+				applyParent = function(self)
 					Ent_FollowBone(self.ent, self.parent, self.param)
+					self:applyTransform()
 				end,
-				function(self)
+				removeParent = function(self)
 					Ent_FollowBone(self.ent, NULL, 0)
-				end
+				end,
+				updateTransform = function(self)
+					local bonepos, boneang = Ent_GetBonePosition(self.parent, self.param)
+					self.pos, self.ang = WorldToLocal(Ent_GetPos(self.ent), Ent_GetAngles(self.ent), bonepos, boneang)
+				end,
+				applyTransform = function(self)
+					Ent_SetLocalPos(self.ent, self.pos)
+					Ent_SetLocalAngles(self.ent, self.ang)
+				end,
 			}
 		},
 
@@ -656,7 +673,7 @@ SF.Parent = {
 			if parent then
 				self.parent = parent
 				self.param = param
-				self.applyParent, self.removeParent = unpack(self.parentTypes[type])
+				setmetatable(self, self.parentTypes[type])
 
 				Ent_GetTable(parent).sfParent.children[self.ent] = self
 				self:updateTransform()
@@ -722,6 +739,15 @@ SF.Parent = {
 	end
 }
 setmetatable(SF.Parent, SF.Parent)
+
+setmetatable(SF.Parent.__index.parentTypes.entity, SF.Parent)
+SF.Parent.__index.parentTypes.entity.__index = SF.Parent.__index.parentTypes.entity
+
+setmetatable(SF.Parent.__index.parentTypes.attachment, SF.Parent)
+SF.Parent.__index.parentTypes.attachment.__index = SF.Parent.__index.parentTypes.attachment
+
+setmetatable(SF.Parent.__index.parentTypes.bone, SF.Parent)
+SF.Parent.__index.parentTypes.bone.__index = SF.Parent.__index.parentTypes.bone
 
 if CLIENT then
 -- When parent is retransmitted, it loses it's children
