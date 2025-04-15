@@ -1,6 +1,25 @@
 --- Provides permissions for URLs
 
-local checkWhitelist, urlrestrictor
+local whitelist_file = SERVER and "sf_url_whitelist.txt" or "starfall/cl_url_whitelist.txt"
+local urlrestrictor
+local function checkWhitelist(instance, url, key)
+	if TypeID(url) ~= TYPE_STRING then return false, "The url is not a string" end
+	print(instance, url, key)
+
+	if not string.match(url,"^(%w-)://") then
+		url = "http://"..url
+	end
+
+	local result = hook.Run("CanAccessUrl", url)
+	if result==true then return true
+	elseif result==false then return false, "The url was blocked"
+	end
+
+	local prefix, site, data = string.match(url,"^(%w-)://([^/]*)/?(.*)")
+	if not site then return false, "This url is malformed" end
+	site = site.."/"..(data or "") -- Make sure there is / at the end of site
+	return urlrestrictor:check(site), "This url is not whitelisted. See data/"..whitelist_file.." for valid sites."
+end
 
 local P = {}
 P.id = "urlwhitelist"
@@ -22,24 +41,6 @@ end
 
 SF.Permissions.registerProvider(P)
 
-
-function checkWhitelist(instance, url, key)
-	if TypeID(url) ~= TYPE_STRING then return false, "The url is not a string" end
-
-	if not string.match(url,"^(%w-)://") then
-		url = "http://"..url
-	end
-
-	local result = hook.Run("CanAccessUrl", url)
-	if result==true then return true
-	elseif result==false then return false, "The url was blocked"
-	end
-
-	local prefix, site, data = string.match(url,"^(%w-)://([^/]*)/?(.*)")
-	if not site then return false, "This url is malformed" end
-	site = site.."/"..(data or "") -- Make sure there is / at the end of site
-	return urlrestrictor:check(site), "This url is not whitelisted. See https://github.com/thegrb93/StarfallEx/wiki/Whitelist for more information."
-end
 
 local function whitelistNotifyError(filename, err)
 	local errmsg = "Error in "..filename..": "..err
@@ -106,16 +107,15 @@ local function runWhitelist(filename, code)
 end
 
 function SF.ReloadUrlWhitelist()
-	local filename = SERVER and "sf_url_whitelist.txt" or "starfall/cl_url_whitelist.txt"
 	local code
-	if file.Exists(filename, "DATA") then
-		code = file.Read(filename, "DATA")
+	if file.Exists(whitelist_file, "DATA") then
+		code = file.Read(whitelist_file, "DATA")
 	else
 		code = loadDefaultWhitelist()
-		file.Write(filename, code)
+		file.Write(whitelist_file, code)
 	end
 
-	if not runWhitelist(filename, code) then
+	if not runWhitelist(whitelist_file, code) then
 		runWhitelist("starfall_whitelist_default.txt", loadDefaultWhitelist())
 	end
 end
