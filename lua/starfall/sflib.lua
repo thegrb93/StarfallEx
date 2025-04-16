@@ -630,20 +630,18 @@ SF.Parent = {
 			attachment = {
 				applyParent = function(self)
 					Ent_SetParent(self.ent, self.parent)
-					Ent_Fire(self.ent, "SetParentAttachmentMaintainOffset", self.param, 0.01)
+					Ent_Fire(self.ent, "SetParentAttachment", self.param[1], 0.01)
 				end,
 				removeParent = function(self)
 					Ent_SetParent(self.ent)
 				end,
 				updateTransform = function(self)
-					local attach = Ent_GetAttachment(self.parent, self.param)
+					local attach = Ent_GetAttachment(self.parent, self.param[2])
 					self.pos, self.ang = WorldToLocal(Ent_GetPos(self.ent), Ent_GetAngles(self.ent), attach.Pos, attach.Ang)
 				end,
 				applyTransform = function(self)
-					local attach = Ent_GetAttachment(self.parent, self.param)
-					local pos, ang = LocalToWorld(self.pos, self.ang, attach.Pos, attach.Ang)
-					Ent_SetPos(self.ent, pos)
-					Ent_SetAngles(self.ent, ang)
+					Ent_SetLocalPos(self.ent, self.pos)
+					Ent_SetLocalAngles(self.ent, self.ang)
 				end,
 			},
 			bone = {

@@ -349,14 +349,12 @@ function ents_methods:setParent(parent, attachment, bone)
 		elseif attachment ~= nil then
 			if CLIENT then SF.Throw("Parenting to an attachment is not supported in clientside!", 2) end
 			if isstring(attachment) then
-				if Ent_LookupAttachment(parent, attachment) < 1 then SF.Throw("Invalid attachment provided!", 2) end
+				attachment = {attachment, Ent_LookupAttachment(parent, attachment)}
+				if attachment[2] < 1 then SF.Throw("Invalid attachment provided!", 2) end
 			elseif isnumber(attachment) then
 				local attachments = Ent_GetAttachments(parent)
-				if attachments and attachments[attachment] then
-					attachment = attachments[attachment].name
-				else
-					SF.Throw("Invalid attachment ID provided!", 2)
-				end
+				local name = attachments and attachments[attachment] and attachments[attachment].name or SF.Throw("Invalid attachment ID provided!", 2)
+				attachment = {name, attachment}
 			else
 				SF.ThrowTypeError("string or number", SF.GetType(attachment), 2)
 			end
