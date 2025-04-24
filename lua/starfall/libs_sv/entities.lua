@@ -1199,8 +1199,9 @@ function ents_methods:setPreventTransmit(target, prevent)
 	else
 		newtarget = {}
 		for i, pl in ipairs(target) do
-			if not Ent_IsPlayer(getent(pl)) then continue end
-			table.insert(newtarget,instance.Types.Player.GetPlayer(pl))
+			pl = eunwrap(pl)
+			if not Ent_IsValid(pl) or not Ent_IsPlayer(pl) then continue end
+			table.insert(newtarget,pl)
 		end
 	end
 	
