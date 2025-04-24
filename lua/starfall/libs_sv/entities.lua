@@ -1188,8 +1188,8 @@ end
 -- @param boolean prevent Whether the entity should be prevented from being transmitted.
 function ents_methods:setPreventTransmit(target,prevent)
 	local ent = getent(self)
-	if Ent_IsPlayer(ent) then SF.Throw("Entity is a player!", 2) end
 	checkpermission(instance, ent, "entities.canTool")
+	if Ent_IsPlayer(ent) then SF.Throw("Entity is a player!", 2) end
 
 	checkluatype(target,TYPE_TABLE)
 
