@@ -1184,7 +1184,7 @@ end
 
 --- Prevents an entity from being transmitted to one or more clients. In order to work, this function has to also be called on all the entity's children if any.
 -- @server
--- @param Player|table player The player or table of players to target.
+-- @param Player|table target The player or table of players to target.
 -- @param boolean prevent Whether the entity should be prevented from being transmitted.
 function ents_methods:setPreventTransmit(target,prevent)
 	local ent = getent(self)
