@@ -1200,7 +1200,7 @@ function ents_methods:setPreventTransmit(target, prevent)
 		newtarget = {}
 		for i, pl in ipairs(target) do
 			if not Ent_IsPlayer(getent(pl)) then continue end
-			newtarget[i] = instance.Types.Player.GetPlayer(pl)
+			table.insert(newtarget,instance.Types.Player.GetPlayer(pl))
 		end
 	end
 	
