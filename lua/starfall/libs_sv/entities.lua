@@ -1189,7 +1189,7 @@ end
 function ents_methods:setPreventTransmit(target, prevent)
 	local ent = getent(self)
 	checkpermission(instance, ent, "entities.canTool")
-	if Ent_IsPlayer(ent) then SF.Throw("Entity is a player!", 2) end
+	if Ent_IsPlayer(ent) then SF.Throw("Cannot be used on players!", 2) end
 
 	checkluatype(target, TYPE_TABLE)
 
