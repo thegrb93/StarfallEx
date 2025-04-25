@@ -29,6 +29,7 @@ registerprivilege("entities.ignite", "Ignite", "Allows the user to ignite entiti
 registerprivilege("entities.canTool", "CanTool", "Whether or not the user can use the toolgun on the entity", { entities = {} })
 registerprivilege("entities.use", "Use", "Whether or not the user can use the entity", { entities = {} })
 registerprivilege("entities.getTable", "GetTable", "Allows the user to get an entity's table", { entities = {}, usergroups = { default = 1 } })
+registerprivilege("entities.preventTransmit","Prevent Transmit","Allows the user to hide an entity from any client", { entities = {}, usergroups = { default = 1 } })
 
 local function table_find(tbl, val)
 	for i=1, #tbl do if tbl[i]==val then return i end end
