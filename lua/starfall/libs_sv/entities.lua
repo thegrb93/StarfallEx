@@ -1205,7 +1205,7 @@ function ents_methods:setPreventTransmit(target, prevent)
 	
 	checkluatype(prevent, TYPE_BOOL)
 
-	ent:SetPreventTransmit(newtarget, prevent)
+	Ent_SetPreventTransmit(ent, newtarget, prevent)
 end
 
 end
