@@ -1189,7 +1189,7 @@ end
 -- @param boolean prevent Whether the entity should be prevented from being transmitted.
 function ents_methods:setPreventTransmit(target, prevent)
 	local ent = getent(self)
-	checkpermission(instance, ent, "entities.canTool")
+	checkpermission(instance, ent, "entities.preventTransmit")
 	if Ent_IsPlayer(ent) then SF.Throw("Cannot be used on players!", 2) end
 
 	checkluatype(target, TYPE_TABLE)
