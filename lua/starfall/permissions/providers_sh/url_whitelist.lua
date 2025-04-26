@@ -47,7 +47,7 @@ local function whitelistNotifyError(filename, err)
 	if SERVER then
 		ErrorNoHalt(errmsg)
 	else
-		SF.AddNotify(LocalPlayer(), errmsg, "ERROR", 7, "ERROR1")
+		SF.AddNotify(LocalPlayer(), errmsg, "ERROR", 7, "SILENT")
 	end
 end
 
