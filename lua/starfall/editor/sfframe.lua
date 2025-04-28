@@ -673,7 +673,7 @@ function Editor:GetNextAvailableTab()
 end
 
 function Editor:NewTab()
-	self:OpenCode(nil, SF.DefaultCode())
+	self:OpenCode(nil, SF.DefaultCode(), nil, true)
 end
 
 function Editor:CloseTab(_tab,dontask)
