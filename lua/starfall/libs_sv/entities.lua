@@ -29,6 +29,7 @@ registerprivilege("entities.ignite", "Ignite", "Allows the user to ignite entiti
 registerprivilege("entities.canTool", "CanTool", "Whether or not the user can use the toolgun on the entity", { entities = {} })
 registerprivilege("entities.use", "Use", "Whether or not the user can use the entity", { entities = {} })
 registerprivilege("entities.getTable", "GetTable", "Allows the user to get an entity's table", { entities = {}, usergroups = { default = 1 } })
+registerprivilege("entities.preventTransmit","Prevent Transmit","Allows the user to hide an entity from any client", { entities = {}, usergroups = { default = 1 } })
 
 local function table_find(tbl, val)
 	for i=1, #tbl do if tbl[i]==val then return i end end
@@ -206,7 +207,7 @@ end
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
-local Ent_AddCallback,Ent_DrawShadow,Ent_Extinguish,Ent_Fire,Ent_GetChildren,Ent_GetClass,Ent_GetCreationID,Ent_GetForward,Ent_GetFriction,Ent_GetMoveType,Ent_GetParent,Ent_GetPhysicsObject,Ent_GetRight,Ent_GetTable,Ent_GetUp,Ent_GetVar,Ent_Ignite,Ent_IsConstraint,Ent_IsPlayer,Ent_IsPlayerHolding,Ent_IsScripted,Ent_IsValid,Ent_IsVehicle,Ent_IsWorld,Ent_OBBMaxs,Ent_OBBMins,Ent_PhysicsInit,Ent_PhysicsInitSphere,Ent_Remove,Ent_RemoveCallback,Ent_SetAngles,Ent_SetCollisionBounds,Ent_SetCollisionGroup,Ent_SetElasticity,Ent_SetFriction,Ent_SetLightingOriginEntity,Ent_SetLocalAngles,Ent_SetLocalPos,Ent_SetMoveType,Ent_SetNotSolid,Ent_SetPos,Ent_SetSolid,Ent_SetVelocity,Ent_TestPVS,Ent_Use = ENT_META.AddCallback,ENT_META.DrawShadow,ENT_META.Extinguish,ENT_META.Fire,ENT_META.GetChildren,ENT_META.GetClass,ENT_META.GetCreationID,ENT_META.GetForward,ENT_META.GetFriction,ENT_META.GetMoveType,ENT_META.GetParent,ENT_META.GetPhysicsObject,ENT_META.GetRight,ENT_META.GetTable,ENT_META.GetUp,ENT_META.GetVar,ENT_META.Ignite,ENT_META.IsConstraint,ENT_META.IsPlayer,ENT_META.IsPlayerHolding,ENT_META.IsScripted,ENT_META.IsValid,ENT_META.IsVehicle,ENT_META.IsWorld,ENT_META.OBBMaxs,ENT_META.OBBMins,ENT_META.PhysicsInit,ENT_META.PhysicsInitSphere,ENT_META.Remove,ENT_META.RemoveCallback,ENT_META.SetAngles,ENT_META.SetCollisionBounds,ENT_META.SetCollisionGroup,ENT_META.SetElasticity,ENT_META.SetFriction,ENT_META.SetLightingOriginEntity,ENT_META.SetLocalAngles,ENT_META.SetLocalPos,ENT_META.SetMoveType,ENT_META.SetNotSolid,ENT_META.SetPos,ENT_META.SetSolid,ENT_META.SetVelocity,ENT_META.TestPVS,ENT_META.Use
+local Ent_AddCallback,Ent_DrawShadow,Ent_Extinguish,Ent_Fire,Ent_GetChildren,Ent_GetClass,Ent_GetCreationID,Ent_GetForward,Ent_GetFriction,Ent_GetMoveType,Ent_GetParent,Ent_GetPhysicsObject,Ent_GetRight,Ent_GetTable,Ent_GetUp,Ent_GetVar,Ent_Ignite,Ent_IsConstraint,Ent_IsPlayer,Ent_IsPlayerHolding,Ent_IsScripted,Ent_IsValid,Ent_IsVehicle,Ent_IsWorld,Ent_OBBMaxs,Ent_OBBMins,Ent_PhysicsInit,Ent_PhysicsInitSphere,Ent_Remove,Ent_RemoveCallback,Ent_SetAngles,Ent_SetCollisionBounds,Ent_SetCollisionGroup,Ent_SetElasticity,Ent_SetFriction,Ent_SetLightingOriginEntity,Ent_SetLocalAngles,Ent_SetLocalPos,Ent_SetMoveType,Ent_SetNotSolid,Ent_SetPreventTransmit,Ent_SetPos,Ent_SetSolid,Ent_SetVelocity,Ent_TestPVS,Ent_Use = ENT_META.AddCallback,ENT_META.DrawShadow,ENT_META.Extinguish,ENT_META.Fire,ENT_META.GetChildren,ENT_META.GetClass,ENT_META.GetCreationID,ENT_META.GetForward,ENT_META.GetFriction,ENT_META.GetMoveType,ENT_META.GetParent,ENT_META.GetPhysicsObject,ENT_META.GetRight,ENT_META.GetTable,ENT_META.GetUp,ENT_META.GetVar,ENT_META.Ignite,ENT_META.IsConstraint,ENT_META.IsPlayer,ENT_META.IsPlayerHolding,ENT_META.IsScripted,ENT_META.IsValid,ENT_META.IsVehicle,ENT_META.IsWorld,ENT_META.OBBMaxs,ENT_META.OBBMins,ENT_META.PhysicsInit,ENT_META.PhysicsInitSphere,ENT_META.Remove,ENT_META.RemoveCallback,ENT_META.SetAngles,ENT_META.SetCollisionBounds,ENT_META.SetCollisionGroup,ENT_META.SetElasticity,ENT_META.SetFriction,ENT_META.SetLightingOriginEntity,ENT_META.SetLocalAngles,ENT_META.SetLocalPos,ENT_META.SetMoveType,ENT_META.SetNotSolid,ENT_META.SetPreventTransmit,ENT_META.SetPos,ENT_META.SetSolid,ENT_META.SetVelocity,ENT_META.TestPVS,ENT_META.Use
 local function Ent_IsNPC(ent) return dgetmeta(ent)==NPC_META end
 local function Ent_IsPlayer(ent) return dgetmeta(ent)==PLY_META end
 local function Ent_IsVehicle(ent) return dgetmeta(ent)==VEH_META end
@@ -1180,6 +1181,32 @@ function ents_methods:setLightingOriginEntity(lightOrigin)
 	checkpermission(instance, ent, "entities.setRenderProperty")
 	if lightOrigin then lightOrigin = getent(lightOrigin) end
 	Ent_SetLightingOriginEntity(ent, lightOrigin)
+end
+
+--- Prevents an entity from being transmitted to one or more clients. In order to work, this function has to also be called on all the entity's children if any.
+-- @server
+-- @param Player|table target The player or table of players to target.
+-- @param boolean prevent Whether the entity should be prevented from being transmitted.
+function ents_methods:setPreventTransmit(target, prevent)
+	local ent = getent(self)
+	checkpermission(instance, ent, "entities.preventTransmit")
+	if Ent_IsPlayer(ent) then SF.Throw("Cannot be used on players!", 2) end
+
+	checkluatype(target, TYPE_TABLE)
+
+	local newtarget
+	if debug.getmetatable(target) == instance.Types.Player then
+		newtarget = instance.Types.Player.GetPlayer(target)
+	else
+		newtarget = {}
+		for i, pl in ipairs(target) do
+			newtarget[i] = instance.Types.Player.GetPlayer(pl)
+		end
+	end
+	
+	checkluatype(prevent, TYPE_BOOL)
+
+	Ent_SetPreventTransmit(ent, newtarget, prevent)
 end
 
 end
