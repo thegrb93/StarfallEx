@@ -182,6 +182,7 @@ end
 --- Input library.
 -- @name input
 -- @class library
+-- @client
 -- @libtbl input_library
 SF.RegisterLibrary("input")
 
