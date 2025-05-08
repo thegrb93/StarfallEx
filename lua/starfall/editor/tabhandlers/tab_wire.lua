@@ -79,10 +79,22 @@ TabHandler.AutoValidateConVar = CreateClientConVar("sf_editor_wire_validateontex
 TabHandler.CacheDebug = CreateClientConVar("sf_editor_wire_cachedebug", "0", true, false)
 TabHandler.HtmlBackgroundConvar = CreateClientConVar("sf_editor_wire_htmlbackground", "", true, false)
 TabHandler.HtmlBackgroundOpacityConvar = CreateClientConVar("sf_editor_wire_htmlbackgroundopacity", "5", true, false)
+TabHandler.ACControlStyle = CreateClientConVar( "sf_editor_wire_ac_controlstyle", "2", true, false )
+TabHandler.ACMaxWidth = CreateClientConVar( "sf_editor_wire_ac_list_max_width", "600", true, false )
+TabHandler.ACMaxResults = CreateClientConVar( "sf_editor_wire_ac_maxresults", 20, true, false )
 
 cvars.AddChangeCallback("sf_editor_wire_htmlbackground",function(_,_,url)
 	TabHandler:UpdateHtmlBackground()
 end)
+
+local AC_CONTROL_OFF = 0 -- Autocomplete off
+local AC_CONTROL_DEFAULT = 1 -- Default style - Tab/CTRL+Tab to choose item;\nEnter/Space to use;\nArrow keys to abort.
+local AC_CONTROL_VISUALCSHARP = 2 -- Visual C# Style - Ctrl+Space to use the top match;\nArrow keys to choose item;\nTab/Enter/Space to use;\nCode validation hotkey (ctrl+space) moved to ctrl+b.
+local AC_CONTROL_SCROLLER = 3 -- Scroller style - Mouse scroller to choose item;\nMiddle mouse to use.
+local AC_CONTROL_SCROLLER_ENTER = 4 -- Scroller Style w/ Enter - Mouse scroller to choose item;\nEnter to use.
+local AC_CONTROL_ECLIPSE = 5 -- Eclipse Style - Enter to use top match;\nTab to enter auto completion menu;\nArrow keys to choose item;\nEnter to use;\nSpace to abort.
+local AC_CONTROL_ATOM = 6 -- Atom style - Tab/Enter to use, arrow keys to choose
+
 
 ---------------------
 -- Colors
@@ -304,6 +316,33 @@ function TabHandler:RegisterSettings()
 
 	local htmlbackground = form:TextEntry("Custom background image url:", "sf_editor_wire_htmlbackground")
 	local htmlbackgroundopacity = form:NumSlider("Custom background image opacity","sf_editor_wire_htmlbackgroundopacity", 0, 255, 1)
+
+	local AutoCompleteControlOptions = form:ComboBox("Auto completion control style")
+
+	local modes = {
+		{ "Off", "Turn off autocomplete." },
+		{ "Default", "Current mode:\nTab/CTRL+Tab to choose item;\nEnter/Space to use;\nArrow keys to abort." },
+		{ "Visual C# Style", "Current mode:\nCtrl+Space to use the top match;\nArrow keys to choose item;\nTab/Enter/Space to use;\nCode validation hotkey (ctrl+space) moved to ctrl+b." },
+		{ "Scroller", "Current mode:\nMouse scroller to choose item;\nMiddle mouse to use." },
+		{ "Scroller w/ Enter", "Current mode:\nMouse scroller to choose item;\nEnter to use." },
+		{ "Eclipse Style", "Current mode:\nEnter to use top match;\nTab to enter auto completion menu;\nArrow keys to choose item;\nEnter to use;\nSpace to abort." },
+		{ "Atom/IntelliJ style", "Current mode:\nTab/Enter to use;\nArrow keys to choose." },
+	}
+
+	AutoCompleteControlOptions:SetSortItems(false)
+	for k, v in ipairs(modes) do
+		AutoCompleteControlOptions:AddChoice(v[1])
+	end
+	local curmode = math.Clamp(TabHandler.ACControlStyle:GetInt()+1, 1, #modes)
+	AutoCompleteControlOptions:SetValue(modes[curmode][1])
+	AutoCompleteControlOptions:SetToolTip(modes[curmode][2])
+
+	AutoCompleteControlOptions.OnSelect = function(panel, index)
+		panel:SetToolTip(modes[index][2])
+		RunConsoleCommand("sf_editor_wire_ac_controlstyle", index-1)
+	end
+
+	local acmaxresults = form:NumSlider("Autocomplete max results","sf_editor_wire_ac_maxresults", 1, 50, 1)
 
 	return form, "Wire", "icon16/pencil.png", "Options for wire tabs."
 end
@@ -1526,6 +1565,7 @@ function PANEL:_OnTextChanged()
 	end
 
 	self:SetSelection(text)
+	self:AutocompleteOpen()
 	if self.OnTextChanged then self:OnTextChanged() end
 end
 
@@ -2519,6 +2559,7 @@ function PANEL:_OnKeyCodeTyped(code)
 	else
 		
 		if code == KEY_ENTER then
+			if self:AutocompleteKeybind(code) then return end
 			local row = self:GetRowText(self.Caret[1]):sub(1, self.Caret[2]-1)
 			local diff = (row:find("%S") or (row:len() + 1))-1
 			local tabs = string_rep("    ", math_floor(diff / 4))
@@ -2544,6 +2585,7 @@ function PANEL:_OnKeyCodeTyped(code)
 			self:SetSelection("\n" .. tabs)
 			if self.OnTextChanged then self:OnTextChanged() end
 		elseif code == KEY_UP then
+			if self:AutocompleteKeybind(code) then return end
 			if self.Caret[1] <= 1 then return end
 			self.Caret[1] = self.Caret[1] - 1
 			while self.Rows[self.Caret[1]][3] do
@@ -2551,6 +2593,7 @@ function PANEL:_OnKeyCodeTyped(code)
 			end
 			self:SetCaret(self.Caret)
 		elseif code == KEY_DOWN then
+			if self:AutocompleteKeybind(code) then return end
 			if self.Caret[1] >= #self.Rows then 
 					self.Caret[2] = #self.Rows[self.Caret[1]][1]
 					self:SetCaret(self.Caret)
@@ -2638,6 +2681,7 @@ function PANEL:_OnKeyCodeTyped(code)
 	if code == KEY_TAB or (control and (code == KEY_I or code == KEY_O)) then
 		if code == KEY_O then shift = not shift end
 		if code == KEY_TAB and control then shift = not shift end
+		if self:AutocompleteKeybind(code) then return end
 		if self:HasSelection() then
 			self:Indent(shift)
 		else
@@ -2665,6 +2709,8 @@ function PANEL:_OnKeyCodeTyped(code)
 	if control and not handled then
 		handled = self:OnShortcut(code, shift)
 	end
+
+	self:AutocompleteOpen()
 
 	return handled
 end
@@ -2770,19 +2816,28 @@ function PANEL:SkipPattern(pattern)
 	return text
 end
 
-function PANEL:IsDirectiveLine()
-	local line = self:GetRowText(caret[1])
-	return line:match("^@") ~= nil
-end
 
 function PANEL:getWordStart(caret, getword)
 	local line = self:GetRowText(caret[1])
 
-	for startpos, endpos in line:gmatch("()[a-zA-Z0-9_]+()") do -- "()%w+()"
+	for startpos, endpos in string.gmatch(line, "()[a-zA-Z0-9_]+()") do -- "()%w+()"
 		if startpos <= caret[2] and endpos >= caret[2] then
-			return { caret[1], startpos }, getword and line:sub(startpos, endpos-1) or nil
+			return { caret[1], startpos }, getword and string.sub(line, startpos, endpos-1) or nil
 		end
 	end
+
+	return { caret[1], 1 }
+end
+
+function PANEL:getWordCallingStart(caret, getword)
+	local line = self:GetRowText(caret[1])
+
+	for startpos, endpos in string.gmatch(line, "()[%w%.:_]+()") do
+		if startpos <= caret[2] and endpos >= caret[2] then
+			return { caret[1], startpos }, getword and string.sub(line, startpos, endpos-1) or nil
+		end
+	end
+
 	return { caret[1], 1 }
 end
 
@@ -2791,10 +2846,388 @@ function PANEL:getWordEnd(caret, getword)
 
 	for startpos, endpos in line:gmatch("()[a-zA-Z0-9_]+()") do -- "()%w+()"
 		if startpos <= caret[2] and endpos >= caret[2] then
-			return { caret[1], endpos }, getword and line:sub(startpos, endpos-1) or nil
+			return { caret[1], endpos }, getword and string.sub(line, startpos, endpos-1) or nil
 		end
 	end
 	return { caret[1], #line + 1 }
+end
+
+
+function PANEL:getWordPrevious()
+	local ln, col = self.Caret[1], self.Caret[2]
+	local row = self:GetRowText(ln)
+	local startpos, _, word = string.find(string.sub(row, 1, col - 1), "(%w+)[^%w%.:_]+(%w*)$", 1)
+	if not startpos then startpos, word = 1, "" end
+
+	return word, self:GetArea({ { ln, startpos - 1 }, { ln, startpos } })
+end
+
+local AC_COLOR_CONSTANT = Color(86, 156, 214)
+local AC_COLOR_FUNCTION = Color(220, 220, 170)
+local AC_COLOR_VARIABLE = Color(156, 220, 254)
+local AC_COLOR_KEYWORD = Color(197, 134, 192)
+local AC_COLOR_DIRECTIVE = AC_COLOR_CONSTANT
+
+local function concatParameters(params)
+	if not params then return "()" end
+
+	local t = {}
+	for _, param in ipairs(params) do
+		if string.find(param.type or "", "%.%.%.") then
+			t[#t + 1] = "..." .. param.name
+		else
+			t[#t + 1] = param.name
+		end
+	end
+	return "(" .. table.concat(t, ", ") .. ")"
+end
+
+local AutoCompleteSuggestion = {
+	__index = {
+		getDistance()
+	},
+	__call = function(t, name, desc, color, replace)
+		return setmetatable({
+			name = name,
+			desc = desc,
+			color = color,
+			replace = replace or name,
+		}, t)
+	end
+}
+setmetatable(AutoCompleteSuggestion, AutoCompleteSuggestion)
+function AutoCompleteSuggestion.Sort(list, target)
+end
+
+function PANEL:AutocompletePopulate()
+	local prevWord = self:getWordPrevious()
+	if prevWord == "function" or prevWord == "local" then return end
+
+	local _, typing = self:getWordCallingStart(self.Caret, true)
+	if not typing then return end
+
+	local suggestions = {}
+
+	local line = self:GetRowText(self.Caret[1])
+
+	repeat
+		local directivepos = string.find(line, "--@", 1, true)
+		if directivepos and self.Caret[2] > directivepos then
+			for name, data in pairs(SF.Docs.Directives) do
+				suggestions[#suggestions + 1] = AutoCompleteSuggestion(name, data.description or ("The directive " .. name), AC_COLOR_DIRECTIVE)
+			end
+			break
+		end
+		
+		local selfCall = string.match(typing, "%:([%w_]+)")
+		if selfCall then
+			local beforeSeparator = string.match(typing, "([^:]+)[:]")
+			for typeName, typeData in pairs(SF.Docs.Types) do
+				if typeData.methods then
+					for funcName, funcMethod in pairs(typeData.methods) do
+						if string.StartsWith(funcName, selfCall) then
+							suggestions[#suggestions + 1] = AutoCompleteSuggestion(typeName..":"..funcName..concatParameters(funcMethod.params), funcMethod.description, AC_COLOR_FUNCTION, beforeSeparator..":"..funcName)
+						end
+					end
+				end
+			end
+			break
+		end
+
+		local dotCall = string.match(typing, "%.([%w_]+)")
+		if dotCall then
+			local libName = string.match(typing, "([^%.]+)[%.]")
+			local libData = SF.Docs.Libraries[libName]
+			if libData then
+				if libData.methods and libName ~= "builtins" then
+					for funcName, funcMethod in pairs(libData.methods) do
+						local fullName = libName .. "." .. funcName
+						if string.StartsWith(fullName, typing) then
+							suggestions[#suggestions + 1] = AutoCompleteSuggestion(funcName .. concatParameters(funcMethod.params), funcMethod.description, AC_COLOR_FUNCTION, fullName)
+						end
+					end
+				end
+			end
+			break
+		end
+
+		for funcName, funcMethod in pairs(SF.Docs.Libraries.builtins) do
+			if string.StartsWith(funcName, typing) then
+				suggestions[#suggestions + 1] = AutoCompleteSuggestion(funcName .. concatParameters(funcMethod.params), funcMethod.description, AC_COLOR_FUNCTION, funcName)
+			end
+		end
+
+		for libName, libData in pairs(SF.Docs.Libraries) do
+			if string.StartsWith(libName, typing) and libName ~= "builtins" then
+				suggestions[#suggestions + 1] = AutoCompleteSuggestion(libName, "The library " .. libName, AC_COLOR_FUNCTION)
+			end
+		end
+
+		for keyword in pairs(self.CurrentMode.Keywords) do
+			if string.StartsWith(keyword, typing) then
+				suggestions[#suggestions + 1] = AutoCompleteSuggestion(keyword, "The keyword " .. keyword, AC_COLOR_KEYWORD)
+			end
+		end
+
+		for keyword in pairs(self.CurrentMode.KeywordsConst) do
+			if string.StartsWith(keyword, typing) then
+				suggestions[#suggestions + 1] = AutoCompleteSuggestion(keyword, "The keyword " .. keyword, AC_COLOR_CONSTANT)
+			end
+		end
+
+		
+	until true
+
+	-- Sort suggestions, clamp to max
+	AutoCompleteSuggestion.Sort(suggestionsList, target)
+	for i=TabHandler.ACMaxResults:GetInt()+1, #suggestionsList do
+		suggestionsList[i] = nil
+	end
+	
+	acPanel.selected = 0
+	local maxw = 15
+
+	surface.SetFont(self.CurrentFont)
+
+	-- Add all suggestions to the list
+	for i, suggestion in ipairs(suggestionsList) do
+		local niceName = suggestion.name
+
+
+
+		-- get the width of the widest suggestion
+		local w,_ = surface_GetTextSize( niceName )
+		w = w + 15
+
+		w = math.min(TabHandler.ACMaxWidth:GetInt(), w)
+
+		if w > maxw then maxw = w end
+	end
+
+	-- Size and positions etc
+	acPanel:SetSize( maxw, #suggestionsList * 20 + 2 )
+	acPanel.curw = maxw
+	acPanel.curh = #suggestionsList * 20 + 2
+end
+
+function PANEL:AutocompleteApply()
+	local suggestion = self.acPanel:GetSelected()
+	if not suggestion then return false end
+	local ret = false
+
+	-- Get word position
+	local wordStart = self:getWordCallingStart( self.Caret )
+	local wordEnd = self:getWordEnd( self.Caret )
+
+	local replacement, caretOffset = suggestion:replacement(self)
+
+	-- Check if anything needs changing
+	local selection = self:GetArea( { wordStart, wordEnd } )
+	if selection == replacement then -- There's no point in doing anything.
+		return false
+	end
+
+	-- Overwrite selection
+	if replacement and replacement ~= "" then
+		self:SetArea( { wordStart, wordEnd }, replacement )
+
+		-- Move caret
+		if caretOffset then
+			self.Start = { wordStart[1], wordStart[2] + caretOffset }
+			self.Caret = { wordStart[1], wordStart[2] + caretOffset }
+		else
+			self.Start = { wordStart[1], wordStart[2] + #replacement }
+			self.Caret = { wordStart[1], wordStart[2] + #replacement }
+		end
+
+		ret = true
+	end
+
+	
+	self.acPanel:SetVisible(false)
+	self:ScrollCaret()
+	self:RequestFocus()
+end
+
+
+function PANEL:AutocompleteCreate()
+	local acPanel = vgui.Create( "StarfallPanel", self )
+	acPanel:SetVisible( false )
+
+	function acPanel:SelectSuggestion(delta)
+		self.selected = (self.selected + delta - 1)%(#self.AC_suggestionsList) + 1
+		self:UpdateInfo()
+	end
+	
+	function acPanel:GetSelected()
+		self.suggestionlist
+	end
+
+	function acPanel:UpdateInfo()
+		local suggestion = self:GetSelected()
+		local suggestiondesc = self.suggestioninfo.desc
+	
+		if not suggestion or not suggestion.desc then
+			suggestiondesc:SetText("")
+			return
+		end
+	
+		local desc = "Description:\n" ..string.Trim(string.gsub(desc, "\n%s+", "\n"))
+		suggestiondesc:SetText( desc )
+		suggestiondesc:SizeToContents()
+	end
+
+	local keyWait = false
+	local controlSchemes = setmetatable({
+		[AC_CONTROL_DEFAULT] = function( pnl )
+			if input.IsKeyDown( KEY_ENTER ) or input.IsKeyDown( KEY_SPACE ) then
+				self:AutocompleteApply()
+			elseif input.IsKeyDown( KEY_TAB ) and not keyWait then
+				pnl:SelectSuggestion( input.IsKeyDown( KEY_LCONTROL ) and -1 or 1 )
+				keyWait = true
+			elseif keyWait and not input.IsKeyDown( KEY_TAB ) then
+				keyWait = nil
+			elseif input.IsKeyDown( KEY_UP ) or input.IsKeyDown( KEY_DOWN ) or input.IsKeyDown( KEY_LEFT ) or input.IsKeyDown( KEY_RIGHT ) then
+				pnl:SetVisible(false)
+			end
+		end,
+		[AC_CONTROL_VISUALCSHARP] = function( pnl )
+			if input.IsKeyDown( KEY_TAB ) or input.IsKeyDown( KEY_ENTER ) or input.IsKeyDown( KEY_SPACE ) then
+				self:AutocompleteApply()
+			elseif input.IsKeyDown( KEY_DOWN ) and not keyWait then
+				pnl:SelectSuggestion( 1 )
+				keyWait = true
+			elseif input.IsKeyDown( KEY_UP ) and not keyWait then
+				pnl:SelectSuggestion( -1 )
+				keyWait = true
+			elseif keyWait and not input.IsKeyDown( KEY_UP ) and not input.IsKeyDown( KEY_DOWN ) then
+				keyWait = nil
+			end
+		end,
+		[AC_CONTROL_SCROLLER] = function( pnl )
+			if input.IsMouseDown( MOUSE_MIDDLE ) then
+				self:AutocompleteApply()
+			end
+		end,
+		[AC_CONTROL_SCROLLER_ENTER] = function( pnl )
+			if input.IsKeyDown( KEY_ENTER ) then
+				self:AutocompleteApply()
+			end
+		end,
+		[AC_CONTROL_ECLIPSE] = function( pnl )
+			if input.IsKeyDown( KEY_ENTER ) then
+				self:AutocompleteApply()
+			elseif input.IsKeyDown( KEY_SPACE ) then
+				pnl:SetVisible(false)
+			elseif input.IsKeyDown( KEY_DOWN ) and not keyWait then
+				pnl:SelectSuggestion( 1 )
+				keyWait = true
+			elseif input.IsKeyDown( KEY_UP ) and not keyWait then
+				pnl:SelectSuggestion( -1 )
+				keyWait = true
+			elseif keyWait and not input.IsKeyDown( KEY_UP ) and not input.IsKeyDown( KEY_DOWN ) then
+				keyWait = nil
+			end
+		end,
+	}, {__index = function() return function() end end})
+	controlSchemes[AC_CONTROL_ATOM] = controlSchemes[AC_CONTROL_VISUALCSHARP]
+
+	acPanel.Think = function( pnl ) controlSchemes[TabHandler.ACControlStyle:GetInt()]() end
+
+	local suggestionlist = vgui.Create( "DPanelList", acPanel )
+	suggestionlist:Dock(LEFT)
+	-- suggestionlist.Paint = function() end
+
+	for i=1, 128 do
+		local txt = vgui.Create("DLabel")
+		txt:SetText( "" )
+		txt:SetCursor("hand")
+		txt:SetVisible(false)
+		txt:SetPaintBackgroundEnabled(true)
+
+		-- Enable mouse presses
+		txt.OnMousePressed = function( pnl, code )
+			if code == MOUSE_LEFT then
+				self:AutocompleteApply( pnl.suggestion )
+			end
+		end
+
+		-- Enable mouse hovering
+		txt.OnCursorEntered = function( pnl )
+			acPanel.selected = pnl.count
+			acPanel:AutocompleteUpdateInfo( pnl.suggestion )
+		end
+
+		suggestionlist:AddItem( txt )
+	end
+	acPanel.suggestionlist = suggestionlist
+
+
+	local suggestioninfo = vgui.Create( "DPanelList", acPanel )
+	suggestioninfo:Dock(RIGHT)
+	suggestioninfo:EnableVerticalScrollbar( true )
+	suggestioninfo.Paint = function() end
+	acPanel.suggestioninfo = suggestioninfo
+	
+	local desc = vgui.Create("DLabel")
+	desc:SetText("")
+	desc:SizeToContents()
+	suggestioninfo:AddItem(desc)
+	suggestioninfo.desc = desc
+
+	self.acPanel = acPanel
+	return acPanel
+end
+
+function PANEL:AutocompleteOpen()
+	local acPanel = self.acPanel
+
+	if not SF.Docs or TabHandler.ACControlStyle:GetInt()==AC_CONTROL_OFF then
+		if acPanel then self.acPanel:SetVisible(false) end
+		return
+	end
+
+	if not acPanel then acPanel = self:AutocompleteCreate() end
+
+	if self:AutocompletePopulate() then
+
+		-- Calculate its position
+		local caret = self:CopyPosition( self.Caret )
+		local wordStart = self:getWordStart({ self.Caret[1], self.Caret[2] - 1 })
+
+		local x = self.FontWidth * (wordStart[2] - self.Scroll[2] + 1) + 48
+		local y = self.FontHeight * (wordStart[1] - self.Scroll[1] + 1) + 2
+
+		acPanel:SetVisible( true )
+		acPanel:SetPos(x, y)
+	end
+end
+
+function PANEL:AutocompleteKeybind(code)
+	if not (self.acPanel and self.acPanel:IsVisible()) then return end
+	local mode = TabHandler.ACControlStyle:GetInt()
+
+	if code == KEY_ENTER then
+		if mode == AC_CONTROL_ECLIPSE then
+			self:AutocompleteApply()
+			return true
+		end
+	elseif code == KEY_UP then
+		if mode == AC_CONTROL_VISUALCSHARP or mode == AC_CONTROL_ATOM then
+			self.acPanel:RequestFocus()
+			return true
+		end
+	elseif code == KEY_DOWN then
+		if mode == AC_CONTROL_VISUALCSHARP or mode == AC_CONTROL_ATOM then
+			self.acPanel:RequestFocus()
+			return true
+		end
+	elseif code == KEY_TAB then
+		if mode == AC_CONTROL_DEFAULT or mode == AC_CONTROL_ECLIPSE or mode == AC_CONTROL_ATOM then
+			self.acPanel:RequestFocus()
+			return true
+		end
+	end
 end
 
 function PANEL:NextPattern(pattern)
