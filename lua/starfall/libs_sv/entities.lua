@@ -345,7 +345,7 @@ end
 --- Sets a custom prop's shadow forces, moving the entity to the desired position and angles
 -- This gets overriden by Entity.setCustomPropForces and cannot be used together
 -- See available parameters here: https://wiki.facepunch.com/gmod/PhysObj:ComputeShadowControl
--- @param table|false data Shadow physics data, excluding 'deltatime'. 'teleportdistance' higher than 0 requires 'entities.setPos'. Pass a falsy value to disable custom physics entirely
+-- @param table|boolean data Shadow physics data, excluding 'deltatime'. 'teleportdistance' higher than 0 requires 'entities.setPos'. Pass a falsy value to disable custom physics entirely
 function ents_methods:setCustomPropShadowForce(data)
 	local ent = getent(self)
 	local ent_tbl = Ent_GetTable(ent)
