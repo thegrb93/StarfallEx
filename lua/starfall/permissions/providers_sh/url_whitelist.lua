@@ -53,11 +53,8 @@ end
 
 local function loadDefaultWhitelist()
 	local filename = "data_static/starfall_whitelist_default.txt"
-	local f = file.Open(filename, "rb", "GAME")
-	if not f then whitelistNotifyError(filename, "Could not open file!") return "" end
-	local code = util.Decompress(f:Read())
-	f:Close()
-	if code==nil or code=="" then whitelistNotifyError(filename, "Could not decode file!") return "" end
+	local code = file.Read(filename, "GAME")
+	if not code then whitelistNotifyError(filename, "Could not open file!") return "" end
 	return code
 end
 
