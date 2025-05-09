@@ -109,7 +109,7 @@ function SF.ReloadUrlWhitelist()
 	local code = file.Read(whitelist_file, "DATA")
 	if not (code and code ~= "") then
 		code = loadDefaultWhitelist()
-		if (code and code ~= "") then then
+		if (code and code ~= "") then
 			file.Write(whitelist_file, code)
 		end
 	end
