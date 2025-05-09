@@ -2873,6 +2873,7 @@ function PANEL:getWordPrevious()
 end
 
 local AC_COLOR_CONSTANT = Color(86, 156, 214)
+local AC_COLOR_LIBRARY = Color(100, 50, 230)
 local AC_COLOR_FUNCTION = Color(150, 40, 40)
 local AC_COLOR_HOOK = Color(206, 145, 120)
 
@@ -2927,7 +2928,7 @@ local function levenshteinDistance(a,b)
 	return mat[m*n]
 end
 local AutoCompleteSuggestion = {
-	__call = function(t, writing, compare, name, desc, color, replace, replacelength)
+	__call = function(t, writing, compare, name, desc, color, replace, replacelength, reopen)
 		if not replace then replace = name end
 		local distance = levenshteinDistance(writing, compare)
 		return setmetatable({
@@ -2936,7 +2937,8 @@ local AutoCompleteSuggestion = {
 			color = color,
 			replace = replace,
 			distance = distance,
-			replacelength = replacelength
+			replacelength = replacelength,
+			reopen = reopen
 		}, t)
 	end,
 	__lt = function(a,b)
@@ -3027,7 +3029,7 @@ function PANEL:AutocompletePopulate()
 		for libName, libData in pairs(SF.Docs.Libraries) do
 			local libNamel = string.lower(libName)
 			if string.StartsWith(libNamel, typingl) and libName ~= "builtins" then
-				suggestions[#suggestions + 1] = AutoCompleteSuggestion(typingl, libNamel, libName, "The library " .. libName, AC_COLOR_FUNCTION, libName..".", #typing)
+				suggestions[#suggestions + 1] = AutoCompleteSuggestion(typingl, libNamel, libName, "The library " .. libName, AC_COLOR_LIBRARY, libName..".", #typing, true)
 			end
 		end
 
@@ -3053,7 +3055,11 @@ end
 function PANEL:AutocompleteApply()
 	local selection = self.acPanel:GetSelected()
 	self:SetCaret(self:SetArea({{self.Caret[1], math.max(1, self.Caret[2]-selection.replacelength)}, self.Caret }, selection.replace ))
-	self:AutocompleteOpen()
+	if selection.reopen then
+		self:AutocompleteOpen()
+	else
+		self.acPanel:SetVisible(false)
+	end
 	self:RequestFocus()
 end
 
