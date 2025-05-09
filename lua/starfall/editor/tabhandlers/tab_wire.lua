@@ -2988,11 +2988,12 @@ function PANEL:AutocompletePopulate()
 		end
 
 	until true
+	if suggestions[1]==nil then return end
 
-	table.sort(suggestionsList)
+	table.sort(suggestions)
 
 	for i, item in ipairs(acPanel.suggestionlist:GetItems()) do
-		local suggestion = suggestionsList[i]
+		local suggestion = suggestions[i]
 		if suggestion then
 			item:SetText(suggestion.name)
 			item:SetVisible(true)
@@ -3002,14 +3003,14 @@ function PANEL:AutocompletePopulate()
 			item:SetVisible(false)
 		end
 	end
-	acPanel.numitems = math.min(#suggestionsList, 64)
+	acPanel.numitems = math.min(#suggestions, 64)
 	acPanel:UpdateSelection(1)
 
 	local w1, h1 = acPanel.suggestionlist:GetSize()
 	local w2, h2 = acPanel.suggestioninfo:GetSize()
 	acPanel:SetSize(math.Clamp(w1 + w2, 100, 600), math.Clamp(h1 + h2, 100, 600))
 
-	return suggestionsList[1] ~= nil
+	return true
 end
 
 function PANEL:AutocompleteApply()
