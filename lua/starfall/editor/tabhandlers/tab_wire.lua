@@ -2884,26 +2884,27 @@ local function concatParameters(params)
 end
 
 local function levenshteinDistance(a,b)
-	local m = #a
-	local n = #b
-	a = {string.byte(a, 1, m)}
-	b = {string.byte(b, 1, n)}
+	a = {string.byte(a, 1, #a)}
+	b = {string.byte(b, 1, #b)}
 
+	local m = #a+1
+	local n = #b+1
 	local mat = {}
-	for i=1, m+1 do
+	for i=1, m do
 		mat[i] = i-1
 	end
-	for i=1, n+1 do
+	for i=1, n do
 		mat[m*(i-1)+1] = i-1
 	end
-	for j=1, n do
-		for i=1, m do
+	for j=1, n-1 do
+		for i=1, m-1 do
 			local preva = mat[m*j + i]
 			local prevb = mat[m*(j-1) + i + 1]
 			local prevc = mat[m*(j-1) + i]
 			mat[m*j + i + 1] = math.min(preva+1, prevb+1, prevc+(a[i]~=b[j] and 1 or 0))
 		end
 	end
+
 	return mat[m*(n+1)]
 end
 local AutoCompleteSuggestion = {
