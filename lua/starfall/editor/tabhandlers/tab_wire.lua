@@ -87,13 +87,6 @@ cvars.AddChangeCallback("sf_editor_wire_htmlbackground",function(_,_,url)
 	TabHandler:UpdateHtmlBackground()
 end)
 
-local AC_CONTROL_OFF = 0 -- Autocomplete off
-local AC_CONTROL_DEFAULT = 1 -- Default style - Tab/CTRL+Tab to choose item;\nEnter/Space to use;\nArrow keys to abort.
-local AC_CONTROL_VISUALCSHARP = 2 -- Visual C# Style - Ctrl+Space to use the top match;\nArrow keys to choose item;\nTab/Enter/Space to use;\nCode validation hotkey (ctrl+space) moved to ctrl+b.
-local AC_CONTROL_SCROLLER = 3 -- Scroller style - Mouse scroller to choose item;\nMiddle mouse to use.
-local AC_CONTROL_SCROLLER_ENTER = 4 -- Scroller Style w/ Enter - Mouse scroller to choose item;\nEnter to use.
-local AC_CONTROL_ECLIPSE = 5 -- Eclipse Style - Enter to use top match;\nTab to enter auto completion menu;\nArrow keys to choose item;\nEnter to use;\nSpace to abort.
-local AC_CONTROL_ATOM = 6 -- Atom style - Tab/Enter to use, arrow keys to choose
 
 
 ---------------------
@@ -321,12 +314,11 @@ function TabHandler:RegisterSettings()
 
 	local modes = {
 		{ "Off", "Turn off autocomplete." },
-		{ "Default", "Current mode:\nTab/CTRL+Tab to choose item;\nEnter/Space to use;\nArrow keys to abort." },
-		{ "Visual C# Style", "Current mode:\nCtrl+Space to use the top match;\nArrow keys to choose item;\nTab/Enter/Space to use;\nCode validation hotkey (ctrl+space) moved to ctrl+b." },
+		{ "Expression2 Style", "Current mode:\nTab/CTRL+Tab to choose item;\nEnter/Space to use;\nArrow keys to abort." },
+		{ "Visual Studio Style", "Current mode:\nCtrl+Space to use the top match;\nArrow keys to choose item;\nTab/Enter/Space to use;\nCode validation hotkey (ctrl+space) moved to ctrl+b." },
 		{ "Scroller", "Current mode:\nMouse scroller to choose item;\nMiddle mouse to use." },
 		{ "Scroller w/ Enter", "Current mode:\nMouse scroller to choose item;\nEnter to use." },
 		{ "Eclipse Style", "Current mode:\nEnter to use top match;\nTab to enter auto completion menu;\nArrow keys to choose item;\nEnter to use;\nSpace to abort." },
-		{ "Atom/IntelliJ style", "Current mode:\nTab/Enter to use;\nArrow keys to choose." },
 	}
 
 	AutoCompleteControlOptions:SetSortItems(false)
@@ -2872,6 +2864,13 @@ function PANEL:getWordPrevious()
 	return word, self:GetArea({ { ln, startpos - 1 }, { ln, startpos } })
 end
 
+local AC_CONTROL_OFF = 0
+local AC_CONTROL_E2 = 1
+local AC_CONTROL_VSCODE = 2
+local AC_CONTROL_SCROLLER = 3
+local AC_CONTROL_SCROLLER_ENTER = 4
+local AC_CONTROL_ECLIPSE = 5
+
 local AC_COLOR_CONSTANT = Color(86, 156, 214)
 local AC_COLOR_LIBRARY = Color(100, 50, 230)
 local AC_COLOR_FUNCTION = Color(150, 40, 40)
@@ -3113,7 +3112,7 @@ function PANEL:AutocompleteCreate()
 	end
 
 	local controlSchemes = setmetatable({
-		[AC_CONTROL_DEFAULT] = function( pnl )
+		[AC_CONTROL_E2] = function( pnl )
 			local t = CurTime()
 			if WaitForKeyUp(t, pnl) then return end
 			if input.IsKeyDown( KEY_ENTER ) or input.IsKeyDown( KEY_SPACE ) then
@@ -3125,7 +3124,7 @@ function PANEL:AutocompleteCreate()
 				pnl:SetVisible(false)
 			end
 		end,
-		[AC_CONTROL_VISUALCSHARP] = function( pnl )
+		[AC_CONTROL_VSCODE] = function( pnl )
 			local t = CurTime()
 			if WaitForKeyUp(t, pnl) then return end
 			if input.IsKeyDown( KEY_TAB ) or input.IsKeyDown( KEY_ENTER ) or input.IsKeyDown( KEY_SPACE ) then
@@ -3164,7 +3163,6 @@ function PANEL:AutocompleteCreate()
 			end
 		end,
 	}, {__index = function() return function() end end})
-	controlSchemes[AC_CONTROL_ATOM] = controlSchemes[AC_CONTROL_VISUALCSHARP]
 
 	local function setThink()
 		acPanel.Think = controlSchemes[TabHandler.ACControlStyle:GetInt()]
@@ -3282,22 +3280,22 @@ function PANEL:AutocompleteKeybind(code)
 	local mode = TabHandler.ACControlStyle:GetInt()
 
 	if code == KEY_ENTER then
-		if mode == AC_CONTROL_ECLIPSE or mode == AC_CONTROL_VISUALCSHARP or mode == AC_CONTROL_ATOM or mode == AC_CONTROL_SCROLLER_ENTER then
+		if mode == AC_CONTROL_ECLIPSE or mode == AC_CONTROL_VSCODE or mode == AC_CONTROL_SCROLLER_ENTER then
 			self:AutocompleteApply()
 			return true
 		end
 	elseif code == KEY_UP then
-		if mode == AC_CONTROL_VISUALCSHARP or mode == AC_CONTROL_ATOM or mode == AC_CONTROL_ECLIPSE then
+		if mode == AC_CONTROL_VSCODE or mode == AC_CONTROL_ECLIPSE then
 			self.acPanel:RequestFocus()
 			return true
 		end
 	elseif code == KEY_DOWN then
-		if mode == AC_CONTROL_VISUALCSHARP or mode == AC_CONTROL_ATOM or mode == AC_CONTROL_ECLIPSE then
+		if mode == AC_CONTROL_VSCODE or mode == AC_CONTROL_ECLIPSE then
 			self.acPanel:RequestFocus()
 			return true
 		end
 	elseif code == KEY_TAB then
-		if mode == AC_CONTROL_DEFAULT or mode == AC_CONTROL_VISUALCSHARP or mode == AC_CONTROL_ATOM then
+		if mode == AC_CONTROL_E2 or mode == AC_CONTROL_VSCODE then
 			self.acPanel:RequestFocus()
 			return true
 		end
