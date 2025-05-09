@@ -2873,10 +2873,7 @@ function PANEL:getWordPrevious()
 end
 
 local AC_COLOR_CONSTANT = Color(86, 156, 214)
-local AC_COLOR_FUNCTION = Color(220, 220, 170)
-local AC_COLOR_VARIABLE = Color(156, 220, 254)
-local AC_COLOR_KEYWORD = Color(197, 134, 192)
-local AC_COLOR_DIRECTIVE = AC_COLOR_CONSTANT
+local AC_COLOR_FUNCTION = Color(150, 40, 40)
 local AC_COLOR_HOOK = Color(206, 145, 120)
 
 local function concatParameters(params)
@@ -2958,7 +2955,7 @@ function PANEL:AutocompletePopulate()
 		if dirTyped then
 			dirTyped = string.lower(dirTyped)
 			for dirName, directive in pairs(SF.Docs.Directives) do
-				suggestions[#suggestions + 1] = AutoCompleteSuggestion(dirTyped, string.lower(dirName), "--@"..dirName, directive.description or ("The directive " .. dirName), AC_COLOR_DIRECTIVE, dirName, #dirTyped)
+				suggestions[#suggestions + 1] = AutoCompleteSuggestion(dirTyped, string.lower(dirName), "--@"..dirName, directive.description or ("The directive " .. dirName), AC_COLOR_CONSTANT, dirName, #dirTyped)
 			end
 			break
 		end
@@ -3017,8 +3014,8 @@ function PANEL:AutocompletePopulate()
 			break
 		end
 
-		for funcName, funcMethod in pairs(SF.Docs.Libraries.builtins) do
-			local typingl = string.lower(typing)
+		local typingl = string.lower(typing)
+		for funcName, funcMethod in pairs(SF.Docs.Libraries.builtins.methods) do
 			local funcNamel = string.lower(funcName)
 			if string.StartsWith(funcNamel, typingl) then
 				local fullfunc = funcName..concatParameters(funcMethod.params)
@@ -3028,7 +3025,6 @@ function PANEL:AutocompletePopulate()
 		end
 
 		for libName, libData in pairs(SF.Docs.Libraries) do
-			local typingl = string.lower(typing)
 			local libNamel = string.lower(libName)
 			if string.StartsWith(libNamel, typingl) and libName ~= "builtins" then
 				suggestions[#suggestions + 1] = AutoCompleteSuggestion(typingl, libNamel, libName, "The library " .. libName, AC_COLOR_FUNCTION, libName..".", #typing)
