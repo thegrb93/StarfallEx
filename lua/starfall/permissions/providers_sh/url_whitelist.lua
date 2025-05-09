@@ -52,8 +52,8 @@ local function whitelistNotifyError(filename, err)
 end
 
 local function loadDefaultWhitelist()
-	local filename = "data_static/starfall_whitelist_default.txt"
-	local code = file.Read(filename, "GAME")
+	local filename = "starfall/starfall_whitelist_default.lua"
+	local code = file.Read(filename, "LUA")
 	if not code then whitelistNotifyError(filename, "Could not open file!") return "" end
 	return code
 end

@@ -4,6 +4,8 @@ AddCSLuaFile("starfall/preprocessor.lua")
 AddCSLuaFile("starfall/toolscreen.lua")
 AddCSLuaFile("starfall/permissions/core.lua")
 AddCSLuaFile("starfall/transfer.lua")
+AddCSLuaFile("starfall/starfall_default.lua")
+AddCSLuaFile("starfall/starfall_whitelist_default.lua")
 AddCSLuaFile("starfall/editor/editor.lua")
 
 resource.AddWorkshop("3412004213")

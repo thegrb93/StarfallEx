@@ -85,7 +85,8 @@ function SF.DefaultCode()
 	elseif file.Exists("starfall/default.lua", "DATA") then
 		return file.Read("starfall/default.lua", "DATA")
 	else
-		local code = string.gsub(file.Read("data_static/starfall_default.txt", "GAME"), "@author", "@author "..string.gsub(LocalPlayer():Nick(), "[^%w%s%p_]", ""))
+		local code = file.Read("starfall/starfall_default.lua", "LUA")
+		code = string.gsub(code, "@author", "@author "..string.gsub(LocalPlayer():Nick(), "[^%w%s%p_]", ""))
 		file.Write("starfall/default.txt", code)
 		return code
 	end
