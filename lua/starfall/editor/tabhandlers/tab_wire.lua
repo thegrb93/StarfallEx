@@ -3067,6 +3067,8 @@ function PANEL:AutocompleteCreate()
 	local acPanel = vgui.Create( "StarfallPanel", self )
 	acPanel:SetBackgroundColor(Color(0,0,0,200))
 
+	acPanel.keyWait = 0
+	acPanel.keyHolding = false
 	acPanel.selection = 1
 	acPanel.numitems = 0
 	acPanel.suggestions = {}
@@ -3097,34 +3099,43 @@ function PANEL:AutocompleteCreate()
 		desctxt:SizeToContents()
 	end
 
+	local function WaitForKeyUp(t, pnl)
+		if input.IsKeyDown( KEY_TAB ) or input.IsKeyDown( KEY_ENTER ) or input.IsKeyDown( KEY_SPACE ) or input.IsKeyDown( KEY_UP ) or input.IsKeyDown( KEY_DOWN ) or input.IsKeyDown( KEY_LEFT ) or input.IsKeyDown( KEY_RIGHT ) then
+			if t < pnl.keyWait then
+				return true
+			elseif pnl.keyWait~=0 then
+				pnl.keyHolding = true
+			end
+		else
+			pnl.keyWait = 0
+			pnl.keyHolding = false
+		end
+	end
+
 	local controlSchemes = setmetatable({
 		[AC_CONTROL_DEFAULT] = function( pnl )
-			if pnl.keyWait then
-				if input.IsKeyDown( KEY_TAB ) or input.IsKeyDown( KEY_ENTER ) or input.IsKeyDown( KEY_SPACE ) then return end
-				pnl.keyWait = false
-			end
+			local t = CurTime()
+			if WaitForKeyUp(t, pnl) then return end
 			if input.IsKeyDown( KEY_ENTER ) or input.IsKeyDown( KEY_SPACE ) then
 				self:AutocompleteApply()
 			elseif input.IsKeyDown( KEY_TAB ) then
 				pnl:ScrollSelect( input.IsKeyDown( KEY_LCONTROL ) and -1 or 1 )
-				pnl.keyWait = true
+				pnl.keyWait = t + (pnl.keyHolding and 0.1 or 0.5)
 			elseif input.IsKeyDown( KEY_UP ) or input.IsKeyDown( KEY_DOWN ) or input.IsKeyDown( KEY_LEFT ) or input.IsKeyDown( KEY_RIGHT ) then
 				pnl:SetVisible(false)
 			end
 		end,
 		[AC_CONTROL_VISUALCSHARP] = function( pnl )
-			if pnl.keyWait then
-				if input.IsKeyDown( KEY_TAB ) or input.IsKeyDown( KEY_ENTER ) or input.IsKeyDown( KEY_SPACE ) or input.IsKeyDown( KEY_UP ) or input.IsKeyDown( KEY_DOWN ) then return end
-				pnl.keyWait = false
-			end
+			local t = CurTime()
+			if WaitForKeyUp(t, pnl) then return end
 			if input.IsKeyDown( KEY_TAB ) or input.IsKeyDown( KEY_ENTER ) or input.IsKeyDown( KEY_SPACE ) then
 				self:AutocompleteApply()
 			elseif input.IsKeyDown( KEY_DOWN ) then
 				pnl:ScrollSelect( 1 )
-				pnl.keyWait = true
+				pnl.keyWait = t + (pnl.keyHolding and 0.1 or 0.5)
 			elseif input.IsKeyDown( KEY_UP ) then
 				pnl:ScrollSelect( -1 )
-				pnl.keyWait = true
+				pnl.keyWait = t + (pnl.keyHolding and 0.1 or 0.5)
 			end
 		end,
 		[AC_CONTROL_SCROLLER] = function( pnl )
@@ -3138,20 +3149,18 @@ function PANEL:AutocompleteCreate()
 			end
 		end,
 		[AC_CONTROL_ECLIPSE] = function( pnl )
-			if pnl.keyWait then
-				if input.IsKeyDown( KEY_ENTER ) or input.IsKeyDown( KEY_SPACE ) or input.IsKeyDown( KEY_UP ) or input.IsKeyDown( KEY_DOWN ) then return end
-				pnl.keyWait = false
-			end
+			local t = CurTime()
+			if WaitForKeyUp(t, pnl) then return end
 			if input.IsKeyDown( KEY_ENTER ) then
 				self:AutocompleteApply()
 			elseif input.IsKeyDown( KEY_SPACE ) then
 				pnl:SetVisible(false)
 			elseif input.IsKeyDown( KEY_DOWN ) then
 				pnl:ScrollSelect( 1 )
-				pnl.keyWait = true
+				pnl.keyWait = t + (pnl.keyHolding and 0.1 or 0.5)
 			elseif input.IsKeyDown( KEY_UP ) then
 				pnl:ScrollSelect( -1 )
-				pnl.keyWait = true
+				pnl.keyWait = t + (pnl.keyHolding and 0.1 or 0.5)
 			end
 		end,
 	}, {__index = function() return function() end end})
@@ -3257,7 +3266,7 @@ function PANEL:AutocompleteOpen()
 		local x = self.FontWidth * (wordStart[2] - self.Scroll[2] + 1) + 48
 		local y = self.FontHeight * (wordStart[1] - self.Scroll[1] + 1) + 2
 
-		acPanel.keyWait = true
+		acPanel.keyWait = CurTime()+0.5
 		acPanel:SetVisible( true )
 		local sw = self:GetSize()
 		local w = acPanel:GetSize()
