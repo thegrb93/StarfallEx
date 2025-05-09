@@ -2905,7 +2905,7 @@ local function levenshteinDistance(a,b)
 		end
 	end
 
-	return mat[m*(n+1)]
+	return mat[m*n]
 end
 local AutoCompleteSuggestion = {
 	__call = function(t, writing, name, desc, color, replace)
