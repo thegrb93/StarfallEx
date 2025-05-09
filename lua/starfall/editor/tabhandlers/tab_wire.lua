@@ -80,8 +80,7 @@ TabHandler.CacheDebug = CreateClientConVar("sf_editor_wire_cachedebug", "0", tru
 TabHandler.HtmlBackgroundConvar = CreateClientConVar("sf_editor_wire_htmlbackground", "", true, false)
 TabHandler.HtmlBackgroundOpacityConvar = CreateClientConVar("sf_editor_wire_htmlbackgroundopacity", "5", true, false)
 TabHandler.ACControlStyle = CreateClientConVar( "sf_editor_wire_ac_controlstyle", "2", true, false )
-TabHandler.ACMaxWidth = CreateClientConVar( "sf_editor_wire_ac_list_max_width", "600", true, false )
-TabHandler.ACMaxResults = CreateClientConVar( "sf_editor_wire_ac_maxresults", 20, true, false )
+TabHandler.ACAuto = CreateClientConVar( "sf_editor_wire_ac_auto", "1", true, false )
 
 cvars.AddChangeCallback("sf_editor_wire_htmlbackground",function(_,_,url)
 	TabHandler:UpdateHtmlBackground()
@@ -342,7 +341,7 @@ function TabHandler:RegisterSettings()
 		RunConsoleCommand("sf_editor_wire_ac_controlstyle", index-1)
 	end
 
-	local acmaxresults = form:NumSlider("Autocomplete max results","sf_editor_wire_ac_maxresults", 1, 50, 1)
+	form:CheckBox( "Autocomplete while typing. (Use ctrl+space otherwise)", "sf_editor_wire_ac_auto" )
 
 	return form, "Wire", "icon16/pencil.png", "Options for wire tabs."
 end
@@ -1565,7 +1564,10 @@ function PANEL:_OnTextChanged()
 	end
 
 	self:SetSelection(text)
-	self:AutocompleteOpen()
+	if TabHandler.ACAuto:GetBool() then
+		self:AutocompleteOpen()
+	end
+
 	if self.OnTextChanged then self:OnTextChanged() end
 end
 
@@ -1574,11 +1576,10 @@ function PANEL:OnMouseWheeled(delta)
 		local mode = TabHandler.ACControlStyle:GetInt()
 		if mode == AC_CONTROL_SCROLLER or mode == AC_CONTROL_SCROLLER_ENTER then
 			self.acPanel:ScrollSelect( -delta )
-			self.acPanel:RequestFocus()
-			return
 		else
-			self.acPanel:SetVisible(false)
+			self.acPanel:RequestFocus()
 		end
+		return
 	end
 
 	self.ScrollBar:OnMouseWheeled(delta/self.Size[1] * TabHandler.ScrollSpeedConVar:GetFloat())
@@ -2540,6 +2541,9 @@ function PANEL:_OnKeyCodeTyped(code)
 				self:SetCaret(self:SetArea({ self.Caret, self:wordLeft(self.Caret) }))
 				if self.OnTextChanged then self:OnTextChanged() end
 			end
+			if TabHandler.ACAuto:GetBool() then
+				self:AutocompleteOpen()
+			end
 		elseif code == KEY_DELETE then
 			if self:HasSelection() then
 				self:SetSelection()
@@ -2671,6 +2675,9 @@ function PANEL:_OnKeyCodeTyped(code)
 				end
 				self:SetCaret(self:SetArea({ self.Caret, self:MovePosition(self.Caret, delta) }))
 				if self.OnTextChanged then self:OnTextChanged() end
+			end
+			if TabHandler.ACAuto:GetBool() then
+				self:AutocompleteOpen()
 			end
 		elseif code == KEY_DELETE then
 			if self:HasSelection() then
@@ -2829,10 +2836,11 @@ end
 
 
 
-function PANEL:getWordStart(caret, getword)
+function PANEL:getWordStart(caret, getword, pattern)
 	local line = self:GetRowText(caret[1])
+	if pattern == nil then pattern = "()[%w_]+()" end -- "()%w+()"
 
-	for startpos, endpos in string.gmatch(line, "()[a-zA-Z0-9_]+()") do -- "()%w+()"
+	for startpos, endpos in string.gmatch(line, pattern) do
 		if startpos <= caret[2] and endpos >= caret[2] then
 			return { caret[1], startpos }, getword and string.sub(line, startpos, endpos-1) or nil
 		end
@@ -2841,22 +2849,11 @@ function PANEL:getWordStart(caret, getword)
 	return { caret[1], 1 }
 end
 
-function PANEL:getWordCallingStart(caret, getword)
+function PANEL:getWordEnd(caret, getword, pattern)
 	local line = self:GetRowText(caret[1])
+	if pattern == nil then pattern = "()[%w_]+()" end -- "()%w+()"
 
-	for startpos, endpos in string.gmatch(line, "()[%w%.:_]+()") do
-		if startpos <= caret[2] and endpos >= caret[2] then
-			return { caret[1], startpos }, getword and string.sub(line, startpos, endpos-1) or nil
-		end
-	end
-
-	return { caret[1], 1 }
-end
-
-function PANEL:getWordEnd(caret, getword)
-	local line = self:GetRowText(caret[1])
-
-	for startpos, endpos in line:gmatch("()[a-zA-Z0-9_]+()") do -- "()%w+()"
+	for startpos, endpos in string.gmatch(line, pattern) do
 		if startpos <= caret[2] and endpos >= caret[2] then
 			return { caret[1], endpos }, getword and string.sub(line, startpos, endpos-1) or nil
 		end
@@ -2895,6 +2892,21 @@ local function concatParameters(params)
 	return "(" .. table.concat(t, ", ") .. ")"
 end
 
+local function WrapText(txt, width)
+	local ret = {}
+	local prev_end, prev_newline = 0, 0
+	for cur_end in string.gmatch(txt, "%S+()") do
+		local w, _ = surface_GetTextSize(string.sub(txt, prev_newline, cur_end))
+		if w > width then
+			ret[#ret+1] = string.Trim(string.sub(txt, prev_newline, prev_end))
+			prev_newline = prev_end + 1
+		end
+		prev_end = cur_end
+	end
+	ret[#ret+1] = string.Trim(string.sub(txt, prev_newline))
+	return table.concat(ret, "\n")
+end
+
 local function levenshteinDistance(a,b)
 	a = {string.byte(a, 1, #a)}
 	b = {string.byte(b, 1, #b)}
@@ -2913,21 +2925,22 @@ local function levenshteinDistance(a,b)
 			local preva = mat[m*j + i]
 			local prevb = mat[m*(j-1) + i + 1]
 			local prevc = mat[m*(j-1) + i]
-			mat[m*j + i + 1] = math.min(preva+0.01, prevb+1, prevc+(a[i]~=b[j] and 1 or 0))
+			mat[m*j + i + 1] = math.min(preva+1, prevb+0.2, prevc+(a[i]~=b[j] and 1 or 0))
 		end
 	end
 
 	return mat[m*n]
 end
 local AutoCompleteSuggestion = {
-	__call = function(t, writing, name, desc, color, replace)
+	__call = function(t, writing, compare, name, desc, color, replace)
 		if not replace then replace = name end
+		local distance = levenshteinDistance(writing, compare)
 		return setmetatable({
 			name = name,
 			desc = desc,
 			color = color,
 			replace = replace,
-			distance = levenshteinDistance(writing, replace)
+			distance = distance
 		}, t)
 	end,
 	__lt = function(a,b)
@@ -2940,29 +2953,30 @@ function PANEL:AutocompletePopulate()
 	local suggestions = {}
 
 	repeat
-		local line = self:GetRowText(self.Caret[1])
-		local _, typing = self:getWordCallingStart(self.Caret, true)
+		local line = string.sub(self:GetRowText(self.Caret[1]), 1, self.Caret[2]-1)
+
+		local _, typing = self:getWordStart(self.Caret, true, "()[%w%.:_]+()")
 		if typing==nil then typing = "" end
 
-		local directivepos = string.find(line, "--@", 1, true)
-		if directivepos and self.Caret[2] > directivepos then
+		local dirTyped = string.match(line, "--@(%w*)$")
+		if dirTyped then
 			for name, directive in pairs(SF.Docs.Directives) do
-				suggestions[#suggestions + 1] = AutoCompleteSuggestion(typing, name, directive.description or ("The directive " .. name), AC_COLOR_DIRECTIVE, "--@"..name)
+				local replace = "--@"..name
+				suggestions[#suggestions + 1] = AutoCompleteSuggestion(dirTyped, name, replace, directive.description or ("The directive " .. name), AC_COLOR_DIRECTIVE, replace)
 			end
 			break
 		end
 
-		local hookDef = string.match(fullTyping, "hook%.add%s*%(%s*")
+		--[[local hookDef = string.match(line, "hook%.add%s*%(?%s*\"?(%w*)$")
 		if hookDef then
 			for hookName, hookInfo in pairs(SF.Docs.Hooks) do
-				local name = '"'..hookName..'"'
-				if string.StartsWith(name, typing) then
-					local fullhook = hookDef..name..", \"\", function"..concatParameters(hookInfo.params).." end)"
-					suggestions[#suggestions + 1] = AutoCompleteSuggestion(typing, name, hookInfo.description or ("The hook " .. hookName), fullhook, AC_COLOR_HOOK)
+				if string.StartsWith(hookName, hookDef) then
+					local fullhook = hookDef.."\""..hookName.."\", \"\", function"..concatParameters(hookInfo.params).." end)"
+					suggestions[#suggestions + 1] = AutoCompleteSuggestion(hookDef, hookName, hookInfo.description or ("The hook " .. hookName), AC_COLOR_HOOK, fullhook)
 				end
 			end
 			break
-		end
+		end]]
 		
 		local prevWord = self:getWordPrevious()
 		if prevWord == "function" or prevWord == "local" then return end
@@ -2979,7 +2993,7 @@ function PANEL:AutocompletePopulate()
 					for funcName, funcMethod in pairs(typeData.methods) do
 						if string.StartsWith(funcName, selfCall) then
 							local fullfunc = funcName..concatParameters(funcMethod.params)
-							suggestions[#suggestions + 1] = AutoCompleteSuggestion(selfCall, typeName..":"..fullfunc, funcMethod.description, AC_COLOR_FUNCTION, beforeSeparator..":"..fullfunc)
+							suggestions[#suggestions + 1] = AutoCompleteSuggestion(typing, funcName, typeName..":"..fullfunc, funcMethod.description, AC_COLOR_FUNCTION, beforeSeparator..":"..fullfunc)
 						end
 					end
 				end
@@ -2994,7 +3008,7 @@ function PANEL:AutocompletePopulate()
 			if libName ~= "builtins" and libData and libData.methods then
 				for funcName, funcMethod in pairs(libData.methods) do
 					local fullfunc = funcName..concatParameters(funcMethod.params)
-					suggestions[#suggestions + 1] = AutoCompleteSuggestion(dotCall, fullfunc, funcMethod.description, AC_COLOR_FUNCTION, libName.."."..fullfunc)
+					suggestions[#suggestions + 1] = AutoCompleteSuggestion(dotCall, funcName, fullfunc, funcMethod.description, AC_COLOR_FUNCTION, libName.."."..fullfunc)
 				end
 			end
 			break
@@ -3002,13 +3016,13 @@ function PANEL:AutocompletePopulate()
 
 		for funcName, funcMethod in pairs(SF.Docs.Libraries.builtins) do
 			if string.StartsWith(funcName, typing) then
-				suggestions[#suggestions + 1] = AutoCompleteSuggestion(typing, funcName .. concatParameters(funcMethod.params), funcMethod.description, AC_COLOR_FUNCTION)
+				suggestions[#suggestions + 1] = AutoCompleteSuggestion(typing, funcName, funcName .. concatParameters(funcMethod.params), funcMethod.description, AC_COLOR_FUNCTION)
 			end
 		end
 
 		for libName, libData in pairs(SF.Docs.Libraries) do
 			if string.StartsWith(libName, typing) and libName ~= "builtins" then
-				suggestions[#suggestions + 1] = AutoCompleteSuggestion(typing, libName, "The library " .. libName, AC_COLOR_FUNCTION, libName..".")
+				suggestions[#suggestions + 1] = AutoCompleteSuggestion(typing, libName, libName, "The library " .. libName, AC_COLOR_FUNCTION, libName..".")
 			end
 		end
 
@@ -3021,14 +3035,10 @@ function PANEL:AutocompletePopulate()
 	for i, item in ipairs(acPanel.suggestionlist:GetCanvas():GetChildren()) do
 		local suggestion = suggestions[i]
 		acPanel.suggestions[i] = suggestion
-		if suggestion then
-			item:SetText(suggestion.name)
-			item:SetVisible(true)
-		else
-			item:SetText("")
-			item:SetVisible(false)
-		end
+		item:SetVisible(suggestion ~= nil)
 	end
+	acPanel.suggestionlist:PerformLayout()
+
 	acPanel.numitems = math.min(#suggestions, 64)
 	acPanel:UpdateSelection(1)
 
@@ -3039,7 +3049,7 @@ function PANEL:AutocompleteApply()
 	local replacement = self.acPanel:GetSelected().replace
 	self.acPanel:SetVisible(false)
 
-	local wordStart = self:getWordCallingStart( self.Caret )
+	local wordStart = self:getWordStart( self.Caret, false, "()[%w%.:_]+()" )
 	local wordEnd = self:getWordEnd( self.Caret )
 
 	self:SetArea( { wordStart, wordEnd }, replacement )
@@ -3059,15 +3069,12 @@ function PANEL:AutocompleteCreate()
 	acPanel.suggestions = {}
 
 	function acPanel:UpdateSelection(select)
-		local children = self.suggestionlist:GetCanvas():GetChildren()
-		children[self.selection]:SetTextStyleColor( Color(255, 255, 255, 0) )
-		children[select]:SetTextStyleColor( Color(255, 255, 255, 40) )
 		self.selection = select
 		self:UpdateInfo()
 	end
 
 	function acPanel:ScrollSelect(delta)
-		self:UpdateSelection((self.selected + delta - 1)%self.numitems + 1)
+		self:UpdateSelection((self.selection + delta - 1)%self.numitems + 1)
 	end
 
 	function acPanel:GetSelected()
@@ -3083,8 +3090,7 @@ function PANEL:AutocompleteCreate()
 			return
 		end
 
-		local desc = "Description:\n" ..string.Trim(string.gsub(suggestion.desc, "\n%s+", "\n"))
-		desctxt:SetText( desc )
+		desctxt:SetText( WrapText(suggestion.desc, 300) )
 		desctxt:SizeToContents()
 		self.suggestioninfo:InvalidateLayout()
 	end
@@ -3161,13 +3167,14 @@ function PANEL:AutocompleteCreate()
 	suggestionlist:Dock(LEFT)
 	suggestionlist.Paint = function() end
 
+	surface.SetFont(self.CurrentFont)
+	local _, labelH = surface.GetTextSize( "H" )
+
 	for i=1, 64 do
 		local txt = vgui.Create("DLabel")
-		txt:SetPaintBackgroundEnabled( true )
-		txt:SetTextStyleColor( Color(255, 255, 255, 0) )
-		txt:SetText( "" )
+		txt:SetText("")
 		txt:SetCursor("hand")
-		txt:SetSize(300, 15)
+		txt:SetSize(300, labelH)
 		txt:SetVisible(false)
 		txt.index = i
 
@@ -3181,21 +3188,21 @@ function PANEL:AutocompleteCreate()
 
 		txt.Paint = function( pnl, w, h )
 			local suggestion = acPanel.suggestions[pnl.index]
+			if suggestion==nil then return end
 
-			if acPanel.selected == pnl.index then
-				surface_SetDrawColor(50, 50, 50, 150)
-			else
-				surface_SetDrawColor(30, 30, 30, 150)
-			end
+			surface_SetDrawColor(30, 30, 30, 150)
 			surface_DrawRect(0, 0, w, h)
 
 			surface_SetDrawColor(suggestion.color:Unpack())
 			surface_DrawRect(0, 0, 4, h)
 
-			surface.SetFont(self.CurrentFont)
-			local _, h2 = surface.GetTextSize( suggestion.name )
+			if acPanel.selection == pnl.index then
+				surface_SetDrawColor(255, 255, 255, 150)
+				surface_DrawRect(0, 0, w, h)
+			end
 
-			surface.SetTextPos( 6, (h / 2) - (h2 / 2) )
+			surface.SetFont(self.CurrentFont)
+			surface.SetTextPos( 6, 0 )
 			surface.SetTextColor( 255,255,255,255 )
 			surface.DrawText( suggestion.name )
 		end
@@ -3205,9 +3212,7 @@ function PANEL:AutocompleteCreate()
 
 		suggestionlist:AddItem( txt )
 	end
-	suggestionlist:PerformLayout()
 	acPanel.suggestionlist = suggestionlist
-
 
 	local suggestioninfo = vgui.Create( "DPanelList", acPanel )
 	suggestioninfo:DockMargin(6,6,6,6)
@@ -3223,7 +3228,7 @@ function PANEL:AutocompleteCreate()
 	suggestioninfo:AddItem(desc)
 	suggestioninfo.desc = desc
 	
-	acPanel:SetSize(600, 300)
+	acPanel:SetSize(624, 300)
 
 	self.acPanel = acPanel
 	return acPanel
@@ -3250,7 +3255,9 @@ function PANEL:AutocompleteOpen()
 
 		acPanel.keyWait = true
 		acPanel:SetVisible( true )
-		acPanel:SetPos(x, y)
+		local sw = self:GetSize()
+		local w = acPanel:GetSize()
+		acPanel:SetPos(math.min(x, sw-w), y)
 	else
 		acPanel:SetVisible( false )
 	end
@@ -3261,7 +3268,7 @@ function PANEL:AutocompleteKeybind(code)
 	local mode = TabHandler.ACControlStyle:GetInt()
 
 	if code == KEY_ENTER then
-		if mode == AC_CONTROL_ECLIPSE then
+		if mode == AC_CONTROL_ECLIPSE or mode == AC_CONTROL_VISUALCSHARP or mode == AC_CONTROL_ATOM or mode == AC_CONTROL_SCROLLER_ENTER then
 			self:AutocompleteApply()
 			return true
 		end
