@@ -3046,6 +3046,7 @@ function PANEL:AutocompletePopulate()
 		acPanel.suggestions[i] = suggestion
 		item:SetVisible(suggestion ~= nil)
 	end
+	acPanel.suggestionlist:InvalidateLayout()
 
 	acPanel.numitems = math.min(#suggestions, 64)
 	acPanel:UpdateSelection(1)
