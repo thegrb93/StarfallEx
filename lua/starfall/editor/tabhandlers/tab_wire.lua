@@ -3003,7 +3003,6 @@ function PANEL:AutocompletePopulate()
 	end
 	acPanel.numitems = math.min(#suggestionsList, 64)
 	acPanel:UpdateSelection(1)
-	acPanel.suggestionlist:SizeToContents()
 
 	local w1, h1 = acPanel.suggestionlist:GetSize()
 	local w2, h2 = acPanel.suggestioninfo:GetSize()
@@ -3013,40 +3012,15 @@ function PANEL:AutocompletePopulate()
 end
 
 function PANEL:AutocompleteApply()
-	local suggestion = self.acPanel:GetSelected()
-	if not suggestion then return false end
-	local ret = false
+	local replacement = self.acPanel:GetSelected().replace
+	self.acPanel:SetVisible(false)
 
-	-- Get word position
 	local wordStart = self:getWordCallingStart( self.Caret )
 	local wordEnd = self:getWordEnd( self.Caret )
 
-	local replacement, caretOffset = suggestion:replacement(self)
-
-	-- Check if anything needs changing
-	local selection = self:GetArea( { wordStart, wordEnd } )
-	if selection == replacement then -- There's no point in doing anything.
-		return false
-	end
-
-	-- Overwrite selection
-	if replacement and replacement ~= "" then
-		self:SetArea( { wordStart, wordEnd }, replacement )
-
-		-- Move caret
-		if caretOffset then
-			self.Start = { wordStart[1], wordStart[2] + caretOffset }
-			self.Caret = { wordStart[1], wordStart[2] + caretOffset }
-		else
-			self.Start = { wordStart[1], wordStart[2] + #replacement }
-			self.Caret = { wordStart[1], wordStart[2] + #replacement }
-		end
-
-		ret = true
-	end
-
-
-	self.acPanel:SetVisible(false)
+	self:SetArea( { wordStart, wordEnd }, replacement )
+	self.Start = { wordStart[1], wordStart[2] + #replacement }
+	self.Caret = { wordStart[1], wordStart[2] + #replacement }
 	self:ScrollCaret()
 	self:RequestFocus()
 end
