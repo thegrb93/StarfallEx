@@ -2920,7 +2920,7 @@ local function levenshteinDistance(a,b)
 			local preva = mat[m*j + i]
 			local prevb = mat[m*(j-1) + i + 1]
 			local prevc = mat[m*(j-1) + i]
-			mat[m*j + i + 1] = math.min(preva+1, prevb+0.2, prevc+(a[i]~=b[j] and 1 or 0))
+			mat[m*j + i + 1] = math.min(preva+1, prevb+0.05, prevc+(a[i]~=b[j] and 1 or 0))
 		end
 	end
 
@@ -3051,11 +3051,9 @@ function PANEL:AutocompletePopulate()
 end
 
 function PANEL:AutocompleteApply()
-	self.acPanel:SetVisible(false)
-
 	local selection = self.acPanel:GetSelected()
-
 	self:SetCaret(self:SetArea({{self.Caret[1], math.max(1, self.Caret[2]-selection.replacelength)}, self.Caret }, selection.replace ))
+	self:AutocompleteOpen()
 	self:RequestFocus()
 end
 
@@ -3209,7 +3207,6 @@ function PANEL:AutocompleteCreate()
 		-- Enable mouse hovering
 		txt.OnCursorEntered = function( pnl )
 			acPanel:UpdateSelection(pnl.index)
-			suggestionlist:RequestFocus()
 		end
 
 		suggestionlist:AddItem( txt )
@@ -3226,9 +3223,6 @@ function PANEL:AutocompleteCreate()
 
 	local desc = vgui.Create("DLabel")
 	desc:SetText("")
-	desc.OnCursorEntered = function( pnl )
-		suggestioninfo:RequestFocus()
-	end
 	suggestioninfo:AddItem(desc)
 	suggestioninfo.desc = desc
 	
@@ -3264,6 +3258,7 @@ function PANEL:AutocompleteOpen()
 		acPanel:SetPos(math.min(x, sw-w), y)
 	else
 		acPanel:SetVisible( false )
+		self:RequestFocus()
 	end
 end
 
