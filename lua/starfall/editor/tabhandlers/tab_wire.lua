@@ -836,6 +836,7 @@ function PANEL:OpenContextMenu()
 end
 
 function PANEL:OnMousePressed(code)
+	if self.acPanel then self.acPanel:SetVisible(false) end
 	if code == MOUSE_LEFT then
 		local x,y = self:CursorPos()
 		if x > self.LineNumberWidth - 10 and x < self.LineNumberWidth then
@@ -3045,7 +3046,6 @@ function PANEL:AutocompletePopulate()
 		acPanel.suggestions[i] = suggestion
 		item:SetVisible(suggestion ~= nil)
 	end
-	acPanel.suggestionlist:PerformLayout()
 
 	acPanel.numitems = math.min(#suggestions, 64)
 	acPanel:UpdateSelection(1)
@@ -3094,7 +3094,6 @@ function PANEL:AutocompleteCreate()
 
 		desctxt:SetText( WrapText(suggestion.desc, 300) )
 		desctxt:SizeToContents()
-		self.suggestioninfo:InvalidateLayout()
 	end
 
 	local controlSchemes = setmetatable({
@@ -3165,9 +3164,10 @@ function PANEL:AutocompleteCreate()
 
 	local suggestionlist = vgui.Create( "DPanelList", acPanel )
 	suggestionlist:DockMargin(6, 6, 6, 6)
-	suggestionlist:SetSize(300, 300)
+	suggestionlist:SetSize(400, 300)
 	suggestionlist:Dock(LEFT)
-	--suggestionlist.Paint = function() end
+	suggestionlist:EnableVerticalScrollbar( true )
+	suggestionlist.Paint = function() end
 
 	surface.SetFont(self.CurrentFont)
 	local _, labelH = surface.GetTextSize( "H" )
@@ -3224,19 +3224,18 @@ function PANEL:AutocompleteCreate()
 	suggestioninfo:SetSize(300, 300)
 	suggestioninfo:EnableVerticalScrollbar( true )
 	suggestioninfo:Dock(LEFT)
-	--suggestioninfo.Paint = function() end
+	suggestioninfo.Paint = function() end
 	acPanel.suggestioninfo = suggestioninfo
 
 	local desc = vgui.Create("DLabel")
 	desc:SetText("")
-	desc:SetSize(300, 300)
 	desc.OnCursorEntered = function( pnl )
 		suggestioninfo:RequestFocus()
 	end
 	suggestioninfo:AddItem(desc)
 	suggestioninfo.desc = desc
 	
-	acPanel:SetSize(624, 300)
+	acPanel:SetSize(700, 300)
 
 	self.acPanel = acPanel
 	return acPanel
