@@ -4,7 +4,6 @@ local whitelist_file = SERVER and "sf_url_whitelist.txt" or "starfall/cl_url_whi
 local urlrestrictor
 local function checkWhitelist(instance, url, key)
 	if TypeID(url) ~= TYPE_STRING then return false, "The url is not a string" end
-	print(instance, url, key)
 
 	if not string.match(url,"^(%w-)://") then
 		url = "http://"..url
