@@ -54,33 +54,35 @@ end
 local function loadDefaultWhitelist()
 	local filename = "starfall/starfall_whitelist_default.lua"
 	local code = file.Read(filename, "LUA")
-	if not code then whitelistNotifyError(filename, "Could not open file!") return "" end
+	if not code then whitelistNotifyError(filename, "Could not open file!") end
 	return code
 end
 
 local function runWhitelist(filename, code)
 	urlrestrictor = SF.StringRestrictor(false)
 
-	local function pattern(txt)
-		if not isstring(txt) then return end
-		txt = "^"..txt.."$"
-		urlrestrictor:addWhitelistEntry(txt)
-	end
-	local function simple(txt)
-		if not isstring(txt) then return end
-		txt = "^"..string.PatternSafe(txt).."/.*"
-		urlrestrictor:addWhitelistEntry(txt)
-	end
-	local function blacklist(txt)
-		if not isstring(txt) then return end
-		txt = "^"..string.PatternSafe(txt)..".*"
-		urlrestrictor:addBlacklistEntry(txt)
-	end
-	local function blacklistpattern(txt)
-		if not isstring(txt) then return end
-		txt = "^"..txt.."$"
-		urlrestrictor:addBlacklistEntry(txt)
-	end
+	local env = {
+		pattern = function(txt)
+			if not isstring(txt) then return end
+			txt = "^"..txt.."$"
+			urlrestrictor:addWhitelistEntry(txt)
+		end,
+		simple = function(txt)
+			if not isstring(txt) then return end
+			txt = "^"..string.PatternSafe(txt).."/.*"
+			urlrestrictor:addWhitelistEntry(txt)
+		end,
+		blacklist = function(txt)
+			if not isstring(txt) then return end
+			txt = "^"..string.PatternSafe(txt)..".*"
+			urlrestrictor:addBlacklistEntry(txt)
+		end,
+		blacklistpattern = function(txt)
+			if not isstring(txt) then return end
+			txt = "^"..txt.."$"
+			urlrestrictor:addBlacklistEntry(txt)
+		end,
+	}
 
 	local func = SF.CompileString(code, filename, false)
 	if isstring(func) then
@@ -88,7 +90,7 @@ local function runWhitelist(filename, code)
 		return false
 	end
 
-	setfenv(func, {pattern=pattern, simple=simple, blacklist=blacklist, blacklistpattern=blacklistpattern})
+	setfenv(func, env)
 
 	local start = SysTime()
 	debug.sethook(function() if SysTime()-start>2 then error("Infinite loop break") end end, "", 2000)
@@ -104,16 +106,16 @@ local function runWhitelist(filename, code)
 end
 
 function SF.ReloadUrlWhitelist()
-	local code
-	if file.Exists(whitelist_file, "DATA") then
-		code = file.Read(whitelist_file, "DATA")
-	else
+	local code = file.Read(whitelist_file, "DATA")
+	if not (code and code ~= "") then
 		code = loadDefaultWhitelist()
-		file.Write(whitelist_file, code)
+		if (code and code ~= "") then then
+			file.Write(whitelist_file, code)
+		end
 	end
 
-	if not runWhitelist(whitelist_file, code) then
-		runWhitelist("starfall_whitelist_default.txt", loadDefaultWhitelist())
+	if not ((code and code ~= "") and runWhitelist(whitelist_file, code)) then
+		urlrestrictor = SF.StringRestrictor(false)
 	end
 end
 SF.ReloadUrlWhitelist()
