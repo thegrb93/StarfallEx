@@ -2873,6 +2873,7 @@ local AC_CONTROL_ECLIPSE = 5
 
 local AC_COLOR_CONSTANT = Color(86, 156, 214)
 local AC_COLOR_LIBRARY = Color(100, 50, 230)
+local AC_COLOR_FIELD = Color(100, 230, 100)
 local AC_COLOR_FUNCTION = Color(150, 40, 40)
 local AC_COLOR_HOOK = Color(206, 145, 120)
 
@@ -3011,8 +3012,15 @@ function PANEL:AutocompletePopulate()
 					local replacement = TabHandler.ACWithParams:GetBool() and (fullfunc) or (funcName.."(")
 					suggestions[#suggestions + 1] = AutoCompleteSuggestion(dotCall, string.lower(funcName), fullfunc, funcMethod.description, AC_COLOR_FUNCTION, replacement, #dotCall)
 				end
+				break
 			end
-			break
+			local fields = SF.Docs.Libraries.builtins.fields[libName]
+			if fields then
+				for fieldName, fieldData in pairs(fieldData) do
+					suggestions[#suggestions + 1] = AutoCompleteSuggestion(dotCall, string.lower(fieldName), fieldName, fieldData.description, AC_COLOR_FIELD, fieldName, #dotCall)
+				end
+				break
+			end
 		end
 
 		local typingl = string.lower(typing)
@@ -3029,6 +3037,12 @@ function PANEL:AutocompletePopulate()
 			local libNamel = string.lower(libName)
 			if string.StartsWith(libNamel, typingl) and libName ~= "builtins" then
 				suggestions[#suggestions + 1] = AutoCompleteSuggestion(typingl, libNamel, libName, "The library " .. libName, AC_COLOR_LIBRARY, libName..".", #typing, true)
+			end
+		end
+		for fieldName, fieldData in pairs(SF.Docs.Libraries.builtins.fields) do
+			local fieldNamel = string.lower(fieldName)
+			if string.StartsWith(fieldNamel, typingl) then
+				suggestions[#suggestions + 1] = AutoCompleteSuggestion(typingl, fieldNamel, fieldName, fieldData.description, AC_COLOR_FIELD, fieldName, #typing, true)
 			end
 		end
 
