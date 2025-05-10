@@ -316,8 +316,6 @@ function TabHandler:RegisterSettings()
 		{ "Off", "Turn off autocomplete." },
 		{ "Expression2 Style", "Current mode:\nTab/CTRL+Tab to choose item;\nEnter/Space to use;\nArrow keys to abort." },
 		{ "Visual Studio Style", "Current mode:\nCtrl+Space to use the top match;\nArrow keys to choose item;\nTab/Enter/Space to use;\nCode validation hotkey (ctrl+space) moved to ctrl+b." },
-		{ "Scroller", "Current mode:\nMouse scroller to choose item;\nMiddle mouse to use." },
-		{ "Scroller w/ Enter", "Current mode:\nMouse scroller to choose item;\nEnter to use." },
 		{ "Eclipse Style", "Current mode:\nEnter to use top match;\nTab to enter auto completion menu;\nArrow keys to choose item;\nEnter to use;\nSpace to abort." },
 	}
 
@@ -1568,12 +1566,7 @@ end
 
 function PANEL:OnMouseWheeled(delta)
 	if self.acPanel and self.acPanel:IsVisible() then
-		local mode = TabHandler.ACControlStyle:GetInt()
-		if mode == AC_CONTROL_SCROLLER or mode == AC_CONTROL_SCROLLER_ENTER then
-			self.acPanel:ScrollSelect( -delta )
-		else
-			self.acPanel:RequestFocus()
-		end
+		self.acPanel:RequestFocus()
 		return
 	end
 
@@ -2867,9 +2860,7 @@ end
 local AC_CONTROL_OFF = 0
 local AC_CONTROL_E2 = 1
 local AC_CONTROL_VSCODE = 2
-local AC_CONTROL_SCROLLER = 3
-local AC_CONTROL_SCROLLER_ENTER = 4
-local AC_CONTROL_ECLIPSE = 5
+local AC_CONTROL_ECLIPSE = 3
 
 local AC_COLOR_CONSTANT = Color(86, 156, 214)
 local AC_COLOR_LIBRARY = Color(100, 50, 230)
@@ -3014,9 +3005,10 @@ function PANEL:AutocompletePopulate()
 				end
 				break
 			end
-			local fields = SF.Docs.Libraries.builtins.fields[libName]
-			if fields then
-				for fieldName, fieldData in pairs(fieldData) do
+			local tables = SF.Docs.Libraries.builtins.tables[libName]
+			if tables then
+				for _, fieldData in pairs(tables.fields) do
+					local fieldName = fieldData.name
 					suggestions[#suggestions + 1] = AutoCompleteSuggestion(dotCall, string.lower(fieldName), fieldName, fieldData.description, AC_COLOR_FIELD, fieldName, #dotCall)
 				end
 				break
@@ -3039,7 +3031,7 @@ function PANEL:AutocompletePopulate()
 				suggestions[#suggestions + 1] = AutoCompleteSuggestion(typingl, libNamel, libName, "The library " .. libName, AC_COLOR_LIBRARY, libName..".", #typing, true)
 			end
 		end
-		for fieldName, fieldData in pairs(SF.Docs.Libraries.builtins.fields) do
+		for fieldName, fieldData in pairs(SF.Docs.Libraries.builtins.tables) do
 			local fieldNamel = string.lower(fieldName)
 			if string.StartsWith(fieldNamel, typingl) then
 				suggestions[#suggestions + 1] = AutoCompleteSuggestion(typingl, fieldNamel, fieldName, fieldData.description, AC_COLOR_FIELD, fieldName, #typing, true)
@@ -3099,6 +3091,7 @@ function PANEL:AutocompleteCreate()
 		return self.suggestions[self.selection]
 	end
 
+	local editorCanvas = self
 	function acPanel:UpdateInfo()
 		local suggestion = self:GetSelected()
 		local desctxt = self.suggestioninfo.desc
@@ -3108,6 +3101,7 @@ function PANEL:AutocompleteCreate()
 			return
 		end
 
+		surface.SetFont(editorCanvas.CurrentFont)
 		desctxt:SetText( WrapText(suggestion.desc, 300) )
 		desctxt:SizeToContents()
 	end
@@ -3151,16 +3145,6 @@ function PANEL:AutocompleteCreate()
 				pnl.keyWait = t + (pnl.keyHolding and 0.1 or 0.5)
 			end
 		end,
-		[AC_CONTROL_SCROLLER] = function( pnl )
-			if input.IsMouseDown( MOUSE_MIDDLE ) then
-				self:AutocompleteApply()
-			end
-		end,
-		[AC_CONTROL_SCROLLER_ENTER] = function( pnl )
-			if input.IsKeyDown( KEY_ENTER ) then
-				self:AutocompleteApply()
-			end
-		end,
 		[AC_CONTROL_ECLIPSE] = function( pnl )
 			local t = CurTime()
 			if WaitForKeyUp(t, pnl) then return end
@@ -3178,11 +3162,10 @@ function PANEL:AutocompleteCreate()
 		end,
 	}, {__index = function() return function() end end})
 
-	local function setThink()
-		acPanel.Think = controlSchemes[TabHandler.ACControlStyle:GetInt()]
-	end
+	local function setThink() acPanel.Think = controlSchemes[TabHandler.ACControlStyle:GetInt()] end
 	setThink()
-	cvars.AddChangeCallback(TabHandler.ACControlStyle:GetName(), setThink)
+	cvars.RemoveChangeCallback(TabHandler.ACControlStyle:GetName(), "autocompletestyle")
+	cvars.AddChangeCallback(TabHandler.ACControlStyle:GetName(), setThink, "autocompletestyle")
 
 	local suggestionlist = vgui.Create( "DPanelList", acPanel )
 	suggestionlist:DockMargin(6, 6, 6, 6)
@@ -3250,6 +3233,7 @@ function PANEL:AutocompleteCreate()
 
 	local desc = vgui.Create("DLabel")
 	desc:SetText("")
+	desc:SetFont(self.CurrentFont)
 	suggestioninfo:AddItem(desc)
 	suggestioninfo.desc = desc
 	
@@ -3294,7 +3278,7 @@ function PANEL:AutocompleteKeybind(code)
 	local mode = TabHandler.ACControlStyle:GetInt()
 
 	if code == KEY_ENTER then
-		if mode == AC_CONTROL_ECLIPSE or mode == AC_CONTROL_VSCODE or mode == AC_CONTROL_SCROLLER_ENTER then
+		if mode == AC_CONTROL_ECLIPSE or mode == AC_CONTROL_VSCODE then
 			self:AutocompleteApply()
 			return true
 		end
