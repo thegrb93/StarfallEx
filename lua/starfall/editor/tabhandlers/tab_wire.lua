@@ -315,8 +315,8 @@ function TabHandler:RegisterSettings()
 	local modes = {
 		{ "Off", "Turn off autocomplete." },
 		{ "Expression2 Style", "Current mode:\nTab/CTRL+Tab to choose item;\nEnter/Space to use;\nArrow keys to abort." },
-		{ "Visual Studio Style", "Current mode:\nCtrl+Space to use the top match;\nArrow keys to choose item;\nTab/Enter/Space to use;\nCode validation hotkey (ctrl+space) moved to ctrl+b." },
-		{ "Eclipse Style", "Current mode:\nEnter to use top match;\nTab to enter auto completion menu;\nArrow keys to choose item;\nEnter to use;\nSpace to abort." },
+		{ "Visual Studio Style", "Current mode:\nArrow keys to choose item;\nTab use.\nSpace to abort." },
+		{ "Eclipse Style", "Current mode:\nArrow keys to choose item;\nEnter to use;\nSpace to abort." },
 	}
 
 	AutoCompleteControlOptions:SetSortItems(false)
@@ -3034,7 +3034,7 @@ function PANEL:AutocompletePopulate()
 		for fieldName, fieldData in pairs(SF.Docs.Libraries.builtins.tables) do
 			local fieldNamel = string.lower(fieldName)
 			if string.StartsWith(fieldNamel, typingl) then
-				suggestions[#suggestions + 1] = AutoCompleteSuggestion(typingl, fieldNamel, fieldName, fieldData.description, AC_COLOR_FIELD, fieldName, #typing, true)
+				suggestions[#suggestions + 1] = AutoCompleteSuggestion(typingl, fieldNamel, fieldName, fieldData.description, AC_COLOR_FIELD, fieldName..".", #typing, true)
 			end
 		end
 
@@ -3063,8 +3063,12 @@ function PANEL:AutocompleteApply()
 	if selection.reopen then
 		self:AutocompleteOpen()
 	else
-		self.acPanel:SetVisible(false)
+		self:AutocompleteClose()
 	end
+end
+
+function PANEL:AutocompleteClose()
+	self.acPanel:SetVisible(false)
 	self:RequestFocus()
 end
 
@@ -3136,7 +3140,9 @@ function PANEL:AutocompleteCreate()
 		[AC_CONTROL_VSCODE] = function( pnl )
 			local t = CurTime()
 			if WaitForKeyUp(t, pnl) then return end
-			if input.IsKeyDown( KEY_TAB ) or input.IsKeyDown( KEY_ENTER ) or input.IsKeyDown( KEY_SPACE ) then
+			if input.IsKeyDown( KEY_SPACE ) then
+				self:AutocompleteClose()
+			elseif input.IsKeyDown( KEY_TAB ) then
 				self:AutocompleteApply()
 			elseif input.IsKeyDown( KEY_DOWN ) then
 				pnl:ScrollSelect( 1 )
@@ -3149,10 +3155,10 @@ function PANEL:AutocompleteCreate()
 		[AC_CONTROL_ECLIPSE] = function( pnl )
 			local t = CurTime()
 			if WaitForKeyUp(t, pnl) then return end
-			if input.IsKeyDown( KEY_ENTER ) then
+			if input.IsKeyDown( KEY_SPACE ) then
+				self:AutocompleteClose()
+			elseif input.IsKeyDown( KEY_ENTER ) then
 				self:AutocompleteApply()
-			elseif input.IsKeyDown( KEY_SPACE ) then
-				pnl:SetVisible(false)
 			elseif input.IsKeyDown( KEY_DOWN ) then
 				pnl:ScrollSelect( 1 )
 				pnl.keyWait = t + (pnl.keyHolding and 0.1 or 0.5)
@@ -3248,7 +3254,7 @@ function PANEL:AutocompleteOpen()
 	local acPanel = self.acPanel
 
 	if not SF.Docs or TabHandler.ACControlStyle:GetInt()==AC_CONTROL_OFF then
-		if acPanel then self.acPanel:SetVisible(false) end
+		if acPanel then self:AutocompleteClose() end
 		return
 	end
 
@@ -3279,7 +3285,14 @@ function PANEL:AutocompleteKeybind(code)
 	local mode = TabHandler.ACControlStyle:GetInt()
 
 	if code == KEY_ENTER then
-		if mode == AC_CONTROL_ECLIPSE or mode == AC_CONTROL_VSCODE then
+		if mode == AC_CONTROL_ECLIPSE or mode == AC_CONTROL_E2 then
+			self:AutocompleteApply()
+			return true
+		else
+			self:AutocompleteClose()
+		end
+	elseif code == KEY_SPACE then
+		if mode == AC_CONTROL_E2 then
 			self:AutocompleteApply()
 			return true
 		end
@@ -3294,7 +3307,11 @@ function PANEL:AutocompleteKeybind(code)
 			return true
 		end
 	elseif code == KEY_TAB then
-		if mode == AC_CONTROL_E2 or mode == AC_CONTROL_VSCODE then
+		if mode == AC_CONTROL_VSCODE then
+			self:AutocompleteApply()
+			self.TabFocus = true
+			return true
+		elseif mode == AC_CONTROL_E2 then
 			self.acPanel:RequestFocus()
 			return true
 		end
