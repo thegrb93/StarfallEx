@@ -3101,6 +3101,7 @@ function PANEL:AutocompleteCreate()
 			return
 		end
 
+		desctxt:SetSize(self.suggestioninfo:GetSize())
 		surface.SetFont(editorCanvas.CurrentFont)
 		desctxt:SetText( WrapText(suggestion.desc, 300) )
 		desctxt:SizeToContents()
@@ -3264,9 +3265,9 @@ function PANEL:AutocompleteOpen()
 
 		acPanel.keyWait = CurTime()+0.5
 		acPanel:SetVisible( true )
-		local sw = self:GetSize()
-		local w = acPanel:GetSize()
-		acPanel:SetPos(math.min(x, sw-w), y)
+		local sw, sh = self:GetSize()
+		local w, h = acPanel:GetSize()
+		acPanel:SetPos(math.Clamp(sw-w, 0, x), math.Clamp(sh-h, 0, y))
 	else
 		acPanel:SetVisible( false )
 		self:RequestFocus()
