@@ -7,7 +7,6 @@ local ENT_META,NPC_META,PHYS_META,PLY_META,VEH_META,WEP_META = FindMetaTable("En
 local isentity = isentity
 
 local Ent_AddCallback,Ent_GetTable,Ent_IsScripted,Ent_IsValid,Ent_RemoveCallback = ENT_META.AddCallback,ENT_META.GetTable,ENT_META.IsScripted,ENT_META.IsValid,ENT_META.RemoveCallback
-local Ply_InVehicle = PLY_META.InVehicle
 
 -- Register privileges
 registerprivilege("entities.applyDamage", "Apply damage", "Allows the user to apply damage to an entity", { entities = {} })
@@ -213,6 +212,7 @@ local function Ent_IsPlayer(ent) return dgetmeta(ent)==PLY_META end
 local function Ent_IsVehicle(ent) return dgetmeta(ent)==VEH_META end
 local function Ent_IsWeapon(ent) return dgetmeta(ent)==WEP_META end
 
+local Ply_InVehicle = PLY_META.InVehicle
 local Phys_AddAngleVelocity,Phys_AddVelocity,Phys_ApplyForceCenter,Phys_ApplyForceOffset,Phys_ApplyTorqueCenter,Phys_EnableDrag,Phys_EnableGravity,Phys_EnableMotion,Phys_GetAngleVelocity,Phys_GetMass,Phys_GetMaterial,Phys_IsMoveable,Phys_IsValid,Phys_SetContents,Phys_SetInertia,Phys_SetMass,Phys_Wake = PHYS_META.AddAngleVelocity,PHYS_META.AddVelocity,PHYS_META.ApplyForceCenter,PHYS_META.ApplyForceOffset,PHYS_META.ApplyTorqueCenter,PHYS_META.EnableDrag,PHYS_META.EnableGravity,PHYS_META.EnableMotion,PHYS_META.GetAngleVelocity,PHYS_META.GetMass,PHYS_META.GetMaterial,PHYS_META.IsMoveable,PHYS_META.IsValid,PHYS_META.SetContents,PHYS_META.SetInertia,PHYS_META.SetMass,PHYS_META.Wake
 
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
