@@ -2462,6 +2462,41 @@ do
 			end
 		end)
 
+		-- For development. Generates the ENT locals used by the library
+		if game.SinglePlayer() then
+			concommand.Add("sf_printlibrarylocals", function(ply, com, arg)
+				if not arg[1] then print("Expected library path argument in 'starfall'") return end
+				local lib = file.Read("starfall/"..arg[1], "LUA")
+				if not lib then print("File not found: ".."\"starfall/"..arg[1].."\"") return end
+				local metas = {"Ent_","Ply_","Wep_","Veh_","Npc_","Phys_"}
+				local badfuncs = {"IsPlayer","IsWeapon","IsVehicle","IsNPC"}
+				for _, meta in ipairs(metas) do
+					local found = {}
+					for f in string.gmatch(lib, meta.."([%w_]+)%s*%b()") do
+						found[f] = true
+					end
+					if table.IsEmpty(found) then continue end
+
+					for _, v in ipairs(badfuncs) do
+						if found[v] then
+							print(meta..v.." needs to be handled differently")
+							found[v] = nil
+						end
+					end
+
+					local list = table.GetKeys(found)
+					table.sort(list)
+					local metatbl = string.upper(meta).."META"
+					local a, b = {}, {}
+					for i, method in ipairs(list) do
+						a[i] = meta..method
+						b[i] = metatbl.."."..method
+					end
+					print("local " .. table.concat(a, ",") .. " = " .. table.concat(b, ","))
+				end
+			end)
+		end
+
 	else
 		net.Receive("sf_receivelibrary", function(len)
 			net.ReadStarfall(nil, function(ok, data)
