@@ -77,7 +77,7 @@ local PVSManager = {
 			local count = 0
 			local adding = (rawget(self.PVScountTable[inst.player][inst][tply],id) == nil and pos ~= nil)
 			for c,chip in pairs(self.PVScountTable[inst.player]) do
-				count = count + #chip[tply]
+				count = count + table.Count(chip[tply])
 			end
 			if count >= PVSLimitCvar:GetInt() and adding then SF.Throw("The max number of PVS points for "..tply:Nick() .." has been reached. ("..PVSLimitCvar:GetInt()..")") end
 		end,
