@@ -15,10 +15,7 @@ registerprivilege("player.setArmor", "SetArmor", "Allows changing a player's arm
 registerprivilege("player.setMaxArmor", "SetMaxArmor", "Allows changing a player's max armor", { usergroups = { default = 1 }, entities = {} })
 registerprivilege("player.modifyMovementProperties", "ModifyMovementProperties", "Allows various changes to a player's movement", { usergroups = { default = 1 }, entities = {} })
 
-local PVSPointLimit
 local PVSLimitCvar = CreateConVar("sf_pvs_pointlimit", 16, FCVAR_ARCHIVE, "The number of PVS points that can be set on each player, limit is shared across all chips")
-PVSPointLimit = PVSLimitCvar:GetInt()
-cvars.AddChangeCallback("sf_pvs_pointlimit",function() PVSPointLimit = PVSLimitCvar:GetInt() end)
 
 local PVSManager = {
 
@@ -27,12 +24,10 @@ local PVSManager = {
 			table.Empty(self.PVSactiveTable)
 
 			local active = self.PVSactiveTable
-			if not table.IsEmpty(self.PVScountTable) then --add everything to the table
-				for cPly, chips in pairs( self.PVScountTable ) do
-					for chip, targets in pairs( chips ) do
-						for tPly, points in pairs( targets ) do
-							table.Add( active[tPly] , points )
-						end
+			for cPly, chips in pairs( self.PVScountTable ) do
+				for chip, targets in pairs( chips ) do
+					for tPly, points in pairs( targets ) do
+						table.Add( active[tPly] , points )
 					end
 				end
 			end
@@ -51,23 +46,31 @@ local PVSManager = {
 			end
 		end,
 
+		prepareUpdateActiveTable = function(self)
+			if not self.preparingPVSUpdate then
+				self.preparingPVSUpdate = true
+				timer.Simple(0,function()
+					self:updateActiveTable()
+					self.preparingPVSUpdate = false
+				end)
+			end	
+		end,
+
 		clearInstCountTable = function(self, inst)
-			if rawget(self.PVScountTable, inst.player) then
-				self.PVScountTable[inst.player][inst] = nil
+			self.PVScountTable[inst.player][inst] = nil
+			if table.IsEmpty(self.PVScountTable[inst.player]) then
+				self.PVScountTable[inst.player] = nil
 			end
-			self:updateActiveTable()
+			self:prepareUpdateActiveTable()
 		end,
 
 		clearInstPlyTable = function(self, inst, tply )
 			self.PVScountTable[inst.player][inst][tply] = nil
 
 			if table.IsEmpty(self.PVScountTable[inst.player][inst]) then
-				self.PVScountTable[inst.player][inst] = nil
-				if table.IsEmpty(self.PVScountTable[inst.player]) then
-					self.PVScountTable[inst.player] = nil
-				end
+				self:clearInstCountTable(inst)
 			end
-			self:updateActiveTable()
+			self:prepareUpdateActiveTable()
 		end,
 
 		checkCountTable = function( self, inst, tply, id, pos)
@@ -76,7 +79,7 @@ local PVSManager = {
 			for c,chip in pairs(self.PVScountTable[inst.player]) do
 				count = count + #chip[tply]
 			end
-			if count >= PVSPointLimit and adding then SF.Throw("The max number of PVS points for "..tply:Nick() .." has been reached. ("..PVSPointLimit..")") end
+			if count >= PVSLimitCvar:GetInt() and adding then SF.Throw("The max number of PVS points for "..tply:Nick() .." has been reached. ("..PVSLimitCvar:GetInt()..")") end
 		end,
 
 		setPointToCountTable = function(self, inst, tply, id, pos)
@@ -86,22 +89,9 @@ local PVSManager = {
 			self.PVScountTable[inst.player][inst][tply][id] = pos
 
 			if table.IsEmpty(self.PVScountTable[inst.player][inst][tply]) then
-				self.PVScountTable[inst.player][inst][tply] = nil
-				if table.IsEmpty(self.PVScountTable[inst.player][inst]) then
-					self.PVScountTable[inst.player][inst] = nil
-					if table.IsEmpty(self.PVScountTable[inst.player]) then
-						self.PVScountTable[inst.player] = nil
-					end
-				end
+				self:clearInstPlyTable(inst, tply)
 			end
-		
-			if not self.preparingPVSUpdate then
-				self.preparingPVSUpdate = true
-				timer.Simple(0,function()
-					self:updateActiveTable()
-					self.preparingPVSUpdate = false
-				end)
-			end	
+			self:prepareUpdateActiveTable()
 		end
 	},
 	__call = function(t)
@@ -125,7 +115,6 @@ local function checkvector(v)
 		SF.Throw("Input vector too large or NAN", 3)
 	end
 end
-
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
@@ -450,10 +439,11 @@ end
 
 --- sets ID of a given point to add PVS points
 -- can only be used on either the chip's owner, or HUD connected players.
--- @param number ID ID to set position of
+-- @param number ID ID to set position of, clamped between 1 and the PVS Points limit.
 -- @param Vector? position position to set the override point to, nil to delete this point if it exists.
 function player_methods:setPVSPoint( ID, position )
 	checkluatype(ID, TYPE_NUMBER)
+	ID = math.floor(math.Clamp(ID,1,PVSLimitCvar:GetInt()))
 	if not (SF.IsHUDActive(instance.entity, getply(self) ) or getply(self) == instance.player) then 
 		SF.Throw("setPVS can only be used on owner or HUD connected players!") 
 	end
