@@ -22,87 +22,87 @@ cvars.AddChangeCallback("sf_pvs_pointlimit",function() PVSPointLimit = PVSLimitC
 
 local PVSManager = {
 
-    __index = { 
-        updateActiveTable = function(self)
-            table.Empty(self.PVSactiveTable)
+	__index = { 
+		updateActiveTable = function(self)
+			table.Empty(self.PVSactiveTable)
 
-            local active = self.PVSactiveTable
-            if not table.IsEmpty(self.PVScountTable) then --add everything to the table
-                for cPly, chips in pairs( self.PVScountTable ) do
-                    for chip, targets in pairs( chips ) do
-                        for tPly, points in pairs( targets ) do
-                            table.Add( active[tPly] , points )
-                        end
-                    end
-                end
-            end
+			local active = self.PVSactiveTable
+			if not table.IsEmpty(self.PVScountTable) then --add everything to the table
+				for cPly, chips in pairs( self.PVScountTable ) do
+					for chip, targets in pairs( chips ) do
+						for tPly, points in pairs( targets ) do
+							table.Add( active[tPly] , points )
+						end
+					end
+				end
+			end
 
-            if not table.IsEmpty(self.PVSactiveTable) then--activate/deactivate hook depending on whether or not active table is empty.
-                hook.Add("SetupPlayerVisibility", "SF_SetupPlayerVisibility", function( ply, viewEntity )
-                    local plyPVSes = self.PVSactiveTable[ ply ]
-                    if plyPVSes then
-                        for _,point in ipairs( plyPVSes ) do
-                            AddOriginToPVS( point )
-                        end
-                    end
-                end)
-            else
-                hook.Remove( "SetupPlayerVisiblity", "SF_SetupPlayerVisibility")
-            end
-        end,
+			if not table.IsEmpty(self.PVSactiveTable) then--activate/deactivate hook depending on whether or not active table is empty.
+				hook.Add("SetupPlayerVisibility", "SF_SetupPlayerVisibility", function( ply, viewEntity )
+					local plyPVSes = self.PVSactiveTable[ ply ]
+					if plyPVSes then
+						for _,point in ipairs( plyPVSes ) do
+							AddOriginToPVS( point )
+						end
+					end
+				end)
+			else
+				hook.Remove( "SetupPlayerVisiblity", "SF_SetupPlayerVisibility")
+			end
+		end,
 
-        clearInstCountTable = function(self, inst)
-            if rawget(self.PVScountTable, inst.player) then
-                self.PVScountTable[inst.player][inst] = nil
-            end
-            self:updateActiveTable()
-        end,
+		clearInstCountTable = function(self, inst)
+			if rawget(self.PVScountTable, inst.player) then
+				self.PVScountTable[inst.player][inst] = nil
+			end
+			self:updateActiveTable()
+		end,
 
-        clearInstPlyTable = function(self, inst, tply )
-            self.PVScountTable[inst.player][inst][tply] = nil
+		clearInstPlyTable = function(self, inst, tply )
+			self.PVScountTable[inst.player][inst][tply] = nil
 
-            if table.IsEmpty(self.PVScountTable[inst.player][inst]) then
-                self.PVScountTable[inst.player][inst] = nil
-                if table.IsEmpty(self.PVScountTable[inst.player]) then
-                    self.PVScountTable[inst.player] = nil
-                end
-            end
-            self:updateActiveTable()
-        end,
+			if table.IsEmpty(self.PVScountTable[inst.player][inst]) then
+				self.PVScountTable[inst.player][inst] = nil
+				if table.IsEmpty(self.PVScountTable[inst.player]) then
+					self.PVScountTable[inst.player] = nil
+				end
+			end
+			self:updateActiveTable()
+		end,
 
-        checkCountTable = function( self, inst, tply, id, pos)
-            local count = 0
-            local adding = (rawget(self.PVScountTable[inst.player][inst][tply],id) == nil and pos ~= nil)
-            for c,chip in pairs(self.PVScountTable[inst.player]) do
-                count = count + #chip[tply]
-            end
-            if count >= PVSPointLimit and adding then SF.Throw("The max number of PVS points for "..tply:Nick() .." has been reached. ("..PVSPointLimit..")") end
-        end,
+		checkCountTable = function( self, inst, tply, id, pos)
+			local count = 0
+			local adding = (rawget(self.PVScountTable[inst.player][inst][tply],id) == nil and pos ~= nil)
+			for c,chip in pairs(self.PVScountTable[inst.player]) do
+				count = count + #chip[tply]
+			end
+			if count >= PVSPointLimit and adding then SF.Throw("The max number of PVS points for "..tply:Nick() .." has been reached. ("..PVSPointLimit..")") end
+		end,
 
-        setPointToCountTable = function(self, inst, tply, id, pos)
-        
-        
-            self:checkCountTable(inst, tply, id, pos)
-            self.PVScountTable[inst.player][inst][tply][id] = pos
+		setPointToCountTable = function(self, inst, tply, id, pos)
+		
+		
+			self:checkCountTable(inst, tply, id, pos)
+			self.PVScountTable[inst.player][inst][tply][id] = pos
 
-            if table.IsEmpty(self.PVScountTable[inst.player][inst][tply]) then
-                self.PVScountTable[inst.player][inst][tply] = nil
-                if table.IsEmpty(self.PVScountTable[inst.player][inst]) then
-                    self.PVScountTable[inst.player][inst] = nil
-                    if table.IsEmpty(self.PVScountTable[inst.player]) then
-                        self.PVScountTable[inst.player] = nil
-                    end
-                end
-            end
-        self:updateActiveTable()
-        end
-    },
-    __call = function(t)
-        return setmetatable({
-            PVScountTable = SF.AutoGrowingTable(),
-            PVSactiveTable = SF.AutoGrowingTable()
-        }, t)
-    end
+			if table.IsEmpty(self.PVScountTable[inst.player][inst][tply]) then
+				self.PVScountTable[inst.player][inst][tply] = nil
+				if table.IsEmpty(self.PVScountTable[inst.player][inst]) then
+					self.PVScountTable[inst.player][inst] = nil
+					if table.IsEmpty(self.PVScountTable[inst.player]) then
+						self.PVScountTable[inst.player] = nil
+					end
+				end
+			end
+		self:updateActiveTable()
+		end
+	},
+	__call = function(t)
+		return setmetatable({
+			PVScountTable = SF.AutoGrowingTable(),
+			PVSactiveTable = SF.AutoGrowingTable()
+		}, t)
+	end
 }
 
 setmetatable(PVSManager,PVSManager)
@@ -110,12 +110,12 @@ setmetatable(PVSManager,PVSManager)
 local PlayerPVSManager = PVSManager()
 
 local function checkvector(v)
-    if v[1]<-1e12 or v[1]>1e12 or v[1]~=v[1] or
-       v[2]<-1e12 or v[2]>1e12 or v[2]~=v[2] or
-       v[3]<-1e12 or v[3]>1e12 or v[3]~=v[3] then
+	if v[1]<-1e12 or v[1]>1e12 or v[1]~=v[1] or
+	   v[2]<-1e12 or v[2]>1e12 or v[2]~=v[2] or
+	   v[3]<-1e12 or v[3]>1e12 or v[3]~=v[3] then
 
-        SF.Throw("Input vector too large or NAN", 3)
-    end
+		SF.Throw("Input vector too large or NAN", 3)
+	end
 end
 
 
@@ -153,9 +153,9 @@ instance:AddHook("deinitialize", function()
 end)
 
 instance:AddHook( "starfall_hud_disconnected", function( activator, ply )
-    if ply ~= instance.player then
-        PlayerPVSManager:clearInstPlyTable( instance, ply ) --starfall_hud_connected and disconnected doesn't pass the player
-    end
+	if ply ~= instance.player then
+		PlayerPVSManager:clearInstPlyTable( instance, ply ) --starfall_hud_connected and disconnected doesn't pass the player
+	end
 end)
 
 --- Lets you change the size of yourself if the server has sf_permissions_entity_owneraccess 1
