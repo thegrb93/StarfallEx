@@ -27,6 +27,7 @@ local PVSManager = {
 			table.Empty(self.PVSactiveTable)
 
 			local active = self.PVSactiveTable
+			PrintTable(self.PVScountTable)
 			if not table.IsEmpty(self.PVScountTable) then --add everything to the table
 				for cPly, chips in pairs( self.PVScountTable ) do
 					for chip, targets in pairs( chips ) do
@@ -94,13 +95,21 @@ local PVSManager = {
 					end
 				end
 			end
-		self:updateActiveTable()
+		
+			if not self.preparingPVSUpdate then
+				self.preparingPVSUpdate = true
+				timer.Simple(0,function()
+					self:updateActiveTable()
+					self.preparingPVSUpdate = false
+				end)
+			end	
 		end
 	},
 	__call = function(t)
 		return setmetatable({
 			PVScountTable = SF.AutoGrowingTable(),
-			PVSactiveTable = SF.AutoGrowingTable()
+			PVSactiveTable = SF.AutoGrowingTable(),
+			PreparingPVSUpdate = false
 		}, t)
 	end
 }
@@ -444,7 +453,7 @@ end
 -- can only be used on either the chip's owner, or HUD connected players.
 -- @param number ID ID to set position of
 -- @param Vector? position position to set the override point to, nil to delete this point if it exists.
-function player_methods:setPVS( ID, position )
+function player_methods:setPVSPoint( ID, position )
 	checkluatype(ID, TYPE_NUMBER)
 	if not (SF.IsHUDActive(instance.entity, getply(self) ) or getply(self) == instance.player) then 
 		SF.Throw("setPVS can only be used on owner or HUD connected players!") 
