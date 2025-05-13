@@ -151,7 +151,7 @@ end)
 
 instance:AddHook( "starfall_hud_disconnected", function( activator, ply )
 	if ply ~= instance.player then
-		PlayerPVSManager:clearInstPlyTable( instance, ply ) --starfall_hud_connected and disconnected doesn't pass the player
+		PlayerPVSManager:clearInstPlyTable( instance, ply )
 	end
 end)
 
