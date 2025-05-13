@@ -27,7 +27,6 @@ local PVSManager = {
 			table.Empty(self.PVSactiveTable)
 
 			local active = self.PVSactiveTable
-			PrintTable(self.PVScountTable)
 			if not table.IsEmpty(self.PVScountTable) then --add everything to the table
 				for cPly, chips in pairs( self.PVScountTable ) do
 					for chip, targets in pairs( chips ) do
