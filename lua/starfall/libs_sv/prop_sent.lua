@@ -166,6 +166,18 @@ registerSent("gmod_wire_nailer", {{
 	["ShowBeam"] = {TYPE_BOOL, true},
 }})
 
+registerSent("gmod_wire_nm_sprite", {{
+	["Model"] = {TYPE_STRING, "models/beer/wiremod/watersensor_mini.mdl"},
+	["spr_scale"] = {TYPE_NUMBER, 1},
+	["spr_framerate"] = {TYPE_NUMBER, 10},
+	["spr_rendermode"] = {TYPE_NUMBER, 9},
+	["spr_texture"] = {TYPE_STRING, "sprites/light_glow03.vmt"},
+	["r"] = {TYPE_NUMBER, 255},
+	["g"] = {TYPE_NUMBER, 255},
+	["b"] = {TYPE_NUMBER, 255},
+	["a"] = {TYPE_NUMBER, 255},
+}})
+
 registerSent("gmod_wire_grabber", {{
 	["Model"] = {TYPE_STRING, "models/jaanus/wiretool/wiretool_range.mdl"},
 	["Range"] = {TYPE_NUMBER, 100},
@@ -1543,6 +1555,16 @@ return function() end
 -- string Model = "models/jaanus/wiretool/wiretool_siren.mdl"
 -- number Range = 100
 -- boolean ShowBeam = true
+-- 
+-- > gmod_wire_nm_sprite
+-- number spr_scale = 1
+-- number spr_framerate = 10
+-- number spr_rendermode = 9
+-- string spr_texture = "sprites/light_glow03.vmt"
+-- number r = 255
+-- number g = 255
+-- number b = 255
+-- number a = 255
 -- 
 -- > gmod_wire_numpad
 -- string Model = "models/beer/wiremod/numpad.mdl"
