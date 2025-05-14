@@ -75,7 +75,7 @@ local PVSManager = {
 
 		checkCountTable = function( self, inst, tply, id, pos)
 			local count = 0
-			if rawget(self.PVScountTable[inst.player][inst][tply],id) == nil and pos ~= nil then return end
+			if rawget(self.PVScountTable[inst.player][inst][tply],id) ~= nil or pos == nil then return end
 			for c,chip in pairs(self.PVScountTable[inst.player]) do
 				count = count + table.Count(chip[tply])
 			end
