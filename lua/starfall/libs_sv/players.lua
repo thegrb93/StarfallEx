@@ -15,6 +15,106 @@ registerprivilege("player.setArmor", "SetArmor", "Allows changing a player's arm
 registerprivilege("player.setMaxArmor", "SetMaxArmor", "Allows changing a player's max armor", { usergroups = { default = 1 }, entities = {} })
 registerprivilege("player.modifyMovementProperties", "ModifyMovementProperties", "Allows various changes to a player's movement", { usergroups = { default = 1 }, entities = {} })
 
+local PVSLimitCvar = CreateConVar("sf_pvs_pointlimit", 16, FCVAR_ARCHIVE, "The number of PVS points that can be set on each player, limit is shared across all chips")
+
+local PVSManager = {
+
+	__index = { 
+		updateActiveTable = function(self)
+			table.Empty(self.PVSactiveTable)
+
+			local active = self.PVSactiveTable
+			for cPly, chips in pairs( self.PVScountTable ) do
+				for chip, targets in pairs( chips ) do
+					for tPly, points in pairs( targets ) do
+						table.Add( active[tPly] , points )
+					end
+				end
+			end
+
+			if not table.IsEmpty(self.PVSactiveTable) then--activate/deactivate hook depending on whether or not active table is empty.
+				hook.Add("SetupPlayerVisibility", "SF_SetupPlayerVisibility", function( ply, viewEntity )
+					local plyPVSes = self.PVSactiveTable[ ply ]
+					if plyPVSes then
+						for _,point in ipairs( plyPVSes ) do
+							AddOriginToPVS( point )
+						end
+					end
+				end)
+			else
+				hook.Remove( "SetupPlayerVisiblity", "SF_SetupPlayerVisibility")
+			end
+		end,
+
+		prepareUpdateActiveTable = function(self)
+			if not self.preparingPVSUpdate then
+				self.preparingPVSUpdate = true
+				timer.Simple(0,function()
+					self:updateActiveTable()
+					self.preparingPVSUpdate = false
+				end)
+			end	
+		end,
+
+		clearInstCountTable = function(self, inst)
+			self.PVScountTable[inst.player][inst] = nil
+			if table.IsEmpty(self.PVScountTable[inst.player]) then
+				self.PVScountTable[inst.player] = nil
+			end
+			self:prepareUpdateActiveTable()
+		end,
+
+		clearInstPlyTable = function(self, inst, tply )
+			self.PVScountTable[inst.player][inst][tply] = nil
+
+			if table.IsEmpty(self.PVScountTable[inst.player][inst]) then
+				self:clearInstCountTable(inst)
+			end
+			self:prepareUpdateActiveTable()
+		end,
+
+		checkCountTable = function( self, inst, tply, id, pos)
+			local count = 0
+			if rawget(self.PVScountTable[inst.player][inst][tply],id) == nil and pos ~= nil then return end
+			for c,chip in pairs(self.PVScountTable[inst.player]) do
+				count = count + table.Count(chip[tply])
+			end
+			if count >= PVSLimitCvar:GetInt() then SF.Throw("The max number of PVS points for "..tply:Nick() .." has been reached. ("..PVSLimitCvar:GetInt()..")") end
+		end,
+
+		setPointToCountTable = function(self, inst, tply, id, pos)
+		
+		
+			self:checkCountTable(inst, tply, id, pos)
+			self.PVScountTable[inst.player][inst][tply][id] = pos
+
+			if table.IsEmpty(self.PVScountTable[inst.player][inst][tply]) then
+				self:clearInstPlyTable(inst, tply)
+			end
+			self:prepareUpdateActiveTable()
+		end
+	},
+	__call = function(t)
+		return setmetatable({
+			PVScountTable = SF.AutoGrowingTable(),
+			PVSactiveTable = SF.AutoGrowingTable(),
+			PreparingPVSUpdate = false
+		}, t)
+	end
+}
+
+setmetatable(PVSManager,PVSManager)
+
+local PlayerPVSManager = PVSManager()
+
+local function checkvector(v)
+	if v[1]<-1e12 or v[1]>1e12 or v[1]~=v[1] or
+	   v[2]<-1e12 or v[2]>1e12 or v[2]~=v[2] or
+	   v[3]<-1e12 or v[3]>1e12 or v[3]~=v[3] then
+
+		SF.Throw("Input vector too large or NAN", 3)
+	end
+end
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
@@ -45,6 +145,13 @@ instance:AddHook("deinitialize", function()
 		if instance.data.viewEntityChanged then
 			Ply_SetViewEntity(ply)
 		end
+	end
+	PlayerPVSManager:clearInstCountTable( instance )
+end)
+
+instance:AddHook( "starfall_hud_disconnected", function( activator, ply )
+	if ply ~= instance.player then
+		PlayerPVSManager:clearInstPlyTable( instance, ply )
 	end
 end)
 
@@ -328,6 +435,25 @@ function player_methods:enterVehicle(vehicle)
 	local ent = getply(self)
 	checkpermission(instance, ent, "player.enterVehicle")
 	Ply_EnterVehicle(ent, vhunwrap(vehicle))
+end
+
+--- sets ID of a given point to add PVS points
+-- can only be used on either the chip's owner, or HUD connected players.
+-- @param number ID ID to set position of, clamped between 1 and the PVS Points limit.
+-- @param Vector? position position to set the override point to, nil to delete this point if it exists.
+function player_methods:setPVSPoint( ID, position )
+	checkluatype(ID, TYPE_NUMBER)
+	ID = math.floor(math.Clamp(ID,1,PVSLimitCvar:GetInt()))
+	if not (SF.IsHUDActive(instance.entity, getply(self) ) or getply(self) == instance.player) then 
+		SF.Throw("setPVS can only be used on owner or HUD connected players!") 
+	end
+	if position ~= nil then position = vunwrap( position ) checkvector(position) end
+	PlayerPVSManager:setPointToCountTable(instance, getply(self), ID, position)
+end
+
+--- Clears a given player's PVS override points set by this chip
+function player_methods:clearPVSPoints()
+	PlayerPVSManager:clearInstPlyTable( instance, getply(self) )
 end
 
 end

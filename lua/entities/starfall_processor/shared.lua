@@ -209,7 +209,7 @@ local function runHudHooks(ply, chip, activator, enabled)
 	local instance = chip.instance
 	if instance then
 		instance:runScriptHook(enabled and "hudconnected" or "huddisconnected", instance.WrapObject(activator), instance.WrapObject(ply))
-		instance:RunHook(enabled and "starfall_hud_connected" or "starfall_hud_disconnected", activator)
+		instance:RunHook(enabled and "starfall_hud_connected" or "starfall_hud_disconnected", activator, ply)
 	end
 end
 

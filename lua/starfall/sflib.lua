@@ -1018,6 +1018,11 @@ SF.Errormeta = {
 	__metatable = "SFError"
 }
 
+SF.AutoGrowingTable = {
+    __index = function(t,k) local r=SF.AutoGrowingTable() t[k]=r return r end,
+    __call = function(t) return setmetatable({}, SF.AutoGrowingTable) end
+}
+setmetatable(SF.AutoGrowingTable, SF.AutoGrowingTable)
 
 --- Builds an error type to that contains line numbers, file name, and traceback
 function SF.MakeError(msg, level, uncatchable, prependinfo, userdata)
