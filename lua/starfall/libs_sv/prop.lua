@@ -559,8 +559,10 @@ function props_library.createSent(pos, ang, class, frozen, data)
 
 		hookcall = "PlayerSpawnedVehicle"
 	elseif sent2 then
+		local classTbl = scripted_ents.GetStored(class)
+		if not classTbl then SF.Throw("This entity doesn't exist!", 2) end
 		if ply ~= SF.Superuser then
-			if scripted_ents.GetStored(class).t.AdminOnly and not ply:IsAdmin() then SF.Throw("This sent is admin only!", 2) end
+			if classTbl.t.AdminOnly and not ply:IsAdmin() then SF.Throw("This sent is admin only!", 2) end
 			if gamemode.Call("PlayerSpawnSENT", ply, class) == false then SF.Throw("Another hook prevented the sent from spawning", 2) end
 		end
 
