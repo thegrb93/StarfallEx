@@ -8,8 +8,6 @@ local plyDecalBurst = SF.BurstObject("decals", "decals", 50, 50, "Rate decals ca
 
 local math_huge = math.huge
 
-local checkvector = SF.CheckVector
-
 --- Provides functions for doing line/AABB traces
 -- @name trace
 -- @class library
@@ -167,8 +165,6 @@ end
 function trace_library.decal(name, start, endpos, filter)
 	checkpermission(instance, nil, "trace.decal")
 	checkluatype(name, TYPE_STRING)
-	checkvector(start)
-	checkvector(endpos)
 
 	if filter ~= nil then checkluatype(filter, TYPE_TABLE) filter = convertFilter(filter) end
 
