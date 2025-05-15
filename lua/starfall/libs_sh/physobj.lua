@@ -3,7 +3,6 @@ local checkluatype = SF.CheckLuaType
 local PHYS_META = FindMetaTable("PhysObj")
 
 local checknumber = SF.CheckNumber
-
 local checkvector = SF.CheckVector
 
 --- PhysObj Type
