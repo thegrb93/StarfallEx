@@ -1557,7 +1557,7 @@ function PANEL:_OnTextChanged()
 	end
 
 	self:SetSelection(text)
-	if TabHandler.ACAuto:GetBool() then
+	if not ctrlv and TabHandler.ACAuto:GetBool() then
 		self:AutocompleteOpen()
 	end
 
