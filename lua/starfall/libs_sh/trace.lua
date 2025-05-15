@@ -7,14 +7,6 @@ SF.Permissions.registerPrivilege("trace.decal", "Decal Trace", "Allows the user 
 local plyDecalBurst = SF.BurstObject("decals", "decals", 50, 50, "Rate decals can be created per second.", "Number of decals that can be created in a short time.")
 
 local math_huge = math.huge
-local function checkvector(pos)
-	local pos1 = pos[1]
-	if pos1 ~= pos1 or pos1 == math_huge or pos1 == -math_huge then SF.Throw("Inf or nan vector in trace position", 3) end
-	local pos2 = pos[2]
-	if pos2 ~= pos2 or pos2 == math_huge or pos2 == -math_huge then SF.Throw("Inf or nan vector in trace position", 3) end
-	local pos3 = pos[3]
-	if pos3 ~= pos3 or pos3 == math_huge or pos3 == -math_huge then SF.Throw("Inf or nan vector in trace position", 3) end
-end
 
 --- Provides functions for doing line/AABB traces
 -- @name trace
@@ -173,8 +165,6 @@ end
 function trace_library.decal(name, start, endpos, filter)
 	checkpermission(instance, nil, "trace.decal")
 	checkluatype(name, TYPE_STRING)
-	checkvector(start)
-	checkvector(endpos)
 
 	if filter ~= nil then checkluatype(filter, TYPE_TABLE) filter = convertFilter(filter) end
 

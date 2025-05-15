@@ -189,20 +189,8 @@ SF.InstanceCollisionListeners = {
 }
 setmetatable(SF.InstanceCollisionListeners, SF.InstanceCollisionListeners)
 
-local function checknumber(n)
-	if n<-1e12 or n>1e12 or n~=n then
-		SF.Throw("Input number too large or NAN", 3)
-	end
-end
-
-local function checkvector(v)
-	if v[1]<-1e12 or v[1]>1e12 or v[1]~=v[1] or
-	   v[2]<-1e12 or v[2]>1e12 or v[2]~=v[2] or
-	   v[3]<-1e12 or v[3]>1e12 or v[3]~=v[3] then
-
-		SF.Throw("Input vector too large or NAN", 3)
-	end
-end
+local checknumber = SF.CheckNumber
+local checkvector = SF.CheckVector
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
