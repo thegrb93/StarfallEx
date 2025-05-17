@@ -47,13 +47,12 @@ local hex_to_rgb = {
 SF.RegisterType("Color", nil, nil, FindMetaTable("Color"), nil, function(checktype, color_meta)
 	return function(clr)
 		-- Colors don't sanitize their member types so tonumber needed
-		-- https://github.com/Facepunch/garrysmod-issues/issues/6131
 		local r,g,b,a = Col_Unpack(clr)
 		return setmetatable({tonumber(r) or 255, tonumber(g) or 255, tonumber(b) or 255, tonumber(a) or 255}, color_meta)
 	end,
 	function(obj)
 		checktype(obj, color_meta, 2)
-		return Color((tonumber(obj[1]) or 255), (tonumber(obj[2]) or 255), (tonumber(obj[3]) or 255), (tonumber(obj[4]) or 255))
+		return Color(obj[1], obj[2], obj[3], obj[4])
 	end
 end)
 
@@ -67,10 +66,8 @@ local function wrap(tbl)
 end
 
 local function QuickUnwrapper()
-	-- Colors don't sanitize their member types so tonumber needed
-	-- https://github.com/Facepunch/garrysmod-issues/issues/6131
 	local Col = Color(255,255,255)
-	return function(v) Col_SetUnpacked(Col, tonumber(v[1]) or 255, tonumber(v[2]) or 255, tonumber(v[3]) or 255, tonumber(v[4]) or 255) return Col end
+	return function(v) Col_SetUnpacked(Col, v[1], v[2], v[3], v[4]) return Col end
 end
 color_meta.QuickUnwrap1 = QuickUnwrapper()
 
