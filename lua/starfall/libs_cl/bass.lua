@@ -170,7 +170,7 @@ local function loadSound(path, flags, callback, loadFunc)
 	local is2D = not3D(flags)
 
 	if is2D then
-		checkpermission(instance, nil, "bass.play2D")
+		checkpermission(instance, nil, "bass.play2DHud")
 	end
 
 	plyCount:use(instance.player, 1)

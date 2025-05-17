@@ -397,7 +397,7 @@ SF.hookAdd("PostDrawSkyBox", nil, hudPrepareSafeArgs, cleanupRender)
 -- @param number zfar Current far plane of the camera
 -- @return table Table containing information for the camera. {origin=camera origin, angles=camera angles, fov=camera fov, znear=znear, zfar=zfar, drawviewer=drawviewer, ortho=ortho table}
 SF.hookAdd("CalcView", nil, function(instance, ply, pos, ang, fov, znear, zfar)
-	return haspermission(instance, nil, "render.calcview") or instance.player == SF.Superuser,
+	return haspermission(instance, nil, "render.calcview2") or instance.player == SF.Superuser,
 		{instance.Types.Vector.Wrap(pos), instance.Types.Angle.Wrap(ang), fov, znear, zfar}
 end, function(instance, tbl)
 	local t = tbl[2]

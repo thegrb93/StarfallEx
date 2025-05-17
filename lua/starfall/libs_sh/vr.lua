@@ -32,7 +32,7 @@ if CLIENT then
 	SF.hookAdd("VRMod_Input", "vrinput")
 
 	local function hudPrepareSafeArgs(instance, ...)
-		if SF.IsHUDActive(instance.entity) and (haspermission(instance, nil, "render.hud") or instance.player == SF.Superuser) then
+		if haspermission(instance, nil, "render.drawhud") or instance.player == SF.Superuser then
 			instance:prepareRender()
 			return true, {...}
 		end
