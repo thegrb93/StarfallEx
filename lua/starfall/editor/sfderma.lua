@@ -1056,14 +1056,13 @@ function PANEL:AddProviders(providers, server)
 			header:DockMargin(0, 5, 0, 0)
 			header:SetSize(0, 20)
 			header:Dock(TOP)
-			header:SetToolTip(id)
+			header:SetToolTip(setting[2])
 			header:SetBackgroundColor(Color(0,0,0,20))
 
 			local settingtext = vgui.Create("DLabel", header)
 			settingtext:SetFont("DermaDefault")
 			settingtext:SetColor(Color(255, 255, 255))
 			settingtext:SetText(id)
-			settingtext:DockMargin(5, 0, 0, 0)
 			settingtext:Dock(LEFT)
 			settingtext:SizeToContents()
 
@@ -1071,7 +1070,6 @@ function PANEL:AddProviders(providers, server)
 			description:SetFont("DermaDefault")
 			description:SetColor(Color(128, 128, 128))
 			description:SetText(" - "..setting[2])
-			description:DockMargin(5, 0, 0, 0)
 			description:Dock(FILL)
 
 			local buttons = {}

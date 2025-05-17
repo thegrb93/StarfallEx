@@ -2,8 +2,7 @@ local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 
 -- Register Priveleges
-registerprivilege("notification", "Create notifications", "Allows the user to create notifications on their screen", { client = { default = 1 } })
-registerprivilege("notification.hud", "Create notifications with HUD connected", "Allows a user to create notifications on the player's screen if connected to a HUD", { client = {} })
+registerprivilege("notifications", "Create notifications", "Allows the user to create notifications on their screen", { client = { default = 5 } })
 
 
 --- Notification library. Allows the user to display hints on the bottom right of their screen
@@ -35,11 +34,7 @@ local notification_library = instance.Libraries.notification
 ---NOTIFY.CLEANUP
 -- @param number length Time in seconds to display the notification (Max length of 30)
 function notification_library.addLegacy(text, type, length)
-	if SF.IsHUDActive(instance.entity) then
-		checkpermission(instance, nil, "notification.hud")
-	else
-		checkpermission(instance, nil, "notification")
-	end
+	checkpermission(instance, nil, "notifications")
 	checkluatype(text, TYPE_STRING)
 	checkluatype(type, TYPE_NUMBER)
 	checkluatype(length, TYPE_NUMBER)
@@ -53,11 +48,7 @@ end
 -- @param string text The text to display
 -- @param number? progress An optional progress val 0-1 indicating progress.
 function notification_library.addProgress(id, text, progress)
-	if SF.IsHUDActive(instance.entity) then
-		checkpermission(instance, nil, "notification.hud")
-	else
-		checkpermission(instance, nil, "notification")
-	end
+	checkpermission(instance, nil, "notifications")
 	checkluatype(id, TYPE_STRING)
 	checkluatype(text, TYPE_STRING)
 	if progress~=nil then
@@ -84,11 +75,7 @@ end
 --- Removes the notification with the given index after 0.8 seconds
 -- @param string id String index of the notification to kill
 function notification_library.kill(id)
-	if SF.IsHUDActive(instance.entity) then
-		checkpermission(instance, nil, "notification.hud")
-	else
-		checkpermission(instance, nil, "notification")
-	end
+	checkpermission(instance, nil, "notifications")
 	checkluatype(id, TYPE_STRING)
 
 	id = "SF:"..instance.player:SteamID64()..id
