@@ -1056,14 +1056,13 @@ function PANEL:AddProviders(providers, server)
 			header:DockMargin(0, 5, 0, 0)
 			header:SetSize(0, 20)
 			header:Dock(TOP)
-			header:SetToolTip(id)
+			header:SetToolTip(setting[2])
 			header:SetBackgroundColor(Color(0,0,0,20))
 
 			local settingtext = vgui.Create("DLabel", header)
 			settingtext:SetFont("DermaDefault")
 			settingtext:SetColor(Color(255, 255, 255))
 			settingtext:SetText(id)
-			settingtext:DockMargin(5, 0, 0, 0)
 			settingtext:Dock(LEFT)
 			settingtext:SizeToContents()
 
@@ -1071,25 +1070,21 @@ function PANEL:AddProviders(providers, server)
 			description:SetFont("DermaDefault")
 			description:SetColor(Color(128, 128, 128))
 			description:SetText(" - "..setting[2])
-			description:DockMargin(5, 0, 0, 0)
 			description:Dock(FILL)
 
-			local buttons = {}
-			for i,option in pairs(p.settingsoptions) do
-				local button = vgui.Create("StarfallButton", header)
-				button:SetText(option)
-				button:DockMargin(0, 0, 3, 0)
-				button:Dock(RIGHT)
-				button.active = setting[3]==i
+			local selector = vgui.Create("DComboBox", header)
+			selector:SetSize(100, 20)
+			selector:SetSortItems(false)
+			selector:DockMargin(0, 0, 3, 0)
+			selector:Dock(RIGHT)
 
-				button.DoClick = function(self)
-					RunConsoleCommand(server and "sf_permission" or "sf_permission_cl", id, p.id, i)
-					for _, b in ipairs(buttons) do
-						b.active = false
-					end
-					self.active = true
-				end
-				buttons[i] = button
+			for i,option in ipairs(p.settingsoptions) do
+				selector:AddChoice(option)
+			end
+
+			selector:SetValue(p.settingsoptions[setting[3]])
+			selector.OnSelect = function (self, index, value, data)
+				RunConsoleCommand(server and "sf_permission" or "sf_permission_cl", id, p.id, index)
 			end
 
 			self.scrollPanel:AddItem(header)

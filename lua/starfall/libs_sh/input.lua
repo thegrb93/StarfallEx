@@ -51,6 +51,8 @@ registerprivilege("input", "Input", "Allows the user to see what buttons you're 
 registerprivilege("input.chat", "Input", "Allows the user to see your chat keypresses.", { client = { default = 1 } })
 registerprivilege("input.bindings", "Input", "Allows the user to see your bindings.", { client = { default = 1 } })
 registerprivilege("input.emulate", "Input", "Allows starfall to emulate user input.", { client = { default = 1 } })
+registerprivilege("input.lockcontrols", "Input", "Allows starfall to lock game control input.", { client = { default = 5 } })
+registerprivilege("input.enablecursor", "Input", "Allows starfall to enable the game's cursor.", { client = { default = 5 } })
 
 local controlsLocked = false
 local function unlockControls(instance)
@@ -192,23 +194,25 @@ local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check
 
 local getent
 local lockedControlCooldown = 0
-instance.data.input = {controlsLocked = false}
+
+local inputdata = {controlsLocked = false, cursorEnabled = false}
+instance.data.input = inputdata
 
 instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
 end)
 
 instance:AddHook("deinitialize", function()
-	if instance.data.cursorEnabled then
+	if inputdata.cursorEnabled then
 		gui.EnableScreenClicker(false)
 	end
-	if instance.data.input.controlsLocked then
+	if inputdata.controlsLocked then
 		unlockControls(instance)
 	end
 end)
 
 instance:AddHook("starfall_hud_disconnected", function()
-	if instance.data.cursorEnabled then
+	if inputdata.cursorEnabled then
 		gui.EnableScreenClicker(false)
 	end
 end)
@@ -336,13 +340,9 @@ end
 -- @param boolean enabled Whether or not the cursor should be enabled
 function input_library.enableCursor(enabled)
 	checkluatype(enabled, TYPE_BOOL)
-	checkpermission(instance, nil, "input")
+	checkpermission(instance, nil, "input.enablecursor")
 
-	if not SF.IsHUDActive(instance.entity) then
-		SF.Throw("No HUD component connected", 2)
-	end
-
-	instance.data.cursorEnabled = enabled
+	inputdata.cursorEnabled = enabled
 	gui.EnableScreenClicker(enabled)
 end
 
@@ -361,11 +361,7 @@ end
 -- @param boolean enabled Whether to lock or unlock the controls
 function input_library.lockControls(enabled)
 	checkluatype(enabled, TYPE_BOOL)
-	checkpermission(instance, nil, "input")
-
-	if not SF.IsHUDActive(instance.entity) and (enabled or not instance.data.input.controlsLocked) then
-		SF.Throw("No HUD component connected", 2)
-	end
+	checkpermission(instance, nil, "input.lockcontrols")
 
 	if enabled then
 		if lockedControlCooldown + inputLockCooldown:GetFloat() > CurTime() then
@@ -389,7 +385,7 @@ end
 -- @client
 -- @return boolean Whether the player's control can be locked
 function input_library.canLockControls()
-	return SF.IsHUDActive(instance.entity) and lockedControlCooldown + inputLockCooldown:GetFloat() <= CurTime()
+	return haspermission(instance, nil, "input.lockcontrols") and lockedControlCooldown + inputLockCooldown:GetFloat() <= CurTime()
 end
 
 --- Returns whether the game menu overlay ( main menu ) is open or not.

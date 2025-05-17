@@ -5,7 +5,7 @@ local math_sqrt = math.sqrt
 -- Register privileges
 registerprivilege("bass.loadFile", "Play local sound files with `bass`.", "Allows users to create sound channels by file path.", { client = {} })
 registerprivilege("bass.loadURL", "Play remote sound files with `bass`.", "Allows users to create sound channels by URL.", { client = {}, urlwhitelist = {} })
-registerprivilege("bass.play2D", "Play sounds in global game context with `bass`.", "Allows users to create sound channels which play in global game context (without `3d` flag).", { client = { default = 1 } })
+registerprivilege("bass.play2DHud", "Play sounds in global game context with `bass`.", "Allows users to create sound channels which play in global game context (without `3d` flag).", { client = { default = 5 } })
 
 local plyCount = SF.LimitObject("bass", "bass sounds", 20, "The number of sounds allowed to be playing via Starfall client at once")
 SF.ResourceCounters.Bass = {icon = "icon16/sound_add.png", count = function(ply) return plyCount:get(ply) end}
@@ -170,8 +170,7 @@ local function loadSound(path, flags, callback, loadFunc)
 	local is2D = not3D(flags)
 
 	if is2D then
-		if not SF.IsHUDActive(instance.entity) then SF.Throw("Player isn't connected to HUD!", 2) end
-		checkpermission(instance, nil, "bass.play2D")
+		checkpermission(instance, nil, "bass.play2DHud")
 	end
 
 	plyCount:use(instance.player, 1)

@@ -18,14 +18,15 @@ local Vec_Unpack = VEC_META.Unpack
 local Ent_GetTable = ENT_META.GetTable
 
 registerprivilege("render.screen", "Render Screen", "Allows the user to render to a starfall screen", { client = {} })
-registerprivilege("render.hud", "Render Hud", "Allows the user to render to your hud", { client = {} })
 registerprivilege("render.offscreen", "Render Screen", "Allows the user to render without a screen", { client = {} })
 registerprivilege("render.renderView", "Render View", "Allows the user to render the world again with custom perspective", { client = {} })
 registerprivilege("render.renderscene", "Render Scene", "Allows the user to render a world again without a screen with custom perspective", { client = {} })
 registerprivilege("render.effects", "Render Effects", "Allows the user to render special effects such as screen blur, color modification, and bloom", { client = {} })
-registerprivilege("render.calcview", "Render CalcView", "Allows the use of the CalcView hook", { client = {} })
 registerprivilege("render.captureImage", "Render Capture Image", "Allows capturing a rendertarget into an image format", { client = { default = 1 } })
 registerprivilege("render.fog", "Render Fog", "Allows the user to control fog", { client = {} })
+registerprivilege("render.drawhud", "Render Hud", "Allows the user to render to your hud", { client = { default = 5 } })
+registerprivilege("render.calcview2", "Render CalcView", "Allows the use of the CalcView hook", { client = { default = 5 } })
+registerprivilege("render.screenshake", "Render Screen Shake", "Allows screen shaking", { client = { default = 5 } })
 
 local cv_max_fonts = CreateConVar("sf_render_maxfonts", "30", { FCVAR_ARCHIVE })
 local cv_max_maxrenderviewsperframe = CreateConVar("sf_render_maxrenderviewsperframe", "2", { FCVAR_ARCHIVE })
@@ -186,11 +187,11 @@ local function cleanupRenderAllowTrueReturn(instance, args)
 end
 
 local function canRenderHud(instance)
-	return SF.IsHUDActive(instance.entity) and (haspermission(instance, nil, "render.hud") or instance.player == SF.Superuser)
+	return haspermission(instance, nil, "render.drawhud") or instance.player == SF.Superuser
 end
 
 local function hudPrepareSafeArgs(instance, ...)
-	if SF.IsHUDActive(instance.entity) and (haspermission(instance, nil, "render.hud") or instance.player == SF.Superuser) then
+	if canRenderHud(instance) then
 		instance:prepareRender()
 		return true, {...}
 	end
@@ -396,7 +397,7 @@ SF.hookAdd("PostDrawSkyBox", nil, hudPrepareSafeArgs, cleanupRender)
 -- @param number zfar Current far plane of the camera
 -- @return table Table containing information for the camera. {origin=camera origin, angles=camera angles, fov=camera fov, znear=znear, zfar=zfar, drawviewer=drawviewer, ortho=ortho table}
 SF.hookAdd("CalcView", nil, function(instance, ply, pos, ang, fov, znear, zfar)
-	return SF.IsHUDActive(instance.entity) and (haspermission(instance, nil, "render.calcview") or instance.player == SF.Superuser),
+	return haspermission(instance, nil, "render.calcview2") or instance.player == SF.Superuser,
 		{instance.Types.Vector.Wrap(pos), instance.Types.Angle.Wrap(ang), fov, znear, zfar}
 end, function(instance, tbl)
 	local t = tbl[2]
@@ -2726,7 +2727,7 @@ local vector_zero = Vector(0, 0, 0)
 -- @param number frequency The frequency of the effect in hertz
 -- @param number duration The duration of the effect in seconds, max 10.
 function render_library.screenShake(amplitude, frequency, duration)
-	if not SF.IsHUDActive(instance.entity) then SF.Throw("Player isn't connected to HUD!", 2) end
+	checkpermission(instance, nil, "render.screenshake")
 	util.ScreenShake(vector_zero, amplitude, frequency, clamp(duration, 0, 10), 0)
 end
 
