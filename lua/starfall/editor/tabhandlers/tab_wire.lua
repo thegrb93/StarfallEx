@@ -183,7 +183,7 @@ function TabHandler:UpdateHtmlBackground()
 			["$basetexture"] = "starfall_editor_background_rt"
 		})
 	end
-	SF.G_HttpTextureLoader:request(SF.HttpTextureRequest(url,nil,self.HtmlBackgroundRT,function(_,_,fn) fn(0,0,1024,1024) end))
+	SF.G_HttpTextureLoader:request(SF.HttpTextureRequest(url,nil,self.HtmlBackgroundRT,function(_,_,fn) if fn then fn(0,0,1024,1024) end end))
 end
 
 function TabHandler:RegisterTabMenu(menu, content)
