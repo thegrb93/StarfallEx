@@ -2722,9 +2722,9 @@ function PANEL:_OnKeyCodeTyped(code)
 end
 
 local function currentGroup(s, idx)
-	if string.match(s, "^[%w_]", idx) then return "%w_" end
-	if string.match(s, "^%s", idx) then return "%s" end
-	return "%p"
+	if string.match(s, "^[%w_]", idx) then return "[%w_]", "[^%w_]" end
+	if string.match(s, "^%s", idx) then return "%s", "%S" end
+	return "[^%w_%s]", "[%w_%s]"
 end
 
 -- helpers for ctrl-left/right
@@ -2736,8 +2736,8 @@ function PANEL:wordLeft(caret)
 		caret = { caret[1]-1, #self:GetRowText(caret[1]-1) }
 		row = self:GetRowText(caret[1])
 	end
-	local group = currentGroup(row, caret[2]-1)
-	local pos = string.match(string.sub(row, 1, caret[2]-1), "[^"..group.."]()["..group.."]+[^"..group.."]*$")
+	local group, antigroup = currentGroup(row, caret[2]-1)
+	local pos = string.match(string.sub(row, 1, caret[2]-1), antigroup.."()"..group.."+"..antigroup.."*$")
 	caret[2] = pos or 1
 	return caret
 end
@@ -2751,9 +2751,9 @@ function PANEL:wordRight(caret)
 		row = self:GetRowText(caret[1])
 		if row:sub(1, 1) ~= " " then return caret end
 	end
-	local group = currentGroup(row, caret[2])
-	local pos = string.match(row, "[^"..group.."]()", caret[2])
-	caret[2] = pos and pos-1 or (#row + 1)
+	local group, antigroup = currentGroup(row, caret[2])
+	local pos = string.match(row, "()"..antigroup, caret[2])
+	caret[2] = pos or (#row + 1)
 	return caret
 end
 
