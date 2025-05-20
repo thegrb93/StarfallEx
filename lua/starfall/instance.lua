@@ -90,11 +90,7 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 	instance.player = player
 
 	if player == SF.Superuser then
-		if SF.softLockProtectionSuperUser:GetBool() then
-			instance:setCheckCpu(SF.softLockProtection:GetBool())
-		else
-			instance:setCheckCpu(false)
-		end
+		instance:setCheckCpu(SF.softLockProtectionSuperUser:GetBool() and SF.softLockProtection:GetBool())
 	else
 		if SERVER then
 			instance:setCheckCpu(SF.softLockProtection:GetBool())
