@@ -1,13 +1,10 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
-local dgetmeta = debug.getmetatable
 local ENT_META,PLY_META,VEH_META = FindMetaTable("Entity"),FindMetaTable("Player"),FindMetaTable("Vehicle")
 
-local Ent_IsValid = ENT_META.IsValid
-local Ply_GetVehicle,Ply_GetEyeTrace = PLY_META.GetVehicle,PLY_META.GetEyeTrace
 
-local sf_max_driveruse_dist, UseEnableVehicles
+local UseEnableVehicles
 if SERVER then
 	-- Register privileges
 	registerprivilege("vehicle.eject", "Vehicle eject", "Removes a driver from vehicle", { entities = {} })
@@ -15,7 +12,10 @@ if SERVER then
 	registerprivilege("vehicle.strip", "Vehicle strip", "Strips weapons from a driver in vehicle", { entities = {} })
 	registerprivilege("vehicle.lock", "Vehicle lock", "Allow vehicle locking/unlocking", { entities = {} })
 
-	sf_max_driveruse_dist = CreateConVar("sf_vehicle_use_distance", 100, FCVAR_ARCHIVE, "The max reach distance allowed for Vehicle:driverUse function.")
+	local sf_max_driveruse_dist = CreateConVar("sf_vehicle_use_distance", 100, FCVAR_ARCHIVE, "The max reach distance allowed for Vehicle:driverUse function.")
+
+	local Ent_IsValid = ENT_META.IsValid
+	local Ply_GetVehicle,Ply_GetEyeTrace = PLY_META.GetVehicle,PLY_META.GetEyeTrace
 
 	UseEnableVehicles = {
 		setEnabled = function(self, vehicle, enabled)
@@ -64,19 +64,15 @@ SF.RegisterType("Vehicle", false, true, VEH_META, "Entity")
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
-local Ent_Fire = ENT_META.Fire
+local Ent_Fire,Ent_IsValid = ENT_META.Fire,ENT_META.IsValid
 local Ply_ExitVehicle,Ply_Kill,Ply_StripWeapon,Ply_StripWeapons = PLY_META.ExitVehicle,PLY_META.Kill,PLY_META.StripWeapon,PLY_META.StripWeapons
 local Veh_GetDriver,Veh_GetPassenger = VEH_META.GetDriver,VEH_META.GetPassenger
-
-local function Ent_IsVehicle(ent) return dgetmeta(ent)==VEH_META end
 
 local vehicle_methods, vehicle_meta, wrap, unwrap = instance.Types.Vehicle.Methods, instance.Types.Vehicle, instance.Types.Vehicle.Wrap, instance.Types.Vehicle.Unwrap
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local pwrap = instance.Types.Player.Wrap
 
-local getent
 instance:AddHook("initialize", function()
-	getent = ent_meta.GetEntity
 	vehicle_meta.__tostring = ent_meta.__tostring
 end)
 
