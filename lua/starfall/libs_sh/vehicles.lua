@@ -18,10 +18,10 @@ if SERVER then
 	local Ply_GetVehicle,Ply_GetEyeTrace = PLY_META.GetVehicle,PLY_META.GetEyeTrace
 
 	UseEnableVehicles = {
-		setEnabled = function(self, vehicle, enabled)
+		setEnabled = function(self, vehicle, enabled, key)
 			if enabled then
 				self:addhooks()
-				self.vehicles[vehicle] = true
+				self.vehicles[vehicle] = key
 			else
 				self.vehicles[vehicle] = nil
 				self:removehooks()
@@ -37,9 +37,9 @@ if SERVER then
 		addhooks = function(self)
 			if table.IsEmpty(self.vehicles) then
 				hook.Add("KeyPress","SF_VehicleButtons",function(ply, key)
-					if key==IN_ATTACK then
-						local veh = Ply_GetVehicle(ply)
-						if self.vehicles[veh] then self:use(ply, veh) end
+					local veh = Ply_GetVehicle(ply)
+					if key==self.vehicles[veh] then
+						self:use(ply, veh)
 					end
 				end)
 			end
@@ -157,9 +157,11 @@ if SERVER then
 
 	--- Allows passengers of a vehicle to aim and use things by clicking on them
 	-- @param boolean enabled Whether to enable the ability to use by clicking
-	function vehicle_methods:useEnable(enabled)
+	-- @param number? key Optional IN_KEY alternate control for using (default IN.ATTACK)
+	function vehicle_methods:useEnable(enabled, key)
 		checkluatype(enabled, TYPE_BOOL)
-		UseEnableVehicles:setEnabled(getveh(self), enabled)
+		if key~=nil then checkluatype(key, TYPE_NUMBER) else key = IN_ATTACK end
+		UseEnableVehicles:setEnabled(getveh(self), enabled, key)
 	end
 
 end
