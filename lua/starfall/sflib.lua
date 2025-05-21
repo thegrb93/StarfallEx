@@ -142,8 +142,8 @@ function SF.EntityTable(key, destructor, dontwait)
 			if e ~= SF.Superuser then
 				local function ondestroy()
 					if t[e] then
-						if destructor then destructor(e, v) end
 						t[e] = nil
+						if destructor then destructor(e, v) end
 					end
 				end
 				if SERVER or dontwait then

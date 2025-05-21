@@ -57,9 +57,7 @@ if CLIENT then
 	end
 
 	playerAnimRemove = function(ply)
-		playerAnimation[ply] = nil
-
-		if next(playerAnimation) == nil then
+		if table.IsEmpty(playerAnimation) then
 			hook.Remove("CalcMainActivity", "sf_player_animation")
 		end
 	end

@@ -4,7 +4,10 @@ local registerprivilege = SF.Permissions.registerPrivilege
 local dgetmeta = debug.getmetatable
 local ENT_META,PLY_META,VEH_META = FindMetaTable("Entity"),FindMetaTable("Player"),FindMetaTable("Vehicle")
 
-local sf_max_driveruse_dist
+local Ent_IsValid = ENT_META.IsValid
+local Ply_GetVehicle,Ply_GetEyeTrace = PLY_META.GetVehicle,PLY_META.GetEyeTrace
+
+local sf_max_driveruse_dist, UseEnableVehicles
 if SERVER then
 	-- Register privileges
 	registerprivilege("vehicle.eject", "Vehicle eject", "Removes a driver from vehicle", { entities = {} })
@@ -13,8 +16,44 @@ if SERVER then
 	registerprivilege("vehicle.lock", "Vehicle lock", "Allow vehicle locking/unlocking", { entities = {} })
 
 	sf_max_driveruse_dist = CreateConVar("sf_vehicle_use_distance", 100, FCVAR_ARCHIVE, "The max reach distance allowed for Vehicle:driverUse function.")
-end
 
+	UseEnableVehicles = {
+		setEnabled = function(self, vehicle, enabled)
+			if enabled then
+				if not self.vehicles[vehicle] then
+					self:addhooks()
+					self.vehicles[vehicle] = {}
+				end
+			else
+				self.vehicles[vehicle] = nil
+				self:removehooks()
+			end
+		end,
+		use = function(self, ply, veh)
+			local tr = Ply_GetEyeTrace(ply)
+			local ent = tr.Entity
+			if Ent_IsValid(ent) and tr.HitPos:DistToSqr(tr.StartPos) <= sf_max_driveruse_dist:GetFloat()^2 and not ent:IsVehicle() and ent.Use and hook.Run("PlayerUse", ply, ent) ~= false then
+				ent:Use(ply, veh, USE_ON, 0)
+			end
+		end,
+		addhooks = function(self)
+			if table.IsEmpty(self.vehicles) then
+				hook.Add("KeyPress","SF_VehicleButtons",function(ply, key)
+					if key==IN_ATTACK then
+						local veh = Ply_GetVehicle(ply)
+						if self.vehicles[veh] then self:use(ply, veh) end
+					end
+				end)
+			end
+		end,
+		removehooks = function(self)
+			if table.IsEmpty(self.vehicles) then
+				hook.Remove("KeyPress","SF_VehicleButtons")
+			end
+		end,
+		vehicles = SF.EntityTable("UseEnableVehicles", function() UseEnableVehicles:removehooks() end)
+	}
+end
 
 --- Vehicle type
 -- @name Vehicle
@@ -25,8 +64,8 @@ SF.RegisterType("Vehicle", false, true, VEH_META, "Entity")
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
-local Ent_Fire,Ent_GetPos,Ent_IsValid,Ent_Use = ENT_META.Fire,ENT_META.GetPos,ENT_META.IsValid,ENT_META.Use
-local Ply_ExitVehicle,Ply_GetShootPos,Ply_Kill,Ply_StripWeapon,Ply_StripWeapons = PLY_META.ExitVehicle,PLY_META.GetShootPos,PLY_META.Kill,PLY_META.StripWeapon,PLY_META.StripWeapons
+local Ent_Fire = ENT_META.Fire
+local Ply_ExitVehicle,Ply_Kill,Ply_StripWeapon,Ply_StripWeapons = PLY_META.ExitVehicle,PLY_META.Kill,PLY_META.StripWeapon,PLY_META.StripWeapons
 local Veh_GetDriver,Veh_GetPassenger = VEH_META.GetDriver,VEH_META.GetPassenger
 
 local function Ent_IsVehicle(ent) return dgetmeta(ent)==VEH_META end
@@ -122,23 +161,11 @@ if SERVER then
 		Ent_Fire(ent, "Unlock")
 	end
 
-	--- Simulate a Use action on the entity by the driver
-	-- @param Entity ent The entity to be used.
-	-- @param number? usetype The USE_ enum use type. (Default: USE_ON)
-	-- @param number? value The use value (Default: 0)
-	function vehicle_methods:driverUse(ent, usetype, value)
-		ent = getent(ent)
-		if Ent_IsVehicle(ent) then return end -- Prevent source engine bug when using vehicle while in a vehicle
-		local driver = Veh_GetDriver(getveh(self))
-		if not Ent_IsValid(driver) then return end
-		if usetype~=nil then checkluatype(usetype, TYPE_NUMBER) end
-		if value~=nil then checkluatype(value, TYPE_NUMBER) end
-
-		if Ply_GetShootPos(driver):DistToSqr(Ent_GetPos(ent)) > sf_max_driveruse_dist:GetFloat()^2 then SF.Throw("Entity is greater than "..sf_max_driveruse_dist:GetFloat().." units from the player", 2) end
-
-		checkpermission(instance, ent, "entities.use")
-
-		Ent_Use(ent, driver, instance.entity, usetype, value)
+	--- Allows passengers of a vehicle to aim and use things by clicking on them
+	-- @param boolean enabled Whether to enable the ability to use by clicking
+	function vehicle_methods:useEnable(enabled)
+		checkluatype(enabled, TYPE_BOOL)
+		UseEnableVehicles:setEnabled(getveh(self), enabled)
 	end
 
 end
