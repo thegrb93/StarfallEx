@@ -20,10 +20,8 @@ if SERVER then
 	UseEnableVehicles = {
 		setEnabled = function(self, vehicle, enabled)
 			if enabled then
-				if not self.vehicles[vehicle] then
-					self:addhooks()
-					self.vehicles[vehicle] = {}
-				end
+				self:addhooks()
+				self.vehicles[vehicle] = true
 			else
 				self.vehicles[vehicle] = nil
 				self:removehooks()
