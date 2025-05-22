@@ -11,8 +11,9 @@ if SERVER then
 	registerprivilege("vehicle.kill", "Vehicle kill", "Kills a driver in vehicle", { entities = {} })
 	registerprivilege("vehicle.strip", "Vehicle strip", "Strips weapons from a driver in vehicle", { entities = {} })
 	registerprivilege("vehicle.lock", "Vehicle lock", "Allow vehicle locking/unlocking", { entities = {} })
+	registerprivilege("vehicle.use", "Vehicle use", "Allow passengers in a vehicle to use while sitting", { entities = {} })
 
-	local sf_max_driveruse_dist = CreateConVar("sf_vehicle_use_distance", 100, FCVAR_ARCHIVE, "The max reach distance allowed for Vehicle:driverUse function.")
+	local sf_max_driveruse_dist = CreateConVar("sf_vehicle_use_distance", 100, FCVAR_ARCHIVE, "The max reach distance allowed for player use with Vehicle:useEnable function.")
 
 	local Ent_IsValid = ENT_META.IsValid
 	local Ply_GetVehicle,Ply_GetEyeTrace = PLY_META.GetVehicle,PLY_META.GetEyeTrace
@@ -159,9 +160,11 @@ if SERVER then
 	-- @param boolean enabled Whether to enable the ability to use by clicking
 	-- @param number? key Optional IN_KEY alternate control for using (default IN.ATTACK)
 	function vehicle_methods:useEnable(enabled, key)
+		local veh = getveh(self)
 		checkluatype(enabled, TYPE_BOOL)
+		checkpermission(instance, veh, "vehicle.use")
 		if key~=nil then checkluatype(key, TYPE_NUMBER) else key = IN_ATTACK end
-		UseEnableVehicles:setEnabled(getveh(self), enabled, key)
+		UseEnableVehicles:setEnabled(veh, enabled, key)
 	end
 
 end
