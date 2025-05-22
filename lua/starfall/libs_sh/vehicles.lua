@@ -1,18 +1,58 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
-local ENT_META = FindMetaTable("Entity")
-local PLY_META = FindMetaTable("Player")
-local VEH_META = FindMetaTable("Vehicle")
+local ENT_META,PLY_META,VEH_META = FindMetaTable("Entity"),FindMetaTable("Player"),FindMetaTable("Vehicle")
 
+
+local UseEnableVehicles
 if SERVER then
 	-- Register privileges
 	registerprivilege("vehicle.eject", "Vehicle eject", "Removes a driver from vehicle", { entities = {} })
 	registerprivilege("vehicle.kill", "Vehicle kill", "Kills a driver in vehicle", { entities = {} })
 	registerprivilege("vehicle.strip", "Vehicle strip", "Strips weapons from a driver in vehicle", { entities = {} })
 	registerprivilege("vehicle.lock", "Vehicle lock", "Allow vehicle locking/unlocking", { entities = {} })
-end
+	registerprivilege("vehicle.use", "Vehicle use", "Allow passengers in a vehicle to use while sitting", { entities = {} })
 
+	local sf_max_driveruse_dist = CreateConVar("sf_vehicle_use_distance", 100, FCVAR_ARCHIVE, "The max reach distance allowed for player use with Vehicle:useEnable function.")
+
+	local Ent_IsValid = ENT_META.IsValid
+	local Ply_GetVehicle,Ply_GetEyeTrace = PLY_META.GetVehicle,PLY_META.GetEyeTrace
+
+	UseEnableVehicles = {
+		setEnabled = function(self, vehicle, enabled, key)
+			if enabled then
+				self:addhooks()
+				self.vehicles[vehicle] = key
+			else
+				self.vehicles[vehicle] = nil
+				self:removehooks()
+			end
+		end,
+		use = function(self, ply, veh)
+			local tr = Ply_GetEyeTrace(ply)
+			local ent = tr.Entity
+			if Ent_IsValid(ent) and tr.HitPos:DistToSqr(tr.StartPos) <= sf_max_driveruse_dist:GetFloat()^2 and not ent:IsVehicle() and ent.Use and hook.Run("PlayerUse", ply, ent) ~= false then
+				ent:Use(ply, veh, USE_ON, 0)
+			end
+		end,
+		addhooks = function(self)
+			if table.IsEmpty(self.vehicles) then
+				hook.Add("KeyPress","SF_VehicleButtons",function(ply, key)
+					local veh = Ply_GetVehicle(ply)
+					if key==self.vehicles[veh] then
+						self:use(ply, veh)
+					end
+				end)
+			end
+		end,
+		removehooks = function(self)
+			if table.IsEmpty(self.vehicles) then
+				hook.Remove("KeyPress","SF_VehicleButtons")
+			end
+		end,
+		vehicles = SF.EntityTable("UseEnableVehicles", function() UseEnableVehicles:removehooks() end)
+	}
+end
 
 --- Vehicle type
 -- @name Vehicle
@@ -115,6 +155,18 @@ if SERVER then
 		hook.Remove("CanExitVehicle", "SF_CanExitVehicle"..ent:EntIndex())
 		Ent_Fire(ent, "Unlock")
 	end
+
+	--- Allows passengers of a vehicle to aim and use things by clicking on them
+	-- @param boolean enabled Whether to enable the ability to use by clicking
+	-- @param number? key Optional IN_KEY alternate control for using (default IN.ATTACK)
+	function vehicle_methods:useEnable(enabled, key)
+		local veh = getveh(self)
+		checkluatype(enabled, TYPE_BOOL)
+		checkpermission(instance, veh, "vehicle.use")
+		if key~=nil then checkluatype(key, TYPE_NUMBER) else key = IN_ATTACK end
+		UseEnableVehicles:setEnabled(veh, enabled, key)
+	end
+
 end
 
 end
