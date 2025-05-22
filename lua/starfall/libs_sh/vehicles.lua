@@ -158,7 +158,7 @@ if SERVER then
 
 	--- Allows passengers of a vehicle to aim and use things by clicking on them
 	-- @param boolean enabled Whether to enable the ability to use by clicking
-	-- @param number? key Optional IN_KEY alternate control for using (default IN.ATTACK)
+	-- @param number? key Optional IN_KEY alternate control for using (default IN_KEY.ATTACK)
 	function vehicle_methods:useEnable(enabled, key)
 		local veh = getveh(self)
 		checkluatype(enabled, TYPE_BOOL)
