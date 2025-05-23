@@ -134,7 +134,7 @@ function P.refreshSettingsCache()
 end
 
 local invalidators = {
-	[1669008186] = { -- Nov 21, 2022
+	{
 		message = "HTTP's URL whitelisting was misconfigured, and set by default to Disabled",
 		realm = CLIENT,
 		invalidate = {"http.get", "http.post"},
@@ -142,10 +142,13 @@ local invalidators = {
 			return P.settings["http.get"]["urlwhitelist"] == 2 or P.settings["http.post"]["urlwhitelist"] == 2
 		end
 	},
-	[1747969845] = { -- May 22, 2025
+	{
 		message = "Default of several permissions updated to 5",
 		realm = CLIENT,
 		invalidate = {"bass.play2D", "notification", "render.hud", "render.calcview"},
+		check = function()
+			return P.settings["render.hud"]["client"] == 3
+		end
 	}
 }
 
@@ -170,17 +173,20 @@ function P.loadPermissionsSafe()
 	local saveSettings = not file.Exists(P.filename, "DATA")
 	P.settings = setmetatable(util.JSONToTable(file.Read(P.filename) or "") or {}, getmetatable(P.settings))
 
-	local settingsTime = file.Time(P.filename, "DATA") or math.huge
-	for issueTime, issue in pairs(invalidators) do
-		if settingsTime < issueTime and issue.realm and (issue.check == nil or issue.check()) then 
+	local settingVersion = tonumber(P.settings.permVersion) or 1
+	while invalidators[settingVersion] do
+		local issue = invalidators[settingVersion]
+		if issue.realm and (issue.check == nil or issue.check()) then 
 			printC("Your configuration has been modified due to a misconfiguration.")
 			printC("Reason: " .. issue.message)
 			printC("Changes: " .. table.concat(issue.invalidate, ", "))
 			for _, v in ipairs(issue.invalidate) do
-				saveSettings = true
 				P.settings[v] = nil
 			end
 		end
+		settingVersion = settingVersion + 1
+		P.settings.permVersion = settingVersion
+		saveSettings = true
 	end
 
 	for k, v in pairs(P.privileges) do
