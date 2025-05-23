@@ -141,6 +141,11 @@ local invalidators = {
 		check = function()
 			return P.settings["http.get"]["urlwhitelist"] == 2 or P.settings["http.post"]["urlwhitelist"] == 2
 		end
+	},
+	[1747969845] = { -- May 22, 2025
+		message = "Default of several permissions updated to 5",
+		realm = CLIENT,
+		invalidate = {"bass.play2D", "notification", "render.hud", "render.calcview"},
 	}
 }
 
