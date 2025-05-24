@@ -1,6 +1,5 @@
 --- Provides permissions for URLs
 
-local whitelist_file = SERVER and "sf_url_whitelist.txt" or "starfall/cl_url_whitelist.txt"
 local urlrestrictor
 local function checkWhitelist(instance, url, key)
 	if TypeID(url) ~= TYPE_STRING then return false, "The url is not a string" end
@@ -17,7 +16,7 @@ local function checkWhitelist(instance, url, key)
 	local prefix, site, data = string.match(url,"^(%w-)://([^/]*)/?(.*)")
 	if not site then return false, "This url is malformed" end
 	site = site.."/"..(data or "") -- Make sure there is / at the end of site
-	return urlrestrictor:check(site), "This url is not whitelisted. See data/"..whitelist_file.." for valid sites."
+	return urlrestrictor:check(site), "This url is not whitelisted."
 end
 
 local P = {}
@@ -104,22 +103,26 @@ local function loadDefaultWhitelist()
 	end
 end
 
-function SF.ReloadUrlWhitelist()
-	urlrestrictor = SF.StringRestrictor(false)
-
-	loadDefaultWhitelist()
+local function loadUserWhitelist()
+	local filename = SERVER and "sf_url_whitelist.txt" or "starfall/cl_url_whitelist.txt"
 
 	-- Invalidate the previous whitelist
-	if file.Time(whitelist_file, "DATA") < 1748087096 then
-		file.Delete(whitelist_file)
+	if file.Time(filename, "DATA") < 1748087096 then
+		file.Delete(filename)
 	end
 
-	local code = file.Read(whitelist_file, "DATA")
+	local code = file.Read(filename, "DATA")
 	if (code and code ~= "") then
-		runWhitelist(whitelist_file, code)
+		runWhitelist(filename, code)
 	else
-		file.Write(whitelist_file, "-- This file can be used to adjust the url whitelist.\n-- See https://raw.githubusercontent.com/thegrb93/StarfallEx/refs/heads/master/lua/starfall/starfall_whitelist_default.lua for examples.\n")
+		file.Write(filename, "-- This file can be used to adjust the url whitelist.\n-- See https://raw.githubusercontent.com/thegrb93/StarfallEx/refs/heads/master/lua/starfall/starfall_whitelist_default.lua for examples.\n")
 	end
+end
+
+function SF.ReloadUrlWhitelist()
+	urlrestrictor = SF.StringRestrictor(false)
+	loadDefaultWhitelist()
+	loadUserWhitelist()
 end
 SF.ReloadUrlWhitelist()
 
