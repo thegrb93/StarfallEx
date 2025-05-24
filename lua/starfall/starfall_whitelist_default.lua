@@ -196,6 +196,7 @@ pattern [[tts.cyzon.us/(.+)]]
 ---  https://autumn.revolt.chat/attachments/mmCR_bFMLEfBAE8mweH2u4o9_x6DiDtU9JXoSbdvZE/live-bocchi-reaction.gif
 simple [[static.revolt.chat]]
 simple [[autumn.revolt.chat]]
+simple [[cdn.revoltusercontent.com]]
 
 -- Youtube Converter API
 --- Examples:
