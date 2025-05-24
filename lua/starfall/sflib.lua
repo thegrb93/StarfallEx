@@ -436,15 +436,31 @@ SF.StringRestrictor = {
 			return self.default
 		end,
 		addWhitelistEntry = function(self, value)
-			table.insert(self.whitelist, value)
+			if not self.whitelistSet[value] then
+				self.whitelistSet[value] = true
+				table.insert(self.whitelist, value)
+			end
+			if self.blacklistSet[value] then
+				self.blacklistSet[value] = nil
+				table.RemoveByValue(self.blacklist, value)
+			end
 		end,
 		addBlacklistEntry = function(self, value)
-			table.insert(self.blacklist, value)
+			if not self.blacklistSet[value] then
+				table.insert(self.blacklist, value)
+				self.blacklistSet[value] = true
+			end
+			if self.whitelistSet[value] then
+				self.whitelistSet[value] = nil
+				table.RemoveByValue(self.whitelist, value)
+			end
 		end
 	},
 	__call = function(p, allowbydefault)
 		local t = {
+			whitelistSet = {},
 			whitelist = {}, -- patterns
+			blacklistSet = {},
 			blacklist = {}, -- patterns
 			default = allowbydefault or false,
 		}

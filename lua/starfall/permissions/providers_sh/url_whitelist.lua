@@ -1,6 +1,5 @@
 --- Provides permissions for URLs
 
-local whitelist_file = SERVER and "sf_url_whitelist.txt" or "starfall/cl_url_whitelist.txt"
 local urlrestrictor
 local function checkWhitelist(instance, url, key)
 	if TypeID(url) ~= TYPE_STRING then return false, "The url is not a string" end
@@ -17,7 +16,7 @@ local function checkWhitelist(instance, url, key)
 	local prefix, site, data = string.match(url,"^(%w-)://([^/]*)/?(.*)")
 	if not site then return false, "This url is malformed" end
 	site = site.."/"..(data or "") -- Make sure there is / at the end of site
-	return urlrestrictor:check(site), "This url is not whitelisted. See data/"..whitelist_file.." for valid sites."
+	return urlrestrictor:check(site), "This url is not whitelisted."
 end
 
 local P = {}
@@ -50,16 +49,7 @@ local function whitelistNotifyError(filename, err)
 	end
 end
 
-local function loadDefaultWhitelist()
-	local filename = "starfall/starfall_whitelist_default.lua"
-	local code = file.Read(filename, "LUA")
-	if not code then whitelistNotifyError(filename, "Could not open file!") end
-	return code
-end
-
 local function runWhitelist(filename, code)
-	urlrestrictor = SF.StringRestrictor(false)
-
 	local env = {
 		pattern = function(txt)
 			if not isstring(txt) then return end
@@ -104,18 +94,29 @@ local function runWhitelist(filename, code)
 	return true
 end
 
-function SF.ReloadUrlWhitelist()
-	local code = file.Read(whitelist_file, "DATA")
-	if not (code and code ~= "") then
-		code = loadDefaultWhitelist()
-		if (code and code ~= "") then
-			file.Write(whitelist_file, code)
-		end
+local function loadDefaultWhitelist()
+	local filename = "starfall/starfall_whitelist_default.lua"
+	local code = file.Read(filename, "LUA")
+	if not code then whitelistNotifyError(filename, "Could not open file!") end
+	if (code and code ~= "") then
+		runWhitelist(filename, code)
 	end
+end
 
-	if not ((code and code ~= "") and runWhitelist(whitelist_file, code)) then
-		urlrestrictor = SF.StringRestrictor(false)
+local function loadUserWhitelist()
+	local filename = SERVER and "sf_url_whitelist.txt" or "starfall/cl_url_whitelist.txt"
+	local code = file.Read(filename, "DATA")
+	if (code and code ~= "") then
+		runWhitelist(filename, code)
+	else
+		file.Write(filename, "-- This file can be used to adjust the url whitelist.\n-- See https://raw.githubusercontent.com/thegrb93/StarfallEx/refs/heads/master/lua/starfall/starfall_whitelist_default.lua for examples.\n")
 	end
+end
+
+function SF.ReloadUrlWhitelist()
+	urlrestrictor = SF.StringRestrictor(false)
+	loadDefaultWhitelist()
+	loadUserWhitelist()
 end
 SF.ReloadUrlWhitelist()
 
