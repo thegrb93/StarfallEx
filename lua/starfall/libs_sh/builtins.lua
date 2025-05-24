@@ -422,9 +422,9 @@ os_library.difftime = os.difftime
 -- @return number Seconds passed since Unix epoch
 os_library.time = os.time
 
---- Returns operating system running gmod
--- @return string The system OS. "windows", "osx", "linux"
-function os_library.name()
+--- Returns the operating system type running gmod
+-- @return string The system OS type. "windows", "osx", "linux"
+function os_library.type()
 	return system.IsWindows() and "windows" or system.IsLinux() and "linux" or system.IsOSX() and "osx" or ""
 end
 
