@@ -63,16 +63,12 @@ if CLIENT then
 	function SF.Editor.init()
 		if SF.Editor.initialized or SF.Editor.editor then return end
 
-		if not SF.Docs and not SF.WaitingForDocs then
-			SF.WaitingForDocs = true
-			SF.DocsData = file.Read("sf_docs.txt", "DATA") or ""
-			net.Start("starfall_docs") net.WriteString(util.CRC(SF.DocsData)) net.SendToServer()
-		end
-
+		SF.Editor.requestDocs()
 		SF.Editor.createEditor()
 		if not SF.Editor.modelViewer then
 			SF.Editor.modelViewer = SF.Editor.createModelViewer()
 		end
+
 		SF.Editor.initialized = true
 	end
 
@@ -650,35 +646,41 @@ if CLIENT then
 		print("Editor reloaded")
 	end)
 
+	local retries = 0
+	function SF.Editor.requestDocs()
+		if retries == 3 then
+			SF.AddNotify(LocalPlayer(), "Starfall documentation failed to download after 3 tries!", "ERROR", 7, "ERROR1")
+			return
+		end
+		retries = retries + 1
+
+		if not SF.DocsData then
+			SF.DocsData = file.Read("sf_docs.txt", "DATA") or ""
+		end
+
+		net.Start("starfall_docs") net.WriteString(util.CRC(SF.DocsData)) net.SendToServer()
+	end
+
 	local function initDocs(data)
 		local ok, docs = xpcall(function() return SF.StringToTable(util.Decompress(data)) end, debug.traceback)
 		if ok then
 			SF.Docs = docs
+			SF.DocsData = nil
 			-- reinitialize tabhandler to regenerate libmap
 			SF.Editor.TabHandlers.wire:Init()
 			SF.Editor.TabHandlers.helper:RefreshHelper()
 			-- clear cache to redraw text
 			SF.Editor.editor:OnThemeChange(SF.Editor.Themes.CurrentTheme)
-			SF.DocsData = nil
-			SF.WaitingForDocs = nil
 		else
+			SF.DocsData = ""
 			ErrorNoHalt("There was an error decoding the docs:\n" .. tostring(docs) .. "\n")
 			SF.AddNotify(LocalPlayer(), "Error processing Starfall documentation!", "ERROR", 7, "ERROR1")
-		end
-		return ok
-	end
-	local retries = 0
-	local function retryDocs()
-		if retries < 3 then
-			retries = retries + 1
-			net.Start("starfall_docs") net.WriteString("") net.SendToServer()
-		else
-			SF.AddNotify(LocalPlayer(), "Starfall documentation failed after 3 tries!", "ERROR", 7, "ERROR1")
+			SF.Editor.requestDocs()
 		end
 	end
 	net.Receive("starfall_docs", function(len, ply)
 		if net.ReadBool() then
-			if not initDocs(SF.DocsData) then retryDocs() end
+			initDocs(SF.DocsData)
 		else
 			SF.AddNotify(LocalPlayer(), "Downloading Starfall Documentation", "GENERIC", 7, "DRIP3")
 			net.ReadStream(nil, function(data)
@@ -688,9 +690,9 @@ if CLIENT then
 					else
 						SF.AddNotify(LocalPlayer(), "Error saving Starfall documentation!", "ERROR", 7, "ERROR1")
 					end
-					if not initDocs(data) then retryDocs() end
+					initDocs(data)
 				else
-					retryDocs()
+					SF.Editor.requestDocs()
 				end
 			end)
 		end
@@ -737,7 +739,7 @@ elseif SERVER then
 				net.WriteBool(true)
 			else
 				net.WriteBool(false)
-				ply.SF_SentDocs = net.WriteStream(SF.Docs, function() ply.SF_SentDocs = true end, true)
+				ply.SF_SentDocs = net.WriteStream(SF.Docs, nil, true)
 			end
 			net.Send(ply)
 		end
