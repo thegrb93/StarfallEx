@@ -50,16 +50,7 @@ local function whitelistNotifyError(filename, err)
 	end
 end
 
-local function loadDefaultWhitelist()
-	local filename = "starfall/starfall_whitelist_default.lua"
-	local code = file.Read(filename, "LUA")
-	if not code then whitelistNotifyError(filename, "Could not open file!") end
-	return code
-end
-
 local function runWhitelist(filename, code)
-	urlrestrictor = SF.StringRestrictor(false)
-
 	local env = {
 		pattern = function(txt)
 			if not isstring(txt) then return end
@@ -104,17 +95,31 @@ local function runWhitelist(filename, code)
 	return true
 end
 
+local function loadDefaultWhitelist()
+	local filename = "starfall/starfall_whitelist_default.lua"
+	local code = file.Read(filename, "LUA")
+	if not code then whitelistNotifyError(filename, "Could not open file!") end
+
+	if (code and code ~= "") then
+		runWhitelist(whitelist_file, code)
+	end
+end
+
 function SF.ReloadUrlWhitelist()
-	local code = file.Read(whitelist_file, "DATA")
-	if not (code and code ~= "") then
-		code = loadDefaultWhitelist()
-		if (code and code ~= "") then
-			file.Write(whitelist_file, code)
-		end
+	urlrestrictor = SF.StringRestrictor(false)
+
+	loadDefaultWhitelist()
+
+	-- Invalidate the previous whitelist
+	if file.Time(whitelist_file, "DATA") < 1748087096 then
+		file.Delete(whitelist_file)
 	end
 
-	if not ((code and code ~= "") and runWhitelist(whitelist_file, code)) then
-		urlrestrictor = SF.StringRestrictor(false)
+	local code = file.Read(whitelist_file, "DATA")
+	if (code and code ~= "") then
+		runWhitelist(whitelist_file, code)
+	else
+		file.Write(whitelist_file, "-- This file can be used to adjust the url whitelist.\n-- See https://raw.githubusercontent.com/thegrb93/StarfallEx/refs/heads/master/lua/starfall/starfall_whitelist_default.lua for examples.\n")
 	end
 end
 SF.ReloadUrlWhitelist()
