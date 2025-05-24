@@ -99,9 +99,8 @@ local function loadDefaultWhitelist()
 	local filename = "starfall/starfall_whitelist_default.lua"
 	local code = file.Read(filename, "LUA")
 	if not code then whitelistNotifyError(filename, "Could not open file!") end
-
 	if (code and code ~= "") then
-		runWhitelist(whitelist_file, code)
+		runWhitelist(filename, code)
 	end
 end
 
