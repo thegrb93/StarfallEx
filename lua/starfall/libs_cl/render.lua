@@ -893,7 +893,7 @@ end
 
 --- Gets the current draw color set with render.setColor().
 -- @return Color The current draw color
-function render_library.getDrawColor()
+function render_library.getColor()
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end 
 	local drawClr = surface.GetDrawColor()
 	return setmetatable({drawClr.r, drawClr.g, drawClr.b, drawClr.a}, col_meta)
