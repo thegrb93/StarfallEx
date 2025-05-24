@@ -105,12 +105,6 @@ end
 
 local function loadUserWhitelist()
 	local filename = SERVER and "sf_url_whitelist.txt" or "starfall/cl_url_whitelist.txt"
-
-	-- Invalidate the previous whitelist
-	if file.Time(filename, "DATA") < 1748087096 then
-		file.Delete(filename)
-	end
-
 	local code = file.Read(filename, "DATA")
 	if (code and code ~= "") then
 		runWhitelist(filename, code)
