@@ -768,20 +768,21 @@ end
 --- Sets the chip to allow other chips to view its sources
 -- @param boolean enable If true, allow sharing scripts
 function builtins_library.shareScripts(enable)
-	instance.shareScripts = (enable == true) or nil
+	checkluatype(enable, TYPE_BOOL)
+	instance.shareScripts = enable
 end
 
 --- Runs an included script and caches the result.
 -- The path must be an actual path, including the file extension and using slashes for directory separators instead of periods.
 -- @param string path The file path to include. Make sure to --@include it
 -- @return any Return value of the script
-function builtins_library.require(path)
+function builtins_library.require(path, ...)
 	checkluatype(path, TYPE_STRING)
 
 	local curdir = SF.GetExecutingPath() or ""
 	path = instance.ppdata:ResolvePath(path, curdir) or path
 
-	return instance:require(path)
+	return instance:require(path, ...)
 end
 
 --- Runs all included scripts in a directory and caches the results.

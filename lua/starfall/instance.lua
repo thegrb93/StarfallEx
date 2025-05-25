@@ -638,7 +638,7 @@ function SF.Instance:runFunction(func, ...)
 end
 
 local requireSentinel = {}
-function SF.Instance:require(path)
+function SF.Instance:require(path, ...)
 	local loaded = self.requires
 	if loaded[path] == requireSentinel then
 		SF.Throw("Cyclic require loop detected!", 3)
@@ -647,7 +647,7 @@ function SF.Instance:require(path)
 	else
 		local func = self.scripts[path] or SF.Throw("Can't find file '" .. path .. "' (did you forget to --@include it?)", 3)
 		loaded[path] = requireSentinel
-		local ret = func()
+		local ret = func(...)
 		loaded[path] = ret or true
 		return ret
 	end
