@@ -831,13 +831,13 @@ end
 -- Pretty much like standard Lua dofile()
 -- @param string path The file path to include. Make sure to --@include it
 -- @return ... Return value(s) of the script
-function builtins_library.dofile(path)
+function builtins_library.dofile(path, ...)
 	checkluatype(path, TYPE_STRING)
 
 	local curdir = SF.GetExecutingPath() or ""
 	path = instance.ppdata:ResolvePath(path, curdir) or path
 
-	return (instance.scripts[path] or SF.Throw("Can't find file '" .. path .. "' (did you forget to --@include it?)", 2))()
+	return (instance.scripts[path] or SF.Throw("Can't find file '" .. path .. "' (did you forget to --@include it?)", 2))(...)
 end
 
 --- Runs all included scripts in directory, but does not cache the result.
