@@ -138,18 +138,19 @@ local invalidators = {
 		message = "HTTP's URL whitelisting was misconfigured, and set by default to Disabled",
 		realm = CLIENT,
 		invalidate = {"http.get", "http.post"},
-		check = function()
-			return P.settings["http.get"]["urlwhitelist"] == 2 or P.settings["http.post"]["urlwhitelist"] == 2
+		check = function(perm)
+			return perm.urlwhitelist == 2
 		end
 	},
+	{realm = false}, -- This version didn't work
 	{
 		message = "Default of several permissions updated to 5",
 		realm = CLIENT,
 		invalidate = {"bass.play2D", "notification", "render.hud", "render.calcview"},
-		check = function()
-			return P.settings["render.hud"]["client"] == 3
+		check = function(perm)
+			return perm.client ~= 5
 		end
-	}
+	},
 }
 
 local printC = function(...) (SERVER and MsgC or chat.AddText)(Color(255, 255, 255), "[", Color(11, 147, 234), "Starfall", Color(255, 255, 255), "]: ", ...) if SERVER then MsgC("\n") end end
@@ -176,12 +177,18 @@ function P.loadPermissionsSafe()
 	local settingVersion = tonumber(P.settings.permVersion) or 1
 	while invalidators[settingVersion] do
 		local issue = invalidators[settingVersion]
-		if issue.realm and (issue.check == nil or issue.check()) then 
-			printC("Your configuration has been modified due to a misconfiguration.")
-			printC("Reason: " .. issue.message)
-			printC("Changes: " .. table.concat(issue.invalidate, ", "))
+		if issue.realm then
+			local changed = false
 			for _, v in ipairs(issue.invalidate) do
-				P.settings[v] = nil
+				if issue.check == nil or issue.check(P.settings[v]) then
+					P.settings[v] = nil
+					changed = true
+				end
+			end
+			if changed then
+				printC("Your configuration has been modified due to a misconfiguration.")
+				printC("Reason: " .. issue.message)
+				printC("Changes: " .. table.concat(issue.invalidate, ", "))
 			end
 		end
 		settingVersion = settingVersion + 1
