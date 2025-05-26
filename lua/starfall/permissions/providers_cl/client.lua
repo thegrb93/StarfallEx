@@ -20,7 +20,7 @@ P.checks = {
 	"allow",
 	"block",
 	function(instance, target, key)
-		return LocalPlayer()==instance.player or SF.IsHUDActive(instance.entity), "No HUD connected"
+		return SF.IsHUDActive(instance.entity), "No HUD connected"
 	end,
 }
 
