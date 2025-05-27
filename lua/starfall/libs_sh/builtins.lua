@@ -775,6 +775,7 @@ end
 --- Runs an included script and caches the result.
 -- The path must be an actual path, including the file extension and using slashes for directory separators instead of periods.
 -- @param string path The file path to include. Make sure to --@include it
+-- @param ... args Optional arguments to provide to the script (access them using vararg ...)
 -- @return any Return value of the script
 function builtins_library.require(path, ...)
 	checkluatype(path, TYPE_STRING)
@@ -830,6 +831,7 @@ end
 --- Runs an included script, but does not cache the result.
 -- Pretty much like standard Lua dofile()
 -- @param string path The file path to include. Make sure to --@include it
+-- @param ... args Optional arguments to provide to the script (access them using vararg ...)
 -- @return ... Return value(s) of the script
 function builtins_library.dofile(path, ...)
 	checkluatype(path, TYPE_STRING)
