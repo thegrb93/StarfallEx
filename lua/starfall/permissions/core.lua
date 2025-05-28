@@ -8,8 +8,12 @@ local P = SF.Permissions
 P.privileges = {}
 P.providers = {}
 P.settings = setmetatable({},{__index = function(t,k) local r={} t[k]=r return r end})
-P.filename = SERVER and "sf_perms2_sv.txt" or "sf_perms2_cl.txt"
+P.filename = SERVER and "sf_perms_sv.txt" or "sf_perms_cl.txt"
 
+do -- Delete old settings due to setting issues with new defaults
+	local t = file.Time(P.filename, "DATA")
+	if t>0 and t<1748452637 then file.Delete(P.filename) end
+end
 
 local Privilege = {
 	__index = {
@@ -105,10 +109,12 @@ local Privilege = {
 setmetatable(Privilege, Privilege)
 
 function P.registerProvider(provider)
+	if P.providers[provider.id] then error("Attempt to register same provider twice! "..name) end
 	P.providers[provider.id] = provider
 end
 
 function P.registerPrivilege(id, name, description, providerconfig)
+	if P.privileges[id] then error("Attempt to register same privilege twice! "..name) end
 	P.privileges[id] = Privilege(id, name, description, providerconfig)
 end
 
@@ -133,25 +139,7 @@ function P.refreshSettingsCache()
 	end
 end
 
-local invalidators = {
-	{
-		message = "HTTP's URL whitelisting was misconfigured, and set by default to Disabled",
-		realm = CLIENT,
-		invalidate = {"http.get", "http.post"},
-		check = function(perm)
-			return perm.urlwhitelist == 2
-		end
-	},
-	{realm = false}, -- This version didn't work
-	{
-		message = "Default of several permissions updated to 5",
-		realm = CLIENT,
-		invalidate = {"bass.play2D", "notification", "render.hud", "render.calcview"},
-		check = function(perm)
-			return perm.client ~= 5
-		end
-	},
-}
+local invalidators = {}
 
 local printC = function(...) (SERVER and MsgC or chat.AddText)(Color(255, 255, 255), "[", Color(11, 147, 234), "Starfall", Color(255, 255, 255), "]: ", ...) if SERVER then MsgC("\n") end end
 
@@ -174,9 +162,9 @@ function P.loadPermissionsSafe()
 	local saveSettings = not file.Exists(P.filename, "DATA")
 	P.settings = setmetatable(util.JSONToTable(file.Read(P.filename) or "") or {}, getmetatable(P.settings))
 
-	local settingVersion = tonumber(P.settings.permVersion) or 1
-	while invalidators[settingVersion] do
-		local issue = invalidators[settingVersion]
+	local version = tonumber(P.settings.version) or 1
+	while invalidators[version] do
+		local issue = invalidators[version]
 		if issue.realm then
 			local changed = false
 			for _, v in ipairs(issue.invalidate) do
@@ -191,8 +179,10 @@ function P.loadPermissionsSafe()
 				printC("Changes: " .. table.concat(issue.invalidate, ", "))
 			end
 		end
-		settingVersion = settingVersion + 1
-		P.settings.permVersion = settingVersion
+		version = version + 1
+	end
+	if version ~= P.settings.version then
+		P.settings.version = version
 		saveSettings = true
 	end
 
