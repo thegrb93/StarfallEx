@@ -162,9 +162,9 @@ function P.loadPermissionsSafe()
 	local saveSettings = not file.Exists(P.filename, "DATA")
 	P.settings = setmetatable(util.JSONToTable(file.Read(P.filename) or "") or {}, getmetatable(P.settings))
 
-	local settingVersion = tonumber(P.settings.permVersion) or 1
-	while invalidators[settingVersion] do
-		local issue = invalidators[settingVersion]
+	local version = tonumber(P.settings.version) or 1
+	while invalidators[version] do
+		local issue = invalidators[version]
 		if issue.realm then
 			local changed = false
 			for _, v in ipairs(issue.invalidate) do
@@ -179,8 +179,10 @@ function P.loadPermissionsSafe()
 				printC("Changes: " .. table.concat(issue.invalidate, ", "))
 			end
 		end
-		settingVersion = settingVersion + 1
-		P.settings.permVersion = settingVersion
+		version = version + 1
+	end
+	if version ~= P.settings.version then
+		P.settings.version = version
 		saveSettings = true
 	end
 
