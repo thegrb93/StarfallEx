@@ -699,15 +699,33 @@ function props_library.spawnRate()
 	return plyPropBurst.rate
 end
 
+--- Returns whether the chip will automatically remove created props when the chip is removed
+-- @server
+-- @return boolean Determines whether props will be cleaned
+function props_library.getPropClean()
+    return propConfig.clean
+end
+
+--- Returns whether the props are undo-able
+-- @server
+-- @return boolean Determines whether props are undo-able
+function props_library.getPropUndo()
+    return propConfig.undo
+end
+
 --- Sets whether the chip should remove created props when the chip is removed
+-- @server
 -- @param boolean on Whether the props should be cleaned or not
 function props_library.setPropClean(on)
+	checkluatype(on, TYPE_BOOL)
 	propConfig.clean = on
 end
 
 --- Sets whether the props should be undo-able
+-- @server
 -- @param boolean on Whether the props should be undo-able
 function props_library.setPropUndo(on)
+	checkluatype(on, TYPE_BOOL)
 	propConfig.undo = on
 end
 
