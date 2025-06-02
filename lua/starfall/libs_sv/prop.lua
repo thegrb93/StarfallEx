@@ -717,6 +717,7 @@ end
 -- @server
 -- @param boolean on Whether the props should be cleaned or not
 function props_library.setPropClean(on)
+	checkluatype(on, TYPE_BOOL)
 	propConfig.clean = on
 end
 
@@ -724,6 +725,7 @@ end
 -- @server
 -- @param boolean on Whether the props should be undo-able
 function props_library.setPropUndo(on)
+	checkluatype(on, TYPE_BOOL)
 	propConfig.undo = on
 end
 
