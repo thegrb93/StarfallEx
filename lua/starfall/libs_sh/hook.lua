@@ -236,6 +236,31 @@ if SERVER then
 		end
 	end)
 
+	--- Called when an entity is damaged, after EntityTakeDamage is processed.
+	-- @name PostEntityTakeDamage
+	-- @class hook
+	-- @server
+	-- @param Entity target Entity that is hurt
+	-- @param Entity attacker Entity that attacked
+	-- @param Entity inflictor Entity that inflicted the damage
+	-- @param number amount How much damage
+	-- @param number type Type of the damage
+	-- @param Vector position Position of the damage
+	-- @param Vector force Force of the damage
+	-- @param boolean took Whether the entity actually received the damage or not
+	add("PostEntityTakeDamage", nil, function(instance, target, dmg, took)
+		return true, {
+			instance.WrapObject(target),
+			instance.WrapObject(dmg:GetAttacker()),
+			instance.WrapObject(dmg:GetInflictor()),
+			dmg:GetDamage(),
+			dmg:GetDamageType(),
+			instance.Types.Vector.Wrap(dmg:GetDamagePosition()),
+			instance.Types.Vector.Wrap(dmg:GetDamageForce()),
+			took
+		}
+	end)
+
 	--- Called whenever an NPC is killed.
 	-- @name OnNPCKilled
 	-- @class hook
