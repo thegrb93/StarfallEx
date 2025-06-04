@@ -1,8 +1,8 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
-local IsValid = FindMetaTable("Entity").IsValid
-local IsValidPhys = FindMetaTable("PhysObj").IsValid
+local Ent_IsValid = FindMetaTable("Entity").IsValid
+local Phys_IsValid = FindMetaTable("PhysObj").IsValid
 
 -- Register privileges
 registerprivilege("prop.create", "Create prop", "Allows the user to create props")
@@ -85,7 +85,7 @@ function props_library.create(pos, ang, model, frozen)
 
 	for I = 0, propent:GetPhysicsObjectCount() - 1 do
 		local obj = propent:GetPhysicsObjectNum(I)
-		if IsValidPhys(obj) then
+		if Phys_IsValid(obj) then
 			obj:EnableMotion(not frozen)
 		end
 	end
@@ -134,7 +134,7 @@ function props_library.createRagdoll(model, frozen)
 	if frozen then
 		for I = 0, ent:GetPhysicsObjectCount() - 1 do
 			local obj = ent:GetPhysicsObjectNum(I)
-			if IsValidPhys(obj) then
+			if Phys_IsValid(obj) then
 				obj:EnableMotion(false)
 			end
 		end
@@ -224,7 +224,7 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	end)
 
 	local physobj = propent:GetPhysicsObject()
-	if not IsValidPhys(physobj) then
+	if not Phys_IsValid(physobj) then
 		SF.Throw("Custom prop generated with invalid physics object!", 2)
 	end
 
@@ -301,7 +301,7 @@ function props_library.createComponent(pos, ang, class, model, frozen)
 
 	for I = 0,  comp:GetPhysicsObjectCount() - 1 do
 		local obj = comp:GetPhysicsObjectNum(I)
-		if IsValidPhys(obj) then
+		if Phys_IsValid(obj) then
 			obj:EnableMotion(not frozen)
 		end
 	end
@@ -388,7 +388,7 @@ function props_library.createSeat(pos, ang, model, frozen)
 		prop:Activate()
 
 		local phys = prop:GetPhysicsObject()
-		if IsValidPhys(phys) then
+		if Phys_IsValid(phys) then
 			phys:EnableMotion(not frozen)
 		end
 
@@ -407,7 +407,7 @@ function props_library.createSeat(pos, ang, model, frozen)
 		end
 	end)
 	if not ok then
-		if Ent_IsValid(entity) then Ent_Remove(entity) end
+		if Ent_IsValid(entity) then entity:Remove() end
 		SF.Throw("Failed to create entity (" .. tostring(err) .. ")", 2)
 	end
 	entList:register(instance, prop)
@@ -461,7 +461,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 			entity:Activate()
 		end)
 		if not ok then
-			if Ent_IsValid(entity) then Ent_Remove(entity) end
+			if Ent_IsValid(entity) then entity:Remove() end
 			SF.Throw("Failed to create entity (" .. tostring(err) .. ")", 2)
 		end
 
@@ -478,7 +478,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 				entity = sent.t.SpawnFunction( sent.t, ply, SF.dumbTrace(NULL, pos), class )
 			else
 				entity = ents.Create( class )
-				if IsValid(entity) then
+				if Ent_IsValid(entity) then
 					entity:SetPos(pos)
 					entity:SetAngles(ang)
 					entity:Spawn()
@@ -487,7 +487,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 			end
 		end)
 		if not ok then
-			if Ent_IsValid(entity) then Ent_Remove(entity) end
+			if Ent_IsValid(entity) then entity:Remove() end
 			SF.Throw("Failed to create entity (" .. tostring(err) .. ")", 2)
 		end
 
@@ -527,7 +527,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 			entity:Activate()
 		end)
 		if not ok then
-			if Ent_IsValid(entity) then Ent_Remove(entity) end
+			if Ent_IsValid(entity) then entity:Remove() end
 			SF.Throw("Failed to create entity (" .. tostring(err) .. ")", 2)
 		end
 
@@ -538,7 +538,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		local ok, err = instance:runExternal(function()
 			entity = ents.Create(vehicle.Class)
 
-			if IsValid(entity) then
+			if Ent_IsValid(entity) then
 				entity:SetModel(vehicle.Model)
 				if (vehicle.Model == "models/buggy.mdl") then
 					entity:SetKeyValue("vehiclescript", "scripts/vehicles/jeep_test.txt")
@@ -579,7 +579,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 				entity:Activate()
 			end)
 			if not ok then
-				if Ent_IsValid(entity) then Ent_Remove(entity) end
+				if Ent_IsValid(entity) then entity:Remove() end
 				SF.Throw("Failed to create entity (" .. tostring(err) .. ")", 2)
 			end
 		end
@@ -660,18 +660,18 @@ function props_library.createSent(pos, ang, class, frozen, data)
 			end
 		end)
 		if not ok then
-			if Ent_IsValid(entity) then Ent_Remove(entity) end
+			if Ent_IsValid(entity) then entity:Remove() end
 			SF.Throw("Failed to create entity (" .. tostring(err) .. ")", 2)
 		end
 	end
 
-	if IsValid(entity) then
+	if Ent_IsValid(entity) then
 		entList:register(instance, entity)
 
 		if CPPI then entity:CPPISetOwner(ply == SF.Superuser and NULL or ply) end
 
 		local phys = entity:GetPhysicsObject()
-		if IsValidPhys(phys) then
+		if Phys_IsValid(phys) then
 			phys:EnableMotion(not frozen)
 		end
 

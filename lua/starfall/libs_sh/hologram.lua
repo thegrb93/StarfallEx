@@ -141,7 +141,7 @@ function hologram_library.create(pos, ang, model, scale)
 		end
 	end)
 	if not ok then
-		if Ent_IsValid(holoent) then Ent_Remove(holoent) end
+		if Ent_IsValid(holoent) then holoent:Remove() end
 		SF.Throw("Failed to create entity (" .. tostring(err) .. ")", 2)
 	end
 	entList:register(instance, holoent)

@@ -112,7 +112,7 @@ function nextbot_library.create(pos, mdl)
 		if CPPI then nb:CPPISetOwner(ply == SF.Superuser and NULL or ply) end
 	end)
 	if not ok then
-		if Ent_IsValid(nb) then Ent_Remove(nb) end
+		if Ent_IsValid(nb) then nb:Remove() end
 		SF.Throw("Failed to create entity (" .. tostring(err) .. ")", 2)
 	end
 	entList:register(instance, nb)
