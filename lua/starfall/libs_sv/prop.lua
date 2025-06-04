@@ -377,35 +377,41 @@ function props_library.createSeat(pos, ang, model, frozen)
 
 	local prop
 
-	prop = ents.Create(class)
-	prop:SetModel(model)
+	local ok, err = instance:runExternal(function()
+		prop = ents.Create(class)
+		prop:SetModel(model)
 
-	prop:SetPos(pos)
-	prop:SetAngles(ang)
-	prop:Spawn()
-	prop:SetKeyValue( "limitview", 0 )
-	prop:Activate()
+		prop:SetPos(pos)
+		prop:SetAngles(ang)
+		prop:Spawn()
+		prop:SetKeyValue( "limitview", 0 )
+		prop:Activate()
 
-	entList:register(instance, prop)
-
-	local phys = prop:GetPhysicsObject()
-	if IsValidPhys(phys) then
-		phys:EnableMotion(not frozen)
-	end
-
-	if ply ~= SF.Superuser then
-		prop:SetCreator( ply )
-
-		if propConfig.undo then
-			undo.Create("SF")
-				undo.SetPlayer(ply)
-				undo.AddEntity(prop)
-			undo.Finish("SF (" .. class .. ")")
+		local phys = prop:GetPhysicsObject()
+		if IsValidPhys(phys) then
+			phys:EnableMotion(not frozen)
 		end
 
-		ply:AddCleanup("props", prop)
-		gamemode.Call("PlayerSpawnedVehicle", ply, prop)
+		if ply ~= SF.Superuser then
+			prop:SetCreator( ply )
+
+			if propConfig.undo then
+				undo.Create("SF")
+					undo.SetPlayer(ply)
+					undo.AddEntity(prop)
+				undo.Finish("SF (" .. class .. ")")
+			end
+
+			ply:AddCleanup("props", prop)
+			gamemode.Call("PlayerSpawnedVehicle", ply, prop)
+		end
+	end)
+	if not ok then
+		if Ent_IsValid(entity) then Ent_Remove(entity) end
+		SF.Throw("Failed to create entity (" .. tostring(err) .. ")", 2)
 	end
+	entList:register(instance, prop)
+	instance:checkCpu()
 
 	return owrap(prop)
 end
@@ -447,12 +453,16 @@ function props_library.createSent(pos, ang, class, frozen, data)
 			if gamemode.Call("PlayerSpawnSWEP", ply, class, swep) == false then SF.Throw("Another hook prevented the swep from spawning", 2) end
 		end
 
-		entity = ents.Create(swep.ClassName)
-		if IsValid(entity) then
+		local ok, err = instance:runExternal(function()
+			entity = ents.Create(swep.ClassName)
 			entity:SetPos(pos)
 			entity:SetAngles(ang)
 			entity:Spawn()
 			entity:Activate()
+		end)
+		if not ok then
+			if Ent_IsValid(entity) then Ent_Remove(entity) end
+			SF.Throw("Failed to create entity (" .. tostring(err) .. ")", 2)
 		end
 
 		hookcall = "PlayerSpawnedSWEP"
@@ -462,17 +472,23 @@ function props_library.createSent(pos, ang, class, frozen, data)
 			if gamemode.Call("PlayerSpawnSENT", ply, class) == false then SF.Throw("Another hook prevented the sent from spawning", 2) end
 		end
 
-		local sent = scripted_ents.GetStored( class )
-		if sent and sent.t.SpawnFunction then
-			entity = sent.t.SpawnFunction( sent.t, ply, SF.dumbTrace(NULL, pos), class )
-		else
-			entity = ents.Create( class )
-			if IsValid(entity) then
-				entity:SetPos(pos)
-				entity:SetAngles(ang)
-				entity:Spawn()
-				entity:Activate()
+		local ok, err = instance:runExternal(function()
+			local sent = scripted_ents.GetStored( class )
+			if sent and sent.t.SpawnFunction then
+				entity = sent.t.SpawnFunction( sent.t, ply, SF.dumbTrace(NULL, pos), class )
+			else
+				entity = ents.Create( class )
+				if IsValid(entity) then
+					entity:SetPos(pos)
+					entity:SetAngles(ang)
+					entity:Spawn()
+					entity:Activate()
+				end
 			end
+		end)
+		if not ok then
+			if Ent_IsValid(entity) then Ent_Remove(entity) end
+			SF.Throw("Failed to create entity (" .. tostring(err) .. ")", 2)
 		end
 
 		hookcall = "PlayerSpawnedSENT"
@@ -482,9 +498,10 @@ function props_library.createSent(pos, ang, class, frozen, data)
 			if gamemode.Call("PlayerSpawnNPC", ply, class, "") == false then SF.Throw("Another hook prevented the npc from spawning", 2) end
 		end
 
-		entity = ents.Create(npc.Class)
+		
+		local ok, err = instance:runExternal(function()
+			entity = ents.Create(npc.Class)
 
-		if IsValid(entity) then
 			if (npc.Model) then
 				entity:SetModel(npc.Model)
 			end
@@ -508,53 +525,63 @@ function props_library.createSent(pos, ang, class, frozen, data)
 			entity:SetAngles(ang)
 			entity:Spawn()
 			entity:Activate()
+		end)
+		if not ok then
+			if Ent_IsValid(entity) then Ent_Remove(entity) end
+			SF.Throw("Failed to create entity (" .. tostring(err) .. ")", 2)
 		end
 
 		hookcall = "PlayerSpawnedNPC"
 	elseif vehicle then
 		if ply ~= SF.Superuser and gamemode.Call("PlayerSpawnVehicle", ply, vehicle.Model, vehicle.Class, vehicle) == false then SF.Throw("Another hook prevented the vehicle from spawning", 2) end
 
-		entity = ents.Create(vehicle.Class)
+		local ok, err = instance:runExternal(function()
+			entity = ents.Create(vehicle.Class)
 
-		if IsValid(entity) then
-			entity:SetModel(vehicle.Model)
-			if (vehicle.Model == "models/buggy.mdl") then
-				entity:SetKeyValue("vehiclescript", "scripts/vehicles/jeep_test.txt")
-			end
-			if (vehicle.Model == "models/vehicle.mdl") then
-				entity:SetKeyValue("vehiclescript", "scripts/vehicles/jalopy.txt")
-			end
-			if (vehicle.KeyValues) then
-				for k, v in pairs(vehicle.KeyValues) do
-
-					local kLower = string.lower(k)
-
-					if (kLower == "vehiclescript" or
-						 kLower == "limitview"     or
-						 kLower == "vehiclelocked" or
-						 kLower == "cargovisible"  or
-						 kLower == "enablegun")
-					then
-						entity:SetKeyValue(k, v)
-					end
-
+			if IsValid(entity) then
+				entity:SetModel(vehicle.Model)
+				if (vehicle.Model == "models/buggy.mdl") then
+					entity:SetKeyValue("vehiclescript", "scripts/vehicles/jeep_test.txt")
 				end
+				if (vehicle.Model == "models/vehicle.mdl") then
+					entity:SetKeyValue("vehiclescript", "scripts/vehicles/jalopy.txt")
+				end
+				if (vehicle.KeyValues) then
+					for k, v in pairs(vehicle.KeyValues) do
+
+						local kLower = string.lower(k)
+
+						if (kLower == "vehiclescript" or
+							kLower == "limitview"     or
+							kLower == "vehiclelocked" or
+							kLower == "cargovisible"  or
+							kLower == "enablegun")
+						then
+							entity:SetKeyValue(k, v)
+						end
+
+					end
+				end
+
+				if (vehicle.Members) then
+					table.Merge(entity, vehicle.Members)
+					duplicator.StoreEntityModifier(entity, "VehicleMemDupe", vehicle.Members)
+				end
+
+				if (entity.SetVehicleClass) then entity:SetVehicleClass(class) end
+				entity.VehicleName = class
+				entity.VehicleTable = vehicle
+
+				entity.ClassOverride = vehicle.Class
+				entity:SetPos(pos)
+				entity:SetAngles(ang)
+				entity:Spawn()
+				entity:Activate()
+			end)
+			if not ok then
+				if Ent_IsValid(entity) then Ent_Remove(entity) end
+				SF.Throw("Failed to create entity (" .. tostring(err) .. ")", 2)
 			end
-
-			if (vehicle.Members) then
-				table.Merge(entity, vehicle.Members)
-				duplicator.StoreEntityModifier(entity, "VehicleMemDupe", vehicle.Members)
-			end
-
-			if (entity.SetVehicleClass) then entity:SetVehicleClass(class) end
-			entity.VehicleName = class
-			entity.VehicleTable = vehicle
-
-			entity.ClassOverride = vehicle.Class
-			entity:SetPos(pos)
-			entity:SetAngles(ang)
-			entity:Spawn()
-			entity:Activate()
 		end
 
 		hookcall = "PlayerSpawnedVehicle"
@@ -607,7 +634,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		enttbl.Pos = pos
 		enttbl.Angle = ang
 
-		local isOk, errorMsg = instance:runExternal(function()
+		local ok, err = instance:runExternal(function()
 			if sent2._preFactory then
 				sent2._preFactory(ply, enttbl)
 			end
@@ -632,17 +659,9 @@ function props_library.createSent(pos, ang, class, frozen, data)
 				entity:PostEntityPaste(ply, entity, {[entity:EntIndex()] = entity})
 			end
 		end)
-
-		if not isOk then
-			if IsValid(entity) then
-				entity:Remove()
-			end
-
-			if debug.getmetatable(errorMsg) == SF.Errormeta then
-				error(errorMsg, 3)
-			else
-				SF.Throw("Failed to create entity (" .. tostring(errorMsg) .. ")", 2)
-			end
+		if not ok then
+			if Ent_IsValid(entity) then Ent_Remove(entity) end
+			SF.Throw("Failed to create entity (" .. tostring(err) .. ")", 2)
 		end
 	end
 
@@ -672,6 +691,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 			end
 		end
 
+		instance:checkCpu()
 		return owrap(entity)
 	end
 end
