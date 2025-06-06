@@ -446,7 +446,9 @@ registerSent("gmod_wire_plug", {
 		if validModels[self.Model] then
 			self.Model = validModels[self.Model].plug
 		else
-			if not table.HasValue(table.MemberValuesFromKey(validModels, "plug"), self.Model) then error("Invalid plug model") end
+			local found = false
+			for _, v in pairs(validModels) do if v.plug==self.Model then found = true break end end
+			if not found then error("Invalid plug model") end
 		end
 	end,
 
