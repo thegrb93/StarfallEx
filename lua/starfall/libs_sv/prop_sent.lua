@@ -460,10 +460,7 @@ registerSent("gmod_wire_plug", {
 
 registerSent("gmod_wire_socket", {
 	_preFactory = function(ply, self)
-		local validModels = list.GetForEdit("Wire_Socket_Models")
-		if not validModels[self.Model] then
-			error("Invalid socket model")
-		end
+		if not list.GetForEdit("Wire_Socket_Models")[self.Model] then error("Invalid socket model") end
 	end,
 	{
 		["Model"] = {TYPE_STRING, "models/props_lab/tpplugholder_single.mdl"},
