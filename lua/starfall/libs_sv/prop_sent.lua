@@ -440,12 +440,35 @@ registerSent("gmod_wire_trigger", {
 	}
 })
 
-registerSent("gmod_wire_socket", {{
-	["Model"] = {TYPE_STRING, "models/props_lab/tpplugholder_single.mdl"},
-	["ArrayInput"] = {TYPE_BOOL, false},
-	["WeldForce"] = {TYPE_NUMBER, 5000},
-	["AttachRange"] = {TYPE_NUMBER, 5},
-}})
+registerSent("gmod_wire_plug", {
+	_preFactory = function(ply, self)
+		local validModels = list.GetForEdit("Wire_Socket_Models")
+		if validModels[self.Model] then
+			self.Model = validModels[self.Model].plug
+		else
+			local found = false
+			for _, v in pairs(validModels) do if v.plug==self.Model then found = true break end end
+			if not found then error("Invalid plug model") end
+		end
+	end,
+
+	{
+		["Model"] = {TYPE_STRING, "models/props_lab/tpplugholder_single.mdl"},
+		["ArrayInput"] = {TYPE_BOOL, false},
+	}
+})
+
+registerSent("gmod_wire_socket", {
+	_preFactory = function(ply, self)
+		if not list.GetForEdit("Wire_Socket_Models")[self.Model] then error("Invalid socket model") end
+	end,
+	{
+		["Model"] = {TYPE_STRING, "models/props_lab/tpplugholder_single.mdl"},
+		["ArrayInput"] = {TYPE_BOOL, false},
+		["WeldForce"] = {TYPE_NUMBER, 5000},
+		["AttachRange"] = {TYPE_NUMBER, 5},
+	}
+})
 
 registerSent("gmod_wire_simple_explosive", {{
 	["Model"] = {TYPE_STRING, "models/props_c17/oildrum001_explosive.mdl"},
@@ -1581,6 +1604,10 @@ return function() end
 -- 
 -- > gmod_wire_pixel
 -- string Model = "models/jaanus/wiretool/wiretool_siren.mdl"
+-- 
+-- > gmod_wire_plug
+-- boolean ArrayInput = false
+-- string Model = "models/props_lab/tpplugholder_single.mdl"
 -- 
 -- > gmod_wire_pod
 -- string Model = "models/jaanus/wiretool/wiretool_siren.mdl"
