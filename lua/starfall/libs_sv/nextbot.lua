@@ -97,19 +97,26 @@ function nextbot_library.create(pos, mdl)
 	mdl = SF.CheckModel(mdl, ply)
 	entList:checkuse(ply, 1)
 
-	local nb = ents.Create("starfall_cnextbot")
-	nb:SetPos(pos)
-	nb:SetModel(mdl)
-	nb.instance = instance
-	nb:Spawn()
+	local nb
+	local ok, err = instance:runExternal(function()
+		nb = ents.Create("starfall_cnextbot")
+		nb:SetPos(pos)
+		nb:SetModel(mdl)
+		nb.instance = instance
+		nb:Spawn()
 
-	if ply ~= SF.Superuser then
-		nb:SetCreator(ply)
+		if ply ~= SF.Superuser then
+			nb:SetCreator(ply)
+		end
+
+		if CPPI then nb:CPPISetOwner(ply == SF.Superuser and NULL or ply) end
+	end)
+	if not ok then
+		if Ent_IsValid(nb) then nb:Remove() end
+		SF.Throw("Failed to create entity (" .. tostring(err) .. ")", 2)
 	end
-
 	entList:register(instance, nb)
-
-	if CPPI then nb:CPPISetOwner(ply == SF.Superuser and NULL or ply) end
+	instance:checkCpu()
 
 	return nbwrap(nb)
 end

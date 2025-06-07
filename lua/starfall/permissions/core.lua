@@ -109,12 +109,12 @@ local Privilege = {
 setmetatable(Privilege, Privilege)
 
 function P.registerProvider(provider)
-	if P.providers[provider.id] then error("Attempt to register same provider twice! "..name) end
+	if P.providers[provider.id] then ErrorNoHaltWithStack("Registering same provider more than once! "..name) end
 	P.providers[provider.id] = provider
 end
 
 function P.registerPrivilege(id, name, description, providerconfig)
-	if P.privileges[id] then error("Attempt to register same privilege twice! "..name) end
+	if P.privileges[id] then ErrorNoHaltWithStack("Registering same privilege more than once! "..name) end
 	P.privileges[id] = Privilege(id, name, description, providerconfig)
 end
 

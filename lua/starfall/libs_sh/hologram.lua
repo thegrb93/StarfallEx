@@ -108,6 +108,7 @@ local scale_identity = Vector(1,1,1)
 function hologram_library.create(pos, ang, model, scale)
 	checkpermission(instance, nil, "hologram.create")
 	checkluatype(model, TYPE_STRING)
+	if CLIENT and instance.data.render.isRendering then SF.Throw("Can't create hologram while rendering!", 2) end
 
 	local ply = instance.player
 	pos = SF.clampPos(vunwrap1(pos))
@@ -118,15 +119,14 @@ function hologram_library.create(pos, ang, model, scale)
 	entList:checkuse(ply, 1)
 
 	local holoent
-	if SERVER then
-		holoent = ents.Create("starfall_hologram")
-	else
-		if instance.data.render.isRendering then SF.Throw("Can't create hologram while rendering!", 2) end
-		holoent = ents.CreateClientside("starfall_hologram")
-		debug.setmetatable(holoent, cl_hologram_meta)
-	end
+	local ok, err = instance:runExternal(function()
+		if SERVER then
+			holoent = ents.Create("starfall_hologram")
+		else
+			holoent = ents.CreateClientside("starfall_hologram")
+			debug.setmetatable(holoent, cl_hologram_meta)
+		end
 
-	if Ent_IsValid(holoent) then
 		local ent_tbl = Ent_GetTable(holoent)
 		Ent_SetPos(holoent, pos)
 		Ent_SetAngles(holoent, ang)
@@ -139,10 +139,15 @@ function hologram_library.create(pos, ang, model, scale)
 		else
 			ent_tbl.SFHoloOwner = ply
 		end
-
-		entList:register(instance, holoent)
-		return wrap(holoent)
+	end)
+	if not ok then
+		if Ent_IsValid(holoent) then holoent:Remove() end
+		SF.Throw("Failed to create entity (" .. tostring(err) .. ")", 2)
 	end
+	entList:register(instance, holoent)
+	instance:checkCpu()
+
+	return wrap(holoent)
 end
 
 --- Checks if a user can spawn anymore holograms.

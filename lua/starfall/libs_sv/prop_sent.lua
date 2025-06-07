@@ -585,8 +585,8 @@ registerSent("gmod_wire_output", {{
 
 registerSent("gmod_wire_motor", {
 	_preFactory = function(ply, self)
-		if not IsValid(self.Ent1) then SF.Throw("Invalid Entity, Parameter: ent1", 3) end
-		if not IsValid(self.Ent2) then SF.Throw("Invalid Entity, Parameter: ent2", 3) end
+		if not IsValid(self.Ent1) then error("Invalid Entity, Parameter: ent1") end
+		if not IsValid(self.Ent2) then error("Invalid Entity, Parameter: ent2") end
 
 		self.model = self.Model
 		self.MyId = "starfall_createsent"
@@ -722,8 +722,8 @@ registerSent("gmod_wire_igniter", {{
 
 registerSent("gmod_wire_hydraulic", {
 	_preFactory = function(ply, self)
-		if not IsValid(self.Ent1) then SF.Throw("Invalid Entity, Parameter: ent1", 3) end
-		if not IsValid(self.Ent2) then SF.Throw("Invalid Entity, Parameter: ent2", 3) end
+		if not IsValid(self.Ent1) then error("Invalid Entity, Parameter: ent1") end
+		if not IsValid(self.Ent2) then error("Invalid Entity, Parameter: ent2") end
 
 		self.model = self.Model
 		self.MyId = "starfall_createsent"
@@ -937,7 +937,7 @@ registerSent("gmod_wire_value", {
 			checkluatype(val[1], TYPE_STRING, 3, "Parameter: value[" .. i .. "][1]")
 
 			local typ = string.upper(val[1])
-			if not valid_types[typ] then SF.Throw("value[" .. i .. "] type is invalid " .. typ, 3) end
+			if not valid_types[typ] then error("value[" .. i .. "] type is invalid " .. typ) end
 
 			checkluatype(val[2], TYPE_STRING, 3, "Parameter: value[" .. i .. "][2]")
 
@@ -961,7 +961,7 @@ registerSent("gmod_wire_adv_emarker", {{
 
 registerSent("gmod_wire_wheel", {
 	_preFactory = function(ply, self)
-		if not IsValid(self.Base) then SF.Throw("Invalid Entity, Parameter: base", 3) end
+		if not IsValid(self.Base) then error("Invalid Entity, Parameter: base") end
 	end,
 
 	_postFactory = function(ply, self, enttbl)
