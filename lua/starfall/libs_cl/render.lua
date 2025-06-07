@@ -2395,7 +2395,7 @@ function render_library.traceSurfaceColor(startpos, endpos)
 end
 
 --- Checks if the client is connected to a HUD component that's linked to this chip
--- @return boolean True if a HUD component is connected and active, nil otherwise
+-- @return boolean If a HUD component is connected and active
 function render_library.isHUDActive()
 	return SF.IsHUDActive(instance.entity)
 end

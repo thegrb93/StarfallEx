@@ -1952,11 +1952,18 @@ function SF.dumbTrace(entity, pos)
 	return dumbtrace
 end
 
-function SF.IsHUDActive(ent, ply)
-	local tbl = Ent_GetTable(ent) if tbl==nil then return end
-	tbl = tbl.ActiveHuds if tbl==nil then return end
-	return tbl[SERVER and (ply or error("Missing player arg")) or LocalPlayer()]
+SF.IsHUDActive = SERVER and function(ent, ply)
+	if ply==nil then error("Missing player arg") end
+	local tbl = Ent_GetTable(ent) if tbl==nil then return false end
+	tbl = tbl.ActiveHuds if tbl==nil then return false end
+	return tbl[ply] == true
 end
+or function(ent)
+	local tbl = Ent_GetTable(ent) if tbl==nil then return false end
+	tbl = tbl.ActiveHuds if tbl==nil then return false end
+	return tbl[LocalPlayer()] == true
+end
+
 
 local soundsMap = {
 	["DRIP1"] = 0, [0] = "ambient/water/drip1.wav",
