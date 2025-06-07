@@ -362,7 +362,7 @@ else
 	-- @param number defaultSensitivity The base sensitivity
 	-- @param number localFOV The player's current FOV
 	-- @param number defaultFOV The player's default/original FOV
-	-- @return number? Return a number which multiplies the sensitify. -1 will do nothing but prevent other hooks overriding (Requires a connected HUD).
+	-- @return number? Return a number which multiplies the sensitivity. -1 will do nothing but prevent other hooks overriding (Requires a connected HUD).
 	add("AdjustMouseSensitivity", nil, nil, function(instance, args, ply)
 		if args[1] and isnumber(args[2]) and SF.IsHUDActive(instance.entity) then
 			return args[2]
