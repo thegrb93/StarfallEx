@@ -2891,17 +2891,21 @@ end
 
 local function WrapText(txt, width)
 	local ret = {}
-	local prev_end, prev_newline = 0, 0
-	for cur_end in string.gmatch(txt, "%S+()") do
-		local w, _ = surface_GetTextSize(string.sub(txt, prev_newline, cur_end))
-		if w > width then
-			ret[#ret+1] = string.Trim(string.sub(txt, prev_newline, prev_end))
-			prev_newline = prev_end + 1
+	for _, line in pairs(string.Split(txt, "\n")) do
+		local breaks = {}
+		local prev_end, prev_newline = 0, 0
+		for cur_end in string.gmatch(line, "%S+()") do
+			local w, _ = surface_GetTextSize(string.sub(line, prev_newline, cur_end))
+			if w > width then
+				breaks[#breaks+1] = string.Trim(string.sub(line, prev_newline, prev_end))
+				prev_newline = prev_end + 1
+			end
+			prev_end = cur_end
 		end
-		prev_end = cur_end
+		breaks[#breaks+1] = string.Trim(string.sub(line, prev_newline))
+		table.Add(ret, breaks)
 	end
-	ret[#ret+1] = string.Trim(string.sub(txt, prev_newline))
-	return table.concat(ret, "\n")
+	return ret
 end
 
 local function levenshteinDistance(a,b)
@@ -3096,26 +3100,22 @@ function PANEL:AutocompleteCreate()
 
 	function acPanel:ScrollSelect(delta)
 		self:UpdateSelection((self.selection + delta - 1)%self.numitems + 1)
+		self.suggestionlist:ScrollToChild( self.suggestionlist.Items[self.selection] )
 	end
 
 	function acPanel:GetSelected()
 		return self.suggestions[self.selection]
 	end
 
-	local editorCanvas = self
 	function acPanel:UpdateInfo()
 		local suggestion = self:GetSelected()
 		local desctxt = self.suggestioninfo.desc
 
-		if not (suggestion and suggestion.desc) then
+		if suggestion and suggestion.desc then
+			desctxt:SetText(suggestion.desc)
+		else
 			desctxt:SetText("")
-			return
 		end
-
-		desctxt:SetSize(self.suggestioninfo:GetSize())
-		surface.SetFont(editorCanvas.CurrentFont)
-		desctxt:SetText( WrapText(suggestion.desc, 300) )
-		desctxt:SizeToContents()
 	end
 
 	local function WaitForKeyUp(t, pnl)
@@ -3187,6 +3187,7 @@ function PANEL:AutocompleteCreate()
 	suggestionlist:Dock(LEFT)
 	suggestionlist:EnableVerticalScrollbar( true )
 	suggestionlist.Paint = function() end
+	suggestionlist.Items = {}
 
 	surface.SetFont(self.CurrentFont)
 	local _, labelH = surface.GetTextSize( "H" )
@@ -3234,6 +3235,7 @@ function PANEL:AutocompleteCreate()
 		end
 
 		suggestionlist:AddItem( txt )
+		suggestionlist.Items[i] = txt
 	end
 	acPanel.suggestionlist = suggestionlist
 
@@ -3245,13 +3247,29 @@ function PANEL:AutocompleteCreate()
 	suggestioninfo.Paint = function() end
 	acPanel.suggestioninfo = suggestioninfo
 
-	local desc = vgui.Create("DLabel")
-	desc:SetText("")
-	desc:SetFont(self.CurrentFont)
+	local desc = vgui.Create("DPanel")
+	desc:SetSize(300,900)
+	desc.Text = {}
+	desc.Paint = function(pnl)
+		surface.SetFont(self.CurrentFont)
+		surface.SetTextColor( 255,255,255,255 )
+		local y = 0
+		for i=1, #pnl.Text do
+			surface.SetTextPos( 0, y )
+			surface.DrawText(pnl.Text[i])
+			local _, h = surface_GetTextSize(pnl.Text[i])
+			y = y + h
+		end
+	end
+	desc.SetText = function(pnl, txt)
+		surface.SetFont(self.CurrentFont)
+		pnl.Text = WrapText(txt, 300)
+	end
+
 	suggestioninfo:AddItem(desc)
 	suggestioninfo.desc = desc
 	
-	acPanel:SetSize(700, 300)
+	acPanel:SetSize(720, 300)
 
 	self.acPanel = acPanel
 	return acPanel
