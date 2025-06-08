@@ -158,7 +158,7 @@ function player_methods:setModelScale(scale)
 end
 
 --- Checks if the player is connected to a HUD component that's linked to this chip
--- @return boolean True if a HUD component is connected and active for the player, nil otherwise
+-- @return boolean If a HUD component is connected and active for the player
 function player_methods:isHUDActive()
 	return SF.IsHUDActive(instance.entity, getply(self))
 end
