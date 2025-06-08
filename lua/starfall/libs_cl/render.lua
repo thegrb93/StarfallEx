@@ -1196,6 +1196,12 @@ function render_library.destroyRenderTarget(name)
 	end
 end
 
+--- Determines if currently rendering to a render-target
+-- @return boolean true when a render target is active (e.g., via render.selectRenderTarget); otherwise, false when rendering directly to the screen or the default backbuffer
+function render_library.isInRenderTarget()
+	return renderdata.isRendering and renderdata.usingRT or false
+end
+
 --- Selects the render target to draw on.
 -- Nil for the visible RT.
 -- @param string? name Name of the render target to use
