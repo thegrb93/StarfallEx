@@ -1199,7 +1199,7 @@ end
 --- Determines if currently rendering to a render-target
 -- @return boolean true when a render target is active (e.g., via render.selectRenderTarget); otherwise, false when rendering directly to the screen or the default backbuffer
 function render_library.isInRenderTarget()
-	return renderdata.isRendering and renderdata.usingRT or false
+	return renderdata.usingRT
 end
 
 --- Selects the render target to draw on.
@@ -1327,6 +1327,7 @@ end
 function render_library.clear(clr, clearDepth, clearStencil)
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 	if renderdata.usingRT then
+		if clearStencil and renderdata.noStencil then SF.Throw("Clearing stencil is not allowed in current context") end
 		if clr == nil then
 			render.Clear(0, 0, 0, 255, clearDepth, clearStencil)
 		else
@@ -1345,6 +1346,7 @@ end
 function render_library.clearRGBA(r, g, b, a, clearDepth, clearStencil)
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 	if renderdata.usingRT then
+		if clearStencil and renderdata.noStencil then SF.Throw("Clearing stencil is not allowed in current context") end
 		render.Clear(r, g, b, a, clearDepth, clearStencil)
 	end
 end
@@ -2361,7 +2363,7 @@ end
 -- @return number The red channel value.
 -- @return number The green channel value.
 -- @return number The blue channel value.
--- @return number? The alpha channel value or no value if the render target has no alpha channel.
+-- @return number The alpha channel value.
 function render_library.readPixelRGBA(x, y)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	return render.ReadPixel(x, y)
