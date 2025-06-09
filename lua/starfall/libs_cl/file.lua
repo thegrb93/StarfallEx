@@ -39,6 +39,8 @@ SF.RegisterType("File", true, false)
 local TempFileCache = {}
 do
 	function TempFileCache:Initialize()
+		local maxtime = cv_temp_maxage:GetInt()
+		local ostime = os.time()
 		local entries = {}
 		local files, dirs = file.Find("sf_filedatatemp/*", "DATA")
 		for k, plyid in ipairs(dirs) do
@@ -49,7 +51,7 @@ do
 				local path = dir.."/"..filen
 				local time = file.Time(path, "DATA")
 
-				if os.time() > time + cv_temp_maxage:GetInt() then
+				if ostime > time + maxtime then
 					file.Delete(path)
 					fileCount = fileCount - 1
 				else
