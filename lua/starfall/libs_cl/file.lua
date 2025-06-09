@@ -44,20 +44,22 @@ do
 		for k, plyid in ipairs(dirs) do
 			local dir = "sf_filedatatemp/"..plyid
 			files = file.Find(dir.."/*", "DATA")
-			if next(files)==nil then
-				SF.DeleteFolder(dir)
-			else
-				for k, filen in ipairs(files) do
-					local path = dir.."/"..filen
-					local time = file.Time(path, "DATA")
+			local fileCount = #files
+			for k, filen in ipairs(files) do
+				local path = dir.."/"..filen
+				local time = file.Time(path, "DATA")
 
-					if os.time() > time + cv_temp_maxage:GetInt() then
-						file.Delete(path)
-					else
-						local size = file.Size(path, "DATA")
-						entries[path] = {path = path, plyid = plyid, time = time, size = size}
-					end
+				if os.time() > time + cv_temp_maxage:GetInt() then
+					file.Delete(path)
+					fileCount = fileCount - 1
+				else
+					local size = file.Size(path, "DATA")
+					entries[path] = {path = path, plyid = plyid, time = time, size = size}
 				end
+			end
+
+			if fileCount == 0 then
+				SF.DeleteFolder(dir)
 			end
 		end
 		self.entries = entries
