@@ -19,6 +19,7 @@ file.CreateDir("sf_filedatatemp/")
 local cv_temp_maxfiles = CreateConVar("sf_file_tempmax", "256", { FCVAR_ARCHIVE }, "The max number of files a player can store in temp")
 local cv_temp_maxusersize = CreateConVar("sf_file_tempmaxusersize", "64", { FCVAR_ARCHIVE }, "The max total of megabytes a player can store in temp")
 local cv_temp_maxsize = CreateConVar("sf_file_tempmaxsize", "128", { FCVAR_ARCHIVE }, "The max total of megabytes allowed in temp")
+local cv_temp_maxage = CreateConVar("sf_file_tempmaxage", "604800", { FCVAR_ARCHIVE }, "The max age of a temp file in seconds (default 7 days)")
 local cv_max_concurrent_reads = CreateConVar("sf_file_asyncmax", "10", { FCVAR_ARCHIVE }, "The max concurrent async reads allowed")
 
 --- File functions. Allows modification of files.
@@ -38,17 +39,29 @@ SF.RegisterType("File", true, false)
 local TempFileCache = {}
 do
 	function TempFileCache:Initialize()
+		local maxtime = cv_temp_maxage:GetInt()
+		local ostime = os.time()
 		local entries = {}
 		local files, dirs = file.Find("sf_filedatatemp/*", "DATA")
 		for k, plyid in ipairs(dirs) do
 			local dir = "sf_filedatatemp/"..plyid
 			files = file.Find(dir.."/*", "DATA")
-			if next(files)==nil then SF.DeleteFolder(dir) else
-				for k, filen in ipairs(files) do
-					local path = dir.."/"..filen
-					local time, size = file.Time(path, "DATA"), file.Size(path, "DATA")
+			local fileCount = #files
+			for k, filen in ipairs(files) do
+				local path = dir.."/"..filen
+				local time = file.Time(path, "DATA")
+
+				if ostime > time + maxtime then
+					file.Delete(path)
+					fileCount = fileCount - 1
+				else
+					local size = file.Size(path, "DATA")
 					entries[path] = {path = path, plyid = plyid, time = time, size = size}
 				end
+			end
+
+			if fileCount == 0 then
+				SF.DeleteFolder(dir)
 			end
 		end
 		self.entries = entries
@@ -160,7 +173,6 @@ do
 
 	TempFileCache:Initialize()
 end
-
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
