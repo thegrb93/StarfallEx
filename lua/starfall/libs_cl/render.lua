@@ -1855,22 +1855,6 @@ function render_library.createFont(font, size, weight, antialias, additive, shad
 	outline = tobool(outline)
 	extended = tobool(extended)
 
-	-- Attempt to make fonts more consistent regardless of client's operating system
-	-- https://wiki.facepunch.com/gmod/Finding_the_Font_Name#findthefontsname
-	--[[
-	if system.IsLinux() then
-		-- Linux: Should be using font filename due to reliability, it is case-sensitive
-		font = string.gsub(font, " ", "-") -- Based on Roboto (which uses - instead of space): https://github.com/Facepunch/garrysmod/tree/master/garrysmod/resource/fonts
-		-- Make sure the font ends with .ttf (ensuring it is a filename)
-		if string.lower(string.sub(font, -4)) ~= ".ttf" then font = font .. ".ttf" end
-	else
-		-- Windows/macOS: Use the embedded font name (check if the font is filename which exists in GAME /resource/fonts, if so, extract the embedded name)
-		--font = string.lower(font) -- Make it case-insensitive for lookup?
-		--                             defined_fonts would have to support this change by having a metatable with custom __index function,
-		--                             and become filename based, so it would retrieve actual CreateFont-name upon lookup
-	end
-	--]]
-
 	local name = string.format("sf_screen_font_%s_%d_%d_%d_%d%d%d%d%d",
 		font, size, weight, blursize,
 		antialias and 1 or 0,
