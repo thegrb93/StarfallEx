@@ -43,8 +43,8 @@ local playerFonts = SF.EntityTable("playerFonts")
 
 local defined_fonts = {
 	-- https://wiki.facepunch.com/gmod/Default_Fonts
-	-- Sorted in (case-insensitive) ascending order:
-	["akbar"] = true,
+	-- Sorted embedded names in case-insensitive ascending order:
+	["Akbar"] = true, -- Linux: akbar.ttf
 	["BudgetLabel"] = true,
 	["CenterPrintText"] = true,
 	["ChatFont"] = true,
@@ -54,7 +54,7 @@ local defined_fonts = {
 	["CloseCaption_Italic"] = true,
 	["CloseCaption_Normal"] = true,
 	["ContentHeader"] = true,
-	["coolvetica"] = true,
+	["Coolvetica"] = true, -- Linux: coolvetica.ttf
 	["CreditsLogo"] = true,
 	["CreditsOutroLogos"] = true,
 	["CreditsOutroText"] = true,
@@ -70,9 +70,11 @@ local defined_fonts = {
 	["DefaultSmall"] = true,
 	["DefaultUnderline"] = true,
 	["DefaultVerySmall"] = true,
+	["DejaVu Sans Mono"] = true, -- Linux: DejaVuSansMono.ttf
 	["DermaDefault"] = true,
 	["DermaDefaultBold"] = true,
 	["DermaLarge"] = true,
+	["FontAwesome"] = true, -- Linux: FontAwesome.ttf
 	["GModNotify"] = true,
 	["GModToolHelp"] = true,
 	["GModToolName"] = true,
@@ -91,22 +93,12 @@ local defined_fonts = {
 	["HudSelectionText"] = true,
 	["Marlett"] = true,
 	["QuickInfo"] = true,
-	["Roboto-Black"] = true,
-	["Roboto-BlackItalic"] = true,
-	["Roboto-Bold"] = true,
-	["Roboto-BoldCondensed"] = true,
-	["Roboto-BoldCondensedItalic"] = true,
-	["Roboto-BoldItalic"] = true,
-	["Roboto-Condensed"] = true,
-	["Roboto-CondensedItalic"] = true,
-	["Roboto-Italic"] = true,
-	["Roboto-Light"] = true,
-	["Roboto-LightItalic"] = true,
-	["Roboto-Medium"] = true,
-	["Roboto-MediumItalic"] = true,
-	["Roboto-Regular"] = true,
-	["Roboto-Thin"] = true,
-	["Roboto-ThinItalic"] = true,
+	["Roboto Bk"] = true, -- Linux: Roboto-Black.ttf, or Roboto-BlackItalic.ttf
+	["Roboto Cn"] = true, -- Linux: Roboto-Condensed.ttf, or Roboto-CondensedItalic.ttf, or Roboto-BoldCondensed.ttf, or Roboto-BoldCondensedItalic.ttf
+	["Roboto Lt"] = true, -- Linux: Roboto-Light.ttf, or Roboto-LightItalic.ttf, or Roboto-Medium.ttf, or Roboto-MediumItalic.ttf
+	["Roboto Mono"] = true, -- Linux: RobotoMono.ttf
+	["Roboto Th"] = true, -- Linux: Roboto-Thin.ttf, or Roboto-ThinItalic.ttf
+	["Roboto"] = true, -- Linux: Roboto-Regular.ttf, or Roboto-Italic.ttf, or Roboto-Bold.ttf, or Roboto-BoldItalic.ttf
 	["ScoreboardDefault"] = true,
 	["ScoreboardDefaultTitle"] = true,
 	["TargetID"] = true,
@@ -1827,11 +1819,12 @@ end
 -- For Windows and macOS clients, the font name is not the .ttf file's file name. Instead, the .ttf file has the name of the font embedded within it. This embedded name is what Garry's Mod uses to create the font and make it available in-game.
 -- For Linux clients, using the embedded font name tends to be unreliable. It is recommended to use the font's (case-sensitive) file name, like "Roboto-Regular.ttf", instead. You can use os.isLinux to help determine which name to use.
 -- Base font can be one of (keep in mind that these may not exist on all clients if they are not shipped with game/Starfall):
--- \- akbar
--- \- coolvetica
--- \- Roboto
--- \- Roboto Mono
+-- \- Akbar
+-- \- Coolvetica
+-- \- DejaVu Sans Mono
 -- \- FontAwesome
+-- \- Roboto Mono
+-- \- Roboto
 -- \- Courier New
 -- \- Verdana
 -- \- Arial
@@ -1841,7 +1834,6 @@ end
 -- \- Tahoma
 -- \- Trebuchet
 -- \- Trebuchet MS
--- \- DejaVu Sans Mono
 -- \- Lucida Console
 -- \- Times New Roman
 function render_library.createFont(font, size, weight, antialias, additive, shadow, outline, blursize, extended, scanlines)
