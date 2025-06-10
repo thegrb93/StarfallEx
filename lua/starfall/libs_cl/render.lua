@@ -1327,7 +1327,6 @@ end
 function render_library.clear(clr, clearDepth, clearStencil)
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 	if renderdata.usingRT then
-		if clearStencil and renderdata.noStencil then SF.Throw("Clearing stencil is not allowed in current context") end
 		if clr == nil then
 			render.Clear(0, 0, 0, 255, clearDepth, clearStencil)
 		else
@@ -1346,7 +1345,6 @@ end
 function render_library.clearRGBA(r, g, b, a, clearDepth, clearStencil)
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 	if renderdata.usingRT then
-		if clearStencil and renderdata.noStencil then SF.Throw("Clearing stencil is not allowed in current context") end
 		render.Clear(r, g, b, a, clearDepth, clearStencil)
 	end
 end
