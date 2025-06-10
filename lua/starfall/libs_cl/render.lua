@@ -43,7 +43,8 @@ local playerFonts = SF.EntityTable("playerFonts")
 
 local defined_fonts = {
 	-- https://wiki.facepunch.com/gmod/Default_Fonts
-	-- Sorted in ascending order:
+	-- Sorted in (case-insensitive) ascending order:
+	["akbar"] = true,
 	["BudgetLabel"] = true,
 	["CenterPrintText"] = true,
 	["ChatFont"] = true,
@@ -53,11 +54,13 @@ local defined_fonts = {
 	["CloseCaption_Italic"] = true,
 	["CloseCaption_Normal"] = true,
 	["ContentHeader"] = true,
+	["coolvetica"] = true,
 	["CreditsLogo"] = true,
 	["CreditsOutroLogos"] = true,
 	["CreditsOutroText"] = true,
 	["CreditsText"] = true,
 	["Crosshairs"] = true,
+	["csd"] = true,
 	["DebugFixed"] = true,
 	["DebugFixedSmall"] = true,
 	["DebugOverlay"] = true,
@@ -1824,8 +1827,8 @@ end
 -- For Windows and macOS clients, the font name is not the .ttf file's file name. Instead, the .ttf file has the name of the font embedded within it. This embedded name is what Garry's Mod uses to create the font and make it available in-game.
 -- For Linux clients, using the embedded font name tends to be unreliable. It is recommended to use the font's (case-sensitive) file name, like "Roboto-Regular.ttf", instead. You can use os.isLinux to help determine which name to use.
 -- Base font can be one of (keep in mind that these may not exist on all clients if they are not shipped with game/Starfall):
--- \- Akbar
--- \- Coolvetica
+-- \- akbar
+-- \- coolvetica
 -- \- Roboto
 -- \- Roboto Mono
 -- \- FontAwesome
@@ -1851,6 +1854,22 @@ function render_library.createFont(font, size, weight, antialias, additive, shad
 	shadow = tobool(shadow)
 	outline = tobool(outline)
 	extended = tobool(extended)
+
+	-- Attempt to make fonts more consistent regardless of client's operating system
+	-- https://wiki.facepunch.com/gmod/Finding_the_Font_Name#findthefontsname
+	--[[
+	if system.IsLinux() then
+		-- Linux: Should be using font filename due to reliability, it is case-sensitive
+		font = string.gsub(font, " ", "-") -- Based on Roboto (which uses - instead of space): https://github.com/Facepunch/garrysmod/tree/master/garrysmod/resource/fonts
+		-- Make sure the font ends with .ttf (ensuring it is a filename)
+		if string.lower(string.sub(font, -4)) ~= ".ttf" then font = font .. ".ttf" end
+	else
+		-- Windows/macOS: Use the embedded font name (check if the font is filename which exists in GAME /resource/fonts, if so, extract the embedded name)
+		--font = string.lower(font) -- Make it case-insensitive for lookup?
+		--                             defined_fonts would have to support this change by having a metatable with custom __index function,
+		--                             and become filename based, so it would retrieve actual CreateFont-name upon lookup
+	end
+	--]]
 
 	local name = string.format("sf_screen_font_%s_%d_%d_%d_%d%d%d%d%d",
 		font, size, weight, blursize,
