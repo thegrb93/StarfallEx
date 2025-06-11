@@ -43,6 +43,13 @@ local playerFonts = SF.EntityTable("playerFonts")
 
 local defined_fonts = {
 	-- https://wiki.facepunch.com/gmod/Default_Fonts
+	-- See also: https://wiki.facepunch.com/gmod/Finding_the_Font_Name#findthefontsname
+	-- On Windows and macOS, the font name is not the .ttf filename. Instead, the .ttf file has
+	-- the name of the font embedded within it. This embedded name is what Garry's Mod uses.
+	-- On Linux, using the embedded font name tends to be unreliable; it is recommended to use
+	-- the font (case-sensitive) file name, e.g. "Roboto-Regular.ttf", instead.
+	-- You can use os.isLinux to help determine which name to use.
+	--------------------------------------------------------------------------------------------------
 	-- Sorted embedded names in case-insensitive ascending order:
 	["Akbar"] = true, -- Linux: akbar.ttf
 	["BudgetLabel"] = true,
@@ -108,7 +115,6 @@ local defined_fonts = {
 	["WeaponIcons"] = true,
 	["WeaponIconsSelected"] = true,
 	["WeaponIconsSmall"] = true,
-	["WorkshopLarge"] = true,
 }
 SF.DefinedFonts = defined_fonts
 
@@ -1805,37 +1811,24 @@ function render_library.drawLine(x1, y1, x2, y2)
 end
 
 --- Creates a font. Does not require rendering hook
--- @param string font Base font to use. https://wiki.facepunch.com/gmod/Default_Fonts 
+-- @param string font Base font to use
 -- @param number? size Font size. Default 16
 -- @param number? weight Font weight. Default 400
 -- @param boolean? antialias Antialias font? Default false
 -- @param boolean? additive If true, adds brightness to pixels behind it rather than drawing over them. Default false
 -- @param boolean? shadow Enable drop shadow? Default false
 -- @param boolean? outline Enable outline? Default false
--- @param boolean? blursize The size of the blur Default 0
+-- @param boolean? blursize The size of the blur. Default 0
 -- @param boolean? extended Allows the font to display glyphs outside of Latin-1 range. Unicode code points above 0xFFFF are not supported. Required to use FontAwesome
 -- @param number? scanlines Scanline interval. Must be greater than 1 to work. Shares uniqueness with blursize so you cannot create more than one scanline type of font with the same blursize. Default 0
 -- @return string The font name that can be used with the rest of the font functions.
--- For Windows and macOS clients, the font name is not the .ttf file's file name. Instead, the .ttf file has the name of the font embedded within it. This embedded name is what Garry's Mod uses to create the font and make it available in-game.
+-- You should read this if the font is not working:
+-- For Windows and macOS clients, the font name is not the .ttf filename. Instead, the .ttf file has the name of the font embedded within it. This embedded name is what Garry's Mod uses to create the font and make it available in-game.
 -- For Linux clients, using the embedded font name tends to be unreliable. It is recommended to use the font's (case-sensitive) file name, like "Roboto-Regular.ttf", instead. You can use os.isLinux to help determine which name to use.
 -- Base font can be one of (keep in mind that these may not exist on all clients if they are not shipped with game/Starfall):
--- \- Akbar
--- \- Coolvetica
--- \- DejaVu Sans Mono
--- \- FontAwesome
--- \- Roboto Mono
--- \- Roboto
--- \- Courier New
--- \- Verdana
--- \- Arial
--- \- HalfLife2
--- \- hl2mp
--- \- csd
--- \- Tahoma
--- \- Trebuchet
--- \- Trebuchet MS
--- \- Lucida Console
--- \- Times New Roman
+-- https://wiki.facepunch.com/gmod/Default_Fonts
+-- https://github.com/Facepunch/garrysmod/tree/master/garrysmod/resource/fonts
+-- https://github.com/thegrb93/StarfallEx/tree/master/resource/fonts
 function render_library.createFont(font, size, weight, antialias, additive, shadow, outline, blursize, extended, scanlines)
 	size = tonumber(size) or 16
 	weight = tonumber(weight) or 400
@@ -1884,28 +1877,8 @@ end
 -- @param string font The font to use
 -- Use a font created by render.createFont or use one of these already defined fonts:
 -- https://wiki.facepunch.com/gmod/Default_Fonts
--- \- DebugFixed
--- \- DebugFixedSmall
--- \- Default
--- \- Marlett
--- \- Trebuchet18
--- \- Trebuchet24
--- \- HudHintTextLarge
--- \- HudHintTextSmall
--- \- CenterPrintText
--- \- HudSelectionText
--- \- CloseCaption_Normal
--- \- CloseCaption_Bold
--- \- CloseCaption_BoldItalic
--- \- ChatFont
--- \- TargetID
--- \- TargetIDSmall
--- \- HL2MPTypeDeath
--- \- BudgetLabel
--- \- HudNumbers
--- \- DermaDefault
--- \- DermaDefaultBold
--- \- DermaLarge
+-- https://github.com/Facepunch/garrysmod/tree/master/garrysmod/resource/fonts
+-- https://github.com/thegrb93/StarfallEx/tree/master/resource/fonts
 function render_library.setFont(font)
 	if not defined_fonts[font] then SF.Throw("Font does not exist.", 2) end
 	renderdata.font = font
