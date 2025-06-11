@@ -42,79 +42,37 @@ SF.RT_Material = RT_Material
 local playerFonts = SF.EntityTable("playerFonts")
 
 local defined_fonts = {
-	-- https://wiki.facepunch.com/gmod/Default_Fonts
-	-- See also: https://wiki.facepunch.com/gmod/Finding_the_Font_Name#findthefontsname
-	-- On Windows and macOS, the font name is not the .ttf filename. Instead, the .ttf file has
-	-- the name of the font embedded within it. This embedded name is what Garry's Mod uses.
-	-- On Linux, using the embedded font name tends to be unreliable; it is recommended to use
-	-- the font (case-sensitive) file name, e.g. "Roboto-Regular.ttf", instead.
-	-- You can use os.isLinux to help determine which name to use.
-	--------------------------------------------------------------------------------------------------
-	-- Sorted embedded names in case-insensitive ascending order:
-	["Akbar"] = true, -- Linux: akbar.ttf
-	["BudgetLabel"] = true,
-	["CenterPrintText"] = true,
-	["ChatFont"] = true,
-	["ClientTitleFont"] = true,
-	["CloseCaption_Bold"] = true,
-	["CloseCaption_BoldItalic"] = true,
-	["CloseCaption_Italic"] = true,
-	["CloseCaption_Normal"] = true,
-	["ContentHeader"] = true,
-	["Coolvetica"] = true, -- Linux: coolvetica.ttf
-	["CreditsLogo"] = true,
-	["CreditsOutroLogos"] = true,
-	["CreditsOutroText"] = true,
-	["CreditsText"] = true,
-	["Crosshairs"] = true,
-	["csd"] = true,
-	["DebugFixed"] = true,
-	["DebugFixedSmall"] = true,
-	["DebugOverlay"] = true,
-	["Default"] = true,
-	["DefaultFixed"] = true,
-	["DefaultFixedDropShadow"] = true,
-	["DefaultSmall"] = true,
-	["DefaultUnderline"] = true,
-	["DefaultVerySmall"] = true,
-	["DejaVu Sans Mono"] = true, -- Linux: DejaVuSansMono.ttf
-	["DermaDefault"] = true,
-	["DermaDefaultBold"] = true,
-	["DermaLarge"] = true,
-	["FontAwesome"] = true, -- Linux: FontAwesome.ttf
-	["GModNotify"] = true,
-	["GModToolHelp"] = true,
-	["GModToolName"] = true,
-	["GModToolScreen"] = true,
-	["GModToolSubtitle"] = true,
-	["GModWorldtip"] = true,
-	["HDRDemoText"] = true,
-	["HL2MPTypeDeath"] = true,
-	["HudDefault"] = true,
-	["HudHintTextLarge"] = true,
-	["HudHintTextSmall"] = true,
-	["HudNumbers"] = true,
-	["HudNumbersGlow"] = true,
-	["HudNumbersSmall"] = true,
-	["HudSelectionNumbers"] = true,
-	["HudSelectionText"] = true,
-	["Marlett"] = true,
-	["QuickInfo"] = true,
-	["Roboto Bk"] = true, -- Linux: Roboto-Black.ttf, or Roboto-BlackItalic.ttf
-	["Roboto Cn"] = true, -- Linux: Roboto-Condensed.ttf, or Roboto-CondensedItalic.ttf, or Roboto-BoldCondensed.ttf, or Roboto-BoldCondensedItalic.ttf
-	["Roboto Lt"] = true, -- Linux: Roboto-Light.ttf, or Roboto-LightItalic.ttf, or Roboto-Medium.ttf, or Roboto-MediumItalic.ttf
-	["Roboto Mono"] = true, -- Linux: RobotoMono.ttf
-	["Roboto Th"] = true, -- Linux: Roboto-Thin.ttf, or Roboto-ThinItalic.ttf
-	["Roboto"] = true, -- Linux: Roboto-Regular.ttf, or Roboto-Italic.ttf, or Roboto-Bold.ttf, or Roboto-BoldItalic.ttf
-	["ScoreboardDefault"] = true,
-	["ScoreboardDefaultTitle"] = true,
-	["TargetID"] = true,
-	["TargetIDSmall"] = true,
-	["Trebuchet18"] = true,
-	["Trebuchet24"] = true,
-	["WeaponIcons"] = true,
-	["WeaponIconsSelected"] = true,
-	["WeaponIconsSmall"] = true,
+	DebugFixed = true,
+	DebugFixedSmall = true,
+	Default = true,
+	Marlett = true,
+	Trebuchet18 = true,
+	Trebuchet24 = true,
+	HudHintTextLarge = true,
+	HudHintTextSmall = true,
+	CenterPrintText = true,
+	HudSelectionText = true,
+	CloseCaption_Normal = true,
+	CloseCaption_Bold = true,
+	CloseCaption_BoldItalic = true,
+	ChatFont = true,
+	TargetID = true,
+	TargetIDSmall = true,
+	HL2MPTypeDeath = true,
+	BudgetLabel = true,
+	HudNumbers = true,
+	DermaDefault = true,
+	DermaDefaultBold = true,
+	DermaLarge = true,
+	GModNotify = true,
+	ScoreboardDefault = true,
+	ScoreboardDefaultTitle = true,
+	GModToolName = true,
+	GModToolSubtitle = true,
+	GModToolHelp = true,
+	GModToolScreen = true,
+	ContentHeader = true,
+	GModWorldtip = true,
 }
 SF.DefinedFonts = defined_fonts
 
@@ -1818,17 +1776,28 @@ end
 -- @param boolean? additive If true, adds brightness to pixels behind it rather than drawing over them. Default false
 -- @param boolean? shadow Enable drop shadow? Default false
 -- @param boolean? outline Enable outline? Default false
--- @param boolean? blursize The size of the blur. Default 0
+-- @param boolean? blursize The size of the blur Default 0
 -- @param boolean? extended Allows the font to display glyphs outside of Latin-1 range. Unicode code points above 0xFFFF are not supported. Required to use FontAwesome
 -- @param number? scanlines Scanline interval. Must be greater than 1 to work. Shares uniqueness with blursize so you cannot create more than one scanline type of font with the same blursize. Default 0
 -- @return string The font name that can be used with the rest of the font functions.
--- You should read this if the font is not working:
--- For Windows and macOS clients, the font name is not the .ttf filename. Instead, the .ttf file has the name of the font embedded within it. This embedded name is what Garry's Mod uses to create the font and make it available in-game.
--- For Linux clients, using the embedded font name tends to be unreliable. It is recommended to use the font's (case-sensitive) file name, like "Roboto-Regular.ttf", instead. You can use os.isLinux to help determine which name to use.
--- Base font can be one of (keep in mind that these may not exist on all clients if they are not shipped with game/Starfall):
--- https://wiki.facepunch.com/gmod/Default_Fonts
--- https://github.com/Facepunch/garrysmod/tree/master/garrysmod/resource/fonts
--- https://github.com/thegrb93/StarfallEx/tree/master/resource/fonts
+-- Base font can be one of (keep in mind that these may not exist on all clients if they are not shipped with starfall):
+-- \- Akbar
+-- \- Coolvetica
+-- \- Roboto
+-- \- Roboto Mono
+-- \- FontAwesome
+-- \- Courier New
+-- \- Verdana
+-- \- Arial
+-- \- HalfLife2
+-- \- hl2mp
+-- \- csd
+-- \- Tahoma
+-- \- Trebuchet
+-- \- Trebuchet MS
+-- \- DejaVu Sans Mono
+-- \- Lucida Console
+-- \- Times New Roman
 function render_library.createFont(font, size, weight, antialias, additive, shadow, outline, blursize, extended, scanlines)
 	size = tonumber(size) or 16
 	weight = tonumber(weight) or 400
@@ -1876,9 +1845,28 @@ end
 --- Sets the font
 -- @param string font The font to use
 -- Use a font created by render.createFont or use one of these already defined fonts:
--- https://wiki.facepunch.com/gmod/Default_Fonts
--- https://github.com/Facepunch/garrysmod/tree/master/garrysmod/resource/fonts
--- https://github.com/thegrb93/StarfallEx/tree/master/resource/fonts
+-- \- DebugFixed
+-- \- DebugFixedSmall
+-- \- Default
+-- \- Marlett
+-- \- Trebuchet18
+-- \- Trebuchet24
+-- \- HudHintTextLarge
+-- \- HudHintTextSmall
+-- \- CenterPrintText
+-- \- HudSelectionText
+-- \- CloseCaption_Normal
+-- \- CloseCaption_Bold
+-- \- CloseCaption_BoldItalic
+-- \- ChatFont
+-- \- TargetID
+-- \- TargetIDSmall
+-- \- HL2MPTypeDeath
+-- \- BudgetLabel
+-- \- HudNumbers
+-- \- DermaDefault
+-- \- DermaDefaultBold
+-- \- DermaLarge
 function render_library.setFont(font)
 	if not defined_fonts[font] then SF.Throw("Font does not exist.", 2) end
 	renderdata.font = font
