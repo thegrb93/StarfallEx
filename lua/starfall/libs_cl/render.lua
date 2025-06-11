@@ -150,10 +150,9 @@ local rt_bank = SF.ResourceHandler("render_rendertargets", "Render targets", "20
 		return GetRenderTarget("Starfall_CustomRT_" .. i, 1024, 1024)
 	end,
 	function(_, Rt)
-		local oldRt = render.GetRenderTarget()
-		render.SetRenderTarget( Rt )
+		render.PushRenderTarget(Rt)
 		render.Clear(0, 0, 0, 255, true)
-		render.SetRenderTarget( oldRt )
+		render.PopRenderTarget()
 	end
 )
 
@@ -1197,6 +1196,12 @@ function render_library.destroyRenderTarget(name)
 	end
 end
 
+--- Determines if currently rendering to a render-target
+-- @return boolean true when a render target is active (e.g., via render.selectRenderTarget); otherwise, false when rendering directly to the screen or the default backbuffer
+function render_library.isInRenderTarget()
+	return renderdata.usingRT
+end
+
 --- Selects the render target to draw on.
 -- Nil for the visible RT.
 -- @param string? name Name of the render target to use
@@ -1316,29 +1321,31 @@ function render_library.setCullMode(mode)
 end
 
 --- Clears the active render target
--- @param Color? clr Color type to clear with
--- @param boolean? depth Boolean if should clear depth. Default false
-function render_library.clear(clr, depth)
+-- @param Color? clr Color type to clear with. Default opaque black
+-- @param boolean? clearDepth Boolean if should clear depth. Default false
+-- @param boolean? clearStencil Boolean if should clear stencil. Default false
+function render_library.clear(clr, clearDepth, clearStencil)
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 	if renderdata.usingRT then
 		if clr == nil then
-			render.Clear(0, 0, 0, 255, depth)
+			render.Clear(0, 0, 0, 255, clearDepth, clearStencil)
 		else
-			render.Clear(clr.r, clr.g, clr.b, clr.a, depth)
+			render.Clear(clr.r, clr.g, clr.b, clr.a, clearDepth, clearStencil)
 		end
 	end
 end
 
 --- Clears the active render target
--- @return number The red channel value.
--- @return number The green channel value.
--- @return number The blue channel value.
--- @return number The alpha channel value.
--- @param boolean? depth Boolean if should clear depth. Default false
-function render_library.clearRGBA(r, g, b, a, depth)
+-- @param number r The red channel value.
+-- @param number g The green channel value.
+-- @param number b The blue channel value.
+-- @param number a The alpha channel value.
+-- @param boolean? clearDepth Boolean if should clear depth. Default false
+-- @param boolean? clearStencil Boolean if should clear stencil. Default false
+function render_library.clearRGBA(r, g, b, a, clearDepth, clearStencil)
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 	if renderdata.usingRT then
-		render.Clear(r, g, b, a, depth)
+		render.Clear(r, g, b, a, clearDepth, clearStencil)
 	end
 end
 
