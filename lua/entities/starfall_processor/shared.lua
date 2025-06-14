@@ -264,7 +264,7 @@ if SERVER then
 				disconnect(false)
 			end
 		else
-			if not enabled and chip.instance.data.viewEntityChanged then
+			if not enabled and chip.instance and chip.instance.data.viewEntityChanged then
 				chip.instance.data.viewEntityChanged = false
 				ply:SetViewEntity()
 			end
