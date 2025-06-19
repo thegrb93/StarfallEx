@@ -63,8 +63,9 @@ local start_vec, endpos_vec, minbox_vec, maxbox_vec, origin_vec, angles_ang, nor
 -- @param number? mask Trace mask
 -- @param number? colgroup The collision group of the trace
 -- @param boolean? ignworld Whether the trace should ignore world
+-- @param boolean? whitelist Make 'filter' param array act as a hit whitelist instead of blacklist
 -- @return table Result of the trace https://wiki.facepunch.com/gmod/Structures/TraceResult
-function trace_library.line(start, endpos, filter, mask, colgroup, ignworld)
+function trace_library.line(start, endpos, filter, mask, colgroup, ignworld, whitelist)
 	vec_SetUnpacked(start_vec, start[1], start[2], start[3])
 	vec_SetUnpacked(endpos_vec, endpos[1], endpos[2], endpos[3])
 
@@ -75,6 +76,7 @@ function trace_library.line(start, endpos, filter, mask, colgroup, ignworld)
 		mask = mask,
 		collisiongroup = colgroup,
 		ignoreworld = ignworld,
+		whitelist = whitelist,
 	}), "TraceResult")
 end
 
@@ -87,8 +89,9 @@ end
 -- @param number? mask Trace mask
 -- @param number? colgroup The collision group of the trace
 -- @param boolean? ignworld Whether the trace should ignore world
+-- @param boolean? whitelist Make 'filter' param array act as a hit whitelist instead of blacklist
 -- @return table Result of the trace https://wiki.facepunch.com/gmod/Structures/TraceResult
-function trace_library.hull(start, endpos, minbox, maxbox, filter, mask, colgroup, ignworld)
+function trace_library.hull(start, endpos, minbox, maxbox, filter, mask, colgroup, ignworld, whitelist)
 	vec_SetUnpacked(start_vec, start[1], start[2], start[3])
 	vec_SetUnpacked(endpos_vec, endpos[1], endpos[2], endpos[3])
 	vec_SetUnpacked(minbox_vec, minbox[1], minbox[2], minbox[3])
@@ -103,6 +106,7 @@ function trace_library.hull(start, endpos, minbox, maxbox, filter, mask, colgrou
 		ignoreworld = ignworld,
 		mins = minbox_vec,
 		maxs = maxbox_vec,
+		whitelist = whitelist,
 	}), "TraceResult")
 end
 
