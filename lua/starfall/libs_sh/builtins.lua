@@ -593,6 +593,21 @@ if SERVER then
 		printTableX(tbl, 0, { [tbl] = true })
 	end
 
+	--- Checks how much of the serverside print burst limit is remaining
+	--- The cost of each print is roughly equivalent to totalStringLength + 6*numColors + 2*numStrings
+	-- @server
+	-- @return number Size of the remaining print burst in bytes
+	function builtins_library.printSizeLeft()
+		return printBurst:check(instance.player)
+	end
+
+	--- Returns the refill rate of the serverside print burst limit
+	-- @server
+	-- @return number Number of bytes per second the print burst limit refills
+	function builtins_library.printRate()
+		return printBurst.rate
+	end
+
 	--- Execute a console command
 	-- @shared
 	-- @param string cmd Command to execute
@@ -602,6 +617,21 @@ if SERVER then
 		checkpermission(instance, nil, "console.command")
 		concmdBurst:use(instance.player, #cmd)
 		instance.player:ConCommand(cmd)
+	end
+
+	--- Checks how many concmds are remaining in the serverside burst limit
+	-- @server
+	-- @return number Number of concmds able to be ran serverside
+	function builtins_library.concmdLeft()
+		if not haspermission(instance,  nil, "console.command") then return 0 end
+		return concmdBurst:check(instance.player)
+	end
+
+	--- Returns how many concmds per second the user can run serverside
+	-- @server
+	-- @return number Number of concmds per second the user can run serverside
+	function builtins_library.concmdRate()
+		return concmdBurst.rate
 	end
 
 	--- Sets the chip's userdata that the duplicator tool saves. max 1MiB; can be changed with convar sf_userdata_max
