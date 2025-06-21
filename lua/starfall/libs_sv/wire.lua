@@ -11,6 +11,8 @@ registerprivilege("wire.wirelink.read", "Wirelink Read", "Allows the user to rea
 registerprivilege("wire.wirelink.write", "Wirelink Write", "Allows the user to write to wirelink")
 registerprivilege("wire.createWire", "Create Wire", "Allows the user to create a wire between two entities", { entities = {} })
 registerprivilege("wire.deleteWire", "Delete Wire", "Allows the user to delete a wire between two entities", { entities = {} })
+registerprivilege("wire.trigger", "Direct Trigger", "Allows the user to directly trigger inputs", { entities = {} })
+registerprivilege("wire.read", "Direct Read", "Allows the user to directly read inputs", { entities = {} })
 registerprivilege("wire.getInputs", "Get Inputs", "Allows the user to get Inputs of an entity")
 registerprivilege("wire.getOutputs", "Get Outputs", "Allows the user to get Outputs of an entity")
 
@@ -622,33 +624,27 @@ local function checkoutput(outputs, k, converters)
 end
 
 local function triggerInput(ent, k, v)
-	checkpermission(instance, nil, "wire.wirelink.write")
 	local input, convert = checkinput(Ent_GetTable(ent).Inputs, k, SFToWire)
 	instance:runExternal(WireLib.TriggerInput, ent, k, convert(v))
 end
 local function triggerOutput(ent, k, v)
-	checkpermission(instance, nil, "wire.wirelink.write")
 	local output, convert = checkoutput(Ent_GetTable(ent).Outputs, k, SFToWire)
 	instance:runExternal(Wire_TriggerOutput, ent, k, convert(v))
 end
 local function triggerCell(ent, k, v)
-	checkpermission(instance, nil, "wire.wirelink.write")
 	local WriteCell = Ent_GetTable(ent).WriteCell or SF.Throw("Entity does not have WriteCell capability", 3)
 	instance:runExternal(WriteCell, ent, k, v)
 end
 
 local function readInput(ent, k)
-	checkpermission(instance, nil, "wire.wirelink.read")
 	local input, convert = checkinput(Ent_GetTable(ent).Inputs, k, WireToSF)
 	return convert(input.Value)
 end
 local function readOutput(ent, k)
-	checkpermission(instance, nil, "wire.wirelink.read")
 	local output, convert = checkoutput(Ent_GetTable(ent).Outputs, k, WireToSF)
 	return convert(output.Value)
 end
 local function readCell(ent, k)
-	checkpermission(instance, nil, "wire.wirelink.read")
 	local ReadCell = Ent_GetTable(ent).ReadCell or SF.Throw("Entity does not have ReadCell capability", 3)
 	local ok, n = instance:runExternal(ReadCell, ent, k)
 	return ok and tonumber(n) or 0
@@ -660,7 +656,9 @@ end
 -- @param any value The value to set the input to (must match the input type)
 function wire_library.triggerInput(ent, inputname, value)
 	checkluatype(inputname, TYPE_STRING)
-	triggerInput(getent(ent), inputname, value)
+	ent = getent(ent)
+	checkpermission(instance, ent, "wire.trigger")
+	triggerInput(ent, inputname, value)
 end
 
 --- Sets the value of an entity's output, triggering it as well
@@ -669,7 +667,9 @@ end
 -- @param any value The value to set the output to (must match the output type)
 function wire_library.triggerOutput(ent, outputname, value)
 	checkluatype(outputname, TYPE_STRING)
-	triggerOutput(getent(ent), outputname, value)
+	ent = getent(ent)
+	checkpermission(instance, ent, "wire.trigger")
+	triggerOutput(ent, outputname, value)
 end
 
 --- Sets the value of an entity's wire memory, triggering it as well
@@ -679,7 +679,9 @@ end
 function wire_library.triggerCell(ent, index, value)
 	checkluatype(index, TYPE_NUMBER)
 	checkluatype(value, TYPE_NUMBER)
-	triggerCell(getent(ent), index, value)
+	ent = getent(ent)
+	checkpermission(instance, ent, "wire.trigger")
+	triggerCell(ent, index, value)
 end
 
 --- Gets the value of an entity's input
@@ -688,7 +690,9 @@ end
 -- @return any value The value to set the input to (must match the input type)
 function wire_library.readInput(ent, inputname)
 	checkluatype(inputname, TYPE_STRING)
-	return readInput(getent(ent), inputname)
+	ent = getent(ent)
+	checkpermission(instance, ent, "wire.read")
+	return readInput(ent, inputname)
 end
 
 --- Gets the value of an entity's output
@@ -697,7 +701,9 @@ end
 -- @return any value The value to set the output to (must match the output type)
 function wire_library.readOutput(ent, outputname)
 	checkluatype(outputname, TYPE_STRING)
-	return readOutput(getent(ent), outputname)
+	ent = getent(ent)
+	checkpermission(instance, ent, "wire.read")
+	return readOutput(ent, outputname)
 end
 
 --- Gets a value from an entity's wire memory
@@ -706,7 +712,9 @@ end
 -- @return number The value at the address
 function wire_library.readCell(ent, index)
 	checkluatype(index, TYPE_NUMBER)
-	return readCell(getent(ent), index)
+	ent = getent(ent)
+	checkpermission(instance, ent, "wire.read")
+	return readCell(ent, index)
 end
 
 --- Returns an entities wirelink
@@ -722,7 +730,7 @@ ents_methods.getWirelink = wire_library.getWirelink
 wirelink_meta.__index = function(self, k)
 	local method = wirelink_methods[k]
 	if method then return method end
-
+	checkpermission(instance, nil, "wire.wirelink.read")
 	if isstring(k) then
 		return readOutput(getwl(self), k)
 	elseif isnumber(k) then
@@ -736,6 +744,7 @@ end
 -- @param string|number k Name of input or index of cell
 -- @param any v Value to set input or cell
 wirelink_meta.__newindex = function(self, k, v)
+	checkpermission(instance, nil, "wire.wirelink.write")
 	if isstring(k) then
 		triggerInput(getwl(self), k, v)
 	elseif isnumber(k) then
