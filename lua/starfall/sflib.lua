@@ -192,9 +192,10 @@ setmetatable(SF.StructWrapper, SF.StructWrapper)
 SF.BurstObject = {
 	__index = {
 		calc = function(self, obj)
-			local ret = math.min(obj.val + (CurTime() - obj.lasttick) * self.rate, self.max)
+			local new = math.min(obj.val + (CurTime() - obj.lasttick) * self.rate, self.max)
+			obj.val = new
 			obj.lasttick = CurTime()
-			return ret
+			return new
 		end,
 		use = function(self, ply, amount)
 			local obj = self:get(ply)
@@ -206,8 +207,7 @@ SF.BurstObject = {
 		end,
 		check = function(self, ply)
 			local obj = self:get(ply)
-			obj.val = self:calc(obj)
-			return obj.val
+			return self:calc(obj)
 		end,
 		get = function(self, ply)
 			if ply~=SF.Superuser and not Ent_IsValid(ply) then SF.Throw("Invalid starfall user", 4) end

@@ -664,9 +664,10 @@ local plyMeshCount = SF.LimitObject("mesh", "total meshes", 1000, "How many mesh
 
 function plyTriangleRenderBurst:calc(obj)
 	local t = RealTime()
-	local ret = math.min(obj.val + (t - obj.lasttick)/RealFrameTime() * self.rate, self.max)
+	local new = math.min(obj.val + (t - obj.lasttick)/RealFrameTime() * self.rate, self.max)
+	obj.val = new
 	obj.lasttick = t
-	return ret
+	return new
 end
 
 --- Mesh library.
