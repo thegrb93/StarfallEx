@@ -443,7 +443,7 @@ function constraint_library.nocollide(e1, e2, bone1, bone2)
 	checkluatype(bone1, TYPE_NUMBER)
 	checkluatype(bone2, TYPE_NUMBER)
 
-	local ent = constraint.NoCollide(ent1, ent2, bone1, bone2)
+	local ent = constraint.NoCollide(ent1, ent2, bone1, bone2, true)
 	if ent then
 		entList:register(instance, ent)
 		return cwrap(ent)
