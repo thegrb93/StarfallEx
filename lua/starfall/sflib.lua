@@ -1352,6 +1352,7 @@ end
 
 --- Compile String but fix a compile error.
 function SF.CompileString(script, identifier, handle_error)
+	if not string.match(script, "%S") then return function() end end
 	if string.match(script, "%f[%w_]repeat%f[^%w_].*%f[%w_]continue%f[^%w_].*%f[%w_]until%f[^%w_]") then
 		return "Using 'continue' in a repeat-until loop has been banned due to a glua bug."
 	end
