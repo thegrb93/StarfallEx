@@ -16,7 +16,6 @@ function ENT:Initialize()
 	self:SetSolid(SOLID_VPHYSICS)
 	self:SetUseType(SIMPLE_USE)
 
-	self.enabled = {}
 	self:AddEFlags( EFL_FORCE_CHECK_TRANSMIT )
 end
 
@@ -26,9 +25,7 @@ end
 
 function ENT:Use(ply)
 	if not IsValid(self.link) then ply:ChatPrint("This hud isn't linked to a chip!") return end
-	local enabled = not self.enabled[ply]
-	self.enabled[ply] = enabled or nil
-	SF.EnableHud(ply, self.link, self, enabled)
+	SF.EnableHud(ply, self.link, self, not SF.IsHUDActive(self.link, ply))
 end
 
 function ENT:LinkVehicle(ent)
