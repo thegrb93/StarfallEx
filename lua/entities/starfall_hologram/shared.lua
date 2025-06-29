@@ -6,6 +6,7 @@ ENT.Author          = "Starfall Organization"
 
 ENT.Spawnable       = false
 ENT.AdminSpawnable  = false
+ENT.DoNotDuplicate  = true
 
 ENT.IsSFHologram = true
 
