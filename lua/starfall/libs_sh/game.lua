@@ -279,6 +279,13 @@ else
 	-- @return number Server frametime standard deviation
 	game_library.serverFrameTime = engine.ServerFrameTime
 
+	--- Returns the real frame-time which is unaffected by host_timescale
+	-- @name game_library.realFrameTime
+	-- @client
+	-- @class function
+	-- @return number Frametime
+	game_library.realFrameTime = RealFrameTime
+
 	--- Returns if the client is currently timing out from the server
 	-- @name game_library.isTimingOut
 	-- @client
@@ -288,5 +295,12 @@ else
 	game_library.isTimingOut = GetTimeoutInfo
 
 end
+
+--- Returns the frame time of the physics engine
+-- @name game_library.physicsFrameTime
+-- @shared
+-- @class function
+-- @return number The physics frame time length
+game_library.physicsFrameTime = physenv.GetLastSimulationTime
 
 end
