@@ -280,6 +280,7 @@ math_library.remap = math.Remap
 -- @class function
 -- @param number value The number to be rounded
 -- @param number? decimals Optional decimal places to round to. Defaults to 0
+-- @return number The rounded value
 math_library.round = math.Round
 
 --- Calculates the sine of given angle.
