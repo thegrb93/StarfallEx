@@ -994,8 +994,8 @@ local render_SetMaterial = render.SetMaterial
 local render_SetColorMaterial = render.SetColorMaterial
 local draw_NoTexture = draw.NoTexture
 
---- Sets the current render material
--- @param Material mat The material object
+--- Sets or resets the current render material
+-- @param Material? mat The material object to use, or nil to reset
 function render_library.setMaterial(mat)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if mat then
@@ -1776,7 +1776,7 @@ end
 -- @param boolean? additive If true, adds brightness to pixels behind it rather than drawing over them. Default false
 -- @param boolean? shadow Enable drop shadow? Default false
 -- @param boolean? outline Enable outline? Default false
--- @param boolean? blursize The size of the blur Default 0
+-- @param number? blursize The size of the blur Default 0
 -- @param boolean? extended Allows the font to display glyphs outside of Latin-1 range. Unicode code points above 0xFFFF are not supported. Required to use FontAwesome
 -- @param number? scanlines Scanline interval. Must be greater than 1 to work. Shares uniqueness with blursize so you cannot create more than one scanline type of font with the same blursize. Default 0
 -- @return string The font name that can be used with the rest of the font functions.
@@ -1883,7 +1883,7 @@ end
 -- @param number x X coordinate
 -- @param number y Y coordinate
 -- @param string text Text to draw
--- @param number alignment Horizontal text alignment. Default TEXT_ALIGN.LEFT
+-- @param number? alignment Horizontal text alignment. Default TEXT_ALIGN.LEFT
 function render_library.drawText(x, y, text, alignment)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
@@ -1977,11 +1977,11 @@ function render_library.enableDepth(enable)
 	render.OverrideDepthEnable(enable, enable)
 end
 
---- Enables blend mode control. Read OpenGL or DirectX docs for more info
+--- Enables or disables blend mode control. Read OpenGL or DirectX docs for more info
 -- @param boolean on Whether to control the blend mode of upcoming rendering
--- @param number srcBlend http://wiki.facepunch.com/gmod/Enums/BLEND
--- @param number destBlend
--- @param number blendFunc http://wiki.facepunch.com/gmod/Enums/BLENDFUNC
+-- @param number? srcBlend http://wiki.facepunch.com/gmod/Enums/BLEND
+-- @param number? destBlend
+-- @param number? blendFunc http://wiki.facepunch.com/gmod/Enums/BLENDFUNC
 -- @param number? srcBlendAlpha http://wiki.facepunch.com/gmod/Enums/BLEND
 -- @param number? destBlendAlpha
 -- @param number? blendFuncAlpha http://wiki.facepunch.com/gmod/Enums/BLENDFUNC
