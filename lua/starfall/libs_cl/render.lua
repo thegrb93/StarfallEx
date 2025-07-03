@@ -1883,7 +1883,7 @@ end
 -- @param number x X coordinate
 -- @param number y Y coordinate
 -- @param string text Text to draw
--- @param number alignment Horizontal text alignment. Default TEXT_ALIGN.LEFT
+-- @param number? alignment Horizontal text alignment. Default TEXT_ALIGN.LEFT
 function render_library.drawText(x, y, text, alignment)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
