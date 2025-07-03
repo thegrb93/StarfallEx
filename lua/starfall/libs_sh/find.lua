@@ -209,7 +209,7 @@ end
 --- Returns a sorted array of entities by how close they are to a point
 -- @param table ents The array of entities
 -- @param Vector pos The position
--- @param boolean furthest Whether to have the further entities first
+-- @param boolean? furthest Whether to have the further entities first
 -- @return table A table of the closest entities
 function find_library.sortByClosest(ents, pos, furthest)
 	local distances = {}
