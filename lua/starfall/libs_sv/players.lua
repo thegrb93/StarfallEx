@@ -164,7 +164,7 @@ function player_methods:isHUDActive()
 end
 
 --- Sets the view entity of the player. Only works if they are linked to a hud.
--- @param Entity ent Entity to set the player's view entity to, or nothing to reset it
+-- @param Entity? ent Entity to set the player's view entity to, or nothing to reset it
 function player_methods:setViewEntity(ent)
 	local ply = getply(self)
 	if ent~=nil then ent = getent(ent) end
