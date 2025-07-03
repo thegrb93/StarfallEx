@@ -2247,8 +2247,8 @@ end
 --- Gets a 2D cursor position where ply is aiming at the current rendered screen or nil if they aren't aiming at it.
 -- @param Player? ply player to get cursor position from. Default player()
 -- @param Entity? screen An explicit screen to get the cursor pos of (default: The current rendering screen using 'render' hook)
--- @return number X position
--- @return number Y position
+-- @return number? X position or nil if the player is not aiming at the screen
+-- @return number? Y position or nil if the player is not aiming at the screen
 function render_library.cursorPos(ply, screen)
 	if ply~=nil then
 		ply = getent(ply)
