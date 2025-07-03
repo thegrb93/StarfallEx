@@ -994,8 +994,8 @@ local render_SetMaterial = render.SetMaterial
 local render_SetColorMaterial = render.SetColorMaterial
 local draw_NoTexture = draw.NoTexture
 
---- Sets the current render material
--- @param Material mat The material object
+--- Sets or resets the current render material
+-- @param Material? mat The material object to use, or nil to reset
 function render_library.setMaterial(mat)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if mat then
