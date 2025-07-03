@@ -1977,11 +1977,11 @@ function render_library.enableDepth(enable)
 	render.OverrideDepthEnable(enable, enable)
 end
 
---- Enables blend mode control. Read OpenGL or DirectX docs for more info
+--- Enables or disables blend mode control. Read OpenGL or DirectX docs for more info
 -- @param boolean on Whether to control the blend mode of upcoming rendering
--- @param number srcBlend http://wiki.facepunch.com/gmod/Enums/BLEND
--- @param number destBlend
--- @param number blendFunc http://wiki.facepunch.com/gmod/Enums/BLENDFUNC
+-- @param number? srcBlend http://wiki.facepunch.com/gmod/Enums/BLEND
+-- @param number? destBlend
+-- @param number? blendFunc http://wiki.facepunch.com/gmod/Enums/BLENDFUNC
 -- @param number? srcBlendAlpha http://wiki.facepunch.com/gmod/Enums/BLEND
 -- @param number? destBlendAlpha
 -- @param number? blendFuncAlpha http://wiki.facepunch.com/gmod/Enums/BLENDFUNC
