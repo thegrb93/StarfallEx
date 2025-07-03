@@ -16,6 +16,18 @@ local function checkWhitelist(instance, url, key)
 	local prefix, site, data = string.match(url,"^(%w-)://([^/]*)/?(.*)")
 	if not site then return false, "This url is malformed" end
 	site = site.."/"..(data or "") -- Make sure there is / at the end of site
+
+	if CFCHTTP then
+		local url = prefix .. "://" .. site
+		local options = CFCHTTP.GetOptionsForURL(url)
+
+		if options.allowed then
+			return true
+		else
+			return false, "The url was blocked by the CFC HTTP whitelist."
+		end
+	end
+
 	return urlrestrictor:check(site), "This url is not whitelisted."
 end
 
