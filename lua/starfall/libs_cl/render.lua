@@ -1776,7 +1776,7 @@ end
 -- @param boolean? additive If true, adds brightness to pixels behind it rather than drawing over them. Default false
 -- @param boolean? shadow Enable drop shadow? Default false
 -- @param boolean? outline Enable outline? Default false
--- @param boolean? blursize The size of the blur Default 0
+-- @param number? blursize The size of the blur Default 0
 -- @param boolean? extended Allows the font to display glyphs outside of Latin-1 range. Unicode code points above 0xFFFF are not supported. Required to use FontAwesome
 -- @param number? scanlines Scanline interval. Must be greater than 1 to work. Shares uniqueness with blursize so you cannot create more than one scanline type of font with the same blursize. Default 0
 -- @return string The font name that can be used with the rest of the font functions.
