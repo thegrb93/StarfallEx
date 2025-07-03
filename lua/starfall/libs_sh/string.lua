@@ -33,8 +33,8 @@ end
 --- Returns the given string's characters in their numeric ASCII representation.
 -- @class function
 -- @param string str The string to get the chars from
--- @param number start The first character of the string to get the byte of
--- @param number end The last character of the string to get the byte of
+-- @param number? start The first character of the string to get the byte of. Defaults to 1
+-- @param number? end The last character of the string to get the byte of. Defaults to 'start'
 -- @return ... Vararg numerical bytes
 string_library.byte = sfstring.byte
 
