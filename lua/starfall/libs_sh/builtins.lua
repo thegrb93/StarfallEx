@@ -228,6 +228,11 @@ builtins_library.CLIENT = CLIENT
 -- @class field
 builtins_library.SERVER = SERVER
 
+--- Constant that denotes wether the code is executed on the owner's client
+-- @name builtins_library.OWNER
+-- @class field
+builtins_library.OWNER = CLIENT and instance.player == LocalPlayer()
+
 --- Returns if this is the first time this hook was predicted.
 -- @name builtins_library.isFirstTimePredicted
 -- @class function
