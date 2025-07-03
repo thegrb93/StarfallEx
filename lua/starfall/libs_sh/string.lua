@@ -76,7 +76,7 @@ string_library.explode = sfstring.Explode
 -- @class function
 -- @param string haystack The string to search in
 -- @param string needle The string to find, can contain patterns if enabled
--- @param number start The position to start the search from, negative start position will be relative to the end position
+-- @param number? start The position to start the search from, negative start position will be relative to the end position
 -- @param boolean? noPatterns Disable patterns. Defaults to false
 -- @return number? Starting position of the found text, or nil if the text wasn't found
 -- @return number? Ending position of found text, or nil if the text wasn't found
