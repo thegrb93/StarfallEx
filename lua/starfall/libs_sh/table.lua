@@ -42,7 +42,7 @@ table_library.collapseKeyValue = table.CollapseKeyValue
 --- Concatenates the contents of a table to a string.
 -- @class function
 -- @param table tbl The table to concatenate
--- @param string concatenator A seperator to insert between each string
+-- @param string? concatenator A seperator to insert between each string. Defaults to ""
 -- @param number? startPos Optional key to start at. Defaults to 1
 -- @param number? endPos Optional key to end at. Defaults to #tbl
 -- @return string Concatenated string

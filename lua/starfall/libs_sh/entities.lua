@@ -266,10 +266,10 @@ end
 
 --- Plays a sound on the entity
 -- @param string snd Sound path
--- @param number soundLevel Default 75
--- @param number pitchPercent Default 100
--- @param number volume Default 1
--- @param number channel Default CHAN_AUTO or CHAN_WEAPON for weapons
+-- @param number? soundLevel Default 75
+-- @param number? pitchPercent Default 100
+-- @param number? volume Default 1
+-- @param number? channel Default CHAN_AUTO or CHAN_WEAPON for weapons
 function ents_methods:emitSound(snd, lvl, pitch, volume, channel)
 	checkluatype(snd, TYPE_STRING)
 	SF.CheckSound(instance.player, snd)

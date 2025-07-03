@@ -403,7 +403,7 @@ os_library.clock = os.clock
 --- Returns the date/time as a formatted string or in a table.
 -- See https://wiki.facepunch.com/gmod/Structures/DateData for the table structure
 -- @class function
--- @param string format The format string. If starts with an '!', it will use UTC timezone rather than the local timezone
+-- @param string? format The format string. If starts with an '!', it will use UTC timezone rather than the local timezone
 -- @param number? time Time to use for the format. Default os.time()
 -- @return string|table If format is equal to '*t' or '!*t' then it will return a table with DateData structure, otherwise a string
 os_library.date = function(format, time)
@@ -824,7 +824,7 @@ end
 --- Runs all included scripts in a directory and caches the results.
 -- The path must be an actual path, including the file extension and using slashes for directory separators instead of periods.
 -- @param string path The directory to include. Make sure to --@includedir it
--- @param table loadpriority Table of files that should be loaded before any others in the directory
+-- @param table? loadpriority Table of files that should be loaded before any others in the directory
 -- @return table Table of return values of the scripts
 function builtins_library.requiredir(path, loadpriority)
 	checkluatype(path, TYPE_STRING)

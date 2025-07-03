@@ -33,8 +33,8 @@ end
 --- Returns the given string's characters in their numeric ASCII representation.
 -- @class function
 -- @param string str The string to get the chars from
--- @param number start The first character of the string to get the byte of
--- @param number end The last character of the string to get the byte of
+-- @param number? start The first character of the string to get the byte of. Defaults to 1
+-- @param number? end The last character of the string to get the byte of. Defaults to 'start'
 -- @return ... Vararg numerical bytes
 string_library.byte = sfstring.byte
 
@@ -76,7 +76,7 @@ string_library.explode = sfstring.Explode
 -- @class function
 -- @param string haystack The string to search in
 -- @param string needle The string to find, can contain patterns if enabled
--- @param number start The position to start the search from, negative start position will be relative to the end position
+-- @param number? start The position to start the search from, negative start position will be relative to the end position
 -- @param boolean? noPatterns Disable patterns. Defaults to false
 -- @return number? Starting position of the found text, or nil if the text wasn't found
 -- @return number? Ending position of found text, or nil if the text wasn't found
