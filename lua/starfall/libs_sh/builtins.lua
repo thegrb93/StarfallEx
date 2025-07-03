@@ -403,7 +403,7 @@ os_library.clock = os.clock
 --- Returns the date/time as a formatted string or in a table.
 -- See https://wiki.facepunch.com/gmod/Structures/DateData for the table structure
 -- @class function
--- @param string format The format string. If starts with an '!', it will use UTC timezone rather than the local timezone
+-- @param string? format The format string. If starts with an '!', it will use UTC timezone rather than the local timezone
 -- @param number? time Time to use for the format. Default os.time()
 -- @return string|table If format is equal to '*t' or '!*t' then it will return a table with DateData structure, otherwise a string
 os_library.date = function(format, time)
