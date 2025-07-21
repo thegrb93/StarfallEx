@@ -162,7 +162,7 @@ function props_library.createRagdoll(model, frozen)
 		end
 	end)
 	if not ok then
-		if Ent_IsValid(propent) then propent:Remove() end
+		if Ent_IsValid(ragdoll) then ragdoll:Remove() end
 		SF.Throw("Failed to create entity (" .. tostring(err) .. ")", 2)
 	end
 	entList:register(instance, ragdoll)
