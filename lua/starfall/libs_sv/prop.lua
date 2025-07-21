@@ -620,7 +620,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 				sent2._preFactory(ply, enttbl)
 			end
 
-			entity = duplicator.CreateEntityFromTable(ply, enttbl)
+			entity = duplicator.CreateEntityFromTable(ply ~= SF.Superuser and ply or game.GetWorld(), enttbl)
 			if not isentity(entity) then
 				entity = nil
 				error("Factory func returned invalid value", 2)
