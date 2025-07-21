@@ -1682,7 +1682,7 @@ function Editor:ReloadTab(tabIndex, interactive)
 	local executeReload = function()
 		local fileContent = file.Read(filepath)
 		if fileContent == nil then
-			SF.AddNotify(LocalPlayer(), "Error while reloading, failed to read file: "..filepath, 7, "ERROR1")
+			SF.AddNotify(LocalPlayer(), "Error while reloading, failed to read file: "..filepath, "ERROR", 7, "ERROR1")
 			return
 		end
 
