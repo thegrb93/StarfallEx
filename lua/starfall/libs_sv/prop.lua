@@ -340,7 +340,7 @@ function props_library.createComponent(pos, ang, class, model, frozen)
 		end
 	end)
 	if not ok then
-		if Ent_IsValid(propent) then propent:Remove() end
+		if Ent_IsValid(comp) then comp:Remove() end
 		SF.Throw("Failed to create entity (" .. tostring(err) .. ")", 2)
 	end
 	entList:register(instance, comp)
