@@ -1666,8 +1666,8 @@ end
 --- Gets the acceptable value range for the flex controller, as defined by the model
 -- @shared
 -- @param number flexid The id of the flex
--- @return The minimum value for this flex
--- @return The maximum value for this flex
+-- @return number The minimum value for this flex
+-- @return number The maximum value for this flex
 function ents_methods:getFlexBounds(flexid)
 	local ent = getent(self)
 	
