@@ -1678,7 +1678,7 @@ function ents_methods:getFlexBounds(flexid)
 		SF.Throw("Invalid flex: "..flexid, 2)
 	end
 	
-	return Ent_GetFlexBounds(flexid)
+	return Ent_GetFlexBounds(ent, flexid)
 end
 
 --- Gets the model of an entity
