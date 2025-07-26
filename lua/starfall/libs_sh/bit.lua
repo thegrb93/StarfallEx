@@ -255,7 +255,7 @@ end
 -- @param number pos Position to seek to
 function ss_methods:seek(pos)
 	if pos < 1 then error("Index must be 1 or greater", 2) end
-	self.index = #self+1
+	self.index = #self + 1
 	self.subindex = 1
 
 	local length = 0
@@ -269,7 +269,7 @@ function ss_methods:seek(pos)
 	end
 end
 
---- Move the internal pointer by amount i
+--- Move the internal pointer by amount i. The position will be clamped to [1, buffersize+1]
 -- @param number length The offset
 function ss_methods:skip(length)
 	while length>0 do
@@ -283,7 +283,7 @@ function ss_methods:skip(length)
 				self.subindex = 1
 			end
 		else
-			self.index = self.index + 1
+			self.index = #self + 1
 			self.subindex = 1
 			break
 		end
