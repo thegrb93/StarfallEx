@@ -74,34 +74,42 @@ function props_library.create(pos, ang, model, frozen)
 	entList:checkuse(ply, 1)
 	if ply ~= SF.Superuser and gamemode.Call("PlayerSpawnProp", ply, model)==false then SF.Throw("Another hook prevented the prop from spawning", 2) end
 
-	local propent = ents.Create("prop_physics")
-	propent:SetPos(pos)
-	propent:SetAngles(ang)
-	propent:SetModel(model)
-	propent:Spawn()
+	local propent
+	local ok, err = instance:runExternal(function()
+		propent = ents.Create("prop_physics")
+		propent:SetPos(pos)
+		propent:SetAngles(ang)
+		propent:SetModel(model)
+		propent:Spawn()
+
+		if not propent:GetModel() then error("Invalid model") end
+
+		for I = 0, propent:GetPhysicsObjectCount() - 1 do
+			local obj = propent:GetPhysicsObjectNum(I)
+			if Phys_IsValid(obj) then
+				obj:EnableMotion(not frozen)
+			end
+		end
+		FixInvalidPhysicsObject(propent)
+
+		if ply ~= SF.Superuser then
+			gamemode.Call("PlayerSpawnedProp", ply, model, propent)
+
+			if propConfig.undo then
+				undo.Create("Prop")
+					undo.SetPlayer(ply)
+					undo.AddEntity(propent)
+				undo.Finish("Prop (" .. tostring(model) .. ")")
+			end
+			ply:AddCleanup("props", propent)
+		end
+	end)
+	if not ok then
+		if Ent_IsValid(propent) then propent:Remove() end
+		SF.Throw("Failed to create entity (" .. tostring(err) .. ")", 2)
+	end
 	entList:register(instance, propent)
-
-	if not propent:GetModel() then propent:Remove() SF.Throw("Invalid model", 2) end
-
-	for I = 0, propent:GetPhysicsObjectCount() - 1 do
-		local obj = propent:GetPhysicsObjectNum(I)
-		if Phys_IsValid(obj) then
-			obj:EnableMotion(not frozen)
-		end
-	end
-	FixInvalidPhysicsObject(propent)
-
-	if ply ~= SF.Superuser then
-		gamemode.Call("PlayerSpawnedProp", ply, model, propent)
-
-		if propConfig.undo then
-			undo.Create("Prop")
-				undo.SetPlayer(ply)
-				undo.AddEntity(propent)
-			undo.Finish("Prop (" .. tostring(model) .. ")")
-		end
-		ply:AddCleanup("props", propent)
-	end
+	instance:checkCpu()
 
 	return ewrap(propent)
 end
@@ -124,35 +132,43 @@ function props_library.createRagdoll(model, frozen)
 	entList:checkuse(ply, 1)
 	if ply ~= SF.Superuser and gamemode.Call("PlayerSpawnRagdoll", ply, model)==false then SF.Throw("Another hook prevented the ragdoll from spawning", 2) end
 
-	local ent = ents.Create("prop_ragdoll")
-	ent:SetModel(model)
-	ent:Spawn()
-	entList:register(instance, ent)
+	local ragdoll
+	local ok, err = instance:runExternal(function()
+		ragdoll = ents.Create("prop_ragdoll")
+		ragdoll:SetModel(model)
+		ragdoll:Spawn()
 
-	if not ent:GetModel() then ent:Remove() SF.Throw("Invalid model", 2) end
+		if not ragdoll:GetModel() then error("Invalid model") end
 
-	if frozen then
-		for I = 0, ent:GetPhysicsObjectCount() - 1 do
-			local obj = ent:GetPhysicsObjectNum(I)
-			if Phys_IsValid(obj) then
-				obj:EnableMotion(false)
+		if frozen then
+			for I = 0, ragdoll:GetPhysicsObjectCount() - 1 do
+				local obj = ragdoll:GetPhysicsObjectNum(I)
+				if Phys_IsValid(obj) then
+					obj:EnableMotion(false)
+				end
 			end
 		end
-	end
 
-	if ply ~= SF.Superuser then
-		gamemode.Call("PlayerSpawnedRagdoll", ply, model, ent)
+		if ply ~= SF.Superuser then
+			gamemode.Call("PlayerSpawnedRagdoll", ply, model, ragdoll)
 
-		if propConfig.undo then
-			undo.Create("Ragdoll")
-				undo.SetPlayer(ply)
-				undo.AddEntity(ent)
-			undo.Finish("Ragdoll (" .. tostring(model) .. ")")
+			if propConfig.undo then
+				undo.Create("Ragdoll")
+					undo.SetPlayer(ply)
+					undo.AddEntity(ragdoll)
+				undo.Finish("Ragdoll (" .. tostring(model) .. ")")
+			end
+			ply:AddCleanup("ragdolls", ragdoll)
 		end
-		ply:AddCleanup("ragdolls", ent)
+	end)
+	if not ok then
+		if Ent_IsValid(ragdoll) then ragdoll:Remove() end
+		SF.Throw("Failed to create entity (" .. tostring(err) .. ")", 2)
 	end
+	entList:register(instance, ragdoll)
+	instance:checkCpu()
 
-	return ewrap(ent)
+	return ewrap(ragdoll)
 end
 
 --- Creates a custom prop.
@@ -211,41 +227,48 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	streamdata = util.Compress(streamdata:getString())
 	SF.NetBurst:use(instance.player, #streamdata*8)
 
-	plyVertexCount:free(ply, -totalVertices)
+	local propent
+	local ok, err = instance:runExternal(function()
+		propent = ents.Create("starfall_prop")
+		propent.streamdata = streamdata
+		propent:SetPos(pos)
+		propent:SetAngles(ang)
+		propent.Mesh = uwVertices
+		propent:Spawn()
 
-	local propent = ents.Create("starfall_prop")
-	propent.streamdata = streamdata
-	propent:SetPos(pos)
-	propent:SetAngles(ang)
-	propent.Mesh = uwVertices
-	propent:Spawn()
+		local physobj = propent:GetPhysicsObject()
+		if not Phys_IsValid(physobj) then
+			SF.Throw("Custom prop generated with invalid physics object!", 2)
+		end
+
+		physobj:EnableCollisions(true)
+		physobj:EnableMotion(not frozen)
+		physobj:EnableDrag(true)
+		physobj:Wake()
+
+		propent:TransmitData()
+
+		if ply ~= SF.Superuser then
+			gamemode.Call("PlayerSpawnedProp", ply, "starfall_prop", propent)
+
+			if propConfig.undo then
+				undo.Create("Prop")
+					undo.SetPlayer(ply)
+					undo.AddEntity(propent)
+				undo.Finish("Starfall Prop")
+			end
+			ply:AddCleanup("props", propent)
+		end
+	end)
+	if not ok then
+		if Ent_IsValid(propent) then propent:Remove() end
+		SF.Throw("Failed to create entity (" .. tostring(err) .. ")", 2)
+	end
+	plyVertexCount:free(ply, -totalVertices)
 	entList:register(instance, propent, function()
 		plyVertexCount:free(ply, totalVertices)
 	end)
-
-	local physobj = propent:GetPhysicsObject()
-	if not Phys_IsValid(physobj) then
-		SF.Throw("Custom prop generated with invalid physics object!", 2)
-	end
-
-	physobj:EnableCollisions(true)
-	physobj:EnableMotion(not frozen)
-	physobj:EnableDrag(true)
-	physobj:Wake()
-
-	propent:TransmitData()
-
-	if ply ~= SF.Superuser then
-		gamemode.Call("PlayerSpawnedProp", ply, "starfall_prop", propent)
-
-		if propConfig.undo then
-			undo.Create("Prop")
-				undo.SetPlayer(ply)
-				undo.AddEntity(propent)
-			undo.Finish("Starfall Prop")
-		end
-		ply:AddCleanup("props", propent)
-	end
+	instance:checkCpu()
 
 	return ewrap(propent)
 end
@@ -286,37 +309,42 @@ function props_library.createComponent(pos, ang, class, model, frozen)
 		if gamemode.Call("PlayerSpawnSENT", ply, class)==false then SF.Throw("Another hook prevented the component from spawning", 2) end
 	end
 
-	local comp = ents.Create(class)
-	comp:SetPos(pos)
-	comp:SetAngles(ang)
-	comp:SetModel(model)
-	comp:Spawn()
+	local comp
+	local ok, err = instance:runExternal(function()
+		comp = ents.Create(class)
+		comp:SetPos(pos)
+		comp:SetAngles(ang)
+		comp:SetModel(model)
+		comp:Spawn()
+
+		local mdl = comp:GetModel()
+		if not mdl or mdl == "models/error.mdl" then error("Invalid model!") end
+
+		for I = 0,  comp:GetPhysicsObjectCount() - 1 do
+			local obj = comp:GetPhysicsObjectNum(I)
+			if Phys_IsValid(obj) then
+				obj:EnableMotion(not frozen)
+			end
+		end
+
+		if ply ~= SF.Superuser then
+			if propConfig.undo then
+				undo.Create(class)
+					undo.SetPlayer(ply)
+					undo.AddEntity(comp)
+				undo.Finish("Prop (" .. tostring(model) .. ")")
+			end
+
+			ply:AddCount("starfall_components", comp)
+			ply:AddCleanup("starfall_components", comp)
+		end
+	end)
+	if not ok then
+		if Ent_IsValid(comp) then comp:Remove() end
+		SF.Throw("Failed to create entity (" .. tostring(err) .. ")", 2)
+	end
 	entList:register(instance, comp)
-
-	local mdl = comp:GetModel()
-	if not mdl or mdl == "models/error.mdl" then
-		comp:Remove()
-		return SF.Throw("Invalid model!", 1)
-	end
-
-	for I = 0,  comp:GetPhysicsObjectCount() - 1 do
-		local obj = comp:GetPhysicsObjectNum(I)
-		if Phys_IsValid(obj) then
-			obj:EnableMotion(not frozen)
-		end
-	end
-
-	if ply ~= SF.Superuser then
-		if propConfig.undo then
-			undo.Create(class)
-				undo.SetPlayer(ply)
-				undo.AddEntity(comp)
-			undo.Finish("Prop (" .. tostring(model) .. ")")
-		end
-
-		ply:AddCount("starfall_components", comp)
-		ply:AddCleanup("starfall_components", comp)
-	end
+	instance:checkCpu()
 
 	return ewrap(comp)
 end
