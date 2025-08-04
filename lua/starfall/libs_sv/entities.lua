@@ -716,7 +716,7 @@ function ents_methods:setMass(mass)
 
 	checkpermission(instance, ent, "entities.setMass")
 
-	local m = math.Clamp(mass, 1, 50000)
+	local m = math.Clamp(mass, 0.001, 50000)
 	Phys_SetMass(phys, m)
 	duplicator.StoreEntityModifier(ent, "mass", { Mass = m })
 end
