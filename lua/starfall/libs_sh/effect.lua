@@ -64,6 +64,29 @@ function effect_library.canCreate()
 	return plyEffectBurst:check(instance.player)>=1
 end
 
+--- Creates a "beam ring point" effect, like the AR2 orb explosion
+-- @param Vector pos The origin position of the effect
+-- @param number lifetime How long the effect will be drawing for, in seconds
+-- @param number startRad Initial radius of the effect
+-- @param number endRad Final radius of the effect
+-- @param number width How thick the beam should be
+-- @param number amplitude How noisy the beam should be
+-- @param Color color Color
+-- @param number? speed Causes the beam to start faded if set to any integer other than 0
+-- @param number? flags Beam flags
+-- @param number? framerate Texture framerate
+-- @param string? material The material to use instead of the default one
+function effect_library.beamRingPoint(pos, lifetime, startRad, endRad, width, amplitude, color, speed, flags, framerate, material)
+	checkpermission(instance, nil, "effect.play")
+	plyEffectBurst:use(instance.player, 1)
+	
+	effects.BeamRingPoint(vunwrap1(pos), math.min(lifetime, 25.6), startRad, endRad, width, amplitude, cunwrap(color), {
+		speed = speed,
+		flags = flags,
+		framerate = framerate,
+		material = material})
+end
+
 --- Plays the effect
 -- @param string eff The effect type name to play
 function effect_methods:play(eff)
