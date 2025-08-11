@@ -29,6 +29,7 @@ SF.RegisterType("Effect", true, false)
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
+local checkvector = SF.CheckVector
 
 local effect_library = instance.Libraries.effect
 local effect_methods, effect_meta, wrap, unwrap = instance.Types.Effect.Methods, instance.Types.Effect, instance.Types.Effect.Wrap, instance.Types.Effect.Unwrap
@@ -77,13 +78,16 @@ end
 -- @param number? framerate Texture framerate
 -- @param string? material The material to use instead of the default one
 function effect_library.beamRingPoint(pos, lifetime, startRad, endRad, width, amplitude, color, speed, flags, framerate, material)
+	pos = vunwrap1(pos)
+	checkvector(pos)
+	
 	checkpermission(instance, nil, "effect.play")
 	plyEffectBurst:use(instance.player, 1)
 	
-	effects.BeamRingPoint(vunwrap1(pos), math.min(lifetime, 25.6), startRad, endRad, width, amplitude, cunwrap(color), {
-		speed = speed,
+	effects.BeamRingPoint(pos, math.Clamp(lifetime, 0, 25.6), math.Clamp(startRad, -4096, 4096), math.Clamp(startRad, -4096, 4096), math.Clamp(width, 0, 128), math.Clamp(amplitude, 0, 64), cunwrap(color), {
+		speed = math.Clamp(speed, 0, 255),
 		flags = flags,
-		framerate = framerate,
+		framerate = math.Clamp(framerate, 0, 255),
 		material = material})
 end
 
