@@ -84,7 +84,13 @@ function effect_library.beamRingPoint(pos, lifetime, startRad, endRad, width, am
 	checkpermission(instance, nil, "effect.play")
 	plyEffectBurst:use(instance.player, 1)
 	
-	effects.BeamRingPoint(pos, math.Clamp(lifetime, 0, 25.6), math.Clamp(startRad, -4096, 4096), math.Clamp(endRad, -4096, 4096), math.Clamp(width, 0, 128), math.Clamp(amplitude, 0, 64), cunwrap(color), {
+	lifetime = math.Clamp(lifetime, 0, 25.6)
+	startRad = math.Clamp(startRad, -4096, 4096)
+	endRad = math.Clamp(endRad, -4096, 4096)
+	width = math.Clamp(width, 0, 128)
+	amplitude = math.Clamp(amplitude, 0, 64)
+
+	effects.BeamRingPoint(pos, lifetime, startRad, endRad, width, amplitude, cunwrap(color), {
 		speed = speed and math.Clamp(speed, 0, 255) or nil,
 		flags = flags,
 		framerate = framerate and math.Clamp(framerate, 0, 255) or nil,
