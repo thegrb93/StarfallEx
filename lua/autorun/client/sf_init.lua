@@ -6,3 +6,4 @@ list.Set("Starfall_gate_Models", "models/spacecode/sfchip_small.mdl", true)
 SF = {}
 
 include("starfall/sflib.lua")
+hook.Run("StarfallInitialized")

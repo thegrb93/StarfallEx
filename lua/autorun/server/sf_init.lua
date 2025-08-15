@@ -35,3 +35,4 @@ SetGlobalString("SF.Version", SF.Version)
 
 
 include("starfall/sflib.lua")
+hook.Run("StarfallInitialized")
