@@ -1681,6 +1681,20 @@ function ents_methods:getFlexBounds(flexid)
 	return Ent_GetFlexBounds(ent, flexid)
 end
 
+--- Overrides the look position for an entity's eyes. The target position will be in world coordinates for NPCs, but it will be in local coordinates relative to the eyes attachment for ragdolls.
+--  Setting the target position to Vector(0,0,0) will remove the override entirely.
+-- @param Vector pos The position to look at
+function ents_methods:setEyeTarget(pos)
+
+    local ent = getent(self)
+	
+	vec = vunwrap(pos)
+	checkvector(vec)
+	checkpermission(instance,ent,"entities.canTool")
+	
+    ent:SetEyeTarget(vec)
+end
+	
 --- Gets the model of an entity
 -- @shared
 -- @return string Model of the entity
