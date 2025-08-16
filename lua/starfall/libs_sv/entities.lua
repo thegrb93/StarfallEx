@@ -635,6 +635,18 @@ function ents_methods:breakEnt()
 	Ent_Fire(ent, "break", 1, 0)
 end
 
+--- Sets the target look position for an entity's eyes. The target position will be in world coordinates for NPCs, but it will be in local coordinates relative to the eyes attachment for ragdolls.
+-- @param Vector pos The position the entity will look at
+function ents_methods:setEyeTarget(pos)
+	local ent = getent(self)
+		
+    vec = vunwrap(pos)
+    checkvector(vec)
+    checkpermission(instance,ent,"entities.canTool")
+    
+    ent:SetEyeTarget(vec)
+end 
+	
 --- Ignites an entity
 -- @param number length How long the fire lasts
 -- @param number? radius (optional) How large the fire hitbox is (entity obb is the max)
