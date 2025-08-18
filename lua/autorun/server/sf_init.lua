@@ -33,5 +33,4 @@ if sf_dir then
 end
 SetGlobalString("SF.Version", SF.Version)
 
-
 include("starfall/sflib.lua")
