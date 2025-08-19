@@ -71,18 +71,18 @@ function joystick_library.numAxes(enum)
 	return joystick.count(enum, 1)
 end
 
---- Gets the number of detected povs on a joystick
--- @param number enum Joystick number. Starts at 0
--- @return number Number of povs
-function joystick_library.numPovs(enum)
-	refresh(enum)
-	return joystick.count(enum, 2)
-end
-
 --- Gets the number of detected buttons on a joystick
 -- @param number enum Joystick number. Starts at 0
 -- @return number Number of buttons
 function joystick_library.numButtons(enum)
+	refresh(enum)
+	return joystick.count(enum, 2)
+end
+
+--- Gets the number of detected povs on a joystick
+-- @param number enum Joystick number. Starts at 0
+-- @return number Number of povs
+function joystick_library.numPovs(enum)
 	refresh(enum)
 	return joystick.count(enum, 3)
 end
