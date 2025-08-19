@@ -2478,6 +2478,8 @@ do
 			local sh_filename = "starfall/libs_sh/"..name..".lua"
 			local cl_filename = "starfall/libs_cl/"..name..".lua"
 
+			SF.ReloadingLibrary = true
+
 			local sendToClientTbl = {}
 			if file.Exists(sh_filename, "LUA") or file.Exists(sv_filename, "LUA") then
 				print("Reloaded library: " .. name)
@@ -2504,6 +2506,8 @@ do
 				net.WriteStarfall({files = files, mainfile = name})
 				net.Broadcast()
 			end
+
+			SF.ReloadingLibrary = false
 		end)
 
 		-- For development. Generates the ENT locals used by the library
@@ -2545,6 +2549,7 @@ do
 		net.Receive("sf_receivelibrary", function(len)
 			net.ReadStarfall(nil, function(ok, data)
 				if ok then
+					SF.ReloadingLibrary = true
 					SF.Modules[data.mainfile] = {}
 					print("Reloaded library: " .. data.mainfile)
 					for k, code in pairs(data.files) do
@@ -2567,6 +2572,7 @@ do
 							SF.Permissions.loadPermissions()
 						end
 					end
+					SF.ReloadingLibrary = false
 				end
 			end)
 		end)
