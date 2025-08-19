@@ -225,7 +225,7 @@ function P.includePermissions()
 	end
 end
 
-local function changePermission(ply, arg)
+local function changePermission(print, arg)
 	if arg[1] then
 		local privilege = P.privileges[arg[1]]
 		if privilege then
@@ -234,30 +234,34 @@ local function changePermission(ply, arg)
 				if val and val>=1 and val<=#P.providers[arg[2]].settingsoptions then
 					privilege:applySetting(arg[2], math.floor(val))
 				else
-					ply:PrintMessage(HUD_PRINTCONSOLE, "The setting's value is out of bounds or not a number.\n")
+					print("The setting's value is out of bounds or not a number.\n")
 				end
 			else
-				ply:PrintMessage(HUD_PRINTCONSOLE, "Permission, " .. tostring(arg[2]) .. ", couldn't be found.\nHere's a list of permissions.\n")
-				for id, _ in pairs(privilege.providerconfig) do ply:PrintMessage(HUD_PRINTCONSOLE, id.."\n") end
+				print("Permission, " .. tostring(arg[2]) .. ", couldn't be found.\nHere's a list of permissions.\n")
+				for id, _ in pairs(privilege.providerconfig) do print(id.."\n") end
 			end
 		else
-			ply:PrintMessage(HUD_PRINTCONSOLE, "Privilege, " .. tostring(arg[1]) .. ", couldn't be found.\nHere's a list of privileges.\n")
-			for id, _ in SortedPairs(P.privileges) do ply:PrintMessage(HUD_PRINTCONSOLE, id.."\n") end
+			print("Privilege, " .. tostring(arg[1]) .. ", couldn't be found.\nHere's a list of privileges.\n")
+			for id, _ in SortedPairs(P.privileges) do print(id.."\n") end
 		end
 	else
-		ply:PrintMessage(HUD_PRINTCONSOLE, "Usage: sf_permission <privilege> <permission> <value>.\n")
+		print("Usage: sf_permission <privilege> <permission> <value>.\n")
 	end
+end
+
+local function printfunc(ply)
+	return ply:IsValid() and function(msg) ply:PrintMessage(HUD_PRINTCONSOLE, msg) end or Msg
 end
 
 -- Console commands for changing permissions.
 if SERVER then
 	concommand.Add("sf_permission", function(ply, com, arg)
 		if ply:IsValid() and not ply:IsSuperAdmin() then return end
-		changePermission(ply, arg)
+		changePermission(printfunc(ply), arg)
 	end)
 else
 	concommand.Add("sf_permission_cl", function(ply, com, arg)
-		changePermission(ply, arg)
+		changePermission(printfunc(ply), arg)
 	end)
 end
 
