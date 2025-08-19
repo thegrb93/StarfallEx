@@ -3,10 +3,9 @@ if not SF.Require("joystick") then return function() end end
 local next_updates = {}
 
 local function refresh(enum)
-	enum = math.Clamp(enum, 0, 12)
-	local next_update = next_updates[enum] or 0
-	if CurTime()>next_update then
-		next_updates[enum] = CurTime() + 0.0303
+	enum = math.Clamp(math.floor(enum), 0, 12)
+	if CurTime()~=next_updates[enum] then
+		next_updates[enum] = CurTime()
 		joystick.refresh(enum)
 	end
 end
