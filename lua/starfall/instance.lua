@@ -144,7 +144,9 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 
 		instance.scripts[filename] = func
 	end
+
 	hook.Run("StarfallPostInstanceCompile", instance)
+
 	return true, instance
 end
 
