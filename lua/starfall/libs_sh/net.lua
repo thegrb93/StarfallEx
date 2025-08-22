@@ -17,7 +17,7 @@ net.Receive("SF_netmessage", function(len, ply)
 		local instance = ent.instance
 		if instance and instance.runScriptHook then
 			local name = net.ReadString()
-			len = len - 16 - (#name + 1) * 8 -- This gets rid of the 2-byte entity, and the null-terminated string, making this now quantify the length of the user's net message
+			len = len - MAX_EDICT_BITS - (#name + 1) * 8 -- This gets rid of the 2-byte entity, and the null-terminated string, making this now quantify the length of the user's net message
 			instance.data.net.ply = ply
 			if ply then ply = instance.Types.Player.Wrap(ply) end
 
