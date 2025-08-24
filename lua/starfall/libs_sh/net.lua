@@ -59,6 +59,12 @@ instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
 	vunwrap1 = vec_meta.QuickUnwrap1
 end)
+instance:AddHook("deinitialize", function()
+	if streams[instance.player] then
+		streams[instance.player]:Remove()
+		streams[instance.player] = nil
+	end
+end)
 
 local function write(data)
 	netSize = netSize + data[2]
@@ -244,8 +250,8 @@ function net_library.readStream(cb)
 	if streams[instance.player] then SF.Throw("The previous stream must finish before reading another.", 2) end
 
 	streams[instance.player] = net.ReadStream((SERVER and instance.data.net.ply or nil), function(data)
-		instance:runFunction(cb, data)
 		streams[instance.player] = nil
+		instance:runFunction(cb, data)
 	end)
 end
 
@@ -254,6 +260,7 @@ end
 function net_library.cancelStream()
 	if not streams[instance.player] then SF.Throw("Not currently reading a stream.", 2) end
 	streams[instance.player]:Remove()
+	streams[instance.player] = nil
 end
 
 --- Returns the progress of a running readStream
