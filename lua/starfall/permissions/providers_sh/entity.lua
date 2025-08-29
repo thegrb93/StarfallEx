@@ -26,81 +26,57 @@ if CPPI then
 	if SERVER then
 		P.checks = {
 			function(instance, target)
-				if Ent_IsValid(target) then
-					if target == instance.player and owneraccess:GetBool() then return true end
-					if Ply_IsSuperAdmin(instance.player) then return true end
-					if target:CPPIGetOwner()==instance.player then
-						return true
-					else
-						return false, "You're not the owner of this prop"
-					end
-				else
-					return false, "Entity is invalid"
-				end
+				if not Ent_IsValid(target) then return false, "Entity is invalid" end
+				if target == instance.player and owneraccess:GetBool() or
+					Ply_IsSuperAdmin(instance.player) or
+					target:CPPIGetOwner()==instance.player then return true end
+
+				return false, "You're not the owner of this prop"
 			end,
 			function(instance, target)
-				if Ent_IsValid(target) then
-					if target == instance.player and owneraccess:GetBool() then return true end
-					if target:CPPICanTool(instance.player, "starfall_ent_lib") then
-						return true
-					else
-						return false, "You can't toolgun this entity"
-					end
-				else
-					return false, "Entity is invalid"
-				end
+				if not Ent_IsValid(target) then return false, "Entity is invalid" end
+				if target == instance.player and owneraccess:GetBool() or
+					target:CPPICanTool(instance.player, "starfall_ent_lib") then return true end
+
+				return false, "You can't toolgun this entity"
 			end,
 			function(instance, target)
-				if Ent_IsValid(target) then
-					if target == instance.player and owneraccess:GetBool() then return true end
-					if target:CPPICanPhysgun(instance.player) then
-						return true
-					else
-						return false, "You can't physgun this entity"
-					end
-				else
-					return false, "Entity is invalid"
-				end
+				if not Ent_IsValid(target) then return false, "Entity is invalid" end
+				if target == instance.player and owneraccess:GetBool() or
+					target:CPPICanPhysgun(instance.player) then return true end
+
+				return false, "You can't physgun this entity"
 			end,
 			"allow"
 		}
 	else
 		P.checks = {
 			function(instance, target)
-				if Ent_IsValid(target) then
-					if target==instance.player or LocalPlayer()==instance.player or Ply_IsSuperAdmin(instance.player) then return true end
-					if target:CPPIGetOwner()==instance.player then
-						return true
-					else
-						return false, "You're not the owner of this prop"
-					end
-				else
-					return false, "Entity is invalid"
-				end
+				if not Ent_IsValid(target) then return false, "Entity is invalid" end
+				if target==instance.player or
+					LocalPlayer()==instance.player or
+					Ply_IsSuperAdmin(instance.player) or
+					target:CPPIGetOwner()==instance.player then return true end
+
+				return false, "You're not the owner of this prop"
 			end,
 			function(instance, target)
-				if Ent_IsValid(target) then
-					if target==instance.player or LocalPlayer()==instance.player or Ply_IsSuperAdmin(instance.player) then return true end
-					if target:CPPICanTool(instance.player, "starfall_ent_lib") then
-						return true
-					else
-						return false, "You can't toolgun this entity"
-					end
-				else
-					return false, "Entity is invalid"
-				end
+				if not Ent_IsValid(target) then return false, "Entity is invalid" end
+				if target==instance.player or
+					LocalPlayer()==instance.player or
+					Ply_IsSuperAdmin(instance.player) or
+					target:CPPICanTool(instance.player, "starfall_ent_lib") then return true end
+
+				return false, "You can't toolgun this entity"
 			end,
 			function(instance, target)
-				if Ent_IsValid(target) then
-					if target==instance.player or LocalPlayer()==instance.player or Ply_IsSuperAdmin(instance.player) then return true end
-					if target:CPPICanPhysgun(instance.player) then
-						return true
-					else
-						return false, "You can't physgun this entity"
-					end
-				else
-					return false, "Entity is invalid"
-				end
+				if not Ent_IsValid(target) then return false, "Entity is invalid" end
+				if target==instance.player or
+					LocalPlayer()==instance.player or
+					Ply_IsSuperAdmin(instance.player) or
+					target:CPPICanPhysgun(instance.player) then return true end
+
+				return false, "You can't physgun this entity"
 			end,
 			"allow"
 		}
@@ -111,43 +87,31 @@ else
 	if SERVER then
 		P.checks = {
 			function(instance, target)
-				if Ent_IsValid(target) then
-					if target == instance.player and owneraccess:GetBool() then return true end
-					if Ply_IsSuperAdmin(instance.player) then return true end
-					if P.props[target]==instance.player then
-						return true
-					else
-						return false, "You're not the owner of this prop"
-					end
-				else
-					return false, "Entity is invalid"
-				end
+				if not Ent_IsValid(target) then return false, "Entity is invalid" end
+				if target == instance.player and owneraccess:GetBool() or
+					Ply_IsSuperAdmin(instance.player) or
+					P.props[target]==instance.player then return true end
+
+				return false, "You're not the owner of this prop"
 			end,
 			function(instance, target)
-				if Ent_IsValid(target) then
-					if target == instance.player and owneraccess:GetBool() then return true end
-					if hook.Run("CanTool", instance.player, SF.dumbTrace(target), "starfall_ent_lib") ~= false then
-						return true
-					else
-						return false, "Target doesn't have toolgun access"
-					end
-				else
-					return false, "Entity is invalid"
-				end
+				if not Ent_IsValid(target) then return false, "Entity is invalid" end
+				if target == instance.player and owneraccess:GetBool() or
+					hook.Run("CanTool", instance.player, SF.dumbTrace(target), "starfall_ent_lib") ~= false then return true end
+
+				return false, "Target doesn't have toolgun access"
 			end,
 			function(instance, target)
-				if Ent_IsValid(target) then
-					if target == instance.player and owneraccess:GetBool() then return true end
-					if hook.Run("PhysgunPickup", instance.player, target) ~= false then
-						-- Some mods expect a release when there's a pickup involved.
-						hook.Run("PhysgunDrop", instance.player, target)
-						return true
-					else
-						return false, "Target doesn't have physgun access"
-					end
-				else
-					return false, "Entity is invalid"
+				if not Ent_IsValid(target) then return false, "Entity is invalid" end
+				if target == instance.player and owneraccess:GetBool() then return true end
+
+				if hook.Run("PhysgunPickup", instance.player, target) ~= false then
+					-- Some mods expect a release when there's a pickup involved.
+					hook.Run("PhysgunDrop", instance.player, target)
+					return true
 				end
+
+				return false, "Target doesn't have physgun access"
 			end,
 			"allow"
 		}
@@ -202,21 +166,14 @@ else
 	else
 		P.checks = {
 			function(instance, target)
-				if Ent_IsValid(target) then
-					if target==instance.player or LocalPlayer()==instance.player or Ply_IsSuperAdmin(instance.player) then return true end
-					local owner = Ent_GetNWEntity(target, "SFPP")
-					if owner ~= NULL then
-						if owner==instance.player then
-							return true
-						else
-							return false, "You're not the owner of this prop"
-						end
-					else
-						return false, "The entity's owner hasn't been transmitted yet or doesn't exist"
-					end
-				else
-					return false, "Entity is invalid"
-				end
+				if not Ent_IsValid(target) then return false, "Entity is invalid" end
+				if target==instance.player or
+					LocalPlayer()==instance.player or
+					Ply_IsSuperAdmin(instance.player) or
+					Ent_GetNWEntity(target, "SFPP")==instance.player or
+					target.SFHoloOwner==instance.player then return true end
+
+				return false, "You're not the owner of this prop"
 			end,
 			nil,
 			nil,
