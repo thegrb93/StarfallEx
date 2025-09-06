@@ -30,7 +30,6 @@ function ENT:Initialize()
 	}
 
 	self:AddEFlags( EFL_FORCE_CHECK_TRANSMIT )
-	self:TransmitData()
 
 	local physobj = self:GetPhysicsObject()
 	physobj:EnableCollisions(true)
@@ -186,6 +185,7 @@ local function createCustomProp(ply, pos, ang, sfmeshdata)
 	propent:Spawn()
 	propent:SetPos(pos)
 	propent:SetAngles(ang)
+	propent:TransmitData()
 
 	local totalVertices = 0
 	for k, v in ipairs(meshConvexes) do
