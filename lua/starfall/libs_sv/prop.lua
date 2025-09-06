@@ -197,9 +197,7 @@ function props_library.createCustom(pos, ang, meshConvexes, frozen)
 
 	local propent
 	local ok, err = instance:runExternal(function()
-		propent = SF.createCustomProp(instance.player, meshConvexesUnwrapped)
-		propent:SetPos(pos)
-		propent:SetAngles(ang)
+		propent = SF.createCustomProp(instance.player, pos, ang, meshConvexesUnwrapped)
 
 		local physobj = propent:GetPhysicsObject()
 		if Phys_IsValid(physobj) then

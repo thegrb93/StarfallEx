@@ -96,7 +96,7 @@ local maxConvexesPerProp = CreateConVar("sf_props_custom_maxconvexesperprop", "1
 local customPropVertexLimit = SF.LimitObject("props_custom_vertices", "custom prop vertices", 14400, "The max vertices allowed to spawn custom props per player")
 
 local function streamToMesh(meshdata)
-	local maxConvexesPerProp = maxConvexesPerProp:GetInt() GetConVarNumber()
+	local maxConvexesPerProp = maxConvexesPerProp:GetInt()
 	local maxVerticesPerConvex = maxVerticesPerConvex:GetInt()
 
 	local meshConvexes = {}
@@ -106,7 +106,7 @@ local function streamToMesh(meshdata)
 	if nConvexes > maxConvexesPerProp then SF.Throw("Exceeded the max convexes per prop (" .. maxConvexesPerProp .. ")", 2) end
 	for iConvex = 1, nConvexes do
 		local nVertices = meshdata:readInt32()
-		if #nVertices>maxVerticesPerConvex then SF.Throw("Exceeded the max vertices per convex (" .. maxVerticesPerConvex .. ")", 2) end
+		if nVertices>maxVerticesPerConvex then SF.Throw("Exceeded the max vertices per convex (" .. maxVerticesPerConvex .. ")", 2) end
 		local convex = {}
 		for iVertex = 1, nVertices do
 			convex[iVertex] = Vector(meshdata:readFloat(), meshdata:readFloat(), meshdata:readFloat())
@@ -159,7 +159,7 @@ local function checkMesh(ply, meshConvexes)
 end
 
 
-local function createCustomProp(ply, sfmeshdata)
+local function createCustomProp(ply, pos, ang, sfmeshdata)
 	local meshConvexes
 	if isstring(sfmeshdata) then
 		meshConvexes = streamToMesh(sfmeshdata)
@@ -184,6 +184,8 @@ local function createCustomProp(ply, sfmeshdata)
 
 	propent.sfmeshdata = sfmeshdata
 	propent:Spawn()
+	propent:SetPos(pos)
+	propent:SetAngles(ang)
 
 	local totalVertices = 0
 	for k, v in ipairs(meshConvexes) do
@@ -196,5 +198,5 @@ local function createCustomProp(ply, sfmeshdata)
 
 	return propent
 end
-duplicator.RegisterEntityClass("starfall_prop", createCustomProp, "sfmeshdata")
+duplicator.RegisterEntityClass("starfall_prop", createCustomProp, "Pos", "Ang", "sfmeshdata")
 SF.createCustomProp = createCustomProp
