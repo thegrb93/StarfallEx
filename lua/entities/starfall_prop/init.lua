@@ -93,9 +93,9 @@ local minVertexDistance = CreateConVar("sf_props_custom_minvertexdistance", "0.2
 local maxVerticesPerConvex = CreateConVar("sf_props_custom_maxverticesperconvex", "300", FCVAR_ARCHIVE, "The max vertices allowed per convex")
 local maxConvexesPerProp = CreateConVar("sf_props_custom_maxconvexesperprop", "10", FCVAR_ARCHIVE, "The max convexes per prop")
 
-customPropVertexLimit = SF.LimitObject("props_custom_vertices", "custom prop vertices", 14400, "The max vertices allowed to spawn custom props per player")
+local customPropVertexLimit = SF.LimitObject("props_custom_vertices", "custom prop vertices", 14400, "The max vertices allowed to spawn custom props per player")
 
-function streamToMesh(meshdata)
+local function streamToMesh(meshdata)
 	local maxConvexesPerProp = maxConvexesPerProp:GetInt() GetConVarNumber()
 	local maxVerticesPerConvex = maxVerticesPerConvex:GetInt()
 
@@ -117,7 +117,7 @@ function streamToMesh(meshdata)
 	return meshConvexes
 end
 
-function meshToStream(meshConvexes)
+local function meshToStream(meshConvexes)
 	local meshdata = SF.StringStream()
 	meshdata:writeInt32(#meshConvexes)
 	for _, convex in ipairs(meshConvexes) do

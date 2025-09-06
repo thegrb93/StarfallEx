@@ -202,7 +202,7 @@ function props_library.createCustom(pos, ang, meshConvexes, frozen)
 		propent:SetAngles(ang)
 
 		local physobj = propent:GetPhysicsObject()
-		if physobj:IsValid() then
+		if Phys_IsValid(physobj) then
 			physobj:EnableMotion(not frozen)
 			physobj:Wake()
 		end
