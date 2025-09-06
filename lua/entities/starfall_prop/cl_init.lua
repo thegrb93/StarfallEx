@@ -19,14 +19,15 @@ function ENT:Initialize()
 	function() if mesh then mesh:Destroy() end end)
 end
 
-function ENT:BuildPhysics(mesh)
-	self:PhysicsInitMultiConvex(mesh)
+function ENT:BuildPhysics(ent_tbl, physmesh)
+	ent_tbl.sf_physmesh = physmesh
+	self:PhysicsInitMultiConvex(physmesh)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
 	self:EnableCustomCollisions(true)
 end
 
-function ENT:BuildRenderMesh(rendermesh)
+function ENT:BuildRenderMesh(ent_tbl, rendermesh)
 	local phys = self:GetPhysicsObject()
 	if not Phys_IsValid(phys) then return end
 
@@ -42,8 +43,6 @@ function ENT:BuildRenderMesh(rendermesh)
 	if #rendermesh < 3 then return end
 
 	ent_tbl.sf_rendermesh:BuildFromTriangles(rendermesh)
-	self:SetRenderBounds(mins, maxs)
-	self:SetCollisionBounds(mins, maxs)
 end
 
 function ENT:Think()
@@ -107,9 +106,10 @@ net.Receive("starfall_custom_prop", function()
 		ent_tbl.sf_meshapplied = true
 
 		local physmesh, mins, maxs = streamToMesh(data)
-		ent_tbl.sf_physmesh = physmesh
-		ent_tbl.BuildPhysics(self, physmesh)
-		ent_tbl.BuildRenderMesh(self)
+		ent_tbl.BuildPhysics(self, ent_tbl, physmesh)
+		ent_tbl.BuildRenderMesh(self, ent_tbl)
+		self:SetRenderBounds(mins, maxs)
+		self:SetCollisionBounds(mins, maxs)
 	end
 
 	net.ReadReliableEntity(function(e)
@@ -131,6 +131,6 @@ hook.Add("NetworkEntityCreated", "starfall_prop_physics", function(ent)
 	local ent_tbl = Ent_GetTable(ent)
 	local mesh = ent_tbl.sf_physmesh
 	if mesh and not Phys_IsValid(ent:GetPhysicsObject()) then
-		ent_tbl.BuildPhysics(ent, mesh)
+		ent_tbl.BuildPhysics(ent, ent_tbl, mesh)
 	end
 end)
