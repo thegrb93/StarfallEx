@@ -9,6 +9,8 @@ local Ent_GetTable = ENT_META.GetTable
 
 function ENT:Initialize()
 	self.BaseClass.Initialize(self)
+
+	self:PhysicsInitMultiConvex(self.sf_physmesh) self.sf_physmesh = nil
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
 	self:EnableCustomCollisions(true)
@@ -30,11 +32,6 @@ function ENT:Initialize()
 	}
 
 	self:AddEFlags( EFL_FORCE_CHECK_TRANSMIT )
-
-	local physobj = self:GetPhysicsObject()
-	physobj:EnableCollisions(true)
-	physobj:EnableDrag(true)
-	physobj:Wake()
 end
 
 function ENT:EnableCustomPhysics(mode)
@@ -173,19 +170,24 @@ local function createCustomProp(ply, pos, ang, sfmeshdata)
 	SF.NetBurst:use(ply, #sfmeshdata*8)
 
 	local propent = ents.Create("starfall_prop")
-	propent:PhysicsInitMultiConvex(meshConvexes)
+	propent.sf_physmesh = meshConvexes
 
+	propent.sfmeshdata = sfmeshdata
+	propent:Spawn()
+	
 	local physobj = propent:GetPhysicsObject()
 	if not physobj:IsValid() then
 		propent:Remove()
 		SF.Throw("Custom prop has invalid physics!", 2)
 	end
-
-	propent.sfmeshdata = sfmeshdata
-	propent:Spawn()
+	
 	propent:SetPos(pos)
 	propent:SetAngles(ang)
 	propent:TransmitData()
+
+	physobj:EnableCollisions(true)
+	physobj:EnableDrag(true)
+	physobj:Wake()
 
 	local totalVertices = 0
 	for k, v in ipairs(meshConvexes) do
