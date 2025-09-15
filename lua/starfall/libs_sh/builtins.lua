@@ -619,6 +619,7 @@ if SERVER then
 	function builtins_library.concmd(cmd)
 		checkluatype(cmd, TYPE_STRING)
 		if #cmd > 512 then SF.Throw("Console command is too long!", 2) end
+		if IsConCommandBlocked(cmd) then SF.Throw("Console command is blocked!", 2) end
 		checkpermission(instance, nil, "console.command")
 		concmdBurst:use(instance.player, #cmd)
 		instance.player:ConCommand(cmd)
