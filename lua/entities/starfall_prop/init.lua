@@ -7,6 +7,8 @@ util.AddNetworkString("starfall_custom_prop")
 local ENT_META = FindMetaTable("Entity")
 local Ent_GetTable = ENT_META.GetTable
 
+ENT.PhysicsSounds = true
+
 function ENT:Initialize()
 	self.BaseClass.Initialize(self)
 
