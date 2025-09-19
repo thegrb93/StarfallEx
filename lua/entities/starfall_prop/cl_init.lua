@@ -105,6 +105,7 @@ end
 net.Receive("starfall_custom_prop", function()
 
 	local applyData = SF.WaitForAllArgs(2, function(self, data)
+		if self:GetClass()~="starfall_prop" then return end
 		local ent_tbl = Ent_GetTable(self)
 		if not (ent_tbl and ent_tbl.sf_rendermesh:IsValid() and data and not ent_tbl.sf_meshapplied) then return end
 		ent_tbl.sf_meshapplied = true
@@ -116,13 +117,8 @@ net.Receive("starfall_custom_prop", function()
 		self:SetCollisionBounds(mins, maxs)
 	end)
 
-	net.ReadReliableEntity(function(self)
-		if self and self:GetClass()=="starfall_prop" then applyData(self, nil) end
-	end)
-
-	net.ReadStream(nil, function(data)
-		if data then applyData(nil, data) end
-	end)
+	net.ReadReliableEntity(function(self) applyData(self, nil) end)
+	net.ReadStream(nil, function(data) applyData(nil, data) end)
 end)
 
 hook.Add("NetworkEntityCreated", "starfall_prop_physics", function(ent)
