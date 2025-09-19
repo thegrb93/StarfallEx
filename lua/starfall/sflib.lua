@@ -1530,6 +1530,20 @@ function SF.WaitForEntity(index, creationIndex, callback)
 	end, callback, 10)
 end
 
+function SF.WaitForAllArgs(numarg, func)
+    local inputs = {}
+    return function(...)
+        for i=1, numarg do
+            local v = select(i, ...)
+            if v~=nil then inputs[i]=v end
+        end
+        for i=1, numarg do
+            if inputs[i]==nil then return end
+        end
+        func(unpack(inputs))
+    end
+end
+
 
 local playerinithooks = {}
 hook.Add("PlayerInitialSpawn","SF_PlayerInitialize",function(ply)
