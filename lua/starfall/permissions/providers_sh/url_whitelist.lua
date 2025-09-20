@@ -106,10 +106,9 @@ local function loadUserWhitelist()
 		local func = SF.CompileString(code, filename, false)
 		if isstring(func) then
 			whitelistNotifyError(filename, func)
-			return false
+		else
+			runWhitelist(filename, func)
 		end
-
-		runWhitelist(filename, func)
 	else
 		file.Write(filename, "-- This file can be used to adjust the url whitelist.\n-- See https://raw.githubusercontent.com/thegrb93/StarfallEx/refs/heads/master/lua/starfall/starfall_whitelist_default.lua for examples.\n")
 	end
