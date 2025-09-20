@@ -177,9 +177,18 @@ end
 -- @param string materialName The physical material to set it to
 function physobj_methods:setMaterial(material)
 	checkluatype(material, TYPE_STRING)
+	if #material > 32 then SF.Throw("Material name length is over 32!", 2) end
 	local phys = unwrap(self)
-	checkpermission(instance, Phys_GetEntity(phys), "entities.setRenderProperty")
+	local ent = Phys_GetEntity(phys)
+	checkpermission(instance, ent, "entities.setRenderProperty")
+
 	Phys_SetMaterial(phys, material)
+
+	local entSetPhysMaterial = ent.SetPhysMaterial
+	if entSetPhysMaterial then
+		entSetPhysMaterial(ent, material)
+	end
+
 	if not Phys_IsMoveable(phys) then
 		Phys_EnableMotion(phys, true)
 		Phys_EnableMotion(phys, false)

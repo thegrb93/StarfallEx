@@ -8,3 +8,12 @@ ENT.Spawnable       = false
 ENT.AdminSpawnable  = false
 
 ENT.IsSFProp = true
+
+function ENT:SetupDataTables()
+	self:NetworkVar( "String", 0, "PhysMaterial" )
+
+	if CLIENT then
+		self:NetworkVarNotify( "PhysMaterial", self.OnPhysMaterialChanged )
+	end
+end
+
