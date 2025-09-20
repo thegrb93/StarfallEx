@@ -109,7 +109,7 @@ local Privilege = {
 setmetatable(Privilege, Privilege)
 
 function P.registerProvider(provider)
-	if P.providers[provider.id] and not SF.ReloadingLibrary then ErrorNoHaltWithStack("Registering same provider more than once! "..name) end
+	if P.providers[provider.id] and not SF.ReloadingLibrary then ErrorNoHaltWithStack("Registering same provider more than once! "..provider.name) end
 	P.providers[provider.id] = provider
 end
 
