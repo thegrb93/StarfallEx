@@ -49,7 +49,7 @@ local function whitelistNotifyError(filename, err)
 	end
 end
 
-local function runWhitelist(filename, code)
+local function runWhitelist(filename, func)
 	local env = {
 		pattern = function(txt)
 			if not isstring(txt) then return end
@@ -73,12 +73,6 @@ local function runWhitelist(filename, code)
 		end,
 	}
 
-	local func = SF.CompileString(code, filename, false)
-	if isstring(func) then
-		whitelistNotifyError(filename, func)
-		return false
-	end
-
 	setfenv(func, env)
 
 	local start = SysTime()
@@ -96,18 +90,26 @@ end
 
 local function loadDefaultWhitelist()
 	local filename = "starfall/starfall_whitelist_default.lua"
-	local code = file.Read(filename, "LUA")
-	if not code then whitelistNotifyError(filename, "Could not open file!") end
-	if (code and code ~= "") then
-		runWhitelist(filename, code)
+	-- Clientside lua files can't be file.Read if client doesn't have addon installed
+	local func = CompileFile( filename )
+	if func then
+		runWhitelist(filename, func)
+	else
+		whitelistNotifyError(filename, "Could not open file!")
 	end
 end
 
 local function loadUserWhitelist()
 	local filename = SERVER and "sf_url_whitelist.txt" or "starfall/cl_url_whitelist.txt"
 	local code = file.Read(filename, "DATA")
+	
 	if (code and code ~= "") then
-		runWhitelist(filename, code)
+		local func = SF.CompileString(code, filename, false)
+		if isstring(func) then
+			whitelistNotifyError(filename, func)
+		else
+			runWhitelist(filename, func)
+		end
 	else
 		file.Write(filename, "-- This file can be used to adjust the url whitelist.\n-- See https://raw.githubusercontent.com/thegrb93/StarfallEx/refs/heads/master/lua/starfall/starfall_whitelist_default.lua for examples.\n")
 	end
