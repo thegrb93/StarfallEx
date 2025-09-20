@@ -25,6 +25,11 @@ function ENT:BuildPhysics(ent_tbl, physmesh)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
 	self:EnableCustomCollisions(true)
+
+	local phys = self:GetPhysicsObject()
+	if Phys_IsValid(phys) then
+		phys:SetMaterial(ent_tbl.GetPhysMaterial(self))
+	end
 end
 
 function ENT:BuildRenderMesh(ent_tbl, rendermesh)
@@ -134,3 +139,10 @@ hook.Add("NetworkEntityCreated", "starfall_prop_physics", function(ent)
 		ent_tbl.BuildPhysics(ent, ent_tbl, mesh)
 	end
 end)
+
+function ENT:OnPhysMaterialChanged(name, old, new)
+	local phys = ent:GetPhysicsObject()
+	if Phys_IsValid(phys) then
+		phys:SetMaterial(Ent_GetTable(self).GetPhysMaterial(self))
+	end
+end
