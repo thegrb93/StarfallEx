@@ -26,9 +26,9 @@ function ENT:BuildPhysics(ent_tbl, physmesh)
 	self:SetSolid(SOLID_VPHYSICS)
 	self:EnableCustomCollisions(true)
 
-	local phys = ent:GetPhysicsObject()
+	local phys = self:GetPhysicsObject()
 	if Phys_IsValid(phys) then
-		phys:SetMaterial(Ent_GetTable(self).GetPhysMaterial(self))
+		phys:SetMaterial(ent_tbl.GetPhysMaterial(self))
 	end
 end
 
