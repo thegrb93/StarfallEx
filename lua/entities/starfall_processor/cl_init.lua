@@ -163,14 +163,9 @@ net.Receive("starfall_processor_download", function(len)
 end)
 
 net.Receive("starfall_processor_link", function()
-	local component, proc
-	local function link()
-		if component and proc then
-			SF.LinkEnt(component, proc)
-		end
-	end
-	net.ReadReliableEntity(function(e) component=e link() end)
-	net.ReadReliableEntity(function(e) proc=e link() end)
+	local link = SF.WaitForAllArgs(2, function(component, proc) SF.LinkEnt(component, proc) end)
+	net.ReadReliableEntity(function(component) link(component, nil) end)
+	net.ReadReliableEntity(function(proc) link(nil, proc) end)
 end)
 
 net.Receive("starfall_processor_kill", function()
