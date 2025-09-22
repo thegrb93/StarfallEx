@@ -132,6 +132,6 @@ end)
 function ENT:OnPhysMaterialChanged(name, old, new)
 	local phys = self:GetPhysicsObject()
 	if Phys_IsValid(phys) then
-		phys:SetMaterial(Ent_GetTable(self).GetPhysMaterial(self))
+		phys:SetMaterial(new)
 	end
 end
