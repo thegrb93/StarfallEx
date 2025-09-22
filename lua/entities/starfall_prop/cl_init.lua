@@ -130,7 +130,7 @@ hook.Add("NetworkEntityCreated", "starfall_prop_physics", function(ent)
 end)
 
 function ENT:OnPhysMaterialChanged(name, old, new)
-	local phys = ent:GetPhysicsObject()
+	local phys = self:GetPhysicsObject()
 	if Phys_IsValid(phys) then
 		phys:SetMaterial(Ent_GetTable(self).GetPhysMaterial(self))
 	end
