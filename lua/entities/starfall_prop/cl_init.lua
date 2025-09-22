@@ -105,7 +105,7 @@ end
 net.Receive("starfall_custom_prop", function()
 
 	local applyData = SF.WaitForAllArgs(2, function(self, data)
-		if self:GetClass()~="starfall_prop" then return end
+		if Ent_IsValid(self) and self:GetClass()~="starfall_prop" then return end
 		local ent_tbl = Ent_GetTable(self)
 		if not (ent_tbl and ent_tbl.sf_rendermesh:IsValid() and data and not ent_tbl.sf_meshapplied) then return end
 		ent_tbl.sf_meshapplied = true
