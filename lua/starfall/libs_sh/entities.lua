@@ -266,6 +266,7 @@ if sound_library then
 
 	--- Emits a sound not attached to any entity at the specified position
 	-- @param string snd Sound path
+	-- @param Vector position Where the sound originates from
 	-- @param number? soundLevel Default 75
 	-- @param number? pitchPercent Default 100
 	-- @param number? volume Default 1
