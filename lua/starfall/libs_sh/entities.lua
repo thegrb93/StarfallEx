@@ -265,7 +265,6 @@ if sound_library then
 	end
 
 	--- Emits a sound not attached to any entity at the specified position
-	-- @param string path Filepath to the sound file.
 	-- @param string snd Sound path
 	-- @param number? soundLevel Default 75
 	-- @param number? pitchPercent Default 100
