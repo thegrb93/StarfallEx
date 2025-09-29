@@ -275,6 +275,7 @@ if sound_library then
 	-- @param boolean? nofilter (Optional) Boolean Make the sound play for everyone regardless of range or location. Only affects Server-side sounds.
 	function sound_library.emitSound(snd, position, lvl, pitch, volume, channel, dsp, nofilter)
 		checkluatype(snd, TYPE_STRING)
+		if nofilter~=nil then checkluatype(nofilter, TYPE_BOOL) end
 		SF.CheckSound(instance.player, snd)
 
 		checkpermission(instance, nil, "sound.emitSound")
