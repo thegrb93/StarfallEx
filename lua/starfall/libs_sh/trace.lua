@@ -97,6 +97,8 @@ function trace_library.hull(start, endpos, minbox, maxbox, filter, mask, colgrou
 	vec_SetUnpacked(minbox_vec, minbox[1], minbox[2], minbox[3])
 	vec_SetUnpacked(maxbox_vec, maxbox[1], maxbox[2], maxbox[3])
 
+	OrderVectors(minbox_vec, maxbox_vec)
+
 	return structWrapper(instance, util_TraceHull({
 		start = start_vec,
 		endpos = endpos_vec,

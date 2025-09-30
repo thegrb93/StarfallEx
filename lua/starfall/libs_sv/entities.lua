@@ -277,6 +277,8 @@ function ents_methods:applyDamage(amt, attacker, inflictor, dmgtype, pos)
 	local ent = getent(self)
 
 	checkluatype(amt, TYPE_NUMBER)
+	amt = math.Clamp(amt, 0, 1073741824)
+
 	checkpermission(instance, ent, "entities.applyDamage")
 
 	local dmg = DamageInfo()
