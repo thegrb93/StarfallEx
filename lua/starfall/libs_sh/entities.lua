@@ -263,6 +263,32 @@ if sound_library then
 	function sound_library:emitSoundsLeft()
 		return emitSoundBurst:check(instance.player)
 	end
+
+	--- Emits a sound not attached to any entity at the specified position
+	-- @param string snd Sound path
+	-- @param Vector position Where the sound originates from
+	-- @param number? soundLevel Default 75
+	-- @param number? pitchPercent Default 100
+	-- @param number? volume Default 1
+	-- @param number? channel Default CHAN_AUTO or CHAN_WEAPON for weapons
+	-- @param number? dsp Default 1 DSP preset
+	-- @param boolean? nofilter (Optional) Boolean Make the sound play for everyone regardless of range or location. Only affects Server-side sounds.
+	function sound_library.emitSound(snd, position, lvl, pitch, volume, channel, dsp, nofilter)
+		checkluatype(snd, TYPE_STRING)
+		if nofilter~=nil then checkluatype(nofilter, TYPE_BOOL) end
+		SF.CheckSound(instance.player, snd)
+
+		checkpermission(instance, nil, "sound.emitSound")
+		emitSoundBurst:use(instance.player, 1)
+
+		local filter
+		if nofilter and SERVER then
+			filter = RecipientFilter()
+			filter:AddAllPlayers()
+		end
+		
+		EmitSound(snd, vunwrap1(position), 0, channel, volume, lvl, nil, pitch, number, filter)
+	end
 end
 
 --- Plays a sound on the entity
@@ -271,8 +297,11 @@ end
 -- @param number? pitchPercent Default 100
 -- @param number? volume Default 1
 -- @param number? channel Default CHAN_AUTO or CHAN_WEAPON for weapons
-function ents_methods:emitSound(snd, lvl, pitch, volume, channel)
+-- @param number? dsp Default 1 DSP preset
+-- @param boolean? nofilter (Optional) Boolean Make the sound play for everyone regardless of range or location. Only affects Server-side sounds.
+function ents_methods:emitSound(snd, lvl, pitch, volume, channel, dsp, nofilter)
 	checkluatype(snd, TYPE_STRING)
+	if nofilter~=nil then checkluatype(nofilter, TYPE_BOOL) end
 	SF.CheckSound(instance.player, snd)
 
 	local ent = getent(self)
@@ -282,7 +311,14 @@ function ents_methods:emitSound(snd, lvl, pitch, volume, channel)
 	local snds = soundsByEntity[ent]
 	if not snds then snds = {} soundsByEntity[ent] = snds end
 	snds[snd] = true
-	Ent_EmitSound(ent, snd, lvl, pitch, volume, channel)
+
+	local filter
+	if nofilter and SERVER then
+		filter = RecipientFilter()
+		filter:AddAllPlayers()
+	end
+	
+	Ent_EmitSound(ent, snd, lvl, pitch, volume, channel, nil, dsp, filter)
 end
 
 --- Stops a sound on the entity
