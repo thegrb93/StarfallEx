@@ -1453,12 +1453,32 @@ function ents_methods:localToWorld(data)
 	return vwrap(Ent_LocalToWorld(getent(self), vunwrap1(data)))
 end
 
---- Converts a direction vector in entity local space to world space
--- @shared
--- @param Vector data Local space vector direction
--- @return Vector data as world space vector direction
-function ents_methods:localToWorldVector(data)
-	return vwrap(Phys_LocalToWorldVector(Ent_GetPhysicsObject(getent(self)), vunwrap1(data)))
+if SERVER then
+	--- Converts a direction vector in entity local space to world space
+	-- @shared
+	-- @param Vector data Local space vector direction
+	-- @return Vector data as world space vector direction
+	function ents_methods:localToWorldVector(data)
+		return vwrap(Phys_LocalToWorldVector(Ent_GetPhysicsObject(getent(self)), vunwrap1(data)))
+	end
+
+	--- Converts a direction vector in world space to entity local space
+	-- @shared
+	-- @param Vector data World space direction vector
+	-- @return Vector data as local space direction vector
+	function ents_methods:worldToLocalVector(data)
+		return vwrap(Phys_WorldToLocalVector(Ent_GetPhysicsObject(getent(self)), vunwrap1(data)))
+	end
+else
+	function ents_methods:localToWorldVector(data)
+		local ent = getent(self)
+		return vwrap(Ent_LocalToWorld(ent, vunwrap1(data)) - Ent_GetPos(ent))
+	end
+
+	function ents_methods:worldToLocalVector(data)
+		local ent = getent(self)
+		return vwrap(Ent_WorldToLocal(ent, vunwrap1(data) + Ent_GetPos(ent)))
+	end
 end
 
 --- Converts an angle in entity local space to world space
@@ -1475,14 +1495,6 @@ end
 -- @return Vector data as local space vector
 function ents_methods:worldToLocal(data)
 	return vwrap(Ent_WorldToLocal(getent(self), vunwrap1(data)))
-end
-
---- Converts a direction vector in world space to entity local space
--- @shared
--- @param Vector data World space direction vector
--- @return Vector data as local space direction vector
-function ents_methods:worldToLocalVector(data)
-	return vwrap(Phys_WorldToLocalVector(Ent_GetPhysicsObject(getent(self)), vunwrap1(data)))
 end
 
 --- Converts an angle in world space to entity local space
