@@ -1231,7 +1231,8 @@ function ents_methods:setBoneMatrix(bone, matrix)
 	checkluatype(bone, TYPE_NUMBER)
 	checkpermission(instance, ent, "entities.setRenderProperty")
 
-	Ent_SetBoneMatrix(ent, bone, matrix)
+	local id = ent:AddCallback("BuildBonePositions", function() Ent_SetBoneMatrix(ent, bone, matrix) end)
+	ent:RemoveCallback("BuildBonePosition",id) -- We dont need more this callback, it done his thing.
 end
 
 --- Returns the world transform matrix of the entity
