@@ -82,35 +82,6 @@ instance:AddHook("initialize", function()
 	aunwrap1 = ang_meta.QuickUnwrap1
 end)
 
-local BoneMatrixTbl = {
-	__index = {
-		set = function(self, bone, matrix)
-			self.bones[bone] = matrix
-		end,
-		remove = function(self, bone)
-			self.bones[bone] = nil
-		end,
-		apply = function(self, ent)
-			local bones = self.bones
-			for i=0, self.boneend do
-				if bones[i] then Ent_SetBoneMatrix(ent, i, bones[i]) end
-			end
-		end,
-		addCallback = function(self)
-			local ent = self.ent
-			self.hook = ent:AddCallback("BuildBonePositions", function() self:apply(ent) end)
-		end,
-	},
-	__call = function(t, ent, boneend)
-		return setmetatable({
-			ent = ent,
-			boneend = boneend,
-			bones = {},
-		}, t)
-	end
-}
-setmetatable(BoneMatrixTbl, BoneMatrixTbl)
-
 local function getent(self)
 	local ent = ent_meta.sf2sensitive[self]
 	if Ent_IsValid(ent) or Ent_IsWorld(ent) then
@@ -1267,15 +1238,18 @@ function ents_methods:setBoneMatrix(bone, matrix)
 	local boneTbl = ent_tbl.SF_BoneMatrix
 	if matrix then
 		if boneTbl then
-			boneTbl:set(bone, matrix)
+			boneTbl[bone] = matrix
 		else
-			boneTbl = BoneMatrixTbl(ent, boneend)
-			boneTbl:set(bone, matrix)
-			boneTbl:addCallback()
+			boneTbl = {[bone] = matrix}
 			ent_tbl.SF_BoneMatrix = boneTbl
+			ent:AddCallback("BuildBonePositions", function()
+				for i=0, boneend do
+					if boneTbl[i] then Ent_SetBoneMatrix(ent, i, boneTbl[i]) end
+				end
+			end)
 		end
 	elseif boneTbl then
-		boneTbl:remove(bone)
+		boneTbl[bone] = nil
 	end
 end
 
