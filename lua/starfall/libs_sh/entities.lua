@@ -1220,8 +1220,9 @@ function ents_methods:getBoneMatrix(bone)
 	return mwrap(Ent_GetBoneMatrix(getent(self), bone))
 end
 
---- Sets the bone matrix of given bone to given matrix. See also Entity:getBoneMatrix.
--- @shared
+if CLIENT then
+--- Sets the bone matrix of given bone to given matrix. Call setupBones to apply all changes.
+-- @client
 -- @param number bone The bone ID
 -- @param VMatrix matrix The matrix to set
 function ents_methods:setBoneMatrix(bone, matrix)
@@ -1253,10 +1254,11 @@ function ents_methods:setBoneMatrix(bone, matrix)
 	end
 end
 
---- Invokes the BuildBonePositions of an entity
+--- Invokes the BuildBonePositions of an entity. Should be called after setting all bone matrices.
 -- @client
 function ents_methods:setupBones()
 	Ent_SetupBones(getent(self))
+end
 end
 
 --- Returns the world transform matrix of the entity
