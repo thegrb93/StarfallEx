@@ -82,6 +82,35 @@ instance:AddHook("initialize", function()
 	aunwrap1 = ang_meta.QuickUnwrap1
 end)
 
+local BoneMatrixTbl = {
+	__index = {
+		set = function(self, bone, matrix)
+			self.bones[bone] = matrix
+		end,
+		remove = function(self, bone)
+			self.bones[bone] = nil
+		end,
+		apply = function(self, ent)
+			local bones = self.bones
+			for i=0, self.boneend do
+				if bones[i] then Ent_SetBoneMatrix(ent, i, bones[i]) end
+			end
+		end,
+		addCallback = function(self)
+			local ent = self.ent
+			self.hook = ent:AddCallback("BuildBonePositions", function() self:apply(ent) end)
+		end,
+	},
+	__call = function(t, ent, boneend)
+		return setmetatable({
+			ent = ent,
+			boneend = boneend,
+			bones = {},
+		}, t)
+	end
+}
+setmetatable(BoneMatrixTbl, BoneMatrixTbl)
+
 local function getent(self)
 	local ent = ent_meta.sf2sensitive[self]
 	if Ent_IsValid(ent) or Ent_IsWorld(ent) then
@@ -1231,8 +1260,29 @@ function ents_methods:setBoneMatrix(bone, matrix)
 	checkluatype(bone, TYPE_NUMBER)
 	checkpermission(instance, ent, "entities.setRenderProperty")
 
-	local id = ent:AddCallback("BuildBonePositions", function() Ent_SetBoneMatrix(ent, bone, matrix) end)
-	ent:RemoveCallback("BuildBonePosition",id) -- We dont need more this callback, it done his thing.
+	local boneend = Ent_GetBoneCount(ent)-1
+	bone = math.Clamp(math.floor(bone), 0, boneend)
+
+	local ent_tbl = Ent_GetTable(ent)
+	local boneTbl = ent_tbl.SF_BoneMatrix
+	if matrix then
+		if boneTbl then
+			boneTbl:set(bone, matrix)
+		else
+			boneTbl = BoneMatrixTbl(ent, boneend)
+			boneTbl:set(bone, matrix)
+			boneTbl:addCallback()
+			ent_tbl.SF_BoneMatrix = boneTbl
+		end
+	elseif boneTbl then
+		boneTbl:remove(bone)
+	end
+end
+
+--- Invokes the BuildBonePositions of an entity
+-- @client
+function ents_methods:setupBones()
+	Ent_SetupBones(getent(self))
 end
 
 --- Returns the world transform matrix of the entity
