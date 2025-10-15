@@ -98,7 +98,7 @@ game_library.getRealTickInterval = engine.AbsoluteFrameTime
 -- @return number Ticks
 game_library.getTickCount = engine.TickCount
 
---- Returns the public IP address and port of the current server. This will return the IP/port that you are connecting through when ran clientside.
+--- Returns the public IP address and port of the current server
 -- @name game_library.getIPAddress
 -- @class function
 -- @return string The IP address and port in the format "x.x.x.x:x"
