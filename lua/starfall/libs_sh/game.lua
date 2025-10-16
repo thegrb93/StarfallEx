@@ -98,6 +98,12 @@ game_library.getRealTickInterval = engine.AbsoluteFrameTime
 -- @return number Ticks
 game_library.getTickCount = engine.TickCount
 
+--- Returns the public IP address and port of the current server
+-- @name game_library.getIPAddress
+-- @class function
+-- @return string The IP address and port in the format "x.x.x.x:x"
+game_library.getIPAddress = game.GetIPAddress
+
 --- Checks if a model exists in the game files
 -- @param string path Filepath in game folder
 -- @return boolean? True if exists, false if not, nil if error
