@@ -79,14 +79,27 @@ Editor.StartHelperUndocked = CreateClientConVar("sf_helper_startundocked", "0", 
 Editor.EditorFileAutoReload = CreateClientConVar("sf_editor_file_auto_reload", "0", true, false, "Controls the auto reload functionality of Starfall's Editor")
 Editor.EditorFileAutoReloadInterval = CreateClientConVar("sf_editor_file_auto_reload_interval", "1", true, false, "Controls the polling interval of the auto reload functionality of Starfall's Editor")
 
+local defaultCode = [=[--@name Untitled
+--@author
+--@shared
+
+--[[
+Starfall Scripting Environment
+
+StarfallEx Addon: https://github.com/thegrb93/StarfallEx
+Documentation: http://thegrb93.github.io/StarfallEx
+
+This default code can be edited via the 'default.txt' file
+]]
+]=]
+
 function SF.DefaultCode()
 	if file.Exists("starfall/default.txt", "DATA") then
 		return file.Read("starfall/default.txt", "DATA")
 	elseif file.Exists("starfall/default.lua", "DATA") then
 		return file.Read("starfall/default.lua", "DATA")
 	else
-		local code = file.Read("starfall/starfall_default.lua", "LUA")
-		code = string.gsub(code, "@author", "@author "..string.gsub(LocalPlayer():Nick(), "[^%w%s%p_]", ""))
+		code = string.gsub(defaultCode, "@author", "@author "..string.gsub(LocalPlayer():Nick(), "[^%w%s%p_]", ""))
 		file.Write("starfall/default.txt", code)
 		return code
 	end
