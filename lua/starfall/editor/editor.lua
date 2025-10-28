@@ -60,14 +60,6 @@ if CLIENT then
 	SF.Editor.colors.medlight = Color(127, 178, 240)
 	SF.Editor.colors.light = Color(173, 213, 247)
 
-	concommand.Add("sf_reloadeditor", function()
-		if SF.Editor.initialized or IsValid(SF.Editor.editor) then
-			SF.Editor.editor:Remove()
-			SF.Editor.editor = nil
-			SF.Editor.initialized = false
-		end
-	end)
-
 	function SF.Editor.init()
 		if SF.Editor.initialized or SF.Editor.editor then return end
 
