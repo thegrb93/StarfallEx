@@ -315,8 +315,8 @@ function TabHandler:RegisterSettings()
 	local modes = {
 		{ "Off", "Turn off autocomplete." },
 		{ "Expression2 Style", "Current mode:\nTab/CTRL+Tab to choose item;\nEnter/Space to use;\nArrow keys to abort." },
-		{ "Visual Studio Style", "Current mode:\nArrow keys to choose item;\nTab use.\nSpace to abort." },
-		{ "Eclipse Style", "Current mode:\nArrow keys to choose item;\nEnter to use;\nSpace to abort." },
+		{ "Visual Studio Style", "Current mode:\nArrow keys to choose item;\nTab use.\nSpace/Escape to abort." },
+		{ "Eclipse Style", "Current mode:\nArrow keys to choose item;\nEnter to use;\nSpace/Escape to abort." },
 	}
 
 	AutoCompleteControlOptions:SetSortItems(false)
@@ -3131,6 +3131,13 @@ function PANEL:AutocompleteCreate()
 		end
 	end
 
+	-- This is for allowing escape to kill the autocomplete
+	hook.Add("OnPauseMenuShow", self, function()
+		if TabHandler.ACControlStyle:GetInt() ~= AC_CONTROL_E2 and IsValid(self.acPanel) and self.acPanel:IsVisible() then
+			self:AutocompleteClose()
+			return false
+		end
+	end)
 	local controlSchemes = setmetatable({
 		[AC_CONTROL_E2] = function( pnl )
 			local t = CurTime()
