@@ -1756,7 +1756,9 @@ function Editor:setFileAutoReload(enabled)
 	self.autoReloadEnabled = enabled
 	if enabled then
 		timer.Create(Editor.EditorFileAutoReload:GetName(), self.autoReloadInterval, 0, function(_, _, newValue)
-			self:ReloadTabs(false)
+			if IsValid(self) then
+				self:ReloadTabs(false)
+			end
 		end)
 	else
 		timer.Remove(Editor.EditorFileAutoReload:GetName())
