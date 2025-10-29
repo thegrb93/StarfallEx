@@ -1,5 +1,6 @@
 ENT.Type            = "anim"
 ENT.Base            = "base_anim"
+ENT.PhysicsSounds   = true
 
 ENT.PrintName       = "Starfall Custom Prop"
 ENT.Author          = "Sparky OvO"
