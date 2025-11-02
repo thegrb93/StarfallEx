@@ -199,7 +199,24 @@ end
 function http_library.urlDropboxToRaw(url)
 	checkluatype(url, TYPE_STRING)
 	if #url > 64e3 then SF.Throw("String exceeds length limit!", 2) end
-	return string.gsub(url, "www%.dropbox%.com", "dl%.dropboxusercontent%.com")
+	local rawUrl, _ = string.gsub(url, "www%.dropbox%.com", "dl%.dropboxusercontent%.com")
+	return rawUrl
+end
+
+--- Converts a github file url to a raw one
+-- @param string url The url to convert
+-- @return string The converted url
+function http_library.urlGithubToRaw(url)
+	checkluatype(url, TYPE_STRING)
+	if #url > 64e3 then SF.Throw("String exceeds length limit!", 2) end
+	
+	-- https://github.com/username/repo_name/tree/path_to_folder/anyfolder
+	-- https://github.com/username/repo_name/blob/path_to_file/hi.txt
+	local rawUrl, _ = string.gsub(url, "https://github%.com/", "https://raw.githubusercontent.com/")
+	rawUrl = string.gsub(rawUrl, "/blob/", "/", 1) -- files
+	rawUrl = string.gsub(rawUrl, "/tree/", "/", 1) -- folders
+	
+	return rawUrl
 end
 
 end
