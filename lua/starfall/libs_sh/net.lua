@@ -136,16 +136,14 @@ local netStarted = false
 local netSize = 0
 local netData
 local netReceives = {}
+local plyStreams = StreamManager.plyStreams[instance.player]
 instance.data.net = {receives = netReceives}
 instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
 	vunwrap1 = vec_meta.QuickUnwrap1
 end)
 instance:AddHook("deinitialize", function()
-	local plyStreams = rawget(StreamManager.plyStreams, instance.player)
-	if plyStreams then
-		plyStreams:deinitialize(instance)
-	end
+	plyStreams:deinitialize(instance)
 end)
 
 local function write(data)
@@ -325,9 +323,8 @@ function net_library.writeStream(str, compress)
 	if #str == 0 then SF.Throw("String is empty!", 2) end
 	if #str > 64e6 then SF.Throw("String is too long!", 2) end
 
-	local plyStream = StreamManager.plyStreams[instance.player]
-	if not plyStream:canWriteStream() then SF.Throw("Too many active writeStreams!", 2) end
-	local writePending = plyStream:addWriteStream(instance)
+	if not plyStreams:canWriteStream() then SF.Throw("Too many active writeStreams!", 2) end
+	local writePending = plyStreams:addWriteStream(instance)
 	local function writeStreamFunc()
 		writePending(net.WriteStream(str, function() end, compress == false))
 	end
@@ -339,11 +336,10 @@ end
 -- @param function cb Callback to run when the stream is finished. The first parameter in the callback is the data. Will be nil if transfer fails or is cancelled
 function net_library.readStream(cb)
 	checkluatype (cb, TYPE_FUNCTION)
-	local plyStream = StreamManager.plyStreams[instance.player]
-	if plyStream.readStream then SF.Throw("The previous stream must finish before reading another.", 2) end
+	if plyStreams.readStream then SF.Throw("The previous stream must finish before reading another.", 2) end
 
-	plyStream:addReadStream(instance, net.ReadStream((SERVER and instance.data.net.ply or nil), function(data)
-		plyStream.readStream = false
+	plyStreams:addReadStream(instance, net.ReadStream((SERVER and instance.data.net.ply or nil), function(data)
+		plyStreams.readStream = false
 		instance:runFunction(cb, data)
 	end))
 end
@@ -351,18 +347,16 @@ end
 --- Cancels a currently running readStream
 -- @shared
 function net_library.cancelStream()
-	local plyStream = StreamManager.plyStreams[instance.player]
-	if not plyStream.readStream then SF.Throw("Not currently reading a stream.", 2) end
-	plyStream:cancelReadStream()
+	if not plyStreams.readStream then SF.Throw("Not currently reading a stream.", 2) end
+	plyStreams:cancelReadStream()
 end
 
 --- Returns the progress of a running readStream
 -- @shared
 -- @return number The progress ratio 0-1
 function net_library.getStreamProgress()
-	local plyStream = StreamManager.plyStreams[instance.player]
-	if not plyStream.readStream then SF.Throw("Not currently reading a stream.", 2) end
-	return plyStream.readStream[2]:GetProgress()
+	if not plyStreams.readStream then SF.Throw("Not currently reading a stream.", 2) end
+	return plyStreams.readStream[2]:GetProgress()
 end
 
 --- Writes an integer to the net message
@@ -624,21 +618,20 @@ end
 -- @return boolean Whether we're currently reading data from a stream
 -- @return boolean Whether we're currently writing data to a stream
 function net_library.isStreaming()
-	local plyStream = StreamManager.plyStreams[instance.player]
-	return plyStream:isReading(), plyStream:isWriting()
+	return plyStreams:isReading(), plyStreams:isWriting()
 end
 
 --- Returns whether a readStream can be initiated
 -- @return boolean Whether a readStream can be initiated
 function net_library.canReadStream()
-	return StreamManager.plyStreams[instance.player]:canReadStream()
+	return plyStreams:canReadStream()
 end
 
 --- Returns whether a writeStream can be initiated
 -- @return boolean Whether a writeStream can be initiated
 -- @return number The number of active write streams
 function net_library.canWriteStream()
-	return StreamManager.plyStreams[instance.player]:canWriteStream()
+	return plyStreams:canWriteStream()
 end
 
 end
