@@ -1537,9 +1537,13 @@ SF.WaitForEntity = {
 			hook.Remove("Think", "SF_WaitingForEntities")
 		end
 	end,
-	getCount = function(self, index)
-		local t = rawget(self.waiting, index)
-		return t and #t or 0
+	checkCount = function(self, max)
+		local total = 0
+		for index, tbl in pairs(self.waiting) do
+			total = total + #tbl
+			if total > max then return false end
+		end
+		return true
 	end
 }
 

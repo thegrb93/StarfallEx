@@ -583,7 +583,7 @@ function net_library.readEntity(callback)
 	local creationindex = net.ReadUInt(32)
 	if callback ~= nil and CLIENT then
 		checkluatype(callback, TYPE_FUNCTION)
-		if SF.WaitForEntity:getCount(index)>=128 then SF.Throw("Too many callbacks for entity index!: "..index, 2) end
+		if not SF.WaitForEntity:checkCount(128) then SF.Throw("Too many callbacks for entity index!: "..index, 2) end
 		SF.WaitForEntity:add(index, creationindex, function(ent)
 			if ent ~= nil then ent = instance.WrapObject(ent) end
 			instance:runFunction(callback, ent)
