@@ -1495,40 +1495,53 @@ function SF.EntIsReady(ent)
 	end
 end
 
-local waitingConditions = {}
-function SF.WaitForConditions(callback, timeoutcallback, timeout)
-	if not callback() then
-		if #waitingConditions == 0 then
-			hook.Add("Think", "SF_WaitingForConditions", function()
-				local time = CurTime()
-				local i = 1
-				while i <= #waitingConditions do
-					local v = waitingConditions[i]
-					if v.callback() then
-						table.remove(waitingConditions, i)
-					elseif time>v.timeout then
-						if v.timeoutcallback then v.timeoutcallback() end
-						table.remove(waitingConditions, i)
-					else
-						i = i + 1
-					end
-				end
-				if #waitingConditions == 0 then hook.Remove("Think", "SF_WaitingForConditions") end
-			end)
-		end
-		waitingConditions[#waitingConditions+1] = {callback = callback, timeoutcallback = timeoutcallback, timeout = CurTime()+timeout}
-	end
-end
-
-function SF.WaitForEntity(index, creationIndex, callback)
-	SF.WaitForConditions(function()
-		local ent=Entity(index)
+SF.WaitForEntity = {
+	waiting = setmetatable({},{__index = function(t,k) local r={} t[k]=r return r end}),
+	add = function(self, index, creationIndex, callback)
+		local ent = Entity(index)
 		if SF.EntIsReady(ent) and Ent_GetCreationID(ent)==creationIndex then
 			ProtectedCall(callback, ent)
-			return true
+		else
+			if table.IsEmpty(self.waiting) then
+				hook.Add("Think", "SF_WaitingForEntities", function() self:check() end)
+			end
+			local t = self.waiting[index]
+			t[#t+1] = {creationIndex = creationIndex, callback = callback, timeout = CurTime()+5}
 		end
-	end, callback, 10)
-end
+	end,
+	check = function(self)
+		local time = CurTime()
+		for index, tbl in pairs(self.waiting) do
+			local ent = Entity(index)
+			if SF.EntIsReady(ent) then
+				local creationIndex = Ent_GetCreationID(ent)
+				for i=#tbl, 1, -1 do
+					local v = tbl[i]
+					if creationIndex==v.creationIndex then
+						ProtectedCall(v.callback, ent)
+						table.remove(tbl, i)
+					elseif time>=v.timeout then
+						table.remove(tbl, i)
+					end
+				end
+			else
+				for i=#tbl, 1, -1 do
+					if time>=tbl[i].timeout then
+						table.remove(tbl, i)
+					end
+				end
+			end
+			if #tbl==0 then self.waiting[index] = nil end
+		end
+		if table.IsEmpty(self.waiting) then
+			hook.Remove("Think", "SF_WaitingForEntities")
+		end
+	end,
+	getCount = function(self, index)
+		local t = rawget(self.waiting, index)
+		return t and #t or 0
+	end
+}
 
 function SF.WaitForAllArgs(numarg, func)
     local inputs = {}

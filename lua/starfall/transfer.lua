@@ -8,7 +8,7 @@ function net.WriteReliableEntity(ent)
 end
 
 function net.ReadReliableEntity(cb)
-	SF.WaitForEntity(net.ReadUInt(16), net.ReadUInt(32), cb)
+	SF.WaitForEntity:add(net.ReadUInt(16), net.ReadUInt(32), cb)
 end
 
 -- Net extension stuff

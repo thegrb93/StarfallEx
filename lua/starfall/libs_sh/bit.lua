@@ -537,7 +537,8 @@ local function readEntity(self, instance, callback)
 	local creationindex = self:readUInt32()
 	if callback ~= nil and CLIENT then
 		checkluatype(callback, TYPE_FUNCTION)
-		SF.WaitForEntity(index, creationindex, function(ent)
+		if SF.WaitForEntity:getCount(index)>=128 then SF.Throw("Too many callbacks for entity index!: "..index, 2) end
+		SF.WaitForEntity:add(index, creationindex, function(ent)
 			if ent ~= nil then ent = instance.WrapObject(ent) end
 			instance:runFunction(callback, ent)
 		end)
