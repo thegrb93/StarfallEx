@@ -577,13 +577,14 @@ end
 --- Reads a entity from the net message
 -- @shared
 -- @param function? callback (Client only) optional callback to be ran whenever the entity becomes valid; returns nothing if this is used. The callback passes the entity if it succeeds or nil if it fails.
--- @return Entity The entity that was read
+-- @return Entity? The entity that was read or nil if callback used
 function net_library.readEntity(callback)
 	local index = net.ReadUInt(16)
 	local creationindex = net.ReadUInt(32)
 	if callback ~= nil and CLIENT then
 		checkluatype(callback, TYPE_FUNCTION)
-		SF.WaitForEntity(index, creationindex, function(ent)
+		if SF.WaitForEntity:getCount(index)>=128 then SF.Throw("Too many callbacks for entity index!: "..index, 2) end
+		SF.WaitForEntity:add(index, creationindex, function(ent)
 			if ent ~= nil then ent = instance.WrapObject(ent) end
 			instance:runFunction(callback, ent)
 		end)
