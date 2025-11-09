@@ -119,7 +119,7 @@ function P.registerPrivilege(id, name, description, providerconfig)
 end
 
 function P.check(instance, target, key)
-	local ok, reason = P.privileges[key].check(instance, target)
+	local ok, reason = P.privileges[key].check(instance, target, key)
 	if not ok then SF.Throw("Permission " .. key .. ": " .. reason, 3) end
 end
 
