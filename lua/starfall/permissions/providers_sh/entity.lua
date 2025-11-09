@@ -18,30 +18,105 @@ local ENT_META,PLY_META = FindMetaTable("Entity"),FindMetaTable("Player")
 local Ent_GetNWEntity,Ent_GetTable,Ent_IsValid,Ent_SetNWEntity = ENT_META.GetNWEntity,ENT_META.GetTable,ENT_META.IsValid,ENT_META.SetNWEntity
 local Ply_IsSuperAdmin,Ply_SteamID64 = PLY_META.IsSuperAdmin,PLY_META.SteamID64
 
+if SERVER then
+	P.ent_overrides = setmetatable({}, {__mode = "k"})
+	function SF.Permissions.getEntityOverrides()
+		return next, P.ent_overrides, nil
+	end
+	-- Grant temporary override permissions for an entity
+	function SF.Permissions.tryAddEntityOverride(instance, entity, grantedInstance, permission)
+		if not Ent_IsValid(entity) then return false, "Entity is invalid" end
+
+		local owner = SF.Permissions.getOwner(entity)
+		if not IsValid(owner) then return false, "Cannot override entity permissions on an ownerless entity!" end
+		if owner ~= instance.player then return false, "Cannot override entity permissions on an entity you don't own!" end
+
+		local instanceOverrides = P.ent_overrides[grantedInstance]
+		if not instanceOverrides then
+			instanceOverrides = setmetatable({}, {__mode = "k"})
+			P.ent_overrides[grantedInstance] = instanceOverrides
+		end
+
+		local allowedEntityPermissions = instanceOverrides[entity]
+		if not allowedEntityPermissions then
+			allowedEntityPermissions = {}
+			instanceOverrides[entity] = allowedEntityPermissions
+		end
+
+		allowedEntityPermissions[permission] = true
+		return true
+	end
+	-- Revoke temporary override permissions
+	function SF.Permissions.tryRemoveEntityOverride(instance, entity, grantedInstance, permission)
+		if not Ent_IsValid(entity) then return false, "Entity is invalid" end
+
+		local owner = SF.Permissions.getOwner(entity)
+		if not IsValid(owner) then return false, "Cannot override entity permissions on an ownerless entity!" end
+		if owner ~= instance.player then return false, "Cannot override entity permissions on an entity you don't own!" end
+
+		local instanceOverrides = P.ent_overrides[grantedInstance]
+		if not instanceOverrides then return true end
+
+		local allowedEntityPermissions = instanceOverrides[entity]
+		if not allowedEntityPermissions then return true end
+
+		allowedEntityPermissions[permission] = nil
+		return true
+	end
+	-- Check if the instance's player has been granted override permissions for this entity
+	function SF.Permissions.hasEntityOverride(instance, entity, permission)
+		if not Ent_IsValid(entity) then return false, false, "Entity is invalid" end
+
+		local instanceOverrides = P.ent_overrides[instance]
+		if not instanceOverrides then return true, false end
+
+		local allowedEntityPermissions = instanceOverrides[entity]
+		if not allowedEntityPermissions then return true, false end
+
+		return true, allowedEntityPermissions[permission] ~= nil or allowedEntityPermissions["*"] ~= nil
+	end
+end
+
 if CPPI then
 	function SF.Permissions.getOwner(ent)
 		return ent:CPPIGetOwner()
 	end
+	local hasOverride = SF.Permissions.hasEntityOverride
 
 	if SERVER then
 		P.checks = {
-			function(instance, target)
+			function(instance, target, key)
 				if not Ent_IsValid(target) then return false, "Entity is invalid" end
+
+				local ok, overridden, errorStr = hasOverride(instance, target, key)
+				if not ok then return false, errorStr end
+				if overridden then return true end
+
 				if target == instance.player and owneraccess:GetBool() or
 					Ply_IsSuperAdmin(instance.player) or
 					target:CPPIGetOwner()==instance.player then return true end
 
 				return false, "You're not the owner of this prop"
 			end,
-			function(instance, target)
+			function(instance, target, key)
 				if not Ent_IsValid(target) then return false, "Entity is invalid" end
+
+				local ok, overridden, errorStr = hasOverride(instance, target, key)
+				if not ok then return false, errorStr end
+				if overridden then return true end
+
 				if target == instance.player and owneraccess:GetBool() or
 					target:CPPICanTool(instance.player, "starfall_ent_lib") then return true end
 
 				return false, "You can't toolgun this entity"
 			end,
-			function(instance, target)
+			function(instance, target, key)
 				if not Ent_IsValid(target) then return false, "Entity is invalid" end
+
+				local ok, overridden, errorStr = hasOverride(instance, target, key)
+				if not ok then return false, errorStr end
+				if overridden then return true end
+
 				if target == instance.player and owneraccess:GetBool() or
 					target:CPPICanPhysgun(instance.player) then return true end
 
@@ -51,8 +126,13 @@ if CPPI then
 		}
 	else
 		P.checks = {
-			function(instance, target)
+			function(instance, target, key)
 				if not Ent_IsValid(target) then return false, "Entity is invalid" end
+
+				local ok, overridden, errorStr = hasOverride(instance, target, key)
+				if not ok then return false, errorStr end
+				if overridden then return true end
+
 				if target==instance.player or
 					LocalPlayer()==instance.player or
 					Ply_IsSuperAdmin(instance.player) or
@@ -60,8 +140,13 @@ if CPPI then
 
 				return false, "You're not the owner of this prop"
 			end,
-			function(instance, target)
+			function(instance, target, key)
 				if not Ent_IsValid(target) then return false, "Entity is invalid" end
+
+				local ok, overridden, errorStr = hasOverride(instance, target, key)
+				if not ok then return false, errorStr end
+				if overridden then return true end
+
 				if target==instance.player or
 					LocalPlayer()==instance.player or
 					Ply_IsSuperAdmin(instance.player) or
@@ -69,8 +154,13 @@ if CPPI then
 
 				return false, "You can't toolgun this entity"
 			end,
-			function(instance, target)
+			function(instance, target, key)
 				if not Ent_IsValid(target) then return false, "Entity is invalid" end
+
+				local ok, overridden, errorStr = hasOverride(instance, target, key)
+				if not ok then return false, errorStr end
+				if overridden then return true end
+
 				if target==instance.player or
 					LocalPlayer()==instance.player or
 					Ply_IsSuperAdmin(instance.player) or
@@ -84,25 +174,42 @@ if CPPI then
 		if not ENT_META.CPPICanPhysgun then P.checks[3] = P.checks[1] end
 	end
 else
+	local hasOverride = SF.Permissions.hasEntityOverride
+
 	if SERVER then
 		P.checks = {
-			function(instance, target)
+			function(instance, target, key)
 				if not Ent_IsValid(target) then return false, "Entity is invalid" end
+
+				local ok, overridden, errorStr = hasOverride(instance, target, key)
+				if not ok then return false, errorStr end
+				if overridden then return true end
+
 				if target == instance.player and owneraccess:GetBool() or
 					Ply_IsSuperAdmin(instance.player) or
 					P.props[target]==instance.player then return true end
 
 				return false, "You're not the owner of this prop"
 			end,
-			function(instance, target)
+			function(instance, target, key)
 				if not Ent_IsValid(target) then return false, "Entity is invalid" end
+
+				local ok, overridden, errorStr = hasOverride(instance, target, key)
+				if not ok then return false, errorStr end
+				if overridden then return true end
+
 				if target == instance.player and owneraccess:GetBool() or
 					hook.Run("CanTool", instance.player, SF.dumbTrace(target), "starfall_ent_lib") ~= false then return true end
 
 				return false, "Target doesn't have toolgun access"
 			end,
-			function(instance, target)
+			function(instance, target, key)
 				if not Ent_IsValid(target) then return false, "Entity is invalid" end
+
+				local ok, overridden, errorStr = hasOverride(instance, target, key)
+				if not ok then return false, errorStr end
+				if overridden then return true end
+
 				if target == instance.player and owneraccess:GetBool() then return true end
 
 				if hook.Run("PhysgunPickup", instance.player, target) ~= false then
