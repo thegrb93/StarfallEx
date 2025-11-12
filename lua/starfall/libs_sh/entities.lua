@@ -172,7 +172,7 @@ if CLIENT then
 		elseif metaType == vec_meta then
 			vec = vunwrap( clr )
 		else
-			SF.Throw( "No color or vector provided!", 2 )
+			SF.ThrowTypeError("Color or Vector", SF.GetType(clr), 2)
 		end
 
 
