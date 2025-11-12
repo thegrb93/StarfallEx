@@ -919,12 +919,6 @@ function builtins_library.dodir(path, loadpriority)
 	return returns
 end
 
--- Used for loadstring, setfenv, and getfenv.
-local whitelistedEnvs = setmetatable({
-	[instance.env] = true,
-}, {__mode = 'k'})
-instance.whitelistedEnvs = whitelistedEnvs
-
 --- Like Lua 5.2 or LuaJIT's load/loadstring, except it has no mode parameter and, of course, the resulting function is in your instance's environment by default.
 -- For compatibility with older versions of Starfall, loadstring is NOT an alias of this function like it is in vanilla Lua 5.2/LuaJIT.
 -- @param string code String to compile
@@ -932,37 +926,24 @@ instance.whitelistedEnvs = whitelistedEnvs
 -- @param table? env Environment of compiled function
 -- @return function? Compiled function, or nil if failed to compile
 -- @return string? Error string, or nil if successfully compiled
-function builtins_library.loadstring(ld, source, mode, env)
+function builtins_library.loadstring(ld, source)
 	checkluatype(ld, TYPE_STRING)
 	if source == nil then
 		source = "=(load)"
 	else
 		checkluatype(source, TYPE_STRING)
 	end
-	if not isstring(mode) then
-		mode, env = nil, mode
-	end
-	if env == nil then
-		env = instance.env
-	else
-		checkluatype(env, TYPE_TABLE)
-	end
 	source = "SF:"..source
 	local retval = SF.CompileString(ld, source, false)
 	if isfunction(retval) then
-		whitelistedEnvs[env] = true
-		return setfenv(retval, env)
+		return setfenv(retval, instance.env)
 	end
 	return nil, tostring(retval)
 end
 builtins_library.load = builtins_library.loadstring
 
---- Lua's setfenv
--- Sets the environment of either the stack level or the function specified.
--- Note that this function will throw an error if you try to use it on anything outside of your sandbox.
--- @param function|number funcOrStackLevel Function or stack level to set the environment of
--- @param table tbl New environment
--- @return function Function with environment set to tbl
+--[[ High security risk functions that add very little value. Don't add again.
+
 function builtins_library.setfenv(location, environment)
 	if location == nil then
 		location = 2
@@ -978,11 +959,6 @@ function builtins_library.setfenv(location, environment)
 	SF.Throw("cannot change environment of given object", 2)
 end
 
---- Lua's getfenv
--- Returns the environment of either the stack level or the function specified.
--- Note that this function will return nil if the return value would be anything other than builtins_library or an environment you have passed to setfenv.
--- @param function|number funcOrStackLevel Function or stack level to get the environment of
--- @return table? Environment table (or nil, if restricted)
 function builtins_library.getfenv(location)
 	if location == nil then
 		location = 2
@@ -996,6 +972,8 @@ function builtins_library.getfenv(location)
 		return fenv
 	end
 end
+
+]]
 
 --- Gets an SF type's methods table
 -- @param string sfType Name of SF type
