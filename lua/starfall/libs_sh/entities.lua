@@ -164,8 +164,7 @@ if CLIENT then
 		checkpermission(instance, ent, "entities.setRenderProperty")
 		
 		local metaType = dgetmeta( clr )
-		local vec = clr
-
+		local vec
 		if metaType == col_meta then
 			clr = cunwrap(clr)
 			vec = Vector(clr.r / 255, clr.g / 255, clr.b / 255)
