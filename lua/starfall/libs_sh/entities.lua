@@ -158,12 +158,22 @@ if CLIENT then
 	--- Sets the sheet color of a player-model
 	-- Can only be used on players, bots, ragdolls, holograms and Starfall NextBots
 	-- @client
-	-- @param Color clr RGB color to use, alpha channel not supported
+	-- @param Color|Vector clr RGB color to use, alpha channel not supported.
 	function ents_methods:setSheetColor(clr)
 		local ent = getent(self)
 		checkpermission(instance, ent, "entities.setRenderProperty")
-		clr = cunwrap(clr)
-		local vec = Vector(clr.r / 255, clr.g / 255, clr.b / 255)
+		
+		local metaType = dgetmeta( clr )
+		local vec
+		if metaType == col_meta then
+			clr = cunwrap(clr)
+			vec = Vector(clr.r / 255, clr.g / 255, clr.b / 255)
+		elseif metaType == vec_meta then
+			vec = vunwrap( clr )
+		else
+			SF.ThrowTypeError("Color or Vector", SF.GetType(clr), 2)
+		end
+
 
 		if Ent_IsPlayer(ent) then
 			Ent_GetTable(ent).SetPlayerColor(ent, vec)
