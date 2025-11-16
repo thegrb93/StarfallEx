@@ -741,6 +741,7 @@ else
 	function builtins_library.concmd(cmd)
 		checkluatype(cmd, TYPE_STRING)
 		if instance.player ~= LocalPlayer() then SF.Throw("Can't run concmd on other players!", 2) end
+		if IsConCommandBlocked(cmd) then SF.Throw("Console command is blocked!", 2) end
 		LocalPlayer():ConCommand(cmd)
 	end
 
