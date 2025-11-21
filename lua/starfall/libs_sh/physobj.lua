@@ -14,8 +14,7 @@ SF.RegisterType("PhysObj", true, false, PHYS_META)
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
-local Phys_AddAngleVelocity,Phys_AddGameFlag,Phys_AddVelocity,Phys_ApplyForceCenter,Phys_ApplyForceOffset,Phys_ApplyTorqueCenter,Phys_CalculateForceOffset,Phys_CalculateVelocityOffset,Phys_ClearGameFlag,Phys_EnableDrag,Phys_EnableGravity,Phys_EnableMotion,Phys_GetAABB,Phys_GetAngleVelocity,Phys_GetAngles,Phys_GetDamping,Phys_GetEntity,Phys_GetFrictionSnapshot,Phys_GetInertia,Phys_GetMass,Phys_GetMassCenter,Phys_GetMaterial,Phys_GetMesh,Phys_GetMeshConvexes,Phys_GetPos,Phys_GetPositionMatrix,Phys_GetStress,Phys_GetSurfaceArea,Phys_GetVelocity,Phys_GetVelocityAtPoint,Phys_GetVolume,Phys_HasGameFlag,Phys_IsAsleep,Phys_IsDragEnabled,Phys_IsGravityEnabled,Phys_IsMoveable,Phys_IsValid,Phys_LocalToWorld,Phys_LocalToWorldVector,Phys_SetAngleDragCoefficient,Phys_SetAngleVelocity,Phys_SetAngles,Phys_SetBuoyancyRatio,Phys_SetContents,Phys_SetDamping,Phys_SetDragCoefficient,Phys_SetInertia,Phys_SetMass,Phys_SetMaterial,Phys_SetPos,Phys_SetVelocity,Phys_Sleep,Phys_Wake,Phys_WorldToLocal,Phys_WorldToLocalVector = PHYS_META.AddAngleVelocity,PHYS_META.AddGameFlag,PHYS_META.AddVelocity,PHYS_META.ApplyForceCenter,PHYS_META.ApplyForceOffset,PHYS_META.ApplyTorqueCenter,PHYS_META.CalculateForceOffset,PHYS_META.CalculateVelocityOffset,PHYS_META.ClearGameFlag,PHYS_META.EnableDrag,PHYS_META.EnableGravity,PHYS_META.EnableMotion,PHYS_META.GetAABB,PHYS_META.GetAngleVelocity,PHYS_META.GetAngles,PHYS_META.GetDamping,PHYS_META.GetEntity,PHYS_META.GetFrictionSnapshot,PHYS_META.GetInertia,PHYS_META.GetMass,PHYS_META.GetMassCenter,PHYS_META.GetMaterial,PHYS_META.GetMesh,PHYS_META.GetMeshConvexes,PHYS_META.GetPos,PHYS_META.GetPositionMatrix,PHYS_META.GetStress,PHYS_META.GetSurfaceArea,PHYS_META.GetVelocity,PHYS_META.GetVelocityAtPoint,PHYS_META.GetVolume,PHYS_META.HasGameFlag,PHYS_META.IsAsleep,PHYS_META.IsDragEnabled,PHYS_META.IsGravityEnabled,PHYS_META.IsMoveable,PHYS_META.IsValid,PHYS_META.LocalToWorld,PHYS_META.LocalToWorldVector,PHYS_META.SetAngleDragCoefficient,PHYS_META.SetAngleVelocity,PHYS_META.SetAngles,PHYS_META.SetBuoyancyRatio,PHYS_META.SetContents,PHYS_META.SetDamping,PHYS_META.SetDragCoefficient,PHYS_META.SetInertia,PHYS_META.SetMass,PHYS_META.SetMaterial,PHYS_META.SetPos,PHYS_META.SetVelocity,PHYS_META.Sleep,PHYS_META.Wake,PHYS_META.WorldToLocal,PHYS_META.WorldToLocalVector
-
+local Phys_AddAngleVelocity,Phys_AddGameFlag,Phys_AddVelocity,Phys_ApplyForceCenter,Phys_ApplyForceOffset,Phys_ApplyTorqueCenter,Phys_CalculateForceOffset,Phys_CalculateVelocityOffset,Phys_ClearGameFlag,Phys_EnableDrag,Phys_EnableGravity,Phys_EnableMotion,Phys_GetAABB,Phys_GetAngleVelocity,Phys_GetAngles,Phys_GetDamping,Phys_GetEntity,Phys_GetFrictionSnapshot,Phys_GetInertia,Phys_GetMass,Phys_GetMassCenter,Phys_GetMaterial,Phys_GetMesh,Phys_GetMeshConvexes,Phys_GetPos,Phys_GetPositionMatrix,Phys_GetStress,Phys_GetSurfaceArea,Phys_GetVelocity,Phys_GetVelocityAtPoint,Phys_GetVolume,Phys_HasGameFlag,Phys_IsAsleep,Phys_IsDragEnabled,Phys_IsGravityEnabled,Phys_IsMoveable,Phys_IsValid,Phys_LocalToWorld,Phys_LocalToWorldVector,Phys_SetAngleDragCoefficient,Phys_SetAngleVelocity,Phys_SetAngleVelocityInstantaneous,Phys_SetAngles,Phys_SetBuoyancyRatio,Phys_SetContents,Phys_SetDamping,Phys_SetDragCoefficient,Phys_SetInertia,Phys_SetMass,Phys_SetMaterial,Phys_SetPos,Phys_SetVelocity,Phys_SetVelocityInstantaneous,Phys_Sleep,Phys_Wake,Phys_WorldToLocal,Phys_WorldToLocalVector = PHYS_META.AddAngleVelocity,PHYS_META.AddGameFlag,PHYS_META.AddVelocity,PHYS_META.ApplyForceCenter,PHYS_META.ApplyForceOffset,PHYS_META.ApplyTorqueCenter,PHYS_META.CalculateForceOffset,PHYS_META.CalculateVelocityOffset,PHYS_META.ClearGameFlag,PHYS_META.EnableDrag,PHYS_META.EnableGravity,PHYS_META.EnableMotion,PHYS_META.GetAABB,PHYS_META.GetAngleVelocity,PHYS_META.GetAngles,PHYS_META.GetDamping,PHYS_META.GetEntity,PHYS_META.GetFrictionSnapshot,PHYS_META.GetInertia,PHYS_META.GetMass,PHYS_META.GetMassCenter,PHYS_META.GetMaterial,PHYS_META.GetMesh,PHYS_META.GetMeshConvexes,PHYS_META.GetPos,PHYS_META.GetPositionMatrix,PHYS_META.GetStress,PHYS_META.GetSurfaceArea,PHYS_META.GetVelocity,PHYS_META.GetVelocityAtPoint,PHYS_META.GetVolume,PHYS_META.HasGameFlag,PHYS_META.IsAsleep,PHYS_META.IsDragEnabled,PHYS_META.IsGravityEnabled,PHYS_META.IsMoveable,PHYS_META.IsValid,PHYS_META.LocalToWorld,PHYS_META.LocalToWorldVector,PHYS_META.SetAngleDragCoefficient,PHYS_META.SetAngleVelocity,PHYS_META.SetAngleVelocityInstantaneous,PHYS_META.SetAngles,PHYS_META.SetBuoyancyRatio,PHYS_META.SetContents,PHYS_META.SetDamping,PHYS_META.SetDragCoefficient,PHYS_META.SetInertia,PHYS_META.SetMass,PHYS_META.SetMaterial,PHYS_META.SetPos,PHYS_META.SetVelocity,PHYS_META.SetVelocityInstantaneous,PHYS_META.Sleep,PHYS_META.Wake,PHYS_META.WorldToLocal,PHYS_META.WorldToLocalVector
 
 local physobj_methods, physobj_meta, wrap, unwrap = instance.Types.PhysObj.Methods, instance.Types.PhysObj, instance.Types.PhysObj.Wrap, instance.Types.PhysObj.Unwrap
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
@@ -252,7 +251,31 @@ if SERVER then
 		Phys_SetVelocity(phys, vel)
 	end
 
-    --- Applies velocity to an object
+	--- Sets the velocity of the physics object instantly
+	-- @server
+	-- @param Vector vel The velocity that will be set
+	function physobj_methods:setVelocityInstantaneous( vel )
+		vel = vunwrap1( vel )
+		checkvector( vel )
+
+		local phys = unwrap( self )
+		checkpermission( instance, Phys_GetEntity( phys ), "entities.setVelocity" )
+		Phys_SetVelocityInstantaneous( phys, vel )
+	end
+
+	--- Sets the angular velocity of the physics object instantly
+	-- @server
+	-- @param Angle ang The angular velocity that will be set
+	function physobj_methods:setAngleVelocityInstantaneous( vel )
+		vel = vunwrap1( vel )
+		checkvector( vel )
+
+		local phys = unwrap( self )
+		checkpermission( instance, Phys_GetEntity( phys ), "entities.setVelocity" )
+		Phys_SetAngleVelocityInstantaneous( phys, vel )
+	end
+
+	--- Applies velocity to an object
     -- @server
     -- @param Vector vel The world velocity vector to apply
     function physobj_methods:addVelocity(vel)
