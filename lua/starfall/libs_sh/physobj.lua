@@ -252,7 +252,7 @@ if SERVER then
 		Phys_SetVelocity(phys, vel)
 	end
 
-	--- Sets the angular velocity of the physics object instantly
+	--- Sets the velocity of the physics object instantly
 	-- @server
 	-- @param Vector vel The velocity that will be set
 	function physobj_methods:setVelocityInstantaneous( vel )
@@ -264,7 +264,7 @@ if SERVER then
 		Phys_SetVelocityInstantaneous( phys, vel )
 	end
 
-	--- Sets the velocity of the physics object instantly
+	--- Sets the angular velocity of the physics object instantly
 	-- @server
 	-- @param Angle ang The angular velocity that will be set
 	function physobj_methods:setAngleVelocityInstantaneous( vel )
