@@ -7,7 +7,6 @@ local ENT_META,PLY_META,VEH_META = FindMetaTable("Entity"),FindMetaTable("Player
 local UseEnableVehicles
 
 registerprivilege("vehicle.thirdPerson", "Vehicle thirdPerson", "Forces the vehicle camera", { entities = {} })
-registerprivilege("vehicle.entryAnim", "Vehicle entryAnim", "Toggle the enter/exit anim", { entities = {} })
 
 if SERVER then
 	-- Register privileges
@@ -16,6 +15,7 @@ if SERVER then
 	registerprivilege("vehicle.strip", "Vehicle strip", "Strips weapons from a driver in vehicle", { entities = {} })
 	registerprivilege("vehicle.lock", "Vehicle lock", "Allow vehicle locking/unlocking", { entities = {} })
 	registerprivilege("vehicle.use", "Vehicle use", "Allow passengers in a vehicle to use while sitting", { entities = {} })
+	registerprivilege("vehicle.entryAnim", "Vehicle entryAnim", "Toggle the enter/exit anim", { entities = {} })
 
 	local sf_max_driveruse_dist = CreateConVar("sf_vehicle_use_distance", 100, FCVAR_ARCHIVE, "The max reach distance allowed for player use with Vehicle:useEnable function.")
 
