@@ -5,6 +5,10 @@ local ENT_META,PLY_META,VEH_META = FindMetaTable("Entity"),FindMetaTable("Player
 
 
 local UseEnableVehicles
+
+registerprivilege("vehicle.thirdPerson", "Vehicle thirdPerson", "Forces the vehicle camera", { entities = {} })
+registerprivilege("vehicle.entryAnim", "Vehicle entryAnim", "Toggle the enter/exit anim", { entities = {} })
+
 if SERVER then
 	-- Register privileges
 	registerprivilege("vehicle.eject", "Vehicle eject", "Removes a driver from vehicle", { entities = {} })
@@ -12,8 +16,6 @@ if SERVER then
 	registerprivilege("vehicle.strip", "Vehicle strip", "Strips weapons from a driver in vehicle", { entities = {} })
 	registerprivilege("vehicle.lock", "Vehicle lock", "Allow vehicle locking/unlocking", { entities = {} })
 	registerprivilege("vehicle.use", "Vehicle use", "Allow passengers in a vehicle to use while sitting", { entities = {} })
-	registerprivilege( "vehicle.thirdPerson", "Vehicle thirdPerson", "Forces the vehicle camera", { entities = {} } )
-	registerprivilege( "vehicle.entryAnim", "Vehicle entryAnim", "Toggle the enter/exit anim", { entities = {} } )
 
 	local sf_max_driveruse_dist = CreateConVar("sf_vehicle_use_distance", 100, FCVAR_ARCHIVE, "The max reach distance allowed for player use with Vehicle:useEnable function.")
 
@@ -106,36 +108,36 @@ end
 
 --- Forces the vehicles camera into third person or first person
 -- @param boolean thirdPerson
-function vehicle_methods:setThirdPersonMode( enabled )
-	local veh = getveh( self )
+function vehicle_methods:setThirdPersonMode(enabled)
+	local veh = getveh(self)
 
-	checkluatype( enabled, TYPE_BOOL )
-	checkpermission( instance, veh, "vehicle.thirdPerson" )
+	checkluatype(enabled, TYPE_BOOL)
+	checkpermission(instance, veh, "vehicle.thirdPerson")
 
-	Veh_SetThirdPersonMode( veh, enabled )
+	Veh_SetThirdPersonMode(veh, enabled)
 end
 
 --- Gets if third person mode is enabled or disabled
 -- @return boolean true if third person mode is enabled, false if not
 function vehicle_methods:getThirdPersonMode()
-	return Veh_GetThirdPersonMode( getveh( self ) )
+	return Veh_GetThirdPersonMode(getveh(self))
 end
 
 --- Sets the third person camera distance
 -- @param number distance
-function vehicle_methods:setCameraDistance( dist )
-	local veh = getveh( self )
+function vehicle_methods:setCameraDistance(dist)
+	local veh = getveh(self)
 
-	checkluatype( dist, TYPE_NUMBER )
-	checkpermission( instance, veh, "vehicle.thirdPerson" )
+	checkluatype(dist, TYPE_NUMBER)
+	checkpermission(instance, veh, "vehicle.thirdPerson")
 
-	Veh_SetCameraDistance( veh, dist )
+	Veh_SetCameraDistance(veh, dist)
 end
 
 --- Returns the camera distance
 -- @return number distance
 function vehicle_methods:getCameraDistance()
-	return Veh_GetCameraDistance( getveh( self ) )
+	return Veh_GetCameraDistance(getveh(self))
 end
 
 --- Returns the view position and angle of the passenger
@@ -143,14 +145,14 @@ end
 -- @return Vector The view position
 -- @return Angle The view angles
 -- @return number The passengers FOV
-function vehicle_methods:getVehicleViewPosition( role )
+function vehicle_methods:getVehicleViewPosition(role)
 	if role then
-		checkluatype( role, TYPE_NUMBER )
+		checkluatype(role, TYPE_NUMBER)
 	end
 
-	local pos, ang, fov = Veh_GetVehicleViewPosition( getveh( self ), role )
+	local pos, ang, fov = Veh_GetVehicleViewPosition(getveh(self), role)
 
-	return vwrap( pos ), awrap( ang ), fov
+	return vwrap(pos), awrap(ang), fov
 end
 
 
@@ -226,13 +228,13 @@ if SERVER then
 	--- Toggles the vehicles entry/exit camera animation
 	-- @param boolean Enabled
 	-- @server
-	function vehicle_methods:setVehicleEntryAnim( enabled )
-		local veh = getveh( self )
+	function vehicle_methods:setVehicleEntryAnim(enabled)
+		local veh = getveh(self)
 
-		checkluatype( enabled, TYPE_BOOL )
-		checkpermission( instance, veh, "vehicle.entryAnim" )
+		checkluatype(enabled, TYPE_BOOL)
+		checkpermission(instance, veh, "vehicle.entryAnim")
 
-		Veh_SetVehicleEntryAnim( veh, enabled )
+		Veh_SetVehicleEntryAnim(veh, enabled)
 	end
 
 
@@ -241,26 +243,26 @@ if SERVER then
 	-- @param number distance
 	-- @return Vector The exit position, or nil if unable to exit in that direction
 	-- @server
-	function vehicle_methods:checkExitPoint( yaw, dist )
-		checkluatype( yaw, TYPE_NUMBER )
-		checkluatype( dist, TYPE_NUMBER )
+	function vehicle_methods:checkExitPoint(yaw, dist)
+		checkluatype(yaw, TYPE_NUMBER)
+		checkluatype(dist, TYPE_NUMBER)
 
-		local exitPos = Veh_CheckExitPoint( getveh( self ), yaw, dist )
-		return exitPos and vwrap( exitPos )
+		local exitPos = Veh_CheckExitPoint(getveh(self), yaw, dist)
+		return exitPos and vwrap(exitPos)
 	end
 
 	--- Gets the vehicles speed in MPH
 	-- @server
 	-- @return number Speed
 	function vehicle_methods:getSpeed()
-		return Veh_GetSpeed( getveh( self ) )
+		return Veh_GetSpeed(getveh(self))
 	end
 
 	--- Gets the vehicles speed in Half-Life Hammer units. Same as ent:getVelocity + vector:getLength
 	-- @server
 	-- @return number Speed
 	function vehicle_methods:getHLSpeed()
-		return Veh_GetHLSpeed( getveh( self ) )
+		return Veh_GetHLSpeed(getveh(self))
 	end
 end
 
