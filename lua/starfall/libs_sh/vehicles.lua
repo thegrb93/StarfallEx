@@ -15,7 +15,6 @@ if SERVER then
 	registerprivilege("vehicle.strip", "Vehicle strip", "Strips weapons from a driver in vehicle", { entities = {} })
 	registerprivilege("vehicle.lock", "Vehicle lock", "Allow vehicle locking/unlocking", { entities = {} })
 	registerprivilege("vehicle.use", "Vehicle use", "Allow passengers in a vehicle to use while sitting", { entities = {} })
-	registerprivilege("vehicle.entryAnim", "Vehicle entryAnim", "Toggle the enter/exit anim", { entities = {} })
 
 	local sf_max_driveruse_dist = CreateConVar("sf_vehicle_use_distance", 100, FCVAR_ARCHIVE, "The max reach distance allowed for player use with Vehicle:useEnable function.")
 
@@ -223,18 +222,6 @@ if SERVER then
 		checkpermission(instance, veh, "vehicle.use")
 		if key~=nil then checkluatype(key, TYPE_NUMBER) else key = IN_ATTACK end
 		UseEnableVehicles:setEnabled(veh, enabled, key)
-	end
-
-	--- Toggles the vehicles entry/exit camera animation
-	-- @param boolean Enabled
-	-- @server
-	function vehicle_methods:setVehicleEntryAnim(enabled)
-		local veh = getveh(self)
-
-		checkluatype(enabled, TYPE_BOOL)
-		checkpermission(instance, veh, "vehicle.entryAnim")
-
-		Veh_SetVehicleEntryAnim(veh, enabled)
 	end
 
 
