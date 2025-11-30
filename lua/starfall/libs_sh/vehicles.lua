@@ -110,7 +110,7 @@ function vehicle_methods:setThirdPersonMode( enabled )
 	local veh = getveh( self )
 
 	checkluatype( enabled, TYPE_BOOL )
-	checkpermission( instance, veh, "vehicles.thirdPerson" )
+	checkpermission( instance, veh, "vehicle.thirdPerson" )
 
 	Veh_SetThirdPersonMode( veh, enabled )
 end
