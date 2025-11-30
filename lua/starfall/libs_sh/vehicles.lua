@@ -235,7 +235,7 @@ if SERVER then
 		checkluatype(dist, TYPE_NUMBER)
 
 		local exitPos = Veh_CheckExitPoint(getveh(self), yaw, dist)
-		return exitPos and vwrap(exitPos)
+		if exitPos then return vwrap(exitPos) end
 	end
 
 	--- Gets the vehicles speed in MPH
