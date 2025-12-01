@@ -5,6 +5,9 @@ local ENT_META,PLY_META,VEH_META = FindMetaTable("Entity"),FindMetaTable("Player
 
 
 local UseEnableVehicles
+
+registerprivilege("vehicle.thirdPerson", "Vehicle thirdPerson", "Forces the vehicle camera", { entities = {} })
+
 if SERVER then
 	-- Register privileges
 	registerprivilege("vehicle.eject", "Vehicle eject", "Removes a driver from vehicle", { entities = {} })
@@ -65,11 +68,14 @@ return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 local Ent_Fire,Ent_IsValid = ENT_META.Fire,ENT_META.IsValid
 local Ply_ExitVehicle,Ply_Kill,Ply_StripWeapon,Ply_StripWeapons = PLY_META.ExitVehicle,PLY_META.Kill,PLY_META.StripWeapon,PLY_META.StripWeapons
-local Veh_GetDriver,Veh_GetPassenger = VEH_META.GetDriver,VEH_META.GetPassenger
+local Veh_CheckExitPoint,Veh_GetCameraDistance,Veh_GetDriver,Veh_GetHLSpeed,Veh_GetPassenger,Veh_GetSpeed,Veh_GetThirdPersonMode,Veh_GetVehicleViewPosition,Veh_SetCameraDistance,Veh_SetThirdPersonMode,Veh_SetVehicleEntryAnim = VEH_META.CheckExitPoint,VEH_META.GetCameraDistance,VEH_META.GetDriver,VEH_META.GetHLSpeed,VEH_META.GetPassenger,VEH_META.GetSpeed,VEH_META.GetThirdPersonMode,VEH_META.GetVehicleViewPosition,VEH_META.SetCameraDistance,VEH_META.SetThirdPersonMode,VEH_META.SetVehicleEntryAnim
 
 local vehicle_methods, vehicle_meta, wrap, unwrap = instance.Types.Vehicle.Methods, instance.Types.Vehicle, instance.Types.Vehicle.Wrap, instance.Types.Vehicle.Unwrap
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local vec_meta, vwrap = instance.Types.Vector, instance.Types.Vector.Wrap
+local ang_meta, awrap = instance.Types.Angle, instance.Types.Angle.Wrap
 local pwrap = instance.Types.Player.Wrap
+
 
 instance:AddHook("initialize", function()
 	vehicle_meta.__tostring = ent_meta.__tostring
@@ -97,6 +103,57 @@ function vehicle_methods:getPassenger(n)
 	checkluatype(n, TYPE_NUMBER)
 	return pwrap(Veh_GetPassenger(getveh(self), n))
 end
+
+
+--- Forces the vehicles camera into third person or first person
+-- @param boolean thirdPerson
+function vehicle_methods:setThirdPersonMode(enabled)
+	local veh = getveh(self)
+
+	checkluatype(enabled, TYPE_BOOL)
+	checkpermission(instance, veh, "vehicle.thirdPerson")
+
+	Veh_SetThirdPersonMode(veh, enabled)
+end
+
+--- Gets if third person mode is enabled or disabled
+-- @return boolean true if third person mode is enabled, false if not
+function vehicle_methods:getThirdPersonMode()
+	return Veh_GetThirdPersonMode(getveh(self))
+end
+
+--- Sets the third person camera distance
+-- @param number distance
+function vehicle_methods:setCameraDistance(dist)
+	local veh = getveh(self)
+
+	checkluatype(dist, TYPE_NUMBER)
+	checkpermission(instance, veh, "vehicle.thirdPerson")
+
+	Veh_SetCameraDistance(veh, dist)
+end
+
+--- Returns the camera distance
+-- @return number distance
+function vehicle_methods:getCameraDistance()
+	return Veh_GetCameraDistance(getveh(self))
+end
+
+--- Returns the view position and angle of the passenger
+-- @param number? role 0 is the driver.
+-- @return Vector The view position
+-- @return Angle The view angles
+-- @return number The passengers FOV
+function vehicle_methods:getVehicleViewPosition(role)
+	if role then
+		checkluatype(role, TYPE_NUMBER)
+	end
+
+	local pos, ang, fov = Veh_GetVehicleViewPosition(getveh(self), role)
+
+	return vwrap(pos), awrap(ang), fov
+end
+
 
 if SERVER then
 	--- Ejects the driver of the vehicle
@@ -167,6 +224,33 @@ if SERVER then
 		UseEnableVehicles:setEnabled(veh, enabled, key)
 	end
 
+
+	--- Tries to find an exit point for leaving the vehicle
+	-- @param number yaw
+	-- @param number distance
+	-- @return Vector The exit position, or nil if unable to exit in that direction
+	-- @server
+	function vehicle_methods:checkExitPoint(yaw, dist)
+		checkluatype(yaw, TYPE_NUMBER)
+		checkluatype(dist, TYPE_NUMBER)
+
+		local exitPos = Veh_CheckExitPoint(getveh(self), yaw, dist)
+		if exitPos then return vwrap(exitPos) end
+	end
+
+	--- Gets the vehicles speed in MPH
+	-- @server
+	-- @return number Speed
+	function vehicle_methods:getSpeed()
+		return Veh_GetSpeed(getveh(self))
+	end
+
+	--- Gets the vehicles speed in Half-Life Hammer units.
+	-- @server
+	-- @return number Speed
+	function vehicle_methods:getHLSpeed()
+		return Veh_GetHLSpeed(getveh(self))
+	end
 end
 
 end
