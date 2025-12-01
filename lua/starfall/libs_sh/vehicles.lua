@@ -245,7 +245,7 @@ if SERVER then
 		return Veh_GetSpeed(getveh(self))
 	end
 
-	--- Gets the vehicles speed in Half-Life Hammer units. Same as ent:getVelocity + vector:getLength
+	--- Gets the vehicles speed in Half-Life Hammer units.
 	-- @server
 	-- @return number Speed
 	function vehicle_methods:getHLSpeed()
