@@ -225,6 +225,64 @@ end)
 
 -- ------------------------- Methods ------------------------- --
 
+--- Grants a Starfall instance permission to manipulate an entity. 
+-- @param Entity entity The entity you want to grant permissions for
+-- @param Entity starfall The Starfall you wish to grant permissions to
+-- @param string permission The permission to grant. "*" grants all permissions.
+function ents_methods:grantPermission(starfall, permission)
+	local target = eunwrap(self)
+	local sf     = eunwrap(starfall)
+	local perm   = permission
+
+	local sf_tbl = Ent_GetTable(sf)
+
+	if not sf_tbl.Starfall or not sf_tbl.instance then SF.Throw("Argument 'starfall' must be a Starfall with a valid instance! (see entity:hasInstance() to validate this)") end
+	if not isstring(perm) then SF.Throw("Argument 'permission' must be a string!") end
+
+	local ok, err = SF.Permissions.tryAddEntityOverride(instance, target, sf_tbl.instance, permission)
+	if not ok then SF.Throw("Error while granting permission: " .. err) end
+end
+
+--- Revokes an entity manipulation permission from a Starfall instance.
+-- @param Entity entity The entity you want to revoke permissions for
+-- @param Entity starfall The Starfall you wish to revoke permissions from
+-- @param string permission The permission to grant. "*" grants all permissions. Note that by revoking '*', you do not revoke all permissions from the entity!
+function ents_methods:revokePermission(starfall, permission)
+	local target = eunwrap(self)
+	local sf     = eunwrap(starfall)
+	local perm   = permission
+
+	local sf_tbl = Ent_GetTable(sf)
+
+	if not sf_tbl.Starfall or not sf_tbl.instance then SF.Throw("Argument 'starfall' must be a Starfall with a valid instance! (see entity:hasInstance() to validate this)") end
+	if not isstring(perm) then SF.Throw("Argument 'permission' must be a string!") end
+
+	local ok, err = SF.Permissions.tryRemoveEntityOverride(instance, target, sf_tbl.instance, permission)
+	if not ok then SF.Throw("Error while revoking permission: " .. err) end
+end
+
+--- Obtains all entity overrides for this entity.
+-- @param Entity entity The entity you want to view permission overrides for
+function ents_methods:getPermissionOverrides()
+	local target    = eunwrap(self)
+	local overrides = {}
+	for grantedInstance, instanceOverrides in SF.Permissions.getPermissionOverrides() do
+		if IsValid(grantedInstance.entity) then
+			local permissions = {}
+			overrides[ewrap(grantedInstance.entity)] = permissions
+
+			for overriddenEntity, permissionsLUT in pairs(instanceOverrides) do
+				if IsValid(overriddenEntity) and overriddenEntity == target then
+					for permission in pairs(permissionsLUT) do
+						permissions[permission] = true
+					end
+				end
+			end
+		end
+	end
+	return overrides
+end
+
 --- Links starfall components to a starfall processor or vehicle. Screen can only connect to processor. HUD can connect to processor and vehicle.
 -- @param Entity? e Entity to link the component to, a vehicle or starfall for huds, or a starfall for screens. nil to clear links.
 function ents_methods:linkComponent(e)
