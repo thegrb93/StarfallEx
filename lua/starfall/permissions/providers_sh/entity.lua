@@ -195,16 +195,21 @@ setmetatable(EntityPermissionCache, EntityPermissionCache)
 
 local cacheMeta = {__mode="k", __index = function(t,k) local r=EntityPermissionCache() t[k]=r return r end}
 
-local function check(instance, ent, checkfunc, cacheName)
+local function getEntPermCache(ent_tbl)
+	local cache = ent_tbl.SF_EntPermCache
+	if not cache then
+		cache = setmetatable({}, cacheMeta)
+		ent_tbl.SF_EntPermCache = cache
+	end
+	return cache
+end
+SF.GetEntPermCache = getEntPermCache
+
+local function check(instance, ent, checkfunc)
 	local ent_tbl = Ent_GetTable(ent)
 	if not ent_tbl then return false, "Entity is invalid" end
 	if Ply_IsSuperAdmin(instance.player) then return true end
-	local cache = ent_tbl[cacheName]
-	if not cache then
-		cache = setmetatable({}, cacheMeta)
-		ent_tbl[cacheName] = cache
-	end
-	return cache[instance]:check(instance, ent, checkfunc)
+	return getEntPermCache(ent_tbl)[instance]:check(instance, ent, checkfunc)
 end
 
 SF.Permissions.registerProvider({
@@ -214,13 +219,13 @@ SF.Permissions.registerProvider({
 	defaultsetting = 2,
 	checks = {
 		function(instance, ent)
-			return check(instance, ent, checkOwner, "SF_CheckOwnerCache")
+			return check(instance, ent, checkOwner)
 		end,
 		function(instance, ent)
-			return check(instance, ent, checkCanTool, "SF_CheckToolCache")
+			return check(instance, ent, checkCanTool)
 		end,
 		function(instance, ent)
-			return check(instance, ent, checkCanPhysgun, "SF_CheckPhysgunCache")
+			return check(instance, ent, checkCanPhysgun)
 		end,
 		"allow"
 	}
