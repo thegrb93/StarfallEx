@@ -310,7 +310,7 @@ end
 -- @param Vector origin
 function ents_methods:dissolve(type, magnitude, origin)
 	local ent = getent(self)
-	checkpermission(instance, ent, "entities.applyDamage")
+	checkpermission(instance, ent, "entities.remove")
 
 	if type then checkluatype(type, TYPE_NUMBER) end
 	if magnitude then checkluatype(magnitude, TYPE_NUMBER) end
