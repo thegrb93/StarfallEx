@@ -6,7 +6,8 @@ local dgetmeta = debug.getmetatable
 local ENT_META,NPC_META,PHYS_META,PLY_META,VEH_META,WEP_META = FindMetaTable("Entity"),FindMetaTable("NPC"),FindMetaTable("PhysObj"),FindMetaTable("Player"),FindMetaTable("Vehicle"),FindMetaTable("Weapon")
 local isentity = isentity
 
-local Ent_AddCallback,Ent_GetTable,Ent_IsScripted,Ent_IsValid,Ent_RemoveCallback = ENT_META.AddCallback,ENT_META.GetTable,ENT_META.IsScripted,ENT_META.IsValid,ENT_META.RemoveCallback
+local Ent_AddCallback,Ent_Dissolve,Ent_DrawShadow,Ent_Extinguish,Ent_Fire,Ent_GetChildren,Ent_GetClass,Ent_GetCreationID,Ent_GetForward,Ent_GetFriction,Ent_GetMoveType,Ent_GetParent,Ent_GetPhysicsObject,Ent_GetRight,Ent_GetTable,Ent_GetUnFreezable,Ent_GetUp,Ent_GetVar,Ent_Ignite,Ent_IsConstraint,Ent_IsPlayerHolding,Ent_IsScripted,Ent_IsValid,Ent_IsWorld,Ent_OBBMaxs,Ent_OBBMins,Ent_PhysicsInit,Ent_PhysicsInitSphere,Ent_Remove,Ent_RemoveCallback,Ent_SetAngles,Ent_SetCollisionBounds,Ent_SetCollisionGroup,Ent_SetElasticity,Ent_SetFriction,Ent_SetLightingOriginEntity,Ent_SetLocalAngles,Ent_SetLocalPos,Ent_SetMoveType,Ent_SetNotSolid,Ent_SetPos,Ent_SetPreventTransmit,Ent_SetSolid,Ent_SetUnFreezable,Ent_SetVelocity,Ent_TestPVS,Ent_Use = ENT_META.AddCallback,ENT_META.Dissolve,ENT_META.DrawShadow,ENT_META.Extinguish,ENT_META.Fire,ENT_META.GetChildren,ENT_META.GetClass,ENT_META.GetCreationID,ENT_META.GetForward,ENT_META.GetFriction,ENT_META.GetMoveType,ENT_META.GetParent,ENT_META.GetPhysicsObject,ENT_META.GetRight,ENT_META.GetTable,ENT_META.GetUnFreezable,ENT_META.GetUp,ENT_META.GetVar,ENT_META.Ignite,ENT_META.IsConstraint,ENT_META.IsPlayerHolding,ENT_META.IsScripted,ENT_META.IsValid,ENT_META.IsWorld,ENT_META.OBBMaxs,ENT_META.OBBMins,ENT_META.PhysicsInit,ENT_META.PhysicsInitSphere,ENT_META.Remove,ENT_META.RemoveCallback,ENT_META.SetAngles,ENT_META.SetCollisionBounds,ENT_META.SetCollisionGroup,ENT_META.SetElasticity,ENT_META.SetFriction,ENT_META.SetLightingOriginEntity,ENT_META.SetLocalAngles,ENT_META.SetLocalPos,ENT_META.SetMoveType,ENT_META.SetNotSolid,ENT_META.SetPos,ENT_META.SetPreventTransmit,ENT_META.SetSolid,ENT_META.SetUnFreezable,ENT_META.SetVelocity,ENT_META.TestPVS,ENT_META.Use
+
 
 -- Register privileges
 registerprivilege("entities.applyDamage", "Apply damage", "Allows the user to apply damage to an entity", { entities = {} })
@@ -301,6 +302,24 @@ function ents_methods:applyDamage(amt, attacker, inflictor, dmgtype, pos)
 		dmg:SetDamagePosition(pos)
 	end
 	ent:TakeDamageInfo(dmg)
+end
+
+--- Dissolves an entity. Requires 'entities.applyDamage' permission. See https://wiki.facepunch.com/gmod/Entity:Dissolve
+-- @param number type
+-- @param number magnitude
+-- @param Vector origin
+function ents_methods:dissolve(type, magnitude, origin)
+	local ent = getent(self)
+	checkpermission(instance, ent, "entities.applyDamage")
+
+	if type then checkluatype(type, TYPE_NUMBER) end
+	if magnitude then checkluatype(magnitude, TYPE_NUMBER) end
+	if origin then
+		origin = vunwrap1(origin)
+		checkvector(origin)
+	end
+
+	Ent_Dissolve(ent, type, magnitude, origin)
 end
 
 --- Sets a custom prop's physics simulation forces. Thrusters and balloons use this.
@@ -855,6 +874,40 @@ function ents_methods:isFrozen()
 	if not Phys_IsValid(phys) then SF.Throw("Physics object is invalid", 2) end
 	return not Phys_IsMoveable(phys)
 end
+
+--- Sets whether the entity can be frozen with the physgun
+-- @param boolean freezable
+function ents_methods:setUnFreezable(freezable)
+	checkluatype(freezable, TYPE_BOOL)
+
+	local ent = getent(self)
+	checkpermission(instance, ent, "entities.enableMotion")
+
+	Ent_SetUnFreezable(ent, freezable)
+end
+
+--- Returns if the entity unfreezable
+-- @return boolean unfreezable
+function ents_methods:getUnFreezable()
+	local ent = getent(self)
+	if not Ent_IsValid(ent) then
+		SF.Throw("Invalid entity", 2)
+	end
+
+	return Ent_GetUnFreezable(ent)
+end
+
+--- Blocks this entity from being picked up by the physgun
+-- @param boolean physgunDisabled
+function ents_methods:disablePhysgun(disabled)
+	checkluatype(disabled, TYPE_BOOL)
+
+	local ent = getent(self)
+	checkpermission(instance, ent, "entities.enableMotion")
+
+	ent.PhysgunDisabled = disabled
+end
+
 
 --- Sets the physics of an entity to be a sphere
 -- @param boolean enabled Should the entity be spherical?
