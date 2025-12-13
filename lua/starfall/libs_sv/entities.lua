@@ -889,12 +889,7 @@ end
 --- Returns if the entity unfreezable
 -- @return boolean unfreezable
 function ents_methods:getUnFreezable()
-	local ent = getent(self)
-	if not Ent_IsValid(ent) then
-		SF.Throw("Invalid entity", 2)
-	end
-
-	return Ent_GetUnFreezable(ent)
+	return Ent_GetUnFreezable(getent(self))
 end
 
 --- Blocks this entity from being picked up by the physgun
