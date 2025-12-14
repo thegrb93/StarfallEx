@@ -135,7 +135,9 @@ function props_library.createRagdoll(pos,ang,model, frozen)
 		ragdoll = ents.Create("prop_ragdoll")
 		ragdoll:SetModel(model)
 		ragdoll:Spawn()
+
 		if not ragdoll:GetModel() then error("Invalid model") end
+		
 		for I = 0, ragdoll:GetPhysicsObjectCount() - 1 do
 			local obj = ragdoll:GetPhysicsObjectNum(I)
 			local rpos,rang = WorldToLocal(obj:GetPos(),obj:GetAngles(),Vector(),ang)
