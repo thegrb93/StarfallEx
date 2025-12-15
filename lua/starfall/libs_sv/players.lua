@@ -12,6 +12,7 @@ local playerMaxScale = CreateConVar("sf_player_model_scale_max", "10", { FCVAR_A
 registerprivilege("player.dropweapon", "DropWeapon", "Drops a weapon from the player", { entities = {} })
 registerprivilege("player.setammo", "SetAmmo", "Whether a player can set their ammo", { usergroups = { default = 1 }, entities = {} })
 registerprivilege("player.enterVehicle", "EnterVehicle", "Whether a player can be forced into a vehicle", { usergroups = { default = 1 }, entities = {} })
+registerprivilege("player.exitVehicle", "ExitVehicle", "Whether a player can be forced out of a vehicle", { entities = {} })
 registerprivilege("player.setArmor", "SetArmor", "Allows changing a player's armor", { usergroups = { default = 1 }, entities = {} })
 registerprivilege("player.setMaxArmor", "SetMaxArmor", "Allows changing a player's max armor", { usergroups = { default = 1 }, entities = {} })
 registerprivilege("player.modifyMovementProperties", "ModifyMovementProperties", "Allows various changes to a player's movement", { usergroups = { default = 1 }, entities = {} })
@@ -110,8 +111,8 @@ local PlayerPVSManager = PVSManager()
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
-local Ent_SetFriction,Ent_SetModelScale = ENT_META.SetFriction,ENT_META.SetModelScale
-local Ply_Alive,Ply_DropNamedWeapon,Ply_DropWeapon,Ply_EnterVehicle,Ply_GetTimeoutSeconds,Ply_HasGodMode,Ply_IsConnected,Ply_IsTimingOut,Ply_Kill,Ply_LastHitGroup,Ply_PacketLoss,Ply_Say,Ply_SetAmmo,Ply_SetArmor,Ply_SetCrouchedWalkSpeed,Ply_SetDuckSpeed,Ply_SetEyeAngles,Ply_SetJumpPower,Ply_SetLadderClimbSpeed,Ply_SetMaxArmor,Ply_SetMaxSpeed,Ply_SetRunSpeed,Ply_SetSlowWalkSpeed,Ply_SetStepSize,Ply_SetUnDuckSpeed,Ply_SetViewEntity,Ply_SetWeaponColor,Ply_SetWalkSpeed,Ply_StripAmmo,Ply_StripWeapon,Ply_StripWeapons,Ply_TimeConnected = PLY_META.Alive,PLY_META.DropNamedWeapon,PLY_META.DropWeapon,PLY_META.EnterVehicle,PLY_META.GetTimeoutSeconds,PLY_META.HasGodMode,PLY_META.IsConnected,PLY_META.IsTimingOut,PLY_META.Kill,PLY_META.LastHitGroup,PLY_META.PacketLoss,PLY_META.Say,PLY_META.SetAmmo,PLY_META.SetArmor,PLY_META.SetCrouchedWalkSpeed,PLY_META.SetDuckSpeed,PLY_META.SetEyeAngles,PLY_META.SetJumpPower,PLY_META.SetLadderClimbSpeed,PLY_META.SetMaxArmor,PLY_META.SetMaxSpeed,PLY_META.SetRunSpeed,PLY_META.SetSlowWalkSpeed,PLY_META.SetStepSize,PLY_META.SetUnDuckSpeed,PLY_META.SetViewEntity,PLY_META.SetWeaponColor,PLY_META.SetWalkSpeed,PLY_META.StripAmmo,PLY_META.StripWeapon,PLY_META.StripWeapons,PLY_META.TimeConnected
+local Ent_SetFriction,Ent_SetModelScale = ENT_META.SetFriction,ENT_META.SetModelScale												
+local Ply_Alive,Ply_DropNamedWeapon,Ply_DropWeapon,Ply_EnterVehicle,Ply_ExitVehicle,Ply_GetTimeoutSeconds,Ply_HasGodMode,Ply_IsConnected,Ply_IsTimingOut,Ply_Kill,Ply_LastHitGroup,Ply_PacketLoss,Ply_Say,Ply_SetAmmo,Ply_SetArmor,Ply_SetCrouchedWalkSpeed,Ply_SetDuckSpeed,Ply_SetEyeAngles,Ply_SetJumpPower,Ply_SetLadderClimbSpeed,Ply_SetMaxArmor,Ply_SetMaxSpeed,Ply_SetRunSpeed,Ply_SetSlowWalkSpeed,Ply_SetStepSize,Ply_SetUnDuckSpeed,Ply_SetViewEntity,Ply_SetWeaponColor,Ply_SetWalkSpeed,Ply_StripAmmo,Ply_StripWeapon,Ply_StripWeapons,Ply_TimeConnected = PLY_META.Alive,PLY_META.DropNamedWeapon,PLY_META.DropWeapon,PLY_META.EnterVehicle,PLY_META.ExitVehicle,PLY_META.GetTimeoutSeconds,PLY_META.HasGodMode,PLY_META.IsConnected,PLY_META.IsTimingOut,PLY_META.Kill,PLY_META.LastHitGroup,PLY_META.PacketLoss,PLY_META.Say,PLY_META.SetAmmo,PLY_META.SetArmor,PLY_META.SetCrouchedWalkSpeed,PLY_META.SetDuckSpeed,PLY_META.SetEyeAngles,PLY_META.SetJumpPower,PLY_META.SetLadderClimbSpeed,PLY_META.SetMaxArmor,PLY_META.SetMaxSpeed,PLY_META.SetRunSpeed,PLY_META.SetSlowWalkSpeed,PLY_META.SetStepSize,PLY_META.SetUnDuckSpeed,PLY_META.SetViewEntity,PLY_META.SetWeaponColor,PLY_META.SetWalkSpeed,PLY_META.StripAmmo,PLY_META.StripWeapon,PLY_META.StripWeapons,PLY_META.TimeConnected
 
 local player_methods, player_meta, wrap, unwrap = instance.Types.Player.Methods, instance.Types.Player, instance.Types.Player.Wrap, instance.Types.Player.Unwrap
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
@@ -455,6 +456,13 @@ end
 --- Clears a given player's PVS override points set by this chip
 function player_methods:clearPVSPoints()
 	PlayerPVSManager:clearInstPlyTable( instance, getply(self) )
+end
+
+--- Forces the player out of a vehicle.
+function player_methods:exitVehicle()
+    local ent = getply(self)
+    checkpermission(instance, ent, "player.exitVehicle")
+    Ply_ExitVehicle(ent)
 end
 
 end
