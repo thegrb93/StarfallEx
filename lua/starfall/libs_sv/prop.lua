@@ -110,14 +110,15 @@ end
 
 --- Creates a ragdoll
 -- @server
--- @param Vector pos The position to spawn the ragdoll
--- @param Angle ang The angles to spawn the ragdoll
 -- @param string model Model path
 -- @param boolean? frozen True to spawn the entity in a frozen state. Default = False
+-- @param Vector pos The position to spawn the ragdoll. Default = Vector()
+-- @param Angle ang The angles to spawn the ragdoll. Default = Angle()
 -- @return Entity The ragdoll entity
-function props_library.createRagdoll(pos,ang,model, frozen)
-	pos = SF.clampPos(vunwrap1(pos))
-	ang = aunwrap1(ang)
+function props_library.createRagdoll(model, frozen, pos, ang)
+	frozen = not frozen
+	pos = (pos and SF.clampPos(vunwrap1(pos)) or Vector())
+	ang = (ang and aunwrap1(ang) or Angle())
 	checkpermission(instance, nil, "prop.createRagdoll")
 	checkluatype(model, TYPE_STRING)
 	if frozen~=nil then checkluatype(frozen, TYPE_BOOL) else frozen = false end
@@ -143,8 +144,8 @@ function props_library.createRagdoll(pos,ang,model, frozen)
 			local rpos,rang = WorldToLocal(obj:GetPos(),obj:GetAngles(),Vector(),ang)
 			if Phys_IsValid(obj) then
 				obj:EnableMotion(frozen)
-				obj:SetPos(pos+rpos)
-				obj:SetAngles(rang)
+				if pos ~= Vector() then obj:SetPos(pos+rpos) end
+				if ang ~= Angle() then obj:SetAngles(rang) end
 			end
 		end
 
