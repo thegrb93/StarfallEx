@@ -12,7 +12,7 @@ local playerMaxScale = CreateConVar("sf_player_model_scale_max", "10", { FCVAR_A
 registerprivilege("player.dropweapon", "DropWeapon", "Drops a weapon from the player", { entities = {} })
 registerprivilege("player.setammo", "SetAmmo", "Whether a player can set their ammo", { usergroups = { default = 1 }, entities = {} })
 registerprivilege("player.enterVehicle", "EnterVehicle", "Whether a player can be forced into a vehicle", { usergroups = { default = 1 }, entities = {} })
-registerprivilege("player.exitVehicle", "ExitVehicle", "Whether a player can be forced out of a vehicle", { usergroups = { default = 1 }, entities = {} })
+registerprivilege("player.exitVehicle", "ExitVehicle", "Whether a player can be forced out of a vehicle", { entities = {} })
 registerprivilege("player.setArmor", "SetArmor", "Allows changing a player's armor", { usergroups = { default = 1 }, entities = {} })
 registerprivilege("player.setMaxArmor", "SetMaxArmor", "Allows changing a player's max armor", { usergroups = { default = 1 }, entities = {} })
 registerprivilege("player.modifyMovementProperties", "ModifyMovementProperties", "Allows various changes to a player's movement", { usergroups = { default = 1 }, entities = {} })
