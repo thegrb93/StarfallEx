@@ -4,19 +4,13 @@ local owneraccess
 if SERVER then
 	owneraccess = CreateConVar("sf_permissions_entity_owneraccess", "0", { FCVAR_ARCHIVE }, "Allows starfall chip's owner to access their player entity")
 end
-
-local P = {}
-P.id = "entities"
-P.name = "Entity Permissions"
-P.settingsoptions = { "Owner Only", "Can Tool", "Can Physgun", "Anything" }
-P.defaultsetting = 2
-local truefunc = function() return true end
-P.checks = {truefunc, truefunc, truefunc, truefunc}
-SF.Permissions.registerProvider(P)
+local cacheLifetime = CreateConVar("sf_permissions_entity_cachelife", "5", {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "How long to store successful prop permission checks before checking again")
 
 local ENT_META,PLY_META = FindMetaTable("Entity"),FindMetaTable("Player")
 local Ent_GetNWEntity,Ent_GetTable,Ent_IsValid,Ent_SetNWEntity = ENT_META.GetNWEntity,ENT_META.GetTable,ENT_META.IsValid,ENT_META.SetNWEntity
 local Ply_IsSuperAdmin,Ply_SteamID64 = PLY_META.IsSuperAdmin,PLY_META.SteamID64
+
+local checkOwner, checkCanTool, checkCanPhysgun
 
 if CPPI then
 	function SF.Permissions.getOwner(ent)
@@ -24,105 +18,75 @@ if CPPI then
 	end
 
 	if SERVER then
-		P.checks = {
-			function(instance, target)
-				if not Ent_IsValid(target) then return false, "Entity is invalid" end
-				if target == instance.player and owneraccess:GetBool() or
-					Ply_IsSuperAdmin(instance.player) or
-					target:CPPIGetOwner()==instance.player then return true end
-
-				return false, "You're not the owner of this prop"
-			end,
-			function(instance, target)
-				if not Ent_IsValid(target) then return false, "Entity is invalid" end
-				if target == instance.player and owneraccess:GetBool() or
-					target:CPPICanTool(instance.player, "starfall_ent_lib") then return true end
-
-				return false, "You can't toolgun this entity"
-			end,
-			function(instance, target)
-				if not Ent_IsValid(target) then return false, "Entity is invalid" end
-				if target == instance.player and owneraccess:GetBool() or
-					target:CPPICanPhysgun(instance.player) then return true end
-
-				return false, "You can't physgun this entity"
-			end,
-			"allow"
-		}
+		function checkOwner(instance, ent)
+			if ent == instance.player and owneraccess:GetBool() then return true end
+			if ent:CPPIGetOwner()==instance.player then return true end
+			return false, "You're not the owner of this prop"
+		end
+		function checkCanTool(instance, ent)
+			if ent == instance.player and owneraccess:GetBool() then return true end
+			if ent:CPPICanTool(instance.player, "starfall_ent_lib") then return true end
+			return false, "You can't toolgun this entity"
+		end
+		function checkCanPhysgun(instance, ent)
+			if ent == instance.player and owneraccess:GetBool() then return true end
+			if ent:CPPICanPhysgun(instance.player) then return true end
+			return false, "You can't physgun this entity"
+		end
 	else
-		P.checks = {
-			function(instance, target)
-				if not Ent_IsValid(target) then return false, "Entity is invalid" end
-				if target==instance.player or
-					LocalPlayer()==instance.player or
-					Ply_IsSuperAdmin(instance.player) or
-					target:CPPIGetOwner()==instance.player then return true end
-
-				return false, "You're not the owner of this prop"
-			end,
-			function(instance, target)
-				if not Ent_IsValid(target) then return false, "Entity is invalid" end
-				if target==instance.player or
-					LocalPlayer()==instance.player or
-					Ply_IsSuperAdmin(instance.player) or
-					target:CPPICanTool(instance.player, "starfall_ent_lib") then return true end
-
-				return false, "You can't toolgun this entity"
-			end,
-			function(instance, target)
-				if not Ent_IsValid(target) then return false, "Entity is invalid" end
-				if target==instance.player or
-					LocalPlayer()==instance.player or
-					Ply_IsSuperAdmin(instance.player) or
-					target:CPPICanPhysgun(instance.player) then return true end
-
-				return false, "You can't physgun this entity"
-			end,
-			"allow"
-		}
-		if not ENT_META.CPPICanTool then P.checks[2] = P.checks[1] end
-		if not ENT_META.CPPICanPhysgun then P.checks[3] = P.checks[1] end
+		function checkOwner(instance, ent)
+			if ent==instance.player or LocalPlayer()==instance.player then return true end
+			if ent:CPPIGetOwner()==instance.player then return true end
+			return false, "You're not the owner of this prop"
+		end
+		function checkCanTool(instance, ent)
+			if ent==instance.player or LocalPlayer()==instance.player then return true end
+			if ent:CPPICanTool(instance.player, "starfall_ent_lib") then return true end
+			return false, "You can't toolgun this entity"
+		end
+		function checkCanPhysgun(instance, ent)
+			if ent==instance.player or LocalPlayer()==instance.player then return true end
+			if ent:CPPICanPhysgun(instance.player) then return true end
+			return false, "You can't physgun this entity"
+		end
+		if not ENT_META.CPPICanTool then checkCanTool = checkOwner end
+		if not ENT_META.CPPICanPhysgun then checkCanPhysgun = checkOwner end
 	end
 else
 	if SERVER then
-		P.checks = {
-			function(instance, target)
-				if not Ent_IsValid(target) then return false, "Entity is invalid" end
-				if target == instance.player and owneraccess:GetBool() or
-					Ply_IsSuperAdmin(instance.player) or
-					P.props[target]==instance.player then return true end
+		local PropOwners = SF.EntityTable("PropProtection")
+		local PropOwnersDisconnected = SF.EntityTable("PropProtectionReconnect")
+		SF.PropOwners = PropOwners
 
-				return false, "You're not the owner of this prop"
-			end,
-			function(instance, target)
-				if not Ent_IsValid(target) then return false, "Entity is invalid" end
-				if target == instance.player and owneraccess:GetBool() or
-					hook.Run("CanTool", instance.player, SF.dumbTrace(target), "starfall_ent_lib") ~= false then return true end
-
-				return false, "Target doesn't have toolgun access"
-			end,
-			function(instance, target)
-				if not Ent_IsValid(target) then return false, "Entity is invalid" end
-				if target == instance.player and owneraccess:GetBool() then return true end
-
-				if hook.Run("PhysgunPickup", instance.player, target) ~= false then
-					-- Some mods expect a release when there's a pickup involved.
-					hook.Run("PhysgunDrop", instance.player, target)
-					return true
-				end
-
-				return false, "Target doesn't have physgun access"
-			end,
-			"allow"
-		}
-
-		P.props = SF.EntityTable("PropProtection")
 		function SF.Permissions.getOwner(ent)
-			return P.props[ent] or NULL
+			return PropOwners[ent] or NULL
 		end
 
+		function checkOwner(instance, ent)
+			if ent == instance.player and owneraccess:GetBool() then return true end
+			if PropOwners[ent]==instance.player then return true end
+			return false, "You're not the owner of this prop"
+		end
+		function checkCanTool(instance, ent)
+			if ent == instance.player and owneraccess:GetBool() then return true end
+			if hook.Run("CanTool", instance.player, SF.dumbTrace(ent), "starfall_ent_lib") ~= false then return true end
+			return false, "You can't toolgun this entity"
+		end
+		function checkCanPhysgun(instance, ent)
+			if ent == instance.player and owneraccess:GetBool() then return true end
+
+			if hook.Run("PhysgunPickup", instance.player, ent) ~= false then
+				-- Some mods expect a release when there's a pickup involved.
+				hook.Run("PhysgunDrop", instance.player, ent)
+				return true
+			end
+
+			return false, "You can't physgun this entity"
+		end
+
+
 		local function PropOwn(ply,ent)
-			P.props[ent] = ply
+			PropOwners[ent] = ply
 			Ent_SetNWEntity(ent, "SFPP", ply)
 		end
 
@@ -148,7 +112,7 @@ else
 		hook.Add("PlayerSpawnedSWEP", "SFPP.PlayerSpawnedSWEP", PropOwn)
 		hook.Add("PlayerInitialSpawn","SFPP.PlayerInitialSpawn", function(ply)
 			local steamid = Ply_SteamID64(ply)
-			for k, v in pairs(P.props) do
+			for k, v in pairs(PropOwnersDisconnected) do
 				if v==steamid then
 					PropOwn(ply,k)
 				end
@@ -156,34 +120,114 @@ else
 		end)
 		hook.Add("PlayerDisconnected","SFPP.PlayerDisconnected", function(ply)
 			local steamid = Ply_SteamID64(ply)
-			for k, v in pairs(P.props) do
+			for k, v in pairs(PropOwners) do
 				if v==ply then
-					P.props[k] = steamid
+					PropOwnersDisconnected[k] = steamid
+					PropOwners[k] = nil
 				end
 			end
 		end)
 
 	else
-		P.checks = {
-			function(instance, target)
-				if not Ent_IsValid(target) then return false, "Entity is invalid" end
-				if target==instance.player or
-					LocalPlayer()==instance.player or
-					Ply_IsSuperAdmin(instance.player) or
-					Ent_GetNWEntity(target, "SFPP")==instance.player or
-					target.SFHoloOwner==instance.player then return true end
-
-				return false, "You're not the owner of this prop"
-			end,
-			nil,
-			nil,
-			"allow"
-		}
-		P.checks[2] = P.checks[1]
-		P.checks[3] = P.checks[1]
-
 		function SF.Permissions.getOwner(ent)
 			return Ent_GetTable(ent).SFHoloOwner or Ent_GetNWEntity(ent, "SFPP")
 		end
+
+		function checkOwner(instance, ent)
+			if ent==instance.player or LocalPlayer()==instance.player then return true end
+			if Ent_GetNWEntity(ent, "SFPP")==instance.player or Ent_GetTable(ent).SFHoloOwner==instance.player then return true end
+			return false, "You're not the owner of this prop"
+		end
+		checkCanTool = checkOwner
+		checkCanPhysgun = checkOwner
 	end
 end
+
+local overridesMeta = {__mode = "k"}
+
+local EntityPermissionCache = {
+	__index = {
+		checkNormal = function(self, instance, ent, checkfunc)
+			local t = CurTime()
+			if t < self.timeout then return true end
+
+			local result, reason = checkfunc(instance, ent)
+			if result then self.timeout = t + cacheLifetime:GetFloat() end
+			return result, reason
+		end,
+		checkOverrides = function(self, instance, ent, checkfunc)
+			local t = CurTime()
+			if t < self.timeout then return true end
+
+			if table.IsEmpty(self.overrides) then
+				self.check = self.checkNormal
+				return self:check(instance, ent, checkfunc)
+			end
+			local result, reason
+			for overrideInst in pairs(self.overrides) do
+				result, reason = checkfunc(overrideInst, ent)
+				if result then self.timeout = t + cacheLifetime:GetFloat() return true end
+				self.overrides[overrideInst] = nil
+			end
+			return result, reason
+		end,
+		addOverride = function(self, instance)
+			self.overrides[instance] = true
+			self.check = self.checkOverrides
+		end,
+		removeOverride = function(self, instance)
+			self.overrides[instance] = nil
+			if table.IsEmpty(self.overrides) then
+				self.check = self.checkNormal
+			end
+		end
+	},
+	__call = function(t)
+		local ret = setmetatable({
+			timeout = 0,
+			overrides = setmetatable({}, overridesMeta)
+		}, t)
+		ret.check = ret.checkNormal
+		return ret
+	end
+}
+setmetatable(EntityPermissionCache, EntityPermissionCache)
+
+local cacheMeta = {__mode="k", __index = function(t,k) local r=EntityPermissionCache() t[k]=r return r end}
+
+local function getEntPermCache(ent_tbl, instance)
+	local cache = ent_tbl.SF_EntPermCache
+	if not cache then
+		cache = setmetatable({}, cacheMeta)
+		ent_tbl.SF_EntPermCache = cache
+	end
+	return cache[instance]
+end
+SF.GetEntPermCache = getEntPermCache
+
+local function check(instance, ent, checkfunc)
+	local ent_tbl = Ent_GetTable(ent)
+	if not ent_tbl then return false, "Entity is invalid" end
+	if Ply_IsSuperAdmin(instance.player) then return true end
+	return getEntPermCache(ent_tbl, instance):check(instance, ent, checkfunc)
+end
+
+SF.Permissions.registerProvider({
+	id = "entities",
+	name = "Entity Permissions",
+	settingsoptions = { "Owner Only", "Can Tool", "Can Physgun", "Anything" },
+	defaultsetting = 2,
+	checks = {
+		function(instance, ent)
+			return check(instance, ent, checkOwner)
+		end,
+		function(instance, ent)
+			return check(instance, ent, checkCanTool)
+		end,
+		function(instance, ent)
+			return check(instance, ent, checkCanPhysgun)
+		end,
+		"allow"
+	}
+})
+
