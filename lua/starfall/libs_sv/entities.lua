@@ -194,14 +194,14 @@ local checkvector = SF.CheckVector
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
-local Ent_AddCallback,Ent_DrawShadow,Ent_Extinguish,Ent_Fire,Ent_GetChildren,Ent_GetClass,Ent_GetCreationID,Ent_GetForward,Ent_GetFriction,Ent_GetMoveType,Ent_GetParent,Ent_GetPhysicsObject,Ent_GetRight,Ent_GetTable,Ent_GetUp,Ent_GetVar,Ent_Ignite,Ent_IsConstraint,Ent_IsPlayer,Ent_IsPlayerHolding,Ent_IsScripted,Ent_IsValid,Ent_IsVehicle,Ent_IsWorld,Ent_OBBMaxs,Ent_OBBMins,Ent_PhysicsInit,Ent_PhysicsInitSphere,Ent_Remove,Ent_RemoveCallback,Ent_SetAngles,Ent_SetCollisionBounds,Ent_SetCollisionGroup,Ent_SetElasticity,Ent_SetFriction,Ent_SetLightingOriginEntity,Ent_SetLocalAngles,Ent_SetLocalPos,Ent_SetMoveType,Ent_SetNotSolid,Ent_SetPreventTransmit,Ent_SetPos,Ent_SetSolid,Ent_SetVelocity,Ent_TestPVS,Ent_Use = ENT_META.AddCallback,ENT_META.DrawShadow,ENT_META.Extinguish,ENT_META.Fire,ENT_META.GetChildren,ENT_META.GetClass,ENT_META.GetCreationID,ENT_META.GetForward,ENT_META.GetFriction,ENT_META.GetMoveType,ENT_META.GetParent,ENT_META.GetPhysicsObject,ENT_META.GetRight,ENT_META.GetTable,ENT_META.GetUp,ENT_META.GetVar,ENT_META.Ignite,ENT_META.IsConstraint,ENT_META.IsPlayer,ENT_META.IsPlayerHolding,ENT_META.IsScripted,ENT_META.IsValid,ENT_META.IsVehicle,ENT_META.IsWorld,ENT_META.OBBMaxs,ENT_META.OBBMins,ENT_META.PhysicsInit,ENT_META.PhysicsInitSphere,ENT_META.Remove,ENT_META.RemoveCallback,ENT_META.SetAngles,ENT_META.SetCollisionBounds,ENT_META.SetCollisionGroup,ENT_META.SetElasticity,ENT_META.SetFriction,ENT_META.SetLightingOriginEntity,ENT_META.SetLocalAngles,ENT_META.SetLocalPos,ENT_META.SetMoveType,ENT_META.SetNotSolid,ENT_META.SetPreventTransmit,ENT_META.SetPos,ENT_META.SetSolid,ENT_META.SetVelocity,ENT_META.TestPVS,ENT_META.Use
 local function Ent_IsNPC(ent) return dgetmeta(ent)==NPC_META end
 local function Ent_IsPlayer(ent) return dgetmeta(ent)==PLY_META end
 local function Ent_IsVehicle(ent) return dgetmeta(ent)==VEH_META end
 local function Ent_IsWeapon(ent) return dgetmeta(ent)==WEP_META end
 
+local Ent_AddCallback,Ent_DrawShadow,Ent_Extinguish,Ent_Fire,Ent_GetAngles,Ent_GetChildren,Ent_GetClass,Ent_GetCreationID,Ent_GetForward,Ent_GetFriction,Ent_GetMoveType,Ent_GetParent,Ent_GetPhysicsObject,Ent_GetPhysicsObjectCount,Ent_GetPhysicsObjectNum,Ent_GetPos,Ent_GetRight,Ent_GetTable,Ent_GetUp,Ent_GetVar,Ent_Ignite,Ent_IsConstraint,Ent_IsPlayerHolding,Ent_IsScripted,Ent_IsValid,Ent_IsWorld,Ent_OBBMaxs,Ent_OBBMins,Ent_PhysicsInit,Ent_PhysicsInitSphere,Ent_Remove,Ent_RemoveCallback,Ent_SetAngles,Ent_SetCollisionBounds,Ent_SetCollisionGroup,Ent_SetElasticity,Ent_SetFriction,Ent_SetLightingOriginEntity,Ent_SetLocalAngles,Ent_SetLocalPos,Ent_SetMoveType,Ent_SetNotSolid,Ent_SetPos,Ent_SetPreventTransmit,Ent_SetSolid,Ent_SetVelocity,Ent_TestPVS,Ent_Use = ENT_META.AddCallback,ENT_META.DrawShadow,ENT_META.Extinguish,ENT_META.Fire,ENT_META.GetAngles,ENT_META.GetChildren,ENT_META.GetClass,ENT_META.GetCreationID,ENT_META.GetForward,ENT_META.GetFriction,ENT_META.GetMoveType,ENT_META.GetParent,ENT_META.GetPhysicsObject,ENT_META.GetPhysicsObjectCount,ENT_META.GetPhysicsObjectNum,ENT_META.GetPos,ENT_META.GetRight,ENT_META.GetTable,ENT_META.GetUp,ENT_META.GetVar,ENT_META.Ignite,ENT_META.IsConstraint,ENT_META.IsPlayerHolding,ENT_META.IsScripted,ENT_META.IsValid,ENT_META.IsWorld,ENT_META.OBBMaxs,ENT_META.OBBMins,ENT_META.PhysicsInit,ENT_META.PhysicsInitSphere,ENT_META.Remove,ENT_META.RemoveCallback,ENT_META.SetAngles,ENT_META.SetCollisionBounds,ENT_META.SetCollisionGroup,ENT_META.SetElasticity,ENT_META.SetFriction,ENT_META.SetLightingOriginEntity,ENT_META.SetLocalAngles,ENT_META.SetLocalPos,ENT_META.SetMoveType,ENT_META.SetNotSolid,ENT_META.SetPos,ENT_META.SetPreventTransmit,ENT_META.SetSolid,ENT_META.SetVelocity,ENT_META.TestPVS,ENT_META.Use
 local Ply_InVehicle = PLY_META.InVehicle
-local Phys_AddAngleVelocity,Phys_AddVelocity,Phys_ApplyForceCenter,Phys_ApplyForceOffset,Phys_ApplyTorqueCenter,Phys_EnableDrag,Phys_EnableGravity,Phys_EnableMotion,Phys_GetAngleVelocity,Phys_GetMass,Phys_GetMaterial,Phys_IsMoveable,Phys_IsValid,Phys_SetContents,Phys_SetInertia,Phys_SetMass,Phys_Wake = PHYS_META.AddAngleVelocity,PHYS_META.AddVelocity,PHYS_META.ApplyForceCenter,PHYS_META.ApplyForceOffset,PHYS_META.ApplyTorqueCenter,PHYS_META.EnableDrag,PHYS_META.EnableGravity,PHYS_META.EnableMotion,PHYS_META.GetAngleVelocity,PHYS_META.GetMass,PHYS_META.GetMaterial,PHYS_META.IsMoveable,PHYS_META.IsValid,PHYS_META.SetContents,PHYS_META.SetInertia,PHYS_META.SetMass,PHYS_META.Wake
+local Phys_AddAngleVelocity,Phys_AddVelocity,Phys_ApplyForceCenter,Phys_ApplyForceOffset,Phys_ApplyTorqueCenter,Phys_EnableDrag,Phys_EnableGravity,Phys_EnableMotion,Phys_GetAngleVelocity,Phys_GetAngles,Phys_GetMass,Phys_GetMaterial,Phys_GetPos,Phys_IsMoveable,Phys_IsValid,Phys_SetAngles,Phys_SetContents,Phys_SetInertia,Phys_SetMass,Phys_SetPos,Phys_Wake = PHYS_META.AddAngleVelocity,PHYS_META.AddVelocity,PHYS_META.ApplyForceCenter,PHYS_META.ApplyForceOffset,PHYS_META.ApplyTorqueCenter,PHYS_META.EnableDrag,PHYS_META.EnableGravity,PHYS_META.EnableMotion,PHYS_META.GetAngleVelocity,PHYS_META.GetAngles,PHYS_META.GetMass,PHYS_META.GetMaterial,PHYS_META.GetPos,PHYS_META.IsMoveable,PHYS_META.IsValid,PHYS_META.SetAngles,PHYS_META.SetContents,PHYS_META.SetInertia,PHYS_META.SetMass,PHYS_META.SetPos,PHYS_META.Wake
 
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
@@ -588,6 +588,44 @@ function ents_methods:setLocalAngles(ang)
 	local ent = getent(self)
 	checkpermission(instance, ent, "entities.setAngles")
 	Ent_SetLocalAngles(ent, aunwrap1(ang))
+end
+
+--- Sets the entity's skeleton position and angles without modifying the skeleton pose
+-- @param Vector? pos New position or use nil to only set angles
+-- @param Angle? ang New angles or use nil to only set position
+-- @param number? bone The origin bone to use or nil to use the entity origin
+function ents_methods:transformSkeleton(pos, ang, bone)
+	local ent = getent(self)
+	checkpermission(instance, ent, "entities.setPos")
+
+	local nbones = Ent_GetPhysicsObjectCount(ent)
+	if nbones < 2 then SF.Throw("Expected a ragdoll entity or entity with physics bones!", 2) end
+
+	if pos == nil then pos = vector_origin else pos = SF.clampPos(vunwrap1(pos)) end
+	if ang == nil then ang = angle_zero else ang = aunwrap1(ang) end
+
+	local originpos, originang
+	if bone ~= nil then
+		checkluatype(bone, TYPE_NUMBER)
+		if bone < 0 or bone >= nbones then SF.Throw("Invalid Bone! "..bone, 2) end
+		local phys = Ent_GetPhysicsObjectNum(ent, bone)
+		if not Phys_IsValid(phys) then SF.Throw("Invalid Bone! "..bone, 2) end
+		originpos = Phys_GetPos(phys)
+		originang = Phys_GetAngles(phys)
+	else
+		originpos = Ent_GetPos(ent)
+		originang = Ent_GetAngles(ent)
+	end
+
+	for i = 0, nbones-1 do
+		local phys = Ent_GetPhysicsObjectNum(ent, i)
+		if Phys_IsValid(phys) then
+			local lpos, lang = WorldToLocal(Phys_GetPos(phys), Phys_GetAngles(phys), originpos, originang)
+			local npos, nang = LocalToWorld(lpos, lang, pos, ang)
+			Phys_SetPos(phys, npos)
+			Phys_SetAngles(phys, nang)
+		end
+	end
 end
 
 --- Sets the entity's linear velocity. Physics entities, use physobj:setVelocity
