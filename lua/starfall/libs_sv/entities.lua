@@ -601,9 +601,6 @@ function ents_methods:transformSkeleton(pos, ang, bone)
 	local nbones = Ent_GetPhysicsObjectCount(ent)
 	if nbones < 2 then SF.Throw("Expected a ragdoll entity or entity with physics bones!", 2) end
 
-	if pos == nil then pos = vector_origin else pos = SF.clampPos(vunwrap1(pos)) end
-	if ang == nil then ang = angle_zero else ang = aunwrap1(ang) end
-
 	local originpos, originang
 	if bone ~= nil then
 		checkluatype(bone, TYPE_NUMBER)
@@ -616,6 +613,9 @@ function ents_methods:transformSkeleton(pos, ang, bone)
 		originpos = Ent_GetPos(ent)
 		originang = Ent_GetAngles(ent)
 	end
+
+	if pos == nil then pos = originpos else pos = SF.clampPos(vunwrap1(pos)) end
+	if ang == nil then ang = originang else ang = aunwrap1(ang) end
 
 	for i = 0, nbones-1 do
 		local phys = Ent_GetPhysicsObjectNum(ent, i)
