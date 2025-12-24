@@ -1241,15 +1241,6 @@ function ents_methods:getBoneMatrix(bone)
 	return mwrap(Ent_GetBoneMatrix(getent(self), bone))
 end
 
---- Returns if the entity bone is valid and writable
--- @shared
--- @param number bone Bone index
--- @return boolean True if valid
-function ents_methods:isBoneWriteable(bone)
-	checkluatype(bone, TYPE_NUMBER)
-	return Ent_GetBoneName(getent(self), bone) ~= "__INVALIDBONE__"
-end
-
 if CLIENT then
 --- Sets the bone matrix of given bone to given matrix. Call setupBones to apply all changes.
 -- @client
@@ -1263,7 +1254,6 @@ function ents_methods:setBoneMatrix(bone, matrix)
 	checkpermission(instance, ent, "entities.setRenderProperty")
 
 	bone = math.Clamp(math.floor(bone), 0, Ent_GetBoneCount(ent)-1)
-	if Ent_GetBoneName(ent, bone) == "__INVALIDBONE__" then SF.Throw("Invalid Bone! "..bone, 2) end
 
 	local ent_tbl = Ent_GetTable(ent)
 	local boneTbl = ent_tbl.SF_BoneMatrix
