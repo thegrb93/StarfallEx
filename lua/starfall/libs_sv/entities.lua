@@ -590,11 +590,11 @@ function ents_methods:setLocalAngles(ang)
 	Ent_SetLocalAngles(ent, aunwrap1(ang))
 end
 
---- Sets the entity's skeleton position and angles without modifying the skeleton pose
+--- Sets the entity's ragdoll position and angles without modifying the skeleton pose
 -- @param Vector? pos New position or use nil to only set angles
 -- @param Angle? ang New angles or use nil to only set position
 -- @param number? bone The origin bone to use or nil to use the entity origin
-function ents_methods:transformSkeleton(pos, ang, bone)
+function ents_methods:setRagdollPos(pos, ang, bone)
 	local ent = getent(self)
 	checkpermission(instance, ent, "entities.setPos")
 
