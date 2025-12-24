@@ -412,7 +412,7 @@ function player_methods:setFriction(val)
 end
 
 --- Sets the player's weapon color
--- @param vector col The new color with values 0-1 in each vector component
+-- @param Vector col The new color with values 0-1 in each vector component
 function player_methods:setWeaponColor(col)
 	local ent = getply(self)
 	checkpermission(instance, ent, "entities.setPlayerRenderProperty")
