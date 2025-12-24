@@ -2571,7 +2571,12 @@ do
 						a[i] = meta..method
 						b[i] = metatbl.."."..method
 					end
-					print("local " .. table.concat(a, ",") .. " = " .. table.concat(b, ","))
+					local output = "local " .. table.concat(a, ",") .. " = " .. table.concat(b, ",")
+					-- To deal with the console max buffer
+					for i=1, #output, 2048 do
+						Msg(string.sub(output, i, i+2048-1))
+					end
+					Msg("\n")
 				end
 			end)
 		end
