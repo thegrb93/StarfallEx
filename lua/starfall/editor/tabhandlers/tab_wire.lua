@@ -3070,12 +3070,13 @@ end
 
 function PANEL:AutocompleteApply()
 	local selection = self.acPanel:GetSelected()
-	self:SetCaret(self:SetArea({{self.Caret[1], math.max(1, self.Caret[2]-selection.replacelength)}, self.Caret }, selection.replace ))
-	if selection.reopen then
-		self:AutocompleteOpen()
-	else
-		self:AutocompleteClose()
+	if selection then
+		self:SetCaret(self:SetArea({{self.Caret[1], math.max(1, self.Caret[2]-selection.replacelength)}, self.Caret }, selection.replace ))
+		if selection.reopen then
+			return self:AutocompleteOpen()
+		end
 	end
+	self:AutocompleteClose()
 end
 
 function PANEL:AutocompleteClose()

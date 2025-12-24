@@ -1087,7 +1087,7 @@ function ents_methods:getQuotaAverage()
 	if ent_tbl.Starfall then
 		return ent_tbl.instance and ent_tbl.instance:movingCPUAverage() or 0
 	elseif Ent_GetClass(ent)=="gmod_wire_expression2" then
-		return SERVER and ent_tbl.context.timebench or ent_tbl.GetOverlayData(ent).timebench
+		return SERVER and (ent_tbl.context and ent_tbl.context.timebench or 0) or (ent_tbl.GetOverlayData(ent).timebench or 0)
 	else
 		SF.Throw("The entity isn't a starfall or expression2 chip", 2)
 	end
