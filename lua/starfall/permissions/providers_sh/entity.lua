@@ -147,7 +147,7 @@ local overridesMeta = {__mode = "k"}
 
 local EntityPermissionCache = {
 	__index = {
-		checkSelf = function(self, instance, ent, checkfunc)
+		checkNormal = function(self, instance, ent, checkfunc)
 			local t = CurTime()
 			if t < self.timeout then return true end
 
@@ -160,7 +160,7 @@ local EntityPermissionCache = {
 			if t < self.timeout then return true end
 
 			if table.IsEmpty(self.overrides) then
-				self.check = self.checkSelf
+				self.check = self.checkNormal
 				return self:check(instance, ent, checkfunc)
 			end
 			local result, reason
@@ -178,7 +178,7 @@ local EntityPermissionCache = {
 		removeOverride = function(self, instance)
 			self.overrides[instance] = nil
 			if table.IsEmpty(self.overrides) then
-				self.check = self.checkSelf
+				self.check = self.checkNormal
 			end
 		end
 	},
@@ -187,7 +187,7 @@ local EntityPermissionCache = {
 			timeout = 0,
 			overrides = setmetatable({}, overridesMeta)
 		}, t)
-		ret.check = ret.checkSelf
+		ret.check = ret.checkNormal
 		return ret
 	end
 }
@@ -195,13 +195,13 @@ setmetatable(EntityPermissionCache, EntityPermissionCache)
 
 local cacheMeta = {__mode="k", __index = function(t,k) local r=EntityPermissionCache() t[k]=r return r end}
 
-local function getEntPermCache(ent_tbl)
+local function getEntPermCache(ent_tbl, instance)
 	local cache = ent_tbl.SF_EntPermCache
 	if not cache then
 		cache = setmetatable({}, cacheMeta)
 		ent_tbl.SF_EntPermCache = cache
 	end
-	return cache
+	return cache[instance]
 end
 SF.GetEntPermCache = getEntPermCache
 
@@ -209,7 +209,7 @@ local function check(instance, ent, checkfunc)
 	local ent_tbl = Ent_GetTable(ent)
 	if not ent_tbl then return false, "Entity is invalid" end
 	if Ply_IsSuperAdmin(instance.player) then return true end
-	return getEntPermCache(ent_tbl)[instance]:check(instance, ent, checkfunc)
+	return getEntPermCache(ent_tbl, instance):check(instance, ent, checkfunc)
 end
 
 SF.Permissions.registerProvider({
