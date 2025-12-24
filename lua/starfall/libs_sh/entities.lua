@@ -1254,7 +1254,6 @@ function ents_methods:setBoneMatrix(bone, matrix)
 	checkpermission(instance, ent, "entities.setRenderProperty")
 
 	bone = math.Clamp(math.floor(bone), 0, Ent_GetBoneCount(ent)-1)
-	if Ent_GetBoneName(ent, bone) == "__INVALIDBONE__" then SF.Throw("Invalid Bone! "..bone, 2) end
 
 	local ent_tbl = Ent_GetTable(ent)
 	local boneTbl = ent_tbl.SF_BoneMatrix
@@ -1266,7 +1265,7 @@ function ents_methods:setBoneMatrix(bone, matrix)
 			ent_tbl.SF_BoneMatrix = boneTbl
 			ent:AddCallback("BuildBonePositions", function(ent, bonecount)
 				for i=0, bonecount-1 do
-					if boneTbl[i] then Ent_SetBoneMatrix(ent, i, boneTbl[i]) end
+					if boneTbl[i] and Ent_GetBoneName(ent, i) ~= "__INVALIDBONE__" then Ent_SetBoneMatrix(ent, i, boneTbl[i]) end
 				end
 			end)
 		end
