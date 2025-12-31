@@ -607,4 +607,19 @@ math_library.easeOutQuint = math.ease.OutQuint
 -- @return number "Eased" Value
 math_library.easeOutSine = math.ease.OutSine
 
+--- Returns the averaged of all numbers provided
+-- @class function
+-- @param ...number numbers Any amount of number values
+-- @return number Number average of all values
+function math_library.getAverage( ... )
+	local numbers = { ... }
+	local num = 0
+
+	for i = 1, #numbers do
+		num = num + numbers[i]
+	end
+
+	return num / #numbers
+end
+
 end
