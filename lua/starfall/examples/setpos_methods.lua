@@ -53,7 +53,7 @@ hook.add( "tick", "runtime", function()
     motion = motion + Vector( 0, 0, 48 ) 
     
     -- If the prop exists, set the physobj position to the movement else try and respawn it
-    if smooth and isValid( smooth ) and smooth:isValidPhys() then
+    if isValid( smooth ) and smooth:isValidPhys() then
         -- This is setpos With getting the entities getPhysicsObject()
         -- Interpolation will work!
         smooth:getPhysicsObject():setPos( motion )
