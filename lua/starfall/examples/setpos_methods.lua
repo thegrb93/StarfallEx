@@ -41,7 +41,7 @@ hook.add( "tick", "runtime", function()
     -- Spawns prop when it doesn't exist
     
     -- If the prop exists, setPos to the movement else try and respawn it
-    if normal and isValid( normal ) then
+    if isValid( normal ) then
         -- This is setpos WITHOUT getting the entities getPhysicsObject()
         -- There is NO interpolation!
         normal:setPos( motion )
