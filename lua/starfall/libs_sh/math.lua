@@ -607,4 +607,20 @@ math_library.easeOutQuint = math.ease.OutQuint
 -- @return number "Eased" Value
 math_library.easeOutSine = math.ease.OutSine
 
+--- Returns the averaged of all numbers provided
+-- @class function
+-- @param table numbers Any amount of number values
+-- @return number Number average of all values
+function math_library.mean( numbers )
+	checkluatype( numbers, TYPE_TABLE )
+	
+	local sum = 0
+
+	for i = 1, #numbers do
+		sum = sum + numbers[i]
+	end
+
+	return sum / #numbers
+end
+
 end
