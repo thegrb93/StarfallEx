@@ -338,10 +338,14 @@ function net_library.readStream(cb)
 	checkluatype (cb, TYPE_FUNCTION)
 	if plyStreams.readStream then SF.Throw("The previous stream must finish before reading another.", 2) end
 
-	plyStreams:addReadStream(instance, net.ReadStream((SERVER and instance.data.net.ply or nil), function(data)
+	local ok, stream = pcall(net.ReadStream, (SERVER and instance.data.net.ply or nil), function(data)
 		plyStreams.readStream = false
 		instance:runFunction(cb, data)
-	end))
+	end)
+
+	if not (ok and stream) then SF.Throw("net.ReadStream failed!", 2) end
+
+	plyStreams:addReadStream(instance, stream)
 end
 
 --- Cancels a currently running readStream
