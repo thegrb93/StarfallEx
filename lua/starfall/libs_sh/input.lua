@@ -358,6 +358,23 @@ function input_library.selectWeapon(weapon)
 	input.SelectWeapon( ent )
 end
 
+--- Sets the position of your cursor. Your cursor must be enabled.
+-- @client
+-- @param number X 
+-- @param number Y
+function input_library.setCursorPos(x, y)
+	checkpermission(instance, nil, "input.emulate")
+
+	if not vgui.CursorVisible() then
+		SF.Throw("Your cursor is not visible", 2)
+	end
+
+	checkluatype(x, TYPE_NUMBER)
+	checkluatype(y, TYPE_NUMBER)
+
+	input.SetCursorPos(x, y)
+end
+
 --- Locks game controls for typing purposes. Alt will unlock the controls. Has a 10 second cooldown.
 -- @client
 -- @param boolean enabled Whether to lock or unlock the controls
