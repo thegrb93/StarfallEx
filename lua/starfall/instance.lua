@@ -604,7 +604,7 @@ function SF.Instance:runScriptHook(hook, ...)
 	for name, func in hooks:pairs() do
 		tbl = self:run(func, ...)
 		if not tbl[1] then
-			tbl[2].message = "Hook '" .. hook .. "' errored with: " .. tbl[2].message
+			tbl[2].message = "Hook '" .. hook .. "' errored with: " .. tostring(tbl[2].message)
 			self:Error(tbl[2])
 			return tbl
 		end
@@ -623,7 +623,7 @@ function SF.Instance:runScriptHookForResult(hook, ...)
 				break
 			end
 		else
-			tbl[2].message = "Hook '" .. hook .. "' errored with: " .. tbl[2].message
+			tbl[2].message = "Hook '" .. hook .. "' errored with: " .. tostring(tbl[2].message)
 			self:Error(tbl[2])
 			return tbl
 		end
@@ -634,7 +634,7 @@ end
 function SF.Instance:runFunction(func, ...)
 	local tbl = self:run(func, ...)
 	if not tbl[1] then
-		tbl[2].message = "Callback errored with: " .. tbl[2].message
+		tbl[2].message = "Callback errored with: " .. tostring(tbl[2].message)
 		self:Error(tbl[2])
 	end
 
