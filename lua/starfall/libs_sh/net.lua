@@ -100,15 +100,16 @@ net.Receive("SF_netmessage", function(len, ply)
 		if instance and instance.runScriptHook then
 			local name = net.ReadString()
 			len = len - MAX_EDICT_BITS - (#name + 1) * 8 -- This gets rid of the 2-byte entity, and the null-terminated string, making this now quantify the length of the user's net message
-			instance.data.net.ply = ply
-			if ply then ply = instance.Types.Player.Wrap(ply) end
 
+			instance.data.net.ply = ply
 			local recv = instance.data.net.receives[name]
 			if recv then
-				instance:runFunction(recv, len, ply)
+				instance:runFunction(recv, len, instance.Types.Player.Wrap(ply))
 			else
-				instance:runScriptHook("net", name, len, ply)
+				instance:runScriptHook("net", name, len, instance.Types.Player.Wrap(ply))
 			end
+			instance.data.net.ply = nil
+
 		end
 	end
 end)
@@ -338,10 +339,20 @@ function net_library.readStream(cb)
 	checkluatype (cb, TYPE_FUNCTION)
 	if plyStreams.readStream then SF.Throw("The previous stream must finish before reading another.", 2) end
 
-	plyStreams:addReadStream(instance, net.ReadStream((SERVER and instance.data.net.ply or nil), function(data)
+	local ply
+	if SERVER then
+		if not instance.data.net.ply then SF.Throw("net.readStream must be used from a net hook or receive!", 2) end
+		ply = instance.data.net.ply
+	end
+
+	local ok, stream = pcall(net.ReadStream, ply, function(data)
 		plyStreams.readStream = false
 		instance:runFunction(cb, data)
-	end))
+	end)
+
+	if not (ok and stream) then SF.Throw("net.ReadStream failed!", 2) end
+
+	plyStreams:addReadStream(instance, stream)
 end
 
 --- Cancels a currently running readStream
