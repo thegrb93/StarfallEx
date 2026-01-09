@@ -195,21 +195,13 @@ setmetatable(EntityPermissionCache, EntityPermissionCache)
 
 local cacheMeta = {__mode="k", __index = function(t,k) local r=EntityPermissionCache() t[k]=r return r end}
 
-local function getEntPermCache(ent_tbl, instance)
-	local cache = ent_tbl.SF_EntPermCache
-	if not cache then
-		cache = setmetatable({}, cacheMeta)
-		ent_tbl.SF_EntPermCache = cache
-	end
-	return cache[instance]
-end
-SF.GetEntPermCache = getEntPermCache
+local entPermCaches = SF.EntityTable("entPermCache")
+getmetatable(entPermCaches).__index = function(t, k) local r=setmetatable({}, cacheMeta) t[k]=r return r end
 
 local function check(instance, ent, checkfunc)
-	local ent_tbl = Ent_GetTable(ent)
-	if not ent_tbl then return false, "Entity is invalid" end
+	if not Ent_IsValid(ent) then return false, "Entity is invalid" end
 	if Ply_IsSuperAdmin(instance.player) then return true end
-	return getEntPermCache(ent_tbl, instance):check(instance, ent, checkfunc)
+	return entPermCaches[ent][instance]:check(instance, ent, checkfunc)
 end
 
 SF.Permissions.registerProvider({
