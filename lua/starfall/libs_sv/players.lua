@@ -329,7 +329,7 @@ end
 -- @server
 -- @param number newhealth New health value.
 function player_methods:setHealth(val)
-	local ply = getent(self)
+	local ply = getply(self)
 	checkpermission(instance, ply, "player.setHealth")
 	checkluatype(val, TYPE_NUMBER)
 
@@ -340,7 +340,7 @@ end
 -- @server
 -- @param number newmaxhealth New max health value.
 function player_methods:setMaxHealth(val)
-	local ply = getent(self)
+	local ply = getply(self)
 	checkpermission(instance, ply, "player.setMaxHealth")
 	checkluatype(val, TYPE_NUMBER)
 
