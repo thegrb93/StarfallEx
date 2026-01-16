@@ -15,8 +15,11 @@ registerprivilege("player.enterVehicle", "EnterVehicle", "Whether a player can b
 registerprivilege("player.exitVehicle", "ExitVehicle", "Whether a player can be forced out of a vehicle", { entities = {} })
 registerprivilege("player.setArmor", "SetArmor", "Allows changing a player's armor", { usergroups = { default = 1 }, entities = {} })
 registerprivilege("player.setMaxArmor", "SetMaxArmor", "Allows changing a player's max armor", { usergroups = { default = 1 }, entities = {} })
+registerprivilege("player.setHealth", "SetHealth", "Allows the user to change an player's health", { entities = {}, usergroups = { default = 1 } })
+registerprivilege("player.setMaxHealth", "SetMaxHealth", "Allows the user to change an player's max health", { entities = {}, usergroups = { default = 1 } })
 registerprivilege("player.modifyMovementProperties", "ModifyMovementProperties", "Allows various changes to a player's movement", { usergroups = { default = 1 }, entities = {} })
-
+registerprivilege("player.setPos", "Set Position", "Allows the user to teleport a player to another location", { entities = {}, usergroups = { default = 1 } })
+registerprivilege("player.setEyeAngles", "SetEyeAngles", "Allows the user to rotate the view of a player to another orientation", { entities = {}, usergroups = { default = 1 } })
 local PVSLimitCvar = CreateConVar("sf_pvs_pointlimit", 16, FCVAR_ARCHIVE, "The number of PVS points that can be set on each player, limit is shared across all chips")
 
 local PVSManager = {
@@ -133,6 +136,8 @@ instance:AddHook("initialize", function()
 	aunwrap1 = ang_meta.QuickUnwrap1
 end)
 
+local gravity_reset = {}
+
 instance:AddHook("deinitialize", function()
 	for k, ply in pairs(player.GetAll()) do
 		if instance.data.viewEntityChanged then
@@ -140,6 +145,12 @@ instance:AddHook("deinitialize", function()
 		end
 	end
 	PlayerPVSManager:clearInstCountTable( instance )
+
+	for i, ply in pairs(gravity_reset) do
+		if ply and ply:IsValid() then
+			ply:SetGravity(1)
+		end
+	end
 end)
 
 instance:AddHook( "starfall_hud_disconnected", function( activator, ply )
@@ -245,9 +256,9 @@ end
 --- Sets a player's eye angles
 -- @param Angle ang New angles
 function player_methods:setEyeAngles(ang)
-	local ent = getent(self)
-	checkpermission(instance, ent, "entities.setEyeAngles")
-	Ply_SetEyeAngles(ent, aunwrap1(ang))
+	local ply = getply(self)
+	checkpermission(instance, ply, "player.setEyeAngles")
+	Ply_SetEyeAngles(ply, aunwrap1(ang))
 end
 
 --- Returns the packet loss of the client
@@ -310,6 +321,28 @@ function player_methods:setMaxArmor(val)
 	checkpermission(instance, ent, "player.setMaxArmor")
 	checkvalidnumber(val)
 	Ply_SetMaxArmor(ent, val)
+end
+
+--- Sets the health of the player.
+-- @server
+-- @param number newhealth New health value.
+function player_methods:setHealth(val)
+	local ply = getent(self)
+	checkpermission(instance, ply, "player.setHealth")
+	checkluatype(val, TYPE_NUMBER)
+
+	ply:SetHealth(val)
+end
+
+--- Sets the maximum health for player. Note, that you can still set player's health above this amount with Player:setHealth.
+-- @server
+-- @param number newmaxhealth New max health value.
+function player_methods:setMaxHealth(val)
+	local ply = getent(self)
+	checkpermission(instance, ply, "player.setMaxHealth")
+	checkluatype(val, TYPE_NUMBER)
+
+	ply:SetMaxHealth(val)
 end
 
 --- Sets Crouched Walk Speed
@@ -460,9 +493,48 @@ end
 
 --- Forces the player out of a vehicle.
 function player_methods:exitVehicle()
-    local ent = getply(self)
-    checkpermission(instance, ent, "player.exitVehicle")
-    Ply_ExitVehicle(ent)
+	local ent = getply(self)
+	checkpermission(instance, ent, "player.exitVehicle")
+	Ply_ExitVehicle(ent)
+end
+
+--- Sets the player's position.
+-- @param Vector vec New position
+-- @param boolean? revive Revive the player if they are dead
+function player_methods:setPos(vec, revive)
+	local ply = getply(self)
+	checkpermission(instance, ply, "player.setPos")
+
+	if revive and not ply:Alive() then
+		ply:Spawn()
+	end
+
+	ply:SetPos(SF.clampPos(vunwrap1(vec)))
+end
+
+--- Add the player's linear velocity.
+-- @param Vector vel Add velocity
+function player_methods:addVelocity(vel)
+	local ply = getply(self)
+	vel = vunwrap1(vel)
+	checkvector(vel)
+
+	checkpermission(instance, ply, "player.addVelocity")
+	ply:SetVelocity(vel)
+end
+
+--- Sets the gravity multiplier of the player.
+-- @param number multiplier By how much to multiply the gravity. 1 is normal gravity, 0.5 is half-gravity, etc.
+function player_methods:setGravity(multiplier)
+	local ply = getply(self)
+	checkpermission(instance, ply, "player.modifyMovementProperties")
+	checkluatype(multiplier, TYPE_NUMBER)
+
+	ply:SetGravity(multiplier)
+
+	if not gravity_reset[ply:UserID()] then
+		gravity_reset[ply:UserID()] = ply
+	end
 end
 
 end
