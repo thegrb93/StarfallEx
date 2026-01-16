@@ -443,7 +443,7 @@ function player_methods:setFriction(val)
 	local ent = getply(self)
 	checkpermission(instance, ent, "player.modifyMovementProperties")
 	checkvalidnumber(val)
-	Ent_SetFriction(ent, math.Clamp(val,0,10))
+	Ent_SetFriction(ent, math.Clamp(val/cvars.Number("sv_friction"),0,10))
 end
 
 --- Sets the player's weapon color

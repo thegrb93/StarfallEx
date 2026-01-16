@@ -195,7 +195,7 @@ end
 -- @shared
 -- @return number Friction value
 function player_methods:getFriction()
-	return Ent_GetFriction(getply(self))
+	return Ent_GetFriction(getply(self)) * cvars.Number("sv_friction")
 end
 
 --- Returns the players Step Size
