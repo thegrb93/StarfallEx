@@ -116,8 +116,8 @@ local PlayerPVSManager = PVSManager()
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
-local Ent_SetFriction,Ent_SetModelScale = ENT_META.SetFriction,ENT_META.SetModelScale
-local Ply_Alive,Ply_DropNamedWeapon,Ply_DropWeapon,Ply_EnterVehicle,Ply_ExitVehicle,Ply_GetTimeoutSeconds,Ply_HasGodMode,Ply_IsConnected,Ply_IsTimingOut,Ply_Kill,Ply_LastHitGroup,Ply_PacketLoss,Ply_Say,Ply_SetAmmo,Ply_SetArmor,Ply_SetCrouchedWalkSpeed,Ply_SetDuckSpeed,Ply_SetEyeAngles,Ply_SetJumpPower,Ply_SetLadderClimbSpeed,Ply_SetMaxArmor,Ply_SetMaxSpeed,Ply_SetRunSpeed,Ply_SetSlowWalkSpeed,Ply_SetStepSize,Ply_SetUnDuckSpeed,Ply_SetViewEntity,Ply_SetWeaponColor,Ply_SetWalkSpeed,Ply_StripAmmo,Ply_StripWeapon,Ply_StripWeapons,Ply_TimeConnected = PLY_META.Alive,PLY_META.DropNamedWeapon,PLY_META.DropWeapon,PLY_META.EnterVehicle,PLY_META.ExitVehicle,PLY_META.GetTimeoutSeconds,PLY_META.HasGodMode,PLY_META.IsConnected,PLY_META.IsTimingOut,PLY_META.Kill,PLY_META.LastHitGroup,PLY_META.PacketLoss,PLY_META.Say,PLY_META.SetAmmo,PLY_META.SetArmor,PLY_META.SetCrouchedWalkSpeed,PLY_META.SetDuckSpeed,PLY_META.SetEyeAngles,PLY_META.SetJumpPower,PLY_META.SetLadderClimbSpeed,PLY_META.SetMaxArmor,PLY_META.SetMaxSpeed,PLY_META.SetRunSpeed,PLY_META.SetSlowWalkSpeed,PLY_META.SetStepSize,PLY_META.SetUnDuckSpeed,PLY_META.SetViewEntity,PLY_META.SetWeaponColor,PLY_META.SetWalkSpeed,PLY_META.StripAmmo,PLY_META.StripWeapon,PLY_META.StripWeapons,PLY_META.TimeConnected
+local Ent_Extinguish,Ent_Ignite,Ent_OBBMaxs,Ent_OBBMins,Ent_SetFriction,Ent_SetGravity,Ent_SetModelScale,Ent_SetPos,Ent_SetVelocity = ENT_META.Extinguish,ENT_META.Ignite,ENT_META.OBBMaxs,ENT_META.OBBMins,ENT_META.SetFriction,ENT_META.SetGravity,ENT_META.SetModelScale,ENT_META.SetPos,ENT_META.SetVelocity
+local Ply_Alive,Ply_DropNamedWeapon,Ply_DropWeapon,Ply_EnterVehicle,Ply_ExitVehicle,Ply_GetTimeoutSeconds,Ply_HasGodMode,Ply_IsConnected,Ply_IsTimingOut,Ply_Kill,Ply_LastHitGroup,Ply_PacketLoss,Ply_SetAmmo,Ply_SetArmor,Ply_SetCrouchedWalkSpeed,Ply_SetDuckSpeed,Ply_SetEyeAngles,Ply_SetJumpPower,Ply_SetLadderClimbSpeed,Ply_SetMaxArmor,Ply_SetMaxSpeed,Ply_SetRunSpeed,Ply_SetSlowWalkSpeed,Ply_SetStepSize,Ply_SetUnDuckSpeed,Ply_SetViewEntity,Ply_SetWalkSpeed,Ply_SetWeaponColor,Ply_StripAmmo,Ply_StripWeapon,Ply_StripWeapons,Ply_TimeConnected = PLY_META.Alive,PLY_META.DropNamedWeapon,PLY_META.DropWeapon,PLY_META.EnterVehicle,PLY_META.ExitVehicle,PLY_META.GetTimeoutSeconds,PLY_META.HasGodMode,PLY_META.IsConnected,PLY_META.IsTimingOut,PLY_META.Kill,PLY_META.LastHitGroup,PLY_META.PacketLoss,PLY_META.SetAmmo,PLY_META.SetArmor,PLY_META.SetCrouchedWalkSpeed,PLY_META.SetDuckSpeed,PLY_META.SetEyeAngles,PLY_META.SetJumpPower,PLY_META.SetLadderClimbSpeed,PLY_META.SetMaxArmor,PLY_META.SetMaxSpeed,PLY_META.SetRunSpeed,PLY_META.SetSlowWalkSpeed,PLY_META.SetStepSize,PLY_META.SetUnDuckSpeed,PLY_META.SetViewEntity,PLY_META.SetWalkSpeed,PLY_META.SetWeaponColor,PLY_META.StripAmmo,PLY_META.StripWeapon,PLY_META.StripWeapons,PLY_META.TimeConnected
 
 local player_methods, player_meta, wrap, unwrap = instance.Types.Player.Methods, instance.Types.Player, instance.Types.Player.Wrap, instance.Types.Player.Unwrap
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
@@ -150,7 +150,7 @@ instance:AddHook("deinitialize", function()
 
 	for i, ply in pairs(gravity_reset) do
 		if ply and ply:IsValid() then
-			ply:SetGravity(1)
+			Ent_SetGravity(ply, 1)
 		end
 	end
 end)
@@ -511,7 +511,7 @@ function player_methods:setPos(vec, revive)
 		ply:Spawn()
 	end
 
-	ply:SetPos(SF.clampPos(vunwrap1(vec)))
+	Ent_SetPos(ply, SF.clampPos(vunwrap1(vec)))
 end
 
 --- Add the player's linear velocity.
@@ -522,7 +522,7 @@ function player_methods:addVelocity(vel)
 	checkvector(vel)
 
 	checkpermission(instance, ply, "player.addVelocity")
-	ply:SetVelocity(vel)
+	Ent_SetVelocity(ply, vel)
 end
 
 --- Sets the gravity multiplier of the player.
@@ -532,7 +532,7 @@ function player_methods:setGravity(multiplier)
 	checkpermission(instance, ply, "player.modifyMovementProperties")
 	checkluatype(multiplier, TYPE_NUMBER)
 
-	ply:SetGravity(multiplier)
+	Ent_SetGravity(ply, multiplier)
 
 	if not gravity_reset[ply:UserID()] then
 		gravity_reset[ply:UserID()] = ply
@@ -554,7 +554,7 @@ function player_methods:ignite(length, radius)
 		radius = math.Clamp(radius, 0, (obbmaxs.x - obbmins.x + obbmaxs.y - obbmins.y) / 2)
 	end
 
-	ply:Ignite(length, radius)
+	Ent_Ignite(ply, length, radius)
 end
 
 --- Extinguishes a player
@@ -562,7 +562,7 @@ function player_methods:extinguish()
 	local ply = getply(self)
 	checkpermission(instance, ply, "player.ignite")
 
-	ply:Extinguish()
+	Ent_Extinguish(ply)
 end
 
 end
