@@ -20,6 +20,8 @@ registerprivilege("player.setMaxHealth", "SetMaxHealth", "Allows the user to cha
 registerprivilege("player.modifyMovementProperties", "ModifyMovementProperties", "Allows various changes to a player's movement", { usergroups = { default = 1 }, entities = {} })
 registerprivilege("player.setPos", "Set Position", "Allows the user to teleport a player to another location", { entities = {}, usergroups = { default = 1 } })
 registerprivilege("player.setEyeAngles", "SetEyeAngles", "Allows the user to rotate the view of a player to another orientation", { entities = {}, usergroups = { default = 1 } })
+registerprivilege("player.ignite", "Ignite", "Allows the user to ignite players", { entities = {}, usergroups = { default = 1 } })
+
 local PVSLimitCvar = CreateConVar("sf_pvs_pointlimit", 16, FCVAR_ARCHIVE, "The number of PVS points that can be set on each player, limit is shared across all chips")
 
 local PVSManager = {
@@ -535,6 +537,32 @@ function player_methods:setGravity(multiplier)
 	if not gravity_reset[ply:UserID()] then
 		gravity_reset[ply:UserID()] = ply
 	end
+end
+
+--- Ignites a player
+-- @param number length How long the fire lasts
+-- @param number? radius (optional) How large the fire hitbox is (entity obb is the max)
+function player_methods:ignite(length, radius)
+	local ply = getply(self)
+	checkluatype(length, TYPE_NUMBER)
+
+	checkpermission(instance, ply, "player.ignite")
+
+	if radius~=nil then
+		checkluatype(radius, TYPE_NUMBER)
+		local obbmins, obbmaxs = Ent_OBBMins(ply), Ent_OBBMaxs(ply)
+		radius = math.Clamp(radius, 0, (obbmaxs.x - obbmins.x + obbmaxs.y - obbmins.y) / 2)
+	end
+
+	ply:Ignite(length, radius)
+end
+
+--- Extinguishes a player
+function player_methods:extinguish()
+	local ply = getply(self)
+	checkpermission(instance, ply, "player.ignite")
+
+	ply:Extinguish()
 end
 
 end
