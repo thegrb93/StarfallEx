@@ -18,7 +18,7 @@ registerprivilege("player.setMaxArmor", "SetMaxArmor", "Allows changing a player
 registerprivilege("player.setHealth", "SetHealth", "Allows the user to change an player's health", { entities = {}, usergroups = { default = 1 } })
 registerprivilege("player.setMaxHealth", "SetMaxHealth", "Allows the user to change an player's max health", { entities = {}, usergroups = { default = 1 } })
 registerprivilege("player.modifyMovementProperties", "ModifyMovementProperties", "Allows various changes to a player's movement", { usergroups = { default = 1 }, entities = {} })
-registerprivilege("player.setPos", "Set Position", "Allows the user to teleport a player to another location", { entities = {}, usergroups = { default = 1 } })
+registerprivilege("player.setPos", "Set Position", "Allows the user to teleport a player to another location", { entities = { default = 3}, usergroups = { default = 1 } })
 registerprivilege("player.setEyeAngles", "SetEyeAngles", "Allows the user to rotate the view of a player to another orientation", { entities = {}, usergroups = { default = 1 } })
 registerprivilege("player.ignite", "Ignite", "Allows the user to ignite players", { entities = {}, usergroups = { default = 1 } })
 
