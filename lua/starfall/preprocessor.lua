@@ -58,7 +58,9 @@ SF.PreprocessData = {
 			return "?"
 		end,
 		Preprocess = function(self)
-			for wholedirective, directive, args in string.gmatch(self.code, "(%-%-@(%w+)([^\r\n]*))") do
+			-- Prepend a newline so every real line has a leading '\n'
+			-- Match: newline, optional leading whitespace, then --@..., up to end of line
+			for wholedirective, directive, args in string.gmatch("\n"..self.code, "\n%s*(%-%-@(%w+)([^\r\n]*))") do
 				local func = SF.PreprocessData.directives[directive]
 				if func then
 					local err = func(self, string.Trim(args))
