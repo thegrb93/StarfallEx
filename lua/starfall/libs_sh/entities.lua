@@ -2221,5 +2221,11 @@ function ents_methods:getNetworkVars()
 	return istable(ent_tbl.dt) and instance.Sanitize(ent_tbl.GetNetworkVars(ent)) or nil
 end
 
+--- Gets the gravity multiplier of the entity.
+-- @shared
+-- @return number The gravity multiplier
+function ents_methods:getGravity()
+	return getent(self):GetGravity()
+end
 
 end
