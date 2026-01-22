@@ -116,6 +116,7 @@ function http_library.post(url, payload, callbackSuccess, callbackFail, headers)
 
 			if string.lower(k) == "content-type" then
 				request.type = v
+				headers[k] = nil
 			end
 		end
 
