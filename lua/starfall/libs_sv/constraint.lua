@@ -95,6 +95,17 @@ function constr_methods:isValid()
 	return IsValid(cunwrap(self))
 end
 
+--- Stops the constraint from being saved on duplication or map save.
+-- @param boolean? allowDupe Set to true to re-enable duplicating (default false)
+-- @server
+function constr_methods:doNotDuplicate(allowDupe)
+	if allowDupe then
+		cunwrap(self).DoNotDuplicate = nil
+	else
+		cunwrap(self).DoNotDuplicate = true
+	end
+end
+
 local function checkConstraint(e, t)
 	if IsValid(e) then
 		if e:GetMoveType() == MOVETYPE_VPHYSICS then

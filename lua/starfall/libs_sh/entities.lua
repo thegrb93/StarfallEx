@@ -1178,11 +1178,16 @@ if SERVER then
 	end
 
 	--- Stops the entity from being saved on duplication or map save.
+	-- @param boolean? allowDupe Set to true to re-enable duplicating (default false)	
 	-- @server
-	function ents_methods:doNotDuplicate()
+	function ents_methods:doNotDuplicate(allowDupe)
 		local ent = getent(self)
 		checkpermission(instance, ent, "entities.doNotDuplicate")
-		Ent_GetTable(ent).DoNotDuplicate = true
+		if allowDupe then
+			Ent_GetTable(ent).DoNotDuplicate = nil
+		else
+			Ent_GetTable(ent).DoNotDuplicate = true
+		end
 	end
 
 end
