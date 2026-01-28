@@ -117,6 +117,7 @@ function ENT:DrawTranslucent()
 	self:DrawModel()
 
 	if halo.RenderedEntity() == self then return end
+	if render.GetRenderTarget() then return end
 
 	local transform = self:GetWorldTransformMatrix() * self.ScreenMatrix
 	self.Transform.matrix = transform
