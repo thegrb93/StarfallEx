@@ -70,13 +70,6 @@ function ENT:SetScreenMatrix(info)
 end
 
 function ENT:RenderScreen()
-	local rt = render.GetRenderTarget()
-
-	if rt then
-		local rtname = rt:GetName()
-		if rtname == "_rt_waterreflection" or rtname == "_rt_waterrefraction" then return end
-	end
-	
 	if IsValid(self.link) then
 		local instance = self.link.instance
 		if instance then
@@ -124,6 +117,7 @@ function ENT:DrawTranslucent()
 	self:DrawModel()
 
 	if halo.RenderedEntity() == self then return end
+	if render.GetRenderTarget() then return end
 
 	local transform = self:GetWorldTransformMatrix() * self.ScreenMatrix
 	self.Transform.matrix = transform
