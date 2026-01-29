@@ -535,6 +535,7 @@ end
 
 --- Gets the max rate at which the NextBot can visually rotate.
 -- @server
+-- @return number The nextbot's current maximum yaw rate.
 function nb_methods:getMaxYawRate()
 	local nb = nbunwrap(self)
 	return Ent_GetTable(nb).loco:GetMaxYawRate()
