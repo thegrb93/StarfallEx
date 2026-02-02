@@ -1812,7 +1812,7 @@ function ents_methods:getEffectModel()
 		SF.Throw("This only works on prop_effect", 2)
 	end
 
-	return Ent_GetModel(ent.AttachedEntity)
+	return Ent_GetModel(Ent_GetTable(ent).AttachedEntity)
 end
 
 --- Returns the entity's model bounds. This is different than the collision bounds/hull.
