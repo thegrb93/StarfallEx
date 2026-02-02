@@ -1795,7 +1795,7 @@ function ents_methods:setEyeTarget(pos)
     Ent_SetEyeTarget(ent, vec)
 end
 	
---- Gets the model of an entity. To get the model of a prop_effect, see ent:getEffectModel()
+--- Gets the model of an entity. For prop_effect, see ent:getEffectModel()
 -- @shared
 -- @return string Model of the entity
 function ents_methods:getModel()
