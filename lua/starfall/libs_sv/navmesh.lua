@@ -562,7 +562,7 @@ return function(instance)
 	-- @return boolean Whether the area is blocked or not
 	function lnavarea_methods:isBlocked(teamID, ignoreNavBlockers)
 		checkluatype(teamID, TYPE_NUMBER)
-		checkluatype(ignoreNavBlockers, TYPE_BOOLEAN)
+		checkluatype(ignoreNavBlockers, TYPE_BOOL)
 
 		return lnavunwrap(self):IsBlocked(teamID, ignoreNavBlockers)
 	end
