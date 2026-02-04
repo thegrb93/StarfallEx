@@ -266,7 +266,7 @@ local SFToWire =
 		elseif dataType == TYPE_BOOL then
 			return data and 1 or 0
 		else
-			SF.Throw( "Expected number or boolean", 2 )
+			SF.ThrowTypeError( "number or bool", SF.GetType( data ), 2 )
 		end
 	end,
 	STRING = function(data) checkluatype(data, TYPE_STRING, 2) return data end,
