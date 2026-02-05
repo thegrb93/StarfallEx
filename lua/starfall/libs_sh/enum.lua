@@ -1423,4 +1423,116 @@ env.GMOD_CHANNEL = {
 	STALLED = 3
 }
 
+--- ENUMs used by math.toUnit and math.fromUnit
+-- @name builtins_library.MEASUREMENT_UNIT
+-- @class table
+-- @field HAMMER_UNITS_PER_SECOND
+-- @field HAMMER_UNITS_PER_MINUTE
+-- @field HAMMER_UNITS_PER_HOUR
+-- @field MILLIMETERS_PER_SECOND
+-- @field CENTIMETERS_PER_SECOND
+-- @field DECIMETERS_PER_SECOND
+-- @field METERS_PER_SECOND
+-- @field KILOMETERS_PER_SECOND
+-- @field INCHES_PER_SECOND
+-- @field FEET_PER_SECOND
+-- @field YARDS_PER_SECOND
+-- @field MILES_PER_SECOND
+-- @field NAUTICAL_MILES_PER_SECOND
+-- @field MILLIMETERS_PER_MINUTE
+-- @field CENTIMETERS_PER_MINUTE
+-- @field DECIMETERS_PER_MINUTE
+-- @field METERS_PER_MINUTE
+-- @field KILOMETER_PER_MINUTE
+-- @field INCHES_PER_MINUTE
+-- @field FEET_PER_MINUTE
+-- @field YARDS_PER_MINUTE
+-- @field MILES_PER_MINUTE
+-- @field NAUTICAL_MILES_PER_MINUTE
+-- @field MILLIMETERS_PER_HOUR
+-- @field CENTIMETERS_PER_HOUR
+-- @field DECIMETERS_PER_HOUR
+-- @field METERS_PER_HOUR
+-- @field KILOMETERS_PER_HOUR
+-- @field INCHES_PER_HOUR
+-- @field FEETS_PER_HOUR
+-- @field YARDS_PER_HOUR
+-- @field MILES_PER_HOUR
+-- @field NAUTICAL_MILES_PER_HOUR
+-- @field MPH
+-- @field KNOTS
+-- @field MACH
+-- @field KPH
+-- @field HAMMER_UNIT
+-- @field MILLIMETER
+-- @field CENTIMETER
+-- @field DECIMETER
+-- @field METER
+-- @field KILOMETER
+-- @field INCHES
+-- @field FEET
+-- @field YARD
+-- @field MILE
+-- @field NAUTICAL_MILE
+-- @field GRAM
+-- @field KILOGRAM
+-- @field TON
+-- @field OUNCE
+-- @field POUND
+env.MEASUREMENT_UNIT = {
+	HAMMER_UNITS_PER_SECOND   = 1,
+	HAMMER_UNITS_PER_MINUTE   = 60,
+	HAMMER_UNITS_PER_HOUR     = 3600,
+	MILLIMETERS_PER_SECOND    = 25.4 * 0.75,
+	CENTIMETERS_PER_SECOND    = 2.54 * 0.75,
+	DECIMETERS_PER_SECOND     = 0.254 * 0.75,
+	METERS_PER_SECOND         = 0.0254 * 0.75,
+	KILOMETERS_PER_SECOND     = 0.0000254 * 0.75,
+	INCHES_PER_SECOND         = 1 * 0.75,
+	FEET_PER_SECOND           = (1 / 12) * 0.75,
+	YARDS_PER_SECOND          = (1 / 36) * 0.75,
+	MILES_PER_SECOND          = (1 / 63360) * 0.75,
+	NAUTICAL_MILES_PER_SECOND = (127 / 9260000) * 0.75,
+	MILLIMETERS_PER_MINUTE    = 60 * 25.4 * 0.75,
+	CENTIMETERS_PER_MINUTE    = 60 * 2.54 * 0.75,
+	DECIMETERS_PER_MINUTE     = 60 * 0.254 * 0.75,
+	METERS_PER_MINUTE         = 60 * 0.0254 * 0.75,
+	KILOMETER_PER_MINUTE      = 60 * 0.0000254 * 0.75,
+	INCHES_PER_MINUTE         = 60 * 0.75,
+	FEET_PER_MINUTE           = (60 / 12) * 0.75,
+	YARDS_PER_MINUTE          = (60 / 36) * 0.75,
+	MILES_PER_MINUTE          = (60 / 63360) * 0.75,
+	NAUTICAL_MILES_PER_MINUTE = (60 * 127 / 9260000) * 0.75,
+	MILLIMETERS_PER_HOUR      = 3600 * 25.4 * 0.75,
+	CENTIMETERS_PER_HOUR      = 3600 * 2.54 * 0.75,
+	DECIMETERS_PER_HOUR       = 3600 * 0.254 * 0.75,
+	METERS_PER_HOUR           = 3600 * 0.0254 * 0.75,
+	KILOMETERS_PER_HOUR       = 3600 * 0.0000254 * 0.75,
+	INCHES_PER_HOUR           = 3600 * 0.75,
+	FEETS_PER_HOUR            = (3600 / 12) * 0.75,
+	YARDS_PER_HOUR            = (3600 / 36) * 0.75,
+	MILES_PER_HOUR            = (3600 / 63360) * 0.75,
+	NAUTICAL_MILES_PER_HOUR   = (3600 * 127 / 9260000) * 0.75,
+	MPH                       = (3600 / 63360) * 0.75,
+	KNOTS                     = (3600 * 127 / 9260000) * 0.75,
+	MACH                      = (0.0254 / 295) * 0.75,
+	KPH                       = 3600 * 0.0000254 * 0.75,
+	HAMMER_UNIT               = 1,
+	MILLIMETER                = 25.4 * 0.75,
+	CENTIMETER                = 2.54 * 0.75,
+	DECIMETER                 = 0.254 * 0.75,
+	METER                     = 0.0254 * 0.75,
+	KILOMETER                 = 0.0000254 * 0.75,
+	INCH                      = 1 * 0.75,
+	FEET                      = (1 / 12) * 0.75,
+	YARD                      = (1 / 36) * 0.75,
+	MILE                      = (1 / 63360) * 0.75,
+	NAUTICAL_MILE             = (127 / 9260000) * 0.75,
+	GRAMS                     = 1000,
+	KILOGRAMS                 = 1,
+	TONS                      = 0.001,
+	OUNCES                    = 1 / 0.028349523125,
+	POUNDS                    = 1 / 0.45359237,
+}
+
 end

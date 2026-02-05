@@ -626,4 +626,26 @@ function math_library.mean( numbers )
 	return sum / #numbers
 end
 
+--- Converts a number to a specified unit.
+-- @class function
+-- @param number number the number to convert
+-- @param number number the MEASUREMENT_UNIT to convert the number to
+-- @return number Number in specified unit
+function math_library.toUnit( number, unit )
+	checkluatype( number, TYPE_NUMBER )
+	checkluatype( unit, TYPE_NUMBER )
+	return number * unit
+end
+
+--- Converts a number in specified units to hammer units.
+-- @class function
+-- @param number number the number to convert
+-- @param number number the MEASUREMENT_UNIT the number is in to convert
+-- @return number Number in hammer units
+function math_library.fromUnit( number, unit )
+	checkluatype( number, TYPE_NUMBER )
+	checkluatype( unit, TYPE_STRING )
+	return number / unit
+end
+
 end
