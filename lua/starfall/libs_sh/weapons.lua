@@ -145,7 +145,9 @@ if CLIENT then
 	-- @client
 	-- @return string Display name of weapon
 	function weapon_methods:getPrintName()
-		return language.GetPhrase(string.sub(Wep_GetPrintName(getwep(self)), 2))
+		local printName = Wep_GetPrintName(getwep(self))
+		local langName = language.GetPhrase(string.sub(printName, 2))
+		return string.sub(printName, 2) ~= langName and langName or printName
 	end
 
 	--- Returns if the weapon is carried by the local player.
