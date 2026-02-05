@@ -322,10 +322,25 @@ end, cleanupRender)
 -- @return boolean Return true to prevent the player from drawing
 SF.hookAdd("PrePlayerDraw", "predrawplayer", function(instance, ply, flags)
 	if canRenderHud(instance) then
+		instance:prepareRender()
 		return true, { instance.Types.Player.Wrap(ply), flags }
 	end
 	return false
 end, cleanupRenderAllowTrueReturn)
+
+--- Called after drawing the player. (Only works with HUD) (3D Context)
+-- @name PostDrawPlayer
+-- @class hook
+-- @client
+-- @param Player ply Player that's about to be drawn
+-- @param number flags STUDIO flags for the render operation
+SF.hookAdd("PostPlayerDraw", "postdrawplayer", function(instance, ply, flags)
+	if canRenderHud(instance) then
+		instance:prepareRender()
+		return true, { instance.Types.Player.Wrap(ply), flags }
+	end
+	return false
+end, cleanupRender)
 
 --- Called before drawing the viewmodel rendergroup (3D Context)
 -- @name PreDrawViewModels

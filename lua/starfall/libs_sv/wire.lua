@@ -258,7 +258,17 @@ instance.WireToSF = WireToSF
 
 local SFToWire =
 {
-	NORMAL = function(data) checkluatype(data, TYPE_NUMBER, 2) return data end,
+	NORMAL = function(data)
+		local dataType = TypeID( data )
+		
+		if dataType == TYPE_NUMBER then
+			return data
+		elseif dataType == TYPE_BOOL then
+			return data and 1 or 0
+		else
+			SF.ThrowTypeError( "number or bool", SF.GetType( data ), 2 )
+		end
+	end,
 	STRING = function(data) checkluatype(data, TYPE_STRING, 2) return data end,
 	VECTOR = function(data) return vunwrap(data) end,
 	VECTOR2 = function(data) return v2unwrap(data) end,

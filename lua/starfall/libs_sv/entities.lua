@@ -911,14 +911,12 @@ function ents_methods:getUnFreezable()
 end
 
 --- Blocks this entity from being picked up by the physgun
--- @param boolean physgunDisabled
+-- @param boolean? disabled
 function ents_methods:disablePhysgun(disabled)
-	checkluatype(disabled, TYPE_BOOL)
-
 	local ent = getent(self)
 	checkpermission(instance, ent, "entities.enableMotion")
 
-	if disabled then
+	if disabled or disabled == nil then
 		ent.PhysgunDisabled = true
 	else
 		ent.PhysgunDisabled = nil
