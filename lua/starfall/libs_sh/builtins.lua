@@ -109,8 +109,9 @@ builtins_library.tostring = tostring
 --- Attempts to convert the value to a number.
 -- @name builtins_library.tonumber
 -- @class function
--- @param any obj Object to turn into a number
--- @return number? The object as a number or nil if it couldn't be converted
+-- @param any value Either a string or a number to convert into a number.
+-- @param number? base The numerical base of the digits in the string. Must be between 2 and 36. Default is 10.
+-- @return number? The number representation of the input value or nil if it couldn't be converted.
 builtins_library.tonumber = tonumber
 
 --- Returns an iterator function for a for loop, to return ordered key-value pairs from a table.
