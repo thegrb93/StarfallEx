@@ -627,10 +627,10 @@ function math_library.mean( numbers )
 end
 
 --- Provides a conversion factor given input units
--- Example: local mph = math.unitConversion(MEASUREMENT_UNIT.MILE / MEASUREMENT_UNIT.HOUR)
+-- Example: local mph = math.unitConversion(UNIT.MILE / UNIT.HOUR)
 --          local converted = x * mph
--- @param number to the MEASUREMENT_UNIT to convert the number to
--- @param number? from the MEASUREMENT_UNIT to convert the number from (Default: 1)
+-- @param number to the UNIT to convert the number to
+-- @param number? from the UNIT to convert the number from (Default: 1, works if converting from gmod natural units)
 -- @return number A conversion factor multipled by values to convert units
 function math_library.unitConversion( to, from )
 	return to / (from or 1)

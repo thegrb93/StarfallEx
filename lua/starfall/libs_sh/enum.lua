@@ -1434,19 +1434,19 @@ units.METER = units.INCH / 39.3701
 units.MACH = units.METER / 343
 
 units.GMOD_MASS = 1
-units.KILOGRAM = units.GMOD_MASS
+units.POUND = units.GMOD_MASS
+units.OUNCE = units.POUND * 16
+units.KILOGRAM = units.POUND * 0.453592
 units.GRAM = units.KILOGRAMS * 1000
 units.TON = units.KILOGRAMS * 0.001
-units.OUNCE = units.KILOGRAM * 35.274
-units.POUND = units.KILOGRAM * 2.20462
 
 units.GMOD_TIME = 1
 units.SECOND = units.GMOD_TIME
 units.MINUTE = units.SECOND / 60
 units.HOUR = units.MINUTE / 60
 
--- ENUMs used by math.toUnit and math.fromUnit
--- @name builtins_library.MEASUREMENT_UNIT
+-- ENUMs used by math.unitConversion. They represent conversion factors from gmod natural units (gmod length (3/4 inches), pounds, seconds)
+-- @name builtins_library.UNIT
 -- @class table
 -- @field GMOD_LENGTH
 -- @field INCH
@@ -1457,15 +1457,15 @@ units.HOUR = units.MINUTE / 60
 -- @field METER
 -- @field MACH
 -- @field GMOD_MASS
+-- @field POUND
+-- @field OUNCE
 -- @field KILOGRAM
 -- @field GRAM
 -- @field TON
--- @field OUNCE
--- @field POUND
 -- @field GMOD_TIME
 -- @field SECOND
 -- @field MINUTE
 -- @field HOUR
-env.MEASUREMENT_UNIT = units
+env.UNIT = units
 
 end
