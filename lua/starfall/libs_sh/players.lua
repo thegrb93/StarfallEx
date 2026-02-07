@@ -501,8 +501,6 @@ end
 -- @param number key Key to check. IN_KEY table values
 -- @return boolean Whether their key is down
 function player_methods:keyDown(key)
-	checkvalidnumber(key)
-	
 	return Ply_KeyDown(getply(self), key)
 end
 
