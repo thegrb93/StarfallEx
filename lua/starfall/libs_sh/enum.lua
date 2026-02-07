@@ -1423,4 +1423,49 @@ env.GMOD_CHANNEL = {
 	STALLED = 3
 }
 
+local units = {}
+units.GMOD_LENGTH = 1
+units.INCH = units.GMOD_LENGTH * 0.75
+units.FEET = units.INCH / 12
+units.YARD = units.FEET / 3
+units.MILE = units.YARD / 1760
+units.NAUTICAL_MILE = units.YARD / 2025.37
+units.METER = units.INCH / 39.3701
+units.MACH = units.METER / 343
+
+units.GMOD_MASS = 1
+units.POUND = units.GMOD_MASS
+units.OUNCE = units.POUND * 16
+units.KILOGRAM = units.POUND * 0.453592
+units.GRAM = units.KILOGRAM * 1000
+units.TON = units.KILOGRAM * 0.001
+
+units.GMOD_TIME = 1
+units.SECOND = units.GMOD_TIME
+units.MINUTE = units.SECOND / 60
+units.HOUR = units.MINUTE / 60
+
+-- ENUMs used by math.unitConversion. They represent conversion factors from gmod natural units (gmod length (3/4 inches), pounds, seconds)
+-- @name builtins_library.UNIT
+-- @class table
+-- @field GMOD_LENGTH
+-- @field INCH
+-- @field FEET
+-- @field YARD
+-- @field MILE
+-- @field NAUTICAL_MILE
+-- @field METER
+-- @field MACH
+-- @field GMOD_MASS
+-- @field POUND
+-- @field OUNCE
+-- @field KILOGRAM
+-- @field GRAM
+-- @field TON
+-- @field GMOD_TIME
+-- @field SECOND
+-- @field MINUTE
+-- @field HOUR
+env.UNIT = units
+
 end
