@@ -508,28 +508,25 @@ end
 
 --- Gets whether a key was down one tick ago.
 -- @shared
--- @param number key Key to check.
+-- @param number key Key to check. See IN_KEY table values.
+-- @return boolean Is their key down.
 function player_methods:keyDownLast(key)
-	checkluatype(key, TYPE_NUMBER)
-
 	return Ply_KeyDownLast(getply(self), key)
 end
 
 --- Gets wether a key was just pressed this tick.
 -- @shared
--- @param number key Key to check.
+-- @param number key Key to check. See IN_KEY table values.
+-- @return boolean Was their key pressed.
 function player_methods:keyPressed(key)
-	checkluatype(key, TYPE_NUMBER)
-
 	return Ply_KeyPressed(getply(self), key)
 end
 
 --- Gets wether a key was just released this tick.
 -- @shared
--- @param number key Key to check.
+-- @param number key Key to check. See IN_KEY table values.
+-- @return boolean Was their key released.
 function player_methods:keyReleased(key)
-	checkluatype(key, TYPE_NUMBER)
-
 	return Ply_KeyReleased(getply(self), key)
 end
 
