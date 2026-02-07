@@ -536,7 +536,7 @@ if CLIENT then
 
 	--- Returns the voice volume of the player
 	-- @client
-	-- @return number Returns the players voice volume, how loud the player's voice communication currently is, as a normal number. Doesn't work on local player unless the voice_loopback convar is set to 1.
+	-- @return number Returns the players voice volume, how loud the player's voice communication currently is, as a normal number.
 	function player_methods:voiceVolume()
 		return Ply_VoiceVolume(getply(self))
 	end
