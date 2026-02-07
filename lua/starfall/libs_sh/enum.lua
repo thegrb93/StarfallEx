@@ -1437,8 +1437,8 @@ units.GMOD_MASS = 1
 units.POUND = units.GMOD_MASS
 units.OUNCE = units.POUND * 16
 units.KILOGRAM = units.POUND * 0.453592
-units.GRAM = units.KILOGRAMS * 1000
-units.TON = units.KILOGRAMS * 0.001
+units.GRAM = units.KILOGRAM * 1000
+units.TON = units.KILOGRAM * 0.001
 
 units.GMOD_TIME = 1
 units.SECOND = units.GMOD_TIME
