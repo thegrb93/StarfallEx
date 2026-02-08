@@ -1445,8 +1445,13 @@ units.SECOND = units.GMOD_TIME
 units.MINUTE = units.SECOND / 60
 units.HOUR = units.MINUTE / 60
 
+<<<<<<< Updated upstream
 -- ENUMs used by math.unitConversion. They represent conversion factors from gmod natural units (gmod length (3/4 inches), pounds, seconds)
 -- @name builtins_library.UNIT
+=======
+--- ENUMs used by math.toUnit and math.fromUnit
+-- @name builtins_library.MEASUREMENT_UNIT
+>>>>>>> Stashed changes
 -- @class table
 -- @field GMOD_LENGTH
 -- @field INCH
