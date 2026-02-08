@@ -237,9 +237,9 @@ if SERVER then
 end
 
 --- Aborts the current net message so that a new one can be started.
-function net_library.abort()
-	net_reset()
-end
+-- @class function
+-- @name net_library.abort
+net_library.abort = net_reset
 
 --- Writes an object to a net message automatically typing it
 -- @shared
