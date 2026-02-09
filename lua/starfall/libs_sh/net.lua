@@ -152,17 +152,20 @@ local function write(data)
 	netData[#netData + 1] = data
 end
 
+local function net_reset()
+	netSize = 0
+	netData = {}
+	netStarted = false
+	StreamManager:clearPlaceholders(instance)
+end
+
 local function net_write(unreliable)
 	net.Start("SF_netmessage", unreliable)
 	net.WriteEntity(instance.entity)
 	for _, v in ipairs(netData) do
 		v[1](unpack(v, 3))
 	end
-
-	netSize = 0
-	netData = {}
-	netStarted = false
-	StreamManager:clearPlaceholders(instance)
+	net_reset()
 end
 
 --- Starts the net message
@@ -232,6 +235,11 @@ if SERVER then
 		instance:checkCpu()
 	end
 end
+
+--- Aborts the current net message so that a new one can be started.
+-- @class function
+-- @name net_library.abort
+net_library.abort = net_reset
 
 --- Writes an object to a net message automatically typing it
 -- @shared
