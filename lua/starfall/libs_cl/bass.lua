@@ -464,7 +464,7 @@ end
 --- Retrieves HTTP headers from a bass stream channel created by Bass:loadURL(), if available.
 --- Of special interest here are headers such as icy-name, icy-br, ice-audio-info, icy-genre.
 --- CRITICAL NOTE: Tags aren't available immediately! Must use a timer to wait 100-500ms for BASS to parse metadata during stream init!!
--- @return table<string> A list of HTTP headers or nil if no information is available.
+-- @return table A list of HTTP headers or nil if no information is available.
 function bass_methods:getTagsHTTP()
 	return getsnd(self):GetTagsHTTP()
 end
@@ -486,14 +486,14 @@ end
 
 --- Retrieves .m4a media info, from a bass channel created by Bass:loadFile or Bass:loadURL, if available.
 --- CRITICAL NOTE: Tags aren't available immediately! Must use a timer to wait 100-500ms for BASS to parse metadata during stream init!!
--- @return table<string> A list of available information in no particular order, or nil if no information is available.
+-- @return table A list of available information in no particular order, or nil if no information is available.
 function bass_methods:getTagsMP4()
 	return getsnd(self):GetTagsMP4()
 end
 
 --- Retrieves OGG media info tag, from a bass channel created by Bass:loadFile or Bass:loadURL, if available.
 --- CRITICAL NOTE: Tags aren't available immediately! Must use a timer to wait 100-500ms for BASS to parse metadata during stream init!!
--- @return table<string> A list of available information in no particular order, or nil if no information is available. 
+-- @return table A list of available information in no particular order, or nil if no information is available. 
 function bass_methods:getTagsOGG()
 	return getsnd(self):GetTagsOGG()
 end
@@ -507,7 +507,7 @@ end
 
 --- Retrieves .WMA media info, from a bass channel created by Bass:loadFile or Bass:loadURL, if available.
 --- CRITICAL NOTE: Tags aren't available immediately! Must use a timer to wait 100-500ms for BASS to parse metadata during stream init!!
--- @return table<string> A list of available information in no particular order, or nil if no information is available.
+-- @return table A list of available information in no particular order, or nil if no information is available.
 function bass_methods:getTagsWMA()
 	return getsnd(self):GetTagsWMA()
 end
