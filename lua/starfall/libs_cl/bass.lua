@@ -461,11 +461,9 @@ function bass_methods:getSamplingRate()
 	return getsnd(self):GetSamplingRate()
 end
 
-    --- CRITICAL NOTE: Tags aren't available immediately!
-    --- Must use a timer to wait 100-500ms for BASS to parse metadata during stream init!!
-
 --- Retrieves HTTP headers from a bass stream channel created by Bass:loadURL(), if available.
 --- Of special interest here are headers such as icy-name, icy-br, ice-audio-info, icy-genre.
+--- CRITICAL NOTE: Tags aren't available immediately! Must use a timer to wait 100-500ms for BASS to parse metadata during stream init!!
 -- @return table<string> A list of HTTP headers or nil if no information is available.
 function bass_methods:getTagsHTTP()
 	return getsnd(self):GetTagsHTTP()
