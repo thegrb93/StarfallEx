@@ -2,7 +2,7 @@
 
 <div align="center"><img align="left" src="logos/starfallex_32x32.png" height="100%" /><img align="right" src="logos/starfallex_32x32.png" height="100%" /></div>
 
-_Starfall Scripting Environment_
+_A Garry's Mod Scripting Environment_
 ----------
 
 <br>
