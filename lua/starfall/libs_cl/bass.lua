@@ -530,7 +530,7 @@ function bass_methods:is3D()
 	return getsnd(self):Is3D()
 end
 
---- Sets the 3D mode of the channel. This will affect Bass:set3DEnabled() but not Bass:is3D().
+--- Sets the 3D mode of the channel. This will affect Bass:get3DEnabled() but not Bass:is3D().
 --- This feature requires the channel to be initially created in 3D mode, i.e. Bass:is3D() should return true or this function will do nothing. 
 -- @return boolean enable True or False to toggle 3D.
 function bass_methods:set3DEnabled(enable)
