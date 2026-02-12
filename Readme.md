@@ -4,7 +4,7 @@ Starfall Scripting Environment
 
 #### Method 1
 
-### [Subscribe on workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3412004213)
+### [Subscribe to the workshop addon!](https://steamcommunity.com/sharedfiles/filedetails/?id=3412004213)
 
 #### Method 2
 
