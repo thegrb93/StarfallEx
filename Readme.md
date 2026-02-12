@@ -1,5 +1,10 @@
-Starfall Scripting Environment
+![](branding/banner.png)
+
+<div align="center"><img align="left" src="branding/starfallex_32x32.png" height="100%" /><img align="right" src="branding/starfallex_32x32.png" height="100%" /></div>
+
+_Starfall Scripting Environment_
 ----------
+
 ### Installation
 
 #### Method 1
