@@ -34,5 +34,5 @@ C:\path\to\Steam\steamapps\common\GarrysMod\garrysmod\addons
 - [`Joystick Module`](https://github.com/MattJeanes/Joystick-Module)
 - [`Alternative Linux Joystick Module`](https://gitlab.h08.us/puff/joystick-module-linux/-/jobs/4782/artifacts/browse/joystick/)
 - [`XInput 1.3 Module`](https://github.com/mitterdoo/garrysmod-xinput/releases/latest)
-- [`Luasocket Module`](https://github.com/danielga/gmod_luasocket/releases/latest)
+- [`Luasocket Module`](https://github.com/thegrb93/gmod_luasocket/releases/latest)
 ----------
