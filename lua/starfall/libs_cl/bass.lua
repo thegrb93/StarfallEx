@@ -393,7 +393,7 @@ end
 -- @return boolean Is the audio stream block streamed or not.
 function bass_methods:isBlockStreamed()
 	local uw = getsnd(self)
-	if !uw:IsOnline() then SF.Throw("The Bass Object isn't playing an online audio stream!", 2) end
+	if not uw:IsOnline() then SF.Throw("The Bass Object isn't playing an online audio stream!", 2) end
 	return uw:IsBlockStreamed()
 end
 
@@ -537,7 +537,7 @@ function bass_methods:set3DEnabled(enable)
 	checkluatype(enable, TYPE_BOOLEAN)
 
 	local uw = getsnd(self)
-	if !uw:Is3D() then SF.Throw("You cannot set the mode of a Bass Object that isn't 3D! Please call is3D first!!", 2) end
+	if not uw:Is3D() then SF.Throw("You cannot set the mode of a Bass Object that isn't 3D! Please call is3D first!!", 2) end
 	uw:Set3DEnabled(enable)
 end
 
@@ -589,7 +589,7 @@ function bass_methods:set3DCone(innerAngle, outerAngle, outerVolume)
 
 	local uw = getsnd(self)
 	-- If we ever use / add Set3DEnabled to SF, remember to change this Is3D to Get3DEnabled.
-	if !uw:Is3D() then SF.Throw("You cannot set the cone of a Bass Object that isn't 3D!", 2) end
+	if not uw:Is3D() then SF.Throw("You cannot set the cone of a Bass Object that isn't 3D!", 2) end
 	uw:Set3DCone( innerAngle, outerAngle, outerVolume )
 end
 
