@@ -297,7 +297,7 @@ function bass_methods:setPitch(pitch)
 end
 
 --- Gets the pitch of the sound.
--- @param number The current pitch of the sound.
+-- @return number The current pitch of the sound.
 function bass_methods:getPitch()
 	return getsnd(self):GetPlaybackRate()
 end
@@ -532,7 +532,7 @@ end
 
 --- Sets the 3D mode of the channel. This will affect Bass:get3DEnabled() but not Bass:is3D().
 --- This feature requires the channel to be initially created in 3D mode, i.e. Bass:is3D() should return true or this function will do nothing. 
--- @return boolean enable True or False to toggle 3D.
+-- @param boolean enable True or False to toggle 3D.
 function bass_methods:set3DEnabled(enable)
 	checkluatype(enable, TYPE_BOOLEAN)
 
