@@ -1327,8 +1327,14 @@ end
 --- Require .dll but doesn't throw an error. Returns true if success or false if fail.
 function SF.Require(name)
 	if util.IsBinaryModuleInstalled(name) then
-		require(name)
-		return true
+		local ok, err = pcall(require, name)
+
+		if ok then
+			return true
+		else
+			ErrorNoHalt(err)
+			return false
+		end
 	end
 
 	return false
