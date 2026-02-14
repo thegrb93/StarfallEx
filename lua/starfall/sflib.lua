@@ -1332,7 +1332,7 @@ function SF.Require(name)
 		if ok then
 			return true
 		else
-			ErrorNoHalt(err)
+			ErrorNoHalt(err .. "\n")
 			return false
 		end
 	end
