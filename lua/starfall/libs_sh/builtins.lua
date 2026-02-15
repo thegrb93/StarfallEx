@@ -245,25 +245,25 @@ builtins_library.isFirstTimePredicted = IsFirstTimePredicted
 -- If used on screens, will show 0 if only rendering is done. Operations must be done in the Think loop for them to be counted.
 -- @return number Current cpu time used this Think
 function builtins_library.cpuUsed()
-	return instance.cpu_total
+	return instance.perf.cpuTotal
 end
 
 --- Gets the Average CPU Time in the buffer
 -- @return number Average CPU Time of the buffer.
 function builtins_library.cpuAverage()
-	return instance:movingCPUAverage()
+	return instance.perf:getAverageCpu()
 end
 
 --- Gets the current ram usage of the gmod lua environment
+-- @name builtins_library.ramUsed
+-- @class function
 -- @return number The ram used in kilobytes
-function builtins_library.ramUsed()
-	return SF.Instance.Ram
-end
+builtins_library.ramUsed = gcinfo
 
 --- Gets the moving average of ram usage of the gmod lua environment
 -- @return number The ram used in kilobytes
 function builtins_library.ramAverage()
-	return SF.Instance.RamAvg
+	return instance.perf:getAverageRam()
 end
 
 --- Gets the max allowed ram usage of the gmod lua environment
@@ -287,7 +287,7 @@ end
 function builtins_library.cpuTotalUsed()
 	local total = 0
 	for instance, _ in pairs(SF.playerInstances[instance.player]) do
-		total = total + instance.cpu_total
+		total = total + instance.perf.cpuTotal
 	end
 	return total
 end
@@ -297,7 +297,7 @@ end
 function builtins_library.cpuTotalAverage()
 	local total = 0
 	for instance, _ in pairs(SF.playerInstances[instance.player]) do
-		total = total + instance:movingCPUAverage()
+		total = total + instance.perf:getAverageCpu()
 	end
 	return total
 end
@@ -306,14 +306,14 @@ end
 -- CPU Time is stored in a buffer of N elements, if the average of this exceeds cpuMax, the chip will error.
 -- @return number Max SysTime allowed to take for execution of the chip in a Think.
 function builtins_library.cpuMax()
-	return instance.cpuQuota
+	return instance.perf.cpuLimit
 end
 
 --- Sets a soft cpu quota which will trigger a catchable error if the cpu goes over a certain amount.
 -- @param number quota The threshold where the soft error will be thrown. Ratio of current cpu to the max cpu usage. 0.5 is 50%
 function builtins_library.setSoftQuota(quota)
 	checkluatype(quota, TYPE_NUMBER)
-	instance.cpu_softquota = math.Clamp(quota, 0, 1)
+	instance.perf.cpuSoftLimit = instance.perf.cpuLimit * math.Clamp(quota, 0, 1)
 end
 
 --- Checks if the chip is capable of performing an action.

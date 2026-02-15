@@ -431,6 +431,103 @@ function SF.Instance:DoAliases()
 	self.env.quotaMax = self.env.cpuMax
 end
 
+-- Moving average weighted by sample frequency
+local CpuRamAverage = {
+	checkTotalCpu = function(insts)
+		local plquota = math.huge
+		local cputotal = 0
+		for instance in pairs(insts) do
+			cputotal = cputotal + instance.perf.cpuAverage
+			plquota = math.min(plquota, instance.perf.cpuLimit)
+		end
+
+		while cputotal>plquota do
+			-- Get highest average cpu instance
+			local max, maxinst = 0, nil
+			for instance, _ in pairs(insts) do
+				if instance.perf.cpuAverage>=max then
+					max = instance.perf.cpuAverage
+					maxinst = instance
+				end
+			end
+
+			if maxinst then
+				maxinst:Error(SF.MakeError("SF: Player cpu time limit reached!", 1))
+				cputotal = cputotal - max
+			else
+				break -- Shouldn't ever happen but in case some freak numerical issue happens, prevent infinite loop
+			end
+		end
+	end,
+	__index = {
+		start = function(self)
+			self.lastSampleTime = SysTime()
+		end,
+		stop = function(self)
+			self.cpuAverage = self.cpuAverage + (self.cpuTotal - self.cpuAverage) * self.cpuAverageRatio
+			self.ramAverage = self.ramAverage + (gcinfo() - self.ramAverage)*0.001
+		end,
+		getAverageCpu = function(self)
+			return self.cpuAverage + (self.cpuTotal - self.cpuAverage) * self.cpuAverageRatio
+		end,
+		getAverageRam = function(self)
+			return self.ramAverage + (gcinfo() - self.ramAverage)*0.001
+		end,
+		check = function(self, forceThrow, noThrow)
+			local t = SysTime()
+			self.cpuTotal = self.cpuTotal + t - self.lastSampleTime
+			self.lastSampleTime = t
+
+			local cpuAverage = self:getAverageCpu()
+			local ram, ramAverage = gcinfo(), self:getAverageRam()
+
+			if cpuAverage > self.cpuSoftLimit then
+				if cpuAverage > self.cpuLimit then
+					return self:doError("CPU usage exceeded!", true, noThrow, forceThrow or cpuAverage > self.cpuHardLimit)
+				else
+					return self:doError("CPU usage warning!", false, noThrow, false)
+				end
+			end
+			if ramAverage > self.ramLimit or ram > self.ramHardlimit then
+				return self:doError("RAM usage exceeded!", true, noThrow, forceThrow or ram >= self.ramHardlimit)
+			end
+		end,
+		doError = function(self, msg, nocatch, noThrow, forceThrow)
+			if noThrow then
+				return SF.MakeError(msg, 3, nocatch, true)
+			elseif forceThrow or string.find(debug.getinfo(4, "S").short_src, "SF:", 1, true) then
+				if SERVER and nocatch then
+					local consolemsg = "[Starfall] "..msg
+					if self.instance.player:IsValid() then
+						consolemsg = consolemsg .. " by " .. self.instance.player:Nick() .. " (" .. self.instance.player:SteamID() .. ")"
+					else
+						consolemsg = consolemsg .. " by [Disconnected Player])"
+					end
+					SF.Print(nil, consolemsg .. "\n")
+					MsgC(Color(255,0,0), consolemsg .. "\n")
+				end
+				SF.Throw(msg, 4, nocatch)
+			end
+		end,
+	},
+	__call = function(t, instance, averageWeight, cpuLimit, ramLimit)
+		return setmetatable({
+			lastSampleTime = 0,
+			cpuTotal = 0,
+			cpuAverage = 0,
+			ramAverage = 0,
+			cpuAverageRatio = 1/averageWeight,
+			instance = instance,
+			cpuLimit = cpuLimit,
+			cpuSoftLimit = cpuLimit,
+			cpuHardLimit = cpuLimit*1.5,
+			ramlimit = ramlimit,
+			ramHardlimit = jit.arch~="x64" and 2097152 or 16777216
+		}, t)
+	end
+}
+setmetatable(CpuRamAverage, CpuRamAverage)
+
 --- Overridable hook for pcall-based hook systems
 -- Gets called when inside a starfall context
 -- @param running Are we executing a starfall context?
@@ -439,69 +536,21 @@ function SF.OnRunningOps(running)
 end
 SF.runningOps = false
 
-local function safeThrow(self, msg, nocatch, force)
-	if force or string.find(debug.getinfo(3, "S").short_src, "SF:", 1, true) then
-		if SERVER and nocatch then
-			local consolemsg = "[Starfall] CPU usage exceeded!"
-			if self.player:IsValid() then
-				consolemsg = consolemsg .. " by " .. self.player:Nick() .. " (" .. self.player:SteamID() .. ")"
-			end
-			SF.Print(nil, consolemsg .. "\n")
-			MsgC(Color(255,0,0), consolemsg .. "\n")
-		end
-		SF.Throw(msg, 3, nocatch)
-	end
-end
-
-local function cpuRatio(instance)
-	local t = SysTime()
-	instance.cpu_total = instance.cpu_total + t - instance.start_time
-	instance.start_time = t
-	return instance:movingCPUAverage() / instance.cpuQuota
-end
-
-SF.Instance.Ram = 0
-SF.Instance.RamAvg = 0
-local function ramRatio()
-	local ram = collectgarbage("count")
-	SF.Instance.Ram = ram
-	SF.Instance.RamAvg = SF.Instance.RamAvg + (ram - SF.Instance.RamAvg)*0.001
-	return ram / ramlimit
-end
-
 function SF.Instance:setCheckCpu(runWithOps)
 	if runWithOps then
 		self.run = SF.Instance.runWithOps
-
+		self.perf = CpuRamAverage(
+			self,
+			SF.cpuBufferN:GetInt(),
+			(SERVER or LocalPlayer() ~= self.player) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat(),
+			ramlimit
+		)
 		function self:checkCpu()
-			local ratio = cpuRatio(self)
-			if ratio > self.cpu_softquota then
-				if ratio>1 then
-					safeThrow(self, "CPU usage exceeded!", true, true)
-				else
-					safeThrow(self, "CPU usage warning!")
-				end
-			end
-			if ramRatio() > 1 then
-				safeThrow(self, "RAM usage exceeded!", true, true)
-			end
+			self.perf:check(true)
 		end
-
 		function self.checkCpuHook() --debug.sethook doesn't pass self, so need it as upvalue
-			local ratio = cpuRatio(self)
-			if ratio > self.cpu_softquota then
-				if ratio>1 then
-					safeThrow(self, "CPU usage exceeded!", true, ratio>1.5)
-				else
-					safeThrow(self, "CPU usage warning!")
-				end
-			end
-			local rratio = ramRatio()
-			if rratio > 1 then
-				safeThrow(self, "RAM usage exceeded!", true, rratio > 1.05)
-			end
+			self.perf:check()
 		end
-
 		function self:pushCpuCheck(callback)
 			self.cpustatestack[#self.cpustatestack + 1] = (dgethook() or false)
 			local enabled = callback~=nil
@@ -511,7 +560,6 @@ function SF.Instance:setCheckCpu(runWithOps)
 			end
 			dsethook(callback, "", 2000)
 		end
-		
 		function self:popCpuCheck()
 			local callback = (table.remove(self.cpustatestack) or nil)
 			dsethook(callback, "", 2000)
@@ -521,17 +569,18 @@ function SF.Instance:setCheckCpu(runWithOps)
 				SF.OnRunningOps(enabled)
 			end
 		end
-
-		self.cpuQuota = (SERVER or LocalPlayer() ~= self.player) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
-		self.cpuQuotaRatio = 1 / SF.cpuBufferN:GetInt()
 	else
 		self.run = SF.Instance.runWithoutOps
+		self.perf = CpuRamAverage(
+			self,
+			math.huge,
+			math.huge,
+			math.huge
+		)
 		function self.checkCpu() end
 		function self.checkCpuHook() end
 		function self.pushCpuCheck() end
 		function self.popCpuCheck() end
-		self.cpuQuota = math.huge
-		self.cpuQuotaRatio = 0
 	end
 end
 
@@ -551,7 +600,7 @@ end
 
 function SF.Instance:runWithOps(func, ...)
 	if self.stackn == 0 then
-		self.start_time = SysTime()
+		self.perf:start()
 	elseif self.stackn == 128 then
 		return {false, SF.MakeError("sf stack overflow", 1, true, true)}
 	end
@@ -563,8 +612,8 @@ function SF.Instance:runWithOps(func, ...)
 	self.stackn = self.stackn - 1
 
 	if tbl[1] then
-		if cpuRatio(self)>1 then return {false, SF.MakeError("CPU usage exceeded!", 1, true, true)} end
-		if ramRatio()>1 then return {false, SF.MakeError("RAM usage exceeded!", 1, true, true)} end
+		local r = self.perf:check(true, true)
+		if r then return {false, r} end
 	end
 
 	return tbl
@@ -575,13 +624,9 @@ function SF.Instance:runWithoutOps(func, ...)
 end
 
 function SF.Instance:initialize()
-	self.cpu_total = 0
-	self.cpu_average = 0
-	self.cpu_softquota = 1
-
 	SF.allInstances[self] = true
-	if rawget(SF.playerInstances, self.player)==nil then SF.playerInstances[self.player]={} end
-	SF.playerInstances[self.player][self] = true
+	local plyInsts = rawget(SF.playerInstances, self.player)
+	if plyInsts then plyInsts[self] = true else SF.playerInstances[self.player]={[self] = true} end
 
 	self:RunHook("initialize")
 
@@ -682,29 +727,11 @@ hook.Add("Think", "SF_Think", function()
 	end
 
 	for pl, insts in pairs(SF.playerInstances) do
-		local plquota = math.huge
-		local cputotal = 0
 		for instance in pairs(insts) do
-			instance.cpu_average = instance:movingCPUAverage()
-			instance.cpu_total = 0
 			instance:runScriptHook("think")
-			cputotal = cputotal + instance.cpu_average
-			plquota = math.min(plquota, instance.cpuQuota)
+			instance.perf:stop()
 		end
-
-		if cputotal>plquota then
-			local max, maxinst = 0, nil
-			for instance, _ in pairs(insts) do
-				if instance.cpu_average>=max then
-					max = instance.cpu_average
-					maxinst = instance
-				end
-			end
-
-			if maxinst then
-				maxinst:Error(SF.MakeError("SF: Player cpu time limit reached!", 1))
-			end
-		end
+		CpuRamAverage.checkTotalCpu(insts)
 	end
 end)
 
@@ -716,10 +743,3 @@ function SF.Instance:Error(err)
 		self:deinitialize()
 	end
 end
-
--- Don't self modify. The average should only be modified per tick.
-function SF.Instance:movingCPUAverage()
-	return self.cpu_average + (self.cpu_total - self.cpu_average) * self.cpuQuotaRatio
-end
-
-

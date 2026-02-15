@@ -73,9 +73,9 @@ end
 
 function ENT:Think()
 	if self.instance then
-		local bufferAvg = self.instance.cpu_average
+		local bufferAvg = self.instance.perf.cpuAverage
 		self:SetNWInt("CPUus", math.Round(bufferAvg * 1000000))
-		self:SetNWFloat("CPUpercent", math.floor(bufferAvg / self.instance.cpuQuota * 100))
+		self:SetNWFloat("CPUpercent", math.floor(bufferAvg / self.instance.perf.cpuLimit * 100))
 		self:NextThink(CurTime() + 0.25)
 		return true
 	end

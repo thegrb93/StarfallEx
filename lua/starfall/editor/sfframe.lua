@@ -2027,7 +2027,7 @@ function PANEL:UpdatePlayers(players)
 			local cltotal = 0
 			for instance, _ in pairs(SF.playerInstances[ply]) do
 				svtotal = svtotal + (instance.entity:IsValid() and instance.entity:GetNWInt("CPUus") or 0)
-				cltotal = cltotal + instance.cpu_average
+				cltotal = cltotal + instance.perf.cpuAverage
 			end
 			cpuServerText:SetText(string.format("SV CPU: %3.1f us", svtotal))
 			cpuClientText:SetText(string.format("CL CPU: %3.1f us", cltotal*1e6))
