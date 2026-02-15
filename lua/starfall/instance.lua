@@ -431,7 +431,7 @@ function SF.Instance:DoAliases()
 	self.env.quotaMax = self.env.cpuMax
 end
 
--- Moving average weighted by sample frequency
+-- Monitor average cpu and ram usage by instance
 local CpuRamAverage = {
 	checkTotalCpu = function(insts)
 		local plquota = math.huge
@@ -466,6 +466,7 @@ local CpuRamAverage = {
 		stop = function(self)
 			self.cpuAverage = self.cpuAverage + (self.cpuTotal - self.cpuAverage) * self.cpuAverageRatio
 			self.ramAverage = self.ramAverage + (gcinfo() - self.ramAverage)*0.001
+			self.cpuTotal = 0
 		end,
 		getAverageCpu = function(self)
 			return self.cpuAverage + (self.cpuTotal - self.cpuAverage) * self.cpuAverageRatio
@@ -521,7 +522,7 @@ local CpuRamAverage = {
 			cpuLimit = cpuLimit,
 			cpuSoftLimit = cpuLimit,
 			cpuHardLimit = cpuLimit*1.5,
-			ramlimit = ramlimit,
+			ramLimit = ramLimit,
 			ramHardlimit = jit.arch~="x64" and 2000000 or 16000000
 		}, t)
 	end
