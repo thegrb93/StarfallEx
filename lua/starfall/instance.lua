@@ -489,7 +489,7 @@ local CpuRamAverage = {
 				end
 			end
 			if ramAverage > self.ramLimit or ram > self.ramHardlimit then
-				return self:doError("RAM usage exceeded!", true, noThrow, forceThrow or ram >= self.ramHardlimit)
+				return self:doError("RAM usage exceeded!", true, noThrow, forceThrow or ram > self.ramHardlimit)
 			end
 		end,
 		doError = function(self, msg, nocatch, noThrow, forceThrow)
@@ -522,7 +522,7 @@ local CpuRamAverage = {
 			cpuSoftLimit = cpuLimit,
 			cpuHardLimit = cpuLimit*1.5,
 			ramlimit = ramlimit,
-			ramHardlimit = jit.arch~="x64" and 2097152 or 16777216
+			ramHardlimit = jit.arch~="x64" and 2000000 or 16000000
 		}, t)
 	end
 }
