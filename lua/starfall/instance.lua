@@ -523,7 +523,7 @@ local CpuRamAverage = {
 			cpuSoftLimit = cpuLimit,
 			cpuHardLimit = cpuLimit*1.5,
 			ramLimit = ramLimit,
-			ramHardlimit = jit.arch~="x64" and 2000000 or 16000000
+			ramHardlimit = jit.arch~="x64" and 1200000 or 16000000
 		}, t)
 	end
 }
