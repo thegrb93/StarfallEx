@@ -1086,7 +1086,7 @@ function ents_methods:getQuotaUsed()
 	local ent_tbl = Ent_GetTable(getent(self))
 	if not ent_tbl.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
 
-	return ent_tbl.instance and ent_tbl.instance.cpu_total or 0
+	return ent_tbl.instance and ent_tbl.instance.perf.cpuTotal or 0
 end
 
 --- Gets the Average CPU Time in the buffer of the specified starfall or expression2.
@@ -1096,7 +1096,7 @@ function ents_methods:getQuotaAverage()
 	local ent = getent(self)
 	local ent_tbl = Ent_GetTable(ent)
 	if ent_tbl.Starfall then
-		return ent_tbl.instance and ent_tbl.instance:movingCPUAverage() or 0
+		return ent_tbl.instance and ent_tbl.instance.perf:getAverageCpu() or 0
 	elseif Ent_GetClass(ent)=="gmod_wire_expression2" then
 		return SERVER and (ent_tbl.context and ent_tbl.context.timebench or 0) or (ent_tbl.GetOverlayData(ent).timebench or 0)
 	else
@@ -1113,7 +1113,7 @@ function ents_methods:getQuotaMax()
 	local ent_tbl = Ent_GetTable(ent)
 
 	if ent_tbl.Starfall then
-		return ent_tbl.instance and ent_tbl.instance.cpuQuota or 0
+		return ent_tbl.instance and ent_tbl.instance.perf.cpuLimit or 0
 	elseif Ent_GetClass(ent)=="gmod_wire_expression2" then
 		return GetConVarNumber("wire_expression2_quotatime")
 	else

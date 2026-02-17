@@ -31,8 +31,8 @@ function ENT:GetOverlayText()
 
 	local clientstr, serverstr
 	if ent_tbl.instance then
-		local bufferAvg = ent_tbl.instance.cpu_average
-		clientstr = tostring(math.Round(bufferAvg * 1000000)) .. "us. (" .. tostring(math.floor(bufferAvg / ent_tbl.instance.cpuQuota * 100)) .. "%)"
+		local bufferAvg = ent_tbl.instance.perf.cpuAverage
+		clientstr = tostring(math.Round(bufferAvg * 1000000)) .. "us. (" .. tostring(math.floor(bufferAvg / ent_tbl.instance.perf.cpuLimit * 100)) .. "%)"
 	elseif ent_tbl.error then
 		clientstr = "Errored / Terminated"
 	else

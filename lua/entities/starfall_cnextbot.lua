@@ -38,7 +38,7 @@ function ENT:Initialize()
 end
 
 local function addPerf(instance, startPerfTime)
-	instance.cpu_total = instance.cpu_total + (SysTime() - startPerfTime)
+	instance.perf.cpuTotal = instance.perf.cpuTotal + (SysTime() - startPerfTime)
 end
 
 function ENT:GotoBehavior()
