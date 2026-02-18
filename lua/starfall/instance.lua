@@ -433,29 +433,33 @@ end
 
 -- Monitor average cpu and ram usage by instance
 local CpuRamAverage = {
-	checkTotalCpu = function(insts)
-		local plquota = math.huge
-		local cputotal = 0
-		for instance in pairs(insts) do
-			cputotal = cputotal + instance.perf.cpuAverage
-			plquota = math.min(plquota, instance.perf.cpuLimit)
-		end
-
-		while cputotal>plquota do
-			-- Get highest average cpu instance
-			local max, maxinst = 0, nil
-			for instance, _ in pairs(insts) do
-				if instance.perf.cpuAverage>=max then
-					max = instance.perf.cpuAverage
-					maxinst = instance
-				end
+	checkTotalPlayerCpu = function()
+		for pl, insts in pairs(SF.playerInstances) do
+			local plquota = math.huge
+			local cputotal = 0
+			for instance in pairs(insts) do
+				instance.perf:stop()
+				cputotal = cputotal + instance.perf.cpuAverage
+				plquota = math.min(plquota, instance.perf.cpuLimit)
 			end
 
-			if maxinst then
-				maxinst:Error(SF.MakeError("SF: Player cpu time limit reached!", 1))
-				cputotal = cputotal - max
-			else
-				break -- Shouldn't ever happen but in case some freak numerical issue happens, prevent infinite loop
+			while cputotal>plquota do
+				-- Get highest average cpu instance
+				local max, maxinst = 0, nil
+				for instance, _ in pairs(insts) do
+					if instance.perf.cpuAverage>=max then
+						max = instance.perf.cpuAverage
+						maxinst = instance
+					end
+				end
+
+				if maxinst then
+					maxinst:Error(SF.MakeError("SF: Player cpu time limit reached!", 1))
+					cputotal = cputotal - max
+					insts[maxinst] = nil -- In case of freak issue the Error function doesn't remove the instance
+				else
+					break -- Shouldn't ever happen but in case some freak numerical issue happens, prevent infinite loop
+				end
 			end
 		end
 	end,
@@ -464,8 +468,8 @@ local CpuRamAverage = {
 			self.lastSampleTime = SysTime()
 		end,
 		stop = function(self)
-			self.cpuAverage = self.cpuAverage + (self.cpuTotal - self.cpuAverage) * self.cpuAverageRatio
-			self.ramAverage = self.ramAverage + (gcinfo() - self.ramAverage)*0.001
+			self.cpuAverage = self:getAverageCpu()
+			self.ramAverage = self:getAverageRam()
 			self.cpuTotal = 0
 		end,
 		getAverageCpu = function(self)
@@ -498,12 +502,10 @@ local CpuRamAverage = {
 				return SF.MakeError(msg, 3, nocatch, true)
 			elseif forceThrow or string.find(debug.getinfo(4, "S").short_src, "SF:", 1, true) then
 				if SERVER and nocatch then
-					local consolemsg = "[Starfall] "..msg
-					if self.instance.player:IsValid() then
-						consolemsg = consolemsg .. " by " .. self.instance.player:Nick() .. " (" .. self.instance.player:SteamID() .. ")"
-					else
-						consolemsg = consolemsg .. " by [Disconnected Player])"
-					end
+					local consolemsg = "[Starfall] "..msg..
+						(self.instance.player:IsValid()
+						and (" by " .. self.instance.player:Nick() .. " (" .. self.instance.player:SteamID() .. ")")
+						or (" by [Disconnected Player])"))
 					SF.Print(nil, consolemsg .. "\n")
 					MsgC(Color(255,0,0), consolemsg .. "\n")
 				end
@@ -614,7 +616,7 @@ function SF.Instance:runWithOps(func, ...)
 
 	if tbl[1] then
 		local r = self.perf:check(true, true)
-		if r then return {false, r} end
+		if r then tbl = {false, r} end
 	end
 
 	return tbl
@@ -727,13 +729,10 @@ hook.Add("Think", "SF_Think", function()
 		ErrorNoHalt("[Starfall] ERROR: This should not happen, bad addons?\n")
 	end
 
-	for pl, insts in pairs(SF.playerInstances) do
-		for instance in pairs(insts) do
-			instance:runScriptHook("think")
-			instance.perf:stop()
-		end
-		CpuRamAverage.checkTotalCpu(insts)
+	for instance in pairs(SF.allInstances) do
+		instance:runScriptHook("think")
 	end
+	CpuRamAverage.checkTotalPlayerCpu()
 end)
 
 function SF.Instance:Error(err)
