@@ -614,9 +614,9 @@ function SF.Instance:runWithOps(func, ...)
 	self:popCpuCheck()
 	self.stackn = self.stackn - 1
 
-	local r = self.perf:check(true, true)
-	if r and (tbl[1] or not tbl[2].uncatchable) then
-		tbl = {false, r}
+	if tbl[1] then
+		local r = self.perf:check(true, true)
+		if r then tbl = {false, r} end
 	end
 
 	return tbl
