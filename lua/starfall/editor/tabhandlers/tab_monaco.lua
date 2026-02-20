@@ -37,7 +37,7 @@ function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate
 	--Left Panel
 	self.htmlPanel = vgui.Create("DHTML",self)
 	self.htmlPanel:Dock(FILL)
-    self.htmlPanel:SetHTML(
+	self.htmlPanel:SetHTML(
 [[
 <!DOCTYPE html>
 <html lang="en">
@@ -57,63 +57,51 @@ body { display: flex; flex-direction: column; }
 require.config({ paths: { "vs": "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.29.1/min/vs/" }});
 
 window.MonacoEnvironment = {
-    getWorkerUrl: function(workerId, label) {
-        return `data:text/javascript;charset=utf-8,${encodeURIComponent(`
-            self.MonacoEnvironment = { baseUrl: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.29.1/min/" };
-            importScripts("https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.29.1/min/vs/base/worker/workerMain.min.js");`
-        )}`;
-    }
+	getWorkerUrl: function(workerId, label) {
+		return `data:text/javascript;charset=utf-8,${encodeURIComponent(`
+			self.MonacoEnvironment = { baseUrl: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.29.1/min/" };
+			importScripts("https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.29.1/min/vs/base/worker/workerMain.min.js");`
+		)}`;
+	}
 };
 
-var sfPreInitCode = "";
-function sfSetCode(str) {sfPreInitCode = str;}
-function sfGetCode() {return "";}
+window.sfGetCode = function() {};
+window.sfSetCode = function() {};
 
 require(["vs/editor/editor.main"], function () {
-    var editor = monaco.editor.create(document.getElementById("editor"), {
-        value: sfPreInitCode,
-        language: "lua",
-        theme: "vs-dark"
-    });
+	const editorElement = document.getElementById("editor");
 
-    const editorElement = document.getElementById("editor");
-    window.addEventListener("resize", () => editor.layout({
-        width: editorElement.offsetWidth,
-        height: editorElement.offsetHeight
-    }));
+	var editor = monaco.editor.create(editorElement, {
+		value: "",
+		language: "lua",
+		theme: "vs-dark"
+	});
 
-    function sfSetCode(str) {editor.setValue(str);}
-    function sfGetCode() {sf.getCode(editor.getValue());}
-    sf.doneLoading();
-    sfPreInitCode = null;
+	window.addEventListener("resize", () => editor.layout({
+		width: editorElement.offsetWidth,
+		height: editorElement.offsetHeight
+	}));
+
+	window.sfSetCode = function(str) {editor.setValue(str);};
+	window.sfGetCode = function() {sf.getCode(editor.getValue());};
+	sf.doneLoadingCode();
 });
 </script>
 </body>
 </html>
 
 ]]
-    )
-    self.htmlPanel:AddFunction( "sf", "getCode", function( str )
-        self.innerCode = str
-    end)
+	)
+	self.htmlPanel:AddFunction( "sf", "getCode", function( str )
+		self.innerCode = str
+	end)
 
-    self.isLoaded = false
-    self.htmlPanel:AddFunction( "sf", "doneLoading", function( val )
-        self.isLoaded = true
-    end)
-    self.innerCode = ""
-
-    local function reloadInit()
-        if not self:IsValid() or not self.htmlPanel:IsValid() then return end
-        if self.isLoaded then
-            self:SetCode(self.innerCode)
-            return true
-        else
-            timer.Simple(0.5, reloadInit)
-            return false
-        end
-    end
-    if not reloadInit() then timer.Simple(0.5, reloadInit) end
+	self.isLoaded = false
+	self.htmlPanel:AddFunction( "sf", "doneLoadingCode", function( val )
+		self.isLoaded = true
+		self:SetCode(self.innerCode)
+	end)
+	self.innerCode = ""
 end
 
 function PANEL:OnThemeChange(theme)
@@ -128,18 +116,18 @@ function PANEL:Validate(movecarret) -- Validate request, has to return success,m
 end
 
 function PANEL:GetCode()
-    if self.isLoaded then
-	    self.htmlPanel:RunJavascript("sfGetCode();")
-    end
-    return self.innerCode
+	if self.isLoaded then
+		self.htmlPanel:RunJavascript("window.sfGetCode();")
+	end
+	return self.innerCode
 end
 
 function PANEL:SetCode(text)
 	text = SF.Editor.normalizeCode(text)
-    self.innerCode = text
-    if self.isLoaded then
-        self.htmlPanel:RunJavascript("sfSetCode(\""..string.JavascriptSafe(text).."\");")
-    end
+	self.innerCode = text
+	if self.isLoaded then
+		self.htmlPanel:RunJavascript("window.sfSetCode(\""..string.JavascriptSafe(text).."\");")
+	end
 end
 
 --------------
