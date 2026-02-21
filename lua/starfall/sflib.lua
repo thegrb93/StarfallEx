@@ -1212,7 +1212,7 @@ do
 	-- Takes values returned from starfall hook and returns what should be passed to the gmod hook
 	-- @param gmoverride Whether this hook should override the gamemode function (makes the hook run last, but adds a little overhead)
 	function SF.hookAdd(realname, hookname, customargfunc, customretfunc, gmoverride)
-		hookname = hookname or realname:lower()
+		hookname = (hookname or realname):lower()
 		registered_instances[hookname] = {}
 		if gmoverride then
 			local hookfunc = getHookFunc(registered_instances[hookname], hookname, customargfunc, customretfunc)
