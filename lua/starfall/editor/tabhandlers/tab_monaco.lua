@@ -29,7 +29,7 @@ end
 
 function TabHandler:UpdateSettings()
 	self:QueueJavascript([[
-		window.editor.updateOptions({
+		sfeditor.updateOptions({
 			lineNumbers: "]]..(GetConVarNumber("sf_editor_monaco_linenumbers")~=0 and "on" or "off")..[[",
 		});
 	]])
@@ -38,30 +38,30 @@ end
 function TabHandler:AddSession(tab)
 	local uri
 	if tab.chosenfile then
-		uri = "file:///"..tab.chosenfile
+		uri = "file:///"..string.JavascriptSafe(tab.chosenfile)
 	else
 		local i=1
 		while self.GenericUris[i] do i=i+1 end
 		self.GenericUris[i] = true
-		uri = "inmemory://model/"..i
+		uri = "sf://model/"..i
 	end
 	tab.uri = uri
-	self:QueueJavascript([[window.editor.createModel("]]..string.JavascriptSafe(tab.code)..[[","lua",monaco.Uri.parse("]]..uri..[["));]])
+	tab.generic = true
 end
 
 function TabHandler:RemoveSession(tab)
+	if not IsValid(self.html) then return end
 	if self.html:GetParent() == tab then
 		self.html:SetVisible(false)
 		self.html:SetParent(nil)
 	end
 	if tab.uri then
-		self:QueueJavascript([[var m=window.editor.getModel(monaco.Uri.parse("]]..tab.uri..[["));if(m){m.dispose();}]])
+		self:QueueJavascript([[var m=sfeditor.getModel(monaco.Uri.parse("]]..tab.uri..[["));if(m){m.dispose();}]])
+		if tab.generic then self.GenericUris[tonumber(string.match(tab.uri, "/([^/]+)$"))] = nil end
 	end
 end
 
 function TabHandler:SetSession(tab)
-	if not tab.uri then	self:AddSession(tab) end
-
 	self.html:SetParent(tab)
 	--self.html.OnShortcut = function(_, code) tab:OnShortcut(code) end
 
@@ -70,7 +70,13 @@ function TabHandler:SetSession(tab)
 	self.html:Dock(FILL)
 	self.html:SetVisible(true)
 	self.html:RequestFocus()
-	self:QueueJavascript([[window.editor.setModel(window.editor.getModel("]]..tab.uri..[["))]])
+	
+	self:QueueJavascript([[
+		var uri=monaco.Uri.parse("]]..tab:GetURI()..[[");
+		var m=sfeditor.getModel(uri);
+		if(!m){m=monaco.editor.createModel("", "lua", uri);}
+		sfeditor.setModel(m);
+	]])
 end
 
 function TabHandler:GetActiveTab()
@@ -80,13 +86,12 @@ end
 
 function TabHandler:SetCode(tab)
 	if not self.loaded then return end
-	self.code = tab.code
-	self.html:RunJavascript("window.sfSetCode(\""..string.JavascriptSafe(tab.code).."\");")
+	self.html:RunJavascript([[sfeditor.getModel(monaco.Uri.parse("]]..tab:GetURI()..[[")).setValue("]]..string.JavascriptSafe(tab.code)..[[");]])
 end
 
 function TabHandler:GetCode(tab)
 	if not self.loaded then return end
-	self.html:RunJavascript("window.sfGetCode();")
+	self.html:RunJavascript([[sf.getCode(sfeditor.getModel(monaco.Uri.parse("]]..tab:GetURI()..[[")).getValue());]])
 	tab.code = self.code
 end
 
@@ -139,6 +144,13 @@ function TabHandler:FinishedLoading()
 		self.html:QueueJavascript(code)
 	end
 
+	for i = 1, SF.Editor.editor:GetNumTabs() do
+		local tab = SF.Editor.editor:GetTabContent(i)
+		if tab:GetTabHandler() == self then
+			self:SetCode(tab)
+		end
+	end
+
 	self:UpdateSettings()
 end
 
@@ -176,19 +188,18 @@ require.config({ paths: { "vs": "https://cdnjs.cloudflare.com/ajax/libs/monaco-e
 require(["vs/editor/editor.main"], function () {
 	const editorElement = document.getElementById("editor");
 
-	var editor = monaco.editor.create(editorElement, {
+	window.sfeditor = monaco.editor.create(editorElement, {
 		value: "",
 		language: "lua",
 		theme: "vs-dark"
 	});
-	window.editor = editor;
 
-	window.addEventListener("resize", () => editor.layout({
+	window.addEventListener("resize", () => sfeditor.layout({
 		width: editorElement.offsetWidth,
 		height: editorElement.offsetHeight
 	}));
 
-	editor.addAction({
+	sfeditor.addAction({
 		id: "sf-save",
 		label: "Save",
 		keybindings: [ monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS ],
@@ -196,7 +207,7 @@ require(["vs/editor/editor.main"], function () {
 		run: () => sf.save(),
 	});
 
-	editor.addAction({
+	sfeditor.addAction({
 		id: "sf-save-as",
 		label: "Save As",
 		keybindings: [ monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyS ],
@@ -204,7 +215,7 @@ require(["vs/editor/editor.main"], function () {
 		run: () => sf.saveAs(),
 	});
 
-	editor.addAction({
+	sfeditor.addAction({
 		id: "sf-validate",
 		label: "Validate",
 		keybindings: [ monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Space ],
@@ -212,8 +223,6 @@ require(["vs/editor/editor.main"], function () {
 		run: () => sf.validate(),
 	});
 
-	window.sfSetCode = function(str) {editor.setValue(str);};
-	window.sfGetCode = function() {sf.getCode(editor.getValue());};
 	sf.doneLoading();
 });
 </script>
@@ -256,6 +265,11 @@ function PANEL:Init()
 	self:SetBackgroundColor(Color(39, 40, 34))
 	self:OnThemeChange(SF.Editor.Themes.CurrentTheme)
 	self.code = ""
+end
+
+function PANEL:GetURI()
+	if not self.uri then TabHandler:AddSession(self) end
+	return self.uri
 end
 
 function PANEL:GetCode()
