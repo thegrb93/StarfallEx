@@ -666,9 +666,10 @@ if CLIENT then
 		if ok then
 			SF.Docs = docs
 			SF.DocsData = nil
-			-- reinitialize tabhandler to regenerate libmap
-			SF.Editor.TabHandlers.wire:Init()
-			SF.Editor.TabHandlers.helper:RefreshHelper()
+
+			for k, v in pairs(SF.Editor.TabHandlers) do
+				if v.DocsFinished then v:DocsFinished() end
+			end
 			-- clear cache to redraw text
 			SF.Editor.editor:OnThemeChange(SF.Editor.Themes.CurrentTheme)
 		else

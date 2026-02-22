@@ -19,18 +19,49 @@ local TabHandler = {
 	ControlName = "sf_tab_monaco",
 	IsEditor = true,
 	Description = "Monaco Editor",
+	GenericUris = {},
+	QueuedJavaScript = {}
 }
 
+function TabHandler:QueueJavascript(code)
+	self.QueuedJavaScript[#self.QueuedJavaScript+1] = code
+end
+
 function TabHandler:UpdateSettings()
-	if not self.loaded then return end
-	self.html:QueueJavascript([[
-		editor.updateOptions({
-			lineNumbers: "]]..(GetConVarBool("sf_editor_monaco_linenumbers") and "on" or "off")..[[",
+	self:QueueJavascript([[
+		window.editor.updateOptions({
+			lineNumbers: "]]..(GetConVarNumber("sf_editor_monaco_linenumbers")~=0 and "on" or "off")..[[",
 		});
 	]])
 end
 
-function TabHandler:SetEditorTab(tab)
+function TabHandler:AddSession(tab)
+	local uri
+	if tab.chosenfile then
+		uri = "file:///"..tab.chosenfile
+	else
+		local i=1
+		while self.GenericUris[i] do i=i+1 end
+		self.GenericUris[i] = true
+		uri = "inmemory://model/"..i
+	end
+	tab.uri = uri
+	self:QueueJavascript([[window.editor.createModel("]]..string.JavascriptSafe(tab.code)..[[","lua",monaco.Uri.parse("]]..uri..[["));]])
+end
+
+function TabHandler:RemoveSession(tab)
+	if self.html:GetParent() == tab then
+		self.html:SetVisible(false)
+		self.html:SetParent(nil)
+	end
+	if tab.uri then
+		self:QueueJavascript([[var m=window.editor.getModel(monaco.Uri.parse("]]..tab.uri..[["));if(m){m.dispose();}]])
+	end
+end
+
+function TabHandler:SetSession(tab)
+	if not tab.uri then	self:AddSession(tab) end
+
 	self.html:SetParent(tab)
 	--self.html.OnShortcut = function(_, code) tab:OnShortcut(code) end
 
@@ -39,19 +70,18 @@ function TabHandler:SetEditorTab(tab)
 	self.html:Dock(FILL)
 	self.html:SetVisible(true)
 	self.html:RequestFocus()
+	self:QueueJavascript([[window.editor.setModel(window.editor.getModel("]]..tab.uri..[["))]])
 end
 
-function TabHandler:RemoveEditorTab(tab)
-	if self.html:GetParent() == tab then
-		self.html:SetVisible(false)
-		self.html:SetParent(nil)
-	end
+function TabHandler:GetActiveTab()
+	local tab = self.html:GetParent()
+	return tab:IsValid() and tab or nil
 end
 
 function TabHandler:SetCode(tab)
 	if not self.loaded then return end
 	self.code = tab.code
-	self.htmlPanel:RunJavascript("window.sfSetCode(\""..string.JavascriptSafe(tab.code).."\");")
+	self.html:RunJavascript("window.sfSetCode(\""..string.JavascriptSafe(tab.code).."\");")
 end
 
 function TabHandler:GetCode(tab)
@@ -102,7 +132,18 @@ end
 
 function TabHandler:FinishedLoading()
 	self.loaded = true
+
+	for _, v in ipairs(self.QueuedJavaScript) do self.html:QueueJavascript(v) end
+	self.QueuedJavaScript = nil
+	function TabHandler:QueueJavascript(code)
+		self.html:QueueJavascript(code)
+	end
+
 	self:UpdateSettings()
+end
+
+function TabHandler:DocsFinished()
+	
 end
 
 function TabHandler:Init()
@@ -130,16 +171,7 @@ body { display: flex; flex-direction: column; }
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.29.1/min/vs/loader.min.js"></script>
 <script>
-require.config({ paths: { "vs": "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.29.1/min/vs/" }});
-
-window.MonacoEnvironment = {
-	getWorkerUrl: function(workerId, label) {
-		return `data:text/javascript;charset=utf-8,${encodeURIComponent(`
-			self.MonacoEnvironment = { baseUrl: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.29.1/min/" };
-			importScripts("https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.29.1/min/vs/base/worker/workerMain.min.js");`
-		)}`;
-	}
-};
+require.config({ paths: { "vs": "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.29.1/min/vs" }});
 
 require(["vs/editor/editor.main"], function () {
 	const editorElement = document.getElementById("editor");
@@ -149,6 +181,7 @@ require(["vs/editor/editor.main"], function () {
 		language: "lua",
 		theme: "vs-dark"
 	});
+	window.editor = editor;
 
 	window.addEventListener("resize", () => editor.layout({
 		width: editorElement.offsetWidth,
@@ -160,7 +193,7 @@ require(["vs/editor/editor.main"], function () {
 		label: "Save",
 		keybindings: [ monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS ],
 		contextMenuGroupId: "File",
-		run: function () { sf.save(); },
+		run: () => sf.save(),
 	});
 
 	editor.addAction({
@@ -168,7 +201,7 @@ require(["vs/editor/editor.main"], function () {
 		label: "Save As",
 		keybindings: [ monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyS ],
 		contextMenuGroupId: "File",
-		run: function () { sf.saveAs(); },
+		run: () => sf.saveAs(),
 	});
 
 	editor.addAction({
@@ -176,7 +209,7 @@ require(["vs/editor/editor.main"], function () {
 		label: "Validate",
 		keybindings: [ monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Space ],
 		contextMenuGroupId: "Tasks",
-		run: function () { sf.validate(); },
+		run: () => sf.validate(),
 	});
 
 	window.sfSetCode = function(str) {editor.setValue(str);};
@@ -239,11 +272,11 @@ function PANEL:OnThemeChange(theme)
 end
 
 function PANEL:OnFocusChanged(gained)
-	if gained then TabHandler:SetEditorTab(self) end
+	if gained then TabHandler:SetSession(self) end
 end
 
 function PANEL:OnRemove()
-	TabHandler:RemoveEditorTab(self)
+	TabHandler:RemoveSession(self)
 end
 
 vgui.Register(TabHandler.ControlName, PANEL, "DPanel")
