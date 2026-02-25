@@ -43,10 +43,15 @@ function TabHandler:AddSession(tab)
 		local i=1
 		while self.GenericUris[i] do i=i+1 end
 		self.GenericUris[i] = true
-		uri = "sf://model/"..i
+		uri = "sf://generic/"..i
+		tab.generic = i
 	end
 	tab.uri = uri
-	tab.generic = true
+
+	self:QueueJavascript([[
+		var m=monaco.editor.getModel("]]..uri..[[");
+		if(!m){m=monaco.editor.createModel("]]..string.JavascriptSafe(tab.code)..[[", "lua", "]]..uri..[[");}
+	]])
 end
 
 function TabHandler:RemoveSession(tab)
@@ -56,8 +61,8 @@ function TabHandler:RemoveSession(tab)
 		self.html:SetParent(nil)
 	end
 	if tab.uri then
-		self:QueueJavascript([[var m=sfeditor.getModel(monaco.Uri.parse("]]..tab.uri..[["));if(m){m.dispose();}]])
-		if tab.generic then self.GenericUris[tonumber(string.match(tab.uri, "/([^/]+)$"))] = nil end
+		self:QueueJavascript([[var m=monaco.editor.getModel("]]..tab.uri..[[");if(m){m.dispose();}]])
+		if tab.generic then self.GenericUris[tab.generic] = nil end
 	end
 end
 
@@ -70,28 +75,18 @@ function TabHandler:SetSession(tab)
 	self.html:Dock(FILL)
 	self.html:SetVisible(true)
 	self.html:RequestFocus()
-	
-	self:QueueJavascript([[
-		var uri=monaco.Uri.parse("]]..tab:GetURI()..[[");
-		var m=sfeditor.getModel(uri);
-		if(!m){m=monaco.editor.createModel("", "lua", uri);}
-		sfeditor.setModel(m);
-	]])
-end
 
-function TabHandler:GetActiveTab()
-	local tab = self.html:GetParent()
-	return tab:IsValid() and tab or nil
+	self:QueueJavascript([[sfeditor.setModel(monaco.editor.getModel("]]..tab:GetURI()..[["));]])
 end
 
 function TabHandler:SetCode(tab)
 	if not self.loaded then return end
-	self.html:RunJavascript([[sfeditor.getModel(monaco.Uri.parse("]]..tab:GetURI()..[[")).setValue("]]..string.JavascriptSafe(tab.code)..[[");]])
+	self.html:RunJavascript([[monaco.editor.getModel("]]..tab:GetURI()..[[").setValue("]]..string.JavascriptSafe(tab.code)..[[");]])
 end
 
 function TabHandler:GetCode(tab)
 	if not self.loaded then return end
-	self.html:RunJavascript([[sf.getCode(sfeditor.getModel(monaco.Uri.parse("]]..tab:GetURI()..[[")).getValue());]])
+	self.html:RunJavascript([[sf.getCode(monaco.editor.getModel("]]..tab:GetURI()..[[").getValue());]])
 	tab.code = self.code
 end
 
@@ -156,6 +151,11 @@ end
 
 function TabHandler:DocsFinished()
 	
+end
+
+function TabHandler:GetActiveTab()
+	local tab = self.html:GetParent()
+	return tab:IsValid() and tab or nil
 end
 
 function TabHandler:Init()
