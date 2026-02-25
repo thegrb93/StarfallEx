@@ -20,15 +20,10 @@ local TabHandler = {
 	IsEditor = true,
 	Description = "Monaco Editor",
 	GenericUris = {},
-	QueuedJavaScript = {}
 }
 
-function TabHandler:QueueJavascript(code)
-	self.QueuedJavaScript[#self.QueuedJavaScript+1] = code
-end
-
 function TabHandler:UpdateSettings()
-	self:QueueJavascript([[
+	self.html:RunJavascript([[
 		sfeditor.updateOptions({
 			lineNumbers: "]]..(GetConVarNumber("sf_editor_monaco_linenumbers")~=0 and "on" or "off")..[[",
 		});
@@ -48,7 +43,7 @@ function TabHandler:AddSession(tab)
 	end
 	tab.uri = uri
 
-	self:QueueJavascript([[
+	self.html:RunJavascript([[
 		var m=monaco.editor.getModel("]]..uri..[[");
 		if(!m){m=monaco.editor.createModel("]]..string.JavascriptSafe(tab.code)..[[", "lua", "]]..uri..[[");}
 	]])
@@ -61,7 +56,7 @@ function TabHandler:RemoveSession(tab)
 		self.html:SetParent(nil)
 	end
 	if tab.uri then
-		self:QueueJavascript([[var m=monaco.editor.getModel("]]..tab.uri..[[");if(m){m.dispose();}]])
+		self.html:RunJavascript([[var m=monaco.editor.getModel("]]..tab.uri..[[");if(m){m.dispose();}]])
 		if tab.generic then self.GenericUris[tab.generic] = nil end
 	end
 end
@@ -76,16 +71,14 @@ function TabHandler:SetSession(tab)
 	self.html:SetVisible(true)
 	self.html:RequestFocus()
 
-	self:QueueJavascript([[sfeditor.setModel(monaco.editor.getModel("]]..tab:GetURI()..[["));]])
+	self.html:RunJavascript([[sfeditor.setModel(monaco.editor.getModel("]]..tab:GetURI()..[["));]])
 end
 
 function TabHandler:SetCode(tab)
-	if not self.loaded then return end
 	self.html:RunJavascript([[monaco.editor.getModel("]]..tab:GetURI()..[[").setValue("]]..string.JavascriptSafe(tab.code)..[[");]])
 end
 
 function TabHandler:GetCode(tab)
-	if not self.loaded then return end
 	self.html:RunJavascript([[sf.getCode(monaco.editor.getModel("]]..tab:GetURI()..[[").getValue());]])
 	tab.code = self.code
 end
@@ -132,21 +125,21 @@ end
 
 function TabHandler:FinishedLoading()
 	self.loaded = true
+	for k, v in pairs(self.disabledFuncs) do self[k] = v end
+	self.disabledFuncs = nil
 
-	for _, v in ipairs(self.QueuedJavaScript) do self.html:QueueJavascript(v) end
-	self.QueuedJavaScript = nil
-	function TabHandler:QueueJavascript(code)
-		self.html:QueueJavascript(code)
-	end
+	self:UpdateSettings()
 
 	for i = 1, SF.Editor.editor:GetNumTabs() do
 		local tab = SF.Editor.editor:GetTabContent(i)
 		if tab:GetTabHandler() == self then
-			self:SetCode(tab)
+			self:AddSession(tab)
 		end
 	end
-
-	self:UpdateSettings()
+	local tab = SF.Editor.editor:GetActiveTab().content
+	if tab and tab:GetTabHandler() == self then
+		self:SetSession(tab)
+	end
 end
 
 function TabHandler:DocsFinished()
@@ -160,6 +153,21 @@ end
 
 function TabHandler:Init()
 	self.loaded = false
+	self.disabledFuncs = {}
+	for v in pairs{
+		UpdateSettings = true,
+		AddSession = true,
+		RemoveSession = true,
+		SetSession = true,
+		SetCode = true,
+		GetCode = true,
+		SaveTab = true,
+		RegisterSettings = true
+	} do
+		self.disabledFuncs[v] = self[v]
+		self[v] = function() end
+	end
+
 	self.code = ""
 	self.html = vgui.Create("DHTML")
 	self.html:Dock(FILL)
