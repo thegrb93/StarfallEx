@@ -49,7 +49,7 @@ __call = function(t,jvar,cvar,default)
 	}, t)
 
 	CreateClientConVar(cvar, self:toCvar(default), true, false)
-	cvars.AddChangeCallback(cvar, function(_, _, new) self:update(new) end)
+	cvars.AddChangeCallback(cvar, function(_, _, new) self:update(new) self:apply() end)
 	self:update(GetConVarString(cvar))
 
 	return self
