@@ -47,8 +47,12 @@ __call = function(t,jvar,cvar,default)
 		default = default,
 		type = TypeID(default)
 	}, t)
+
 	CreateClientConVar(cvar, self:toCvar(default), true, false)
 	cvars.AddChangeCallback(cvar, function(_, _, new) self:update(new) end)
+	self:update(GetConVarString(cvar))
+
+	return self
 end,
 __tostring = function(self) return self.js end
 } setmetatable(MonacoSetting, MonacoSetting)
@@ -62,6 +66,38 @@ MonacoSetting.settings = {
 	MonacoSetting("wordBasedSuggestions", "sf_editor_monaco_wordsuggestion", "currentDocument"),
 	MonacoSetting("wordWrap", "sf_editor_monaco_wordwrap", "off"),
 }
+function MonacoSetting:concat()
+	local s = {}
+	for k, v in ipairs(self.settings) do s[k]=tostring(v) end
+	return table.concat(s, ",\n")
+end
+
+local ImageBackgroundSetting = {
+__index = {
+	apply = function(self)
+		if not (IsValid(TabHandler.html) and TabHandler.loaded) then return end
+		if self.url ~= "" then
+			TabHandler.html:RunJavascript([[document.getElementById('editor').style.setProperty('background-image', 'url(\']]..self.url..[[\')');]])
+		else
+			TabHandler.html:RunJavascript([[document.getElementById('editor').style.removeProperty('background-image');]])
+		end
+	end
+},
+__call = function(t,cvarUrl,cvarOpacity)
+	local self = setmetatable({}, t)
+
+	CreateClientConVar(cvarUrl, "", true, false)
+	cvars.AddChangeCallback(cvarUrl, function(_, _, new) self.url=new self:apply() end)
+	self.url = GetConVarString(cvarUrl)
+
+	CreateClientConVar(cvarOpacity, "200", true, false)
+	cvars.AddChangeCallback(cvarOpacity, function(_, _, new) self.opacity=(tonumber(new) or 0)/255 self:apply() end)
+	self.opacity = GetConVarNumber(cvarOpacity)/255
+
+	return self
+end
+} setmetatable(ImageBackgroundSetting, ImageBackgroundSetting)
+TabHandler.ImageBackground = ImageBackgroundSetting("sf_editor_monaco_htmlbackground", "sf_editor_monaco_htmlbackgroundopacity")
 
 function TabHandler:AddSession(tab)
 	tab.uri = "sf://session/"..self.Uri
@@ -143,6 +179,9 @@ function TabHandler:RegisterSettings()
 	setCombo({form:ComboBox("Word suggestions", "sf_editor_monaco_wordsuggestion")}, {"currentDocument","allDocuments","off"})
 	setCombo({form:ComboBox("Word wrap style", "sf_editor_monaco_wordwrap")}, {"on","off"})
 
+	select(2, form:TextEntry("Custom background image url:", "sf_editor_monaco_htmlbackground")):SetDark(false)
+	form:NumSlider("Custom background image opacity","sf_editor_monaco_htmlbackgroundopacity", 0, 255, 1):SetDark(false)
+
 	return scrollPanel, "Monaco", "icon16/cog.png", "Monaco options."
 end
 
@@ -151,12 +190,16 @@ function TabHandler:FinishedLoading()
 	for k, v in pairs(self.disabledFuncs) do self[k] = v end
 	self.disabledFuncs = nil
 
+	if TabHandler.ImageBackground.url ~= "" then
+		TabHandler.ImageBackground:apply()
+	end
+
 	self.html:RunJavascript([[
 		sfeditor.updateOptions({
 			autoDetectHighContrast: false,
 			detectIndentation: false,
 			insertSpaces: false,
-			]]..table.concat(MonacoSetting.settings, ",\n")..[[
+			]]..MonacoSetting:concat()..[[
 		});]])
 
 	for i = 1, SF.Editor.editor:GetNumTabs() do
@@ -212,7 +255,7 @@ function TabHandler:Init()
 <style>
 html, body { height: 100%; margin: 0; overflow: hidden; }
 body { display: flex; flex-direction: column; }
-#editor { flex-grow: 1; border: solid 1px gray; overflow: hidden; }
+#editor { flex-grow: 1; border: solid 1px gray; overflow: hidden; background-size: cover; background-repeat: no-repeat; }
 </style>
 </head>
 <body>
