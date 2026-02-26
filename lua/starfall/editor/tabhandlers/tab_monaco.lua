@@ -2,62 +2,71 @@
 -- Monaco TabHandler
 ----------------------------------------------------
 
-CreateClientConVar("sf_editor_monaco_fontsize", 13, true, false)
-CreateClientConVar("sf_editor_monaco_linenumbers", "on", true, false)
-CreateClientConVar("sf_editor_monaco_suggestions", 1, true, false)
-CreateClientConVar("sf_editor_monaco_tabsize", 4, true, false)
-CreateClientConVar("sf_editor_monaco_theme", "vs-dark", true, false)
-CreateClientConVar("sf_editor_monaco_whitespace", "all", true, false)
-CreateClientConVar("sf_editor_monaco_wordsuggestion", "currentDocument", true, false)
-CreateClientConVar("sf_editor_monaco_wordwrap", "off", true, false)
-
-----------------
--- Handler part
-----------------
-
 local TabHandler = {
 	ControlName = "sf_tab_monaco",
 	IsEditor = true,
 	Description = "Monaco Editor",
-	GenericUris = {},
+	Uri = 1,
 }
 
-function TabHandler:UpdateSettings()
-    local function stringSetting(setting, cvar) return setting..": \""..string.JavascriptSafe(GetConVarString(cvar)).."\"" end
-    local function numberSetting(setting, cvar) return setting..": "..GetConVarNumber(cvar) end
-    local function boolSetting(setting, cvar) return setting..": "..(GetConVarNumber(cvar)~=0 and "true" or "false") end
-
-	self.html:RunJavascript([[
-		sfeditor.updateOptions({]]..
-            table.concat({
-                "autoDetectHighContrast: false"
-                "detectIndentation: false",
-                "insertSpaces: false",
-                stringSetting("lineNumbers", "sf_editor_monaco_linenumbers"),
-                stringSetting("renderWhitespace", "sf_editor_monaco_whitespace"),
-                boolSetting("quickSuggestions", "sf_editor_monaco_suggestions"),
-                numberSetting("tabSize", "sf_editor_monaco_tabsize"),
-                stringSetting("theme", "sf_editor_monaco_theme"),
-                stringSetting("wordBasedSuggestions", "sf_editor_monaco_wordsuggestion"),
-                stringSetting("wordWrap", "sf_editor_monaco_wordwrap"),
-            }, ",")..
-[[		});
-	]])
-end
+local MonacoSetting = {
+__index = {
+	toJs = function(self, var)
+		if self.type == TYPE_STRING then
+			return "\""..string.JavascriptSafe(var).."\""
+		elseif self.type == TYPE_NUMBER then
+			return tonumber(var) or self.default
+		elseif self.type == TYPE_BOOL then
+			return tonumber(var)~=0 and "true" or "false"
+		else
+			error("Unknown var type: "..tostring(var))
+		end
+	end,
+	toCvar = function(self, var)
+		if self.type == TYPE_STRING then
+			return var
+		elseif self.type == TYPE_NUMBER then
+			return tostring(var)
+		elseif self.type == TYPE_BOOL then
+			return var and "1" or "0"
+		else
+			error("Unknown var type: "..tostring(var))
+		end
+	end,
+	update = function(self, new)
+		self.js = self.jvar..": "..self:toJs(new)
+	end,
+	apply = function(self)
+		if not (IsValid(TabHandler.html) and TabHandler.loaded) then return end
+		TabHandler.html:RunJavascript([[sfeditor.updateOptions({]]..self.js..[[});]])
+	end
+},
+__call = function(t,jvar,cvar,default)
+	local self = setmetatable({
+		jvar = jvar,
+		default = default,
+		type = TypeID(default)
+	}, t)
+	CreateClientConVar(cvar, self:toCvar(default), true, false)
+	cvars.AddChangeCallback(cvar, function(_, _, new) self:update(new) end)
+end,
+__tostring = function(self) return self.js end
+} setmetatable(MonacoSetting, MonacoSetting)
+MonacoSetting.settings = {
+	MonacoSetting("fontSize", "sf_editor_monaco_fontsize", 13),
+	MonacoSetting("lineNumbers", "sf_editor_monaco_linenumbers", "on"),
+	MonacoSetting("quickSuggestions", "sf_editor_monaco_suggestions", true),
+	MonacoSetting("tabSize", "sf_editor_monaco_tabsize", 4),
+	MonacoSetting("theme", "sf_editor_monaco_theme", "vs-dark"),
+	MonacoSetting("renderWhitespace", "sf_editor_monaco_whitespace", "all"),
+	MonacoSetting("wordBasedSuggestions", "sf_editor_monaco_wordsuggestion", "currentDocument"),
+	MonacoSetting("wordWrap", "sf_editor_monaco_wordwrap", "off"),
+}
 
 function TabHandler:AddSession(tab)
-	local uri
-	if tab.chosenfile then
-		uri = "file:///"..string.JavascriptSafe(tab.chosenfile)
-	else
-		local i=1
-		while self.GenericUris[i] do i=i+1 end
-		self.GenericUris[i] = true
-		uri = "sf://generic/"..i
-		tab.generic = i
-	end
-	tab.uri = uri
-	self.html:RunJavascript([[monaco.editor.createModel("]]..string.JavascriptSafe(tab.code)..[[", "lua", "]]..uri..[[");]])
+	tab.uri = "sf://session/"..self.Uri
+	self.Uri = self.Uri + 1
+	self.html:RunJavascript([[monaco.editor.createModel("", "lua", "]]..tab.uri..[[");]])
 end
 
 function TabHandler:RemoveSession(tab)
@@ -68,7 +77,6 @@ function TabHandler:RemoveSession(tab)
 	end
 	if tab.uri then
 		self.html:RunJavascript([[var m=monaco.editor.getModel("]]..tab.uri..[[");if(m){m.dispose();}]])
-		if tab.generic then self.GenericUris[tab.generic] = nil end
 	end
 end
 
@@ -82,15 +90,15 @@ function TabHandler:SetSession(tab)
 	self.html:SetVisible(true)
 	self.html:RequestFocus()
 
-	self.html:RunJavascript([[sfeditor.setModel(monaco.editor.getModel("]]..tab:GetURI()..[["));]])
+	self.html:RunJavascript([[sfeditor.setModel(monaco.editor.getModel("]]..tab.uri..[["));]])
 end
 
 function TabHandler:SetCode(tab)
-	self.html:RunJavascript([[monaco.editor.getModel("]]..tab:GetURI()..[[").setValue("]]..string.JavascriptSafe(tab.code)..[[");]])
+	self.html:RunJavascript([[monaco.editor.getModel("]]..tab.uri..[[").setValue("]]..string.JavascriptSafe(tab.code)..[[");]])
 end
 
 function TabHandler:GetCode(tab)
-	self.html:RunJavascript([[sf.getCode(monaco.editor.getModel("]]..tab:GetURI()..[[").getValue());]])
+	self.html:RunJavascript([[sf.getCode(monaco.editor.getModel("]]..tab.uri..[[").getValue());]])
 	tab.code = self.code
 end
 
@@ -109,20 +117,18 @@ function TabHandler:RegisterSettings()
 	form.Paint = function () end
 
 	local function setWang(wang, label)
-		wang.OnValueChanged = function() self:UpdateSettings() end
 		wang:GetParent():DockPadding(10, 1, 10, 1)
 		wang:Dock(RIGHT)
 		label:SetDark(false)
 		return wang, label
 	end
-    local function setCombo(panelLabel, options)
-        panelLabel[2]:SetDark(false)
-        for _, v in ipairs(options) do panelLabel[1]:AddChoice(v) end
-    end,
+	local function setCombo(panelLabel, options)
+		panelLabel[2]:SetDark(false)
+		for _, v in ipairs(options) do panelLabel[1]:AddChoice(v) end
+	end
 	local function setDoClick(panel, tip)
 		panel:SetDark(false)
-		panel.OnChange = function() self:UpdateSettings() end
-        if tip then panel:SetTooltip(tip) end
+		if tip then panel:SetTooltip(tip) end
 		return panel
 	end
 
@@ -145,7 +151,13 @@ function TabHandler:FinishedLoading()
 	for k, v in pairs(self.disabledFuncs) do self[k] = v end
 	self.disabledFuncs = nil
 
-	self:UpdateSettings()
+	self.html:RunJavascript([[
+		sfeditor.updateOptions({
+			autoDetectHighContrast: false,
+			detectIndentation: false,
+			insertSpaces: false,
+			]]..table.concat(MonacoSetting.settings, ",\n")..[[
+		});]])
 
 	for i = 1, SF.Editor.editor:GetNumTabs() do
 		local tab = SF.Editor.editor:GetTabContent(i)
@@ -289,12 +301,8 @@ local PANEL = {}
 function PANEL:Init()
 	self:SetBackgroundColor(Color(39, 40, 34))
 	self:OnThemeChange(SF.Editor.Themes.CurrentTheme)
+	TabHandler:AddSession(self)
 	self.code = ""
-end
-
-function PANEL:GetURI()
-	if not self.uri then TabHandler:AddSession(self) end
-	return self.uri
 end
 
 function PANEL:GetCode()
