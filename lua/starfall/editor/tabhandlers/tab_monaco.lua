@@ -2,14 +2,14 @@
 -- Monaco TabHandler
 ----------------------------------------------------
 
-CreateClientConVar("sf_editor_monaco_wordwrap", 1, true, false)
-CreateClientConVar("sf_editor_monaco_linenumbers", 1, true, false)
-CreateClientConVar("sf_editor_monaco_invisiblecharacters", 0, true, false)
-CreateClientConVar("sf_editor_monaco_indentguides", 1, true, false)
-CreateClientConVar("sf_editor_monaco_autocompletion", 1, true, false)
-CreateClientConVar("sf_editor_monaco_fixconsolebug", 1, true, false)
-CreateClientConVar("sf_editor_monaco_disablelinefolding", 0, true, false)
 CreateClientConVar("sf_editor_monaco_fontsize", 13, true, false)
+CreateClientConVar("sf_editor_monaco_linenumbers", "on", true, false)
+CreateClientConVar("sf_editor_monaco_suggestions", 1, true, false)
+CreateClientConVar("sf_editor_monaco_tabsize", 4, true, false)
+CreateClientConVar("sf_editor_monaco_theme", "vs-dark", true, false)
+CreateClientConVar("sf_editor_monaco_whitespace", "all", true, false)
+CreateClientConVar("sf_editor_monaco_wordsuggestion", "currentDocument", true, false)
+CreateClientConVar("sf_editor_monaco_wordwrap", "off", true, false)
 
 ----------------
 -- Handler part
@@ -23,10 +23,25 @@ local TabHandler = {
 }
 
 function TabHandler:UpdateSettings()
+    local function stringSetting(setting, cvar) return setting..": \""..string.JavascriptSafe(GetConVarString(cvar)).."\"" end
+    local function numberSetting(setting, cvar) return setting..": "..GetConVarNumber(cvar) end
+    local function boolSetting(setting, cvar) return setting..": "..(GetConVarNumber(cvar)~=0 and "true" or "false") end
+
 	self.html:RunJavascript([[
-		sfeditor.updateOptions({
-			lineNumbers: "]]..(GetConVarNumber("sf_editor_monaco_linenumbers")~=0 and "on" or "off")..[[",
-		});
+		sfeditor.updateOptions({]]..
+            table.concat({
+                "autoDetectHighContrast: false"
+                "detectIndentation: false",
+                "insertSpaces: false",
+                stringSetting("lineNumbers", "sf_editor_monaco_linenumbers"),
+                stringSetting("renderWhitespace", "sf_editor_monaco_whitespace"),
+                boolSetting("quickSuggestions", "sf_editor_monaco_suggestions"),
+                numberSetting("tabSize", "sf_editor_monaco_tabsize"),
+                stringSetting("theme", "sf_editor_monaco_theme"),
+                stringSetting("wordBasedSuggestions", "sf_editor_monaco_wordsuggestion"),
+                stringSetting("wordWrap", "sf_editor_monaco_wordwrap"),
+            }, ",")..
+[[		});
 	]])
 end
 
@@ -42,11 +57,7 @@ function TabHandler:AddSession(tab)
 		tab.generic = i
 	end
 	tab.uri = uri
-
-	self.html:RunJavascript([[
-		var m=monaco.editor.getModel("]]..uri..[[");
-		if(!m){m=monaco.editor.createModel("]]..string.JavascriptSafe(tab.code)..[[", "lua", "]]..uri..[[");}
-	]])
+	self.html:RunJavascript([[monaco.editor.createModel("]]..string.JavascriptSafe(tab.code)..[[", "lua", "]]..uri..[[");]])
 end
 
 function TabHandler:RemoveSession(tab)
@@ -97,12 +108,6 @@ function TabHandler:RegisterSettings()
 	form.Header:SetVisible(false)
 	form.Paint = function () end
 
-	local function setDoClick(panel)
-		panel:SetDark(false)
-		panel.OnChange = function() self:UpdateSettings() end
-		return panel
-	end
-
 	local function setWang(wang, label)
 		wang.OnValueChanged = function() self:UpdateSettings() end
 		wang:GetParent():DockPadding(10, 1, 10, 1)
@@ -110,15 +115,27 @@ function TabHandler:RegisterSettings()
 		label:SetDark(false)
 		return wang, label
 	end
+    local function setCombo(panelLabel, options)
+        panelLabel[2]:SetDark(false)
+        for _, v in ipairs(options) do panelLabel[1]:AddChoice(v) end
+    end,
+	local function setDoClick(panel, tip)
+		panel:SetDark(false)
+		panel.OnChange = function() self:UpdateSettings() end
+        if tip then panel:SetTooltip(tip) end
+		return panel
+	end
 
 	setWang(form:NumberWang("Font size", "sf_editor_monaco_fontsize", 5, 40))
-	setDoClick(form:CheckBox("Enable word wrap", "sf_editor_monaco_wordwrap"))
-	setDoClick(form:CheckBox("Show line numbers", "sf_editor_monaco_linenumbers"))
-	setDoClick(form:CheckBox("Show invisible characters", "sf_editor_monaco_invisiblecharacters"))
-	setDoClick(form:CheckBox("Show indenting guides", "sf_editor_monaco_indentguides"))
-	setDoClick(form:CheckBox("Auto completion", "sf_editor_monaco_autocompletion"))
-	setDoClick(form:CheckBox("Fix console bug", "sf_editor_monaco_fixconsolebug")):SetTooltip("Fix console opening when pressing ' or @ (UK Keyboad layout)")
-	setDoClick(form:CheckBox("Disable line folding keybinds", "sf_editor_monaco_disablelinefolding"))
+	setWang(form:NumberWang("Tab size", "sf_editor_monaco_tabsize", 1, 16))
+
+	setDoClick(form:CheckBox("Quick Suggestions", "sf_editor_monaco_suggestions"))
+
+	setCombo({form:ComboBox("Line number style", "sf_editor_monaco_linenumbers")}, {"on","relative","off"})
+	setCombo({form:ComboBox("Theme", "sf_editor_monaco_theme")}, {"vs","vs-dark","hc-black","hc-light"})
+	setCombo({form:ComboBox("Whitespace style", "sf_editor_monaco_whitespace")}, {"all","boundary","selection","trailing","none"})
+	setCombo({form:ComboBox("Word suggestions", "sf_editor_monaco_wordsuggestion")}, {"currentDocument","allDocuments","off"})
+	setCombo({form:ComboBox("Word wrap style", "sf_editor_monaco_wordwrap")}, {"on","off"})
 
 	return scrollPanel, "Monaco", "icon16/cog.png", "Monaco options."
 end
