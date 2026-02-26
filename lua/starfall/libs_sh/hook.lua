@@ -517,6 +517,8 @@ add("DoAnimationEvent")
 -- @param Entity ent New entity
 add("OnEntityCreated", nil, function(instance, ent)
 	timer.Simple(0, function()
+		if not IsValid(ent) then return end
+		
 		instance:runScriptHook("onentitycreated", instance.WrapObject(ent))
 	end)
 	return false
