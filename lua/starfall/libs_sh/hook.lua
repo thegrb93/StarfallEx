@@ -510,11 +510,11 @@ add("DoAnimationEvent")
 
 -- Entity hooks
 
---- Called when an entity gets created
+--- Called the next frame after an entity is created
 -- @name OnEntityCreated
 -- @class hook
 -- @shared
--- @param Entity ent New entity
+-- @param Entity ent The created entity. May be invalid if deleted before this hook runs.
 add("OnEntityCreated", nil, function(instance, ent)
 	timer.Simple(0, function()
 		instance:runScriptHook("onentitycreated", instance.WrapObject(ent))
