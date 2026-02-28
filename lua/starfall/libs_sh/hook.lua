@@ -517,8 +517,6 @@ add("DoAnimationEvent")
 -- @param Entity ent The created entity. May be invalid if deleted before this hook runs.
 add("OnEntityCreated", nil, function(instance, ent)
 	timer.Simple(0, function()
-		if not IsValid(ent) then return end
-		
 		instance:runScriptHook("onentitycreated", instance.WrapObject(ent))
 	end)
 	return false
