@@ -35,8 +35,9 @@ __index = {
 	end,
 	update = function(self, new)
 		self.js = self.jvar..": "..self:toJs(new)
+		self:apply()
 	end,
-	apply = function(self)
+	apply = function(self)     
 		if not (IsValid(TabHandler.html) and TabHandler.loaded) then return end
 		TabHandler.html:RunJavascript([[sfeditor.updateOptions({]]..self.js..[[});]])
 	end
@@ -49,12 +50,11 @@ __call = function(t,jvar,cvar,default)
 	}, t)
 
 	CreateClientConVar(cvar, self:toCvar(default), true, false)
-	cvars.AddChangeCallback(cvar, function(_, _, new) self:update(new) self:apply() end)
+	cvars.AddChangeCallback(cvar, function(_, _, new) self:update(new) end)
 	self:update(GetConVarString(cvar))
 
 	return self
 end,
-__tostring = function(self) return self.js end
 } setmetatable(MonacoSetting, MonacoSetting)
 MonacoSetting.settings = {
 	MonacoSetting("fontSize", "sf_editor_monaco_fontsize", 13),
@@ -68,7 +68,7 @@ MonacoSetting.settings = {
 }
 function MonacoSetting:concat()
 	local s = {}
-	for k, v in ipairs(self.settings) do s[k]=tostring(v) end
+	for k, v in ipairs(self.settings) do s[k]=v.js end
 	return table.concat(s, ",\n")
 end
 
