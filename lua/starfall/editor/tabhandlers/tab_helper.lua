@@ -26,6 +26,7 @@ function TabHandler:RefreshHelper()
 		end
 	end
 end
+TabHandler.DocsFinished = TabHandler.RefreshHelper
 
 function TabHandler:RegisterSettings() -- Setting panels should be registered there
 
