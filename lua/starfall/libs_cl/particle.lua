@@ -58,14 +58,18 @@ end)
 --- Creates a ParticleEmitter data structure
 -- @param Vector position The particle emitter's position
 -- @param boolean use3D Create the emitter in 3D mode
--- @return ParticleEmitter ParticleEmitter Object
+-- @return ParticleEmitter? ParticleEmitter Object or nil if the engine max of 4097 was hit
 function particle_library.create(position, use3D)
 	checkluatype(use3D, TYPE_BOOL)
 	checkpermission(instance, nil, "particle.create")
 	plyEmitterCount:use(instance.player, 1)
 	local emitter = ParticleEmitter(vunwrap1(position), use3D)
-	emitters[emitter] = true
-	return pewrap(emitter)
+	if emitter then
+		emitters[emitter] = true
+		return pewrap(emitter)
+	else
+		plyEmitterCount:free(instance.player, 1)
+	end
 end
 
 --- Returns number of particle emitters left able to be created
