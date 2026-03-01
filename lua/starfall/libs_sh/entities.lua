@@ -371,6 +371,22 @@ function ents_methods:getLinkedComponents()
 	return list
 end
 
+--- Blocks this entity from being picked up by the physgun
+-- @param boolean? disabled
+function ents_methods:disablePhysgun(disabled)
+	local ent = getent(self)
+
+	if SERVER then
+		checkpermission(instance, ent, "entities.enableMotion")
+	end
+
+	if disabled or disabled == nil then
+		ent.PhysgunDisabled = true
+	else
+		ent.PhysgunDisabled = nil
+	end
+end
+
 --- Parents or unparents an entity. Only holograms can be parented to players and clientside holograms can only be parented in the CLIENT realm.
 -- @param Entity? parent Entity parent (nil to unparent)
 -- @param number|string|nil attachment Optional attachment name or ID.
