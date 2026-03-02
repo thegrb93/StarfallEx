@@ -48,24 +48,39 @@ instance:AddHook("initialize", function()
 end)
 
 local emitters = {}
+
+local function destroyEmitter(emitter)
+	local data = emitters[emitter]
+	if data then
+		emitter:Finish()
+		emitters[emitter] = nil
+		timer.Simple(data.dieTime, function()
+			plyEmitterCount:free(instance.player, 1)
+		end)
+	end
+end
+
 instance:AddHook("deinitialize", function()
 	for emitter in pairs(emitters) do
-		emitter:Finish()
-		plyEmitterCount:free(instance.player, 1)
+		destroyEmitter(emitter)
 	end
 end)
 
 --- Creates a ParticleEmitter data structure
 -- @param Vector position The particle emitter's position
 -- @param boolean use3D Create the emitter in 3D mode
--- @return ParticleEmitter ParticleEmitter Object
+-- @return ParticleEmitter? ParticleEmitter Object or nil if the engine max of 4097 was hit
 function particle_library.create(position, use3D)
 	checkluatype(use3D, TYPE_BOOL)
 	checkpermission(instance, nil, "particle.create")
 	plyEmitterCount:use(instance.player, 1)
 	local emitter = ParticleEmitter(vunwrap1(position), use3D)
-	emitters[emitter] = true
-	return pewrap(emitter)
+	if emitter then
+		emitters[emitter] = {dieTime = 0}
+		return pewrap(emitter)
+	else
+		plyEmitterCount:free(instance.player, 1)
+	end
 end
 
 --- Returns number of particle emitters left able to be created
@@ -87,7 +102,8 @@ end
 -- @return Particle A Particle object
 function particleem_methods:add(material, position, startSize, endSize, startLength, endLength, startAlpha, endAlpha, dieTime)
 	self = peunwrap(self)
-	if not emitters[self] then SF.Throw("Tried to use invalid emitter!", 2) end
+	local data = emitters[self]
+	if not data then SF.Throw("Tried to use invalid emitter!", 2) end
 
 	if self:GetNumActiveParticles() > cv_particle_count:GetInt() then
 		SF.Throw("Exeeded the maximum number of particles for this emitter!", 2)
@@ -100,6 +116,7 @@ function particleem_methods:add(material, position, startSize, endSize, startLen
 	checkluatype(endAlpha, TYPE_NUMBER)
 	checkluatype(dieTime, TYPE_NUMBER)
 	if dieTime < 0 or dieTime > 60 then SF.Throw("Die time must be between 0 and 60", 2) end
+	data.dieTime = math.max(data.dieTime, dieTime)
 
 	local particle = self:Add(munwrap(material), vunwrap1(position))
 
@@ -122,10 +139,7 @@ end
 
 --- Removes the emitter, making it no longer usable from Lua. If particles remain, the emitter will be removed when all particles die.
 function particleem_methods:destroy()
-	local emitter = peunwrap(self)
-	emitter:Finish()
-	emitters[emitter] = nil
-	plyEmitterCount:free(instance.player, 1)
+	destroyEmitter(peunwrap(self))
 end
 
 --- Returns the amount of active particles of this emitter.
