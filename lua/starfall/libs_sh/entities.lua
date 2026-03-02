@@ -297,7 +297,7 @@ if sound_library then
 			filter:AddAllPlayers()
 		end
 		
-		EmitSound(snd, vunwrap1(position), 0, channel, volume, lvl, nil, pitch, number, filter)
+		EmitSound(snd, vunwrap1(position), 0, channel, volume, lvl, nil, pitch, dsp, filter)
 	end
 end
 
