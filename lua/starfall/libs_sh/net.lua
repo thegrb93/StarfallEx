@@ -31,6 +31,7 @@ local StreamManager = {
 			end
 		end,
 		isWriting = function(self)
+			self:cleanupWriteStreams()
 			return not (table.IsEmpty(self.writeStreams) and table.IsEmpty(self.placeholders))
 		end,
 		canReadStream = function(self)
