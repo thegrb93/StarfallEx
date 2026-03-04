@@ -376,9 +376,7 @@ end
 function ents_methods:disablePhysgun(disabled)
 	local ent = getent(self)
 
-	if SERVER then
-		checkpermission(instance, ent, "entities.enableMotion")
-	end
+	checkpermission(instance, ent, SERVER and "entities.enableMotion" or "entities.setRenderProperty")
 
 	if disabled or disabled == nil then
 		ent.PhysgunDisabled = true
