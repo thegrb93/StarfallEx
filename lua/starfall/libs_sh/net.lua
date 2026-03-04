@@ -7,7 +7,7 @@ local StreamManager = {
 	__index = {
 		canWriteStream = function(self)
 			self:cleanupWriteStreams()
-			local active = table.Count(self.writeStreams)
+			local active = table.Count(self.writeStreams)+table.Count(self.placeholders)
 			return active<16, active
 		end,
 		addWriteStream = function(self, instance, str, nocompress)
