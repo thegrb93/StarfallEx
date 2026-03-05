@@ -149,48 +149,75 @@ local VALID_METHODS = {
 	OPTIONS = true
 }
 
---- Runs a new http request
--- @param table httpRequest Accepts a table of the following format https://wiki.facepunch.com/gmod/Structures/HTTPRequest
-function http_library.request(httpRequest)
-	checkluatype(httpRequest.url, TYPE_STRING)
-	checkpermission(instance, httpRequest.url, "http.request")
+--       
+-- 
 
-	checkluatype(httpRequest.method, TYPE_STRING)
 
-	if not VALID_METHODS[httpRequest.method] then
-		SF.Throw("Unsupported request method. Check https://wiki.facepunch.com/gmod/Structures/HTTPRequest for details.", 2) -- check last param
+--- Runs a new http request. Wraps HTTP() directly. Official documentation for each parameter can be found here: https://wiki.facepunch.com/gmod/Structures/HTTPRequest
+-- @param table httpRequest Accepts a table of the following format 
+-- @param string url The target url
+-- @param string method Request method, case insensitive. Possible values are: GET, POST, HEAD, PUT, DELETE, PATCH, OPTIONS (Default: "GET")
+-- @param function? success Function to be called on success, taking arguments code (number), body (string), and headers (table)
+-- @param function? failed Function to be called on failure, taking argument reason (string)
+-- @param string? body Body string for POST data. If set, will override parameters
+-- @param table? parameters KeyValue table for URL parameters. This is only applicable to the following request methods: GET, POST (sent in body, so if body is set, parameters are ignored), and HEAD
+-- @param string? type Content type for body. (Default: "text/plain; charset=utf-8")
+-- @param table? headers KeyValue table for headers
+-- @param number? timeout The timeout for the connection. (Default: 60)
+function http_library.request(url, method, success, failed, body, parameters, type, headers, timeout)
+	checkluatype(url, TYPE_STRING)
+	checkpermission(instance, url, "http.request")
+
+	checkluatype(method, TYPE_STRING)
+
+	if not VALID_METHODS[method] then
+		SF.Throw("Unsupported request method. Check https://wiki.facepunch.com/gmod/Structures/HTTPRequest for details.", 2)
 	end
 
 	local request = {
-		url = httpRequest.url,
-		method = httpRequest.method
+		url = url,
+		method = method
 	}
 
-	if httpRequest.type ~= nil then
-		checkluatype(httpRequest.type, TYPE_STRING)
-		request.type = httpRequest.type
+	if type ~= nil then
+		checkluatype(type, TYPE_STRING)
+		request.type = type
 	end
 
-	if httpRequest.timeout ~= nil then
-		checkluatype(httpRequest.timeout, TYPE_NUMBER)
-		request.timeout = httpRequest.timeout
+	if timeout ~= nil then
+		checkluatype(timeout, TYPE_NUMBER)
+		request.timeout = timeout
 	end
 
-	if httpRequest.body ~= nil then
-		checkluatype(httpRequest.body, TYPE_STRING)
-		request.body = httpRequest.body
+	if body ~= nil then
+		checkluatype(body, TYPE_STRING)
+		request.body = body
 	end
 
-	if httpRequest.type ~= nil then
-		checkluatype(httpRequest.type, TYPE_STRING)
-		request.type = httpRequest.type
+	if type ~= nil then
+		checkluatype(type, TYPE_STRING)
+		request.type = type
 	end
 
-	if httpRequest.headers ~= nil then
-		checkluatype(httpRequest.headers, TYPE_TABLE)
+	if parameters ~= nil then
+		checkluatype(parameters, TYPE_TABLE)
+		request.parameters = {}
+
+		for k, v in pairs(parameters) do
+			if not isstring(k) or not isstring(v) then
+				SF.Throw("Request parameters can only contain string keys and string values", 2)
+			end
+			request.parameters[k] = v
+		end
+
+		request.parameters = parameters
+	end
+
+	if headers ~= nil then
+		checkluatype(headers, TYPE_TABLE)
 		request.headers = {}
 
-		for k, v in pairs(httpRequest.headers) do
+		for k, v in pairs(headers) do
 			if not isstring(k) or not isstring(v) then
 				SF.Throw("Headers can only contain string keys and string values", 2)
 			end
@@ -205,23 +232,11 @@ function http_library.request(httpRequest)
 		end
 	end
 
-	if httpRequest.headers ~= nil then
-		checkluatype(httpRequest.headers, TYPE_TABLE)
+	if success ~= nil then checkluatype(success, TYPE_FUNCTION) end
+	if failed ~= nil then checkluatype(failed, TYPE_FUNCTION) end
 
-		for k, v in pairs(httpRequest.headers) do
-			if not isstring(k) or not isstring(v) then
-				SF.Throw("Headers can only contain string keys and string values", 2)
-			end
-		end
-
-		request.headers = httpRequest.headers
-	end
-
-	if httpRequest.success ~= nil then checkluatype(httpRequest.success, TYPE_FUNCTION) end
-	if httpRequest.failed ~= nil then checkluatype(httpRequest.failed, TYPE_FUNCTION) end
-
-	request.success = runCallback(httpRequest.success)
-	request.failed = runCallback(httpRequest.failed)
+	request.success = runCallback(success)
+	request.failed = runCallback(failed)
 
 	requests:use(instance.player, 1)
 
