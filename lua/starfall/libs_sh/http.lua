@@ -189,11 +189,6 @@ function http_library.request(url, method, success, failed, body, parameters, ty
 		request.body = body
 	end
 
-	if type ~= nil then
-		checkluatype(type, TYPE_STRING)
-		request.type = type
-	end
-
 	if parameters ~= nil then
 		checkluatype(parameters, TYPE_TABLE)
 		request.parameters = {}
