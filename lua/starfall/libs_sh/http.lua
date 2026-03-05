@@ -158,7 +158,7 @@ local VALID_METHODS = {
 -- @param table? parameters KeyValue table for URL parameters. This is only applicable to the following request methods: GET, POST (sent in body, so if body is set, parameters are ignored), and HEAD
 -- @param string? type Content type for body. (Default: "text/plain; charset=utf-8")
 -- @param table? headers KeyValue table for headers
--- @param number? timeout The timeout for the connection. (Default: 60)
+-- @param number? timeout The timeout for the connection. Clamped between [0.1, 300]. (Default: 60)
 function http_library.request(url, method, success, failed, body, parameters, type, headers, timeout)
 	checkluatype(url, TYPE_STRING)
 	checkpermission(instance, url, "http.request")
@@ -181,7 +181,7 @@ function http_library.request(url, method, success, failed, body, parameters, ty
 
 	if timeout ~= nil then
 		checkluatype(timeout, TYPE_NUMBER)
-		request.timeout = timeout
+		request.timeout = math.Clamp(timeout, 0.1, 300)
 	end
 
 	if body ~= nil then
