@@ -5,6 +5,7 @@ local registerprivilege = SF.Permissions.registerPrivilege
 local permission_level = SERVER and 1 or 3
 registerprivilege("http.get", "HTTP Get method", "Allows the user to request html data", { client = {}, urlwhitelist = { default = permission_level } })
 registerprivilege("http.post", "HTTP Post method", "Allows the user to post html data", { client = { default = 1 }, urlwhitelist = { default = permission_level } })
+registerprivilege("http.request", "HTTP Request method", "Allows the user to send HTTP requests of any type", { client = { default = 1 }, urlwhitelist = { default = permission_level } })
 
 local requests = SF.LimitObject("http_requests", "http request", 3, "The number of concurrent http requests via Starfall")
 
@@ -135,6 +136,96 @@ function http_library.post(url, payload, callbackSuccess, callbackFail, headers)
 	requests:use(instance.player, 1)
 
 	if CLIENT then SF.HTTPNotify(instance.player, url) end
+	HTTP(request)
+end
+
+local VALID_METHODS = {
+	GET = true,
+	POST = true,
+	HEAD = true,
+	PUT = true,
+	DELETE = true,
+	PATCH = true,
+	OPTIONS = true
+}
+
+--- Runs a new http request
+-- @param table httpRequest Accepts a table of the following format https://wiki.facepunch.com/gmod/Structures/HTTPRequest
+function http_library.request(httpRequest)
+	checkluatype(httpRequest.url, TYPE_STRING)
+	checkpermission(instance, httpRequest.url, "http.request")
+
+	checkluatype(httpRequest.method, TYPE_STRING)
+
+	if not VALID_METHODS[httpRequest.method] then
+		SF.Throw("Unsupported request method. Check https://wiki.facepunch.com/gmod/Structures/HTTPRequest for details.", 2) -- check last param
+	end
+
+	local request = {
+		url = httpRequest.url,
+		method = httpRequest.method
+	}
+
+	if httpRequest.type ~= nil then
+		checkluatype(httpRequest.type, TYPE_STRING)
+		request.type = httpRequest.type
+	end
+
+	if httpRequest.timeout ~= nil then
+		checkluatype(httpRequest.timeout, TYPE_NUMBER)
+		request.timeout = httpRequest.timeout
+	end
+
+	if httpRequest.body ~= nil then
+		checkluatype(httpRequest.body, TYPE_STRING)
+		request.body = httpRequest.body
+	end
+
+	if httpRequest.type ~= nil then
+		checkluatype(httpRequest.type, TYPE_STRING)
+		request.type = httpRequest.type
+	end
+
+	if httpRequest.headers ~= nil then
+		checkluatype(httpRequest.headers, TYPE_TABLE)
+		request.headers = {}
+
+		for k, v in pairs(httpRequest.headers) do
+			if not isstring(k) or not isstring(v) then
+				SF.Throw("Headers can only contain string keys and string values", 2)
+			end
+
+			if string.lower(k) == "content-type" then
+				if request.type == nil then
+					request.type = v
+				end
+			else
+				request.headers[k] = v
+			end
+		end
+	end
+
+	if httpRequest.headers ~= nil then
+		checkluatype(httpRequest.headers, TYPE_TABLE)
+
+		for k, v in pairs(httpRequest.headers) do
+			if not isstring(k) or not isstring(v) then
+				SF.Throw("Headers can only contain string keys and string values", 2)
+			end
+		end
+
+		request.headers = httpRequest.headers
+	end
+
+	if httpRequest.success ~= nil then checkluatype(httpRequest.success, TYPE_FUNCTION) end
+	if httpRequest.failed ~= nil then checkluatype(httpRequest.failed, TYPE_FUNCTION) end
+
+	request.success = runCallback(httpRequest.success)
+	request.failed = runCallback(httpRequest.failed)
+
+	requests:use(instance.player, 1)
+
+	if CLIENT then SF.HTTPNotify(instance.player, request.url) end
 	HTTP(request)
 end
 
