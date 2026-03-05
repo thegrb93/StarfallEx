@@ -151,7 +151,7 @@ local VALID_METHODS = {
 
 --- Runs a new http request. Wraps HTTP() directly. Official documentation for each parameter can be found here: https://wiki.facepunch.com/gmod/Structures/HTTPRequest
 -- @param string url The target url
--- @param string method Request method, case insensitive. Possible values are: GET, POST, HEAD, PUT, DELETE, PATCH, OPTIONS (Default: "GET")
+-- @param string method Request method, case insensitive. Possible values are: GET, POST, HEAD, PUT, DELETE, PATCH, OPTIONS
 -- @param function? success Function to be called on success, taking arguments code (number), body (string), and headers (table)
 -- @param function? failed Function to be called on failure, taking argument reason (string)
 -- @param string? body Body string for POST data. If set, will override parameters
