@@ -149,10 +149,6 @@ local VALID_METHODS = {
 	OPTIONS = true
 }
 
---       
--- 
-
-
 --- Runs a new http request. Wraps HTTP() directly. Official documentation for each parameter can be found here: https://wiki.facepunch.com/gmod/Structures/HTTPRequest
 -- @param table httpRequest Accepts a table of the following format 
 -- @param string url The target url
