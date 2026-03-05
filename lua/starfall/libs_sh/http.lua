@@ -205,8 +205,6 @@ function http_library.request(url, method, success, failed, body, parameters, ty
 			end
 			request.parameters[k] = v
 		end
-
-		request.parameters = parameters
 	end
 
 	if headers ~= nil then
