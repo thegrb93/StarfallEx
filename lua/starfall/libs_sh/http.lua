@@ -166,7 +166,7 @@ function http_library.request(url, method, success, failed, body, parameters, ty
 	checkluatype(method, TYPE_STRING)
 
 	if not VALID_METHODS[method] then
-		SF.Throw("Unsupported request method. Check https://wiki.facepunch.com/gmod/Structures/HTTPRequest for details.", 2)
+		SF.Throw("Invalid http method", 2)
 	end
 
 	local request = {
