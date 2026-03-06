@@ -7,6 +7,7 @@ local TabHandler = {
 	IsEditor = true,
 	Description = "Monaco Editor",
 	Uri = 1,
+	Tabs = {}
 }
 
 local MonacoSetting = {
@@ -37,7 +38,7 @@ __index = {
 		self.js = self.jvar..": "..self:toJs(new)
 		self:apply()
 	end,
-	apply = function(self)     
+	apply = function(self)
 		if not (IsValid(TabHandler.html) and TabHandler.loaded) then return end
 		TabHandler.html:RunJavascript([[sfeditor.updateOptions({]]..self.js..[[});]])
 	end
@@ -101,18 +102,31 @@ TabHandler.ImageBackground = ImageBackgroundSetting("sf_editor_monaco_htmlbackgr
 
 function TabHandler:AddSession(tab)
 	tab.uri = "sf://session/"..self.Uri
+	self.Tabs[tab.uri] = tab
 	self.Uri = self.Uri + 1
-	self.html:RunJavascript([[var m=monaco.editor.createModel("", "lua", "]]..tab.uri..[["); m.pushEOL(monaco.editor.EndOfLineSequence.LF);]])
+
+	-- Lua can't retreive data from javascript directly so we have to update the tab's code any time if changes
+	self.html:RunJavascript([[
+	{
+		let uri="]]..tab.uri..[[";
+		let m=monaco.editor.createModel("", "lua", uri);
+		m.pushEOL(monaco.editor.EndOfLineSequence.LF);
+		m.onDidChangeContent((event) => sf.updateCode(uri, m.getValue()));
+	}
+]])
 end
 
 function TabHandler:RemoveSession(tab)
+	self.Tabs[tab.uri] = nil
 	if not IsValid(self.html) then return end
+
 	if self.html:GetParent() == tab then
 		self.html:SetVisible(false)
 		self.html:SetParent(nil)
 	end
+
 	if tab.uri then
-		self.html:RunJavascript([[var m=monaco.editor.getModel("]]..tab.uri..[[");if(m){m.dispose();}]])
+		self.html:RunJavascript([[{let m=monaco.editor.getModel("]]..tab.uri..[[");if(m){m.dispose();}}]])
 	end
 end
 
@@ -132,9 +146,11 @@ function TabHandler:SetCode(tab)
 	self.html:RunJavascript([[monaco.editor.getModel("]]..tab.uri..[[").setValue("]]..string.JavascriptSafe(tab.code)..[[");]])
 end
 
-function TabHandler:GetCode(tab)
-	self.html:RunJavascript([[sf.getCode(monaco.editor.getModel("]]..tab.uri..[[").getValue());]])
-	tab.code = self.code
+function TabHandler:GetCode(uri, code)
+	local tab = self.Tabs[uri]
+	if not IsValid(tab) then return end
+	tab.code = code
+	tab:OnTextChanged()
 end
 
 function TabHandler:SaveTab(saveas)
@@ -242,7 +258,6 @@ function TabHandler:Init()
 		self[v] = function() end
 	end
 
-	self.code = ""
 	self.html = vgui.Create("DHTML")
 	self.html:Dock(FILL)
 	self.html:DockMargin(5, 59, 5, 5)
@@ -286,7 +301,7 @@ require(["vs/editor/editor.main"], function () {
 		label: "Save",
 		keybindings: [ monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS ],
 		contextMenuGroupId: "File",
-		run: () => sf.save(),
+		run: () => sf.save(false),
 	});
 
 	sfeditor.addAction({
@@ -294,7 +309,7 @@ require(["vs/editor/editor.main"], function () {
 		label: "Save As",
 		keybindings: [ monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyS ],
 		contextMenuGroupId: "File",
-		run: () => sf.saveAs(),
+		run: () => sf.save(true),
 	});
 
 	sfeditor.addAction({
@@ -313,10 +328,9 @@ require(["vs/editor/editor.main"], function () {
 
 ]])
 
-	self.html:AddFunction("sf", "save", function() self:SaveTab() end)
-	self.html:AddFunction("sf", "saveAs", function() self:SaveTab(true) end)
-	self.html:AddFunction("sf", "validate", SF.Editor.doValidation)
-	self.html:AddFunction("sf", "getCode", function(code) self.code = code end)
+	self.html:AddFunction("sf", "save", function(saveas) self:SaveTab(saveas) end)
+	self.html:AddFunction("sf", "validate", function() SF.Editor.editor:Validate() end)
+	self.html:AddFunction("sf", "updateCode", function(uri, code) self:GetCode(uri, code) end)
 	self.html:AddFunction("sf", "doneLoading", function() self:FinishedLoading() end)
 
 	self.html:SetVisible(false)
@@ -342,7 +356,6 @@ function PANEL:Init()
 end
 
 function PANEL:GetCode()
-	TabHandler:GetCode(self)
 	return self.code
 end
 
