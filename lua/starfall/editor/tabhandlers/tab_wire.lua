@@ -162,13 +162,13 @@ local function createWireLibraryMap()
 end
 
 function TabHandler:Init()
-	TabHandler.LibMap = createWireLibraryMap()
-
-	TabHandler.Modes.Starfall = include("starfall/editor/syntaxmodes/starfall.lua")
+	self.LibMap = createWireLibraryMap()
+	self.Modes.Starfall = include("starfall/editor/syntaxmodes/starfall.lua")
 	colors = SF.Editor.Themes.CurrentTheme
 	self:LoadSyntaxColors()
 	self:UpdateHtmlBackground()
 end
+TabHandler.DocsFinished = TabHandler.Init
 
 function TabHandler:UpdateHtmlBackground()
 	local url = self.HtmlBackgroundConvar:GetString()
