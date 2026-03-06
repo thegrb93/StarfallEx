@@ -352,10 +352,10 @@ require(["vs/editor/editor.main"], function () {
 
 ]])
 
-	self.html:AddFunction("sf", "newTab", function(saveas) SF.Editor.editor:NewTab() end)
+	self.html:AddFunction("sf", "newTab", function() SF.Editor.editor:NewTab() end)
 	self.html:AddFunction("sf", "save", function(saveas) self:SaveTab(saveas) end)
-	self.html:AddFunction("sf", "closeTab", function(saveas) SF.Editor.editor:CloseTab() end)
-	self.html:AddFunction("sf", "close", function(saveas) SF.Editor.editor:Close() end)
+	self.html:AddFunction("sf", "closeTab", function() SF.Editor.editor:CloseTab() end)
+	self.html:AddFunction("sf", "close", function() SF.Editor.editor:Close() end)
 	self.html:AddFunction("sf", "validate", function() SF.Editor.editor:Validate() end)
 	self.html:AddFunction("sf", "updateCode", function(uri, code) self:GetCode(uri, code) end)
 	self.html:AddFunction("sf", "doneLoading", function() self:FinishedLoading() end)
