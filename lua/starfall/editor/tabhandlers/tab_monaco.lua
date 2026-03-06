@@ -297,9 +297,17 @@ require(["vs/editor/editor.main"], function () {
 	}));
 
 	sfeditor.addAction({
+		id: "sf-new-tab",
+		label: "New Tab",
+		keybindings: [ monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_N ],
+		contextMenuGroupId: "File",
+		run: () => sf.newTab(),
+	});
+
+	sfeditor.addAction({
 		id: "sf-save",
 		label: "Save",
-		keybindings: [ monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS ],
+		keybindings: [ monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S ],
 		contextMenuGroupId: "File",
 		run: () => sf.save(false),
 	});
@@ -307,9 +315,25 @@ require(["vs/editor/editor.main"], function () {
 	sfeditor.addAction({
 		id: "sf-save-as",
 		label: "Save As",
-		keybindings: [ monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyS ],
+		keybindings: [ monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KEY_S ],
 		contextMenuGroupId: "File",
 		run: () => sf.save(true),
+	});
+
+	sfeditor.addAction({
+		id: "sf-close-tab",
+		label: "Close Tab",
+		keybindings: [ monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_W ],
+		contextMenuGroupId: "File",
+		run: () => sf.closeTab(),
+	});
+
+	sfeditor.addAction({
+		id: "sf-close-editor",
+		label: "Close Editor",
+		keybindings: [ monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_Q ],
+		contextMenuGroupId: "Tasks",
+		run: () => sf.close(),
 	});
 
 	sfeditor.addAction({
@@ -328,7 +352,10 @@ require(["vs/editor/editor.main"], function () {
 
 ]])
 
+	self.html:AddFunction("sf", "newTab", function(saveas) SF.Editor.editor:NewTab() end)
 	self.html:AddFunction("sf", "save", function(saveas) self:SaveTab(saveas) end)
+	self.html:AddFunction("sf", "closeTab", function(saveas) SF.Editor.editor:CloseTab() end)
+	self.html:AddFunction("sf", "close", function(saveas) SF.Editor.editor:Close() end)
 	self.html:AddFunction("sf", "validate", function() SF.Editor.editor:Validate() end)
 	self.html:AddFunction("sf", "updateCode", function(uri, code) self:GetCode(uri, code) end)
 	self.html:AddFunction("sf", "doneLoading", function() self:FinishedLoading() end)
