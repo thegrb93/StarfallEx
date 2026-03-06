@@ -118,7 +118,6 @@ end
 
 function TabHandler:SetSession(tab)
 	self.html:SetParent(tab)
-	--self.html.OnShortcut = function(_, code) tab:OnShortcut(code) end
 
 	tab:DockPadding(0, 0, 0, 0)
 	self.html:DockMargin(0, 0, 0, 0)
@@ -139,6 +138,9 @@ function TabHandler:GetCode(tab)
 end
 
 function TabHandler:SaveTab(saveas)
+	local tab = self:GetActiveTab()
+	if not tab then return end
+	SF.Editor.editor:SaveFile(tab.chosenfile, false, saveas)
 end
 
 function TabHandler:RegisterSettings()
@@ -316,15 +318,6 @@ require(["vs/editor/editor.main"], function () {
 	self.html:AddFunction("sf", "validate", SF.Editor.doValidation)
 	self.html:AddFunction("sf", "getCode", function(code) self.code = code end)
 	self.html:AddFunction("sf", "doneLoading", function() self:FinishedLoading() end)
-
-	self.html.OnKeyCodePressed = function(_, key, notfirst)
-		--[[if input.IsKeyDown(KEY_LCONTROL) then
-			self:OnShortcut(key)
-		end]]
-		if key == 57 and tobool(GetConVarNumber("sf_editor_monaco_fixconsolebug")) then
-			gui.ActivateGameUI()
-		end
-	end
 
 	self.html:SetVisible(false)
 end
