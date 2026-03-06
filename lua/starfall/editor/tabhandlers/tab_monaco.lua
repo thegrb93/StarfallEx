@@ -102,7 +102,7 @@ TabHandler.ImageBackground = ImageBackgroundSetting("sf_editor_monaco_htmlbackgr
 function TabHandler:AddSession(tab)
 	tab.uri = "sf://session/"..self.Uri
 	self.Uri = self.Uri + 1
-	self.html:RunJavascript([[monaco.editor.createModel("", "lua", "]]..tab.uri..[[");]])
+	self.html:RunJavascript([[var m=monaco.editor.createModel("", "lua", "]]..tab.uri..[["); m.pushEOL(monaco.editor.EndOfLineSequence.LF);]])
 end
 
 function TabHandler:RemoveSession(tab)
