@@ -344,6 +344,10 @@ require(["vs/editor/editor.main"], function () {
 		run: () => sf.validate(),
 	});
 
+	sfeditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Tab, function() {
+		sfeditor.trigger('CtrlOutdent', 'editor.action.outdentLines');
+	});
+
 	sf.doneLoading();
 });
 </script>
