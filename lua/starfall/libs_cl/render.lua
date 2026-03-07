@@ -2703,6 +2703,25 @@ function render_library.setFogHeight(height)
 	render.SetFogZ(height)
 end
 
+--- Get the mode current calculated Fog. See: https://wiki.facepunch.com/gmod/Enums/MATERIAL_FOG
+-- @return number return the Fog mode.
+render_library.getFogMode = render.GetFogMode
+
+--- Get the color of the current calculated Fog
+-- @return number The red channel value.
+-- @return number The green channel value.
+-- @return number The blue channel value.
+render_library.getFogColor = render.GetFogColor
+
+--- Get the distances of the current calculated Fog
+-- @return number The start distance of the Fog.
+-- @return number The end distance of the Fog.
+-- @return number The height of the Fog.
+render_library.getFogDistances = render.GetFogDistances
+
+--- Get the maximum density of the current calculated Fog
+-- @return number The maximum density of the Fog (0-1).
+render_library.getFogDensity = render.GetFogMaxDensity
 
 --- Checks whether the hardware supports HDR
 -- @return boolean True if supported
