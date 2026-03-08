@@ -210,26 +210,26 @@ local function HologramShowOwners()
 	surface.SetFont("DebugOverlay")
 
 	for _, ent in ipairs(ents.FindByClass("starfall_hologram")) do
-		local name, steamid = "No Owner", ""
-		local ply = SF.Permissions.getOwner(ent)
-
-		if ply == SF.Superuser then
-			name = "(Superuser)"
-		elseif IsValid(ply) then
-			name = ply:Name()
-			steamid = ply:SteamID()
-		else
-			ply = ent.SFHoloOwner
-
-			if IsValid(ply) then
-				name = ply:Name()
-				steamid = ply:SteamID()
-			end
-		end
-
 		local vec = ent:GetPos():ToScreen()
 
 		if vec.visible then
+			local name, steamid = "No Owner", ""
+			local ply = SF.Permissions.getOwner(ent)
+
+			if ply == SF.Superuser then
+				name = "(Superuser)"
+			elseif IsValid(ply) then
+				name = ply:Name()
+				steamid = ply:SteamID()
+			else
+				ply = ent.SFHoloOwner
+
+				if IsValid(ply) then
+					name = ply:Name()
+					steamid = ply:SteamID()
+				end
+			end
+
 			local w, h = surface.GetTextSize(name)
 
 			-- Draw nick
