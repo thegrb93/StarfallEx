@@ -594,10 +594,8 @@ function SF.Instance:runExternal(func, ...)
 	return ok, err
 end
 
-local function xpcall_callback(err)
-	if dgetmeta(err)~=SF.Errormeta then
-		return SF.MakeError(err, 1)
-	end
+local function makeError(err)
+	if dgetmeta(err)~=SF.Errormeta then err = SF.MakeError(err, 1) end
 	return err
 end
 
@@ -610,7 +608,7 @@ function SF.Instance:runWithOps(func, ...)
 
 	self.stackn = self.stackn + 1
 	self:pushCpuCheck(self.checkCpuHook)
-	local tbl = { xpcall(func, xpcall_callback, ...) }
+	local tbl = { xpcall(func, makeError, ...) }
 	self:popCpuCheck()
 	self.stackn = self.stackn - 1
 
@@ -623,7 +621,7 @@ function SF.Instance:runWithOps(func, ...)
 end
 
 function SF.Instance:runWithoutOps(func, ...)
-	return { xpcall(func, xpcall_callback, ...) }
+	return { xpcall(func, makeError, ...) }
 end
 
 function SF.Instance:initialize()
@@ -637,8 +635,9 @@ function SF.Instance:initialize()
 	if func then
 		local tbl = self:run(func)
 		if not tbl[1] then
-			self:Error(tbl[2])
-			return false, tbl[2]
+			local err = makeError(tbl[2])
+			self:Error(err)
+			return false, err
 		end
 	end
 
@@ -652,8 +651,9 @@ function SF.Instance:runScriptHook(hook, ...)
 	for name, func in hooks:pairs() do
 		tbl = self:run(func, ...)
 		if not tbl[1] then
-			tbl[2].message = "Hook '" .. hook .. "' errored with: " .. tostring(tbl[2].message)
-			self:Error(tbl[2])
+			local err = makeError(tbl[2])
+			err.message = "Hook '" .. hook .. "' errored with: " .. tostring(err.message)
+			self:Error(err)
 			return tbl
 		end
 	end
@@ -671,8 +671,9 @@ function SF.Instance:runScriptHookForResult(hook, ...)
 				break
 			end
 		else
-			tbl[2].message = "Hook '" .. hook .. "' errored with: " .. tostring(tbl[2].message)
-			self:Error(tbl[2])
+			local err = makeError(tbl[2])
+			err.message = "Hook '" .. hook .. "' errored with: " .. tostring(err.message)
+			self:Error(err)
 			return tbl
 		end
 	end
@@ -682,8 +683,9 @@ end
 function SF.Instance:runFunction(func, ...)
 	local tbl = self:run(func, ...)
 	if not tbl[1] then
-		tbl[2].message = "Callback errored with: " .. tostring(tbl[2].message)
-		self:Error(tbl[2])
+		local err = makeError(tbl[2])
+		err.message = "Callback errored with: " .. tostring(err.message)
+		self:Error(err)
 	end
 
 	return tbl
