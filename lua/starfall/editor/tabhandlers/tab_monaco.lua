@@ -109,7 +109,7 @@ function TabHandler:AddSession(tab)
 	self.html:RunJavascript([[
 	{
 		let uri="]]..tab.uri..[[";
-		let m=monaco.editor.createModel("", "lua", uri);
+		let m=monaco.editor.createModel("]]..string.JavascriptSafe(tab.code)..[[", "lua", uri);
 		m.pushEOL(monaco.editor.EndOfLineSequence.LF);
 		m.onDidChangeContent((event) => sf.updateCode(uri, m.getValue()));
 	}
@@ -380,8 +380,8 @@ local PANEL = {}
 function PANEL:Init()
 	self:SetBackgroundColor(Color(39, 40, 34))
 	self:OnThemeChange(SF.Editor.Themes.CurrentTheme)
-	TabHandler:AddSession(self)
 	self.code = ""
+	TabHandler:AddSession(self)
 end
 
 function PANEL:GetCode()
