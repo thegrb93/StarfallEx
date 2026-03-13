@@ -67,10 +67,17 @@ MonacoSetting.settings = {
 	MonacoSetting("wordBasedSuggestions", "sf_editor_monaco_wordsuggestion", "currentDocument"),
 	MonacoSetting("wordWrap", "sf_editor_monaco_wordwrap", "off"),
 }
-function MonacoSetting:concat()
-	local s = {}
-	for k, v in ipairs(self.settings) do s[k]=v.js end
-	return table.concat(s, ",\n")
+function MonacoSetting:applyAll()
+	local settings = {}
+	for k, v in ipairs(self.settings) do settings[k]=v.js end
+	
+	TabHandler.html:RunJavascript([[
+	sfeditor.updateOptions({
+		autoDetectHighContrast: false,
+		detectIndentation: false,
+		insertSpaces: false,
+		]]..table.concat(settings, ",\n")..[[
+	});]])
 end
 
 local ImageBackgroundSetting = {
@@ -109,7 +116,7 @@ function TabHandler:AddSession(tab)
 	self.html:RunJavascript([[
 	{
 		let uri="]]..tab.uri..[[";
-		let m=monaco.editor.createModel("", "lua", uri);
+		let m=monaco.editor.createModel("]]..string.JavascriptSafe(tab.code)..[[", "lua", uri);
 		m.pushEOL(monaco.editor.EndOfLineSequence.LF);
 		m.onDidChangeContent((event) => sf.updateCode(uri, m.getValue()));
 	}
@@ -212,13 +219,7 @@ function TabHandler:FinishedLoading()
 		TabHandler.ImageBackground:apply()
 	end
 
-	self.html:RunJavascript([[
-		sfeditor.updateOptions({
-			autoDetectHighContrast: false,
-			detectIndentation: false,
-			insertSpaces: false,
-			]]..MonacoSetting:concat()..[[
-		});]])
+	MonacoSetting:applyAll()
 
 	for i = 1, SF.Editor.editor:GetNumTabs() do
 		local tab = SF.Editor.editor:GetTabContent(i)
@@ -380,8 +381,8 @@ local PANEL = {}
 function PANEL:Init()
 	self:SetBackgroundColor(Color(39, 40, 34))
 	self:OnThemeChange(SF.Editor.Themes.CurrentTheme)
-	TabHandler:AddSession(self)
 	self.code = ""
+	TabHandler:AddSession(self)
 end
 
 function PANEL:GetCode()
