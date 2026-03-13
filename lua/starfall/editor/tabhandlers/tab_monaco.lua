@@ -67,10 +67,17 @@ MonacoSetting.settings = {
 	MonacoSetting("wordBasedSuggestions", "sf_editor_monaco_wordsuggestion", "currentDocument"),
 	MonacoSetting("wordWrap", "sf_editor_monaco_wordwrap", "off"),
 }
-function MonacoSetting:concat()
-	local s = {}
-	for k, v in ipairs(self.settings) do s[k]=v.js end
-	return table.concat(s, ",\n")
+function MonacoSetting:applyAll()
+	local settings = {}
+	for k, v in ipairs(self.settings) do settings[k]=v.js end
+	
+	TabHandler.html:RunJavascript([[
+	sfeditor.updateOptions({
+		autoDetectHighContrast: false,
+		detectIndentation: false,
+		insertSpaces: false,
+		]]..table.concat(settings, ",\n")..[[
+	});]])
 end
 
 local ImageBackgroundSetting = {
@@ -212,13 +219,7 @@ function TabHandler:FinishedLoading()
 		TabHandler.ImageBackground:apply()
 	end
 
-	self.html:RunJavascript([[
-		sfeditor.updateOptions({
-			autoDetectHighContrast: false,
-			detectIndentation: false,
-			insertSpaces: false,
-			]]..MonacoSetting:concat()..[[
-		});]])
+	MonacoSetting:applyAll()
 
 	for i = 1, SF.Editor.editor:GetNumTabs() do
 		local tab = SF.Editor.editor:GetTabContent(i)
