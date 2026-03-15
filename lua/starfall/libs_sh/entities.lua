@@ -815,6 +815,7 @@ function ents_methods:setRenderFX(renderfx)
 		checkpermission(instance, ent, "entities.setRenderProperty")
 	end
 
+	if renderfx == 23 then SF.Throw("Cannot use kRenderFxRagdoll!", 2) end
 	Ent_SetRenderFX(ent, renderfx)
 	if SERVER then duplicator.StoreEntityModifier(ent, "colour", { RenderFX = renderfx }) end
 end
@@ -1804,7 +1805,7 @@ function ents_methods:setEyeTarget(pos)
 	
 	vec = vunwrap(pos)
 	checkvector(vec)
-	checkpermission(instance,ent,"entities.canTool")
+	checkpermission(instance, ent, SERVER and "entities.canTool" or "entities.setRenderProperty")
 	
     Ent_SetEyeTarget(ent, vec)
 end

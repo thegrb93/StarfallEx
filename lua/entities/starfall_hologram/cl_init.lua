@@ -34,7 +34,7 @@ local HoloRenderStack = SF.RenderStack({
 	end,
 	function(data)
 		if next(data.clips) then
-			return 
+			return
 [[local clipCount = 0
 local prevClip = render.EnableClipping(true)
 for _, clip in pairs(self.clips) do
@@ -192,7 +192,7 @@ hook.Add("NetworkEntityCreated", "starfall_hologram_rescale", function(holo)
 			holo:EnableMatrix("RenderMultiply", holo.HoloMatrix)
 		end
 
-		if not sf_userrenderbounds then        
+		if not sf_userrenderbounds then
 			local mins, maxs = holo:GetModelBounds()
 			if mins then
 				local scale = holo:GetScale()
@@ -206,39 +206,54 @@ hook.Add("NetworkEntityCreated", "starfall_hologram_rescale", function(holo)
 	end
 end)
 
-local function ShowHologramOwners()
-	for _, ent in ents.Iterator() do
-		if ent.IsSFHologram then
-			local name = "No Owner"
-			local steamID = ""
+local function HologramShowOwners()
+	surface.SetFont("DebugOverlay")
+
+	for _, ent in ipairs(ents.FindByClass("starfall_hologram")) do
+		local vec = ent:GetPos():ToScreen()
+
+		if vec.visible then
+			local name, steamid = "No Owner", ""
 			local ply = SF.Permissions.getOwner(ent)
 
-			if ply==SF.Superuser then
+			if ply == SF.Superuser then
 				name = "(Superuser)"
 			elseif IsValid(ply) then
 				name = ply:Name()
-				steamID = ply:SteamID()
+				steamid = ply:SteamID()
 			else
 				ply = ent.SFHoloOwner
+
 				if IsValid(ply) then
 					name = ply:Name()
-					steamID = ply:SteamID()
+					steamid = ply:SteamID()
 				end
 			end
 
-			local vec = ent:GetPos():ToScreen()
+			local w, h = surface.GetTextSize(name)
 
-			draw.DrawText(name .. "\n" .. steamID, "DermaDefault", vec.x, vec.y, Color(255, 0, 0, 255), 1)
+			-- Draw nick
+			surface.SetTextColor(0, 255, 255)
+			surface.SetTextPos(vec.x - w / 2, vec.y - h / 2)
+			surface.DrawText(name)
+
+			local w2, h2 = surface.GetTextSize(steamid)
+
+			-- Draw steamid
+			surface.SetTextColor(0, 255, 255)
+			surface.SetTextPos(vec.x - w2 / 2, vec.y + h / 2)
+			surface.DrawText(steamid)
 		end
 	end
 end
 
 local display_owners = false
+
 concommand.Add("sf_holograms_display_owners", function()
 	display_owners = not display_owners
 
 	if display_owners then
-		hook.Add("HUDPaint", "sf_holograms_showowners", ShowHologramOwners)
+		hook.Add("HUDPaint", "sf_holograms_showowners", HologramShowOwners)
 	else
 		hook.Remove("HUDPaint", "sf_holograms_showowners")
 	end
