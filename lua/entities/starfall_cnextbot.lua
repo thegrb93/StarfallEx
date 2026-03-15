@@ -26,7 +26,7 @@ function ENT:Initialize()
 	ent_tbl.RUNACT = ACT_RUN
 	ent_tbl.IDLEACT = ACT_IDLE
 	ent_tbl.MoveSpeed = 200
-	
+
 	ent_tbl.DeathCallbacks = SF.HookTable()
 	ent_tbl.InjuredCallbacks = SF.HookTable()
 	ent_tbl.LandCallbacks = SF.HookTable()
@@ -35,6 +35,9 @@ function ENT:Initialize()
 	ent_tbl.NavChangeCallbacks = SF.HookTable()
 	ent_tbl.ContactCallbacks = SF.HookTable()
 	ent_tbl.ReachCallbacks = SF.HookTable()
+	ent_tbl.RagCreationCallbacks = SF.HookTable()
+
+	ent_tbl.InstanceRagdollCreationCallback = function() end
 end
 
 local function addPerf(instance, startPerfTime)
@@ -136,7 +139,16 @@ function ENT:OnKilled(dmginfo)
 			inst.Types.Vector.Wrap(dmginfo:GetDamageForce()),
 			dmginfo:GetDamageType())
 	end
-	if ent_tbl.RagdollOnDeath then self:BecomeRagdoll(dmginfo) end
+	if ent_tbl.RagdollOnDeath then
+		local CreatedRagdoll = self:BecomeRagdoll(dmginfo)
+		ent_tbl.InstanceRagdollCreationCallback(CreatedRagdoll) -- this is used for ragdoll cleanup. check nextbot.lua at line 128
+
+		if not ent_tbl.RagCreationCallbacks:isEmpty() then
+			local inst = ent_tbl.instance
+			ent_tbl.RagCreationCallbacks:run(inst,
+				inst.WrapObject(CreatedRagdoll))
+		end
+	end
 end
 
 function ENT:OnLandOnGround(groundent)
