@@ -2703,7 +2703,7 @@ function render_library.setFogHeight(height)
 	render.SetFogZ(height)
 end
 
---- Get the mode current calculated Fog. See: https://wiki.facepunch.com/gmod/Enums/MATERIAL_FOG
+--- Get the mode of the current calculated Fog. See: https://wiki.facepunch.com/gmod/Enums/MATERIAL_FOG
 -- @return number return the Fog mode.
 render_library.getFogMode = render.GetFogMode
 
