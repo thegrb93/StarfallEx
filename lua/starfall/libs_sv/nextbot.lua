@@ -35,6 +35,8 @@ registerprivilege("nextbot.addReachCallback", "Add nextbot approach callback", "
 registerprivilege("nextbot.removeReachCallback", "Remove nextbot approach callback", "Allows the user to remove an approach callback function from the nextbot.", {entities = {}})
 registerprivilege("nextbot.addDeathCallback", "Add nextbot death callback", "Allows the user to add a callback function to run when the nextbot dies.", {entities = {}})
 registerprivilege("nextbot.removeDeathCallback", "Remove nextbot death callback", "Allows the user to remove a death callback function from the nextbot.", {entities = {}})
+registerprivilege("nextbot.addRagdollCreationCallback", "Add nextbot ragdoll creation callback", "Allows the user to add a callback function to run when the nextbot create a ragdoll.", {entities = {}})
+registerprivilege("nextbot.removeRagdollCreationCallback", "Remove nextbot ragdoll creation callback", "Allows the user to remove a ragdoll creation function from the nextbot.", {entities = {}})
 registerprivilege("nextbot.addInjuredCallback", "Add nextbot injured callback", "Allows the user to add a callback function to run when the nextbot is injured.", {entities = {}})
 registerprivilege("nextbot.removeInjuredCallback", "Remove nextbot injured callback", "Allows the user to remove an on injured callback function from the nextbot.", {entities = {}})
 registerprivilege("nextbot.addLandCallback", "Add nextbot land callback", "Allows the user to add a callback function to run when the nextbot lands on the ground.", {entities = {}})
@@ -62,6 +64,8 @@ registerprivilege("nextbot.setAvoidAllowed", "Nextbot allow avoid", "Allows the 
 registerprivilege("nextbot.setJumpGapsAllowed", "Nextbot allow jump gaps", "Allows the user to set whether the nextbot can jump gaps.", {entities = {}})
 
 local entList = SF.EntManager("nextbots", "nextbots", 30, "The number of props allowed to spawn via Starfall")
+local ragdollsList = SF.EntManager("nextbots_ragdolls", "nextbots_ragdolls", -1, "Auto cleanup ragdoll on deinitialize")
+
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
@@ -81,6 +85,7 @@ end)
 
 instance:AddHook("deinitialize", function()
 	entList:deinitialize(instance, true)
+	ragdollsList:deinitialize(instance, true)
 end)
 
 --- Creates a customizable NextBot
@@ -115,7 +120,12 @@ function nextbot_library.create(pos, mdl)
 		if Ent_IsValid(nb) then nb:Remove() end
 		SF.Throw("Failed to create entity (" .. tostring(err) .. ")", 2)
 	end
+
 	entList:register(instance, nb)
+
+	-- sorry i can't find a better way :)
+	local ent_tbl = Ent_GetTable(nb)
+	ent_tbl.InstanceRagdollCreationCallback = function(ragdoll) ragdollsList:register(instance, ragdoll) end
 	instance:checkCpu()
 
 	return nbwrap(nb)
@@ -466,6 +476,28 @@ function nb_methods:removeContactCallback(id)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.removeContactCallback")
 	nb.ContactCallbacks:remove(id)
+end
+
+--- Adds a callback function that will be run when the nextbot create a ragdoll. Note: this will be called only if nb:ragdollOnDeath() is set to True
+-- @server
+-- @param string callbackid The unique ID this callback will use.
+-- @param function callback The function to run when the NB create a ragdoll. The arguments are: (The ragdoll entity the NB created.)
+function nb_methods:addRagdollCreationCallback(id, func)
+	checkluatype(id, TYPE_STRING)
+	checkluatype(func, TYPE_FUNCTION)
+	local nb = nbunwrap(self)
+	checkpermission(instance, nb, "nextbot.addRagdollCreationCallback")
+	nb.RagCreationCallbacks:add(id, func)
+end
+
+--- Removes the ragdoll creation callback function from the NextBot if present.
+-- @server
+-- @param string callbackid The unique ID of the callback to remove.
+function nb_methods:removeRagdollCreationCallback(id)
+	checkluatype(id, TYPE_STRING)
+	local nb = nbunwrap(self)
+	checkpermission(instance, nb, "nextbot.removeRagdollCreationCallback")
+	nb.RagCreationCallbacks:remove(id)
 end
 
 --- Enable or disable ragdolling on death for the NextBot.
