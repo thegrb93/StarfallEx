@@ -2,7 +2,6 @@ local registerprivilege = SF.Permissions.registerPrivilege
 local checkluatype = SF.CheckLuaType
 local ENT_META = FindMetaTable("Entity")
 
-
 --- NextBot type
 -- @name NextBot
 -- @class type
@@ -64,8 +63,6 @@ registerprivilege("nextbot.setAvoidAllowed", "Nextbot allow avoid", "Allows the 
 registerprivilege("nextbot.setJumpGapsAllowed", "Nextbot allow jump gaps", "Allows the user to set whether the nextbot can jump gaps.", {entities = {}})
 
 local entList = SF.EntManager("nextbots", "nextbots", 30, "The number of props allowed to spawn via Starfall")
-local ragdollsList = SF.EntManager("nextbots_ragdolls", "nextbots_ragdolls", -1, "Auto cleanup ragdoll on deinitialize")
-
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
@@ -85,7 +82,7 @@ end)
 
 instance:AddHook("deinitialize", function()
 	entList:deinitialize(instance, true)
-	ragdollsList:deinitialize(instance, true)
+	SF.NextBotRagdolls:deinitialize(instance, true)
 end)
 
 --- Creates a customizable NextBot
@@ -122,10 +119,6 @@ function nextbot_library.create(pos, mdl)
 	end
 
 	entList:register(instance, nb)
-
-	-- sorry i can't find a better way :)
-	local ent_tbl = Ent_GetTable(nb)
-	ent_tbl.InstanceRagdollCreationCallback = function(ragdoll) ragdollsList:register(instance, ragdoll) end
 	instance:checkCpu()
 
 	return nbwrap(nb)
@@ -144,6 +137,30 @@ end
 function nextbot_library.canSpawn()
 	if not SF.Permissions.hasAccess(instance, nil, "nextbot.create") then return false end
 	return entList:check(instance.player) > 0
+end
+
+--- Checks how many nextbots can be spawned
+-- @server
+-- @return number Number of nextbots able to be spawned
+function nextbot_library.nextbotsLeft()
+	if not SF.Permissions.hasAccess(instance,  nil, "nextbot.create") then return 0 end
+	return entList:check(instance.player)
+end
+
+--- Checks if a user can spawn anymore nextbots ragdolls.
+-- @server
+-- @return boolean True if user can spawn nextbots ragdolls, False if not.
+function nextbot_library.canSpawnRagdoll()
+	-- if not SF.Permissions.hasAccess(instance, nil, "nextbot.ragdollOnDeath") then return false end
+	return SF.NextBotRagdolls:check(instance.player) > 0
+end
+
+--- Checks how many ragdolls the nextbots can spawn.
+-- @server
+-- @return number Number how many ragdoll can be spawned.
+function nextbot_library.ragdollsLeft()
+	-- if not SF.Permissions.hasAccess(instance,  nil, "nextbot.ragdollOnDeath") then return 0 end
+	return SF.NextBotRagdolls:check(instance.player)
 end
 
 --- Makes the nextbot try to go to a specified position without using navmesh pathfinding (in a straight line).
@@ -487,7 +504,7 @@ function nb_methods:addRagdollCreationCallback(id, func)
 	checkluatype(func, TYPE_FUNCTION)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.addRagdollCreationCallback")
-	nb.RagCreationCallbacks:add(id, func)
+	nb.RagdollCreationCallbacks:add(id, func)
 end
 
 --- Removes the ragdoll creation callback function from the NextBot if present.
@@ -497,7 +514,7 @@ function nb_methods:removeRagdollCreationCallback(id)
 	checkluatype(id, TYPE_STRING)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.removeRagdollCreationCallback")
-	nb.RagCreationCallbacks:remove(id)
+	nb.RagdollCreationCallbacks:remove(id)
 end
 
 --- Enable or disable ragdolling on death for the NextBot.
