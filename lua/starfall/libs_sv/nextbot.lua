@@ -151,7 +151,7 @@ end
 -- @server
 -- @return boolean True if user can spawn nextbots ragdolls, False if not.
 function nextbot_library.canSpawnRagdoll()
-	-- if not SF.Permissions.hasAccess(instance, nil, "nextbot.ragdollOnDeath") then return false end
+	if not SF.Permissions.hasAccess(instance, nil, "nextbot.ragdollOnDeath") then return false end
 	return SF.NextBotRagdolls:check(instance.player) > 0
 end
 
@@ -159,7 +159,7 @@ end
 -- @server
 -- @return number Number how many ragdoll can be spawned.
 function nextbot_library.ragdollsLeft()
-	-- if not SF.Permissions.hasAccess(instance,  nil, "nextbot.ragdollOnDeath") then return 0 end
+	if not SF.Permissions.hasAccess(instance,  nil, "nextbot.ragdollOnDeath") then return 0 end
 	return SF.NextBotRagdolls:check(instance.player)
 end
 
