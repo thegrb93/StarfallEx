@@ -19,6 +19,8 @@ end
 
 if CLIENT then return end
 
+SF.NextBotRagdolls = SF.EntManager("nextbots_ragdolls", "nextbots_ragdolls", 30, "How many ragdoll can be spawned")
+
 function ENT:Initialize()
 	local ent_tbl = Ent_GetTable(self)
 	ent_tbl.RagdollOnDeath = true
@@ -35,9 +37,7 @@ function ENT:Initialize()
 	ent_tbl.NavChangeCallbacks = SF.HookTable()
 	ent_tbl.ContactCallbacks = SF.HookTable()
 	ent_tbl.ReachCallbacks = SF.HookTable()
-	ent_tbl.RagCreationCallbacks = SF.HookTable()
-
-	ent_tbl.InstanceRagdollCreationCallback = function() end
+	ent_tbl.RagdollCreationCallbacks = SF.HookTable()
 end
 
 local function addPerf(instance, startPerfTime)
@@ -129,8 +129,9 @@ end
 
 function ENT:OnKilled(dmginfo)
 	local ent_tbl = Ent_GetTable(self)
+	local inst = ent_tbl.instance
+	
 	if not ent_tbl.DeathCallbacks:isEmpty() then
-		local inst = ent_tbl.instance
 		ent_tbl.DeathCallbacks:run(inst,
 			dmginfo:GetDamage(),
 			inst.WrapObject(dmginfo:GetAttacker()),
@@ -139,13 +140,18 @@ function ENT:OnKilled(dmginfo)
 			inst.Types.Vector.Wrap(dmginfo:GetDamageForce()),
 			dmginfo:GetDamageType())
 	end
-	if ent_tbl.RagdollOnDeath then
-		local CreatedRagdoll = self:BecomeRagdoll(dmginfo)
-		ent_tbl.InstanceRagdollCreationCallback(CreatedRagdoll) -- this is used for ragdoll cleanup. check nextbot.lua at line 128
 
-		if not ent_tbl.RagCreationCallbacks:isEmpty() then
-			local inst = ent_tbl.instance
-			ent_tbl.RagCreationCallbacks:run(inst,
+	if ent_tbl.RagdollOnDeath then
+		if SF.NextBotRagdolls:check(inst.player) == 0 then
+			self:Remove() -- so the nextbots dont stay forever until cleanup
+			return
+		end
+
+		local CreatedRagdoll = self:BecomeRagdoll(dmginfo)
+		SF.NextBotRagdolls:register(inst, CreatedRagdoll)
+
+		if not ent_tbl.RagdollCreationCallbacks:isEmpty() then
+			ent_tbl.RagdollCreationCallbacks:run(inst,
 				inst.WrapObject(CreatedRagdoll))
 		end
 	end
