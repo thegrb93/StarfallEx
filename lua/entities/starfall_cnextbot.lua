@@ -142,14 +142,16 @@ function ENT:OnKilled(dmginfo)
 	end
 
 	if ent_tbl.RagdollOnDeath and SF.NextBotRagdolls:check(inst.player) > 0 then
-		local CreatedRagdoll = self:BecomeRagdoll(dmginfo)
-		SF.NextBotRagdolls:register(inst, CreatedRagdoll)
+		local ragdoll = self:BecomeRagdoll(dmginfo)
+		if ragdoll:IsValid() then
+			SF.NextBotRagdolls:register(inst, ragdoll)
+		end
 
 		if not ent_tbl.RagdollCreationCallbacks:isEmpty() then
-			ent_tbl.RagdollCreationCallbacks:run(inst, inst.WrapObject(CreatedRagdoll))
+			ent_tbl.RagdollCreationCallbacks:run(inst, inst.WrapObject(ragdoll))
 		end
 	else
-		self:Remove() -- Remove instead of becoming a ragdoll
+		self:Remove()
 	end
 end
 
