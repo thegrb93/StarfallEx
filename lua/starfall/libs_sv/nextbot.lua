@@ -2,7 +2,6 @@ local registerprivilege = SF.Permissions.registerPrivilege
 local checkluatype = SF.CheckLuaType
 local ENT_META = FindMetaTable("Entity")
 
-
 --- NextBot type
 -- @name NextBot
 -- @class type
@@ -35,6 +34,8 @@ registerprivilege("nextbot.addReachCallback", "Add nextbot approach callback", "
 registerprivilege("nextbot.removeReachCallback", "Remove nextbot approach callback", "Allows the user to remove an approach callback function from the nextbot.", {entities = {}})
 registerprivilege("nextbot.addDeathCallback", "Add nextbot death callback", "Allows the user to add a callback function to run when the nextbot dies.", {entities = {}})
 registerprivilege("nextbot.removeDeathCallback", "Remove nextbot death callback", "Allows the user to remove a death callback function from the nextbot.", {entities = {}})
+registerprivilege("nextbot.addRagdollCreationCallback", "Add nextbot ragdoll creation callback", "Allows the user to add a callback function to run when the nextbot create a ragdoll.", {entities = {}})
+registerprivilege("nextbot.removeRagdollCreationCallback", "Remove nextbot ragdoll creation callback", "Allows the user to remove a ragdoll creation function from the nextbot.", {entities = {}})
 registerprivilege("nextbot.addInjuredCallback", "Add nextbot injured callback", "Allows the user to add a callback function to run when the nextbot is injured.", {entities = {}})
 registerprivilege("nextbot.removeInjuredCallback", "Remove nextbot injured callback", "Allows the user to remove an on injured callback function from the nextbot.", {entities = {}})
 registerprivilege("nextbot.addLandCallback", "Add nextbot land callback", "Allows the user to add a callback function to run when the nextbot lands on the ground.", {entities = {}})
@@ -81,6 +82,7 @@ end)
 
 instance:AddHook("deinitialize", function()
 	entList:deinitialize(instance, true)
+	SF.NextBotRagdolls:deinitialize(instance, true)
 end)
 
 --- Creates a customizable NextBot
@@ -115,6 +117,7 @@ function nextbot_library.create(pos, mdl)
 		if Ent_IsValid(nb) then nb:Remove() end
 		SF.Throw("Failed to create entity (" .. tostring(err) .. ")", 2)
 	end
+
 	entList:register(instance, nb)
 	instance:checkCpu()
 
@@ -134,6 +137,30 @@ end
 function nextbot_library.canSpawn()
 	if not SF.Permissions.hasAccess(instance, nil, "nextbot.create") then return false end
 	return entList:check(instance.player) > 0
+end
+
+--- Checks how many nextbots can be spawned
+-- @server
+-- @return number Number of nextbots able to be spawned
+function nextbot_library.nextbotsLeft()
+	if not SF.Permissions.hasAccess(instance,  nil, "nextbot.create") then return 0 end
+	return entList:check(instance.player)
+end
+
+--- Checks if a user can spawn anymore nextbots ragdolls.
+-- @server
+-- @return boolean True if user can spawn nextbots ragdolls, False if not.
+function nextbot_library.canSpawnRagdoll()
+	if not SF.Permissions.hasAccess(instance, nil, "nextbot.ragdollOnDeath") then return false end
+	return SF.NextBotRagdolls:check(instance.player) > 0
+end
+
+--- Checks how many ragdolls the nextbots can spawn.
+-- @server
+-- @return number Number how many ragdoll can be spawned.
+function nextbot_library.ragdollsLeft()
+	if not SF.Permissions.hasAccess(instance,  nil, "nextbot.ragdollOnDeath") then return 0 end
+	return SF.NextBotRagdolls:check(instance.player)
 end
 
 --- Makes the nextbot try to go to a specified position without using navmesh pathfinding (in a straight line).
@@ -466,6 +493,28 @@ function nb_methods:removeContactCallback(id)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.removeContactCallback")
 	nb.ContactCallbacks:remove(id)
+end
+
+--- Adds a callback function that will be run when the nextbot create a ragdoll. Note: this will be called only if nb:ragdollOnDeath() is set to True
+-- @server
+-- @param string callbackid The unique ID this callback will use.
+-- @param function callback The function to run when the NB create a ragdoll. The arguments are: (The ragdoll entity the NB created.)
+function nb_methods:addRagdollCreationCallback(id, func)
+	checkluatype(id, TYPE_STRING)
+	checkluatype(func, TYPE_FUNCTION)
+	local nb = nbunwrap(self)
+	checkpermission(instance, nb, "nextbot.addRagdollCreationCallback")
+	nb.RagdollCreationCallbacks:add(id, func)
+end
+
+--- Removes the ragdoll creation callback function from the NextBot if present.
+-- @server
+-- @param string callbackid The unique ID of the callback to remove.
+function nb_methods:removeRagdollCreationCallback(id)
+	checkluatype(id, TYPE_STRING)
+	local nb = nbunwrap(self)
+	checkpermission(instance, nb, "nextbot.removeRagdollCreationCallback")
+	nb.RagdollCreationCallbacks:remove(id)
 end
 
 --- Enable or disable ragdolling on death for the NextBot.

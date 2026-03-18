@@ -19,6 +19,8 @@ end
 
 if CLIENT then return end
 
+SF.NextBotRagdolls = SF.EntManager("nextbots_ragdolls", "nextbots_ragdolls", 30, "How many ragdoll can be spawned")
+
 function ENT:Initialize()
 	local ent_tbl = Ent_GetTable(self)
 	ent_tbl.RagdollOnDeath = true
@@ -26,7 +28,7 @@ function ENT:Initialize()
 	ent_tbl.RUNACT = ACT_RUN
 	ent_tbl.IDLEACT = ACT_IDLE
 	ent_tbl.MoveSpeed = 200
-	
+
 	ent_tbl.DeathCallbacks = SF.HookTable()
 	ent_tbl.InjuredCallbacks = SF.HookTable()
 	ent_tbl.LandCallbacks = SF.HookTable()
@@ -35,6 +37,7 @@ function ENT:Initialize()
 	ent_tbl.NavChangeCallbacks = SF.HookTable()
 	ent_tbl.ContactCallbacks = SF.HookTable()
 	ent_tbl.ReachCallbacks = SF.HookTable()
+	ent_tbl.RagdollCreationCallbacks = SF.HookTable()
 end
 
 local function addPerf(instance, startPerfTime)
@@ -126,8 +129,9 @@ end
 
 function ENT:OnKilled(dmginfo)
 	local ent_tbl = Ent_GetTable(self)
+	local inst = ent_tbl.instance
+	
 	if not ent_tbl.DeathCallbacks:isEmpty() then
-		local inst = ent_tbl.instance
 		ent_tbl.DeathCallbacks:run(inst,
 			dmginfo:GetDamage(),
 			inst.WrapObject(dmginfo:GetAttacker()),
@@ -136,7 +140,19 @@ function ENT:OnKilled(dmginfo)
 			inst.Types.Vector.Wrap(dmginfo:GetDamageForce()),
 			dmginfo:GetDamageType())
 	end
-	if ent_tbl.RagdollOnDeath then self:BecomeRagdoll(dmginfo) end
+
+	if ent_tbl.RagdollOnDeath and SF.NextBotRagdolls:check(inst.player) > 0 then
+		local ragdoll = self:BecomeRagdoll(dmginfo)
+		if ragdoll:IsValid() then
+			SF.NextBotRagdolls:register(inst, ragdoll)
+		end
+
+		if not ent_tbl.RagdollCreationCallbacks:isEmpty() then
+			ent_tbl.RagdollCreationCallbacks:run(inst, inst.WrapObject(ragdoll))
+		end
+	else
+		self:Remove()
+	end
 end
 
 function ENT:OnLandOnGround(groundent)
