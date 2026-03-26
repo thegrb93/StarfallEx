@@ -639,14 +639,17 @@ end
 local function triggerInput(ent, k, v)
 	local input, convert = checkinput(Ent_GetTable(ent).Inputs, k, SFToWire)
 	instance:runExternal(WireLib.TriggerInput, ent, k, convert(v))
+	instance:checkCpu()
 end
 local function triggerOutput(ent, k, v)
 	local output, convert = checkoutput(Ent_GetTable(ent).Outputs, k, SFToWire)
 	instance:runExternal(Wire_TriggerOutput, ent, k, convert(v))
+	instance:checkCpu()
 end
 local function triggerCell(ent, k, v)
 	local WriteCell = Ent_GetTable(ent).WriteCell or SF.Throw("Entity does not have WriteCell capability", 3)
 	instance:runExternal(WriteCell, ent, k, v)
+	instance:checkCpu()
 end
 
 local function readInput(ent, k)
@@ -660,6 +663,7 @@ end
 local function readCell(ent, k)
 	local ReadCell = Ent_GetTable(ent).ReadCell or SF.Throw("Entity does not have ReadCell capability", 3)
 	local ok, n = instance:runExternal(ReadCell, ent, k)
+	instance:checkCpu()
 	return ok and tonumber(n) or 0
 end
 
