@@ -165,6 +165,9 @@ local function createCustomProp(ply, pos, ang, sfmeshdata)
 	else
 		SF.Throw("Invalid sfmeshdata", 2)
 	end
+	if #sfmeshdata > 65536 then
+		SF.Throw("sfmeshdata is too long!", 2)
+	end
 
 	checkMesh(ply, meshConvexes)
 	SF.NetBurst:use(ply, #sfmeshdata*8)

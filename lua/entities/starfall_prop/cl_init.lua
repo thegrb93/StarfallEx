@@ -107,10 +107,12 @@ net.Receive("starfall_custom_prop", function()
 	local applyData = SF.WaitForAllArgs(2, function(self, data)
 		if Ent_IsValid(self) and self:GetClass()~="starfall_prop" then return end
 		local ent_tbl = Ent_GetTable(self)
-		if not (ent_tbl and ent_tbl.sf_rendermesh:IsValid() and data and not ent_tbl.sf_meshapplied) then return end
+		if not (ent_tbl and ent_tbl.sf_rendermesh:IsValid() and not ent_tbl.sf_meshapplied) then return end
 		ent_tbl.sf_meshapplied = true
 
-		local physmesh, mins, maxs = streamToMesh(data)
+		local meshOk, physmesh, mins, maxs = pcall(streamToMesh, data)
+		if not meshOk then return end
+
 		ent_tbl.BuildPhysics(self, ent_tbl, physmesh)
 		ent_tbl.BuildRenderMesh(self, ent_tbl)
 		self:SetRenderBounds(mins, maxs)
