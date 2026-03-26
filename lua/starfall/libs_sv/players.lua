@@ -306,6 +306,7 @@ function player_methods:say(text, teamOnly)
 	if CurTime() < (ply.sf_say_cd or 0) then SF.Throw("Player say must wait 0.5s between calls!", 2) end
 	ply.sf_say_cd = CurTime() + 0.5
 	instance:runExternal(Ply_Say, ply, text, teamOnly) -- Ply_Say(ply, text, teamOnly)
+	instance:checkCpu()
 end
 
 --- Sets the armor of the player.
