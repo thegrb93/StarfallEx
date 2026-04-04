@@ -72,6 +72,8 @@ TabHandler.EnlightenColorsConVar = CreateClientConVar("sf_editor_wire_enlightenc
 TabHandler.HighlightOnDoubleClickConVar = CreateClientConVar("sf_editor_wire_highlight_on_double_click", "1", true, false)
 TabHandler.DisplayCaretPosConVar = CreateClientConVar("sf_editor_wire_display_caret_pos", "0", true, false)
 TabHandler.AutoIndentConVar = CreateClientConVar("sf_editor_wire_auto_indent", "1", true, false)
+TabHandler.ExpandTabsConVar = CreateClientConVar("sf_editor_wire_expand_tabs", "1", true, false)
+TabHandler.TabSizeConVar = CreateClientConVar("sf_editor_wire_tab_size", "4", true, false)
 TabHandler.EnableAntialiasing = CreateClientConVar("sf_editor_wire_enable_antialiasing", "1", true, false)
 TabHandler.ScrollSpeedConVar = CreateClientConVar("sf_editor_wire_scrollmultiplier", "4", true, false)
 TabHandler.LinesHiddenFormatConVar = CreateClientConVar("sf_editor_wire_lines_hidden_format", "< %d lines hidden >", true, false)
@@ -295,6 +297,16 @@ function TabHandler:RegisterSettings()
 	commentStyle:AddChoice("Each Line", 2)
 
 	local autoIndent = form:CheckBox( "Auto indent", "sf_editor_wire_auto_indent" )
+	local expandTabs = form:CheckBox( "Expand tabs to spaces", "sf_editor_wire_expand_tabs" )
+
+	local tabSize = form:ComboBox( "Tab size" )
+	tabSize.OnSelect = function(_, _, value)
+		RunConsoleCommand("sf_editor_wire_tab_size", value)
+	end
+	for i = 1, 8 do
+		tabSize:AddChoice(i)
+	end
+	tabSize:SetValue(TabHandler.TabSizeConVar:GetString())
 
 	local autoValidate = form:CheckBox( "Automatically validate", "sf_editor_wire_validateontextchange" )
 
@@ -904,7 +916,9 @@ function PANEL:OnMouseReleased(code)
 end
 
 function PANEL:SetCode(text)
-	text = SF.Editor.normalizeCode(text)
+	local indent_str = string.rep(" ", TabHandler.TabSizeConVar:GetInt())
+	if not TabHandler.ExpandTabsConVar:GetBool() then indent_str = "\t" end
+	text = SF.Editor.normalizeCode(text, indent_str)
 	if text == self:GetCode() then return end
 	self.Rows = {}
 	self.RowTexts = {}
@@ -1480,7 +1494,9 @@ local function unindent(line)
 	--local i = line:find("%S")
 	--if i == nil or i > 5 then i = 5 end
 	--return line:sub(i)
-	return line:match("^ ? ? ? ?(.*)$")
+	local indent_str = string.rep(" ?", TabHandler.TabSizeConVar:GetInt())
+	if not TabHandler.ExpandTabsConVar:GetBool() then indent_str = "\t" end
+	return line:match("^" .. indent_str .. "(.*)$")
 end
 
 function PANEL:_OnTextChanged()
@@ -2242,13 +2258,19 @@ function PANEL:Indent(shift)
 	end
 	if shift then
 		-- shift-TAB with a selection --
-		local tmp = self:GetSelection():gsub("\n ? ? ? ?", "\n")
+		local indent_str = string.rep(" ?", TabHandler.TabSizeConVar:GetInt())
+		if not TabHandler.ExpandTabsConVar:GetBool() then indent_str = "\t" end
+		local tmp = self:GetSelection():gsub("\n" .. indent_str, "\n")
 
 		-- makes sure that the first line is outdented
 		self:SetSelection(unindent(tmp))
 	else
 		-- plain TAB with a selection --
-		self:SetSelection("    " .. self:GetSelection():gsub("\n", "\n    "))
+		-- Use the value of the ConVar sf_editor_wire_tab_size to determine how many spaces should be added, and
+		-- sf_editor_wire_expand_tabs to know if spaces should be inserted at all.
+		local indent_str = string.rep(" ", TabHandler.TabSizeConVar:GetInt())
+		if not TabHandler.ExpandTabsConVar:GetBool() then indent_str = "\t" end
+		self:SetSelection(indent_str .. self:GetSelection():gsub("\n", "\n" .. indent_str))
 	end
 	-- restore selection
 	self.Caret = self:CopyPosition(tab_caret)
@@ -2567,7 +2589,13 @@ function PANEL:_OnKeyCodeTyped(code)
 			if self:AutocompleteKeybind(code) then return end
 			local row = self:GetRowText(self.Caret[1]):sub(1, self.Caret[2]-1)
 			local diff = (row:find("%S") or (row:len() + 1))-1
-			local tabs = string_rep("    ", math_floor(diff / 4))
+
+			local indent_str = string.rep(" ", TabHandler.TabSizeConVar:GetInt())
+			local tabs = string_rep(indent_str, math_floor(diff / TabHandler.TabSizeConVar:GetInt()))
+			if not TabHandler.ExpandTabsConVar:GetBool() then
+				tabs = string.rep("\t", diff)
+				print("Diff is "..diff)
+			end
 			if TabHandler.AutoIndentConVar:GetBool() then
 				local function countMatches(s,open,close)
 					-- add spaces to string to detect whole word
@@ -2584,7 +2612,7 @@ function PANEL:_OnKeyCodeTyped(code)
 				if countMatches(row,{"{"},"}") > 0 or 
 					countMatches(row,{"%sthen%s","%sdo%s","[,%s%(]function[%s%(]","%selse%s"},"%send[%s%p]") > 0 or 
 					countMatches(row,{"%srepeat%s"},"%suntil%s") > 0 then 
-						tabs = tabs .. "    "
+						tabs = tabs .. indent_str
 				end
 			end
 			self:SetSelection("\n" .. tabs)
@@ -2615,8 +2643,11 @@ function PANEL:_OnKeyCodeTyped(code)
 			else
 				local buffer = self:GetArea({ self.Caret, { self.Caret[1], 1 } })
 				local delta = -1
-				if self.Caret[2] % 4 == 1 and #(buffer) > 0 and string_rep(" ", #(buffer)) == buffer then
-					delta = -4
+				if TabHandler.ExpandTabsConVar:GetInt() then
+					local ts = TabHandler.TabSizeConVar:GetInt()
+					if self.Caret[2] % ts == 1 and #(buffer) > 0 and string_rep(" ", #(buffer)) == buffer then
+						delta = -ts
+					end
 				end
 				self:SetCaret(self:MovePosition(self.Caret, delta))
 			end
@@ -2626,8 +2657,11 @@ function PANEL:_OnKeyCodeTyped(code)
 			else
 				local buffer = self:GetArea({ { self.Caret[1], self.Caret[2] + 4 }, { self.Caret[1], 1 } })
 				local delta = 1
-				if self.Caret[2] % 4 == 1 and string_rep(" ", #(buffer)) == buffer and #(self.Rows[self.Caret[1]][1]) >= self.Caret[2] + 4 - 1 then
-					delta = 4
+				if TabHandler.ExpandTabsConVar:GetInt() then
+					local ts = TabHandler.TabSizeConVar:GetInt()
+					if self.Caret[2] % ts == 1 and string_rep(" ", #(buffer)) == buffer and #(self.Rows[self.Caret[1]][1]) >= self.Caret[2] + ts - 1 then
+						delta = ts
+					end
 				end
 				self:SetCaret(self:MovePosition(self.Caret, delta))
 			end
@@ -2658,8 +2692,11 @@ function PANEL:_OnKeyCodeTyped(code)
 			else
 				local buffer = self:GetArea({ self.Caret, { self.Caret[1], 1 } })
 				local delta = -1
-				if self.Caret[2] % 4 == 1 and #(buffer) > 0 and string_rep(" ", #(buffer)) == buffer then
-					delta = -4
+				if TabHandler.ExpandTabsConVar:GetBool() then
+					local ts = TabHandler.TabSizeConVar:GetInt()
+					if self.Caret[2] % ts == 1 and #(buffer) > 0 and string_rep(" ", #(buffer)) == buffer then
+						delta = -ts
+					end
 				end
 				self:SetCaret(self:SetArea({ self.Caret, self:MovePosition(self.Caret, delta) }))
 				if self.OnTextChanged then self:OnTextChanged() end
@@ -2671,10 +2708,13 @@ function PANEL:_OnKeyCodeTyped(code)
 			if self:HasSelection() then
 				self:SetSelection()
 			else
-				local buffer = self:GetArea({ { self.Caret[1], self.Caret[2] + 4 }, { self.Caret[1], 1 } })
 				local delta = 1
-				if self.Caret[2] % 4 == 1 and string_rep(" ", #(buffer)) == buffer and #(self.Rows[self.Caret[1]][1]) >= self.Caret[2] + 4 - 1 then
-					delta = 4
+				if TabHandler.ExpandTabsConVar:GetBool() then
+					local ts = TabHandler.TabSizeConVar:GetInt()
+					local buffer = self:GetArea({ { self.Caret[1], self.Caret[2] + ts }, { self.Caret[1], 1 } })
+					if self.Caret[2] % ts == 1 and string_rep(" ", #(buffer)) == buffer and #(self.Rows[self.Caret[1]][1]) >= self.Caret[2] + ts - 1 then
+						delta = ts
+					end
 				end
 				self:SetCaret(self:SetArea({ self.Caret, self:MovePosition(self.Caret, delta) }))
 				if self.OnTextChanged then self:OnTextChanged() end
@@ -2695,18 +2735,25 @@ function PANEL:_OnKeyCodeTyped(code)
 		else
 			-- TAB without a selection --
 			if shift then
-				local newpos = self.Caret[2]-4
-				if newpos < 1 then newpos = 1 end
-				self.Start = { self.Caret[1], newpos }
-				if self:GetSelection():find("%S") then
-					-- TODO: what to do if shift-tab is pressed within text?
-					self.Start = self:CopyPosition(self.Caret)
-				else
-					self:SetSelection("")
+				if TabHandler.ExpandTabsConVar:GetBool() then
+					local newpos = self.Caret[2]-TabHandler.TabSizeConVar:GetInt()
+					if newpos < 1 then newpos = 1 end
+					self.Start = { self.Caret[1], newpos }
+					if self:GetSelection():find("%S") then
+						-- TODO: what to do if shift-tab is pressed within text?
+						self.Start = self:CopyPosition(self.Caret)
+					else
+						self:SetSelection("")
+					end
 				end
 			else
-				local count = (self.Caret[2] + 2) % 4 + 1
-				self:SetSelection(string_rep(" ", count))
+				if TabHandler.ExpandTabsConVar:GetBool() then
+					local ts = TabHandler.TabSizeConVar:GetInt()
+					local count = ts - (self.Caret[2] - 1) % ts
+					self:SetSelection(string_rep(" ", count))
+				else
+					self:SetSelection("\t")
+				end
 			end
 		end
 		-- signal that we want our focus back after (since TAB normally switches focus)

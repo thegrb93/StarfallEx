@@ -108,11 +108,11 @@ if CLIENT then
 		return path
 	end
 
-	--- Converts given text to LF and tabs to spaces.
+	--- Converts given text from CRLF to LF and matches TABs with user configuration.
 	-- Every code which goes into the editor is normalized first.
 	-- Note: remember to normalize every input file when comparing it to already open files to avoid inconsistencies.
-	function SF.Editor.normalizeCode(code)
-		return string.gsub(code, "[\r\t]", {["\r"]="", ["\t"]="    "})
+	function SF.Editor.normalizeCode(code, indent_str)
+		return string.gsub(code, "[\r\t]", {["\r"]="", ["\t"]=indent_str})
 	end
 
 	function SF.Editor.renameFile(oldFile, newFile)
