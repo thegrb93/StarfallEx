@@ -1466,9 +1466,6 @@ function Editor:ChosenFile(Line, code)
 	self:GetCurrentTabContent().chosenfile = Line
 	if Line and not code then
 		code = file.Read(Line)
-		if code then
-			code = SF.Editor.normalizeCode(code)
-		end
 	end
 	self:GetCurrentTabContent().savedCode = code
 
@@ -1655,7 +1652,6 @@ function Editor:LoadFile(Line, forcenewtab)
 
 	local str = file.Read(Line, "DATA")
 	if str then
-		str = SF.Editor.normalizeCode(str)
 		self:OpenCode(Line, str, str, forcenewtab)
 	else
 		SF.AddNotify(LocalPlayer(), "Erroring opening file: " .. Line, "ERROR", 7, "ERROR1")
@@ -1702,7 +1698,7 @@ function Editor:ReloadTab(tabIndex, interactive)
 		end
 
 		tabContent:SetCode(fileContent)
-		tabContent.savedCode = SF.Editor.normalizeCode(fileContent)
+		tabContent.savedCode = fileContent
 		tabContent.autoReloadLastModified = fileLastModified
 		self:UpdateTabText(tab)
 		if tabIndex == activeTabIndex then

@@ -306,7 +306,7 @@ function TabHandler:RegisterSettings()
 	for i = 1, 8 do
 		tabSize:AddChoice(i)
 	end
-	tabSize:SetValue(TabHandler.TabSizeConVar:GetString())
+	tabSize:SetValue(string.format("%.0f", TabHandler.TabSizeConVar:GetInt()))
 
 	local autoValidate = form:CheckBox( "Automatically validate", "sf_editor_wire_validateontextchange" )
 
