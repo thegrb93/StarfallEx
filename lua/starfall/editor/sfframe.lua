@@ -1322,6 +1322,7 @@ end
 
 function Editor:OpenCode(path, code, codeOnDisk, forcenewtab, checkFileExists)
 	if path and checkFileExists and file.Exists("starfall/" .. path, "DATA") then
+		if codeOnDisk==nil then codeOnDisk = file.Read("starfall/" .. path, "DATA") or "" end
 		if code==codeOnDisk then return end
 	end
 
