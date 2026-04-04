@@ -916,9 +916,6 @@ function PANEL:OnMouseReleased(code)
 end
 
 function PANEL:SetCode(text)
-	local indent_str = string.rep(" ", TabHandler.TabSizeConVar:GetInt())
-	if not TabHandler.ExpandTabsConVar:GetBool() then indent_str = "\t" end
-	text = SF.Editor.normalizeCode(text, indent_str)
 	if text == self:GetCode() then return end
 	self.Rows = {}
 	self.RowTexts = {}
@@ -2593,8 +2590,8 @@ function PANEL:_OnKeyCodeTyped(code)
 			local indent_str = string.rep(" ", TabHandler.TabSizeConVar:GetInt())
 			local tabs = string_rep(indent_str, math_floor(diff / TabHandler.TabSizeConVar:GetInt()))
 			if not TabHandler.ExpandTabsConVar:GetBool() then
+				indent_str = "\t"
 				tabs = string.rep("\t", diff)
-				print("Diff is "..diff)
 			end
 			if TabHandler.AutoIndentConVar:GetBool() then
 				local function countMatches(s,open,close)

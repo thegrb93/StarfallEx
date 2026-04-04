@@ -108,13 +108,6 @@ if CLIENT then
 		return path
 	end
 
-	--- Converts given text from CRLF to LF and matches TABs with user configuration.
-	-- Every code which goes into the editor is normalized first.
-	-- Note: remember to normalize every input file when comparing it to already open files to avoid inconsistencies.
-	function SF.Editor.normalizeCode(code, indent_str)
-		return string.gsub(code, "[\r\t]", {["\r"]="", ["\t"]=indent_str})
-	end
-
 	function SF.Editor.renameFile(oldFile, newFile)
 		if file.Exists(newFile, "DATA") then
 			SF.AddNotify(LocalPlayer(), "Failed to rename. File already exists there.", "ERROR", 7, "ERROR1")
