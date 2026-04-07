@@ -1491,8 +1491,7 @@ local function unindent(line)
 	--local i = line:find("%S")
 	--if i == nil or i > 5 then i = 5 end
 	--return line:sub(i)
-	local indent_str = string.rep(" ?", TabHandler.TabSizeConVar:GetInt())
-	if not TabHandler.ExpandTabsConVar:GetBool() then indent_str = "\t" end
+	local indent_str = TabHandler.ExpandTabsConVar:GetBool() and string.rep(" ?", TabHandler.TabSizeConVar:GetInt()) or "\t"
 	return line:match("^" .. indent_str .. "(.*)$")
 end
 
@@ -2255,8 +2254,7 @@ function PANEL:Indent(shift)
 	end
 	if shift then
 		-- shift-TAB with a selection --
-		local indent_str = string.rep(" ?", TabHandler.TabSizeConVar:GetInt())
-		if not TabHandler.ExpandTabsConVar:GetBool() then indent_str = "\t" end
+		local indent_str = TabHandler.ExpandTabsConVar:GetBool() and string.rep(" ?", TabHandler.TabSizeConVar:GetInt()) or "\t"
 		local tmp = self:GetSelection():gsub("\n" .. indent_str, "\n")
 
 		-- makes sure that the first line is outdented
@@ -2265,8 +2263,7 @@ function PANEL:Indent(shift)
 		-- plain TAB with a selection --
 		-- Use the value of the ConVar sf_editor_wire_tab_size to determine how many spaces should be added, and
 		-- sf_editor_wire_expand_tabs to know if spaces should be inserted at all.
-		local indent_str = string.rep(" ", TabHandler.TabSizeConVar:GetInt())
-		if not TabHandler.ExpandTabsConVar:GetBool() then indent_str = "\t" end
+		local indent_str = TabHandler.ExpandTabsConVar:GetBool() and string.rep(" ", TabHandler.TabSizeConVar:GetInt()) or "\t"
 		self:SetSelection(indent_str .. self:GetSelection():gsub("\n", "\n" .. indent_str))
 	end
 	-- restore selection
@@ -2587,12 +2584,8 @@ function PANEL:_OnKeyCodeTyped(code)
 			local row = self:GetRowText(self.Caret[1]):sub(1, self.Caret[2]-1)
 			local diff = (row:find("%S") or (row:len() + 1))-1
 
-			local indent_str = string.rep(" ", TabHandler.TabSizeConVar:GetInt())
-			local tabs = string_rep(indent_str, math_floor(diff / TabHandler.TabSizeConVar:GetInt()))
-			if not TabHandler.ExpandTabsConVar:GetBool() then
-				indent_str = "\t"
-				tabs = string.rep("\t", diff)
-			end
+			local indent_str = TabHandler.ExpandTabsConVar:GetBool() and string.rep(" ", TabHandler.TabSizeConVar:GetInt()) or "\t"
+			local tabs = string_rep(indent_str, TabHandler.ExpandTabsConVar:GetBool() and math_floor(diff / TabHandler.TabSizeConVar:GetInt()) or diff)
 			if TabHandler.AutoIndentConVar:GetBool() then
 				local function countMatches(s,open,close)
 					-- add spaces to string to detect whole word
