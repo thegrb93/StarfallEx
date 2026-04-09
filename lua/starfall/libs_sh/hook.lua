@@ -3,6 +3,9 @@ local checkluatype = SF.CheckLuaType
 local haspermission = SF.Permissions.hasAccess
 local registerprivilege = SF.Permissions.registerPrivilege
 
+local ENT_META = FindMetaTable("Entity")
+local Ent_IsValid = ENT_META.IsValid
+
 --Can only return if you are the first argument
 local function returnOnlyOnYourself(instance, args, ply)
 	if args[1] and instance.player == ply then return args[2] end
@@ -170,7 +173,7 @@ if SERVER then
 	gameevent.Listen("player_say")
 	add("player_say", "playerchat", function(instance, data)
 		local ply = Player(data.userid)
-		return true, {instance.WrapObject(ply), data.text, data.teamonly, not ply:Alive()}
+		return true, {instance.WrapObject(ply), data.text, data.teamonly, not (Ent_IsValid(ply) and ply:Alive())}
 	end)
 
 	--- Called when a players sprays their logo
