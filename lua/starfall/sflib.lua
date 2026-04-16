@@ -314,7 +314,8 @@ SF.LimitObject = {
 		getmetatable(t.counters).__index = function(t,k) t[k]=0 return 0 end
 		
 		scale = scale or 1
-		local maxcvar = CreateConVar("sf_"..cvarname.."_max"..(CLIENT and "_cl" or ""), tostring(max), FCVAR_ARCHIVE, maxhelp)
+		local maxname = "sf_"..cvarname.."_max"..(CLIENT and "_cl" or "")
+		local maxcvar = CreateConVar(maxname, tostring(max), FCVAR_ARCHIVE, maxhelp)
 		SF.CvarCallback(maxcvar, function(val) t.max = val*scale if t.max<0 then t.max = math.huge end end, maxcvar:GetFloat())
 
 		return setmetatable(t, p)
