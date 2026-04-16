@@ -176,8 +176,8 @@ function Editor:Init()
 	self.Components = {}
 
 	-- Controls the auto reload functionality
-	SF.CvarCallback(Editor.EditorFileAutoReload, function(val) self:setFileAutoReload(val) end, Editor.EditorFileAutoReload:GetBool())
-	SF.CvarCallback(Editor.EditorFileAutoReloadInterval, function(val) self:setFileAutoReloadInterval(val) end, Editor.EditorFileAutoReloadInterval:GetFloat())
+	SF.CvarCallback(Editor.EditorFileAutoReload, function(val) self:setFileAutoReload(val) end, "boolean")
+	SF.CvarCallback(Editor.EditorFileAutoReloadInterval, function(val) self:setFileAutoReloadInterval(val) end, "number")
 
 	-- Load border colors, position, & size
 	self:LoadEditorSettings()

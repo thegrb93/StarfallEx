@@ -27,7 +27,7 @@ else
 	SF.CvarEnabled = CreateConVar( "sf_enabled_cl", "1", { FCVAR_ARCHIVE, FCVAR_USERINFO, FCVAR_DONTRECORD }, "Enable clientside starfall" )
 end
 local ramlimit
-SF.CvarCallback(SF.RamCap, function(val) ramlimit = val end, SF.RamCap:GetInt())
+SF.CvarCallback(SF.RamCap, function(val) ramlimit = val end, "number")
 
 SF.Instance = {}
 SF.Instance.__index = SF.Instance

@@ -50,8 +50,7 @@ __call = function(t,jvar,cvarname,default)
 		type = TypeID(default)
 	}, t)
 
-	local cvar = CreateClientConVar(cvarname, self:toCvar(default), true, false)
-	SF.CvarCallback(cvar, function(val) self:update(val) end, cvar:GetString())
+	SF.CvarCallback(CreateClientConVar(cvarname, self:toCvar(default), true, false), function(val) self:update(val) end, "string")
 
 	return self
 end,
@@ -93,11 +92,9 @@ __index = {
 __call = function(t,cvarUrlName,cvarOpacityName)
 	local self = setmetatable({}, t)
 
-	local cvarUrl = CreateClientConVar(cvarUrlName, "", true, false)
-	SF.CvarCallback(cvarUrl, function(val) self.url=val self:apply() end, cvarUrl:GetString())
+	SF.CvarCallback(CreateClientConVar(cvarUrlName, "", true, false), function(val) self.url=val self:apply() end, "string")
 
-	local cvarOpacity = CreateClientConVar(cvarOpacityName, "200", true, false)
-	SF.CvarCallback(cvarOpacity, function(val) self.opacity=val/255 self:apply() end, cvarOpacity:GetFloat())
+	SF.CvarCallback(CreateClientConVar(cvarOpacityName, "200", true, false), function(val) self.opacity=math.Clamp(val/255, 0, 1) self:apply() end, "number")
 
 	return self
 end

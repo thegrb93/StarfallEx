@@ -161,7 +161,7 @@ function TabHandler:Init()
 	self.Modes.Starfall = include("starfall/editor/syntaxmodes/starfall.lua")
 	colors = SF.Editor.Themes.CurrentTheme
 	self:LoadSyntaxColors()
-	SF.CvarCallback(self.HtmlBackgroundConvar, function(val) self:UpdateHtmlBackground(val) end, self.HtmlBackgroundConvar:GetString())
+	SF.CvarCallback(self.HtmlBackgroundConvar, function(val) self:UpdateHtmlBackground(val) end, "string")
 end
 TabHandler.DocsFinished = TabHandler.Init
 
@@ -3178,7 +3178,7 @@ function PANEL:AutocompleteCreate()
 		end,
 	}, {__index = function() return function() end end})
 
-	SF.CvarCallback(TabHandler.ACControlStyle, function(val) acPanel.Think = controlSchemes[math.Clamp(math.floor(val), 1, #controlSchemes)] end, TabHandler.ACControlStyle:GetInt())
+	SF.CvarCallback(TabHandler.ACControlStyle, function(val) acPanel.Think = controlSchemes[math.Clamp(math.floor(val), 0, #controlSchemes)] end, "number")
 
 	local suggestionlist = vgui.Create( "DPanelList", acPanel )
 	suggestionlist:DockMargin(6, 6, 6, 6)

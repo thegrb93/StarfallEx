@@ -9,8 +9,7 @@ surface.CreateFont("StarfallToolBig", { font = "Roboto-Bold.ttf", size = 36 })
 surface.CreateFont("StarfallToolSmall", { font = "Roboto-Italic.ttf", size = 32, shadow = true })
 
 local simulation_fps
-local simulation_fps_cvar = CreateClientConVar("starfall_toolscreen_fps", "120", true, false, "Maximum FPS of the stars animation", 30, 300)
-SF.CvarCallback(simulation_fps_cvar, function(val) simulation_fps = val end, simulation_fps_cvar:GetFloat())
+SF.CvarCallback(CreateClientConVar("starfall_toolscreen_fps", "120", true, false, "Maximum FPS of the stars animation", 30, 300), function(val) simulation_fps = val end, "number")
 
 -- Tuning vars
 local color_background       = Color(41, 38, 52)                  -- Background color
@@ -194,5 +193,4 @@ local function toggle_toolscreen(enabled)
 		end
 	end
 end
-local toolScreenCvar = CreateClientConVar("starfall_toolscreen", "1", true, false, "Enable Starfall custom toolgun screen animation", 0, 1)
-SF.CvarCallback(toolScreenCvar, function(val) toggle_toolscreen(val) end, toolScreenCvar:GetBool(), true)
+SF.CvarCallback(CreateClientConVar("starfall_toolscreen", "1", true, false, "Enable Starfall custom toolgun screen animation", 0, 1), function(val) toggle_toolscreen(val) end, "boolean", true)
