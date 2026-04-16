@@ -43,16 +43,15 @@ __index = {
 		TabHandler.html:RunJavascript([[sfeditor.updateOptions({]]..self.js..[[});]])
 	end
 },
-__call = function(t,jvar,cvar,default)
+__call = function(t,jvar,cvarname,default)
 	local self = setmetatable({
 		jvar = jvar,
 		default = default,
 		type = TypeID(default)
 	}, t)
 
-	CreateClientConVar(cvar, self:toCvar(default), true, false)
-	cvars.AddChangeCallback(cvar, function(_, _, new) self:update(new) end)
-	self:update(GetConVarString(cvar))
+	local cvar = CreateClientConVar(cvarname, self:toCvar(default), true, false)
+	SF.CvarCallback(cvar, function(val) self:update(val) end, cvar:GetString())
 
 	return self
 end,
@@ -91,16 +90,14 @@ __index = {
 		end
 	end
 },
-__call = function(t,cvarUrl,cvarOpacity)
+__call = function(t,cvarUrlName,cvarOpacityName)
 	local self = setmetatable({}, t)
 
-	CreateClientConVar(cvarUrl, "", true, false)
-	cvars.AddChangeCallback(cvarUrl, function(_, _, new) self.url=new self:apply() end)
-	self.url = GetConVarString(cvarUrl)
+	local cvarUrl = CreateClientConVar(cvarUrlName, "", true, false)
+	SF.CvarCallback(cvarUrl, function(val) self.url=val self:apply() end, cvarUrl:GetString())
 
-	CreateClientConVar(cvarOpacity, "200", true, false)
-	cvars.AddChangeCallback(cvarOpacity, function(_, _, new) self.opacity=(tonumber(new) or 0)/255 self:apply() end)
-	self.opacity = GetConVarNumber(cvarOpacity)/255
+	local cvarOpacity = CreateClientConVar(cvarOpacityName, "200", true, false)
+	SF.CvarCallback(cvarOpacity, function(val) self.opacity=val/255 self:apply() end, cvarOpacity:GetFloat())
 
 	return self
 end
