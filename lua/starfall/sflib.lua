@@ -145,7 +145,8 @@ function SF.CvarCallback(cvar, callback, typename, dontInit)
 	else
 		error("Unsupported type!")
 	end
-	cvars.AddChangeCallback(cvar:GetName(), function(_,_,val) callback(converter(val)) end)
+	cvars.RemoveChangeCallback(cvar:GetName(), "sf")
+	cvars.AddChangeCallback(cvar:GetName(), function(_,_,val) callback(converter(val)) end, "sf")
 	if not dontInit then callback(converter(cvar:GetString())) end
 end
 
