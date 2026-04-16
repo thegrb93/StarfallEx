@@ -134,7 +134,7 @@ end
 -- Declare Basic Starfall Types
 -------------------------------------------------------------------------------
 
-function SF.CvarCallback(cvar, callback, curval)
+function SF.CvarCallback(cvar, callback, curval, dontInit)
 	local converter
 	if isnumber(curval) then
 		converter = function(x) return tonumber(x) or tonumber(cvar:GetDefault()) end
@@ -146,7 +146,7 @@ function SF.CvarCallback(cvar, callback, curval)
 		error("Unsupported type!")
 	end
 	cvars.AddChangeCallback(cvar:GetName(), function(_,_,val) callback(converter(val)) end)
-	callback(curval)
+	if not dontInit then callback(curval) end
 end
 
 -- Returns a class that manages a table of entity keys

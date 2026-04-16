@@ -194,7 +194,5 @@ local function toggle_toolscreen(enabled)
 		end
 	end
 end
-CreateClientConVar("starfall_toolscreen", "1", true, false, "Enable Starfall custom toolgun screen animation", 0, 1)
-cvars.AddChangeCallback("starfall_toolscreen", function(_, _, value)
-	toggle_toolscreen(value == "1")
-end)
+local toolScreenCvar = CreateClientConVar("starfall_toolscreen", "1", true, false, "Enable Starfall custom toolgun screen animation", 0, 1)
+SF.CvarCallback(cvar, function(val) toggle_toolscreen(val) end, toolScreenCvar:GetBool(), true)
