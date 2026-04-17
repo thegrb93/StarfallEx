@@ -134,6 +134,22 @@ end
 -- Declare Basic Starfall Types
 -------------------------------------------------------------------------------
 
+function SF.CvarCallback(cvar, callback, typename, dontInit)
+	local converter
+	if typename=="number" then
+		converter = function(x) return tonumber(x) or tonumber(cvar:GetDefault()) end
+	elseif typename=="string" then
+		converter = function(x) return x end
+	elseif typename=="boolean" then
+		converter = function(x) return tobool(x) end
+	else
+		error("Unsupported type!")
+	end
+	cvars.RemoveChangeCallback(cvar:GetName(), "sf")
+	cvars.AddChangeCallback(cvar:GetName(), function(_,_,val) callback(converter(val)) end, "sf")
+	if not dontInit then callback(converter(cvar:GetString())) end
+end
+
 -- Returns a class that manages a table of entity keys
 function SF.EntityTable(key, destructor, dontwait)
 	return setmetatable({}, {
@@ -231,14 +247,10 @@ SF.BurstObject = {
 		}
 
 		local ratename = "sf_"..cvarname.."_burstrate"..(CLIENT and "_cl" or "")
-		local ratecvar = CreateConVar(ratename, tostring(rate), FCVAR_ARCHIVE, ratehelp)
-		t.rate = ratecvar:GetFloat()*scale
-		cvars.AddChangeCallback(ratename, function() t.rate = ratecvar:GetFloat()*scale end)
+		SF.CvarCallback(CreateConVar(ratename, tostring(rate), FCVAR_ARCHIVE, ratehelp), function(val) t.rate = val*scale end, "number")
 
 		local maxname = "sf_"..cvarname.."_burstmax"..(CLIENT and "_cl" or "")
-		local maxcvar = CreateConVar(maxname, tostring(max), FCVAR_ARCHIVE, maxhelp)
-		t.max = maxcvar:GetFloat()*scale
-		cvars.AddChangeCallback(maxname, function() t.max = maxcvar:GetFloat()*scale end)
+		SF.CvarCallback(CreateConVar(maxname, tostring(max), FCVAR_ARCHIVE, maxhelp), function(val) t.max = val*scale end, "number")
 
 		return setmetatable(t, p)
 	end
@@ -299,16 +311,10 @@ SF.LimitObject = {
 			counters = SF.EntityTable("limit"..cvarname)
 		}
 		getmetatable(t.counters).__index = function(t,k) t[k]=0 return 0 end
-
-		local maxname = "sf_"..cvarname.."_max"..(CLIENT and "_cl" or "")
-		local maxcvar = CreateConVar(maxname, tostring(max), FCVAR_ARCHIVE, maxhelp)
+		
 		scale = scale or 1
-		local function calcMax()
-			t.max = maxcvar:GetFloat()*scale
-			if t.max<0 then t.max = math.huge end
-		end
-		calcMax()
-		cvars.AddChangeCallback(maxname, calcMax)
+		local maxname = "sf_"..cvarname.."_max"..(CLIENT and "_cl" or "")
+		SF.CvarCallback(CreateConVar(maxname, tostring(max), FCVAR_ARCHIVE, maxhelp), function(val) t.max = val*scale if t.max<0 then t.max = math.huge end end, "number")
 
 		return setmetatable(t, p)
 	end
