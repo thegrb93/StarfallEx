@@ -910,6 +910,7 @@ function PANEL:OnMouseReleased(code)
 end
 
 function PANEL:SetCode(text)
+	text = SF.Editor.normalizeCode(text)
 	if text == self:GetCode() then return end
 	self.Rows = {}
 	self.RowTexts = {}
