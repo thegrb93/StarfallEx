@@ -1318,8 +1318,10 @@ function Editor:TranslateValues(panel, x, y)
 end
 
 function Editor:OpenCode(path, code, codeOnDisk, forcenewtab, checkFileExists)
+	code = SF.Editor.normalizeCode(code)
+
 	if path and checkFileExists and file.Exists("starfall/" .. path, "DATA") then
-		if codeOnDisk==nil then codeOnDisk = file.Read("starfall/" .. path, "DATA") or "" end
+		if codeOnDisk==nil then codeOnDisk = SF.Editor.normalizeCode(file.Read("starfall/" .. path, "DATA") or "") end
 		if code==codeOnDisk then return end
 	end
 
@@ -1464,6 +1466,9 @@ function Editor:ChosenFile(Line, code)
 	self:GetCurrentTabContent().chosenfile = Line
 	if Line and not code then
 		code = file.Read(Line)
+		if code then
+			code = SF.Editor.normalizeCode(code)
+		end
 	end
 	self:GetCurrentTabContent().savedCode = code
 
@@ -1650,6 +1655,7 @@ function Editor:LoadFile(Line, forcenewtab)
 
 	local str = file.Read(Line, "DATA")
 	if str then
+		str = SF.Editor.normalizeCode(str)
 		self:OpenCode(Line, str, str, forcenewtab)
 	else
 		SF.AddNotify(LocalPlayer(), "Erroring opening file: " .. Line, "ERROR", 7, "ERROR1")
@@ -1696,7 +1702,7 @@ function Editor:ReloadTab(tabIndex, interactive)
 		end
 
 		tabContent:SetCode(fileContent)
-		tabContent.savedCode = fileContent
+		tabContent.savedCode = SF.Editor.normalizeCode(fileContent)
 		tabContent.autoReloadLastModified = fileLastModified
 		self:UpdateTabText(tab)
 		if tabIndex == activeTabIndex then

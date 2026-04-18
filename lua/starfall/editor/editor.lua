@@ -108,6 +108,10 @@ if CLIENT then
 		return path
 	end
 
+	function SF.Editor.normalizeCode(code)
+		return (string.gsub(code, "\r", ""))
+	end
+
 	function SF.Editor.renameFile(oldFile, newFile)
 		if file.Exists(newFile, "DATA") then
 			SF.AddNotify(LocalPlayer(), "Failed to rename. File already exists there.", "ERROR", 7, "ERROR1")
