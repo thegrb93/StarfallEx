@@ -176,8 +176,8 @@ function Editor:Init()
 	self.Components = {}
 
 	-- Controls the auto reload functionality
-	SF.CvarCallback(Editor.EditorFileAutoReload, function(val) self:setFileAutoReload(val) end, "boolean")
 	SF.CvarCallback(Editor.EditorFileAutoReloadInterval, function(val) self:setFileAutoReloadInterval(val) end, "number")
+	SF.CvarCallback(Editor.EditorFileAutoReload, function(val) self:setFileAutoReload(val) end, "boolean")
 
 	-- Load border colors, position, & size
 	self:LoadEditorSettings()
@@ -201,11 +201,6 @@ function Editor:Init()
 	self:SetV(false)
 
 	self:InitShutdownHook()
-
-	-- This should create the timers
-	if self.EditorFileAutoReload then
-		self:setFileAutoReload(true)
-	end
 end
 
 local size = CreateClientConVar("sf_editor_size", "800_600", true, false)
