@@ -433,15 +433,19 @@ function PANEL:DoRightClick(node)
 				end)
 		self.menu:AddSpacer()
 		self.menu:AddOption("Delete", function ()
-				Derma_Query("Are you sure you want to delete this file?",
+				local fileName = node:GetFileName()
+
+				Derma_Query(
+					"Are you sure you want to delete '" .. string.sub(fileName, 10) .. "'?",
 					"Delete file",
 					"Delete",
 					function ()
-						file.Delete(node:GetFileName())
-						SF.AddNotify(LocalPlayer(), "File deleted: " .. node:GetFileName(), "GENERIC", 7, "DRIP3")
+						file.Delete(fileName)
+						SF.AddNotify(LocalPlayer(), "File deleted: " .. fileName, "GENERIC", 7, "DRIP3")
 						self:ReloadTree()
 					end,
-					"Cancel")
+					"Cancel"
+				)
 			end)
 	elseif menu == "folder" then
 		local function expandChildren(node, expand)
