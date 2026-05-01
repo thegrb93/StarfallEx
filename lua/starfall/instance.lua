@@ -182,18 +182,62 @@ function SF.RegisterType(name, weakwrapper, weaksensitive, target_metatable, sup
 	}
 end
 
+-- Cleanup wrapped entity when it's removed
+SF.WrappedEntities = SF.EntityTable("SFWrappedEnts", function(ent)
+	for inst in pairs(SF.allInstances) do
+		for _, meta in ipairs(inst.entityMetas) do
+			local wrap = meta.sensitive2sf[ent]
+			if wrap then
+				meta.sensitive2sf[ent] = nil
+				meta.sf2sensitive[wrap] = nil
+			end
+		end
+	end
+end)
+
 function SF.Instance:CreateWrapper(metatable, typedata)
 	
 	local wrap, unwrap
-	-- If the type already has wrappers, dont re-assign
-	if typedata.weakwrapper==nil or typedata.weaksensitive==nil then
-		if typedata.customwrappers then
-			wrap, unwrap = typedata.customwrappers(self.CheckType, metatable)
-		else
-			return true
-		end
-	else
 
+	-- Create wrapper based on what type of weakness specified
+	if typedata.weakwrapper=="entity" then
+		table.insert(entityMetas, metatable)
+		-- Entities GC when engine entity removed
+		local sf2sensitive, sensitive2sf = {}, {}
+		metatable.sensitive2sf = sensitive2sf
+		metatable.sf2sensitive = sf2sensitive
+
+		if metatable.supertype then
+			local supersensitive2sf = metatable.supertype.sensitive2sf
+			local supersf2sensitive = metatable.supertype.sf2sensitive
+			function wrap(value)
+				if value == nil then return nil end
+				if supersensitive2sf[value] then return supersensitive2sf[value] end
+				SF.WrappedEntities[value] = true
+				local tbl = setmetatable({}, metatable)
+				sf2sensitive[tbl] = value
+				supersensitive2sf[value] = tbl
+				supersf2sensitive[tbl] = value
+				return tbl
+			end
+		else
+			function wrap(value)
+				if value == nil then return nil end
+				if sensitive2sf[value] then return sensitive2sf[value] end
+				SF.WrappedEntities[value] = true
+				local tbl = setmetatable({}, metatable)
+				sensitive2sf[value] = tbl
+				sf2sensitive[tbl] = value
+				return tbl
+			end
+		end
+		function unwrap(value)
+			local ret = sf2sensitive[value]
+			return ret or self.CheckType(value, metatable, 2) or SF.Throw("Object no longer valid", 3)
+		end
+	elseif typedata.weakwrapper==nil or typedata.weaksensitive==nil then
+		wrap, unwrap = typedata.customwrappers(self.CheckType, metatable)
+	else
 		local sf2sensitive = setmetatable({}, { __mode = (typedata.weakwrapper and "k" or "") .. (typedata.weaksensitive and "v" or "") })
 		local sensitive2sf = setmetatable({}, { __mode = (typedata.weaksensitive and "k" or "") .. (typedata.weakwrapper and "v" or "") })
 		metatable.sensitive2sf = sensitive2sf
@@ -202,14 +246,10 @@ function SF.Instance:CreateWrapper(metatable, typedata)
 		if metatable.supertype then
 			local supersensitive2sf = metatable.supertype.sensitive2sf
 			local supersf2sensitive = metatable.supertype.sf2sensitive
-
-			if not supersensitive2sf then return false end --Need to try again since baseclass hasn't been created yet
-
 			function wrap(value)
 				if value == nil then return nil end
-				if sensitive2sf[value] then return sensitive2sf[value] end
+				if supersensitive2sf[value] then return supersensitive2sf[value] end
 				local tbl = setmetatable({}, metatable)
-				sensitive2sf[value] = tbl
 				sf2sensitive[tbl] = value
 				supersensitive2sf[value] = tbl
 				supersf2sensitive[tbl] = value
@@ -238,13 +278,13 @@ function SF.Instance:CreateWrapper(metatable, typedata)
 
 	metatable.Wrap = wrap
 	metatable.Unwrap = unwrap
-	return true
 end
 
 function SF.Instance:BuildEnvironment()
 	self.Libraries = {}
 	self.Types = {}
 	self.env = {}
+	self.entityMetas = {}
 
 	local object_wrappers = {}
 	local object_unwrappers = {}
@@ -380,10 +420,11 @@ function SF.Instance:BuildEnvironment()
 		local numCreated = 0
 		local newTypesToCreate = {}
 		for name, meta in pairs(typesToCreate) do
-			if self:CreateWrapper(meta, SF.Types[name]) then
-				numCreated = numCreated + 1
-			else
+			if meta.supertype and meta.supertype.Wrap==nil then
 				newTypesToCreate[name] = meta
+			else
+				self:CreateWrapper(meta, SF.Types[name])
+				numCreated = numCreated + 1
 			end
 		end
 		if next(newTypesToCreate)==nil then break end

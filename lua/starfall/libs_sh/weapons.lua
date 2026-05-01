@@ -9,7 +9,7 @@ local WEP_META = FindMetaTable("Weapon")
 -- @class type
 -- @libtbl weapon_methods
 -- @libtbl weapon_meta
-SF.RegisterType("Weapon", false, true, WEP_META, "Entity")
+SF.RegisterType("Weapon", "entity", nil, WEP_META, "Entity")
 
 
 return function(instance)

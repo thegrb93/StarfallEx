@@ -51,7 +51,7 @@ end)
 -- @class type
 -- @libtbl ents_methods
 -- @libtbl ent_meta
-SF.RegisterType("Entity", false, true, ENT_META)
+SF.RegisterType("Entity", "entity", nil, ENT_META)
 
 
 return function(instance)

@@ -27,7 +27,7 @@ SF.RegisterLibrary("wire")
 -- @class type
 -- @libtbl wirelink_methods
 -- @libtbl wirelink_meta
-SF.RegisterType("Wirelink", false, true)
+SF.RegisterType("Wirelink", "entity")
 
 --- Vector2 type for wire xv2
 -- @name Vector2

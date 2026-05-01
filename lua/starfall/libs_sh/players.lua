@@ -73,7 +73,7 @@ end
 -- @name Player
 -- @class type
 -- @libtbl player_methods
-SF.RegisterType("Player", false, true, PLY_META, "Entity")
+SF.RegisterType("Player", "entity", nil, PLY_META, "Entity")
 
 
 return function(instance)

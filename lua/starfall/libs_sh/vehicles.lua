@@ -62,7 +62,7 @@ end
 -- @class type
 -- @libtbl vehicle_methods
 -- @libtbl vehicle_meta
-SF.RegisterType("Vehicle", false, true, VEH_META, "Entity")
+SF.RegisterType("Vehicle", "entity", nil, VEH_META, "Entity")
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
