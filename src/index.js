@@ -122,8 +122,6 @@ const SF_DOC = {
 			}
 
 			for (const [, field] of Object.entries(lib.fields)) {
-				console.log(field);
-
 				let fieldData = {
 					name: field.name,
 					description: field.description,
