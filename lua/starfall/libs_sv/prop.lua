@@ -453,7 +453,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		entOk, entErr = instance:runExternal(function()
 			local spawn_function = scripted_ents.GetMember(class, "SpawnFunction")
 			if spawn_function then
-				entity = spawn_function( scripted_ents.GetStored(class), ply, SF.dumbTrace(NULL, pos), class )
+				entity = spawn_function( scripted_ents.GetStored(class).t, ply, SF.dumbTrace(NULL, pos), class )
 			else
 				entity = ents.Create( class )
 				if Ent_IsValid(entity) then
