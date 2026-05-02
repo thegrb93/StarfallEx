@@ -200,7 +200,9 @@ function SF.Instance:CreateWrapper(metatable, typedata)
 	local wrap, unwrap
 
 	-- Create wrapper based on what type of weakness specified
-	if typedata.weakwrapper=="entity" then
+	if typedata.customwrappers then
+		wrap, unwrap = typedata.customwrappers(self.CheckType, metatable)
+	elseif typedata.weakwrapper=="entity" then
 		table.insert(entityMetas, metatable)
 		-- Entities GC when engine entity removed
 		local sf2sensitive, sensitive2sf = {}, {}
@@ -235,8 +237,6 @@ function SF.Instance:CreateWrapper(metatable, typedata)
 			local ret = sf2sensitive[value]
 			return ret or self.CheckType(value, metatable, 2) or SF.Throw("Object no longer valid", 3)
 		end
-	elseif typedata.weakwrapper==nil or typedata.weaksensitive==nil then
-		wrap, unwrap = typedata.customwrappers(self.CheckType, metatable)
 	else
 		local sf2sensitive = setmetatable({}, { __mode = (typedata.weakwrapper and "k" or "") .. (typedata.weaksensitive and "v" or "") })
 		local sensitive2sf = setmetatable({}, { __mode = (typedata.weaksensitive and "k" or "") .. (typedata.weakwrapper and "v" or "") })
