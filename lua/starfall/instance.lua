@@ -203,7 +203,7 @@ function SF.Instance:CreateWrapper(metatable, typedata)
 	if typedata.customwrappers then
 		wrap, unwrap = typedata.customwrappers(self.CheckType, metatable)
 	elseif typedata.weakwrapper=="entity" then
-		table.insert(entityMetas, metatable)
+		table.insert(self.entityMetas, metatable)
 		-- Entities GC when engine entity removed
 		local sf2sensitive, sensitive2sf = {}, {}
 		metatable.sensitive2sf = sensitive2sf
