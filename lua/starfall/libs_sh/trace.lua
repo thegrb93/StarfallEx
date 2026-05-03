@@ -211,15 +211,13 @@ if CLIENT then
 	-- @param Vector pos The position at which to remove decals.
 	-- @param number distance Radius of the sphere to remove decals in.
 	-- @param number? limit If set to above 0, only remove this many decals.
-	-- @param boolean permanent Whether to remove map-spawned decals (true), or only gameplay-spawned decals such as bullet holes or anything placed by util.Decal and similar (false)
-	function trace_library.removeDecalsAt(pos, distance, limit, permanent)
+	function trace_library.removeDecalsAt(pos, distance, limit)
 		checkpermission(instance, nil, "trace.decal")
 		checkluatype(distance, TYPE_NUMBER)
-		checkluatype(permanent, TYPE_BOOL)
 
 		vec_SetUnpacked(start_vec, pos[1], pos[2], pos[3])
 
-		util_RemoveDecalsAt(start_vec, distance, limit, permanent)
+		util_RemoveDecalsAt(start_vec, distance, limit, false)
 	end
 end
 
