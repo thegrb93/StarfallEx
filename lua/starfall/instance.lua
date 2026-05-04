@@ -214,9 +214,10 @@ function SF.Instance:CreateWrapper(metatable, typedata)
 			local supersf2sensitive = metatable.supertype.sf2sensitive
 			function wrap(value)
 				if value == nil then return nil end
-				if supersensitive2sf[value] then return supersensitive2sf[value] end
+				if sensitive2sf[value] then return sensitive2sf[value] end
 				SF.WrappedEntities[value] = true
 				local tbl = setmetatable({}, metatable)
+				sensitive2sf[value] = tbl
 				sf2sensitive[tbl] = value
 				supersensitive2sf[value] = tbl
 				supersf2sensitive[tbl] = value
@@ -248,8 +249,9 @@ function SF.Instance:CreateWrapper(metatable, typedata)
 			local supersf2sensitive = metatable.supertype.sf2sensitive
 			function wrap(value)
 				if value == nil then return nil end
-				if supersensitive2sf[value] then return supersensitive2sf[value] end
+				if sensitive2sf[value] then return sensitive2sf[value] end
 				local tbl = setmetatable({}, metatable)
+				sensitive2sf[value] = tbl
 				sf2sensitive[tbl] = value
 				supersensitive2sf[value] = tbl
 				supersf2sensitive[tbl] = value
