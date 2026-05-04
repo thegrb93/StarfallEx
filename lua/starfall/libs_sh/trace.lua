@@ -14,7 +14,7 @@ local math_huge = math.huge
 -- @libtbl trace_library
 SF.RegisterLibrary("trace")
 
-local structWrapper, util_TraceLine, util_TraceHull, util_IntersectRayWithOBB, util_IntersectRayWithPlane, util_Decal, util_PointContents, util_AimVector = SF.StructWrapper, util.TraceLine, util.TraceHull, util.IntersectRayWithOBB, util.IntersectRayWithPlane, util.Decal, util.PointContents, util.AimVector
+local structWrapper, util_TraceLine, util_TraceHull, util_IntersectRayWithOBB, util_IntersectRayWithPlane, util_Decal, util_DecalEx, util_RemoveDecalsAt, util_PointContents, util_AimVector = SF.StructWrapper, util.TraceLine, util.TraceHull, util.IntersectRayWithOBB, util.IntersectRayWithPlane, util.Decal, util.DecalEx, util.RemoveDecalsAt, util.PointContents, util.AimVector
 
 local vec_SetUnpacked = getmetatable(Vector(0, 0, 0)).SetUnpacked
 local ang_SetUnpacked = getmetatable(Angle(0, 0, 0)).SetUnpacked
@@ -179,6 +179,46 @@ function trace_library.decal(name, start, endpos, filter)
 
 	plyDecalBurst:use(instance.player, 1)
 	util_Decal(name, start_vec, endpos_vec, filter)
+end
+
+if CLIENT then
+	local cunwrap = instance.Types.Color.Unwrap
+	local mtlunwrap = instance.Types.LockedMaterial.Unwrap
+
+	--- Paints a decal on a specific entity
+	-- @client
+	-- @param Material material The material to paint.
+	-- @param Entity ent The entity to apply the decal to
+	-- @param Vector position The position of the decal.
+	-- @param Vector normal The direction of the decal.
+	-- @param Color color The color of the decal. This only works when used on a brush model and only if the decal material has set $vertexcolor to 1.
+	-- @param number w The width scale of the decal.
+	-- @param number h The height scale of the decal.
+	function trace_library.decalEx(material, ent, position, normal, color, w, h)
+		checkpermission(instance, nil, "trace.decal")
+		checkluatype(w, TYPE_NUMBER)
+		checkluatype(h, TYPE_NUMBER)
+
+		vec_SetUnpacked(start_vec, position[1], position[2], position[3])
+		vec_SetUnpacked(normal_vec, normal[1], normal[2], normal[3])
+
+		plyDecalBurst:use(instance.player, 1)
+		util_DecalEx(mtlunwrap(material), eunwrap(ent), start_vec, normal_vec, cunwrap(color), w, h)
+	end
+
+	--- Removes world decals at given position, in given radius. Does not remove decals on models!
+	-- @client
+	-- @param Vector pos The position at which to remove decals.
+	-- @param number distance Radius of the sphere to remove decals in.
+	-- @param number? limit If set to above 0, only remove this many decals.
+	function trace_library.removeDecalsAt(pos, distance, limit)
+		checkpermission(instance, nil, "trace.decal")
+		checkluatype(distance, TYPE_NUMBER)
+
+		vec_SetUnpacked(start_vec, pos[1], pos[2], pos[3])
+
+		util_RemoveDecalsAt(start_vec, distance, limit, false)
+	end
 end
 
 --- Returns True if player is allowed to use trace.decal
