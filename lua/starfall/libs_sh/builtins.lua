@@ -539,6 +539,8 @@ local function argsToChat(...)
 	return processed, length, size
 end
 
+SF.argsToChat = argsToChat
+
 if SERVER then
 	local function sendPrintToPlayer(ply, data, console)
 		net.Start("starfall_print")
@@ -549,6 +551,8 @@ if SERVER then
 		end
 		net.Send(ply)
 	end
+
+	SF.sendPrintToPlayer = sendPrintToPlayer
 
 	--- Prints a message to the player's chat.
 	-- @shared
