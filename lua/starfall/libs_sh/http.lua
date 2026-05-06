@@ -33,7 +33,7 @@ local function runCallback(callback)
 		if callback then
 			if istable(c) then
 				local newc = {}
-				for k, v in pairs(c) do if headerWhitelist:check(k) then newc[k]=v end end
+				for k, v in pairs(c) do if headerWhitelist:check(string.lower(k)) then newc[k]=v end end
 				c = newc
 			end
 			instance:runFunction(callback, a, b, c, d)
