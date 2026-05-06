@@ -6,6 +6,7 @@ import TableCard from './Cards/TableCard';
 import TypeCard from './Cards/TypeCard';
 import MarkdownCard from './Cards/MarkdownCard';
 import ContributorsCard from './Cards/ContributorsCard';
+import FieldCard from './Cards/FieldCard';
 
 function UnknownCard(props)
 {
@@ -37,6 +38,8 @@ function mapClass(c)
         return MarkdownCard;
     case "contributors":
         return ContributorsCard;
+    case "field":
+        return FieldCard;
     default:
       return UnknownCard;
   }

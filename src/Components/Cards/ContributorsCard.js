@@ -25,7 +25,7 @@ export default function ContributorsCard(props)
 		)
 	}
 
-	let contributors = contributorsData.filter(x => x.login != "web-flow").map(x => (
+	let contributors = contributorsData.filter(x => x.login !== "web-flow").map(x => (
 		<li key = {x.id}>
 			<a href = {x.html_url}>
 				<img className = "avatar" src={x.avatar_url+"&s=24"} alt={x.login} />

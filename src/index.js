@@ -61,12 +61,12 @@ const SF_DOC = {
 			path: path,
 			class: type
 		}
-		pages[path.toLowerCase()] = page;
+		pages[path] = page;
 
 		if(parent !== "")
 		{
-			pages[parent.toLowerCase()].data._children.push(data);
-			pages[parent.toLowerCase()].sidebarItem.children.push(sidebarItem);
+			pages[parent].data._children.push(data);
+			pages[parent].sidebarItem.children.push(sidebarItem);
 		}
 		else
 		{
@@ -119,6 +119,18 @@ const SF_DOC = {
 					type: "table",
 				}
 				SF_DOC.AddPage(table.name, "table", "table-realm", table.realm, tableData, path);
+			}
+
+			for (const [, field] of Object.entries(lib.fields)) {
+				let fieldData = {
+					name: field.name,
+					description: field.description,
+					realm: field.realm,
+					parent: lib.name,
+					ghpath: field.path,
+					type: "field",
+				}
+				SF_DOC.AddPage(field.name, "field", "realm", field.realm, fieldData, path);
 			}
 		}
 

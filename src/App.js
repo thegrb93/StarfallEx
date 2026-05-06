@@ -7,11 +7,11 @@ import { HashRouter, useRouteMatch } from 'react-router-dom';
 function AppBody(props)
 {
   const routeMatch = useRouteMatch("/:page");
-  let currentPagePath = "contributors";
+  let currentPagePath = "Contributors";
 
   if(routeMatch !== null && routeMatch.params !== undefined && routeMatch.params.page !== undefined)
   {
-    currentPagePath = routeMatch.params.page.toLowerCase();
+    currentPagePath = routeMatch.params.page;
   }
 
   const currentPage = props.pages[currentPagePath];

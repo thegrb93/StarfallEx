@@ -116,7 +116,7 @@ function renderElements(items, dispatch, currentPage)
 	{
 		if(item.hidden) { continue; }
 		output.push((
-			<SidebarElement key={item.path} path={item.path} name={item.name} collapsed={item.collapsed} dispatch={dispatch} icon = {item.icon} iconType = {item.iconType} type = {item.type} selected={item.path.toLowerCase() === currentPage}>
+			<SidebarElement key={item.path} path={item.path} name={item.name} collapsed={item.collapsed} dispatch={dispatch} icon = {item.icon} iconType = {item.iconType} type = {item.type} selected={item.path === currentPage}>
 				{
 					items && items.length > 0 && renderElements(item.children, dispatch, currentPage)
 				}
