@@ -20,7 +20,7 @@ end
 -- @class type
 -- @libtbl npc_methods
 -- @libtbl npc_meta
-SF.RegisterType("Npc", false, true, NPC_META, "Entity")
+SF.RegisterType("Npc", "entity", nil, NPC_META, "Entity")
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end

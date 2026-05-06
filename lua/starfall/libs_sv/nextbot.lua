@@ -8,7 +8,7 @@ local ENT_META = FindMetaTable("Entity")
 -- @server
 -- @libtbl nb_methods
 -- @libtbl nb_meta
-SF.RegisterType("NextBot", false, true, FindMetaTable("NextBot"), "Entity")
+SF.RegisterType("NextBot", "entity", nil, FindMetaTable("NextBot"), "Entity")
 
 --- Library for spawning NextBots.
 -- @name nextbot
