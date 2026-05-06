@@ -15,6 +15,12 @@ local requests = SF.LimitObject("http_requests", "http request", 3, "The number 
 -- @libtbl http_library
 SF.RegisterLibrary("http")
 
+local headerWhitelist = SF.StringRestrictor(false)
+-- Feel free to pull-request if you need something
+for _, v in ipairs{"accept", "accept-language", "accept-encoding", "content-type", "content-length"} do
+	headerWhitelist:addWhitelistEntry(v)
+end
+
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
@@ -22,10 +28,15 @@ local http_library = instance.Libraries.http
 
 -- Runs the appropriate callback after a http request
 local function runCallback(callback)
-	return function(...)
+	return function(a, b, c, d)
 		requests:free(instance.player, 1)
 		if callback then
-			instance:runFunction(callback, ...)
+			if istable(c) then
+				local newc = {}
+				for k, v in pairs(c) do if headerWhitelist:check(k) then newc[k]=v end end
+				c = newc
+			end
+			instance:runFunction(callback, a, b, c, d)
 		end
 	end
 end
@@ -64,6 +75,9 @@ function http_library.get(url, callbackSuccess, callbackFail, headers)
 		for k, v in pairs(headers) do
 			if not isstring(k) or not isstring(v) then
 				SF.Throw("Headers can only contain string keys and string values", 2)
+			end
+			if not headerWhitelist:check(string.lower(k)) then
+				SF.Throw("Header "..k.." is not whitelisted!", 2)
 			end
 		end
 	end
@@ -115,7 +129,12 @@ function http_library.post(url, payload, callbackSuccess, callbackFail, headers)
 				SF.Throw("Headers can only contain string keys and string values", 2)
 			end
 
-			if string.lower(k) == "content-type" then
+			local k_low = string.lower(k)
+			if not headerWhitelist:check(k_low) then
+				SF.Throw("Header "..k.." is not whitelisted!", 2)
+			end
+
+			if k_low == "content-type" then
 				request.type = v
 				headers[k] = nil
 			end
@@ -210,7 +229,12 @@ function http_library.request(url, method, success, failed, body, parameters, ty
 				SF.Throw("Headers can only contain string keys and string values", 2)
 			end
 
-			if string.lower(k) == "content-type" then
+			local k_low = string.lower(k)
+			if not headerWhitelist:check(k_low) then
+				SF.Throw("Header "..k.." is not whitelisted!", 2)
+			end
+
+			if k_low == "content-type" then
 				if request.type == nil then
 					request.type = v
 				end
