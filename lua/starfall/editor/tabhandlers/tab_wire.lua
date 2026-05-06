@@ -954,6 +954,18 @@ function PANEL:HighlightLine(line, r, g, b, a)
 end
 function PANEL:ClearHighlightedLines() self.HighlightedLines = nil end
 
+local function cellLength(str, typename)
+	if typename == "whitespace" then
+		local tabsize = math.Clamp(TabHandler.TabSizeConVar:GetInt(), 1, 12)
+		local len = 0
+		string.gsub(str, " ", function() len = len + 1 end)
+		string.gsub(str, "\t", function() len = len + tabsize end)
+		return len
+	else
+		return #str
+	end
+end
+
 function PANEL:PaintLine(row, drawpos, leftOffset, drawonlytext)
 	local lines = #self.Rows
 	local lineLen = #self:GetRowText(row)
@@ -1042,17 +1054,17 @@ function PANEL:PaintLine(row, drawpos, leftOffset, drawonlytext)
 
 
 	local nonwhitespace = false
-	for i, cell in ipairs(cells) do
+	for _, cell in ipairs(cells) do
 		if cell[3] == "whitespace" and not nonwhitespace and drawonlytext then -- Skip whitespaces at beginning if its text only
 			continue
 		end
 		nonwhitespace = true
 		if offset > self.Size[2] then return end
 		if offset < 0 then -- When there is part of line horizontally begining before our scrolled area
-			local length = cell[1]:len()
+			local length = cellLength(cell[1], cell[3])
 			if length > -offset then
 				local line = cell[1]:sub(1-offset)
-				offset = line:len()
+				offset = cellLength(line, cell[3])
 
 				if cell[2][2] then --has background
 					if usePigments == 1 and cell[3]:sub(1, 5) == "color" then
@@ -1081,7 +1093,7 @@ function PANEL:PaintLine(row, drawpos, leftOffset, drawonlytext)
 				offset = offset + length
 			end
 		else
-			local length = cell[1]:len()
+			local length = cellLength(cell[1], cell[3])
 			if cell[2][2] then --has background
 				if usePigments == 1 and cell[3]:sub(1, 5) == "color" then
 					surface_SetMaterial( matGrid )

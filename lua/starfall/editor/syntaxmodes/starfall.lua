@@ -250,7 +250,7 @@ function EDITOR:SyntaxColorLine(row)
 
 		addToken("string", self.tokendata)
 	end
-	local spaces = self:SkipPattern(" *")
+	local spaces = self:SkipPattern("[ \t]*")
 	if spaces then addToken("whitespace", spaces) end
 
 	local found = self:SkipPattern("(function)")
@@ -258,7 +258,7 @@ function EDITOR:SyntaxColorLine(row)
 		addToken("storageType", found) -- Add "function"
 		self.tokendata = "" -- Reset tokendata
 
-		local spaces = self:SkipPattern(" *")
+		local spaces = self:SkipPattern("[ \t]*")
 		if spaces then addToken("whitespace", spaces) end
 
 		if self:NextPattern("%s*[a-zA-Z][a-zA-Z0-9_]*") then -- function THIS()
@@ -280,7 +280,7 @@ function EDITOR:SyntaxColorLine(row)
 		end
 		cols.foldable = true
 	end
-	local spaces = self:SkipPattern(" *")
+	local spaces = self:SkipPattern("[ \t]*")
 	if spaces then addToken("whitespace", spaces) end
 
 	found = self:NextPattern("local%s*function%s+")  -- local function
@@ -294,7 +294,7 @@ function EDITOR:SyntaxColorLine(row)
 
 		self.tokendata = "" -- Reset tokendata
 
-		local spaces = self:SkipPattern(" *")
+		local spaces = self:SkipPattern("[ \t]*")
 		if spaces then addToken("whitespace", spaces) end
 
 		if self:NextPattern("%s*[a-zA-Z][a-zA-Z0-9_]*") then -- local function THIS()
@@ -321,7 +321,7 @@ function EDITOR:SyntaxColorLine(row)
 		self.tokendata = ""
 
 		-- eat all spaces
-		local spaces = self:SkipPattern(" *")
+		local spaces = self:SkipPattern("[ \t]*")
 		if spaces then addToken("whitespace", spaces) end
 		if not self.character then break end
 
