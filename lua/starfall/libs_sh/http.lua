@@ -17,7 +17,7 @@ SF.RegisterLibrary("http")
 
 local headerWhitelist = SF.StringRestrictor(false)
 -- Feel free to pull-request if you need something
-for _, v in ipairs{"accept", "accept-language", "accept-encoding", "content-type", "content-length"} do
+for _, v in ipairs{"accept", "accept-language", "accept-encoding", "authorization", "content-type", "content-length"} do
 	headerWhitelist:addWhitelistEntry(v)
 end
 
