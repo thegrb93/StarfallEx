@@ -201,15 +201,15 @@ end
 function player_methods:giveWeapon(weapon, noAmmo)
 	checkluatype(weapon, TYPE_STRING)
 	if noAmmo ~= nil then checkluatype(noAmmo, TYPE_BOOL) end
+
 	local ply = getply(self)
     checkpermission(instance, ply, "player.giveweapon")
 
     local wpnEntry = list.GetEntry("Weapon", weapon)
-    if wpnEntry and wpnEntry.Spawnable then
-        return wwrap(Ply_Give(ply, weapon, noAmmo))
-    else
-        SF.Throw("Invalid weapon!")
-    end
+    if not wpnEntry then SF.Throw(weapon .. " is not a Valid SWEP!") end
+    if not wpnEntry.Spawnable then SF.Throw(weapon .. " is not a Spawnable SWEP!") end
+
+    return wwrap(Ply_Give(ply, weapon, noAmmo))
 end
 
 --- Drops the player's weapon
