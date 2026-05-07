@@ -205,7 +205,7 @@ function player_methods:giveWeapon(weapon, noAmmo)
 	local ply = getply(self)
     checkpermission(instance, ply, "player.giveweapon")
 
-    local wpnEntry = list.GetEntry("Weapon", weapon)
+    local wpnEntry = list.GetForEdit("Weapon", true)[weapon]
     if not wpnEntry then SF.Throw(weapon .. " is not a Valid SWEP!") end
     if not wpnEntry.Spawnable then SF.Throw(weapon .. " is not a Spawnable SWEP!") end
 
