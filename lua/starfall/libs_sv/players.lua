@@ -22,6 +22,7 @@ registerprivilege("player.setPos", "Set Position", "Allows the user to teleport 
 registerprivilege("player.setEyeAngles", "SetEyeAngles", "Allows the user to rotate the view of a player to another orientation", { entities = {}, usergroups = { default = 1 } })
 registerprivilege("player.ignite", "Ignite", "Allows the user to ignite players", { entities = {}, usergroups = { default = 1 } })
 registerprivilege("player.addVelocity", "AddVelocity", "Allows the user to add velocity to a player", { entities = { default = 3 }, usergroups = { default = 1 } })
+registerprivilege("player.giveweapon", "GiveWeapon", "Gives a player a weapon", { usergroups = { default = 1 }, entities = {} })
 
 local PVSLimitCvar = CreateConVar("sf_pvs_pointlimit", 16, FCVAR_ARCHIVE, "The number of PVS points that can be set on each player, limit is shared across all chips")
 
@@ -191,6 +192,24 @@ end
 -- @return boolean True if the player has godmode
 function player_methods:hasGodMode()
 	return Ply_HasGodMode(getply(self))
+end
+
+--- Gives the player a weapon
+-- @param string weapon The class name of the weapon to give
+-- @param boolean? noAmmo Prevent giving ammo on weapon spawn?, Defaults to false.
+-- @return Weapon The weapon
+function player_methods:giveWeapon(weapon, noAmmo)
+	checkluatype(weapon, TYPE_STRING)
+	if noAmmo ~= nil then checkluatype(noAmmo, TYPE_BOOL) end
+	local ply = getply(self)
+    checkpermission(instance, ply, "player.giveweapon")
+
+    local wpnEntry = list.GetEntry("Weapon", weapon)
+    if wpnEntry and wpnEntry.Spawnable then
+        return wwrap(Ply_Give(ply, weapon, noAmmo))
+    else
+        SF.Throw("Invalid weapon!")
+    end
 end
 
 --- Drops the player's weapon
