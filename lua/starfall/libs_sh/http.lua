@@ -17,8 +17,8 @@ SF.RegisterLibrary("http")
 
 local headerWhitelist = SF.StringRestrictor(false)
 -- Feel free to pull-request if you need something
-for _, v in ipairs{"accept", "accept-language", "accept-encoding", "authorization", "content-type", "content-length"} do
-	headerWhitelist:addWhitelistEntry(v)
+for _, v in ipairs{"accept", "accept-language", "accept-encoding", "authorization", "content-type", "content-length", "x-goog-api-key"} do
+	headerWhitelist:addWhitelistEntry(string.PatternSafe(v))
 end
 
 return function(instance)
