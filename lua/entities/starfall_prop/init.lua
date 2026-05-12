@@ -69,22 +69,7 @@ function ENT:UpdateTransmitState()
 	return TRANSMIT_ALWAYS
 end
 
-local CustomPropQueue = {
-    queue = SF.RingQueue(128),
-    sending = nil,
-    add = function(self, propdata)
-        if self.sending == nil then
-            self:next(propdata)
-        else
-            self.queue:push(propdata)
-        end
-    end,
-    next = function(self, propdata)
-        self.sending = propdata or self.queue:pop()
-        if self.sending then self.sending:send() end
-    end
-}
-
+local CustomPropQueue = SF.RingQueue(128)
 local CustomPropData = {
     __index = {
         send = function(self)
@@ -105,7 +90,9 @@ local CustomPropData = {
         finish = function(self)
             if self.finished then return end
             self.finished=true
-            CustomPropQueue:next()
+            CustomPropQueue:pop()
+			local nextdata = CustomPropQueue:front()
+			if nextdata then nextdata:send() end
         end
     },
     __call = function(t, prop, recip)
@@ -115,7 +102,10 @@ local CustomPropData = {
 setmetatable(CustomPropData, CustomPropData)
 
 function ENT:TransmitData(recip)
-    CustomPropQueue:add(CustomPropData(self, recip))
+	local propdata = CustomPropData(self, recip)
+	local shouldstart = CustomPropQueue:isEmpty()
+    CustomPropQueue:push(propdata)
+	if shouldstart then propdata:send() end
 end
 
 SF.WaitForPlayerInit(function(ply)
