@@ -103,9 +103,8 @@ setmetatable(CustomPropData, CustomPropData)
 
 function ENT:TransmitData(recip)
 	local propdata = CustomPropData(self, recip)
-	local shouldstart = CustomPropQueue:isEmpty()
     CustomPropQueue:push(propdata)
-	if shouldstart then propdata:send() end
+	if propdata == CustomPropQueue:front() then propdata:send() end
 end
 
 SF.WaitForPlayerInit(function(ply)
