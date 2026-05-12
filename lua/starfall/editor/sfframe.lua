@@ -448,7 +448,7 @@ function Editor:GetLastTab() return self.LastTab end
 
 function Editor:SetLastTab(Tab) self.LastTab = Tab end
 
-function Editor:GetActiveTab() 
+function Editor:GetActiveTab()
 	local tab = self.C.TabHolder:GetActiveTab()
 	if tab then return tab end
 	self:CreateTab()
@@ -2018,7 +2018,7 @@ function PANEL:UpdatePlayers(players)
 			local svtotal = 0
 			local cltotal = 0
 			for instance, _ in pairs(SF.playerInstances[ply]) do
-				svtotal = svtotal + (instance.entity:IsValid() and instance.entity:GetNWInt("CPUus") or 0)
+				svtotal = svtotal + (instance.entity:IsValid() and instance.entity:GetCPUus("CPUus") or 0)
 				cltotal = cltotal + instance.perf.cpuAverage
 			end
 			cpuServerText:SetText(string.format("SV CPU: %3.1f us", svtotal))

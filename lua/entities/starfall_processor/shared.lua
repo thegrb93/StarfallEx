@@ -18,6 +18,12 @@ ENT.States          = {
 
 local IsValid = FindMetaTable("Entity").IsValid
 
+function ENT:SetupDataTables()
+	self:NetworkVar("Int", 1, "State")
+	self:NetworkVar("Int", 0, "CPUus")
+	self:NetworkVar("Float", 0, "CPUpercent")
+end
+
 function ENT:Compile(sfdata)
 	self:Destroy()
 	local newdata = sfdata~=nil
@@ -64,7 +70,7 @@ function ENT:Compile(sfdata)
 	if SERVER then
 		self.ErroredPlayers = {}
 		self:SetColor4Part(255, 255, 255, select(4, self:GetColor4Part()))
-		self:SetNWInt("State", self.States.Normal)
+		self:SetState(self.States.Normal)
 
 		if self.Inputs then
 			for k, v in pairs(self.Inputs) do
@@ -116,7 +122,7 @@ function ENT:Error(err)
 	local traceback = err.traceback
 
 	if SERVER then
-		self:SetNWInt("State", self.States.Error)
+		self:SetState(self.States.Error)
 		self:SetColor4Part(255, 0, 0, 255)
 	end
 

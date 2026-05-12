@@ -13,7 +13,7 @@ function ENT:Initialize()
 
 	self:AddEFlags( EFL_FORCE_CHECK_TRANSMIT )
 
-	self:SetNWInt("State", self.States.None)
+	self:SetState(self.States.None)
 	self:SetColor4Part(255, 0, 0, select(4, self:GetColor4Part()))
 	self.ErroredPlayers = {}
 	self.ActiveHuds = {}
@@ -74,8 +74,8 @@ end
 function ENT:Think()
 	if self.instance then
 		local bufferAvg = self.instance.perf.cpuAverage
-		self:SetNWInt("CPUus", math.Round(bufferAvg * 1000000))
-		self:SetNWFloat("CPUpercent", math.floor(bufferAvg / self.instance.perf.cpuLimit * 100))
+		self:SetCPUus(math.Round(bufferAvg * 1000000))
+		self:SetCPUpercent(math.floor(bufferAvg / self.instance.perf.cpuLimit * 100))
 		self:NextThink(CurTime() + 0.25)
 		return true
 	end

@@ -27,7 +27,7 @@ end
 
 function ENT:GetOverlayText()
 	local ent_tbl = Ent_GetTable(self)
-	local state = self:GetNWInt("State", 1)
+	local state = self:GetState()
 
 	local clientstr, serverstr
 	if ent_tbl.instance then
@@ -39,7 +39,7 @@ function ENT:GetOverlayText()
 		clientstr = "None"
 	end
 	if state == 1 then
-		serverstr = tostring(self:GetNWInt("CPUus", 0)) .. "us. (" .. tostring(self:GetNWFloat("CPUpercent", 0)) .. "%)"
+		serverstr = tostring(self:GetCPUus()) .. "us. (" .. tostring(self:GetCPUpercent()) .. "%)"
 	elseif state == 2 then
 		serverstr = "Errored"
 	else
