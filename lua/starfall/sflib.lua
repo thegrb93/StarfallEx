@@ -134,6 +134,40 @@ end
 -- Declare Basic Starfall Types
 -------------------------------------------------------------------------------
 
+SF.RingQueue = {
+	__index = {
+		push = function(self, item)
+			if self.writei%self.size + 1 == self.readi then self:grow() end
+			self[self.writei] = item
+			self.writei = self.writei%self.size + 1
+		end,
+		pop = function(self)
+			if self.readi == self.writei then return nil end
+			local ret = self[self.readi]
+			self[self.readi] = nil
+			self.readi = self.readi%self.size + 1
+			return ret
+		end,
+		isEmpty = function(self)
+			return self.readi == self.writei
+		end,
+		grow = function(self)
+			if self.writei < self.size then
+				for i=self.writei+1, self.size do
+					self[i + self.size] = self[i]
+					self[i] = nil
+				end
+				self.readi = self.readi + self.size
+			end
+			self.size = self.size*2
+		end,
+	},
+	__call = function(t, size)
+		return setmetatable({readi = 1, writei = 1, size = size}, t)
+	end
+}
+setmetatable(SF.RingQueue, SF.RingQueue)
+
 function SF.CvarCallback(cvar, callback, typename, dontInit)
 	local converter
 	if typename=="number" then
@@ -946,7 +980,7 @@ SF.HttpTextureRequest = {
 			else
 				if self.callback then self.callback() end
 			end
-			self.textureloader:pop()
+			self.textureloader:nextRequest()
 		end,
 	},
 	__call = function(t, url, instance, texture, callback, donecallback)
@@ -995,26 +1029,23 @@ SF.HttpTextureLoader = {
 			Panel.OnFinishLoadingDocument = function() self:nextRequest() end
 			self.Panel = Panel
 
-			self.queue[1] = request
+			self.queue:push(request)
 			self.request = self.request_postInit
 		end,
 		
 		request_postInit = function(self, request)
-			local len = #self.queue
-			self.queue[len + 1] = request
-			if len==0 then timer.Simple(0, function() self:nextRequest() end) end
+			if self.currentrequest == nil and self.queue:isEmpty() then
+				self:nextRequest(request)
+			else
+				self.queue:push(request)
+			end
 		end,
 
-		nextRequest = function(self)
-			local request = self.queue[1]
-			request:load(self)
-			timer.Create(self.timeoutstr, 10, 1, function() request:destroy() end)
-		end,
-
-		pop = function(self)
-			table.remove(self.queue, 1)
-			if #self.queue > 0 then
-				self:nextRequest()
+		nextRequest = function(self, request)
+			self.currentrequest = request or self.queue:pop()
+			if self.currentrequest then
+				timer.Simple(0, function() self.currentrequest:load(self) end)
+				timer.Create(self.timeoutstr, 10, 1, function() self.currentrequest:destroy() end)
 			else
 				timer.Remove(self.timeoutstr)
 			end
@@ -1022,7 +1053,7 @@ SF.HttpTextureLoader = {
 	},
 	__call = function(p)
 		local ret = setmetatable({
-			queue = {},
+			queue = SF.RingQueue(128),
 		}, p)
 		ret.request = ret.initialize
 		ret.timeoutstr = "SF_URLTextureTimeout"..string.format("%p",ret)

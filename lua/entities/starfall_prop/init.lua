@@ -69,12 +69,53 @@ function ENT:UpdateTransmitState()
 	return TRANSMIT_ALWAYS
 end
 
+local CustomPropQueue = {
+    queue = SF.RingQueue(128),
+    sending = nil,
+    add = function(self, propdata)
+        if self.sending == nil then
+            self:next(propdata)
+        else
+            self.queue:push(propdata)
+        end
+    end,
+    next = function(self, propdata)
+        self.sending = propdata or self.queue:pop()
+        if self.sending then self.sending:send() end
+    end
+}
+
+local CustomPropData = {
+    __index = {
+        send = function(self)
+            if not Ent_IsValid(self.prop) then self:finish() return end
+            net.Start("starfall_custom_prop")
+            net.WriteReliableEntity(self.prop)
+
+            local stream = net.WriteStream(self.prop.sfmeshdata, function() self:finish() end, true)
+            if stream then
+                if self.recip then net.Send(self.recip) else net.Broadcast() end
+                -- Simple timeout. Will be ignored if finished before the timeout
+                timer.Create("SFCustomPropTimeout", 10, 1, function() self:finish() end)
+            else
+                net.Abort()
+                timer.Simple(1, function() self:send() end)
+            end
+        end,
+        finish = function(self)
+            if self.finished then return end
+            self.finished=true
+            CustomPropQueue:next()
+        end
+    },
+    __call = function(t, prop, recip)
+        return setmetatable({prop = prop, recip = recip, finished = false}, t)
+    end
+}
+setmetatable(CustomPropData, CustomPropData)
+
 function ENT:TransmitData(recip)
-	net.Start("starfall_custom_prop")
-	net.WriteReliableEntity(self)
-	local stream = net.WriteStream(self.sfmeshdata, nil, true)
-	if recip then net.Send(recip) else net.Broadcast() end
-	return stream
+    CustomPropQueue:add(CustomPropData(self, recip))
 end
 
 SF.WaitForPlayerInit(function(ply)
