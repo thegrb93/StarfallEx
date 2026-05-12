@@ -151,6 +151,9 @@ SF.RingQueue = {
 		isEmpty = function(self)
 			return self.readi == self.writei
 		end,
+		front = function(self)
+			return self[self.readi]
+		end,
 		grow = function(self)
 			if self.writei < self.size then
 				for i=self.writei+1, self.size do
@@ -1026,7 +1029,7 @@ SF.HttpTextureLoader = {
 			document.body.appendChild(img);
 			</script></body></html>]])
 			Panel:Hide()
-			Panel.OnFinishLoadingDocument = function() self:nextRequest() end
+			Panel.OnFinishLoadingDocument = function() self:loadNext() end
 			self.Panel = Panel
 
 			self.queue:push(request)
@@ -1034,22 +1037,24 @@ SF.HttpTextureLoader = {
 		end,
 		
 		request_postInit = function(self, request)
-			if self.currentrequest == nil and self.queue:isEmpty() then
-				self:nextRequest(request)
-			else
-				self.queue:push(request)
-			end
+			self.queue:push(request)
+			if request == self.queue:front() then self:loadNext() end
 		end,
 
-		nextRequest = function(self, request)
-			self.currentrequest = request or self.queue:pop()
-			if self.currentrequest then
-				timer.Simple(0, function() self.currentrequest:load(self) end)
-				timer.Create(self.timeoutstr, 10, 1, function() self.currentrequest:destroy() end)
+		nextRequest = function(self)
+			self.queue:pop()
+			self:loadNext()
+		end,
+
+		loadNext = function(self)
+			local nextRequest = self.queue:front()
+			if nextRequest then
+				timer.Simple(0, function() nextRequest:load(self) end)
+				timer.Create(self.timeoutstr, 10, 1, function() nextRequest:destroy() end)
 			else
 				timer.Remove(self.timeoutstr)
 			end
-		end
+		end,
 	},
 	__call = function(p)
 		local ret = setmetatable({
