@@ -38,7 +38,7 @@ function ENT:GetOverlayText()
 	else
 		clientstr = "None"
 	end
-	if state == 1 then
+	if state == 0 or state == 1 then
 		serverstr = tostring(self:GetCPUus()) .. "us. (" .. tostring(self:GetCPUpercent()) .. "%)"
 	elseif state == 2 then
 		serverstr = "Errored"
