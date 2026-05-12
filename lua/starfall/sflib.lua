@@ -983,7 +983,7 @@ SF.HttpTextureRequest = {
 			else
 				if self.callback then self.callback() end
 			end
-			self.textureloader:nextRequest()
+			self.textureloader:pop()
 		end,
 	},
 	__call = function(t, url, instance, texture, callback, donecallback)
@@ -1029,7 +1029,7 @@ SF.HttpTextureLoader = {
 			document.body.appendChild(img);
 			</script></body></html>]])
 			Panel:Hide()
-			Panel.OnFinishLoadingDocument = function() self:loadNext() end
+			Panel.OnFinishLoadingDocument = function() self:nextRequest() end
 			self.Panel = Panel
 
 			self.queue:push(request)
@@ -1038,15 +1038,10 @@ SF.HttpTextureLoader = {
 		
 		request_postInit = function(self, request)
 			self.queue:push(request)
-			if request == self.queue:front() then self:loadNext() end
+			if request == self.queue:front() then self:nextRequest() end
 		end,
 
 		nextRequest = function(self)
-			self.queue:pop()
-			self:loadNext()
-		end,
-
-		loadNext = function(self)
 			local nextRequest = self.queue:front()
 			if nextRequest then
 				timer.Simple(0, function() nextRequest:load(self) end)
@@ -1054,6 +1049,11 @@ SF.HttpTextureLoader = {
 			else
 				timer.Remove(self.timeoutstr)
 			end
+		end,
+
+		pop = function(self)
+			self.queue:pop()
+			self:nextRequest()
 		end,
 	},
 	__call = function(p)
