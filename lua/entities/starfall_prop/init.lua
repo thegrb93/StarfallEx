@@ -73,7 +73,7 @@ local CustomPropQueue = SF.RingQueue(128)
 local CustomPropData = {
     __index = {
         send = function(self)
-            if not Ent_IsValid(self.prop) then self:finish() return end
+            if not Ent_IsValid(self.prop) then return self:finish() end
             net.Start("starfall_custom_prop")
             net.WriteReliableEntity(self.prop)
 
@@ -92,7 +92,7 @@ local CustomPropData = {
             self.finished=true
             CustomPropQueue:pop()
 			local nextdata = CustomPropQueue:front()
-			if nextdata then nextdata:send() end
+			if nextdata then return nextdata:send() end
         end
     },
     __call = function(t, prop, recip)
