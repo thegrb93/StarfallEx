@@ -27,7 +27,7 @@ end
 
 function ENT:GetOverlayText()
 	local ent_tbl = Ent_GetTable(self)
-	local state = self:GetState()
+	local state = self:GetCPUstate()
 
 	local clientstr, serverstr
 	if ent_tbl.instance then

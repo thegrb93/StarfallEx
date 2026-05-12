@@ -258,7 +258,7 @@ if CLIENT then
 		if ent and ent:IsValid() and ent:GetClass() == "starfall_processor" then
 			if ent.error then
 				script_name = "< clientside errored >"
-			elseif ent:GetState() == 2 then
+			elseif ent:GetCPUstate() == 2 then
 				script_name = "< serverside errored >"
 			else
 				script_name = ent.name or "Generic"
