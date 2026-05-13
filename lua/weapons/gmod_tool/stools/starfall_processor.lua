@@ -254,7 +254,7 @@ if CLIENT then
 
 	function TOOL:DrawStarfallToolScreen(w, h)
 		local ent = LocalPlayer():GetEyeTrace().Entity
-		local ent_tbl = Ent_GetTable(ent)
+		local ent_tbl = ent:GetTable()
 		local script_name
 		if ent_tbl and ent:GetClass() == "starfall_processor" then
 			if ent_tbl.error then

@@ -2,8 +2,8 @@ AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include("shared.lua")
 
-local IsValid = FindMetaTable("Entity").IsValid
-local IsWorld = FindMetaTable("Entity").IsWorld
+local ENTMETA = FindMetaTable("Entity")
+local Ent_IsValid, Ent_IsWorld, Ent_GetTable = ENTMETA.IsValid, ENTMETA.IsWorld, ENTMETA.GetTable
 
 function ENT:Initialize()
 	self:PhysicsInit(SOLID_VPHYSICS)
@@ -25,7 +25,7 @@ end
 
 function ENT:SetCustomModel(model)
 	if self:GetModel() == model then return end
-	if IsValid(self:GetParent()) then
+	if Ent_IsValid(self:GetParent()) then
 		self:SetModel(model)
 	else
 		local constraints = constraint.GetTable(self)
@@ -84,7 +84,7 @@ function ENT:Think()
 end
 
 function ENT:SendCode(recipient)
-	if not (IsValid(self.owner) or IsWorld(self.owner)) then return end
+	if not (Ent_IsValid(self.owner) or Ent_IsWorld(self.owner)) then return end
 	if not self.sfsenddata then return end
 	local others = {}
 	for _, ply in ipairs(recipient and (istable(recipient) and recipient or { recipient }) or player.GetHumans()) do
@@ -124,7 +124,7 @@ local function EntityLookup(CreatedEntities)
 		if id == nil then return default end
 		if id == 0 then return game.GetWorld() end
 		local ent = CreatedEntities[id]
-		if IsValid(ent) then return ent else return default end
+		if Ent_IsValid(ent) then return ent else return default end
 	end
 end
 function ENT:PostEntityPaste(ply, ent, CreatedEntities)
@@ -163,7 +163,7 @@ local function dupefinished(TimedPasteData, TimedPasteDataCurrent)
 	local entList = TimedPasteData[TimedPasteDataCurrent].CreatedEntities
 	local starfalls = {}
 	for k, v in pairs(entList) do
-		if isentity(v) and IsValid(v) and v:GetClass() == "starfall_processor" and v.sfdata then
+		if isentity(v) and Ent_IsValid(v) and v:GetClass() == "starfall_processor" and v.sfdata then
 			starfalls[#starfalls+1] = v
 		end
 	end
@@ -186,21 +186,21 @@ util.AddNetworkString("starfall_processor_clinit")
 -- Request code from the chip. If the chip doesn't have code yet add player to list to send when there is code.
 net.Receive("starfall_processor_download", function(len, ply)
 	local proc = net.ReadEntity()
-	if IsValid(ply) and IsValid(proc) then
+	if Ent_IsValid(ply) and Ent_IsValid(proc) then
 		proc:SendCode(ply)
 	end
 end)
 
 net.Receive("starfall_processor_link", function(len, ply)
 	local linked = Entity(net.ReadUInt(16))
-	if IsValid(linked.link) then
+	if Ent_IsValid(linked.link) then
 		SF.LinkEnt(linked, linked.link, ply)
 	end
 end)
 
 net.Receive("starfall_processor_kill", function(len, ply)
 	local target = net.ReadEntity()
-	if ply:IsAdmin() and IsValid(target) and target:GetClass()=="starfall_processor" then
+	if ply:IsAdmin() and Ent_IsValid(target) and target:GetClass()=="starfall_processor" then
 		target:Error({message = "Killed by admin", traceback = ""})
 		net.Start("starfall_processor_kill")
 		net.WriteEntity(target)
@@ -210,7 +210,7 @@ end)
 
 net.Receive("starfall_processor_clinit", function(len, ply)
 	local proc = net.ReadEntity()
-	if IsValid(ply) and IsValid(proc) then
+	if Ent_IsValid(ply) and Ent_IsValid(proc) then
 		local instance = proc.instance
 		if instance then
 			instance:runScriptHook("clientinitialized", instance.Types.Player.Wrap(ply))

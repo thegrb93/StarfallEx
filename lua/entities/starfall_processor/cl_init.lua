@@ -2,9 +2,8 @@ include("shared.lua")
 
 DEFINE_BASECLASS("base_gmodentity")
 
-local Ent_GetTable = FindMetaTable("Entity").GetTable
-local Ent_IsValid = FindMetaTable("Entity").IsValid
-local Ent_IsWorld = FindMetaTable("Entity").IsWorld
+local ENTMETA = FindMetaTable("Entity")
+local Ent_IsValid, Ent_IsWorld, Ent_GetTable = ENTMETA.IsValid, ENTMETA.IsWorld, ENTMETA.GetTable
 
 function ENT:Initialize()
 	self.name = "Generic ( No-Name )"
