@@ -254,14 +254,15 @@ if CLIENT then
 
 	function TOOL:DrawStarfallToolScreen(w, h)
 		local ent = LocalPlayer():GetEyeTrace().Entity
+		local ent_tbl = Ent_GetTable(ent)
 		local script_name
-		if ent and ent:IsValid() and ent:GetClass() == "starfall_processor" then
-			if ent.error then
+		if ent_tbl and ent:GetClass() == "starfall_processor" then
+			if ent_tbl.error then
 				script_name = "< clientside errored >"
-			elseif ent:GetCPUstate() == 2 then
+			elseif ent_tbl.GetCPUstate(ent) == 2 then
 				script_name = "< serverside errored >"
 			else
-				script_name = ent.name or "Generic"
+				script_name = ent_tbl.name or "Generic"
 			end
 		elseif SF.Editor.editor then
 			script_name = SF.Editor.editor:GetActiveTab():GetText()

@@ -72,10 +72,12 @@ function ENT:OnRemove()
 end
 
 function ENT:Think()
-	if self.instance then
-		local bufferAvg = self.instance.perf.cpuAverage
-		self:SetCPUus(math.Round(bufferAvg * 1000000))
-		self:SetCPUpercent(math.floor(bufferAvg / self.instance.perf.cpuLimit * 100))
+	local ent_tbl = Ent_GetTable(self)
+	local instance = ent_tbl.instance
+	if instance then
+		local bufferAvg = instance.perf.cpuAverage
+		ent_tbl.SetCPUus(self, math.Round(bufferAvg * 1000000))
+		ent_tbl.SetCPUpercent(self, math.floor(bufferAvg / instance.perf.cpuLimit * 100))
 		self:NextThink(CurTime() + 0.25)
 		return true
 	end

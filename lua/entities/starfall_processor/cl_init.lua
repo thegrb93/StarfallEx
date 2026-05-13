@@ -27,19 +27,20 @@ end
 
 function ENT:GetOverlayText()
 	local ent_tbl = Ent_GetTable(self)
-	local state = self:GetCPUstate()
+	local state = ent_tbl.GetCPUstate(self)
+	local instance = ent_tbl.instance
 
 	local clientstr, serverstr
-	if ent_tbl.instance then
-		local bufferAvg = ent_tbl.instance.perf.cpuAverage
-		clientstr = tostring(math.Round(bufferAvg * 1000000)) .. "us. (" .. tostring(math.floor(bufferAvg / ent_tbl.instance.perf.cpuLimit * 100)) .. "%)"
+	if instance then
+		local bufferAvg = instance.perf.cpuAverage
+		clientstr = tostring(math.Round(bufferAvg * 1000000)) .. "us. (" .. tostring(math.floor(bufferAvg / instance.perf.cpuLimit * 100)) .. "%)"
 	elseif ent_tbl.error then
 		clientstr = "Errored / Terminated"
 	else
 		clientstr = "None"
 	end
 	if state == 0 or state == 1 then
-		serverstr = tostring(self:GetCPUus()) .. "us. (" .. tostring(self:GetCPUpercent()) .. "%)"
+		serverstr = tostring(ent_tbl.GetCPUus(self)) .. "us. (" .. tostring(ent_tbl.GetCPUpercent(self)) .. "%)"
 	elseif state == 2 then
 		serverstr = "Errored"
 	else
