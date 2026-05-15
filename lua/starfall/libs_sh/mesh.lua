@@ -811,6 +811,7 @@ if CLIENT then
 	local function registerMesh(mesh, ntriangles)
 		local meshdata = { ntriangles = ntriangles, matrices = {}, isSkinned = false, mesh = mesh }
 		instanceMeshes[meshdata] = true
+		return meshdata
 	end
 
 	local function destroyMesh(ply, meshdata)
@@ -822,8 +823,8 @@ if CLIENT then
 	end
 
 	instance:AddHook("deinitialize", function()
-		for mesh in pairs(instanceMeshes) do
-			destroyMesh(instance.player, mesh)
+		for meshdata in pairs(instanceMeshes) do
+			destroyMesh(instance.player, meshdata)
 		end
 	end)
 
@@ -1063,18 +1064,18 @@ if CLIENT then
 	mesh_library.writeColor = mesh.Color
 
 	--- Writes the vertex normal to the vertex data
-	-- @name mesh_library.writeNormal
-	-- @class function
 	-- @param Vector normal Normal
 	-- @client
-	mesh_library.writeNormal = mesh.Normal
+	function mesh_library.writeNormal(normal)
+		mesh.Normal(vunwrap1(normal))
+	end
 
 	--- Writes the vertex position to the vertex data
-	-- @name mesh_library.writePosition
-	-- @class function
 	-- @param Vector position Position
 	-- @client
-	mesh_library.writePosition = mesh.Position
+	function mesh_library.writePosition(pos)
+		mesh.Position(vunwrap1(pos))
+	end
 
 	--- Writes the vertex texture coordinates to the vertex data
 	-- @name mesh_library.writeUV
@@ -1096,26 +1097,26 @@ if CLIENT then
 	mesh_library.writeUserData = mesh.UserData
 
 	--- Writes a quad using 4 vertices to the vertex data
-	-- @name mesh_library.writeQuad
-	-- @class function
 	-- @param Vector v1 Vertex1 position
 	-- @param Vector v2 Vertex2 position
 	-- @param Vector v3 Vertex3 position
 	-- @param Vector v4 Vertex4 position
 	-- @param Color col The color for the vertices.
 	-- @client
-	mesh_library.writeQuad = mesh.Quad
+	function mesh_library.writeQuad(v1, v2, v3, v4, col)
+		mesh.Quad(vunwrap1(v1), vunwrap2(v2), vunwrap3(v3), vunwrap4(v4), col)
+	end
 
 	--- Writes a quad using a position, normal and size to the vertex data
-	-- @name mesh_library.writeQuadEasy
-	-- @class function
 	-- @param Vector position
 	-- @param Vector normal
 	-- @param number w
 	-- @param number h
 	-- @param Color col The color for the vertices.
 	-- @client
-	mesh_library.writeQuadEasy = mesh.QuadEasy
+	function mesh_library.writeQuadEasy(position, normal, w, h, col)
+		mesh.QuadEasy(vunwrap1(position), vunwrap2(normal), w, h, col)
+	end
 
 	--- Writes bone data to the vertex data
 	-- @name mesh_library.writeBoneData
@@ -1163,11 +1164,11 @@ if CLIENT then
 	--- Frees the mesh from memory
 	-- @client
 	function mesh_methods:destroy()
-		local meshdata = unwrap(self)
 		if meshgenerating then SF.Throw("Cannot destroy mesh while generating!", 2) end
+		local meshdata = unwrap(self)
 		destroyMesh(instance.player, meshdata)
 		mesh_meta.sf2sensitive[self] = nil
-		mesh_meta.sensitive2sf[meshdata.mesh] = nil
+		mesh_meta.sensitive2sf[meshdata] = nil
 	end
 end
 
