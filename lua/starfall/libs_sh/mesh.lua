@@ -808,8 +808,9 @@ if CLIENT then
 
 	local instanceMeshes = {}
 
-	local function registerMesh(mesh, ntriangles)
-		local meshdata = { ntriangles = ntriangles, matrices = {}, mesh = mesh }
+	local function registerMesh(mesh, ntriangles, isskinned)
+		local meshdata = { ntriangles = ntriangles, mesh = mesh }
+		if isskinned then meshdata.matrices = {} end
 		instanceMeshes[meshdata] = true
 		return meshdata
 	end
@@ -890,7 +891,7 @@ if CLIENT then
 
 		local mesh = Mesh()
 		mesh:BuildFromTriangles(unwrapped)
-		return wrap(registerMesh(mesh, ntriangles))
+		return wrap(registerMesh(mesh, ntriangles, false))
 	end
 
 	--- Creates a mesh from an obj file. Only supports triangular meshes with normals and texture coordinates.
@@ -915,7 +916,7 @@ if CLIENT then
 
 			local mesh = Mesh()
 			mesh:BuildFromTriangles(vertices)
-			meshes[name] = wrap(registerMesh(mesh, ntriangles))
+			meshes[name] = wrap(registerMesh(mesh, ntriangles, false))
 			if threaded then thread_yield() end
 		end
 		return meshes
@@ -927,7 +928,16 @@ if CLIENT then
 	function mesh_library.createEmpty()
 		checkpermission(instance, nil, "mesh")
 		plyMeshCount:use(instance.player, 1)
-		return wrap(registerMesh(Mesh(), 0))
+		return wrap(registerMesh(Mesh(), 0, false))
+	end
+
+	--- Creates a skinned mesh without any vertex data.
+	-- @return Mesh Mesh object
+	-- @client
+	function mesh_library.createEmptySkinned()
+		checkpermission(instance, nil, "mesh")
+		plyMeshCount:use(instance.player, 1)
+		return wrap(registerMesh(Mesh(nil, 2), 0, true))
 	end
 
 	local function wrapVertex(p)
@@ -1138,7 +1148,7 @@ if CLIENT then
 		if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 		local meshdata = unwrap(self)
 		plyTriangleRenderBurst:use(instance.player, meshdata.ntriangles)
-		if meshdata.matrices[1]~=nil then
+		if meshdata.matrices then
 			meshdata.mesh:DrawSkinned(meshdata.matrices)
 		else
 			meshdata.mesh:Draw()
@@ -1151,6 +1161,7 @@ if CLIENT then
 	-- @client
 	function mesh_methods:setupBoneMatrices(count)
 		local meshdata = unwrap(self)
+		if not meshdata.matrices then SF.Throw("Unable to setup bones on non skinned mesh!", 2) end
 		count = math.Clamp(math.floor(count), 0, 53)
 		if #meshdata.matrices ~= count then
 			for i=#meshdata.matrices+1, count do
