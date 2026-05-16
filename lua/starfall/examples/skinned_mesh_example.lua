@@ -219,8 +219,6 @@ hook.add("clientinitialized", "jiggleprop", function(ply)
     for prop in pairs(jiggleprop.static.propstore) do
         if prop.isInitialized then
             prop:send(ply)
-        else
-            jiggleprop.static.propstore[prop] = nil
         end
     end
 end)
