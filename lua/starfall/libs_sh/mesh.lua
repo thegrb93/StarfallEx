@@ -809,7 +809,7 @@ if CLIENT then
 	local instanceMeshes = {}
 
 	local function registerMesh(mesh, ntriangles)
-		local meshdata = { ntriangles = ntriangles, matrices = {}, isSkinned = false, mesh = mesh }
+		local meshdata = { ntriangles = ntriangles, matrices = {}, mesh = mesh }
 		instanceMeshes[meshdata] = true
 		return meshdata
 	end
@@ -1135,30 +1135,42 @@ if CLIENT then
 	--- Draws the mesh. Must be in a 3D rendering context.
 	-- @client
 	function mesh_methods:draw()
-		local meshdata = unwrap(self)
 		if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+		local meshdata = unwrap(self)
 		plyTriangleRenderBurst:use(instance.player, meshdata.ntriangles)
-		if meshdata.isSkinned then
+		if meshdata.matrices[1]~=nil then
 			meshdata.mesh:DrawSkinned(meshdata.matrices)
 		else
 			meshdata.mesh:Draw()
 		end
 	end
 
-	--- Sets the matrix of the skinned mesh
-	-- @param number index The matrix index representing a bone in range 1 -> 53
-	-- @param VMatrix matrix The matrix to set the bone to
+	--- Sets the number of matrices to be used for the skinned mesh.
+	-- @param number count The number of bone matrices to use in range 1 -> 53
 	-- @client
-	function mesh_methods:setMatrix(index, matrix)
-		-- Todo
+	function mesh_methods:setBoneMatrices(count)
+		local meshdata = unwrap(self)
+		count = math.Clamp(math.floor(count), 0, 53)
+		if #meshdata.matrices == count then return end
+		for i=#meshdata.matrices+1, count do
+			meshdata.matrices[i] = Matrix()
+		end
+		for i=count+1, 53 do
+			meshdata.matrices[i] = nil
+		end
 	end
 
-	--- Sets the matrix of the skinned mesh
+	--- Returns a table of the bone matrices. Editing a matrix will edit the bone
 	-- @param number index The matrix index representing a bone in range 1 -> 53
-	-- @return VMatrix The matrix of the bone
+	-- @return table Table of VMatrix representing each bone
 	-- @client
-	function mesh_methods:getMatrix(index)
-		-- Todo
+	function mesh_methods:getBoneMatrices()
+		local meshdata = unwrap(self)
+		local ret = {}
+		for i=1, #meshdata.matrices do
+			ret[i] = mwrap(meshdata.matrices[i])
+		end
+		return ret
 	end
 
 	--- Frees the mesh from memory
