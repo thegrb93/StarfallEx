@@ -848,8 +848,7 @@ if CLIENT then
 		pos = vunwrap,
 		u = function(x) return x end,
 		v = function(x) return x end,
-		userdata = function(x) return x end,
-		weights = function(x) return x end,
+		userdata = function(x) return x end
 	}
 
 	--- Creates a mesh from vertex data.
@@ -1132,7 +1131,7 @@ if CLIENT then
 	-- @name mesh_library.writeBoneData
 	-- @class function
 	-- @param number index The slot index for the vertex, either 0 or 1.
-	-- @param number matrixId The matrix index for the vertex, in the range of 0 -> 52. This is 0-indexed whereas mesh:setMatrix is 1-indexed
+	-- @param number matrixId The matrix index for the vertex, in the range of 1 -> 53.
 	-- @param number weight How much influence that matrix will have on this vertex, in the range of 0 -> 1
 	mesh_library.writeBoneData = mesh.BoneData
 
