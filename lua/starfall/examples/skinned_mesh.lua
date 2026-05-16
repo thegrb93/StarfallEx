@@ -176,6 +176,7 @@ function jiggleprop:initialize(pos, ang, nbones, bonelength, radius, nradial)
     self.radius = radius
     self.nradial = nradial
     self.isInitialized = false
+    self.plysToSend = {}
     self.worker = makeWorker(function() return self:generate(pos, ang) end)
 end
 
@@ -191,7 +192,7 @@ function jiggleprop:generate(pos, ang)
         constraint.weld(self.bones[i-1], self.bones[i], 0, 0, 0, true)
     end
     self.isInitialized = true
-    self:send()
+    if self.plysToSend[1] then self:send(self.plysToSend) end
     return "done"
 end
 
@@ -219,6 +220,8 @@ hook.add("clientinitialized", "jiggleprop", function(ply)
     for prop in pairs(jiggleprop.static.propstore) do
         if prop.isInitialized then
             prop:send(ply)
+        else
+            table.insert(prop.plysToSend, ply)
         end
     end
 end)
