@@ -814,9 +814,9 @@ if CLIENT then
 		return meshdata
 	end
 
-	local function destroyMesh(ply, meshdata)
-		plyTriangleCount:free(ply, meshdata.ntriangles)
-		plyMeshCount:free(ply, 1)
+	local function destroyMesh(meshdata)
+		plyTriangleCount:free(instance.player, meshdata.ntriangles)
+		plyMeshCount:free(instance.player, 1)
 		meshdata.mesh:Destroy()
 		meshdata.mesh = nil
 		instanceMeshes[meshdata] = nil
@@ -824,7 +824,7 @@ if CLIENT then
 
 	instance:AddHook("deinitialize", function()
 		for meshdata in pairs(instanceMeshes) do
-			destroyMesh(instance.player, meshdata)
+			destroyMesh(meshdata)
 		end
 	end)
 
@@ -1147,25 +1147,19 @@ if CLIENT then
 
 	--- Sets the number of matrices to be used for the skinned mesh.
 	-- @param number count The number of bone matrices to use in range 1 -> 53
+	-- @return table Table of reference VMatrix to each bone. Modifying them will modify the bone matrix
 	-- @client
-	function mesh_methods:setBoneMatrices(count)
+	function mesh_methods:setupBoneMatrices(count)
 		local meshdata = unwrap(self)
 		count = math.Clamp(math.floor(count), 0, 53)
-		if #meshdata.matrices == count then return end
-		for i=#meshdata.matrices+1, count do
-			meshdata.matrices[i] = Matrix()
+		if #meshdata.matrices ~= count then
+			for i=#meshdata.matrices+1, count do
+				meshdata.matrices[i] = Matrix()
+			end
+			for i=count+1, 53 do
+				meshdata.matrices[i] = nil
+			end
 		end
-		for i=count+1, 53 do
-			meshdata.matrices[i] = nil
-		end
-	end
-
-	--- Returns a table of the bone matrices. Editing a matrix will edit the bone
-	-- @param number index The matrix index representing a bone in range 1 -> 53
-	-- @return table Table of VMatrix representing each bone
-	-- @client
-	function mesh_methods:getBoneMatrices()
-		local meshdata = unwrap(self)
 		local ret = {}
 		for i=1, #meshdata.matrices do
 			ret[i] = mwrap(meshdata.matrices[i])
@@ -1178,7 +1172,7 @@ if CLIENT then
 	function mesh_methods:destroy()
 		if meshgenerating then SF.Throw("Cannot destroy mesh while generating!", 2) end
 		local meshdata = unwrap(self)
-		destroyMesh(instance.player, meshdata)
+		destroyMesh(meshdata)
 		mesh_meta.sf2sensitive[self] = nil
 		mesh_meta.sensitive2sf[meshdata] = nil
 	end
