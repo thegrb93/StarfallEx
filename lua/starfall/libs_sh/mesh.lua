@@ -804,23 +804,30 @@ function mesh_library.findConvexHull(vertices, threaded)
 end
 
 if CLIENT then
-	local meshData = {}
-	instance.data.meshes = meshData
+	local mesh_methods, mesh_meta, wrap, unwrap = instance.Types.Mesh.Methods, instance.Types.Mesh, instance.Types.Mesh.Wrap, instance.Types.Mesh.Unwrap
 
-	local function destroyMesh(ply, mesh)
-		plyTriangleCount:free(ply, meshData[mesh].ntriangles)
-		plyMeshCount:free(ply, 1)
-		mesh:Destroy()
-		meshData[mesh] = nil
+	local instanceMeshes = {}
+
+	local function registerMesh(mesh, ntriangles, isskinned)
+		local meshdata = { ntriangles = ntriangles, mesh = mesh }
+		if isskinned then meshdata.matrices = {} end
+		instanceMeshes[meshdata] = true
+		return meshdata
+	end
+
+	local function destroyMesh(meshdata)
+		plyTriangleCount:free(instance.player, meshdata.ntriangles)
+		plyMeshCount:free(instance.player, 1)
+		meshdata.mesh:Destroy()
+		meshdata.mesh = nil
+		instanceMeshes[meshdata] = nil
 	end
 
 	instance:AddHook("deinitialize", function()
-		for mesh in pairs(meshData) do
-			destroyMesh(instance.player, mesh)
+		for meshdata in pairs(instanceMeshes) do
+			destroyMesh(meshdata)
 		end
 	end)
-
-	local mesh_methods, mesh_meta, wrap, unwrap = instance.Types.Mesh.Methods, instance.Types.Mesh, instance.Types.Mesh.Wrap, instance.Types.Mesh.Unwrap
 
 	local vertexCheck = {
 		color = function(v) return dgetmeta(v) == col_meta end,
@@ -877,12 +884,13 @@ if CLIENT then
 		end
 
 		if threaded then thread_yield(0) end
-		local mesh = Mesh()
-		mesh:BuildFromTriangles(unwrapped)
-		meshData[mesh] = { ntriangles = ntriangles }
+
 		plyTriangleCount:use(instance.player, ntriangles)
 		plyMeshCount:use(instance.player, 1)
-		return wrap(mesh)
+
+		local mesh = Mesh()
+		mesh:BuildFromTriangles(unwrapped)
+		return wrap(registerMesh(mesh, ntriangles, false))
 	end
 
 	--- Creates a mesh from an obj file. Only supports triangular meshes with normals and texture coordinates.
@@ -907,8 +915,7 @@ if CLIENT then
 
 			local mesh = Mesh()
 			mesh:BuildFromTriangles(vertices)
-			meshData[mesh] = { ntriangles = ntriangles }
-			meshes[name] = wrap(mesh)
+			meshes[name] = wrap(registerMesh(mesh, ntriangles, false))
 			if threaded then thread_yield() end
 		end
 		return meshes
@@ -919,12 +926,17 @@ if CLIENT then
 	-- @client
 	function mesh_library.createEmpty()
 		checkpermission(instance, nil, "mesh")
-
 		plyMeshCount:use(instance.player, 1)
+		return wrap(registerMesh(Mesh(), 0, false))
+	end
 
-		local mesh = Mesh()
-		meshData[mesh] = { ntriangles = 0 }
-		return wrap(mesh)
+	--- Creates a skinned mesh without any vertex data.
+	-- @return Mesh Mesh object
+	-- @client
+	function mesh_library.createEmptySkinned()
+		checkpermission(instance, nil, "mesh")
+		plyMeshCount:use(instance.player, 1)
+		return wrap(registerMesh(Mesh(nil, 2), 0, true))
 	end
 
 	local function wrapVertex(p)
@@ -1031,20 +1043,17 @@ if CLIENT then
 		if mesh_obj == nil then
 			if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 			plyTriangleRenderBurst:use(instance.player, tri_count)
-			meshgenerating = true
 			mesh.Begin(prim_type, prim_count)
 		else
-			mesh_obj = unwrap(mesh_obj)
-			local mesh_tbl = meshData[mesh_obj]
-			if not mesh_tbl then SF.Throw("Tried to use invalid mesh.", 2) end
+			local meshdata = unwrap(mesh_obj)
 			-- Garrysmod bug, crash if mesh isn't empty
-			if mesh_tbl.ntriangles ~= 0 then SF.Throw("mesh.generate requires an empty mesh to populate.", 2) end
+			if meshdata.ntriangles ~= 0 then SF.Throw("mesh.generate requires an empty mesh to populate.", 2) end
 			plyTriangleCount:use(instance.player, tri_count)
-			mesh_tbl.ntriangles = tri_count
-			meshgenerating = mesh_obj
-			mesh.Begin(mesh_obj, prim_type, prim_count)
+			meshdata.ntriangles = tri_count
+			mesh.Begin(meshdata.mesh, prim_type, prim_count)
 		end
 
+		meshgenerating = true
 		instance.canyield = false
 		local ok, err = pcall(func)
 		instance.canyield = true
@@ -1053,50 +1062,50 @@ if CLIENT then
 		if not ok then error(err) end
 	end
 
-	--- Sets the vertex color by RGBA values
+	--- Writes the vertex color by RGBA values to the vertex data
+	-- @name mesh_library.writeColor
+	-- @class function
 	-- @param number r Number, red value
 	-- @param number g Number, green value
 	-- @param number b Number, blue value
 	-- @param number a Number, alpha value
 	-- @client
-	function mesh_library.writeColor(r, g, b, a)
-		mesh.Color(r, g, b, a)
-	end
+	mesh_library.writeColor = mesh.Color
 
-	--- Sets the vertex normal
+	--- Writes the vertex normal to the vertex data
 	-- @param Vector normal Normal
 	-- @client
 	function mesh_library.writeNormal(normal)
 		mesh.Normal(vunwrap1(normal))
 	end
 
-	--- Sets the vertex position
+	--- Writes the vertex position to the vertex data
 	-- @param Vector position Position
 	-- @client
 	function mesh_library.writePosition(pos)
 		mesh.Position(vunwrap1(pos))
 	end
 
-	--- Sets the vertex texture coordinates
+	--- Writes the vertex texture coordinates to the vertex data
+	-- @name mesh_library.writeUV
+	-- @class function
 	-- @param number stage Stage of the texture coordinate
 	-- @param number u U coordinate
 	-- @param number v V coordinate
 	-- @client
-	function mesh_library.writeUV(stage, u, v)
-		mesh.TexCoord(stage, u, v)
-	end
+	mesh_library.writeUV = mesh.TexCoord
 
-	--- Sets the vertex tangent user data
+	--- Writes the vertex tangent user data to the vertex data
+	-- @name mesh_library.writeUserData
+	-- @class function
 	-- @param number x x
 	-- @param number y y
 	-- @param number z z
 	-- @param number handedness
 	-- @client
-	function mesh_library.writeUserData(x, y, z, handedness)
-		mesh.UserData(x, y, z, handedness)
-	end
+	mesh_library.writeUserData = mesh.UserData
 
-	--- Draws a quad using 4 vertices
+	--- Writes a quad using 4 vertices to the vertex data
 	-- @param Vector v1 Vertex1 position
 	-- @param Vector v2 Vertex2 position
 	-- @param Vector v3 Vertex3 position
@@ -1107,7 +1116,7 @@ if CLIENT then
 		mesh.Quad(vunwrap1(v1), vunwrap2(v2), vunwrap3(v3), vunwrap4(v4), col)
 	end
 
-	--- Draws a quad using a position, normal and size
+	--- Writes a quad using a position, normal and size to the vertex data
 	-- @param Vector position
 	-- @param Vector normal
 	-- @param number w
@@ -1118,30 +1127,64 @@ if CLIENT then
 		mesh.QuadEasy(vunwrap1(position), vunwrap2(normal), w, h, col)
 	end
 
+	--- Writes bone data to the vertex data
+	-- @name mesh_library.writeBoneData
+	-- @class function
+	-- @param number index The slot index for the vertex, either 0 or 1.
+	-- @param number matrixId The matrix index for the vertex, in the range of 1 -> 53.
+	-- @param number weight How much influence that matrix will have on this vertex, in the range of 0 -> 1
+	mesh_library.writeBoneData = mesh.BoneData
+
 	--- Pushes the vertex data onto the render stack
+	-- @name mesh_library.advanceVertex
+	-- @class function
 	-- @client
-	function mesh_library.advanceVertex()
-		mesh.AdvanceVertex()
-	end
+	mesh_library.advanceVertex = mesh.AdvanceVertex
 
 	--- Draws the mesh. Must be in a 3D rendering context.
 	-- @client
 	function mesh_methods:draw()
-		local mesh = unwrap(self)
-		local meshdata = meshData[mesh]
-		if not meshdata then SF.Throw("Tried to use invalid mesh.", 2) end
 		if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+		local meshdata = unwrap(self)
 		plyTriangleRenderBurst:use(instance.player, meshdata.ntriangles)
-		mesh:Draw()
+		if meshdata.matrices then
+			meshdata.mesh:DrawSkinned(meshdata.matrices)
+		else
+			meshdata.mesh:Draw()
+		end
+	end
+
+	--- Sets the number of matrices to be used for the skinned mesh.
+	-- @param number count The number of bone matrices to use in range 1 -> 53
+	-- @return table Table of reference VMatrix to each bone. Modifying them will modify the bone matrix
+	-- @client
+	function mesh_methods:setupBoneMatrices(count)
+		local meshdata = unwrap(self)
+		if not meshdata.matrices then SF.Throw("Unable to setup bones on non skinned mesh!", 2) end
+		count = math.Clamp(math.floor(count), 0, 53)
+		if #meshdata.matrices ~= count then
+			for i=#meshdata.matrices+1, count do
+				meshdata.matrices[i] = Matrix()
+			end
+			for i=count+1, 53 do
+				meshdata.matrices[i] = nil
+			end
+		end
+		local ret = {}
+		for i=1, #meshdata.matrices do
+			ret[i] = mwrap(meshdata.matrices[i])
+		end
+		return ret
 	end
 
 	--- Frees the mesh from memory
 	-- @client
 	function mesh_methods:destroy()
-		local mesh = unwrap(self)
-		if not meshData[mesh] then SF.Throw("Tried to use invalid mesh.", 2) end
-		if meshgenerating == mesh then SF.Throw("Cannot destroy mesh currently being generated.", 2) end
-		destroyMesh(instance.player, mesh)
+		if meshgenerating then SF.Throw("Cannot destroy mesh while generating!", 2) end
+		local meshdata = unwrap(self)
+		destroyMesh(meshdata)
+		mesh_meta.sf2sensitive[self] = nil
+		mesh_meta.sensitive2sf[meshdata] = nil
 	end
 end
 

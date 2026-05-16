@@ -66,9 +66,10 @@ end
 
 function ENT:GetRenderMesh()
 	local ent_tbl = Ent_GetTable(self)
-	if ent_tbl.custom_mesh then
-		if ent_tbl.custom_mesh_data[ent_tbl.custom_mesh] then
-			return { Mesh = ent_tbl.custom_mesh, Material = ent_tbl.Material--[[, Matrix = ent_tbl.render_matrix]] }
+	local custom_mesh = ent_tbl.custom_mesh
+	if custom_mesh then
+		if custom_mesh.mesh then
+			return { Mesh = custom_mesh.mesh, Material = ent_tbl.Material--[[, Matrix = ent_tbl.render_matrix]] }
 		else
 			ent_tbl.custom_mesh = nil
 		end

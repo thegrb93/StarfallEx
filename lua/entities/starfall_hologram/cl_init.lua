@@ -143,12 +143,13 @@ function ENT:Draw(flags)
 end
 
 function ENT:GetRenderMesh()
-	local selfTbl = self:GetTable()
-	if selfTbl.custom_mesh then
-		if selfTbl.custom_mesh_data[selfTbl.custom_mesh] then
-			return { Mesh = selfTbl.custom_mesh, Material = selfTbl.Material--[[, Matrix = self.HoloMatrix]] }
+	local ent_tbl = self:GetTable()
+	local custom_mesh = ent_tbl.custom_mesh
+	if custom_mesh then
+		if custom_mesh.mesh then
+			return { Mesh = custom_mesh.mesh, Material = ent_tbl.Material--[[, Matrix = self.HoloMatrix]] }
 		else
-			selfTbl.custom_mesh = nil
+			ent_tbl.custom_mesh = nil
 		end
 	end
 end

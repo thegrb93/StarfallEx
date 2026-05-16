@@ -126,7 +126,6 @@ if CLIENT then
 		checkpermission(instance, ent, "entities.setRenderProperty")
 		if mesh then
 			ent_tbl.custom_mesh = instance.Types.Mesh.Unwrap(mesh)
-			ent_tbl.custom_mesh_data = instance.data.meshes
 		else
 			ent_tbl.custom_mesh = nil
 		end
