@@ -1132,7 +1132,7 @@ if CLIENT then
 	-- @class function
 	-- @param number index The slot index for the vertex, either 0 or 1.
 	-- @param number matrixId The matrix index for the vertex, in the range of 1 -> 53.
-	-- @param number weight How much influence that matrix will have on this vertex, in the range of 0 -> 1
+	-- @param number weight How much influence that matrix will have on this vertex, in the range of 0 -> 1. Both weights on each vertex should sum to 1. 
 	mesh_library.writeBoneData = mesh.BoneData
 
 	--- Pushes the vertex data onto the render stack
