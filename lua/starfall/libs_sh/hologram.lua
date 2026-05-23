@@ -27,8 +27,19 @@ local cl_hologram_meta = {
 }
 SF.Cl_Hologram_Meta = cl_hologram_meta
 
+local plyHoloRenderBurst
+
 if SERVER then
 	registerprivilege("hologram.setMoveType", "Set MoveType", "Allows the user to set hologram's movetype", { entities = {} })
+else
+	plyHoloRenderBurst = SF.BurstObject("holograms_draw", "rendered holograms", 200, 200, "Number of holograms that can be rendered per frame", "Number of holograms that can be rendered per frame")
+	function plyHoloRenderBurst:calc(obj)
+		local t = RealTime()
+		local new = math.min(obj.val + (t - obj.lasttick)/RealFrameTime() * self.rate, self.max)
+		obj.val = new
+		obj.lasttick = t
+		return new
+	end
 end
 
 
@@ -325,6 +336,7 @@ else
 	-- @param boolean? noTint If true, renders the hologram without its color and opacity. The default is for holograms to render with color or opacity, so use this argument if you need that behavior.
 	function hologram_methods:draw(noTint)
 		if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+		plyHoloRenderBurst:use(instance.player, 1)
 
 		local holo = getholo(self)
 		Ent_SetupBones(holo)
