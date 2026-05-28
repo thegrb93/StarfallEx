@@ -140,25 +140,31 @@ local function MenuOpen( ContextMenu, Option, Entity, Trace )
 	local SubMenu = Option:AddSubMenu()
 	SubMenu:AddOption("Restart Clientside", function ()
 		ent:Compile()
-	end)
+	end):SetIcon("icon16/arrow_refresh.png")
+
 	SubMenu:AddOption("Terminate Clientside", function ()
 		ent:Error({message = "Terminated", traceback = ""})
-	end)
+	end):SetIcon("icon16/cancel.png")
+
 	SubMenu:AddOption("Open Global Permissions", function ()
 		SF.Editor.openPermissionsPopup()
-	end)
+	end):SetIcon("icon16/application_form.png")
 
-	if ent:GetReuploadOnReload() then
-		SubMenu:AddOption("Disable reupload on reload", function ()
-			ent:SetReuploadOnReload(false)
-		end)
-	else
-		SubMenu:AddOption("Enable reupload on reload", function ()
-			ent:SetReuploadOnReload(true)
-		end)
-	end
 
 	local instance = ent.instance
+	
+	if instance and instance.player == LocalPlayer() then
+		if ent:GetReuploadOnReload() then
+			SubMenu:AddOption("Disable reupload on reload", function ()
+				ent:SetReuploadOnReload(false)
+			end):SetIcon("icon16/cross.png")
+		else
+			SubMenu:AddOption("Enable reupload on reload", function ()
+				ent:SetReuploadOnReload(true)
+			end):SetIcon("icon16/tick.png")
+		end
+	end
+
 	if instance and instance.player ~= SF.Superuser and (instance.permissionRequest and instance.permissionRequest.overrides and table.Count(instance.permissionRequest.overrides) > 0
 				or instance.permissionOverrides and table.Count(instance.permissionOverrides) > 0) then
 		SubMenu:AddOption("Overriding Permissions", function ()
@@ -171,10 +177,10 @@ end
 properties.Add( "starfall", {
 	MenuLabel = "StarfallEx",
 	Order = 999,
-	MenuIcon = "icon16/wrench.png", -- We should create an icon
+	MenuIcon = "icon16/starfall_icon.png",
 	Filter = function( self, ent, ply )
 		if not Ent_IsValid(ent) then return false end
-		if not gamemode.Call( "CanProperty", ply, "starfall", ent ) then return false end
+
 		return ent.Starfall or ent.link and ent.link.Starfall
 	end,
 	MenuOpen = MenuOpen,
