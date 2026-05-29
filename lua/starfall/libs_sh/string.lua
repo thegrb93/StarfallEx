@@ -27,6 +27,7 @@ end
 -- @param string str The string to convert from
 -- @return Color The color object
 function string_library.toColor(str)
+	SF.CheckPattern(str, ".+.+.+.+")
 	return cwrap(string.ToColor(str))
 end
 
