@@ -304,14 +304,14 @@ end
 --- Writes string containing null characters to the net message
 -- @shared
 -- @param string t The string to be written
--- @param number n How much of the string to write
+-- @param number n How much of the string to write, can't exceed 64000 or the string's length
 function net_library.writeData(t, n)
 	if not netStarted then SF.Throw("net message not started", 2) end
 
 	checkluatype (t, TYPE_STRING)
 	checkluatype (n, TYPE_NUMBER)
 
-	n = math.Clamp(n, 0, 64000)
+	if n>#t or n>64000 then SF.Throw("Invalid length "..n.." for input string of size "..(#t), 2) end
 	write{net.WriteData, n*8, t, n}
 end
 
