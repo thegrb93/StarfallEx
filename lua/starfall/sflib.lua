@@ -1437,7 +1437,7 @@ function SF.ThrowTypeError(expected, got, level, msg)
 	SF.Throw((msg and #msg>0 and (msg .. " ") or "") .. "Type mismatch (Expected " .. expected .. ", got " .. got .. ") in function " .. funcname, level)
 end
 
---- Lookup table of TYPE > name
+--- Lookup table of TYPE > name, https://wiki.facepunch.com/gmod/Enums/TYPE
 SF.TYPENAME = {
 	[TYPE_NONE]             = "Invalid type",
 	[TYPE_NIL]              = "nil",
@@ -1457,7 +1457,9 @@ SF.TYPENAME = {
 	[TYPE_RESTORE]          = "IRestore",
 	[TYPE_DAMAGEINFO]       = "CTakeDamageInfo",
 	[TYPE_EFFECTDATA]       = "CEffectData",
-	[TYPE_RECIPIENTFILTER]  = "CUserCmd",
+	[TYPE_MOVEDATA]         = "CMoveData",
+	[TYPE_RECIPIENTFILTER]  = "CRecipientFilter",
+	[TYPE_USERCMD]          = "CUserCmd",
 	[TYPE_SCRIPTEDVEHICLE]  = "ScriptedVehicle", -- Depricated, also TYPE Enum doesnt specify the name so this it is
 	[TYPE_MATERIAL]         = "IMaterial",
 	[TYPE_PANEL]            = "Panel",
