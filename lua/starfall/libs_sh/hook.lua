@@ -390,6 +390,13 @@ else
 	-- @class hook
 	-- @client
 	add("OnContextMenuClose")
+
+	--- Called whenever a CUserCmd is made for the local player. This runs twice per frame, one for movement one for camera. You can use cmd:getCommandNumber to check which one it is if you want to only run on one of them. Camera will have a 0 command number.
+	-- @name CreateMove
+	-- @class hook
+	-- @client
+	-- @param CUserCmd cmd The UserCmd being created
+	add("CreateMove")
 end
 
 -- Shared hooks
@@ -608,6 +615,31 @@ add("StartEntityDriving")
 -- @class hook
 -- @shared
 add("Tick")
+
+--- This is basically a shared version of createMove.
+-- @name StartCommand
+-- @class hook
+-- @shared
+-- @param Player ply Player whose command is being processed
+-- @param CUserCmd cmd The UserCmd being processed
+add("StartCommand")
+
+--- Called each UserCmd for each player to transfer information from the UserCmd to the CMoveData before the move is processed.
+-- @name SetupMove
+-- @class hook
+-- @shared
+-- @param Player ply Player whose move is being setup
+-- @param CMoveData move The MoveData being processed
+-- @param CUserCmd cmd The UserCmd being processed
+add("SetupMove")
+
+--- Called each UserCmd for each player after their move has been processed.
+-- @name FinishMove
+-- @class hook
+-- @shared
+-- @param Player ply Player whose move is being finished
+-- @param CMoveData move The MoveData being processed
+add("FinishMove")
 
 --- Called when starfall chip errors
 -- @name StarfallError
