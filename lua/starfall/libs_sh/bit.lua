@@ -522,7 +522,7 @@ end
 -- @class function
 -- @param Entity e The entity to be written
 local function writeEntity(self, instance, e)
-	local ent = instance.Types.Entity.GetEntity(e)
+	local ent = instance.Types.Entity.Unwrap(e)
 	self:writeInt16(ent:EntIndex())
 	self:writeInt32(ent:GetCreationID())
 end

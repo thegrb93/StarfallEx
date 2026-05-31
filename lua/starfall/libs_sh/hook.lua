@@ -531,7 +531,6 @@ end)
 -- @shared
 -- @param Entity ent Entity being removed
 -- @param boolean fullupdate If clientside, will be true if the entity was removed by a fullupdate
-add("EntityRemoved")
 
 --- Called when an entity is broken
 -- @name PropBreak
@@ -670,11 +669,6 @@ SF.RegisterLibrary("hook")
 
 return function(instance)
 
-local getent
-instance:AddHook("initialize", function()
-	getent = instance.Types.Entity.GetEntity
-end)
-
 instance:AddHook("deinitialize", function()
 	SF.HookDestroyInstance(instance)
 end)
@@ -744,7 +738,7 @@ local hookrun = hook_library.run
 function hook_library.runRemote(recipient, ...)
 	local recipients
 	if recipient then
-		local ent = getent(recipient)
+		local ent = eunwrap(recipient)
 		if not ent.instance then SF.Throw("Entity has no starfall instance", 2) end
 		recipients = {
 			[ent.instance] = true
