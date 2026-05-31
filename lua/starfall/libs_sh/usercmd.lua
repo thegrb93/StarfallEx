@@ -94,7 +94,6 @@ return function(instance)
 	-- @param number buttons The button(s) to check, see https://wiki.facepunch.com/gmod/Enums/IN for the button enums
 	-- @return boolean true if the button(s) is pressed, false if not
 	function usercmd_methods:keyDown(buttons)
-		checkluatype(buttons, TYPE_NUMBER)
 		return cunwrap(self):KeyDown(buttons)
 	end
 
@@ -179,7 +178,6 @@ return function(instance)
 	-- @param number buttons The button(s) to check, see https://wiki.facepunch.com/gmod/Enums/IN for the button enums
 	-- @return boolean true if the button(s) is down, false if not
 	function movedata_methods:keyDown(buttons)
-		checkluatype(buttons, TYPE_NUMBER)
 		return munwrap(self):KeyDown(buttons)
 	end
 
@@ -187,7 +185,6 @@ return function(instance)
 	-- @param number buttons The button(s) to check, see https://wiki.facepunch.com/gmod/Enums/IN for the button enums
 	-- @return boolean true if the button(s) was pressed, false if not
 	function movedata_methods:keyPressed(buttons)
-		checkluatype(buttons, TYPE_NUMBER)
 		return munwrap(self):KeyPressed(buttons)
 	end
 
@@ -195,7 +192,6 @@ return function(instance)
 	-- @param number buttons The button(s) to check, see https://wiki.facepunch.com/gmod/Enums/IN for the button enums
 	-- @return boolean true if the button(s) was released, false if not
 	function movedata_methods:keyReleased(buttons)
-		checkluatype(buttons, TYPE_NUMBER)
 		return munwrap(self):KeyReleased(buttons)
 	end
 
@@ -203,7 +199,6 @@ return function(instance)
 	-- @param number buttons The button(s) to check, see https://wiki.facepunch.com/gmod/Enums/IN for the button enums
 	-- @return boolean true if the button(s) is down, false if not
 	function movedata_methods:keyDownLast(buttons)
-		checkluatype(buttons, TYPE_NUMBER)
 		return munwrap(self):KeyDownLast(buttons)
 	end
 end
