@@ -8,6 +8,9 @@ local dsethook, dgethook = debug.sethook, debug.gethook
 local dgetmeta = debug.getmetatable
 local SysTime = SysTime
 
+local ENTMETA = FindMetaTable("Entity")
+local Ent_IsValid, Ent_IsWorld = ENTMETA.IsValid, ENTMETA.IsWorld
+
 if SERVER then
 	SF.cpuQuota = CreateConVar("sf_timebuffer", 0.005, FCVAR_ARCHIVE, "The max average the CPU time can reach.")
 	SF.cpuBufferN = CreateConVar("sf_timebuffersize", 100, FCVAR_ARCHIVE, "The window width of the CPU time quota moving average.")
@@ -39,7 +42,7 @@ if SERVER then
 	SF.playerInstances = SF.EntityTable("playerInstances", function(ply, instances)
 		for instance in pairs(instances) do
 			instance:Error({message = "Player disconnected!", traceback = ""})
-			if IsValid(instance.entity) then
+			if Ent_IsValid(instance.entity) then
 				net.Start("starfall_processor_kill")
 				net.WriteEntity(instance.entity)
 				net.Broadcast()
@@ -550,7 +553,7 @@ local CpuRamAverage = {
 			elseif forceThrow or string.find(debug.getinfo(4, "S").short_src, "SF:", 1, true) then
 				if SERVER and nocatch then
 					local consolemsg = "[Starfall] "..msg..
-						(self.instance.player:IsValid()
+						(Ent_IsValid(self.instance.player)
 						and (" by " .. self.instance.player:Nick() .. " (" .. self.instance.player:SteamID() .. ")")
 						or (" by [Disconnected Player])"))
 					SF.Print(nil, consolemsg .. "\n")
