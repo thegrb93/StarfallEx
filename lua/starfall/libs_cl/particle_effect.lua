@@ -31,11 +31,9 @@ local particle_meta, wrap, unwrap = instance.Types.ParticleEffect, instance.Type
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 
-local getent
 local vunwrap1
 local particleEffects = {}
 instance:AddHook("initialize", function()
-	getent = instance.Types.Entity.GetEntity
 	vunwrap1 = vec_meta.QuickUnwrap1
 end)
 
@@ -73,7 +71,7 @@ function particleef_library.attach(entity, name, pattach, options)
 	checkluatype (pattach, TYPE_NUMBER)
 	checkluatype (options, TYPE_TABLE)
 
-	local entity = getent(entity)
+	local entity = eunwrap(entity)
 
 	if badParticle(name) then
 		SF.Throw("Invalid particle effect path: " .. name, 2)
@@ -187,7 +185,7 @@ end
 -- @param Entity entity Entity parent
 function particleef_methods:setControlPointEntity(id,entity)
 	local uw = unwrap(self)
-	local entity = getent(entity)
+	local entity = eunwrap(entity)
 
 	checkluatype (id, TYPE_NUMBER)
 

@@ -90,238 +90,226 @@ local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap
 local wep_meta, wwrap, wunwrap = instance.Types.Weapon, instance.Types.Weapon.Wrap, instance.Types.Weapon.Unwrap
 local veh_meta, vhwrap, vhunwrap = instance.Types.Vehicle, instance.Types.Vehicle.Wrap, instance.Types.Vehicle.Unwrap
 
-local getent
 instance:AddHook("initialize", function()
-	getent = ent_meta.GetEntity
 	player_meta.__tostring = ent_meta.__tostring
 end)
-
-local function getply(self)
-	local ent = player_meta.sf2sensitive[self]
-	if Ent_IsValid(ent) then
-		return ent
-	else
-		SF.Throw("Entity is not valid.", 3)
-	end
-end
-player_meta.GetPlayer = getply
 
 -- ------------------------------------------------------------------------- --
 --- Returns whether the player is alive
 -- @shared
 -- @return boolean True if player alive
 function player_methods:isAlive()
-	return Ply_Alive(getply(self))
+	return Ply_Alive(unwrap(self))
 end
 
 --- Returns the players armor
 -- @shared
 -- @return number Armor
 function player_methods:getArmor()
-	return Ply_Armor(getply(self))
+	return Ply_Armor(unwrap(self))
 end
 
 --- Returns the players maximum armor capacity
 -- @shared
 -- @return number Armor limit
 function player_methods:getMaxArmor()
-	return Ply_GetMaxArmor(getply(self))
+	return Ply_GetMaxArmor(unwrap(self))
 end
 
 --- Returns the players Crouched Walk Speed
 -- @shared
 -- @return number Crouch Walk Speed value
 function player_methods:getCrouchedWalkSpeed()
-	return Ply_GetCrouchedWalkSpeed(getply(self))
+	return Ply_GetCrouchedWalkSpeed(unwrap(self))
 end
 
 --- Returns the players Duck Speed, a rate from 0-1 for how quickly they can crouch
 -- @shared
 -- @return number Duck Speed value
 function player_methods:getDuckSpeed()
-	return Ply_GetDuckSpeed(getply(self))
+	return Ply_GetDuckSpeed(unwrap(self))
 end
 
 --- Returns the players UnDuck Speed, a rate from 0-1 for how quickly they can uncrouch
 -- @shared
 -- @return number UnDuck Speed value
 function player_methods:getUnDuckSpeed()
-	return Ply_GetUnDuckSpeed(getply(self))
+	return Ply_GetUnDuckSpeed(unwrap(self))
 end
 
 --- Returns the players Ladder Climb Speed, probably unstable
 -- @shared
 -- @return number Ladder Climb Speed value
 function player_methods:getLadderClimbSpeed()
-	return Ply_GetLadderClimbSpeed(getply(self))
+	return Ply_GetLadderClimbSpeed(unwrap(self))
 end
 
 --- Returns the players Max Speed, probably unstable
 -- @shared
 -- @return number Max Speed value
 function player_methods:getMaxSpeed()
-	return Ply_GetMaxSpeed(getply(self))
+	return Ply_GetMaxSpeed(unwrap(self))
 end
 
 --- Returns the players Run Speed, which is +speed
 -- @shared
 -- @return number Run Speed value
 function player_methods:getRunSpeed()
-	return Ply_GetRunSpeed(getply(self))
+	return Ply_GetRunSpeed(unwrap(self))
 end
 
 --- Returns the players Slow Walk Speed, which is +walk
 -- @shared
 -- @return number Slow Walk Speed value
 function player_methods:getSlowWalkSpeed()
-	return Ply_GetSlowWalkSpeed(getply(self))
+	return Ply_GetSlowWalkSpeed(unwrap(self))
 end
 
 --- Returns the players Walk Speed
 -- @shared
 -- @return number Walk Speed value
 function player_methods:getWalkSpeed()
-	return Ply_GetWalkSpeed(getply(self))
+	return Ply_GetWalkSpeed(unwrap(self))
 end
 
 --- Returns the players Jump Power
 -- @shared
 -- @return number Jump Power value
 function player_methods:getJumpPower()
-	return Ply_GetJumpPower(getply(self))
+	return Ply_GetJumpPower(unwrap(self))
 end
 
 --- Returns the players Friction
 -- @shared
 -- @return number Friction value
 function player_methods:getFriction()
-	return Ent_GetFriction(getply(self)) * cvars.Number("sv_friction")
+	return Ent_GetFriction(unwrap(self)) * cvars.Number("sv_friction")
 end
 
 --- Returns the players Step Size
 -- @shared
 -- @return number Step Size Value
 function player_methods:getStepSize()
-	return Ply_GetStepSize(getply(self))
+	return Ply_GetStepSize(unwrap(self))
 end
 
 --- Returns whether the player is crouching
 -- @shared
 -- @return boolean True if player crouching
 function player_methods:isCrouching()
-	return Ply_Crouching(getply(self))
+	return Ply_Crouching(unwrap(self))
 end
 
 --- Returns the amount of deaths of the player
 -- @shared
 -- @return number Amount of deaths
 function player_methods:getDeaths()
-	return Ply_Deaths(getply(self))
+	return Ply_Deaths(unwrap(self))
 end
 
 --- Returns whether the player's flashlight is on
 -- @shared
 -- @return boolean True if player has flashlight on
 function player_methods:isFlashlightOn()
-	return Ply_FlashlightIsOn(getply(self))
+	return Ply_FlashlightIsOn(unwrap(self))
 end
 
 --- Returns true if the player is noclipped
 -- @shared
 -- @return boolean True if the player is noclipped
 function player_methods:isNoclipped()
-	return Ent_GetMoveType(getply(self)) == MOVETYPE_NOCLIP
+	return Ent_GetMoveType(unwrap(self)) == MOVETYPE_NOCLIP
 end
 
 --- Returns the amount of kills of the player
 -- @shared
 -- @return number Amount of kills
 function player_methods:getFrags()
-	return Ply_Frags(getply(self))
+	return Ply_Frags(unwrap(self))
 end
 
 --- Returns the name of the player's active weapon
 -- @shared
 -- @return Weapon The weapon
 function player_methods:getActiveWeapon()
-	return wwrap(Ply_GetActiveWeapon(getply(self)))
+	return wwrap(Ply_GetActiveWeapon(unwrap(self)))
 end
 
 --- Returns the player's aim vector
 -- @shared
 -- @return Vector Aim vector
 function player_methods:getAimVector()
-	return vwrap(Ply_GetAimVector(getply(self)))
+	return vwrap(Ply_GetAimVector(unwrap(self)))
 end
 
 --- Returns the player's field of view
 -- @shared
 -- @return number Field of view as a float
 function player_methods:getFOV()
-	return Ply_GetFOV(getply(self))
+	return Ply_GetFOV(unwrap(self))
 end
 
 --- Returns the player's name
 -- @shared
 -- @return string Name
 function player_methods:getName()
-	return Ply_GetName(getply(self))
+	return Ply_GetName(unwrap(self))
 end
 
 --- Returns the entity the player is currently using, like func_tank mounted turrets or +use prop pickups.
 -- @shared
 -- @return Entity Entity
 function player_methods:getEntityInUse()
-	return owrap(Ply_GetEntityInUse(getply(self)))
+	return owrap(Ply_GetEntityInUse(unwrap(self)))
 end
 
 --- Returns the player's shoot position
 -- @shared
 -- @return Vector Shoot position
 function player_methods:getShootPos()
-	return vwrap(Ply_GetShootPos(getply(self)))
+	return vwrap(Ply_GetShootPos(unwrap(self)))
 end
 
 --- Returns whether the player is in a vehicle
 -- @shared
 -- @return boolean True if player in vehicle
 function player_methods:inVehicle()
-	return Ply_InVehicle(getply(self))
+	return Ply_InVehicle(unwrap(self))
 end
 
 --- Returns the vehicle the player is driving
 -- @shared
 -- @return Vehicle Vehicle if player in vehicle or nil
 function player_methods:getVehicle()
-	return vhwrap(Ply_GetVehicle(getply(self)))
+	return vhwrap(Ply_GetVehicle(unwrap(self)))
 end
 
 --- Returns whether the player is an admin
 -- @shared
 -- @return boolean True if player is admin
 function player_methods:isAdmin()
-	return Ply_IsAdmin(getply(self))
+	return Ply_IsAdmin(unwrap(self))
 end
 
 --- Returns whether the player is a bot
 -- @shared
 -- @return boolean True if player is a bot
 function player_methods:isBot()
-	return Ply_IsBot(getply(self))
+	return Ply_IsBot(unwrap(self))
 end
 
 --- Returns whether the player is frozen
 -- @shared
 -- @return boolean True if player is frozen
 function player_methods:isFrozen()
-	return Ply_IsFrozen(getply(self))
+	return Ply_IsFrozen(unwrap(self))
 end
 
 --- Returns whether the player is a super admin
 -- @shared
 -- @return boolean True if player is super admin
 function player_methods:isSuperAdmin()
-	return Ply_IsSuperAdmin(getply(self))
+	return Ply_IsSuperAdmin(unwrap(self))
 end
 
 --- Returns whether the player belongs to a usergroup
@@ -329,28 +317,28 @@ end
 -- @param string groupName Group to check against
 -- @return boolean True if player belongs to group
 function player_methods:isUserGroup(group)
-	return Ply_IsUserGroup(getply(self), group)
+	return Ply_IsUserGroup(unwrap(self), group)
 end
 
 --- Returns the usergroup of the player
 -- @shared
 -- @return string Usergroup, "user" if player has no group
 function player_methods:getUserGroup()
-	return Ply_GetUserGroup(getply(self))
+	return Ply_GetUserGroup(unwrap(self))
 end
 
 --- Returns the player's current ping
 -- @shared
 -- @return number The player's ping
 function player_methods:getPing()
-	return Ply_Ping(getply(self))
+	return Ply_Ping(unwrap(self))
 end
 
 --- Returns the player's SteamID
 -- @shared
 -- @return string SteamID
 function player_methods:getSteamID()
-	return Ply_SteamID(getply(self))
+	return Ply_SteamID(unwrap(self))
 end
 
 --- Returns the player's SteamID64 / Community ID
@@ -362,9 +350,9 @@ end
 -- @return string SteamID64 aka Community ID
 function player_methods:getSteamID64(owner)
 	if owner then
-		return Ply_OwnerSteamID64(getply(self))
+		return Ply_OwnerSteamID64(unwrap(self))
 	else
-		return Ply_SteamID64(getply(self))
+		return Ply_SteamID64(unwrap(self))
 	end
 end
 
@@ -372,35 +360,35 @@ end
 -- @shared
 -- @return number Team Index, from TEAM enums or custom teams
 function player_methods:getTeam()
-	return Ply_Team(getply(self))
+	return Ply_Team(unwrap(self))
 end
 
 --- Returns the name of the player's current team
 -- @shared
 -- @return string Team Name
 function player_methods:getTeamName()
-	return team.GetName(Ply_Team(getply(self)))
+	return team.GetName(Ply_Team(unwrap(self)))
 end
 
 --- Returns the player's UserID
 -- @shared
 -- @return number UserID
 function player_methods:getUserID()
-	return Ply_UserID(getply(self))
+	return Ply_UserID(unwrap(self))
 end
 
 --- Returns a table with information of what the player is looking at
 -- @shared
 -- @return table Trace data https://wiki.facepunch.com/gmod/Structures/TraceResult
 function player_methods:getEyeTrace()
-	return SF.StructWrapper(instance, Ply_GetEyeTrace(getply(self)), "TraceResult")
+	return SF.StructWrapper(instance, Ply_GetEyeTrace(unwrap(self)), "TraceResult")
 end
 
 --- Returns the player's current view entity
 -- @shared
 -- @return Entity Player's current view entity
 function player_methods:getViewEntity()
-	return owrap(Ply_GetViewEntity(getply(self)))
+	return owrap(Ply_GetViewEntity(unwrap(self)))
 end
 
 --- Returns the player's view model
@@ -408,20 +396,20 @@ end
 -- @shared
 -- @return Entity Player's view model
 function player_methods:getViewModel()
-	return owrap(Ply_GetViewModel(getply(self), 0))
+	return owrap(Ply_GetViewModel(unwrap(self), 0))
 end
 
 --- Returns the camera punch offset angle
 -- @return Angle The angle of the view offset
 function player_methods:getViewPunchAngles()
-	return awrap(Ply_GetViewPunchAngles(getply(self)))
+	return awrap(Ply_GetViewPunchAngles(unwrap(self)))
 end
 
 --- Returns a table of weapons the player is carrying
 -- @shared
 -- @return table Table of weapons
 function player_methods:getWeapons()
-	return instance.Sanitize(Ply_GetWeapons(getply(self)))
+	return instance.Sanitize(Ply_GetWeapons(unwrap(self)))
 end
 
 --- Returns the specified weapon or nil if the player doesn't have it
@@ -430,7 +418,7 @@ end
 -- @return Weapon Weapon
 function player_methods:getWeapon(wep)
 	checkluatype(wep, TYPE_STRING)
-	return wwrap(Ply_GetWeapon(getply(self), wep))
+	return wwrap(Ply_GetWeapon(unwrap(self), wep))
 end
 
 --- Returns a player's weapon color
@@ -439,7 +427,7 @@ end
 -- @shared
 -- @return Vector The color
 function player_methods:getWeaponColor()
-	return vwrap(Ply_GetWeaponColor(getply(self)))
+	return vwrap(Ply_GetWeaponColor(unwrap(self)))
 end
 
 --- Returns a player's color
@@ -448,14 +436,14 @@ end
 -- @shared
 -- @return Vector The color
 function player_methods:getPlayerColor()
-	return vwrap(Ply_GetPlayerColor(getply(self)))
+	return vwrap(Ply_GetPlayerColor(unwrap(self)))
 end
 
 --- Returns the entity that the player is standing on
 -- @shared
 -- @return Entity Ground entity
 function player_methods:getGroundEntity()
-	return owrap(Ent_GetGroundEntity(getply(self)))
+	return owrap(Ent_GetGroundEntity(unwrap(self)))
 end
 
 --- Gets the amount of ammo the player has.
@@ -465,21 +453,21 @@ end
 function player_methods:getAmmoCount(id)
 	if not isnumber(id) and not isstring(id) then SF.ThrowTypeError("number or string", SF.GetType(id), 2) end
 
-	return Ply_GetAmmoCount(getply(self), id)
+	return Ply_GetAmmoCount(unwrap(self), id)
 end
 
 --- Returns whether the player is typing in their chat
 -- @shared
 -- @return boolean Whether they are typing in the chat
 function player_methods:isTyping()
-	return Ply_IsTyping(getply(self))
+	return Ply_IsTyping(unwrap(self))
 end
 
 --- Returns whether the player is sprinting
 -- @shared
 -- @return boolean Whether they are sprinting
 function player_methods:isSprinting()
-	return Ply_IsSprinting(getply(self))
+	return Ply_IsSprinting(unwrap(self))
 end
 
 --- Returns whether the player is walking
@@ -487,13 +475,13 @@ end
 -- @shared
 -- @return boolean Whether they are walking
 function player_methods:isWalking()
-	return Ply_IsWalking(getply(self))
+	return Ply_IsWalking(unwrap(self))
 end
 
 --- Gets the player's death ragdoll
 -- @return Entity? The entity or nil if it doesn't exist
 function player_methods:getDeathRagdoll()
-	return owrap(Ply_GetRagdollEntity(getply(self)))
+	return owrap(Ply_GetRagdollEntity(unwrap(self)))
 end
 
 --- Returns whether or not the player is pushing the key.
@@ -501,7 +489,7 @@ end
 -- @param number key Key to check. IN_KEY table values
 -- @return boolean Whether their key is down
 function player_methods:keyDown(key)
-	return Ply_KeyDown(getply(self), key)
+	return Ply_KeyDown(unwrap(self), key)
 end
 
 --- Gets whether a key was down one tick ago.
@@ -509,7 +497,7 @@ end
 -- @param number key Key to check. See IN_KEY table values.
 -- @return boolean Is their key down.
 function player_methods:keyDownLast(key)
-	return Ply_KeyDownLast(getply(self), key)
+	return Ply_KeyDownLast(unwrap(self), key)
 end
 
 --- Gets wether a key was just pressed this tick.
@@ -517,7 +505,7 @@ end
 -- @param number key Key to check. See IN_KEY table values.
 -- @return boolean Was their key pressed.
 function player_methods:keyPressed(key)
-	return Ply_KeyPressed(getply(self), key)
+	return Ply_KeyPressed(unwrap(self), key)
 end
 
 --- Gets wether a key was just released this tick.
@@ -525,14 +513,14 @@ end
 -- @param number key Key to check. See IN_KEY table values.
 -- @return boolean Was their key released.
 function player_methods:keyReleased(key)
-	return Ply_KeyReleased(getply(self), key)
+	return Ply_KeyReleased(unwrap(self), key)
 end
 
 
 --- Returns if the player is taunting
 -- @return boolean Is the player taunting
 function player_methods:isPlayingTaunt()
-	return Ply_IsPlayingTaunt(getply(self))
+	return Ply_IsPlayingTaunt(unwrap(self))
 end
 
 if CLIENT then
@@ -541,28 +529,28 @@ if CLIENT then
 	-- @return string One of: "friend", "blocked", "none", "requested"
 	function player_methods:getFriendStatus()
 		checkpermission(instance, nil, "player.getFriendStatus")
-		return Ply_GetFriendStatus(getply(self))
+		return Ply_GetFriendStatus(unwrap(self))
 	end
 
 	--- Returns whether the local player has muted the player
 	-- @client
 	-- @return boolean True if the player was muted
 	function player_methods:isMuted()
-		return Ply_IsMuted(getply(self))
+		return Ply_IsMuted(unwrap(self))
 	end
 
 	--- Returns whether the player is heard by the local player.
 	-- @client
 	-- @return boolean Whether they are speaking and able to be heard by LocalPlayer
 	function player_methods:isSpeaking()
-		return Ply_IsSpeaking(getply(self))
+		return Ply_IsSpeaking(unwrap(self))
 	end
 
 	--- Returns the voice volume of the player
 	-- @client
 	-- @return number Returns the players voice volume, how loud the player's voice communication currently is, as a normal number.
 	function player_methods:voiceVolume()
-		return Ply_VoiceVolume(getply(self))
+		return Ply_VoiceVolume(unwrap(self))
 	end
 
 	--- Plays gesture animations on a player
@@ -572,7 +560,7 @@ if CLIENT then
 	-- @param number? slot Optional int (Default GESTURE_SLOT.CUSTOM), the gesture slot to use. GESTURE_SLOT table values
 	-- @param number? weight Optional float (Default 1), the weight of the gesture. Ranging from 0-1
 	function player_methods:playGesture(animation, loop, slot, weight)
-		local ply = getply(self)
+		local ply = unwrap(self)
 		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		if slot == nil then
@@ -599,7 +587,7 @@ if CLIENT then
 	-- @client
 	-- @param number? slot Optional int (Default GESTURE_SLOT.CUSTOM), the gesture slot to use. GESTURE_SLOT table values
 	function player_methods:resetGesture(slot)
-		local ply = getply(self)
+		local ply = unwrap(self)
 		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		if slot == nil then slot = GESTURE_SLOT_CUSTOM else checkvalidnumber(slot) end
@@ -612,7 +600,7 @@ if CLIENT then
 	-- @param number? slot Optional int (Default GESTURE_SLOT.CUSTOM), the gesture slot to use. GESTURE_SLOT table values
 	-- @param number? weight Optional float (Default 1), the weight of the gesture. Ranging from 0-1
 	function player_methods:setGestureWeight(slot, weight)
-		local ply = getply(self)
+		local ply = unwrap(self)
 		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		if slot == nil then slot = GESTURE_SLOT_CUSTOM else checkvalidnumber(slot) end
@@ -630,7 +618,7 @@ if CLIENT then
 	-- @param boolean? auto_advance Optional boolean (Default true), should the animation handle advancing itself
 	-- @param number|string|nil act Optional number or string name (Default sequence value), the activity the player should use
 	function player_methods:setAnimation(seq, progress, rate, loop, auto_advance, act)
-		local ply = getply(self)
+		local ply = unwrap(self)
 		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		if isstring(seq) then
@@ -672,7 +660,7 @@ if CLIENT then
 	--- Resets the animation
 	-- @client
 	function player_methods:resetAnimation()
-		local ply = getply(self)
+		local ply = unwrap(self)
 		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		playerAnimRemove(ply)
@@ -682,7 +670,7 @@ if CLIENT then
 	-- @client
 	-- @param number|string|nil activity Activity, nil to use the current animation sequence
 	function player_methods:setAnimationActivity(act)
-		local ply = getply(self)
+		local ply = unwrap(self)
 		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		local anim = playerAnimGet(ply)
@@ -701,7 +689,7 @@ if CLIENT then
 	-- @client
 	-- @param number progress The progress of the animation. Ranging from 0-1
 	function player_methods:setAnimationProgress(progress)
-		local ply = getply(self)
+		local ply = unwrap(self)
 		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		local anim = playerAnimGet(ply)
@@ -716,7 +704,7 @@ if CLIENT then
 	-- @client
 	-- @param number time The time of the animation in seconds. Float
 	function player_methods:setAnimationTime(time)
-		local ply = getply(self)
+		local ply = unwrap(self)
 		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		local anim = playerAnimGet(ply)
@@ -731,7 +719,7 @@ if CLIENT then
 	-- @client
 	-- @param number rate The playback rate of the animation. Float
 	function player_methods:setAnimationRate(rate)
-		local ply = getply(self)
+		local ply = unwrap(self)
 		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		local anim = playerAnimGet(ply)
@@ -746,7 +734,7 @@ if CLIENT then
 	-- @client
 	-- @param boolean auto_advance Should the animation handle advancing itself?
 	function player_methods:setAnimationAutoAdvance(auto_advance)
-		local ply = getply(self)
+		local ply = unwrap(self)
 		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		local anim = playerAnimGet(ply)
@@ -761,7 +749,7 @@ if CLIENT then
 	-- @client
 	-- @param boolean bounce Should the animation bounce instead of loop?
 	function player_methods:setAnimationBounce(bounce)
-		local ply = getply(self)
+		local ply = unwrap(self)
 		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		local anim = playerAnimGet(ply)
@@ -776,7 +764,7 @@ if CLIENT then
 	-- @client
 	-- @param boolean loop Should the animation loop?
 	function player_methods:setAnimationLoop(loop)
-		local ply = getply(self)
+		local ply = unwrap(self)
 		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		local anim = playerAnimGet(ply)
@@ -792,7 +780,7 @@ if CLIENT then
 	-- @param number min Min. Ranging from 0-1
 	-- @param number max Max. Ranging from 0-1
 	function player_methods:setAnimationRange(min, max)
-		local ply = getply(self)
+		local ply = unwrap(self)
 		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
 
 		local anim = playerAnimGet(ply)
@@ -810,7 +798,7 @@ if CLIENT then
 	-- @client
 	-- @return boolean If an animation is playing
 	function player_methods:isPlayingAnimation()
-		local ply = getply(self)
+		local ply = unwrap(self)
 		return playerAnimGet(ply) ~= nil
 	end
 
@@ -818,7 +806,7 @@ if CLIENT then
 	-- @client
 	-- @return number Progress ranging 0-1
 	function player_methods:getAnimationProgress()
-		local ply = getply(self)
+		local ply = unwrap(self)
 		local anim = playerAnimGet(ply)
 
 		if not anim then return 0 end
@@ -829,7 +817,7 @@ if CLIENT then
 	-- @client
 	-- @return number Time in seconds
 	function player_methods:getAnimationTime()
-		local ply = getply(self)
+		local ply = unwrap(self)
 		local anim = playerAnimGet(ply)
 
 		if not anim then return 0 end
@@ -840,7 +828,7 @@ if CLIENT then
 	-- @client
 	-- @return boolean True if the player's playermodel is visible
 	function player_methods:shouldDrawLocalPlayer()
-		return Ply_ShouldDrawLocalPlayer(getply(self))
+		return Ply_ShouldDrawLocalPlayer(unwrap(self))
 	end
 end
 

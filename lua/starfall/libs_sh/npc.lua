@@ -32,10 +32,8 @@ local npc_methods, npc_meta, wrap, unwrap = instance.Types.Npc.Methods, instance
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 
-local getent
 local vunwrap1
 instance:AddHook("initialize", function()
-	getent = ent_meta.GetEntity
 	npc_meta.__tostring = ent_meta.__tostring
 	vunwrap1 = vec_meta.QuickUnwrap1
 end)
@@ -44,22 +42,13 @@ instance:AddHook("deinitialize", function()
 	if SERVER then lagCompensated:deinitialize(instance) end
 end)
 
-local function getnpc(self)
-	local ent = npc_meta.sf2sensitive[self]
-	if Ent_IsValid(ent) then
-		return ent
-	else
-		SF.Throw("Entity is not valid.", 3)
-	end
-end
-
 if SERVER then
 
 	--- Sets an npc's hitboxes to compensate for lag, but limited number of npcs can be set due to high processing needed
 	-- @server
 	-- @param boolean compensate Whether to make an npc's hitboxes compensate lag
 	function npc_methods:setLagCompensated(compensate)
-		local npc = getnpc(self)
+		local npc = unwrap(self)
 		checkpermission(instance, npc, "npcs.modify")
 		if compensate and not Ent_IsLagCompensated(npc) then
 			lagCompensated:checkuse(instance.player, 1)
@@ -75,14 +64,14 @@ if SERVER then
 	-- @server
 	-- @return boolean Whether the npc is lag compensated
 	function npc_methods:isLagCompensated()
-		return Ent_IsLagCompensated(getnpc(self))
+		return Ent_IsLagCompensated(unwrap(self))
 	end
 
 	--- Adds a relationship to the npc
 	-- @server
 	-- @param string str The relationship string. http://wiki.facepunch.com/gmod/NPC:AddRelationship
 	function npc_methods:addRelationship(str)
-		local npc = getnpc(self)
+		local npc = unwrap(self)
 		checkpermission(instance, npc, "npcs.modify")
 		Npc_AddRelationship(npc, str)
 	end
@@ -105,8 +94,8 @@ if SERVER then
 	-- @param string disp String of the relationship. ("hate", "fear", "like", "neutral")
 	-- @param number priority How strong the relationship is. Higher number is stronger
 	function npc_methods:addEntityRelationship(ent, disp, priority)
-		local npc = getnpc(self)
-		local target = getent(ent)
+		local npc = unwrap(self)
+		local target = eunwrap(ent)
 		local relation = dispositions[disp]
 		if not relation then SF.Throw("Invalid relationship specified", 2) end
 		checkpermission(instance, npc, "npcs.modify")
@@ -118,7 +107,7 @@ if SERVER then
 	-- @param Entity ent Target entity
 	-- @return string Relationship of the npc with the target
 	function npc_methods:getRelationship(ent)
-		return dispositions[getnpc(self):Disposition(getent(ent))]
+		return dispositions[unwrap(self):Disposition(eunwrap(ent))]
 	end
 
 	--- Gives the npc a weapon
@@ -127,7 +116,7 @@ if SERVER then
 	function npc_methods:giveWeapon(wep)
 		checkluatype(wep, TYPE_STRING)
 
-		local npc = getnpc(self)
+		local npc = unwrap(self)
 		checkpermission(instance, npc, "npcs.giveweapon")
 
 		local weapon = npc:GetActiveWeapon()
@@ -143,22 +132,22 @@ if SERVER then
 	-- @server
 	-- @param Entity ent Target entity
 	function npc_methods:setEnemy(ent)
-		local npc = getnpc(self)
+		local npc = unwrap(self)
 		checkpermission(instance, npc, "npcs.modify")
-		Npc_SetTarget(npc, getent(ent))
+		Npc_SetTarget(npc, eunwrap(ent))
 	end
 
 	--- Gets what the npc is fighting
 	-- @server
 	-- @return Entity Entity the npc is fighting
 	function npc_methods:getEnemy()
-		return owrap(Npc_GetEnemy(getnpc(self)))
+		return owrap(Npc_GetEnemy(unwrap(self)))
 	end
 
 	--- Stops the npc
 	-- @server
 	function npc_methods:stop()
-		local npc = getnpc(self)
+		local npc = unwrap(self)
 		checkpermission(instance, npc, "npcs.modify")
 		Npc_SetSchedule(npc, SCHED_NONE)
 	end
@@ -166,7 +155,7 @@ if SERVER then
 	--- Makes the npc do a melee attack
 	-- @server
 	function npc_methods:attackMelee()
-		local npc = getnpc(self)
+		local npc = unwrap(self)
 		checkpermission(instance, npc, "npcs.modify")
 		Npc_SetSchedule(npc, SCHED_MELEE_ATTACK1)
 	end
@@ -174,7 +163,7 @@ if SERVER then
 	--- Makes the npc do a ranged attack
 	-- @server
 	function npc_methods:attackRange()
-		local npc = getnpc(self)
+		local npc = unwrap(self)
 		checkpermission(instance, npc, "npcs.modify")
 		Npc_SetSchedule(npc, SCHED_RANGE_ATTACK1)
 	end
@@ -183,7 +172,7 @@ if SERVER then
 	-- @server
 	-- @param Vector vec The position of the destination
 	function npc_methods:goWalk(vec)
-		local npc = getnpc(self)
+		local npc = unwrap(self)
 		checkpermission(instance, npc, "npcs.modify")
 		Npc_SetLastPosition(npc, vunwrap1(vec))
 		Npc_SetSchedule(npc, SCHED_FORCED_GO)
@@ -193,7 +182,7 @@ if SERVER then
 	-- @server
 	-- @param Vector vec The position of the destination
 	function npc_methods:goRun(vec)
-		local npc = getnpc(self)
+		local npc = unwrap(self)
 		checkpermission(instance, npc, "npcs.modify")
 		Npc_SetLastPosition(npc, vunwrap1(vec))
 		Npc_SetSchedule(npc, SCHED_FORCED_GO_RUN)

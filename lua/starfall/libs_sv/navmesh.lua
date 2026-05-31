@@ -44,10 +44,8 @@ return function(instance)
 	local cunwrap = instance.Types.Color.Unwrap
 
 
-	local getent
 	local vunwrap1, vunwrap2
 	instance:AddHook("initialize", function()
-		getent = instance.Types.Entity.GetEntity
 		vunwrap1, vunwrap2 = vec_meta.QuickUnwrap1, vec_meta.QuickUnwrap2
 	end)
 
