@@ -1809,7 +1809,7 @@ end
 function ents_methods:setEyeTarget(pos)
     local ent = getent(self)
 
-	vec = vunwrap(pos)
+	local vec = vunwrap(pos)
 	checkvector(vec)
 	checkpermission(instance, ent, SERVER and "entities.canTool" or "entities.setRenderProperty")
 
