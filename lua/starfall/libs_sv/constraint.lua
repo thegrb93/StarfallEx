@@ -313,7 +313,7 @@ function constraint_library.elastic(index, e1, e2, bone1, bone2, v1, v2, const, 
 	damp = damp or 100
 	rdamp = rdamp or 0
 	width = width or 0
-	strech = strech and true or false
+	stretch = stretch and true or false
 
 	checkluatype(bone1, TYPE_NUMBER)
 	checkluatype(bone2, TYPE_NUMBER)

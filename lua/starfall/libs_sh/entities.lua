@@ -65,7 +65,7 @@ local function Ent_IsWeapon(ent) return dgetmeta(ent)==WEP_META end
 
 local Phys_GetAngleVelocity,Phys_GetInertia,Phys_GetMass,Phys_GetMassCenter,Phys_IsValid,Phys_LocalToWorldVector,Phys_WorldToLocalVector = PHYS_META.GetAngleVelocity,PHYS_META.GetInertia,PHYS_META.GetMass,PHYS_META.GetMassCenter,PHYS_META.IsValid,PHYS_META.LocalToWorldVector,PHYS_META.WorldToLocalVector
 
-local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
+local owrap = instance.WrapObject
 local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
@@ -73,7 +73,7 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 local phys_meta, pwrap, punwrap = instance.Types.PhysObj, instance.Types.PhysObj.Wrap, instance.Types.PhysObj.Unwrap
 local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
 local plywrap = instance.Types.Player.Wrap
-local swrap, sunwrap = instance.Types.SurfaceInfo.Wrap, instance.Types.SurfaceInfo.Unwrap
+local swrap = instance.Types.SurfaceInfo.Wrap
 
 local vunwrap1, vunwrap2
 local aunwrap1
@@ -1797,13 +1797,12 @@ end
 --  Setting the target position to Vector(0,0,0) will remove the override entirely.
 -- @param Vector pos The position to look at
 function ents_methods:setEyeTarget(pos)
-    local ent = eunwrap(self)
-	
-	vec = vunwrap(pos)
+	local ent = eunwrap(self)
+	local vec = vunwrap(pos)
 	checkvector(vec)
 	checkpermission(instance, ent, SERVER and "entities.canTool" or "entities.setRenderProperty")
 	
-    Ent_SetEyeTarget(ent, vec)
+	Ent_SetEyeTarget(ent, vec)
 end
 	
 --- Gets the model of an entity. For prop_effect, see ent:getEffectModel()

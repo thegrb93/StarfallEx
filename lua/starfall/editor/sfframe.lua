@@ -99,7 +99,7 @@ function SF.DefaultCode()
 	elseif file.Exists("starfall/default.lua", "DATA") then
 		return file.Read("starfall/default.lua", "DATA")
 	else
-		code = string.gsub(defaultCode, "@author", "@author "..string.gsub(LocalPlayer():Nick(), "[^%w%s%p_]", ""))
+		local code = string.gsub(defaultCode, "@author", "@author "..string.gsub(LocalPlayer():Nick(), "[^%w%s%p_]", ""))
 		file.Write("starfall/default.txt", code)
 		return code
 	end
@@ -1874,7 +1874,7 @@ end
 vgui.Register("StarfallEditorFrame", Editor, "DFrame")
 
 -- Starfall Users
-PANEL  = {}
+local PANEL = {}
 
 function PANEL:UpdatePlayers(players)
 	local sortedplayers = {}
