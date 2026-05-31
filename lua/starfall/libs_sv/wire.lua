@@ -60,10 +60,7 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 local wirelink_meta, wlwrap, wlunwrap = instance.Types.Wirelink, instance.Types.Wirelink.Wrap, instance.Types.Wirelink.Unwrap
 local COLOR_WHITE = Color(255, 255, 255)
 
-local getent
 instance:AddHook("initialize", function()
-	getent = ent_meta.GetEntity
-
 	local ent = instance.entity
 	if ent.Inputs == nil then
 		WireLib.CreateInputs(ent, {})
@@ -273,7 +270,7 @@ local SFToWire =
 	VECTOR = function(data) return vunwrap(data) end,
 	VECTOR2 = function(data) return v2unwrap(data) end,
 	ANGLE = function(data) return aunwrap(data) end,
-	ENTITY = function(data) return getent(data) end,
+	ENTITY = function(data) return eunwrap(data) end,
 	TABLE = function(data)
 		checkluatype(data, TYPE_TABLE, 2)
 		local completed_tables = {}
@@ -565,7 +562,7 @@ end
 function wire_library.delete(entI, inputname)
 	checkluatype(inputname, TYPE_STRING)
 
-	entI = getent(entI)
+	entI = eunwrap(entI)
 
 	checkpermission(instance, entI, "wire.deleteWire")
 
@@ -578,7 +575,7 @@ end
 local function parseEntity(ent, io)
 
 	if ent then
-		ent = getent(ent)
+		ent = eunwrap(ent)
 		checkpermission(instance, ent, "wire.get" .. io)
 	else
 		ent = instance.entity
@@ -618,7 +615,7 @@ end
 -- @param Entity ent Wire entity
 -- @return Wirelink Wirelink of the entity
 function wire_library.getWirelink(ent)
-	ent = getent(ent)
+	ent = eunwrap(ent)
 	checkpermission(instance, ent, "wire.wirelink")
 
 	if not ent.extended then
@@ -678,7 +675,7 @@ end
 -- @param any value The value to set the input to (must match the input type)
 function wire_library.triggerInput(ent, inputname, value)
 	checkluatype(inputname, TYPE_STRING)
-	ent = getent(ent)
+	ent = eunwrap(ent)
 	checkpermission(instance, ent, "wire.trigger")
 	triggerInput(ent, inputname, value)
 end
@@ -689,7 +686,7 @@ end
 -- @param any value The value to set the output to (must match the output type)
 function wire_library.triggerOutput(ent, outputname, value)
 	checkluatype(outputname, TYPE_STRING)
-	ent = getent(ent)
+	ent = eunwrap(ent)
 	checkpermission(instance, ent, "wire.trigger")
 	triggerOutput(ent, outputname, value)
 end
@@ -701,7 +698,7 @@ end
 function wire_library.triggerCell(ent, index, value)
 	checkluatype(index, TYPE_NUMBER)
 	checkluatype(value, TYPE_NUMBER)
-	ent = getent(ent)
+	ent = eunwrap(ent)
 	checkpermission(instance, ent, "wire.trigger")
 	triggerCell(ent, index, value)
 end
@@ -712,7 +709,7 @@ end
 -- @return any value The value to set the input to (must match the input type)
 function wire_library.readInput(ent, inputname)
 	checkluatype(inputname, TYPE_STRING)
-	ent = getent(ent)
+	ent = eunwrap(ent)
 	checkpermission(instance, ent, "wire.read")
 	return readInput(ent, inputname)
 end
@@ -723,7 +720,7 @@ end
 -- @return any value The value to set the output to (must match the output type)
 function wire_library.readOutput(ent, outputname)
 	checkluatype(outputname, TYPE_STRING)
-	ent = getent(ent)
+	ent = eunwrap(ent)
 	checkpermission(instance, ent, "wire.read")
 	return readOutput(ent, outputname)
 end
@@ -734,7 +731,7 @@ end
 -- @return number The value at the address
 function wire_library.readCell(ent, index)
 	checkluatype(index, TYPE_NUMBER)
-	ent = getent(ent)
+	ent = eunwrap(ent)
 	checkpermission(instance, ent, "wire.read")
 	return readCell(ent, index)
 end

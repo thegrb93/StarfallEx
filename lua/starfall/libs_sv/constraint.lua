@@ -34,11 +34,6 @@ SF.RegisterType("Constraint", true, false)
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
-local getent
-instance:AddHook("initialize", function()
-	getent = instance.Types.Entity.GetEntity
-end)
-
 local constraintsClean = true
 
 instance:AddHook("deinitialize", function()
@@ -502,7 +497,7 @@ end
 -- @return Constraint The constraint entity
 -- @server
 function constraint_library.setElasticLength(index, e, length)
-	local ent1 = getent(e)
+	local ent1 = eunwrap(e)
 
 	checkpermission(instance, ent1, "constraints.elastic")
 
@@ -524,7 +519,7 @@ end
 -- @return Constraint The constraint entity
 -- @server
 function constraint_library.setElasticDamping(index, e, damping)
-	local ent1 = getent(e)
+	local ent1 = eunwrap(e)
 
 	checkpermission(instance, ent1, "constraints.elastic")
 
@@ -546,7 +541,7 @@ end
 -- @return Constraint The constraint entity
 -- @server
 function constraint_library.setElasticConstant(index, e, constant)
-	local ent1 = getent(e)
+	local ent1 = eunwrap(e)
 
 	checkpermission(instance, ent1, "constraints.elastic")
 
@@ -565,7 +560,7 @@ end
 -- @param Entity e Entity to remove the constraints from
 -- @server
 function constraint_library.breakAll(e)
-	local ent1 = getent(e)
+	local ent1 = eunwrap(e)
 	checkpermission(instance, ent1, "constraints.any")
 
 	constraint.RemoveAll(ent1)
@@ -578,7 +573,7 @@ end
 function constraint_library.breakType(e, typename)
 	checkluatype(typename, TYPE_STRING)
 
-	local ent1 = getent(e)
+	local ent1 = eunwrap(e)
 
 	checkpermission(instance, ent1, "constraints.any")
 
@@ -590,7 +585,7 @@ end
 -- @param Entity ent The entity
 -- @return table Table of tables containing constraint information
 function constraint_library.getTable(ent)
-	local ret = constraint.GetTable(getent(ent))
+	local ret = constraint.GetTable(eunwrap(ent))
 	for _, v in ipairs(ret) do
 		if v.Constraint then
 			v.Constraint = cwrap(v.Constraint)

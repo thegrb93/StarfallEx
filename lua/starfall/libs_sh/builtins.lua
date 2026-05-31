@@ -41,11 +41,9 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 
 local builtins_library = instance.env
 
-local getent, getply
 local vunwrap1, vunwrap2
 local aunwrap1, aunwrap2
 instance:AddHook("initialize", function()
-	getent, getply = instance.Types.Entity.GetEntity, instance.Types.Player.GetPlayer
 	vunwrap1, vunwrap2 = vec_meta.QuickUnwrap1, vec_meta.QuickUnwrap2
 	aunwrap1, aunwrap2 = ang_meta.QuickUnwrap1, ang_meta.QuickUnwrap2
 end)
@@ -581,7 +579,7 @@ if SERVER then
 	-- @param Player ply The target player. If in CLIENT, then ply is the client player and this param is omitted
 	-- @param ... printArgs Values to print. Colors before text will set the text color
 	function builtins_library.printHud(ply, ...)
-		ply = getply(ply)
+		ply = eunwrap(ply)
 		if not ply:IsPlayer() then SF.Throw("Expected a target player!", 2) end
 		if not SF.IsHUDActive(instance.entity, ply) then SF.Throw("Player isn't connected to a hud!", 2) end
 
@@ -789,7 +787,7 @@ end
 -- @return table? Table where keys are paths and values are functions, or nil if another chip was specified
 function builtins_library.getScripts(ent)
 	if ent ~= nil then
-		ent = getent(ent)
+		ent = eunwrap(ent)
 		local oinstance = ent.instance
 		if not ent.Starfall or not oinstance then
 			SF.Throw("Invalid starfall chip", 2)
@@ -1219,7 +1217,7 @@ end
 -- @param Player ply The player to enable the hud on. If CLIENT, will be forced to player()
 -- @param boolean active Whether hud hooks should be active. true to force on, false to force off.
 function builtins_library.enableHud(ply, active)
-	ply = SERVER and getply(ply) or LocalPlayer()
+	ply = SERVER and eunwrap(ply) or LocalPlayer()
 	checkluatype(active, TYPE_BOOL)
 
 	if (SERVER and (ply==instance.player or instance.player==SF.Superuser)) or (CLIENT and haspermission(instance, nil, "enablehud")) or (not active and SF.IsHUDActive(instance.entity, ply)) then
@@ -1239,7 +1237,7 @@ end
 -- @param Entity? chip The chip to restart. If nil, it will restart the current chip.
 function builtins_library.restart(chip)
 	if chip then
-		chip = getent(chip)
+		chip = eunwrap(chip)
 		if not (chip.Starfall and chip.sfdata) then SF.Throw("Entity has no starfall data", 2) end
 		if chip.owner ~= instance.player then SF.Throw("You don't own that starfall", 2) end
 	else

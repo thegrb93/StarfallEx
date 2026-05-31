@@ -183,20 +183,17 @@ function SF.RegisterType(name, weakwrapper, weaksensitive, target_metatable, sup
 end
 
 -- Cleanup wrapped entity when it's removed
-SF.WrappedEntities = SF.EntityTable("SFWrappedEnts", function(ent)
-	-- Wait a frame so we don't conflict with sf EntityRemoved hook
-	timer.Simple(0, function()
-		for inst in pairs(SF.allInstances) do
-			for _, meta in ipairs(inst.entityMetas) do
-				local wrap = meta.sensitive2sf[ent]
-				if wrap then
-					meta.sensitive2sf[ent] = nil
-					meta.sf2sensitive[wrap] = nil
-				end
-			end
+SF.WrappedEntities = {}
+
+function SF.Instance:CleanupWrappedEnt(ent)
+	for _, meta in ipairs(self.entityMetas) do
+		local wrap = meta.sensitive2sf[ent]
+		if wrap then
+			meta.sensitive2sf[ent] = nil
+			meta.sf2sensitive[wrap] = nil
 		end
-	end)
-end)
+	end
+end
 
 function SF.Instance:CreateWrapper(metatable, typedata)
 	
@@ -218,7 +215,11 @@ function SF.Instance:CreateWrapper(metatable, typedata)
 			function wrap(value)
 				if value == nil then return nil end
 				if sensitive2sf[value] then return sensitive2sf[value] end
-				SF.WrappedEntities[value] = true
+
+				-- Don't wrap invalid entities and don't put world in SF.WrappedEntities
+				if Ent_IsValid(ent) then SF.WrappedEntities[value] = true
+				elseif not Ent_IsWorld(ent) then ent = NULL end
+
 				local tbl = setmetatable({}, metatable)
 				sensitive2sf[value] = tbl
 				sf2sensitive[tbl] = value
@@ -781,6 +782,27 @@ hook.Add("Think", "SF_Think", function()
 		instance:runScriptHook("think")
 	end
 	CpuRamAverage.checkTotalPlayerCpu()
+end)
+
+hook.Add("EntityRemoved", "SF_EntityRemoved", function(ent, snapshot)
+	for instance in pairs(SF.allInstances) do
+		if instance.hooks.entityremoved then
+			instance:runScriptHook("entityremoved", instance.WrapObject(ent), snapshot)
+		end
+	end
+
+	if SF.WrappedEntities[ent] then
+		if SERVER then
+			for instance in pairs(SF.allInstances) do instance:CleanupWrappedEnt(ent) end
+		else
+			timer.Simple(0, function()
+				if not Ent_IsValid(ent) then
+					for instance in pairs(SF.allInstances) do instance:CleanupWrappedEnt(ent) end
+				end
+			end)
+		end
+		SF.WrappedEntities[ent] = nil
+	end
 end)
 
 function SF.Instance:Error(err)
