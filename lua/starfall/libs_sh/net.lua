@@ -134,7 +134,6 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
 
-local getent
 local vunwrap1
 local netStarted = false
 local netSize = 0
@@ -143,7 +142,6 @@ local netReceives = {}
 local plyStreams = StreamManager.plyStreams[instance.player]
 instance.data.net = {receives = netReceives}
 instance:AddHook("initialize", function()
-	getent = instance.Types.Entity.GetEntity
 	vunwrap1 = vec_meta.QuickUnwrap1
 end)
 instance:AddHook("deinitialize", function()
@@ -198,11 +196,11 @@ function net_library.send(target, unreliable)
 	if SERVER and target then
 		checkluatype(target, TYPE_TABLE)
 		if debug.getmetatable(target)==instance.Types.Player then
-			newtarget = instance.Types.Player.GetPlayer(target)
+			newtarget = instance.Types.Player.Unwrap(target)
 		else
 			newtarget = {}
 			for i, pl in ipairs(target) do
-				newtarget[i] = instance.Types.Player.GetPlayer(pl)
+				newtarget[i] = instance.Types.Player.Unwrap(pl)
 			end
 		end
 	end
@@ -587,7 +585,7 @@ end
 -- @param Entity t The entity to be written
 function net_library.writeEntity(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
-	local ent = getent(t)
+	local ent = eunwrap(t)
 	write{net.WriteUInt, 16, ent:EntIndex(), 16}
 	write{net.WriteUInt, 32, ent:GetCreationID(), 32}
 end

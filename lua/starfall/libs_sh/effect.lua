@@ -38,11 +38,9 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 
-local getent
 local vunwrap1
 local aunwrap1
 instance:AddHook("initialize", function()
-	getent = instance.Types.Entity.GetEntity
 	vunwrap1 = vec_meta.QuickUnwrap1
 	aunwrap1 = ang_meta.QuickUnwrap1
 end)
@@ -246,7 +244,7 @@ end
 --- Sets the effect's entity
 -- @param Entity ent The entity
 function effect_methods:setEntity(ent)
-	unwrap(self):SetEntity(getent(ent))
+	unwrap(self):SetEntity(eunwrap(ent))
 end
 
 --- Sets the effect's flags

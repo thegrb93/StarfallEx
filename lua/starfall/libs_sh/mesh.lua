@@ -261,11 +261,11 @@ do
 	local dist_to_line
 	local dist_to_plane
 	local face_vertices
-	local create_initial_simplex3
+	local find_plane
 	local wrap_points
+	local create_initial_simplex4
 	local find_lightfaces
 	local next_horizon_edge
-	local face_to_mesh_vertex
 
 	function update_points(points)
 		local changed = false

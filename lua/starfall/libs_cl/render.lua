@@ -481,12 +481,10 @@ local markup_methods, markwrap, markunwrap = instance.Types.Markup.Methods, inst
 local mtlunwrap = instance.Types.LockedMaterial.Unwrap
 
 
-local getent
 local vunwrap1, vunwrap2, vunwrap3, vunwrap4
 local aunwrap1
 local cunwrap1
 instance:AddHook("initialize", function()
-	getent = instance.Types.Entity.GetEntity
 	vunwrap1, vunwrap2, vunwrap3, vunwrap4 = vec_meta.QuickUnwrap1, vec_meta.QuickUnwrap2, vec_meta.QuickUnwrap3, vec_meta.QuickUnwrap4
 	aunwrap1 = ang_meta.QuickUnwrap1
 	cunwrap1 = col_meta.QuickUnwrap1
@@ -871,7 +869,7 @@ end
 -- @param Entity? screen (Optional) entity of screen
 function render_library.setBackgroundColor(col, screen)
 	if screen then
-		screen = getent(screen)
+		screen = eunwrap(screen)
 		if screen.link ~= instance.entity then
 			SF.Throw("Entity has to be linked!", 2)
 		end
@@ -1293,7 +1291,7 @@ end
 function render_library.setTextureFromScreen(ent)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
-	ent = getent(ent)
+	ent = eunwrap(ent)
 	if ent.GPU and ent.GPU.RT then
 		RT_Material:SetTexture("$basetexture", ent.GPU.RT)
 		surface_SetMaterial(RT_Material)
@@ -2266,13 +2264,13 @@ end
 -- @return number? Y position or nil if the player is not aiming at the screen
 function render_library.cursorPos(ply, screen)
 	if ply~=nil then
-		ply = getent(ply)
+		ply = eunwrap(ply)
 		if not ply:IsPlayer() then SF.Throw("Entity isn't a player", 2) end
 	else
 		ply = LocalPlayer()
 	end
 
-	if screen~=nil then screen = getent(screen) else screen = renderdata.renderEnt end
+	if screen~=nil then screen = eunwrap(screen) else screen = renderdata.renderEnt end
 	if not screen then SF.Throw("Invalid screen", 2) end
 	local screenTransform = Ent_GetTable(screen).Transform
 	if not screenTransform then SF.Throw("Invalid screen", 2) end
@@ -2312,7 +2310,7 @@ end
 -- @param Entity e The screen to get info from.
 -- @return table A table describing the screen.
 function render_library.getScreenInfo(e)
-	local screen = getent(e)
+	local screen = eunwrap(e)
 	if not screen.ScreenInfo then SF.Throw("Invalid screen", 2) end
 	return instance.Sanitize(screen.ScreenInfo)
 end
@@ -2756,7 +2754,7 @@ function render_library.setScreenDimensions(screen, x, y, w, h)
 	checkluatype(h, TYPE_NUMBER)
 	local halfw, halfh = w/2, h/2
 	if x-halfw<-1024 or y-halfh<-1024 or w<1 or h<1 or x+halfw>1024 or y+halfh>1024 then SF.Throw("The specified dimensions exceeds the bounds!", 2) end
-	screen = getent(screen)
+	screen = eunwrap(screen)
 	local custominfo = SF.CustomScreenInfo
 	if screen.ScreenInfo.Name ~= custominfo.Name then SF.Throw("Expected a custom screen. Make sure the selected screen is the 'custom screen' model!", 2) end
 

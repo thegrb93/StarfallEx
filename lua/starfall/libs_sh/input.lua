@@ -194,15 +194,12 @@ SF.RegisterLibrary("input")
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
-local getent
+local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+
 local lockedControlCooldown = 0
 
 local inputdata = {controlsLocked = false, cursorEnabled = false}
 instance.data.input = inputdata
-
-instance:AddHook("initialize", function()
-	getent = instance.Types.Entity.GetEntity
-end)
 
 instance:AddHook("deinitialize", function()
 	if inputdata.cursorEnabled then
@@ -352,7 +349,7 @@ end
 -- @client
 -- @param Weapon weapon The weapon entity to select
 function input_library.selectWeapon(weapon)
-	local ent = getent(weapon)
+	local ent = eunwrap(weapon)
 	if not (ent:IsWeapon() and ent:IsCarriedByLocalPlayer()) then SF.Throw("This weapon is not your own!", 2) end
 	checkpermission(instance, nil, "input.emulate")
 	input.SelectWeapon( ent )

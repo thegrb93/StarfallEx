@@ -3404,13 +3404,8 @@ function PANEL:GetSyntaxColor(name)
 end
 
 function PANEL:SyntaxColorLine(line)
-	prev = prev or {}
 	if #self.Rows[line] > 2048 then -- Too long to parse
 		local cols = TabHandler.Modes.Text.SyntaxColorLine(self, line)
-		for k,v in pairs(prev) do -- Pass along unfinished etc
-			if isnumber(k) then continue end
-			cols[k] = v
-		end
 		return cols
 	end
 	local cols = self:DoAction("SyntaxColorLine", line)

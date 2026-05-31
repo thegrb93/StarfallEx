@@ -81,19 +81,10 @@ instance:AddHook("initialize", function()
 	vehicle_meta.__tostring = ent_meta.__tostring
 end)
 
-local function getveh(self)
-	local ent = vehicle_meta.sf2sensitive[self]
-	if Ent_IsValid(ent) then
-		return ent
-	else
-		SF.Throw("Entity is not valid.", 3)
-	end
-end
-
 --- Returns the driver of the vehicle
 -- @return Player Driver of vehicle
 function vehicle_methods:getDriver()
-	return pwrap(Veh_GetDriver(getveh(self)))
+	return pwrap(Veh_GetDriver(unwrap(self)))
 end
 
 --- Returns a passenger of a vehicle
@@ -101,14 +92,14 @@ end
 -- @return Player The passenger or NULL if empty
 function vehicle_methods:getPassenger(n)
 	checkluatype(n, TYPE_NUMBER)
-	return pwrap(Veh_GetPassenger(getveh(self), n))
+	return pwrap(Veh_GetPassenger(unwrap(self), n))
 end
 
 
 --- Forces the vehicles camera into third person or first person
 -- @param boolean thirdPerson
 function vehicle_methods:setThirdPersonMode(enabled)
-	local veh = getveh(self)
+	local veh = unwrap(self)
 
 	checkluatype(enabled, TYPE_BOOL)
 	checkpermission(instance, veh, "vehicle.thirdPerson")
@@ -119,13 +110,13 @@ end
 --- Gets if third person mode is enabled or disabled
 -- @return boolean true if third person mode is enabled, false if not
 function vehicle_methods:getThirdPersonMode()
-	return Veh_GetThirdPersonMode(getveh(self))
+	return Veh_GetThirdPersonMode(unwrap(self))
 end
 
 --- Sets the third person camera distance
 -- @param number distance
 function vehicle_methods:setCameraDistance(dist)
-	local veh = getveh(self)
+	local veh = unwrap(self)
 
 	checkluatype(dist, TYPE_NUMBER)
 	checkpermission(instance, veh, "vehicle.thirdPerson")
@@ -136,7 +127,7 @@ end
 --- Returns the camera distance
 -- @return number distance
 function vehicle_methods:getCameraDistance()
-	return Veh_GetCameraDistance(getveh(self))
+	return Veh_GetCameraDistance(unwrap(self))
 end
 
 --- Returns the view position and angle of the passenger
@@ -149,7 +140,7 @@ function vehicle_methods:getVehicleViewPosition(role)
 		checkluatype(role, TYPE_NUMBER)
 	end
 
-	local pos, ang, fov = Veh_GetVehicleViewPosition(getveh(self), role)
+	local pos, ang, fov = Veh_GetVehicleViewPosition(unwrap(self), role)
 
 	return vwrap(pos), awrap(ang), fov
 end
@@ -159,7 +150,7 @@ if SERVER then
 	--- Ejects the driver of the vehicle
 	-- @server
 	function vehicle_methods:ejectDriver()
-		local veh = getveh(self)
+		local veh = unwrap(self)
 		local driver = veh:GetDriver()
 		checkpermission(instance, veh, "vehicle.eject")
 
@@ -171,7 +162,7 @@ if SERVER then
 	--- Kills the driver of the vehicle
 	-- @server
 	function vehicle_methods:killDriver()
-		local ent = getveh(self)
+		local ent = unwrap(self)
 		checkpermission(instance, ent, "vehicle.kill")
 		local driver = Veh_GetDriver(ent)
 		if Ent_IsValid(driver) then
@@ -184,7 +175,7 @@ if SERVER then
 	-- @server
 	function vehicle_methods:stripDriver(class)
 		if class ~= nil then checkluatype(class, TYPE_STRING) end
-		local ent = getveh(self)
+		local ent = unwrap(self)
 		checkpermission(instance, ent, "vehicle.strip")
 		local driver = Veh_GetDriver(ent)
 		if Ent_IsValid(driver) then
@@ -199,7 +190,7 @@ if SERVER then
 	--- Will lock the vehicle preventing players from entering or exiting the vehicle.
 	-- @server
 	function vehicle_methods:lock()
-		local ent = getveh(self)
+		local ent = unwrap(self)
 		checkpermission(instance, ent, "vehicle.lock")
 		local n = "SF_CanExitVehicle"..ent:EntIndex()
 		hook.Add("CanExitVehicle", n, function(v) if v==ent then return false end end)
@@ -210,7 +201,7 @@ if SERVER then
 	--- Will unlock the vehicle.
 	-- @server
 	function vehicle_methods:unlock()
-		local ent = getveh(self)
+		local ent = unwrap(self)
 		checkpermission(instance, ent, "vehicle.lock")
 		hook.Remove("CanExitVehicle", "SF_CanExitVehicle"..ent:EntIndex())
 		Ent_Fire(ent, "Unlock")
@@ -220,7 +211,7 @@ if SERVER then
 	-- @param boolean enabled Whether to enable the ability to use by clicking
 	-- @param number? key Optional IN_KEY alternate control for using (default IN_KEY.ATTACK)
 	function vehicle_methods:useEnable(enabled, key)
-		local veh = getveh(self)
+		local veh = unwrap(self)
 		checkluatype(enabled, TYPE_BOOL)
 		checkpermission(instance, veh, "vehicle.use")
 		if key~=nil then checkluatype(key, TYPE_NUMBER) else key = IN_ATTACK end
@@ -237,7 +228,7 @@ if SERVER then
 		checkluatype(yaw, TYPE_NUMBER)
 		checkluatype(dist, TYPE_NUMBER)
 
-		local exitPos = Veh_CheckExitPoint(getveh(self), yaw, dist)
+		local exitPos = Veh_CheckExitPoint(unwrap(self), yaw, dist)
 		if exitPos then return vwrap(exitPos) end
 	end
 
@@ -245,14 +236,14 @@ if SERVER then
 	-- @server
 	-- @return number Speed
 	function vehicle_methods:getSpeed()
-		return Veh_GetSpeed(getveh(self))
+		return Veh_GetSpeed(unwrap(self))
 	end
 
 	--- Gets the vehicles speed in Half-Life Hammer units.
 	-- @server
 	-- @return number Speed
 	function vehicle_methods:getHLSpeed()
-		return Veh_GetHLSpeed(getveh(self))
+		return Veh_GetHLSpeed(unwrap(self))
 	end
 end
 

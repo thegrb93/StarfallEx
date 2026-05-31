@@ -170,7 +170,7 @@ return function(instance)
 
 local checktype = instance.CheckType
 local quat_methods, quat_meta = instance.Types.Quaternion.Methods, instance.Types.Quaternion
-local ents_methods = instance.Types.Entity.Methods
+local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local ang_methods, awrap, aunwrap = instance.Types.Angle.Methods, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_methods, vec_meta, vwrap, vunwrap = instance.Types.Vector.Methods, instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local mwrap = instance.Types.VMatrix.Wrap
@@ -184,10 +184,8 @@ local function clone(q)
 	return setmetatable({q[1], q[2], q[3], q[4]}, quat_meta)
 end
 
-local getent
 local vunwrap1, vunwrap2
 instance:AddHook("initialize", function()
-	getent = instance.Types.Entity.GetEntity
 	vunwrap1, vunwrap2 = vec_meta.QuickUnwrap1, vec_meta.QuickUnwrap2
 end)
 instance.Types.Quaternion.QuaternionMultiply = getQuatMul
@@ -845,7 +843,7 @@ end
 --- Converts entity angles to a quaternion
 -- @return Quaternion Constructed quaternion
 function ents_methods:getQuaternion()
-	return wrap(quatFromAngle(getent(self):GetAngles()))
+	return wrap(quatFromAngle(eunwrap(self):GetAngles()))
 end
 
 --- Performs spherical linear interpolation between two quaternions

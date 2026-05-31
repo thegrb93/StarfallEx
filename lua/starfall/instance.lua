@@ -8,6 +8,9 @@ local dsethook, dgethook = debug.sethook, debug.gethook
 local dgetmeta = debug.getmetatable
 local SysTime = SysTime
 
+local ENTMETA = FindMetaTable("Entity")
+local Ent_IsValid, Ent_IsWorld = ENTMETA.IsValid, ENTMETA.IsWorld
+
 if SERVER then
 	SF.cpuQuota = CreateConVar("sf_timebuffer", 0.005, FCVAR_ARCHIVE, "The max average the CPU time can reach.")
 	SF.cpuBufferN = CreateConVar("sf_timebuffersize", 100, FCVAR_ARCHIVE, "The window width of the CPU time quota moving average.")
@@ -39,7 +42,7 @@ if SERVER then
 	SF.playerInstances = SF.EntityTable("playerInstances", function(ply, instances)
 		for instance in pairs(instances) do
 			instance:Error({message = "Player disconnected!", traceback = ""})
-			if IsValid(instance.entity) then
+			if Ent_IsValid(instance.entity) then
 				net.Start("starfall_processor_kill")
 				net.WriteEntity(instance.entity)
 				net.Broadcast()
@@ -183,20 +186,17 @@ function SF.RegisterType(name, weakwrapper, weaksensitive, target_metatable, sup
 end
 
 -- Cleanup wrapped entity when it's removed
-SF.WrappedEntities = SF.EntityTable("SFWrappedEnts", function(ent)
-	-- Wait a frame so we don't conflict with sf EntityRemoved hook
-	timer.Simple(0, function()
-		for inst in pairs(SF.allInstances) do
-			for _, meta in ipairs(inst.entityMetas) do
-				local wrap = meta.sensitive2sf[ent]
-				if wrap then
-					meta.sensitive2sf[ent] = nil
-					meta.sf2sensitive[wrap] = nil
-				end
-			end
+SF.WrappedEntities = {}
+
+function SF.Instance:CleanupWrappedEnt(ent)
+	for _, meta in ipairs(self.entityMetas) do
+		local wrap = meta.sensitive2sf[ent]
+		if wrap then
+			meta.sensitive2sf[ent] = nil
+			meta.sf2sensitive[wrap] = nil
 		end
-	end)
-end)
+	end
+end
 
 function SF.Instance:CreateWrapper(metatable, typedata)
 	
@@ -218,7 +218,11 @@ function SF.Instance:CreateWrapper(metatable, typedata)
 			function wrap(value)
 				if value == nil then return nil end
 				if sensitive2sf[value] then return sensitive2sf[value] end
-				SF.WrappedEntities[value] = true
+
+				-- Don't wrap invalid entities and don't put world in SF.WrappedEntities
+				if Ent_IsValid(value) then SF.WrappedEntities[value] = true
+				elseif not Ent_IsWorld(value) then value = NULL end
+
 				local tbl = setmetatable({}, metatable)
 				sensitive2sf[value] = tbl
 				sf2sensitive[tbl] = value
@@ -549,7 +553,7 @@ local CpuRamAverage = {
 			elseif forceThrow or string.find(debug.getinfo(4, "S").short_src, "SF:", 1, true) then
 				if SERVER and nocatch then
 					local consolemsg = "[Starfall] "..msg..
-						(self.instance.player:IsValid()
+						(Ent_IsValid(self.instance.player)
 						and (" by " .. self.instance.player:Nick() .. " (" .. self.instance.player:SteamID() .. ")")
 						or (" by [Disconnected Player])"))
 					SF.Print(nil, consolemsg .. "\n")
@@ -781,6 +785,27 @@ hook.Add("Think", "SF_Think", function()
 		instance:runScriptHook("think")
 	end
 	CpuRamAverage.checkTotalPlayerCpu()
+end)
+
+hook.Add("EntityRemoved", "SF_EntityRemoved", function(ent, snapshot)
+	for instance in pairs(SF.allInstances) do
+		if instance.hooks.entityremoved then
+			instance:runScriptHook("entityremoved", instance.WrapObject(ent), snapshot)
+		end
+	end
+
+	if SF.WrappedEntities[ent] then
+		if SERVER then
+			for instance in pairs(SF.allInstances) do instance:CleanupWrappedEnt(ent) end
+		else
+			timer.Simple(0, function()
+				if not Ent_IsValid(ent) then
+					for instance in pairs(SF.allInstances) do instance:CleanupWrappedEnt(ent) end
+				end
+			end)
+		end
+		SF.WrappedEntities[ent] = nil
+	end
 end)
 
 function SF.Instance:Error(err)
