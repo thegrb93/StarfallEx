@@ -1,19 +1,19 @@
 local CUSERCMD_META = FindMetaTable("CUserCmd")
 local CMOVEDATA_META = FindMetaTable("CMoveData")
 
---- CUserCmd type
+--- CUserCmd, only valid in the hooks that provide it, you can't store them.
 -- @name CUserCmd
 -- @class type
 -- @libtbl usercmd_methods
 -- @libtbl usercmd_meta
-SF.RegisterType("CUserCmd", true, true, CUSERCMD_META)
+SF.RegisterType("CUserCmd", true, false, CUSERCMD_META)
 
---- CMoveData type
+--- CMoveData is only valid in the Move hook, you can't store them.
 -- @name CMoveData
 -- @class type
 -- @libtbl movedata_methods
 -- @libtbl movedata_meta
-SF.RegisterType("CMoveData", true, true, CMOVEDATA_META)
+SF.RegisterType("CMoveData", true, false, CMOVEDATA_META)
 
 return function(instance)
 	local usercmd_methods, usercmd_meta, cwrap, cunwrap = instance.Types.CUserCmd.Methods, instance.Types.CUserCmd, instance.Types.CUserCmd.Wrap, instance.Types.CUserCmd.Unwrap
