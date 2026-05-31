@@ -217,8 +217,8 @@ function SF.Instance:CreateWrapper(metatable, typedata)
 				if sensitive2sf[value] then return sensitive2sf[value] end
 
 				-- Don't wrap invalid entities and don't put world in SF.WrappedEntities
-				if Ent_IsValid(ent) then SF.WrappedEntities[value] = true
-				elseif not Ent_IsWorld(ent) then ent = NULL end
+				if Ent_IsValid(value) then SF.WrappedEntities[value] = true
+				elseif not Ent_IsWorld(value) then value = NULL end
 
 				local tbl = setmetatable({}, metatable)
 				sensitive2sf[value] = tbl
