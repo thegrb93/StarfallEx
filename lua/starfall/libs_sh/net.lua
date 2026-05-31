@@ -196,11 +196,11 @@ function net_library.send(target, unreliable)
 	if SERVER and target then
 		checkluatype(target, TYPE_TABLE)
 		if debug.getmetatable(target)==instance.Types.Player then
-			newtarget = eunwrap(target)
+			newtarget = instance.Types.Player.Unwrap(target)
 		else
 			newtarget = {}
 			for i, pl in ipairs(target) do
-				newtarget[i] = eunwrap(pl)
+				newtarget[i] = instance.Types.Player.Unwrap(pl)
 			end
 		end
 	end
