@@ -604,7 +604,7 @@ registerSent("gmod_wire_motor", {
 			enttbl.friction,
 			enttbl.torque,
 			0,
-			enttbl.torque,
+			enttbl.forcelimit,
 			enttbl.MyId
 		)
 	end,
