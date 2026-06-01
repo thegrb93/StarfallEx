@@ -131,6 +131,7 @@ local MATRIX_STACK_LIMIT = 8
 local matrix_stack = {}
 local view_matrix_stack = {}
 local renderingView = false
+local usingRT = false
 local renderingViewRt
 local drawViewerInView = false
 local MAX_CLIPPING_PLANES = 4
@@ -141,8 +142,15 @@ local pp = {
 	bloom = Material("pp/bloom"),			-- basetexture, levelr, levelg, levelb, colormul
 	colour = Material("pp/colour"),			-- fbtexture, pp_colour_*: addr, addg, addb, brightness, colour, contrast, mulr, mulg, mulb
 	downsample = Material("pp/downsample")	-- fbtexture, darken, multiply
-
 }
+
+local Halo_Render = SF.OG_Halo_Render or halo.Render
+SF.OG_Halo_Render = Halo_Render
+function halo.Render(entry)
+	if usingRT then return end
+	Halo_Render(entry)
+end
+
 local tex_screenEffect = render.GetScreenEffectTexture(0)
 
 local rt_bank = SF.ResourceHandler("render_rendertargets", "Render targets", "20", "The max number of user created rendertargets",
@@ -1234,6 +1242,7 @@ function render_library.selectRenderTarget(name)
 			view_matrix_stack[#view_matrix_stack + 1] = "End2D"
 			render.SetStencilEnable(false)
 			renderdata.usingRT = true
+			usingRT = true
 		end
 	else
 		if renderdata.usingRT and not renderdata.needRT then
@@ -1249,6 +1258,7 @@ function render_library.selectRenderTarget(name)
 				view_matrix_stack[i] = nil
 			end
 			renderdata.usingRT = false
+			usingRT = false
 			if renderdata.noStencil then -- Revert ALL stencil settings from screen
 				render.SetStencilEnable(true)
 				render.SetStencilFailOperation(STENCILOPERATION_KEEP)
@@ -2550,6 +2560,7 @@ function render_library.renderView(tbl)
 	renderdata.prevClippingState = prevData.prevClippingState
 	renderdata.noStencil = prevData.noStencil
 	renderdata.usingRT = prevData.usingRT
+	usingRT = prevData.usingRT
 	pushedClippingPlanes = prevData.pushedClippingPlanes
 
 	renderingView = false
