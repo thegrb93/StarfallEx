@@ -101,7 +101,12 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 			if SF.BlockedUsers:isBlocked(player:SteamID()) then
 				return false, { message = "User has blocked this player's starfalls", traceback = "" }
 			end
-			instance:setCheckCpu(SF.softLockProtection:GetBool() or (SF.softLockProtectionOwner:GetBool() and LocalPlayer() ~= player))
+
+			if LocalPlayer() ~= player then
+				instance:setCheckCpu(SF.softLockProtectionOwner:GetBool())
+			else
+				instance:setCheckCpu(SF.softLockProtection:GetBool())
+			end
 		end
 	end
 
