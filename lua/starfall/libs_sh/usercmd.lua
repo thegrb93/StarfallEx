@@ -129,7 +129,7 @@ return function(instance)
 	--- Gets the number passed to "impulse" console command
 	-- @return number The impulse
 	function movedata_methods:getImpulse()
-		return munwrap(self):GetImpulse()
+		return munwrap(self):GetImpulseCommand()
 	end
 
 	-- Returns the maximum client speed of the player
