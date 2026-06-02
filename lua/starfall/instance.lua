@@ -22,8 +22,8 @@ else
 	SF.cpuQuota = CreateConVar("sf_timebuffer_cl", 0.006, FCVAR_ARCHIVE, "The max average the CPU time can reach.")
 	SF.cpuOwnerQuota = CreateConVar("sf_timebuffer_cl_owner", 0.015, FCVAR_ARCHIVE, "The max average the CPU time can reach for your own chips.")
 	SF.cpuBufferN = CreateConVar("sf_timebuffersize_cl", 100, FCVAR_ARCHIVE, "The window width of the CPU time quota moving average.")
-	SF.softLockProtection = CreateConVar("sf_timebuffersoftlock_cl", 1, FCVAR_ARCHIVE, "Consumes more cpu, but protects from freezing the game. Only turn this off if you want to use a profiler on your scripts.")
-	SF.softLockProtectionOwner = CreateConVar("sf_timebuffersoftlock_cl_owner", 1, FCVAR_ARCHIVE, "If sf_timebuffersoftlock_cl is 0, this enabled will make it only your own chips will be affected.")
+	SF.softLockProtection = CreateConVar("sf_timebuffersoftlock_cl", 1, FCVAR_ARCHIVE, "Enable Cpu-time limiting on other player's chips.")
+	SF.softLockProtectionOwner = CreateConVar("sf_timebuffersoftlock_cl_owner", 1, FCVAR_ARCHIVE, "Enable Cpu-time limiting on your own chips.")
 	SF.softLockProtectionSuperUser = CreateConVar("sf_timebuffersoftlock_superuser", 0, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Determines whether CPU checks should be done for superusers as well?")
 	SF.RamCap = CreateConVar("sf_ram_max_cl", 1500000, FCVAR_ARCHIVE, "If ram exceeds this limit (in kB), starfalls will be terminated")
 	SF.AllowSuperUser = CreateConVar("sf_superuserallowed", 0, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Whether the starfall superuser feature is allowed")
@@ -101,7 +101,12 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 			if SF.BlockedUsers:isBlocked(player:SteamID()) then
 				return false, { message = "User has blocked this player's starfalls", traceback = "" }
 			end
-			instance:setCheckCpu(SF.softLockProtection:GetBool() or (SF.softLockProtectionOwner:GetBool() and LocalPlayer() ~= player))
+
+			if LocalPlayer() == player then
+				instance:setCheckCpu(SF.softLockProtectionOwner:GetBool())
+			else
+				instance:setCheckCpu(SF.softLockProtection:GetBool())
+			end
 		end
 	end
 
