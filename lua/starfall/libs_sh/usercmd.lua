@@ -38,7 +38,7 @@ return function(instance)
 
 	--- The speed the client wishes to move forward with, negative if the clients wants to move backwards.
 	-- @return number The forward move speed
-	function usercmd_methods:getForwardMove()
+	function usercmd_methods:getForwardSpeed()
 		return cunwrap(self):GetForwardMove()
 	end
 
@@ -68,13 +68,13 @@ return function(instance)
 
 	--- The speed the client wishes to move sideways with, positive if it wants to move right, negative if it wants to move left.
 	-- @return number The side move speed
-	function usercmd_methods:getSideMove()
+	function usercmd_methods:getSideSpeed()
 		return cunwrap(self):GetSideMove()
 	end
 
 	--- The speed the client wishes to move up with, negative if the clients wants to move down.
 	-- @return number The up move speed
-	function usercmd_methods:getUpMove()
+	function usercmd_methods:getUpSpeed()
 		return cunwrap(self):GetUpMove()
 	end
 
