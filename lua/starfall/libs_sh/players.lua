@@ -93,6 +93,7 @@ local veh_meta, vhwrap, vhunwrap = instance.Types.Vehicle, instance.Types.Vehicl
 instance:AddHook("initialize", function()
 	player_meta.__tostring = ent_meta.__tostring
 end)
+player_meta.GetPlayer = player_meta.Unwrap -- Backwards compat
 
 -- ------------------------------------------------------------------------- --
 --- Returns whether the player is alive

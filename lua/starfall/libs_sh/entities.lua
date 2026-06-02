@@ -82,6 +82,8 @@ instance:AddHook("initialize", function()
 	aunwrap1 = ang_meta.QuickUnwrap1
 end)
 
+ent_meta.GetEntity = ent_meta.Unwrap -- Backwards compat
+
 --- Gets the string representation of the entity
 -- @return string String representation of the entity
 function ent_meta:__tostring()
