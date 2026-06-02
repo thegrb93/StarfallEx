@@ -80,7 +80,7 @@ return function(instance)
 
 	--- Gets the direction the player is looking in.
 	-- @return Angle The view angles
-	function usercmd_methods:getViewAngles()
+	function usercmd_methods:getEyeAngles()
 		return awrap(cunwrap(self):GetViewAngles())
 	end
 
@@ -110,7 +110,7 @@ return function(instance)
 
 	--- Gets the aim angle. On client is the same as Entity:getAngles.
 	-- @return Angle The aim angle
-	function movedata_methods:getAimAngle()
+	function movedata_methods:getEyeAngles()
 		return awrap(munwrap(self):GetAngles())
 	end
 
