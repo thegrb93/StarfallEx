@@ -2441,18 +2441,22 @@ do
 	string_library.toMinutesSecondsMilliseconds = string.ToMinutesSecondsMilliseconds string_library.ToMinutesSecondsMilliseconds = string.ToMinutesSecondsMilliseconds
 	string_library.toTable = string.ToTable string_library.ToTable = string.ToTable
 	function string_library.trim(str, c)
-		checkregex(str, ".*.-.*")
-		return string.Trim(str, c)
+		if c~=nil then checkluatype(c, TYPE_STRING) c=c.."*" else c="%s*" end checkregex(str, c)
+		local _, start = string.find(str, "^"..c)
+		local stop = string.find(str, c.."$")
+		return string.sub(str, start + 1, stop - 1)
 	end
 	string_library.Trim = string_library.trim
 	function string_library.trimLeft(str, c)
-		checkregex(str, ".-.*")
-		return string.TrimLeft(str, c)
+		if c~=nil then checkluatype(c, TYPE_STRING) c=c.."*" else c="%s*" end checkregex(str, c)
+		local _, start = string.find(str, "^"..c)
+		return string.sub(str, start + 1)
 	end
 	string_library.TrimLeft = string_library.trimLeft
 	function string_library.trimRight(str, c)
-		checkregex(str, ".*.+")
-		return string.TrimRight(str, c)
+		if c~=nil then checkluatype(c, TYPE_STRING) c=c.."*" else c="%s*" end checkregex(str, c)
+		local stop = string.find(str, c.."$")
+		return string.sub(str, 1, stop - 1)
 	end
 	string_library.TrimRight = string_library.trimRight
 	string_library.upper = string.upper
