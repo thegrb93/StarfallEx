@@ -2497,8 +2497,7 @@ function render_library.renderView(tbl)
 		prevClippingState = renderdata.prevClippingState,
 		noStencil = renderdata.noStencil,
 		usingRT = renderdata.usingRT,
-		pushedClippingPlanes = pushedClippingPlanes,
-		noPrevHaloHook = hook.GetTable().ShouldDrawHalos.SF==nil
+		pushedClippingPlanes = pushedClippingPlanes
 	}
 
 	hook.Add("ShouldDrawHalos","SF",function() return false end)
@@ -2555,9 +2554,7 @@ function render_library.renderView(tbl)
 	renderdata.usingRT = prevData.usingRT
 	pushedClippingPlanes = prevData.pushedClippingPlanes
 
-	if prevData.noPrevHaloHook then
-		hook.Remove("ShouldDrawHalos","SF")
-	end
+	hook.Remove("ShouldDrawHalos","SF")
 
 	renderingView = false
 	renderdata.renderingView = false
