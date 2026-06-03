@@ -97,6 +97,18 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 			return unpack(result)
 		end
 	end
+	if CLIENT and not (WireLib and WireLib.__old_renderhalos) then
+		local old_renderhalos = hook.GetTable().PostDrawEffects.RenderHalos
+		if old_renderhalos ~= nil then
+			hook.Add("PostDrawEffects","RenderHalos", function()
+				if hook.Run("ShouldDrawHalos") == false then return end
+
+				old_renderhalos()
+			end)
+		else
+			ErrorNoHalt("RenderHalos detour failed (RenderHalos hook not found)!")
+		end
+	end
 end)
 
 local removedHooks = setmetatable({}, {__index=function(t,k) local r={} t[k]=r return r end})
