@@ -182,7 +182,8 @@ if SERVER then
 	-- @param number damage The amount of damage to be applied
 	function game_library.blastDamage(damageOrigin, damageRadius, damage)
 		checkpermission(instance, nil, "game.blastDamage")
-		util.BlastDamage(instance.entity, instance.player, vunwrap1(damageOrigin), math.Clamp(damageRadius, 0, 1500), damage)
+		local attacker = (instance.player == SF.Superuser) and instance.entity or instance.player
+		util.BlastDamage(instance.entity, attacker, vunwrap1(damageOrigin), math.Clamp(damageRadius, 0, 1500), damage)
 	end
 
 	--- Fires a bullet. Bullet made with this function will not have any tracer, you will have to make them yourself.
@@ -221,7 +222,7 @@ if SERVER then
 		local BulletInfo = {
 			Src = src,
 			Dir = dir,
-			Attacker = instance.player,
+			Attacker = (instance.player == SF.Superuser) and instance.entity or instance.player,
 			Damage = damage,
 			Force = force,
 			Distance = distance,
