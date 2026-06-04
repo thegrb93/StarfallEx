@@ -2500,6 +2500,8 @@ function render_library.renderView(tbl)
 		pushedClippingPlanes = pushedClippingPlanes
 	}
 
+	hook.Add("ShouldDrawHalos","SF",function() return false end)
+
 	matrix_stack = { }
 	view_matrix_stack = { }
 	renderdata.changedFilterMag = false
@@ -2551,6 +2553,8 @@ function render_library.renderView(tbl)
 	renderdata.noStencil = prevData.noStencil
 	renderdata.usingRT = prevData.usingRT
 	pushedClippingPlanes = prevData.pushedClippingPlanes
+
+	hook.Remove("ShouldDrawHalos","SF")
 
 	renderingView = false
 	renderdata.renderingView = false
