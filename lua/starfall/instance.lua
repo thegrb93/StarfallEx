@@ -535,11 +535,14 @@ local CpuRamAverage = {
 		end,
 		check = function(self, forceThrow, noThrow)
 			-- Check ram and cleanup before checking cpu so time spent is measured
-			local ram, ramAverage = gcinfo(), self:getAverageRam()
+			local ram = gcinfo()
+			if ram > self.ramLimit then
+				collectgarbage("step", 100)
+				ram = gcinfo()
+			end
+			local ramAverage = self:getAverageRam()
 			if ramAverage > self.ramLimit or ram > self.ramHardlimit then
 				return self:doError("RAM usage exceeded!", true, noThrow, forceThrow or ram > self.ramHardlimit)
-			elseif ram > self.ramLimit then
-				collectgarbage("step", 100)
 			end
 
 			-- Check cpu time spent
@@ -573,6 +576,7 @@ local CpuRamAverage = {
 		end,
 	},
 	__call = function(t, instance, averageWeight, cpuLimit, ramLimit)
+		local ramHardlimit = jit.arch~="x64" and 1200000 or 16000000
 		return setmetatable({
 			lastSampleTime = 0,
 			cpuTotal = 0,
@@ -583,8 +587,8 @@ local CpuRamAverage = {
 			cpuLimit = cpuLimit,
 			cpuSoftLimit = cpuLimit,
 			cpuHardLimit = cpuLimit*1.5,
-			ramLimit = ramLimit,
-			ramHardlimit = jit.arch~="x64" and 1200000 or 16000000
+			ramLimit = math.min(ramLimit, ramHardlimit*0.95),
+			ramHardlimit = ramHardlimit
 		}, t)
 	end
 }
