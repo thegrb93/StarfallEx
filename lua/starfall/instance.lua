@@ -534,22 +534,26 @@ local CpuRamAverage = {
 			return self.ramAverage + (gcinfo() - self.ramAverage)*0.001
 		end,
 		check = function(self, forceThrow, noThrow)
+			-- Check ram and cleanup before checking cpu so time spent is measured
+			local ram, ramAverage = gcinfo(), self:getAverageRam()
+			if ramAverage > self.ramLimit or ram > self.ramHardlimit then
+				return self:doError("RAM usage exceeded!", true, noThrow, forceThrow or ram > self.ramHardlimit)
+			elseif ram > self.ramLimit then
+				collectgarbage("step", 100)
+			end
+
+			-- Check cpu time spent
 			local t = SysTime()
 			self.cpuTotal = self.cpuTotal + t - self.lastSampleTime
 			self.lastSampleTime = t
 
 			local cpuAverage = self:getAverageCpu()
-			local ram, ramAverage = gcinfo(), self:getAverageRam()
-
 			if cpuAverage > self.cpuSoftLimit then
 				if cpuAverage > self.cpuLimit then
 					return self:doError("CPU usage exceeded!", true, noThrow, forceThrow or cpuAverage > self.cpuHardLimit)
 				else
 					return self:doError("CPU usage warning!", false, noThrow, false)
 				end
-			end
-			if ramAverage > self.ramLimit or ram > self.ramHardlimit then
-				return self:doError("RAM usage exceeded!", true, noThrow, forceThrow or ram > self.ramHardlimit)
 			end
 		end,
 		doError = function(self, msg, nocatch, noThrow, forceThrow)
@@ -615,6 +619,7 @@ function SF.Instance:setCheckCpu(runWithOps)
 			if SF.runningOps ~= enabled then
 				SF.runningOps = enabled
 				SF.OnRunningOps(enabled)
+				collectgarbage(enabled and "restart" or "stop")
 			end
 			dsethook(callback, "", 2000)
 		end
@@ -625,6 +630,7 @@ function SF.Instance:setCheckCpu(runWithOps)
 			if SF.runningOps ~= enabled then
 				SF.runningOps = enabled
 				SF.OnRunningOps(enabled)
+				collectgarbage(enabled and "restart" or "stop")
 			end
 		end
 	else
