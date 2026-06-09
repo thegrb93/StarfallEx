@@ -962,9 +962,17 @@ function PANEL:HighlightLine(line, r, g, b, a)
 end
 function PANEL:ClearHighlightedLines() self.HighlightedLines = nil end
 
+local function tabbedLength(str, endpos)
+	local len = 0
+	for i=1, endpos do
+		len = len + (string.byte(str, i)==9 and TabHandler.TabSize or 1)
+	end
+	return len
+end
+
 local function cellLength(str, typename)
 	if typename == "whitespace" then
-		return select(2, string.gsub(str, " ", " ")) + select(2, string.gsub(str, "\t", "\t"))*TabHandler.TabSize
+		return tabbedLength(str, #str)
 	else
 		return #str
 	end
@@ -1175,14 +1183,6 @@ function PANEL:HighlightArea(area, r, g, b, a)
 	return false
 end
 function PANEL:ClearHighlightedAreas() self.HighlightedAreas = nil end
-
-local function tabbedLength(str, endpos)
-	local len = 0
-	for i=1, endpos do
-		len = len + (string.byte(str, i)==9 and TabHandler.TabSize or 1)
-	end
-	return len
-end
 
 function PANEL:PaintTextOverlay()
 	if self.TextEntry:HasFocus() and self.Caret[2] - self.Scroll[2] >= 0 then
