@@ -534,22 +534,29 @@ local CpuRamAverage = {
 			return self.ramAverage + (gcinfo() - self.ramAverage)*0.001
 		end,
 		check = function(self, forceThrow, noThrow)
+			-- Check ram and cleanup before checking cpu so time spent is measured
+			local ram = gcinfo()
+			if ram > self.ramLimit then
+				collectgarbage("step", 100)
+				ram = gcinfo()
+			end
+			local ramAverage = self:getAverageRam()
+			if ramAverage > self.ramLimit or ram > self.ramHardlimit then
+				return self:doError("RAM usage exceeded!", true, noThrow, forceThrow or ram > self.ramHardlimit)
+			end
+
+			-- Check cpu time spent
 			local t = SysTime()
 			self.cpuTotal = self.cpuTotal + t - self.lastSampleTime
 			self.lastSampleTime = t
 
 			local cpuAverage = self:getAverageCpu()
-			local ram, ramAverage = gcinfo(), self:getAverageRam()
-
 			if cpuAverage > self.cpuSoftLimit then
 				if cpuAverage > self.cpuLimit then
 					return self:doError("CPU usage exceeded!", true, noThrow, forceThrow or cpuAverage > self.cpuHardLimit)
 				else
 					return self:doError("CPU usage warning!", false, noThrow, false)
 				end
-			end
-			if ramAverage > self.ramLimit or ram > self.ramHardlimit then
-				return self:doError("RAM usage exceeded!", true, noThrow, forceThrow or ram > self.ramHardlimit)
 			end
 		end,
 		doError = function(self, msg, nocatch, noThrow, forceThrow)
@@ -569,6 +576,7 @@ local CpuRamAverage = {
 		end,
 	},
 	__call = function(t, instance, averageWeight, cpuLimit, ramLimit)
+		local ramHardlimit = jit.arch~="x64" and 1200000 or 16000000
 		return setmetatable({
 			lastSampleTime = 0,
 			cpuTotal = 0,
@@ -579,8 +587,8 @@ local CpuRamAverage = {
 			cpuLimit = cpuLimit,
 			cpuSoftLimit = cpuLimit,
 			cpuHardLimit = cpuLimit*1.5,
-			ramLimit = ramLimit,
-			ramHardlimit = jit.arch~="x64" and 1200000 or 16000000
+			ramLimit = math.min(ramLimit, ramHardlimit*0.95),
+			ramHardlimit = ramHardlimit
 		}, t)
 	end
 }
@@ -615,6 +623,7 @@ function SF.Instance:setCheckCpu(runWithOps)
 			if SF.runningOps ~= enabled then
 				SF.runningOps = enabled
 				SF.OnRunningOps(enabled)
+				if enabled then collectgarbage("restart") collectgarbage("step", 10) else collectgarbage("stop") end
 			end
 			dsethook(callback, "", 2000)
 		end
@@ -625,6 +634,7 @@ function SF.Instance:setCheckCpu(runWithOps)
 			if SF.runningOps ~= enabled then
 				SF.runningOps = enabled
 				SF.OnRunningOps(enabled)
+				if enabled then collectgarbage("restart") collectgarbage("step", 10) else collectgarbage("stop") end
 			end
 		end
 	else
