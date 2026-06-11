@@ -623,7 +623,7 @@ function SF.Instance:setCheckCpu(runWithOps)
 			if SF.runningOps ~= enabled then
 				SF.runningOps = enabled
 				SF.OnRunningOps(enabled)
-				if enabled then collectgarbage("restart") collectgarbage("step", 10) else collectgarbage("stop") end
+				if enabled then collectgarbage("stop") else collectgarbage("restart") collectgarbage("step", 10) end
 			end
 			dsethook(callback, "", 2000)
 		end
@@ -634,7 +634,7 @@ function SF.Instance:setCheckCpu(runWithOps)
 			if SF.runningOps ~= enabled then
 				SF.runningOps = enabled
 				SF.OnRunningOps(enabled)
-				if enabled then collectgarbage("restart") collectgarbage("step", 10) else collectgarbage("stop") end
+				if enabled then collectgarbage("stop") else collectgarbage("restart") collectgarbage("step", 10) end
 			end
 		end
 	else
