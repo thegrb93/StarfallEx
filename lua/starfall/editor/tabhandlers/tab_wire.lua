@@ -85,6 +85,7 @@ TabHandler.ACControlStyle = CreateClientConVar( "sf_editor_wire_ac_controlstyle"
 TabHandler.ACAuto = CreateClientConVar( "sf_editor_wire_ac_auto", "1", true, false )
 TabHandler.ACWithParams = CreateClientConVar( "sf_editor_wire_ac_withparams", "1", true, false )
 
+SF.CvarCallback(TabHandler.TabSizeConVar, function(val) TabHandler.TabSize = math.Clamp(val, 1, 12) end, "number")
 
 ---------------------
 -- Colors
@@ -300,7 +301,7 @@ function TabHandler:RegisterSettings()
 	for i = 1, 8 do
 		tabSize:AddChoice(i)
 	end
-	tabSize:SetValue(string.format("%.0f", TabHandler.TabSizeConVar:GetInt()))
+	tabSize:SetValue(string.format("%.0f", TabHandler.TabSize))
 
 	local autoValidate = form:CheckBox( "Automatically validate", "sf_editor_wire_validateontextchange" )
 
@@ -580,14 +581,21 @@ function PANEL:CursorToCaret()
 	if y < 0 then y = 0 end
 
 	local line = math_floor(y / self.FontHeight)
-	local char = math_floor(x / self.FontWidth + 0.5)
 	if line > self.VisibleRows then line = self.VisibleRows - 1 end
-
 	line = self.RealLine[line] or lines
+	local linetext = self:GetRowText(line)
+	local linelength = #linetext
 
-	char = char + self.Scroll[2]
-	local length = #self:GetRowText(line)
-	if char > length + 1 then char = length + 1 end
+	local char = linelength + 1
+	local charx = 0
+	for i=1, linelength do
+		local charw = (string.byte(linetext, i)==9 and TabHandler.TabSize or 1)
+		if x <= ((charx - self.Scroll[2])+charw*0.5)*self.FontWidth then
+			char = i-1
+			break
+		end
+		charx = charx + charw
+	end
 	return { line, char }
 end
 
@@ -954,6 +962,22 @@ function PANEL:HighlightLine(line, r, g, b, a)
 end
 function PANEL:ClearHighlightedLines() self.HighlightedLines = nil end
 
+local function tabbedLength(str, endpos)
+	local len = 0
+	for i=1, endpos do
+		len = len + (string.byte(str, i)==9 and TabHandler.TabSize or 1)
+	end
+	return len
+end
+
+local function cellLength(str, typename)
+	if typename == "whitespace" then
+		return tabbedLength(str, #str)
+	else
+		return #str
+	end
+end
+
 function PANEL:PaintLine(row, drawpos, leftOffset, drawonlytext)
 	local lines = #self.Rows
 	local lineLen = #self:GetRowText(row)
@@ -1042,17 +1066,17 @@ function PANEL:PaintLine(row, drawpos, leftOffset, drawonlytext)
 
 
 	local nonwhitespace = false
-	for i, cell in ipairs(cells) do
+	for _, cell in ipairs(cells) do
 		if cell[3] == "whitespace" and not nonwhitespace and drawonlytext then -- Skip whitespaces at beginning if its text only
 			continue
 		end
 		nonwhitespace = true
 		if offset > self.Size[2] then return end
 		if offset < 0 then -- When there is part of line horizontally begining before our scrolled area
-			local length = cell[1]:len()
+			local length = cellLength(cell[1], cell[3])
 			if length > -offset then
 				local line = cell[1]:sub(1-offset)
-				offset = line:len()
+				offset = cellLength(line, cell[3])
 
 				if cell[2][2] then --has background
 					if usePigments == 1 and cell[3]:sub(1, 5) == "color" then
@@ -1081,7 +1105,7 @@ function PANEL:PaintLine(row, drawpos, leftOffset, drawonlytext)
 				offset = offset + length
 			end
 		else
-			local length = cell[1]:len()
+			local length = cellLength(cell[1], cell[3])
 			if cell[2][2] then --has background
 				if usePigments == 1 and cell[3]:sub(1, 5) == "color" then
 					surface_SetMaterial( matGrid )
@@ -1160,7 +1184,6 @@ function PANEL:HighlightArea(area, r, g, b, a)
 end
 function PANEL:ClearHighlightedAreas() self.HighlightedAreas = nil end
 
-
 function PANEL:PaintTextOverlay()
 	if self.TextEntry:HasFocus() and self.Caret[2] - self.Scroll[2] >= 0 then
 		local lines = #self.RowTexts
@@ -1168,9 +1191,9 @@ function PANEL:PaintTextOverlay()
 
 		if (RealTime() - self.Blink) % 0.8 < 0.4 then
 			surface_SetDrawColor(colors.caret)
-			local y = self.Caret[1]
-			y = (self.Caret[1] - self:GetRowOffset(y) - self.Scroll[1]) * height
-			surface_DrawRect((self.Caret[2] - self.Scroll[2]) * width + self.LineNumberWidth + 6, y, 1, height)
+			local x = (tabbedLength(self:GetRowText(self.Caret[1]), self.Caret[2]) - self.Scroll[2]) * width + self.LineNumberWidth + 6
+			local y = (self.Caret[1] - self:GetRowOffset(self.Caret[1]) - self.Scroll[1]) * height
+			surface_DrawRect(x, y, 1, height)
 		end
 		if self.HighlightedAreas then
 			local xofs = self.LineNumberWidth + 6
@@ -1486,7 +1509,7 @@ local function unindent(line)
 	--local i = line:find("%S")
 	--if i == nil or i > 5 then i = 5 end
 	--return line:sub(i)
-	local indent_str = TabHandler.ExpandTabsConVar:GetBool() and string.rep(" ?", TabHandler.TabSizeConVar:GetInt()) or "\t"
+	local indent_str = TabHandler.ExpandTabsConVar:GetBool() and string.rep(" ?", TabHandler.TabSize) or "\t"
 	return line:match("^" .. indent_str .. "(.*)$")
 end
 
@@ -2249,7 +2272,7 @@ function PANEL:Indent(shift)
 	end
 	if shift then
 		-- shift-TAB with a selection --
-		local indent_str = TabHandler.ExpandTabsConVar:GetBool() and string.rep(" ?", TabHandler.TabSizeConVar:GetInt()) or "\t"
+		local indent_str = TabHandler.ExpandTabsConVar:GetBool() and string.rep(" ?", TabHandler.TabSize) or "\t"
 		local tmp = self:GetSelection():gsub("\n" .. indent_str, "\n")
 
 		-- makes sure that the first line is outdented
@@ -2258,7 +2281,7 @@ function PANEL:Indent(shift)
 		-- plain TAB with a selection --
 		-- Use the value of the ConVar sf_editor_wire_tab_size to determine how many spaces should be added, and
 		-- sf_editor_wire_expand_tabs to know if spaces should be inserted at all.
-		local indent_str = TabHandler.ExpandTabsConVar:GetBool() and string.rep(" ", TabHandler.TabSizeConVar:GetInt()) or "\t"
+		local indent_str = TabHandler.ExpandTabsConVar:GetBool() and string.rep(" ", TabHandler.TabSize) or "\t"
 		self:SetSelection(indent_str .. self:GetSelection():gsub("\n", "\n" .. indent_str))
 	end
 	-- restore selection
@@ -2579,8 +2602,8 @@ function PANEL:_OnKeyCodeTyped(code)
 			local row = self:GetRowText(self.Caret[1]):sub(1, self.Caret[2]-1)
 			local diff = (row:find("%S") or (row:len() + 1))-1
 
-			local indent_str = TabHandler.ExpandTabsConVar:GetBool() and string.rep(" ", TabHandler.TabSizeConVar:GetInt()) or "\t"
-			local tabs = string_rep(indent_str, TabHandler.ExpandTabsConVar:GetBool() and math_floor(diff / TabHandler.TabSizeConVar:GetInt()) or diff)
+			local indent_str = TabHandler.ExpandTabsConVar:GetBool() and string.rep(" ", TabHandler.TabSize) or "\t"
+			local tabs = string_rep(indent_str, TabHandler.ExpandTabsConVar:GetBool() and math_floor(diff / TabHandler.TabSize) or diff)
 			if TabHandler.AutoIndentConVar:GetBool() then
 				local function countMatches(s,open,close)
 					-- add spaces to string to detect whole word
@@ -2629,7 +2652,7 @@ function PANEL:_OnKeyCodeTyped(code)
 				local buffer = self:GetArea({ self.Caret, { self.Caret[1], 1 } })
 				local delta = -1
 				if TabHandler.ExpandTabsConVar:GetInt() then
-					local ts = TabHandler.TabSizeConVar:GetInt()
+					local ts = TabHandler.TabSize
 					if self.Caret[2] % ts == 1 and #(buffer) > 0 and string_rep(" ", #(buffer)) == buffer then
 						delta = -ts
 					end
@@ -2643,7 +2666,7 @@ function PANEL:_OnKeyCodeTyped(code)
 				local buffer = self:GetArea({ { self.Caret[1], self.Caret[2] + 4 }, { self.Caret[1], 1 } })
 				local delta = 1
 				if TabHandler.ExpandTabsConVar:GetInt() then
-					local ts = TabHandler.TabSizeConVar:GetInt()
+					local ts = TabHandler.TabSize
 					if self.Caret[2] % ts == 1 and string_rep(" ", #(buffer)) == buffer and #(self.Rows[self.Caret[1]][1]) >= self.Caret[2] + ts - 1 then
 						delta = ts
 					end
@@ -2678,7 +2701,7 @@ function PANEL:_OnKeyCodeTyped(code)
 				local buffer = self:GetArea({ self.Caret, { self.Caret[1], 1 } })
 				local delta = -1
 				if TabHandler.ExpandTabsConVar:GetBool() then
-					local ts = TabHandler.TabSizeConVar:GetInt()
+					local ts = TabHandler.TabSize
 					if self.Caret[2] % ts == 1 and #(buffer) > 0 and string_rep(" ", #(buffer)) == buffer then
 						delta = -ts
 					end
@@ -2695,7 +2718,7 @@ function PANEL:_OnKeyCodeTyped(code)
 			else
 				local delta = 1
 				if TabHandler.ExpandTabsConVar:GetBool() then
-					local ts = TabHandler.TabSizeConVar:GetInt()
+					local ts = TabHandler.TabSize
 					local buffer = self:GetArea({ { self.Caret[1], self.Caret[2] + ts }, { self.Caret[1], 1 } })
 					if self.Caret[2] % ts == 1 and string_rep(" ", #(buffer)) == buffer and #(self.Rows[self.Caret[1]][1]) >= self.Caret[2] + ts - 1 then
 						delta = ts
@@ -2721,7 +2744,7 @@ function PANEL:_OnKeyCodeTyped(code)
 			-- TAB without a selection --
 			if shift then
 				if TabHandler.ExpandTabsConVar:GetBool() then
-					local newpos = self.Caret[2]-TabHandler.TabSizeConVar:GetInt()
+					local newpos = self.Caret[2]-TabHandler.TabSize
 					if newpos < 1 then newpos = 1 end
 					self.Start = { self.Caret[1], newpos }
 					if self:GetSelection():find("%S") then
@@ -2733,7 +2756,7 @@ function PANEL:_OnKeyCodeTyped(code)
 				end
 			else
 				if TabHandler.ExpandTabsConVar:GetBool() then
-					local ts = TabHandler.TabSizeConVar:GetInt()
+					local ts = TabHandler.TabSize
 					local count = ts - (self.Caret[2] - 1) % ts
 					self:SetSelection(string_rep(" ", count))
 				else
