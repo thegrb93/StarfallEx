@@ -537,6 +537,14 @@ local function argsToChat(...)
 	return processed, length, size
 end
 
+-- for custom SF library developers:
+-- Use `instance.argsToChat` in your new code:
+--  *  `instance.argsToChat` provides a more reliable reference to the `argsToChat` function than `SF.argsToChat` does
+--  *  `SF` is a global table, while `instance` is per-instance, as the name implies..
+
+instance.argsToChat = argsToChat
+
+-- here for compatiblity with older SF library addons - See note above
 SF.argsToChat = argsToChat
 
 if SERVER then
