@@ -1587,7 +1587,7 @@ function PANEL:ScrollCaret()
 	local visCaret = self.Caret[1] - self:GetRowOffset(self.Caret[1])
 	if visCaret - self.Scroll[1] < 3 then
 		local line = self.Caret[1]-3
-		while line > 1 and (self.Rows[line][3] or visCaret-line < 3)  do
+		while line > 1 and ((self.Rows[line] and self.Rows[line][3]) or visCaret-line < 3)  do
 			line = line - 1
 		end
 		self.ScrollBar:SetScrollFix(math.max(line,1))
@@ -1595,7 +1595,7 @@ function PANEL:ScrollCaret()
 	if visCaret - self.Scroll[1] > self.Size[1] - 2 then
 		local line = self.Scroll[1]
 		local lines = #self.Rows
-		while line <= lines and (self.Rows[line][3] or visCaret - line > self.Size[1] - 2) do
+		while line <= lines and ((self.Rows[line] and self.Rows[line][3]) or visCaret - line > self.Size[1] - 2) do
 			line = line + 1
 		end
 		self.ScrollBar:SetScrollFix(math.max(line,1))
