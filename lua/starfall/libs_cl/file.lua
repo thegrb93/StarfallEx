@@ -403,8 +403,7 @@ function file_library.rename(path, newPath)
 	if file.Exists(path, "DATA") then
 		if file.Exists(newPath, "DATA") then SF.Throw("Target file already exists!", 2) end
 		file.CreateDir(string.GetPathFromFilename(newPath))
-		file.Rename(path, newPath)
-		return true
+		return file.Rename(path, newPath)
 	end
 end
 
