@@ -810,14 +810,15 @@ hook.Add("EntityRemoved", "SF_EntityRemoved", function(ent, snapshot)
 	if SF.WrappedEntities[ent] then
 		if SERVER then
 			for instance in pairs(SF.allInstances) do instance:CleanupWrappedEnt(ent) end
+			SF.WrappedEntities[ent] = nil
 		else
 			timer.Simple(0, function()
 				if not Ent_IsValid(ent) then
 					for instance in pairs(SF.allInstances) do instance:CleanupWrappedEnt(ent) end
+					SF.WrappedEntities[ent] = nil
 				end
 			end)
 		end
-		SF.WrappedEntities[ent] = nil
 	end
 end)
 
