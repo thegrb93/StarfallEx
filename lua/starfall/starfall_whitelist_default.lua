@@ -220,3 +220,11 @@ simple [[rawcdn.githack.com]]
 --- https://cdn.statically.io/gh/Metastruct/garrysmod-chatsounds/master/sound/chatsounds/autoadd/anime/i%20love%20you.ogg
 --- https://cdn.statically.io/img/statically.dev/w=300,h=500/cat.jpg
 simple [[cdn.statically.io]]
+
+-- DuckDuckGo (search engine)
+--- https://duckduckgo.com/?q=initial_request_to_extract_vqd_token
+--- Examples:
+--- https://duckduckgo.com/v.js?q=nocopyrightsounds&o=json&p=-1&s=0&vqd=4-xxxxxxxxxxxxxxxx&l=wt-wt
+simple [[duckduckgo.com]]
+simple [[html.duckduckgo.com]]
+simple [[noai.duckduckgo.com]]
