@@ -157,7 +157,7 @@ end
 --- Returns the position of this emitter. This is set when creating the emitter with ParticleEmitter.
 -- @return Vector Position of the Emitter
 function particleem_methods:getPos()
-	return vwrap(unwrap(self):GetPos())
+	return vwrap(peunwrap(self):GetPos())
 end
 
 --- Returns whether this emitter is 3D or not. This is set when creating the emitter with ParticleEmitter.
