@@ -91,6 +91,8 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 		player = SF.Superuser
 	end
 	instance.player = player
+	instance.playerid = player:SteamID()
+	instance.playerid64 = player:SteamID64()
 
 	if player == SF.Superuser then
 		instance:setCheckCpu(SF.softLockProtectionSuperUser:GetBool() and SF.softLockProtection:GetBool())
