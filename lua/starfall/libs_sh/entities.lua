@@ -87,7 +87,7 @@ ent_meta.GetEntity = ent_meta.Unwrap -- Backwards compat
 --- Gets the string representation of the entity
 -- @return string String representation of the entity
 function ent_meta:__tostring()
-	local ent = eunwrap(self)
+	local ent = ent_meta.sf2sensitive[self]
 	return Ent_IsValid(ent) and tostring(ent) or "(null entity)"
 end
 
