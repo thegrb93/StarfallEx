@@ -336,8 +336,9 @@ end
 --- Returns the table for a specific list
 -- @name game_library.getList
 -- @shared
--- @param string the list to get
+-- @param string The list to get
 -- @class function
+-- @return table The table for the specific list
 
 function game_library.getList(listName)
 	return list.Get(listName)
