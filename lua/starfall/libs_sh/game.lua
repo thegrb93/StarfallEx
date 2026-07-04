@@ -324,4 +324,23 @@ end
 -- @return number The physics frame time length
 game_library.physicsFrameTime = physenv.GetLastSimulationTime
 
+--- Returns the table of lists in the game
+-- @name game_library.getLists
+-- @shared
+-- @class function
+-- @return table The table of lists
+function game_library.getLists()
+	return list.GetTable()
+end
+
+--- Returns the table for a specific list
+-- @name game_library.getList
+-- @shared
+-- @param string the list to get
+-- @class function
+
+function game_library.getList(listName)
+	return list.Get(listName)
+end
+
 end
