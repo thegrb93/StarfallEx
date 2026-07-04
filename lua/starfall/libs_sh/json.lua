@@ -36,11 +36,12 @@ end
 
 --- Convert JSON string to table
 -- @param string s String to decode
+-- @param boolean? ignoreConversions Optional. If true, ignore string to number conversions for table keys
 -- @return table Table representing the JSON object
-function json_library.decode(s)
+function json_library.decode(s, ignoreConversions)
 	SF.CheckLuaType(s, TYPE_STRING)
 	if #s > max_json:GetInt()*1e6 then SF.Throw("Input json data exceeds max allowed!", 2) end
-	return instance.Sanitize(util.JSONToTable(s))
+	return instance.Sanitize(util.JSONToTable(s, false, ignoreConversions))
 end
 
 end
