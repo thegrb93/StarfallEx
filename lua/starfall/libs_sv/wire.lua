@@ -621,8 +621,7 @@ function wire_library.isConnected(ent, inputName)
 	checkpermission(instance, ent, "wire.getInputs")
 
 	local input = ent.Inputs and ent.Inputs[inputName]
-	if input and Ent_IsValid(input.Src) then return true end
-	return false
+	return Ent_IsValid(input and input.Src)
 end
 
 --- Returns a wirelink to a wire entity
