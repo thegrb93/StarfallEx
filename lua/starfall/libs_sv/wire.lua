@@ -620,8 +620,9 @@ function wire_library.isConnected(ent, inputName)
 	ent = eunwrap(ent)
 	checkpermission(instance, ent, "wire.getInputs")
 
-	local input = ent.Inputs and ent.Inputs[inputName]
-	return Ent_IsValid(input and input.Src)
+	local inputs = Ent_GetTable(ent).Inputs or SF.Throw("Entity has no inputs", 2)
+	local input = inputs[inputName] or SF.Throw("Invalid input: " .. inputName, 2)
+	return Ent_IsValid(input.Src)
 end
 
 --- Returns a wirelink to a wire entity
