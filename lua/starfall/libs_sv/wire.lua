@@ -611,6 +611,20 @@ function wire_library.getOutputs(entO)
 	return parseEntity(entO, "Outputs")
 end
 
+--- Checks if a given input on an entity is connected to any output
+-- @param Entity ent Entity with input
+-- @param string inputName Input name to check
+-- @return boolean Whether the input is connected
+function wire_library.isConnected(ent, inputName)
+	checkluatype(inputName, TYPE_STRING)
+	ent = eunwrap(ent)
+	checkpermission(instance, ent, "wire.getInputs")
+
+	local input = ent.Inputs and ent.Inputs[inputName]
+	if input and Ent_IsValid(input.Src) then return true end
+	return false
+end
+
 --- Returns a wirelink to a wire entity
 -- @param Entity ent Wire entity
 -- @return Wirelink Wirelink of the entity
