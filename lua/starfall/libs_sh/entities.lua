@@ -820,7 +820,7 @@ end
 
 --- Gets the parent of an entity
 -- @shared
--- @return Entity? Entity's parent or nil if not parented
+-- @return Entity Entity's parent or null entity if not parented
 function ents_methods:getParent()
 	return owrap(Ent_GetParent(eunwrap(self)))
 end
