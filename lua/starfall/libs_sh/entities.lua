@@ -820,9 +820,9 @@ end
 
 --- Gets the parent of an entity
 -- @shared
--- @return Entity? Entity's parent or nil if not parented
+-- @return Entity Entity's parent or null entity if not parented
 function ents_methods:getParent()
-	return ewrap(Ent_GetParent(eunwrap(self)))
+	return owrap(Ent_GetParent(eunwrap(self)))
 end
 
 --- Gets the children (the parented entities) of an entity
@@ -982,9 +982,9 @@ function ents_methods:getClipping()
 				local local_ent = false
 
 				if clip.localentid then
-					local_ent = ewrap(Entity(clip.localentid))
+					local_ent = owrap(Entity(clip.localentid))
 				elseif clip.entity then
-					local_ent = ewrap(clip.entity)
+					local_ent = owrap(clip.entity)
 				end
 
 				table.insert(clips, {
@@ -2269,7 +2269,7 @@ end
 -- @shared
 -- @return Entity Ground entity
 function ents_methods:getGroundEntity()
-	return ewrap(Ent_GetGroundEntity(eunwrap(self)))
+	return owrap(Ent_GetGroundEntity(eunwrap(self)))
 end
 
 end
