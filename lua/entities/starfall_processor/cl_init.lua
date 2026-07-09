@@ -195,7 +195,7 @@ net.Receive("starfall_processor_used", function(len)
 	end
 end)
 
-SF.BlockedUsers = SF.BlockedList("user", "running clientside starfall code", "sf_blockedusers.txt",
+SF.BlockedUsers = SF.SavedUserList("blocked_users", "blocked users from running clientside starfall code", "sf_blockedusers.txt",
 	function(steamid)
 		local ply = player.GetBySteamID(steamid)
 		if not ply then return end

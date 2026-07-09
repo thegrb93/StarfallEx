@@ -17,7 +17,7 @@ if SERVER then
 	SF.softLockProtection = CreateConVar("sf_timebuffersoftlock", 1, FCVAR_ARCHIVE, "Consumes more cpu, but protects from freezing the game. Only turn this off if you want to use a profiler on your scripts.")
 	SF.softLockProtectionSuperUser = CreateConVar("sf_timebuffersoftlock_superuser", 0, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Determines whether CPU checks should be done for superusers as well?")
 	SF.RamCap = CreateConVar("sf_ram_max", 1500000, FCVAR_ARCHIVE, "If ram exceeds this limit (in kB), starfalls will be terminated")
-	SF.AllowSuperUser = CreateConVar("sf_superuserallowed", 0, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Whether the starfall superuser feature is allowed")
+	SF.SuperUsers = SF.SavedUserList("super_users", "users allowed to be superuser", "sf_superusers.txt")
 else
 	SF.cpuQuota = CreateConVar("sf_timebuffer_cl", 0.006, FCVAR_ARCHIVE, "The max average the CPU time can reach.")
 	SF.cpuOwnerQuota = CreateConVar("sf_timebuffer_cl_owner", 0.015, FCVAR_ARCHIVE, "The max average the CPU time can reach for your own chips.")
@@ -26,7 +26,6 @@ else
 	SF.softLockProtectionOwner = CreateConVar("sf_timebuffersoftlock_cl_owner", 1, FCVAR_ARCHIVE, "Enable Cpu-time limiting on your own chips.")
 	SF.softLockProtectionSuperUser = CreateConVar("sf_timebuffersoftlock_superuser", 0, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Determines whether CPU checks should be done for superusers as well?")
 	SF.RamCap = CreateConVar("sf_ram_max_cl", 1500000, FCVAR_ARCHIVE, "If ram exceeds this limit (in kB), starfalls will be terminated")
-	SF.AllowSuperUser = CreateConVar("sf_superuserallowed", 0, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Whether the starfall superuser feature is allowed")
 	SF.CvarEnabled = CreateConVar( "sf_enabled_cl", "1", { FCVAR_ARCHIVE, FCVAR_USERINFO, FCVAR_DONTRECORD }, "Enable clientside starfall" )
 end
 local ramlimit
@@ -85,9 +84,9 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 	if player:IsWorld() then
 		player = SF.Superuser
 	elseif ppdata.files[mainfile].superuser then
-		if not SF.AllowSuperUser:GetBool() then return false, { message = "Can't use --@superuser unless sf_superuserallowed is enabled!", traceback = "" } end
 		local ok, message = hook.Run("StarfallCanSuperUser", player)
-		if ok == false or (ok == nil and not player:IsSuperAdmin()) then return false, { message = message or "Can't use --@superuser unless you are superadmin!", traceback = "" } end
+		if ok == false then return false, { message = message or "StarfallCanSuperUser blocked this superuser request!", traceback = "" } end
+		if ok ~= true and not SF.SuperUsers:contains(player:SteamID()) then return false, { message = "Player is not in sf_super_users cvar list!", traceback = "" } end
 		player = SF.Superuser
 	end
 	instance.player = player
@@ -100,7 +99,7 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 		if SERVER then
 			instance:setCheckCpu(SF.softLockProtection:GetBool())
 		else
-			if SF.BlockedUsers:isBlocked(player:SteamID()) then
+			if SF.BlockedUsers:contains(player:SteamID()) then
 				return false, { message = "User has blocked this player's starfalls", traceback = "" }
 			end
 
