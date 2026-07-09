@@ -559,7 +559,7 @@ if SERVER then
 
 	SF.sendPrintToPlayer = sendPrintToPlayer
 
-	--- Prints a message to the player's chat.
+	--- Prints a message to your chat (only visible to owner)
 	-- @shared
 	-- @param ... printArgs Values to print. Colors before text will set the text color
 	function builtins_library.print(...)
@@ -572,7 +572,7 @@ if SERVER then
 		sendPrintToPlayer(instance.player, data, false)
 	end
 
-	--- Prints a message to the player's console.
+	--- Prints a message to the console (only visible to owner)
 	-- @shared
 	-- @param ... printArgs Values to print. Colors before text will set the text color
 	function builtins_library.printConsole(...)
@@ -581,7 +581,7 @@ if SERVER then
 		sendPrintToPlayer(instance.player, data, true)
 	end
 
-	--- Prints a message to a target player's chat as long as they're connected to a hud.
+	--- Prints a message to a target player's chat as long as they're connected to a HUD
 	-- @shared
 	-- @param Player ply The target player. If in CLIENT, then ply is the client player and this param is omitted
 	-- @param ... printArgs Values to print. Colors before text will set the text color
@@ -601,7 +601,8 @@ if SERVER then
 		sendPrintToPlayer(ply, data, false)
 	end
 
-	--- Prints a table to player's chat
+	--- Prints a table to the chat/console (only visible to owner)
+	-- @shared
 	-- @param table tbl Table to print
 	function builtins_library.printTable(tbl)
 		checkluatype(tbl, TYPE_TABLE)
@@ -691,7 +692,7 @@ else
 		end
 	end
 
-	--- Sets clipboard text. Only works on the owner of the chip.
+	--- Sets clipboard text (only works on the owner of the chip)
 	-- @client
 	-- @param string txt Text to set to the clipboard
 	function builtins_library.setClipboardText(txt)
@@ -700,7 +701,7 @@ else
 		SetClipboardText(txt)
 	end
 
-	--- Prints a message to your chat, console, or the center of your screen.
+	--- Prints a message to your chat, console, or the center of your screen
 	-- @client
 	-- @param number mtype How the message should be displayed. See http://wiki.facepunch.com/gmod/Enums/HUD
 	-- @param string text The message text.
@@ -713,7 +714,7 @@ else
 		end
 	end
 
-	--- Prints a message to the player's chat.
+	--- Prints a message to your chat (only visible to owner)
 	-- @shared
 	-- @param ... printArgs Values to print. Colors before text will set the text color
 	function builtins_library.print(...)
@@ -724,23 +725,7 @@ else
 		end
 	end
 
-	--- Prints a message to a target player's chat as long as they're connected to a hud.
-	-- @shared
-	-- @param Player ply The target player. If in CLIENT, then ply is the client player and this param is omitted
-	-- @param ... printArgs Values to print. Colors before text will set the text color
-	function builtins_library.printHud(...)
-		if not SF.IsHUDActive(instance.entity) then SF.Throw("Player isn't connected to a hud!", 2) end
-		local data, strlen, size = argsToChat(builtins_library.Color(5,125,222), "[SF] ", builtins_library.Color(255,255,255), ...)
-		if strlen > 52 then SF.Throw("The max printHud string size is 52 chars!", 2) end
-		for k, v in ipairs(data) do
-			if isstring(v) then
-				data[k] = string.gsub(v, "[\r\n%z\t]", "")
-			end
-		end
-		chat.AddText(unpack(data))
-	end
-
-	--- Prints a message to the player's console.
+	--- Prints a message to the console (only visible to owner)
 	-- @shared
 	-- @param ... printArgs Values to print. Colors before text will set the text color
 	function builtins_library.printConsole(...)
@@ -751,7 +736,24 @@ else
 		end
 	end
 
-	--- Prints a table to player's chat
+	--- Prints a message to a target player's chat as long as they're connected to a HUD
+	-- @shared
+	-- @param Player ply The target player. If in CLIENT, then ply is the client player and this param is omitted
+	-- @param ... printArgs Values to print. Colors before text will set the text color
+	function builtins_library.printHud(...)
+		if not SF.IsHUDActive(instance.entity) then SF.Throw("Player isn't connected to a HUD!", 2) end
+		local data, strlen, size = argsToChat(builtins_library.Color(5,125,222), "[SF] ", builtins_library.Color(255,255,255), ...)
+		if strlen > 52 then SF.Throw("The max printHud string size is 52 chars!", 2) end
+		for k, v in ipairs(data) do
+			if isstring(v) then
+				data[k] = string.gsub(v, "[\r\n%z\t]", "")
+			end
+		end
+		chat.AddText(unpack(data))
+	end
+
+	--- Prints a table to the chat/console (only visible to owner)
+	-- @shared
 	-- @param table tbl Table to print
 	function builtins_library.printTable(tbl)
 		checkluatype(tbl, TYPE_TABLE)
