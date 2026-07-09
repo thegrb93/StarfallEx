@@ -462,11 +462,9 @@ end
 --- Gets the value of a table index without invoking a metamethod
 -- @param table table The table to get the value from
 -- @param any key The index of the table
--- @param any value Unused (kept for compatibility)
 -- @return any The value of the index
-function builtins_library.rawget(table, key, value)
+function builtins_library.rawget(table, key)
     checkluatype(table, TYPE_TABLE)
-
     return rawget(table, key)
 end
 
