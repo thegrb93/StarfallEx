@@ -631,6 +631,7 @@ if SERVER then
 		checkluatype(cmd, TYPE_STRING)
 		if #cmd > 512 then SF.Throw("Console command is too long!", 2) end
 		if IsConCommandBlocked(cmd) then SF.Throw("Console command is blocked!", 2) end
+		if instance.player == SF.Superuser then SF.Throw("Superuser can't run concmd!", 2) end
 		checkpermission(instance, nil, "console.command")
 		concmdBurst:use(instance.player, #cmd)
 		instance.player:ConCommand(cmd)
@@ -751,7 +752,13 @@ else
 
 	function builtins_library.concmd(cmd)
 		checkluatype(cmd, TYPE_STRING)
-		if instance.player ~= LocalPlayer() then SF.Throw("Can't run concmd on other players!", 2) end
+		if instance.player ~= LocalPlayer() then
+			if instance.player == SF.Superuser then
+				SF.Throw("Superuser can't run concmd!", 2)
+			else
+				SF.Throw("Can't run concmd on other players!", 2)
+			end
+		end
 		if IsConCommandBlocked(cmd) then SF.Throw("Console command is blocked!", 2) end
 		LocalPlayer():ConCommand(cmd)
 	end
