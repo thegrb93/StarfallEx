@@ -73,6 +73,7 @@ end
 
 --- Overrides entity isConstraint to return true
 -- @server
+-- @return boolean Whether this is a constraint
 function constr_methods:isConstraint()
 	return true
 end

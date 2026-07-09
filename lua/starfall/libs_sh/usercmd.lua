@@ -132,7 +132,7 @@ return function(instance)
 		return munwrap(self):GetImpulseCommand()
 	end
 
-	-- Returns the maximum client speed of the player
+	--- Returns the maximum client speed of the player
 	-- @return number The max speed
 	function movedata_methods:getMaxClientSpeed()
 		return munwrap(self):GetMaxClientSpeed()

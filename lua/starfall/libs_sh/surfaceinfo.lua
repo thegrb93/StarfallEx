@@ -12,6 +12,8 @@ return function(instance)
 
 local surfaceinfo_methods, surfaceinfo_meta, swrap, sunwrap = instance.Types.SurfaceInfo.Methods, instance.Types.SurfaceInfo, instance.Types.SurfaceInfo.Wrap, instance.Types.SurfaceInfo.Unwrap
 
+--- Returns a string representation of the SurfaceInfo.
+-- @return string
 function surfaceinfo_meta:__tostring()
 	return "SurfaceInfo"
 end
@@ -31,6 +33,9 @@ if SERVER then
 else
 	local lwrap, lunwrap = instance.Types.LockedMaterial.Wrap, instance.Types.LockedMaterial.Unwrap
 
+	--- Returns the material of the surface.
+	-- @client
+	-- @return Material The surface material
 	function surfaceinfo_methods:getMaterial()
 		return lwrap(sunwrap(self):GetMaterial())
 	end

@@ -788,7 +788,7 @@ function ents_methods:setInertia(vec)
 end
 
 --- Sets the physical material of the entity
--- @param string materialName Material to use
+-- @param string mat Material to use
 function ents_methods:setPhysMaterial(mat)
 	local ent = eunwrap(self)
 	if Ent_IsPlayer(ent) then SF.Throw("Target is a player!", 2) end
@@ -990,6 +990,7 @@ end
 
 --- Gets a table of all constrained entities to each other
 -- @param table? filter Optional constraint type filter table where keys are the type name and values are 'true'. "Wire" and "Parent" are used for wires and parents.
+-- @return table All constrained entities
 function ents_methods:getAllConstrained(filter)
 	if filter ~= nil then checkluatype(filter, TYPE_TABLE) end
 
@@ -1162,8 +1163,8 @@ end
 --- You can only use this function on these classes:
 --- - starfall_prop
 --- - starfall_processor
--- @param function|nil func The StartTouch callback function. Arguments: (Entity object), the object entering our entity's bounds.
--- @param function|nil func The EndTouch callback function. Arguments: (Entity object), the object leaving our entity's bounds.
+-- @param function|nil startTouchCB The StartTouch callback function. Arguments: (Entity object), the object entering our entity's bounds.
+-- @param function|nil endTouchCB The EndTouch callback function. Arguments: (Entity object), the object leaving our entity's bounds.
 function ents_methods:setTriggerListener(startTouchCB, endTouchCB)
 	local ent = eunwrap(self)
 	checkpermission(instance, ent, "entities.canTool")

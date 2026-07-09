@@ -462,6 +462,7 @@ end
 --- Gets the value of a table index without invoking a metamethod
 -- @param table table The table to get the value from
 -- @param any key The index of the table
+-- @param any value Unused (kept for compatibility)
 -- @return any The value of the index
 function builtins_library.rawget(table, key, value)
     checkluatype(table, TYPE_TABLE)
@@ -714,6 +715,9 @@ else
 		end
 	end
 
+	--- Prints a message to the player's chat.
+	-- @shared
+	-- @param ... printArgs Values to print. Colors before text will set the text color
 	function builtins_library.print(...)
 		if instance.player == LocalPlayer() then
 			chat.AddText(unpack((argsToChat(...))))
@@ -722,6 +726,10 @@ else
 		end
 	end
 
+	--- Prints a message to a target player's chat as long as they're connected to a hud.
+	-- @shared
+	-- @param Player ply The target player. If in CLIENT, then ply is the client player and this param is omitted
+	-- @param ... printArgs Values to print. Colors before text will set the text color
 	function builtins_library.printHud(...)
 		if not SF.IsHUDActive(instance.entity) then SF.Throw("Player isn't connected to a hud!", 2) end
 		local data, strlen, size = argsToChat(builtins_library.Color(5,125,222), "[SF] ", builtins_library.Color(255,255,255), ...)
@@ -734,6 +742,9 @@ else
 		chat.AddText(unpack(data))
 	end
 
+	--- Prints a message to the player's console.
+	-- @shared
+	-- @param ... printArgs Values to print. Colors before text will set the text color
 	function builtins_library.printConsole(...)
 		if instance.player == LocalPlayer() then
 			local data = argsToChat(...)
@@ -742,6 +753,8 @@ else
 		end
 	end
 
+	--- Prints a table to player's chat
+	-- @param table tbl Table to print
 	function builtins_library.printTable(tbl)
 		checkluatype(tbl, TYPE_TABLE)
 		if instance.player == LocalPlayer() or instance.player == SF.Superuser then
@@ -749,6 +762,9 @@ else
 		end
 	end
 
+	--- Execute a console command
+	-- @shared
+	-- @param string cmd Command to execute
 	function builtins_library.concmd(cmd)
 		checkluatype(cmd, TYPE_STRING)
 		if instance.player ~= LocalPlayer() then SF.Throw("Can't run concmd on other players!", 2) end

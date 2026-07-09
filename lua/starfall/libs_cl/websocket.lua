@@ -178,6 +178,7 @@ function websocket_meta:__newindex(k, v)
 end
 
 --- Returns "WebSocket: " alongside the address of the websocket.
+-- @return string
 function websocket_meta:__tostring()
 	return "WebSocket: " .. unwrap(self).address
 end

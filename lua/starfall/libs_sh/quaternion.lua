@@ -213,8 +213,8 @@ end
 local rijk = { r = 1, i = 2, j = 3, k = 4 }
 
 --- Newindex metamethod
--- @param number|string Key
--- @param number Value to set
+-- @param number|string k
+-- @param number v
 function quat_meta.__newindex(t, k, v)
 	if rijk[k] then
 		rawset(t, rijk[k], v)
@@ -247,7 +247,7 @@ end
 
 --- Index metamethod
 -- Can be indexed with: 1, 2, 3, 4, r, i, j, k, rr, ri, rj, rk, rrr, rijk, kjir, etc. Numerical lookup is the most efficient
--- @param number|string Key
+-- @param number|string k
 -- @return number Found value
 function quat_meta.__index(t, k)
 	local method = quat_methods[k]
@@ -432,6 +432,7 @@ function quat_meta.__unm(q)
 end
 
 --- Equivalence metamethod
+-- @param Quaternion lhs
 -- @param Quaternion rhs Quaternion to compare to
 -- @return boolean True if both sides are equal
 function quat_meta.__eq(lhs, rhs)

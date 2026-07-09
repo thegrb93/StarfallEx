@@ -110,6 +110,8 @@ function SF.ParseObj(obj, thread_yield, Vector, triangulate)
 	return meshes, {positions = pos, normals = norm, texturecoords = uv, faces = faces}
 end
 
+--- Generate tangent vectors for a mesh.
+-- @param table vertices Vertex table
 function SF.GenerateTangents(vertices, thread_yield, Vector)
 	-- Lengyel, Eric. “Computing Tangent Space Basis Vectors for an Arbitrary Mesh”. Terathon Software, 2001. http://terathon.com/code/tangent.html
 	-- GLua version credit @willox https://github.com/CapsAdmin/pac3/pull/578/commits/43fa75c262cde661713cdaa9d1b09bc29ec796b4
@@ -174,6 +176,8 @@ function SF.GenerateTangents(vertices, thread_yield, Vector)
 	end
 end
 
+--- Generate UV coordinates for a mesh.
+-- @param table vertices Vertex table
 function SF.GenerateUV(vertices, scale, Vector, Angle, worldtolocal)
 	local v = Vector()
 	local a = Angle()
@@ -198,6 +202,11 @@ function SF.GenerateUV(vertices, scale, Vector, Angle, worldtolocal)
 	end
 end
 
+--- Generate normals for a mesh.
+-- @param table vertices Vertex table
+-- @param boolean inverted
+-- @param number smoothrad
+-- @param function Vector
 function SF.GenerateNormals(vertices, inverted, smoothrad, Vector)
 	local v = Vector()
 	local cross = v.cross or v.Cross
@@ -1080,7 +1089,7 @@ if CLIENT then
 	end
 
 	--- Writes the vertex position to the vertex data
-	-- @param Vector position Position
+	-- @param Vector pos Position
 	-- @client
 	function mesh_library.writePosition(pos)
 		mesh.Position(vunwrap1(pos))

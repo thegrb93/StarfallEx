@@ -271,7 +271,7 @@ end
 --- Sets the rotation or the matrix to the rotation by an axis and angle
 -- Self-Modifies. Does not return anything
 -- @param Vector axis The normalized axis of rotation
--- @param number angle The angle of rotation in radians
+-- @param number ang The angle of rotation in radians
 function vmatrix_methods:setAxisAngle(axis, ang)
 	local x, y, z = axis[1], axis[2], axis[3]
 	local c = math.cos(ang)

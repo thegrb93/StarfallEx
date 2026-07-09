@@ -334,7 +334,7 @@ math_library.truncate = math.Truncate
 --- Calculates B-Spline point.
 -- @class function
 -- @param number tDiff From 0 to tMax, where alongside the spline the point will be
--- @param number tPoints A table of Vectors. The amount cannot be less than 4
+-- @param table tPoints A table of Vectors. The amount cannot be less than 4
 -- @param number tMax Dictates maximum value for tDiff
 -- @return number Point on Bezier curve, related to tDiff
 function math_library.bSplinePoint(tDiff, tPoints, tMax)
@@ -369,7 +369,7 @@ end
 -- @class function
 -- @param number ratio Ratio of progress through values
 -- @param Vector from Vector to begin from
--- @param Vector Vector to end at
+-- @param Vector to Vector to end at
 -- @return Vector The interpolated vector
 function math_library.lerpVector(ratio, from, to)
 	checkluatype(ratio, TYPE_NUMBER)
@@ -389,10 +389,10 @@ function math_library.distanceToLine(lineStart, lineEnd, pointPos)
 end
 
 --- Returns a point along a bezier curve.
--- @param number ratio Number representing how far along the curve, 0-1.
--- @param Vector start The start position of the curve.
--- @param Vector middle The middle position of the curve.
--- @param Vector end The end position of the curve.
+-- @param number r Number representing how far along the curve, 0-1.
+-- @param Vector v1 The start position of the curve.
+-- @param Vector v2 The middle position of the curve.
+-- @param Vector v3 The end position of the curve.
 -- @return Vector Vector representing the point along the curve.
 function math_library.bezierVector(r, v1, v2, v3)
 	local ri = 1-r
@@ -407,11 +407,11 @@ function math_library.bezierVector(r, v1, v2, v3)
 end
 
 --- Returns a point along a cubic bezier curve.
--- @param number ratio Number representing how far along the curve, 0-1.
--- @param Vector start The start position of the curve.
--- @param Vector tangent1 First tangent
--- @param Vector tangent2 Second tangent
--- @param Vector end The end position of the curve.
+-- @param number r Number representing how far along the curve, 0-1.
+-- @param Vector v1 The start position of the curve.
+-- @param Vector v2 First tangent
+-- @param Vector v3 Second tangent
+-- @param Vector v4 The end position of the curve.
 -- @return Vector Vector representing the point along the curve.
 function math_library.bezierVectorCubic(r, v1, v2, v3, v4)
 	local r2 = r * r

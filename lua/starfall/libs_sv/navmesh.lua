@@ -53,6 +53,8 @@ return function(instance)
 		entList:deinitialize(instance, true)
 	end)
 
+	--- Returns a string representation of the NavArea.
+	-- @return string
 	function lnavarea_meta:__tostring()
 		return "NavArea"
 	end
@@ -99,7 +101,7 @@ return function(instance)
 	--- Add this position and normal to the list of walkable positions, used before map generation with navmesh.beginGeneration
 	-- Requires the `navmesh.modify` permission
 	-- @param Vector pos The terrain position.
-	-- @param Vector normal The terrain normal.
+	-- @param Vector dir The terrain normal.
 	function navmesh_library.addWalkableSeed(pos, dir)
 		checkpermission(instance, nil, "navmesh.modify")
 		navmesh.AddWalkableSeed( vwrap(pos), vwrap(dir) )
@@ -155,6 +157,10 @@ return function(instance)
 		end
 	end
 
+	--- Finds the closest standable ground at, above, or below the provided position.
+	-- @param Vector pos The position to check
+	-- @return number height The height of the ground layer
+	-- @return Vector normal The surface normal of the ground layer
 	function navmesh_library.getGroundHeight(pos)
 		local height, normal = navmesh.GetGroundHeight( vunwrap1(pos) )
 		return height, vwrap(normal)
@@ -373,9 +379,9 @@ return function(instance)
 	--- Returns the amount of CNavAreas that have a connection ( one or two way ) from this CNavArea in given direction.
 	-- See CNavArea:getAdjacentCount for a function that returns CNavArea count from/in all sides/directions.
 	-- @name navarea_methods.getAdjacentCountAtSide
-	-- @param number The direction, in which to look for CNavAreas, see NAV_DIR enums.
+	-- @param number navDir The direction, in which to look for CNavAreas, see NAV_DIR enums.
 	-- @return number The amount of CNavAreas that have a connection ( one or two way ) from this CNavArea in given direction.
-	function lnavarea_methods:getAdjacentCountAtSide()
+	function lnavarea_methods:getAdjacentCountAtSide(navDir)
 		checkluatype(navDir, TYPE_NUMBER)
 		return lnavunwrap(self):GetAdjacentCountAtSide(navDir)
 	end
@@ -538,7 +544,7 @@ return function(instance)
 
 	--- Returns the elevation of this Nav Area at the given position.
 	-- @name navarea_methods.getZ
-	-- @param Vector The position to get the elevation from, the z value from this position is ignored and only the X and Y values are used to this task.
+	-- @param Vector pos The position to get the elevation from, the z value from this position is ignored and only the X and Y values are used to this task.
 	-- @return number Elevation
 	function lnavarea_methods:getZ(pos)
 		return lnavunwrap(self):GetZ( vunwrap1(pos) )
@@ -637,7 +643,7 @@ return function(instance)
 	-- @param number corner The corner(s) to drop, uses NAV_CORNER enums
 	function navarea_methods:placeOnGround(corner)
 		checkluatype(corner, TYPE_NUMBER)
-		return lnavunwrap(self):PlaceOnGround(corner)
+		lnavunwrap(self):PlaceOnGround(corner)
 	end
 
 	--- Removes a CNavArea from the Open List with the lowest cost to traverse to from the starting node, and returns it.

@@ -442,7 +442,7 @@ end
 
 --- Gets the amount of ammo the player has.
 -- @shared
--- @param string|number idOrName The string ammo name or number id of the ammo
+-- @param string|number id The string ammo name or number id of the ammo
 -- @return number The amount of ammo player has in reserve.
 function player_methods:getAmmoCount(id)
 	if not isnumber(id) and not isstring(id) then SF.ThrowTypeError("number or string", SF.GetType(id), 2) end
@@ -605,7 +605,7 @@ if CLIENT then
 
 	--- Plays an animation on the player
 	-- @client
-	-- @param number|string sequence Sequence number or string name
+	-- @param number|string seq Sequence number or string name
 	-- @param number? progress Optional float (Default 0), the progress of the animation. Ranging from 0-1
 	-- @param number? rate Optional float (Default 1), the playback rate of the animation
 	-- @param boolean? loop Optional boolean (Default false), should the animation loop
@@ -662,7 +662,7 @@ if CLIENT then
 
 	--- Sets the animation activity
 	-- @client
-	-- @param number|string|nil activity Activity, nil to use the current animation sequence
+	-- @param number|string|nil act Activity, nil to use the current animation sequence
 	function player_methods:setAnimationActivity(act)
 		local ply = unwrap(self)
 		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
