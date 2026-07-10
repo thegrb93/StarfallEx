@@ -1176,6 +1176,7 @@ end
 
 --- Check if the specified render target exists.
 -- @param string name The name of the render target
+-- @return boolean Whether the render target exists
 function render_library.renderTargetExists(name)
 	checkluatype (name, TYPE_STRING)
 	return renderdata.rendertargets[name] ~= nil
@@ -2147,7 +2148,7 @@ end
 local pos_vec, norm_vec = Vector(0, 0, 0), Vector(0, 0, 0)
 --- Draws a quad.
 -- @param Vector pos Origin of the quad.
--- @param Vector normal The face direction of the quad.
+-- @param Vector norm The face direction of the quad.
 -- @param number width The width of the quad.
 -- @param number height The height of the quad.
 -- @param number? rot The rotation of the quad counter-clockwise in degrees around the normal axis. In other words, the quad will always face the same way but this will rotate its corners.
@@ -2661,7 +2662,7 @@ function render_library.setFogMode(mode)
 end
 
 --- Changes color of the fog
--- @param Color col Color (alpha won't have any effect)
+-- @param Color color Color (alpha won't have any effect)
 function render_library.setFogColor(color)
 	checkpermission(instance, nil, "render.fog")
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end

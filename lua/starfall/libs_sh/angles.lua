@@ -67,9 +67,9 @@ end
 local pyr = { p = 1, y = 2, r = 3, pitch = 1, yaw = 2, roll = 3 }
 
 --- Sets a value at a key in the angle
--- @param Angle Ang
--- @param number|string Key
--- @param number Value
+-- @param Angle t
+-- @param number|string k
+-- @param number v
 function ang_meta.__newindex(t, k, v)
 	if pyr[k] then
 		rawset(t, pyr[k], v)
@@ -80,8 +80,8 @@ end
 
 --- Gets a value at a key in the angle
 -- Can be indexed with: 1, 2, 3, p, y, r, pitch, yaw, roll. 1,2,3 is most efficient.
--- @param number|string Key
--- @return number Value
+-- @param number|string k
+-- @return number|function|nil Value
 function ang_meta.__index(t, k)
 	local method = ang_methods[k]
 	if method then
@@ -100,8 +100,8 @@ function ang_meta.__tostring(a)
 end
 
 --- Multiplication metamethod
--- @param number|Angle a1 Number or Angle multiplicand.
--- @param number|Angle a2 Number or Angle multiplier.
+-- @param number|Angle a Number or Angle multiplicand.
+-- @param number|Angle b Number or Angle multiplier.
 -- @return Angle Resultant angle.
 function ang_meta.__mul(a, b)
 	if isnumber(b) then
@@ -118,8 +118,8 @@ function ang_meta.__mul(a, b)
 end
 
 --- Division metamethod
--- @param number|Angle a1 Number or Angle dividend.
--- @param number|Angle a2 Number or Angle divisor.
+-- @param number|Angle a Number or Angle dividend.
+-- @param number|Angle b Number or Angle divisor.
 -- @return Angle Resultant angle.
 function ang_meta.__div(a, b)
 	if isnumber(b) then
@@ -142,24 +142,24 @@ function ang_meta.__unm(a)
 end
 
 --- Equivalence metamethod
--- @param Angle a1 Initial angle.
--- @param Angle a2 Angle to check against.
+-- @param Angle a Initial angle.
+-- @param Angle b Angle to check against.
 -- @return boolean Whether their fields are equal
 function ang_meta.__eq(a, b)
 	return a[1]==b[1] and a[2]==b[2] and a[3]==b[3]
 end
 
 --- Addition metamethod
--- @param Angle a1 Initial angle.
--- @param Angle a2 Angle to add to the first.
+-- @param Angle a Initial angle.
+-- @param Angle b Angle to add to the first.
 -- @return Angle Resultant angle.
 function ang_meta.__add(a, b)
 	return wrap({ a[1] + b[1], a[2] + b[2], a[3] + b[3] })
 end
 
 --- Subtraction metamethod
--- @param Angle a1 Initial angle.
--- @param Angle a2 Angle to subtract.
+-- @param Angle a Initial angle.
+-- @param Angle b Angle to subtract.
 -- @return Angle Resultant angle.
 function ang_meta.__sub(a, b)
 	return wrap({ a[1]-b[1], a[2]-b[2], a[3]-b[3] })

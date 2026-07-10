@@ -141,14 +141,14 @@ function vr_library.getRightHandPos(ply)
 	return vwrap(vrmod.GetRightHandPos(plyunwrap(ply)))
 end
 
---- Returns the left hand angles
+--- Returns the right hand angles
 -- @param Player target Player to get the right hand angles from
 -- @return Angle Angles
 function vr_library.getRightHandAng(ply)
 	return awrap(vrmod.GetRightHandAng(plyunwrap(ply)))
 end
 
---- Returns the left hand pose
+--- Returns the right hand pose
 -- @param Player target Player to get the right hand pose from
 -- @return Vector Position
 -- @return Angle Angles

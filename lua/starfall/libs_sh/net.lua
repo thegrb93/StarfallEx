@@ -263,7 +263,7 @@ end
 
 --- Writes a table to a net message automatically typing it.
 -- @shared
--- @param table v The table to write
+-- @param table t The table to write
 function net_library.writeTable(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
 	checkluatype(t, TYPE_TABLE)

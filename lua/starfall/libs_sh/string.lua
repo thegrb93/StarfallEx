@@ -16,7 +16,7 @@ local sfstring = SF.SafeStringLib
 
 --- Converts color to a string.
 -- @class function
--- @param Color col The color to put in the string
+-- @param Color color The color to put in the string
 -- @return string String with the color RGBA values separated by spaces
 function string_library.fromColor(color)
 	return string.FromColor(cunwrap(color))

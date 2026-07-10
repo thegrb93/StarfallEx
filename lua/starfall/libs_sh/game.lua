@@ -189,15 +189,15 @@ if SERVER then
 	--- Fires a bullet. Bullet made with this function will not have any tracer, you will have to make them yourself.
 	-- @server
 	-- @param Vector src The position to fire the bullets from.
-	-- @param Vector Dir The fire direction.
+	-- @param Vector dir The fire direction.
 	-- @param number? damage The damage dealt by the bullet. Default: (1-100)
 	-- @param number? num The amount of bullets to fire. Default: (1-40)
 	-- @param number? force The force of the bullets. Default: (0-100)
 	-- @param number? distance Maximum distance the bullet can travel.
-	-- @param Vector? Spread The spread, only x and y are needed.
+	-- @param Vector? spread The spread, only x and y are needed.
 	-- @param number? hullSize The hull size of the bullet. Default: (0-10)
 	-- @param Entity? ignoreEntity The entity that the bullet will ignore when it will be shot.
-	-- @param function? callback Function to be called with attacker, traceResult after the bullet was fired but before the damage is applied (the callback is called even if no damage is applied).
+	-- @param function? cb Function to be called with attacker, traceResult after the bullet was fired but before the damage is applied (the callback is called even if no damage is applied).
 	function game_library.bulletDamage(src, dir, damage, num, force, distance, spread, hullSize, ignoreEntity, cb)
 		checkpermission(instance, nil, "game.bulletDamage")
 		src = vunwrap1(src)

@@ -357,8 +357,8 @@ end
 
 --- Sets the position of your cursor. Your cursor must be enabled.
 -- @client
--- @param number X 
--- @param number Y
+-- @param number x
+-- @param number y
 function input_library.setCursorPos(x, y)
 	checkpermission(instance, nil, "input.emulate")
 

@@ -205,7 +205,7 @@ if CLIENT then
 	-- This function works exactly like the clientside r_lod convar and takes priority over it.
 	-- -1 leaves the engine to automatically set the Level of Detail. The Level Of Detail may range from 0 to 8, with 0 being the highest quality and 8 the lowest.
 	-- @client
-	-- @param number lod The Level Of Detail model ID to use.
+	-- @param number num The Level Of Detail model ID to use.
 	function ents_methods:setLOD(num)
 		local ent = eunwrap(self)
 		checkluatype(num, TYPE_NUMBER)
@@ -532,7 +532,7 @@ end
 --- Allows manipulation of an entity's bones' jiggle status
 -- @shared
 -- @param number bone The bone ID
--- @param boolean enabled Whether to make the bone jiggly or not
+-- @param boolean state Whether to make the bone jiggly or not
 function ents_methods:manipulateBoneJiggle(bone, state)
 	local ent = eunwrap(self)
 	checkluatype(bone, TYPE_NUMBER)
@@ -1172,7 +1172,7 @@ if SERVER then
 
 	--- Sets the health of the entity.
 	-- @server
-	-- @param number newhealth New health value.
+	-- @param number val New health value.
 	function ents_methods:setHealth(val)
 		local ent = eunwrap(self)
 		checkpermission(instance, ent, "entities.setHealth")
@@ -1182,7 +1182,7 @@ if SERVER then
 
 	--- Sets the maximum health for entity. Note, that you can still set entity's health above this amount with Entity:setHealth.
 	-- @server
-	-- @param number newmaxhealth New max health value.
+	-- @param number val New max health value.
 	function ents_methods:setMaxHealth(val)
 		local ent = eunwrap(self)
 		checkpermission(instance, ent, "entities.setMaxHealth")
@@ -1703,7 +1703,7 @@ function ents_methods:getFlexes()
 end
 
 --- Returns the ID of the flex based on given name.
--- @param string flexname The name of the flex to get the ID of. Case sensitive.
+-- @param string name The name of the flex to get the ID of. Case sensitive.
 -- @return number The ID of the flex based on given name.
 function ents_methods:getFlexByName(name)
 	checkluatype(name, TYPE_STRING)
@@ -1711,7 +1711,7 @@ function ents_methods:getFlexByName(name)
 end
 
 --- Returns flex name.
--- @param number flexid The flex id to look up name of.
+-- @param number id The flex id to look up name of.
 -- @return string The flex name
 function ents_methods:getFlexName(id)
 	checkluatype(id, TYPE_NUMBER)

@@ -433,28 +433,28 @@ end
 
 --- Sets the Projected Texture's angles
 -- Will not take effect until ProjectedTexture:update() is called.
---@param Angle ang New angles
+-- @param Angle ang New angles
 function projectedtexture_methods:setAngles(ang)
 	ptunwrap(self):SetAngles(aunwrap(ang))
 end
 
 --- Sets the Projected Texture's brightness
 -- Will not take effect until ProjectedTexture:update() is called.
---@param number brightness
+-- @param number brightness
 function projectedtexture_methods:setBrightness(brightness)
 	ptunwrap(self):SetBrightness(brightness)
 end
 
 --- Sets the Projected Texture's color
 -- Will not take effect until ProjectedTexture:update() is called.
---@param Color col
+-- @param Color col
 function projectedtexture_methods:setColor(col)
 	ptunwrap(self):SetColor(cunwrap(col))
 end
 
 --- Sets the Projected Texture's constant attenuation
 -- Will not take effect until ProjectedTexture:update() is called.
---@param number attenuation
+-- @param number attenuation
 function projectedtexture_methods:setConstantAttenuation(attenuation)
 	ptunwrap(self):SetConstantAttenuation(attenuation)
 end
@@ -462,14 +462,14 @@ end
 --- Sets if the Projected Texture should draw shadows
 -- Will not take effect until ProjectedTexture:update() is called.
 -- Enabling shadows is expensive. Use sparingly.
---@param boolean enabled
+-- @param boolean enabled
 function projectedtexture_methods:setEnableShadows(enabled)
 	ptunwrap(self):SetEnableShadows(enabled)
 end
 
 --- Sets the distance at which the Projected Texture ends
 -- Will not take effect until ProjectedTexture:update() is called.
---@param number farZ
+-- @param number farZ
 function projectedtexture_methods:setFarZ(farZ)
 	ptunwrap(self):SetFarZ(farZ)
 end
@@ -477,7 +477,7 @@ end
 --- Sets the FOV of the Projected texture
 -- Clamped between 0 and 180
 -- Will not take effect until ProjectedTexture:update() is called.
---@param number fov
+-- @param number fov
 function projectedtexture_methods:setFOV(fov)
 	ptunwrap(self):SetFOV(fov)
 end
@@ -485,21 +485,21 @@ end
 --- Sets the horizontal FOV of the Projected texture
 -- Clamped between 0 and 180
 -- Will not take effect until ProjectedTexture:update() is called.
---@param number fov
+-- @param number fov
 function projectedtexture_methods:setHorizontalFOV(fov)
 	ptunwrap(self):SetHorizontalFOV(fov)
 end
 
 --- Sets whether or not the Projected Texture lights world geometry
 -- Will not take effect until ProjectedTexture:update() is called.
---@param boolean enable
+-- @param boolean enable
 function projectedtexture_methods:setLightWorld(enable)
 	ptunwrap(self):SetLightWorld(enable)
 end
 
 --- Sets the Projected Texture's linear attenuation
 -- Will not take effect until ProjectedTexture:update() is called.
---@param number attenuation
+-- @param number attenuation
 function projectedtexture_methods:setLinearAttenuation(attenuation)
 	ptunwrap(self):SetLinearAttenuation(attenuation)
 end
@@ -507,14 +507,14 @@ end
 --- Sets the distance at which the Projected Texture ends
 -- A value of 0 will disable the Projected Texture
 -- Will not take effect until ProjectedTexture:update() is called.
---@param number nearZ
+-- @param number nearZ
 function projectedtexture_methods:setNearZ(nearZ)
 	ptunwrap(self):SetNearZ(nearZ)
 end
 
 --- Sets the view-frustum culling of the Projected Texture
 -- Will not take effect until ProjectedTexture:update() is called.
---@param boolean enable
+-- @param boolean enable
 function projectedtexture_methods:setNoCull(enable)
 	ptunwrap(self):SetNoCull(enable)
 end
@@ -522,32 +522,32 @@ end
 --- Sets the orthographic settings of the Projected Texture
 -- Does not work with shadows
 -- Will not take effect until ProjectedTexture:update() is called.
---@param boolean orthographic
---@param number left
---@param number top
---@param number right
---@param number bottom
+-- @param boolean orthographic
+-- @param number left
+-- @param number top
+-- @param number right
+-- @param number bottom
 function projectedtexture_methods:setOrthographic(orthographic, left, top, right, bottom)
 	ptunwrap(self):SetOrthographic(orthographic, left, top, right, bottom)
 end
 
 --- Sets the Projected Texture's position
 -- Will not take effect until ProjectedTexture:update() is called.
---@param Vector pos
+-- @param Vector pos
 function projectedtexture_methods:setPos(pos)
 	ptunwrap(self):SetPos(SF.clampPos(vunwrap1(pos)))
 end
 
 --- Sets the Projected Texture's quadratic attenuation
 -- Will not take effect until ProjectedTexture:update() is called.
---@param number attenuation
+-- @param number attenuation
 function projectedtexture_methods:setQuadraticAttenuation(attenuation)
 	ptunwrap(self):SetQuadraticAttenuation(attenuation)
 end
 
 --- Sets the Projected Texture's shadow depth bias
 -- Will not take effect until ProjectedTexture:update() is called.
---@param number bias
+-- @param number bias
 function projectedtexture_methods:setShadowDepthBias(bias)
 	ptunwrap(self):SetShadowDepthBias(bias)
 end
@@ -555,14 +555,14 @@ end
 --- Sets the Projected Texture's shadow filter size
 -- 0 looks pixelated, higher values increase blur
 -- Will not take effect until ProjectedTexture:update() is called.
---@param number filter
+-- @param number filter
 function projectedtexture_methods:setShadowFilter(filter)
 	ptunwrap(self):SetShadowFilter(filter)
 end
 
 --- Sets the Projected Texture's shadow slope scale depth bias
 -- Will not take effect until ProjectedTexture:update() is called.
---@param number bias
+-- @param number bias
 function projectedtexture_methods:setShadowSlopeScaleDepthBias(bias)
 	ptunwrap(self):SetShadowSlopeScaleDepthBias(bias)
 end
@@ -570,21 +570,21 @@ end
 --- Sets the Projected Texture's target entity
 -- If set, this will be the only entity that is lit, as well as the world
 -- Will not take effect until ProjectedTexture:update() is called.
---@param Entity ent
+-- @param Entity ent
 function projectedtexture_methods:setTargetEntity(ent)
 	ptunwrap(self):SetTargetEntity(eunwrap(ent))
 end
 
 --- Sets the Projected Texture's texture
 -- Will not take effect until ProjectedTexture:update() is called.
---@param string texture
+-- @param string texture
 function projectedtexture_methods:setTexture(texture)
 	ptunwrap(self):SetTexture(texture)
 end
 
 --- Sets the Projected Texture's texture frame
 -- Will not take effect until ProjectedTexture:update() is called.
---@param number frame
+-- @param number frame
 function projectedtexture_methods:setTextureFrame(frame)
 	ptunwrap(self):SetTextureFrame(frame)
 end
@@ -592,7 +592,7 @@ end
 --- Sets the Projected Texture's vertical FOV
 -- Clamped between 0 and 180
 -- Will not take effect until ProjectedTexture:update() is called.
---@param number fov
+-- @param number fov
 function projectedtexture_methods:setVerticalFOV(fov)
 	ptunwrap(self):SetVerticalFOV(fov)
 end

@@ -325,7 +325,7 @@ function player_methods:say(text, teamOnly)
 end
 
 --- Sets the armor of the player.
--- @param number newarmor New armor value.
+-- @param number val New armor value.
 function player_methods:setArmor(val)
 	local ent = unwrap(self)
 	checkpermission(instance, ent, "player.setArmor")
@@ -334,7 +334,7 @@ function player_methods:setArmor(val)
 end
 
 --- Sets the maximum armor for player. You can still set a player's armor above this amount with Player:setArmor.
--- @param number newmaxarmor New max armor value.
+-- @param number val New max armor value.
 function player_methods:setMaxArmor(val)
 	local ent = unwrap(self)
 	checkpermission(instance, ent, "player.setMaxArmor")
@@ -344,7 +344,7 @@ end
 
 --- Sets the health of the player.
 -- @server
--- @param number newhealth New health value.
+-- @param number val New health value.
 function player_methods:setHealth(val)
 	local ply = unwrap(self)
 	checkpermission(instance, ply, "player.setHealth")
@@ -355,7 +355,7 @@ end
 
 --- Sets the maximum health for player. Note, that you can still set player's health above this amount with Player:setHealth.
 -- @server
--- @param number newmaxhealth New max health value.
+-- @param number val New max health value.
 function player_methods:setMaxHealth(val)
 	local ply = unwrap(self)
 	checkpermission(instance, ply, "player.setMaxHealth")
@@ -365,7 +365,7 @@ function player_methods:setMaxHealth(val)
 end
 
 --- Sets Crouched Walk Speed
--- @param number newcwalkspeed New Crouch Walk speed, This is a multiplier from 0 to 1.
+-- @param number val New Crouch Walk speed, This is a multiplier from 0 to 1.
 function player_methods:setCrouchedWalkSpeed(val)
 	local ent = unwrap(self)
 	checkpermission(instance, ent, "player.modifyMovementProperties")
@@ -374,7 +374,7 @@ function player_methods:setCrouchedWalkSpeed(val)
 end
 
 --- Sets Duck Speed
--- @param number newduckspeed New Duck speed, This is a multiplier from 0 to 1.
+-- @param number val New Duck speed, This is a multiplier from 0 to 1.
 function player_methods:setDuckSpeed(val)
 	local ent = unwrap(self)
 	checkpermission(instance, ent, "player.modifyMovementProperties")
@@ -383,7 +383,7 @@ function player_methods:setDuckSpeed(val)
 end
 
 --- Sets UnDuck Speed
--- @param number newunduckspeed New UnDuck speed, This is a multiplier from 0 to 1.
+-- @param number val New UnDuck speed, This is a multiplier from 0 to 1.
 function player_methods:setUnDuckSpeed(val)
 	local ent = unwrap(self)
 	checkpermission(instance, ent, "player.modifyMovementProperties")
@@ -392,7 +392,7 @@ function player_methods:setUnDuckSpeed(val)
 end
 
 --- Sets Ladder Climb Speed, probably unstable
--- @param number newladderclimbspeed New Ladder Climb speed.
+-- @param number val New Ladder Climb speed.
 function player_methods:setLadderClimbSpeed(val)
 	local ent = unwrap(self)
 	checkpermission(instance, ent, "player.modifyMovementProperties")
@@ -401,7 +401,7 @@ function player_methods:setLadderClimbSpeed(val)
 end
 
 --- Sets Max Speed
--- @param number newmaxspeed New Max speed.
+-- @param number val New Max speed.
 function player_methods:setMaxSpeed(val)
 	local ent = unwrap(self)
 	checkpermission(instance, ent, "player.modifyMovementProperties")
@@ -410,7 +410,7 @@ function player_methods:setMaxSpeed(val)
 end
 
 --- Sets Run Speed ( +speed )
--- @param number newrunspeed New Run speed.
+-- @param number val New Run speed.
 function player_methods:setRunSpeed(val)
 	local ent = unwrap(self)
 	checkpermission(instance, ent, "player.modifyMovementProperties")
@@ -419,7 +419,7 @@ function player_methods:setRunSpeed(val)
 end
 
 --- Sets Slow Walk Speed ( +walk )
--- @param number newslowwalkspeed New Slow Walk speed.
+-- @param number val New Slow Walk speed.
 function player_methods:setSlowWalkSpeed(val)
 	local ent = unwrap(self)
 	checkpermission(instance, ent, "player.modifyMovementProperties")
@@ -428,7 +428,7 @@ function player_methods:setSlowWalkSpeed(val)
 end
 
 --- Sets Walk Speed
--- @param number newwalkspeed New Walk speed.
+-- @param number val New Walk speed.
 function player_methods:setWalkSpeed(val)
 	local ent = unwrap(self)
 	checkpermission(instance, ent, "player.modifyMovementProperties")
@@ -437,7 +437,7 @@ function player_methods:setWalkSpeed(val)
 end
 
 --- Sets Jump Power
--- @param number newjumppower New Jump Power.
+-- @param number val New Jump Power.
 function player_methods:setJumpPower(val)
 	local ent = unwrap(self)
 	checkpermission(instance, ent, "player.modifyMovementProperties")
@@ -446,7 +446,7 @@ function player_methods:setJumpPower(val)
 end
 
 --- Sets Step Size
--- @param number newstepsize New Step Size.
+-- @param number val New Step Size.
 function player_methods:setStepSize(val)
 	local ent = unwrap(self)
 	checkpermission(instance, ent, "player.modifyMovementProperties")
@@ -455,7 +455,7 @@ function player_methods:setStepSize(val)
 end
 
 --- Sets Friction
--- @param number newfriction New Friction.
+-- @param number val New Friction.
 function player_methods:setFriction(val)
 	local ent = unwrap(self)
 	checkpermission(instance, ent, "player.modifyMovementProperties")

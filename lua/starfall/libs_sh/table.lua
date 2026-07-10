@@ -209,11 +209,13 @@ table_library.sortDesc = table.SortDesc
 -- @param table tbl The table to iterate over
 -- @param string? displayName Optional name for the table
 -- @param boolean? niceFormatting Optional, adds new lines and tabs to the string. Defaults to false
+-- @return string The table formatted as a string
 table_library.toString = table.ToString
 
 --- Creates a deep copy and returns that copy. This function does NOT copy userdata, such as Vectors and Angles!
 -- @class function
 -- @param table tbl The table to be copied
+-- @param table? lookup_table An optional lookup table for cyclic reference detection
 -- @return table A deep copy of the original table
 function table_library.copy( tbl, lookup_table )
 	if ( tbl == nil ) then return nil end

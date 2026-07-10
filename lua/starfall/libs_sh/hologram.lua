@@ -182,7 +182,7 @@ if SERVER then
 
 	--- Sets the hologram's local angular velocity.
 	-- @server
-	-- @param Angle angvel *Vector* local angular velocity.
+	-- @param Angle angvel The local angular velocity.
 	function hologram_methods:setLocalAngularVelocity(angvel)
 		local holo = unwrap(self)
 		angvel = aunwrap1(angvel)

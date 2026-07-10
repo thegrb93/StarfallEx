@@ -12,6 +12,8 @@ return function(instance)
 
 local surfaceinfo_methods, surfaceinfo_meta, swrap, sunwrap = instance.Types.SurfaceInfo.Methods, instance.Types.SurfaceInfo, instance.Types.SurfaceInfo.Wrap, instance.Types.SurfaceInfo.Unwrap
 
+--- Returns a string representation of the SurfaceInfo.
+-- @return string
 function surfaceinfo_meta:__tostring()
 	return "SurfaceInfo"
 end
@@ -24,7 +26,7 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 if SERVER then
 	--- Returns the brush surface's material.
 	-- @shared
-	-- @return string|Material In SERVER, the material name, and in CLIENT, the Material object.
+	-- @return string|Material On the server, returns the material name; on the client, returns the Material object.
 	function surfaceinfo_methods:getMaterial()
 		return sunwrap(self):GetMaterial():GetName()
 	end

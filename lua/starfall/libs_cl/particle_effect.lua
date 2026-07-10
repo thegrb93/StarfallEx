@@ -169,21 +169,21 @@ end
 --- Sets a value for given control point.
 -- @param number id Control Point ID (0-63)
 -- @param Vector value Value
-function particleef_methods:setControlPoint(id,value)
+function particleef_methods:setControlPoint(id, value)
 	local uw = unwrap(self)
 
 	checkluatype (id, TYPE_NUMBER)
 
 	checkValid(uw)
 
-	uw:SetControlPoint(id,vunwrap1(value))
+	uw:SetControlPoint(id, vunwrap1(value))
 end
 
 
 --- Essentially makes child control point follow the parent entity.
 -- @param number id Child Control Point ID (0-63)
 -- @param Entity entity Entity parent
-function particleef_methods:setControlPointEntity(id,entity)
+function particleef_methods:setControlPointEntity(id, entity)
 	local uw = unwrap(self)
 	local entity = eunwrap(entity)
 
@@ -191,48 +191,48 @@ function particleef_methods:setControlPointEntity(id,entity)
 
 	checkValid(uw)
 
-	uw:SetControlPointEntity(id,entity)
+	uw:SetControlPointEntity(id, entity)
 end
 
 
 --- Sets the forward direction for given control point.
 -- @param number id Control Point ID (0-63)
--- @param Vector fwd Forward vector
-function particleef_methods:setForwardVector(id,value)
+-- @param Vector value Forward vector
+function particleef_methods:setForwardVector(id, value)
 	local uw = unwrap(self)
 
 	checkluatype (id, TYPE_NUMBER)
 
 	checkValid(uw)
 
-	uw:SetControlPointForwardVector(id,vunwrap1(value))
+	uw:SetControlPointForwardVector(id, vunwrap1(value))
 end
 
 --- Sets the right direction for given control point.
 -- @param number id Control Point ID (0-63)
--- @param Vector right Right vector
-function particleef_methods:setRightVector(id,value)
+-- @param Vector value Right vector
+function particleef_methods:setRightVector(id, value)
 	local uw = unwrap(self)
 
 	checkluatype (id, TYPE_NUMBER)
 
 	checkValid(uw)
 
-	uw:SetControlPointRightVector(id,vunwrap1(value))
+	uw:SetControlPointRightVector(id, vunwrap1(value))
 end
 
 
 --- Sets the up direction for given control point.
 -- @param number id Control Point ID (0-63)
--- @param Vector up Up vector
-function particleef_methods:setUpVector(id,value)
+-- @param Vector value Up vector
+function particleef_methods:setUpVector(id, value)
 	local uw = unwrap(self)
 
 	checkluatype (id, TYPE_NUMBER)
 
 	checkValid(uw)
 
-	uw:SetControlPointUpVector(id,vunwrap1(value))
+	uw:SetControlPointUpVector(id, vunwrap1(value))
 
 end
 
@@ -240,7 +240,7 @@ end
 --- Sets the parent for given control point.
 -- @param number id Child Control Point ID (0-63)
 -- @param number parentid Parent control point ID (0-63)
-function particleef_methods:setControlPointParent(id,parentid)
+function particleef_methods:setControlPointParent(id, parentid)
 	local uw = unwrap(self)
 
 	checkluatype (id, TYPE_NUMBER)
@@ -248,7 +248,7 @@ function particleef_methods:setControlPointParent(id,parentid)
 
 	checkValid(uw)
 
-	uw:SetControlPointParent(id,parentid)
+	uw:SetControlPointParent(id, parentid)
 
 end
 

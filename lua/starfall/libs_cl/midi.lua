@@ -57,6 +57,7 @@ function midi_library.openPort(port)
 end
 
 --- Checks if the specified midi port is currently opened.
+-- @param number port The port number
 -- @return boolean if the port is open
 function midi_library.isPortOpen(port)
 	checkluatype(port, TYPE_NUMBER)

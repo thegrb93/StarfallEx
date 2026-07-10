@@ -220,8 +220,8 @@ if SERVER then
 
 
 	--- Tries to find an exit point for leaving the vehicle
-	-- @param number yaw
-	-- @param number distance
+	-- @param number yaw Yaw/roll from vehicle angle to check for exit
+	-- @param number dist Distance from origin to drop player
 	-- @return Vector The exit position, or nil if unable to exit in that direction
 	-- @server
 	function vehicle_methods:checkExitPoint(yaw, dist)

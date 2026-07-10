@@ -1080,7 +1080,7 @@ if CLIENT then
 	end
 
 	--- Writes the vertex position to the vertex data
-	-- @param Vector position Position
+	-- @param Vector pos Position
 	-- @client
 	function mesh_library.writePosition(pos)
 		mesh.Position(vunwrap1(pos))
