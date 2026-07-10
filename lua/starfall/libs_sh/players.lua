@@ -518,8 +518,8 @@ end
 
 --- Returns the player's hull minimum and maximum vectors
 -- @shared
--- @return Vector mins The hull mins, the lowest corner of the Player's bounding box
--- @return Vector maxs The hull maxs, the highest corner of the Player's bounding box
+-- @return Vector The hull mins, the lowest corner of the Player's bounding box
+-- @return Vector The hull maxs, the highest corner of the Player's bounding box
 function player_methods:getHull()
 	local mins, maxs = Ply_GetHull(unwrap(self))
 	return vwrap(mins), vwrap(maxs)
@@ -527,8 +527,8 @@ end
 
 --- Returns the player's duck hull minimum and maximum vectors
 -- @shared
--- @return Vector mins The hull mins, the lowest corner of the Player's duck bounding box
--- @return Vector maxs The hull maxs, the highest corner of the Player's duck bounding box
+-- @return Vector The hull mins, the lowest corner of the Player's duck bounding box
+-- @return Vector The hull maxs, the highest corner of the Player's duck bounding box
 function player_methods:getHullDuck()
 	local mins, maxs = Ply_GetHullDuck(unwrap(self))
 	return vwrap(mins), vwrap(maxs)
