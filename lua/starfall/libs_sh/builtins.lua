@@ -550,10 +550,9 @@ if SERVER then
 	local function sendPrintToPlayer(ply, data, console)
 		net.Start("starfall_print")
 		net.WriteBool(console)
-		local amount = #data
-		net.WriteUInt(amount, 13)
-		for i = 1, amount do
-			net.WriteType(data[i])
+		net.WriteUInt(#data, 32)
+		for i, v in ipairs(data) do
+			net.WriteType(v)
 		end
 		net.Send(ply)
 	end

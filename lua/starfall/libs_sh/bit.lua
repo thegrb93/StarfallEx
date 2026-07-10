@@ -382,7 +382,7 @@ function ss_methods:readInt32()
 end
 
 --- Reads a 4 byte IEEE754 float from the byte stream and advances the buffer pointer.
--- @return number Float at this position
+-- @return number Float32 at this position
 function ss_methods:readFloat()
 	return UnpackIEEE754Float(string.byte(self:read(4), 1, 4))
 end
@@ -459,8 +459,6 @@ function ss_methods:writeInt16(x)
 	if x < 0 then x = x + 0x10000 end
 	self:write(string.char(x%0x100, bit_rshift(x, 8)%0x100))
 end
---- Writes a short to the buffer and advances the buffer pointer.
--- @param number x Int16 to write
 function ss_methods_big:writeInt16(x)
 	if x==math_huge or x==-math_huge or x~=x then error("Can't convert error float to integer!", 2) end
 	if x < 0 then x = x + 0x10000 end
@@ -480,8 +478,6 @@ function ss_methods:writeInt32(x)
 	if x < 0 then x = x + 0x100000000 end
 	self:write(string.char(x%0x100, bit_rshift(x, 8)%0x100, bit_rshift(x, 16)%0x100, bit_rshift(x, 24)%0x100))
 end
---- Writes an int to the buffer and advances the buffer pointer.
--- @param number x Int32 to write
 function ss_methods_big:writeInt32(x)
 	if x==math_huge or x==-math_huge or x~=x then error("Can't convert error float to integer!", 2) end
 	if x < 0 then x = x + 0x100000000 end
@@ -499,8 +495,6 @@ ss_methods.writeUInt32 = ss_methods.writeInt32
 function ss_methods:writeFloat(x)
 	self:write(string.char(PackIEEE754Float(x)))
 end
---- Writes a 4 byte IEEE754 float to the byte stream and advances the buffer pointer.
--- @param number x The float to write
 function ss_methods_big:writeFloat(x)
 	local a,b,c,d = PackIEEE754Float(x)
 	self:write(string.char(d,c,b,a))
@@ -511,8 +505,6 @@ end
 function ss_methods:writeDouble(x)
 	self:write(string.char(PackIEEE754Double(x)))
 end
---- Writes a 8 byte IEEE754 double to the byte stream and advances the buffer pointer.
--- @param number x The double to write
 function ss_methods_big:writeDouble(x)
 	local a,b,c,d,e,f,g,h = PackIEEE754Double(x)
 	self:write(string.char(h,g,f,e,d,c,b,a))

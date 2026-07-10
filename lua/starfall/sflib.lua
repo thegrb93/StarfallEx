@@ -2087,7 +2087,7 @@ if SERVER then
 	function SF.Print(ply, msg)
 		net.Start("starfall_print")
 			net.WriteBool(true)
-			net.WriteUInt(1, 13)
+			net.WriteUInt(1, 32)
 			net.WriteType(msg)
 		if ply then net.Send(ply) else net.Broadcast() end
 	end
@@ -2134,7 +2134,7 @@ else
 	net.Receive("starfall_print", function ()
 		local console = net.ReadBool()
 		local recv = {}
-		for i = 1, net.ReadUInt(13) do
+		for i = 1, net.ReadUInt(32) do
 			recv[i] = net.ReadType()
 		end
 		if console then
