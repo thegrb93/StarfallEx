@@ -1075,7 +1075,6 @@ registerSent("starfall_processor", {
 	}
 })
 
---- Prints documentation for all registered custom SENTs.
 function SF.PrintCustomSENTDocs()
 	local tostr = {
 		string = function(x) return "\"" .. x .. "\"" end,

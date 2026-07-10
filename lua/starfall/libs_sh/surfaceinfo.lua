@@ -26,16 +26,13 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 if SERVER then
 	--- Returns the brush surface's material.
 	-- @shared
-	-- @return string|Material In SERVER, the material name, and in CLIENT, the Material object.
+	-- @return string|Material On the server, returns the material name; on the client, returns the Material object.
 	function surfaceinfo_methods:getMaterial()
 		return sunwrap(self):GetMaterial():GetName()
 	end
 else
 	local lwrap, lunwrap = instance.Types.LockedMaterial.Wrap, instance.Types.LockedMaterial.Unwrap
 
-	--- Returns the material of the surface.
-	-- @client
-	-- @return Material The surface material
 	function surfaceinfo_methods:getMaterial()
 		return lwrap(sunwrap(self):GetMaterial())
 	end

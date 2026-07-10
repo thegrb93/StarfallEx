@@ -550,16 +550,17 @@ if SERVER then
 	local function sendPrintToPlayer(ply, data, console)
 		net.Start("starfall_print")
 		net.WriteBool(console)
-		net.WriteUInt(#data, 32)
-		for i, v in ipairs(data) do
-			net.WriteType(v)
+		local amount = #data
+		net.WriteUInt(amount, 13)
+		for i = 1, amount do
+			net.WriteType(data[i])
 		end
 		net.Send(ply)
 	end
 
 	SF.sendPrintToPlayer = sendPrintToPlayer
 
-	--- Prints a message to your chat (only visible to owner)
+	--- Prints a message to the chat (only visible to owner, but visible to everyone if superuser)
 	-- @shared
 	-- @param ... printArgs Values to print. Colors before text will set the text color
 	function builtins_library.print(...)
@@ -572,7 +573,7 @@ if SERVER then
 		sendPrintToPlayer(instance.player, data, false)
 	end
 
-	--- Prints a message to the console (only visible to owner)
+	--- Prints a message to the console (only visible to owner, but visible to everyone if superuser)
 	-- @shared
 	-- @param ... printArgs Values to print. Colors before text will set the text color
 	function builtins_library.printConsole(...)
@@ -601,7 +602,7 @@ if SERVER then
 		sendPrintToPlayer(ply, data, false)
 	end
 
-	--- Prints a table to the chat/console (only visible to owner)
+	--- Prints a table to the chat/console (only visible to owner, but visible to everyone if superuser)
 	-- @shared
 	-- @param table tbl Table to print
 	function builtins_library.printTable(tbl)
@@ -701,7 +702,7 @@ else
 		SetClipboardText(txt)
 	end
 
-	--- Prints a message to your chat, console, or the center of your screen
+	--- Prints a message to your chat, console, or the center of your screen (only visible to owner, but visible to everyone if superuser)
 	-- @client
 	-- @param number mtype How the message should be displayed. See http://wiki.facepunch.com/gmod/Enums/HUD
 	-- @param string text The message text.
@@ -714,9 +715,6 @@ else
 		end
 	end
 
-	--- Prints a message to your chat (only visible to owner)
-	-- @shared
-	-- @param ... printArgs Values to print. Colors before text will set the text color
 	function builtins_library.print(...)
 		if instance.player == LocalPlayer() then
 			chat.AddText(unpack((argsToChat(...))))
@@ -725,9 +723,6 @@ else
 		end
 	end
 
-	--- Prints a message to the console (only visible to owner)
-	-- @shared
-	-- @param ... printArgs Values to print. Colors before text will set the text color
 	function builtins_library.printConsole(...)
 		if instance.player == LocalPlayer() then
 			local data = argsToChat(...)
@@ -736,10 +731,6 @@ else
 		end
 	end
 
-	--- Prints a message to a target player's chat as long as they're connected to a HUD
-	-- @shared
-	-- @param Player ply The target player. If in CLIENT, then ply is the client player and this param is omitted
-	-- @param ... printArgs Values to print. Colors before text will set the text color
 	function builtins_library.printHud(...)
 		if not SF.IsHUDActive(instance.entity) then SF.Throw("Player isn't connected to a HUD!", 2) end
 		local data, strlen, size = argsToChat(builtins_library.Color(5,125,222), "[SF] ", builtins_library.Color(255,255,255), ...)
@@ -752,9 +743,6 @@ else
 		chat.AddText(unpack(data))
 	end
 
-	--- Prints a table to the chat/console (only visible to owner)
-	-- @shared
-	-- @param table tbl Table to print
 	function builtins_library.printTable(tbl)
 		checkluatype(tbl, TYPE_TABLE)
 		if instance.player == LocalPlayer() or instance.player == SF.Superuser then
@@ -762,9 +750,6 @@ else
 		end
 	end
 
-	--- Execute a console command
-	-- @shared
-	-- @param string cmd Command to execute
 	function builtins_library.concmd(cmd)
 		checkluatype(cmd, TYPE_STRING)
 		if instance.player ~= LocalPlayer() then SF.Throw("Can't run concmd on other players!", 2) end

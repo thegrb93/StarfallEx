@@ -331,8 +331,6 @@ end
 function ss_methods:readUInt8()
 	return string.byte(self:read(1))
 end
---- Reads an unsigned 8-bit (one byte) integer from the byte stream and advances the buffer pointer.
--- @return number UInt8 at this position
 function ss_methods_big:readUInt8()
 	return string.byte(self:read(1))
 end
@@ -343,8 +341,6 @@ function ss_methods:readUInt16()
 	local a,b = string.byte(self:read(2), 1, 2)
 	return b * 0x100 + a
 end
---- Reads an unsigned 16 bit (two byte) integer from the byte stream and advances the buffer pointer.
--- @return number UInt16 at this position
 function ss_methods_big:readUInt16()
 	local a,b = string.byte(self:read(2), 1, 2)
 	return a * 0x100 + b
@@ -356,8 +352,6 @@ function ss_methods:readUInt32()
 	local a,b,c,d = string.byte(self:read(4), 1, 4)
 	return d * 0x1000000 + c * 0x10000 + b * 0x100 + a
 end
---- Reads an unsigned 32 bit (four byte) integer from the byte stream and advances the buffer pointer.
--- @return number UInt32 at this position
 function ss_methods_big:readUInt32()
 	local a,b,c,d = string.byte(self:read(4), 1, 4)
 	return a * 0x1000000 + b * 0x10000 + c * 0x100 + d
@@ -388,12 +382,10 @@ function ss_methods:readInt32()
 end
 
 --- Reads a 4 byte IEEE754 float from the byte stream and advances the buffer pointer.
--- @return number Float32 at this position
+-- @return number Float at this position
 function ss_methods:readFloat()
 	return UnpackIEEE754Float(string.byte(self:read(4), 1, 4))
 end
---- Reads a 4 byte IEEE754 float from the byte stream and advances the buffer pointer.
--- @return number Float32 at this position
 function ss_methods_big:readFloat()
 	local a,b,c,d = string.byte(self:read(4), 1, 4)
 	return UnpackIEEE754Float(d, c, b, a)
@@ -404,8 +396,6 @@ end
 function ss_methods:readDouble()
 	return UnpackIEEE754Double(string.byte(self:read(8), 1, 8))
 end
---- Reads a 8 byte IEEE754 double from the byte stream and advances the buffer pointer.
--- @return number Double at this position
 function ss_methods_big:readDouble()
 	local a,b,c,d,e,f,g,h = string.byte(self:read(8), 1, 8)
 	return UnpackIEEE754Double(h, g, f, e, d, c, b, a)

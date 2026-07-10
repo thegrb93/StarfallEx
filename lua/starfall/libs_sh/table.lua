@@ -215,7 +215,7 @@ table_library.toString = table.ToString
 --- Creates a deep copy and returns that copy. This function does NOT copy userdata, such as Vectors and Angles!
 -- @class function
 -- @param table tbl The table to be copied
--- @param table lookup_table An optional lookup table for cyclic reference detection
+-- @param table? lookup_table An optional lookup table for cyclic reference detection
 -- @return table A deep copy of the original table
 function table_library.copy( tbl, lookup_table )
 	if ( tbl == nil ) then return nil end
