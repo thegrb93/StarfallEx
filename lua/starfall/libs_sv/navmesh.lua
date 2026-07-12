@@ -25,6 +25,7 @@ SF.RegisterLibrary("navmesh")
 -- @class type
 -- @libtbl navarea_methods
 -- @libtbl navarea_meta
+-- @libtbl lnavarea_meta
 SF.RegisterType("NavArea", true, false, nil, "LockedNavArea")
 SF.RegisterType("LockedNavArea", true, false) -- NavArea that can't be modified.
 
