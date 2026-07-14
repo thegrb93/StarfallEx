@@ -8,12 +8,12 @@ local Ent_IsValid = ENT_META.IsValid
 
 --Can only return if you are the first argument
 local function returnOnlyOnYourself(instance, args, ply)
-	if args[1] and instance.player == ply then return args[2] end
+	if args[1] and (instance.player == ply or instance.player == SF.Superuser) then return args[2] end
 end
 
 --Can only return false on yourself
 local function returnOnlyOnYourselfFalse(instance, args, ply)
-	if args[1] and instance.player == ply and args[2]==false then return false end
+	if args[1] and args[2]==false and (instance.player == ply or instance.player == SF.Superuser) then return false end
 end
 
 local add = SF.hookAdd
@@ -307,7 +307,7 @@ else
 	-- @param boolean isdead Whether the message was send from a dead player
 	-- @return boolean Return true to hide the message. Can only be done for the owner of the chip
 	add("OnPlayerChat", "playerchat", nil, function(instance, ret)
-		if ret[1] and instance.player == LocalPlayer() and ret[2] then return true end
+		if ret[1] and ret[2] and (instance.player == LocalPlayer() or instance.player == SF.Superuser) then return true end
 	end)
 
 	--- Called when the player's chat box text changes.
@@ -779,15 +779,18 @@ function hook_library.runRemote(recipient, ...)
 		recipients = SF.allInstances
 	end
 
+	local owner = instance.player
+	if owner == SF.Superuser then owner = game.GetWorld() end
+
 	local argn = select("#", ...)
 	local unsanitized = instance.Unsanitize({...})
 	local results = {}
 	for k, _ in pairs(recipients) do
 		local result
 		if k==instance then
-			result = { true, hookrun("remote", ewrap(instance.entity), pwrap(instance.player), ...) }
+			result = { true, hookrun("remote", ewrap(instance.entity), pwrap(owner), ...) }
 		else
-			result = k:runScriptHookForResult("remote", k.Types.Entity.Wrap(instance.entity), k.Types.Player.Wrap(instance.player), unpack(k.Sanitize(unsanitized), 1, argn))
+			result = k:runScriptHookForResult("remote", k.Types.Entity.Wrap(instance.entity), k.Types.Player.Wrap(owner), unpack(k.Sanitize(unsanitized), 1, argn))
 		end
 
 		if result[1] and result[2]~=nil then
