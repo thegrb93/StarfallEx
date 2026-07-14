@@ -780,7 +780,7 @@ function hook_library.runRemote(recipient, ...)
 	end
 
 	local owner = instance.player
-	if owner == SF.Superuser then owner = NULL end
+	if owner == SF.Superuser then owner = game.GetWorld() end
 
 	local argn = select("#", ...)
 	local unsanitized = instance.Unsanitize({...})

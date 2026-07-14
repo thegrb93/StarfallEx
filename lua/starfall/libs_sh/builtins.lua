@@ -60,11 +60,16 @@ function builtins_library.chip()
 	return ewrap(instance.entity)
 end
 
+--- Returns true if the chip is running as a superuser
+-- @return boolean Whether the chip owner is superuser
+function builtins_library.superuser()
+	return instance.player==SF.Superuser
+end
+
 --- Returns whoever created the chip
 -- @return Player Owner of the chip
 function builtins_library.owner()
-	if instance.player==SF.Superuser then SF.Throw("Superuser chips don't have an owner", 2) end
-	return instance.Types.Player.Wrap(instance.player)
+	return instance.Types.Player.Wrap(instance.player==SF.Superuser and game.GetWorld() or instance.player)
 end
 
 --- Same as owner() on the server. On the client, returns the local player
