@@ -155,9 +155,9 @@ function nextbot_library.canSpawnRagdoll()
 	return SF.NextBotRagdolls:check(instance.player) > 0
 end
 
---- Checks how many ragdolls the nextbots can spawn
+--- Returns how many nextbot ragdolls you can spawn
 -- @server
--- @return number Number how many ragdoll can be spawned
+-- @return number Amount of nextbot ragdolls that can be spawned
 function nextbot_library.ragdollsLeft()
 	if not SF.Permissions.hasAccess(instance,  nil, "nextbot.ragdollOnDeath") then return 0 end
 	return SF.NextBotRagdolls:check(instance.player)
