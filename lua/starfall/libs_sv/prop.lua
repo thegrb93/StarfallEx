@@ -676,7 +676,7 @@ function props_library.propsLeft()
 	return math.min(entList:check(instance.player), plyPropBurst:check(instance.player))
 end
 
---- Returns how many props per second the user can spawn
+--- Returns how many props you can spawn per second
 -- @server
 -- @return number Number of props per second the user can spawn
 function props_library.spawnRate()

@@ -425,9 +425,9 @@ end
 if SERVER then
 	local props_library = instance.Libraries.prop
 	if props_library then
-		--- Checks if a user can manipulate any more bones.
+		--- Checks if you can manipulate any more bones
 		-- @server
-		-- @return boolean True if user can manipulate bones, False if not.
+		-- @return boolean Returns true if you can manipulate bones, false if not
 		function props_library.canManipulateBones()
 			return manipulateBoneBurst:check(instance.player) >= 1
 		end
@@ -439,9 +439,9 @@ if SERVER then
 			return manipulateBoneBurst:check(instance.player)
 		end
 
-		--- Returns how many bone manipulations per second the user can do
+		--- Returns how many bone manipulations you can do per second
 		-- @server
-		-- @return number Number of props per second the user can spawn
+		-- @return number Number of bone manipulations per second the user can perform
 		function props_library.manipulateBonesRate()
 			return manipulateBoneBurst.rate
 		end
