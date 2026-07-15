@@ -574,7 +574,7 @@ end
 --- Loads an online image or base64 data to the specified texture key
 -- If the texture in key is not set to a rendertarget, a rendertarget will be created and used.
 -- @param string key The key name to set. $basetexture is the key name for most purposes.
--- @param string url The url or base64 data
+-- @param string url The URL or base64 data
 -- @param function? cb An optional callback called when image is loaded. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h, pixelated to reposition the image in the texture. Setting the optional 'pixelated' argument to True tells the image to use nearest-neighbor interpolation
 -- @param function? done An optional callback called when the image is done loading. Passes the material, url
 function material_methods:setTextureURL(key, url, cb, done)
@@ -623,7 +623,7 @@ function material_methods:setTextureURL(key, url, cb, done)
 			instance:runFunction(done, self, url)
 		end
 	end
-	
+
 	SF.G_HttpTextureLoader:request(SF.HttpTextureRequest(url, instance, texture, callback, donecallback))
 end
 

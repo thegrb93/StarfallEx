@@ -150,8 +150,8 @@ function hologram_library.create(pos, ang, model, scale)
 	return wrap(holoent)
 end
 
---- Checks if a user can spawn any more holograms.
--- @return boolean True if user can spawn holograms, False if not.
+--- Checks if you can spawn any more holograms
+-- @return boolean Returns true if you can spawn holograms, false if not
 function hologram_library.canSpawn()
 	if not SF.Permissions.hasAccess(instance,  nil, "hologram.create") then return false end
 	return entList:check(instance.player) > 0

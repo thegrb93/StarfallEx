@@ -54,13 +54,13 @@ function http_library.getActiveRequests()
 end
 
 --- Gets how many get/post operations can be in progress at the same time
--- @return number Maximum amount of concurrent active HTTP get/post requests 
+-- @return number Maximum amount of concurrent active HTTP get/post requests
 function http_library.getMaximumRequests()
 	return requests.max
 end
 
 --- Runs a new http GET request
--- @param string url Http target url
+-- @param string url HTTP resource URL
 -- @param function callbackSuccess The function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)
 -- @param function? callbackFail The function to be called on request fail, taking the failing reason as an argument
 -- @param table? headers GET headers to be sent
@@ -89,7 +89,7 @@ function http_library.get(url, callbackSuccess, callbackFail, headers)
 end
 
 --- Runs a new http POST request
--- @param string url Http target url
+-- @param string url HTTP resource URL
 -- @param table? payload Optional POST payload to be sent, can be both table and string. When table is used, the request body is encoded as application/x-www-form-urlencoded
 -- @param function? callbackSuccess Optional function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)
 -- @param function? callbackFail Optional function to be called on request fail, taking the failing reason as an argument
@@ -169,7 +169,7 @@ local VALID_METHODS = {
 }
 
 --- Runs a new http request. Wraps HTTP() directly. Official documentation for each parameter can be found here: https://wiki.facepunch.com/gmod/Structures/HTTPRequest
--- @param string url The target url
+-- @param string url HTTP resource URL
 -- @param string method Request method, case insensitive. Possible values are: GET, POST, HEAD, PUT, DELETE, PATCH, OPTIONS
 -- @param function? success Function to be called on success, taking arguments code (number), body (string), and headers (table)
 -- @param function? failed Function to be called on failure, taking argument reason (string)
@@ -276,7 +276,7 @@ end
 -- @return string The converted data
 http_library.base64Decode = util.Base64Decode
 
---- Encodes illegal url characters to be legal
+--- Encodes illegal URL characters to be legal
 -- @param string data The data to convert
 -- @return string The converted data
 function http_library.urlEncode(data)
@@ -288,7 +288,7 @@ function http_library.urlEncode(data)
 	return data
 end
 
---- Decodes the % escaped chars in a url
+--- Decodes the % escaped chars in a URL
 -- @param string data The data to convert
 -- @return string The converted data
 function http_library.urlDecode(data)
@@ -302,9 +302,9 @@ function http_library.urlDecode(data)
 	return data
 end
 
---- Converts a simple google drive url to a raw one
--- @param string url The url to convert
--- @return string The converted url
+--- Converts a simple google drive URL to a raw one
+-- @param string url The URL to convert
+-- @return string The converted URL
 function http_library.urlGoogleDriveToRaw(url)
 	checkluatype(url, TYPE_STRING)
 	if #url > 64e3 then SF.Throw("String exceeds length limit!", 2) end
@@ -312,9 +312,9 @@ function http_library.urlGoogleDriveToRaw(url)
 	return "https://drive.google.com/uc?export=download&id="..id
 end
 
---- Converts a regular dropbox url to a raw one
--- @param string url The url to convert
--- @return string The converted url
+--- Converts a regular Dropbox URL to a raw one
+-- @param string url The URL to convert
+-- @return string The converted URL
 function http_library.urlDropboxToRaw(url)
 	checkluatype(url, TYPE_STRING)
 	if #url > 64e3 then SF.Throw("String exceeds length limit!", 2) end
@@ -322,19 +322,19 @@ function http_library.urlDropboxToRaw(url)
 	return rawUrl
 end
 
---- Converts a github file url to a raw one
--- @param string url The url to convert
--- @return string The converted url
+--- Converts a GitHub file URL to a raw one
+-- @param string url The URL to convert
+-- @return string The converted URL
 function http_library.urlGithubToRaw(url)
 	checkluatype(url, TYPE_STRING)
 	if #url > 64e3 then SF.Throw("String exceeds length limit!", 2) end
-	
+
 	-- https://github.com/username/repo_name/tree/path_to_folder/anyfolder
 	-- https://github.com/username/repo_name/blob/path_to_file/hi.txt
 	local rawUrl, _ = string.gsub(url, "https://github%.com/", "https://raw.githubusercontent.com/")
 	rawUrl = string.gsub(rawUrl, "/blob/", "/", 1) -- files
 	rawUrl = string.gsub(rawUrl, "/tree/", "/", 1) -- folders
-	
+
 	return rawUrl
 end
 

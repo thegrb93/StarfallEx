@@ -4,7 +4,7 @@
 
 -- Shows basic usage of a websocket with an echo server.
 
--- First param is the base url
+-- First param is the base URL
 -- Second is the port (optional),
 -- Third is whether to use secure connection (wss) (optional). Some servers require this.
 local ws = WebSocket("ws.ifelse.io", 443, true)

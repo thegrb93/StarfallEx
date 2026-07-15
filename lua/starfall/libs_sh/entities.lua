@@ -1256,9 +1256,9 @@ function ents_methods:lookupBone(name)
 	return Ent_LookupBone(eunwrap(self), name)
 end
 
---- Returns the matrix of the entity's bone. Note: this method is slow/doesn't work well if the entity isn't animated.
+--- Returns the matrix of the entity's bone. Note: this method is slow, and doesn't work well if the entity isn't animated.
 -- @shared
--- @param number? bone Bone index. (def 0)
+-- @param number? bone Bone index. Default is 0.
 -- @return VMatrix The matrix
 function ents_methods:getBoneMatrix(bone)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
@@ -1791,7 +1791,7 @@ end
 -- @return number The maximum value for this flex
 function ents_methods:getFlexBounds(flexid)
 	local ent = eunwrap(self)
-	
+
 	checkluatype(flexid, TYPE_NUMBER)
 	flexid = math.floor(flexid)
 
@@ -1810,7 +1810,7 @@ function ents_methods:setEyeTarget(pos)
 	local vec = vunwrap(pos)
 	checkvector(vec)
 	checkpermission(instance, ent, SERVER and "entities.canTool" or "entities.setRenderProperty")
-	
+
 	Ent_SetEyeTarget(ent, vec)
 end
 
