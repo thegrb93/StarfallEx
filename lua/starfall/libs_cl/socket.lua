@@ -242,7 +242,7 @@ socket_proxy.connect = create_proxy_function(socket.connect)
 -- Optionally, the user can also specify the local address and port to bind (locaddr and locport)
 -- @name socket_library.connect4
 -- @class function
--- @param number addr|string Address to connect to
+-- @param number|string addr Address to connect to
 -- @param number port Port to connect to
 -- @param number? laddr Local address to bind to
 -- @param number? lport Local port to bind to
