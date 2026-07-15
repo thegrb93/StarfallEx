@@ -1,10 +1,15 @@
+# Set the default behavior to automatically normalize line endings
 * text=auto
 
-# Source files
+# Source files (explicitly always use LF on check-in)
 # ============
-*.lua       text
+*.lua text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.yml text eol=lf
 
 # Luadoc output
 # =============
-*.html      text
+*.html text
 *.css text
