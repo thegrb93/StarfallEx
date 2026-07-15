@@ -302,13 +302,13 @@ function http_library.urlDecode(data)
 	return data
 end
 
---- Converts a simple google drive URL to a raw one
+--- Converts a simple Google Drive URL to a raw one
 -- @param string url The URL to convert
 -- @return string The converted URL
 function http_library.urlGoogleDriveToRaw(url)
 	checkluatype(url, TYPE_STRING)
 	if #url > 64e3 then SF.Throw("String exceeds length limit!", 2) end
-	local id = string.match(url, "https://drive%.google%.com/file/d/([^/]+)/view") or SF.Throw("Failed to parse google drive link!", 2)
+	local id = string.match(url, "https://drive%.google%.com/file/d/([^/]+)/view") or SF.Throw("Failed to parse Google Drive link!", 2)
 	return "https://drive.google.com/uc?export=download&id="..id
 end
 
