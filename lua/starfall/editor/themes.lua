@@ -11,7 +11,7 @@ SF.Editor.Themes.CurrentTheme = nil -- Theme table
 SF.Editor.Themes.ThemeConVar = CreateClientConVar("sf_editor_theme", "default", true, false)
 SF.Editor.Themes.DebugOutput = false
 
-local themeformat_version = 1 --Change that if previous themes arent compatibile anymore
+local themeformat_version = 1 --Change that if previous themes aren't compatible anymore
 SF.Editor.Themes.Version = themeformat_version
 
 local function debugPrint(...)
@@ -33,7 +33,7 @@ function SF.Editor.Themes.Load()
 	local result = util.JSONToTable(contents)
 
 	if not result then
-		print("A problem occured during parsing sf_themes.txt, the file will be renamed to sf_themes_old.txt")
+		print("A problem occurred during parsing sf_themes.txt, the file will be renamed to sf_themes_old.txt")
 		file.Write("sf_themes_old.txt", contents)
 		file.Delete("sf_themes.txt")
 
@@ -42,7 +42,7 @@ function SF.Editor.Themes.Load()
 		return
 	end
 
-	result.default = SF.Editor.Themes.Themes.default -- Default theme wont be loaded
+	result.default = SF.Editor.Themes.Themes.default -- Default theme won't be loaded
 	SF.Editor.Themes.Themes = result
 
 	-- Switch the theme, if invalid - switch to default
@@ -93,7 +93,7 @@ function SF.Editor.Themes.SwitchTheme(name)
 	end
 	if theme.Version ~= themeformat_version then
 		SF.Editor.Themes.SwitchTheme("default")
-		print("Theme "..name.." isnt compatibile with this starfall version, you have to reimport it!")
+		print("Theme "..name.." isn't compatible with this starfall version, you have to reimport it!")
 		return
 	end
 	for k, v in pairs(SF.Editor.Themes.Themes.default) do

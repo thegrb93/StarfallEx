@@ -349,7 +349,7 @@ if SERVER then
 		Phys_SetAngleVelocity(phys, angvel)
 	end
 
-	--- Applies a angular velocity to an object
+	--- Applies an angular velocity to an object
 	-- @server
 	-- @param Vector angvel The local angvel vector to apply
 	function physobj_methods:addAngleVelocity(angvel)

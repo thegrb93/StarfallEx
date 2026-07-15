@@ -232,7 +232,7 @@ builtins_library.CLIENT = CLIENT
 -- @class field
 builtins_library.SERVER = SERVER
 
---- Constant that denotes wether the code is executed on the owner's client
+--- Constant that denotes whether the code is executed on the owner's client
 -- @name builtins_library.OWNER
 -- @class field
 builtins_library.OWNER = CLIENT and instance.player == LocalPlayer()
@@ -548,7 +548,7 @@ end
 
 instance.argsToChat = argsToChat
 
--- here for compatiblity with older SF library addons - See note above
+-- here for compatibility with older SF library addons - See note above
 SF.argsToChat = argsToChat
 
 if SERVER then

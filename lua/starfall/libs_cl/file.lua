@@ -378,7 +378,7 @@ end
 function file_library.deleteTemp(filename)
 	checkpermission (instance, nil, "file.writeTemp")
 	checkluatype (filename, TYPE_STRING)
-	
+
 	if #filename > 128 then SF.Throw("Filename is too long!", 2) end
 	checkExtension(filename)
 	filename = string.lower(string.GetFileFromFilename(filename))
@@ -505,25 +505,25 @@ function file_methods:read(n)
 end
 
 --- Reads a boolean and advances the file position
--- @return boolean Boolean
+-- @return boolean Boolean (8-bit)
 function file_methods:readBool()
 	return unwrap(self):ReadBool()
 end
 
---- Reads a byte and advances the file position
+--- Reads an unsigned byte and advances the file position
 -- @return number UInt8 number
 function file_methods:readByte()
 	return unwrap(self):ReadByte()
 end
 
 --- Reads a double and advances the file position
--- @return number Float64 number
+-- @return number Double number (64-bit)
 function file_methods:readDouble()
 	return unwrap(self):ReadDouble()
 end
 
 --- Reads a float and advances the file position
--- @return number Float32 number
+-- @return number Float number (32-bit)
 function file_methods:readFloat()
 	return unwrap(self):ReadFloat()
 end
@@ -534,19 +534,19 @@ function file_methods:readLine()
 	return unwrap(self):ReadLine()
 end
 
---- Reads a long and advances the file position
+--- Reads a signed integer and advances the file position
 -- @return number Int32 number
 function file_methods:readLong()
 	return unwrap(self):ReadLong()
 end
 
---- Reads an unsigned long and advances the file position
+--- Reads an unsigned integer and advances the file position
 -- @return number UInt32 number
 function file_methods:readULong()
 	return unwrap(self):ReadULong()
 end
 
---- Reads a short and advances the file position
+--- Reads a signed short and advances the file position
 -- @return number Int16 number
 function file_methods:readShort()
 	return unwrap(self):ReadShort()
@@ -573,56 +573,56 @@ function file_methods:write(str)
 end
 
 --- Writes a boolean and advances the file position
--- @param boolean x The boolean to write
+-- @param boolean x The boolean to write (8-bit)
 function file_methods:writeBool(x)
 	checkluatype (x, TYPE_BOOL)
 	unwrap(self):WriteBool(x)
 end
 
---- Writes a byte and advances the file position
--- @param number x The byte to write
+--- Writes an unsigned byte and advances the file position
+-- @param number x The byte to write (8-bit)
 function file_methods:writeByte(x)
 	checkluatype (x, TYPE_NUMBER)
 	unwrap(self):WriteByte(x)
 end
 
 --- Writes a double and advances the file position
--- @param number x The double to write
+-- @param number x The double to write (64-bit)
 function file_methods:writeDouble(x)
 	checkluatype (x, TYPE_NUMBER)
 	unwrap(self):WriteDouble(x)
 end
 
 --- Writes a float and advances the file position
--- @param number x The float to write
+-- @param number x The float to write (32-bit)
 function file_methods:writeFloat(x)
 	checkluatype (x, TYPE_NUMBER)
 	unwrap(self):WriteFloat(x)
 end
 
---- Writes a long and advances the file position
--- @param number x The long to write
+--- Writes a signed integer and advances the file position
+-- @param number x The signed integer to write (32-bit)
 function file_methods:writeLong(x)
 	checkluatype (x, TYPE_NUMBER)
 	unwrap(self):WriteLong(x)
 end
 
---- Writes an unsigned long and advances the file position
--- @param number x The unsigned long to write
+--- Writes an unsigned integer and advances the file position
+-- @param number x The unsigned integer to write (32-bit)
 function file_methods:writeULong(x)
 	checkluatype (x, TYPE_NUMBER)
 	unwrap(self):WriteULong(x)
 end
 
---- Writes a short and advances the file position
--- @param number x The short to write
+--- Writes a signed short and advances the file position
+-- @param number x The signed short to write (16-bit)
 function file_methods:writeShort(x)
 	checkluatype (x, TYPE_NUMBER)
 	unwrap(self):WriteShort(x)
 end
 
 --- Writes an unsigned short and advances the file position
--- @param number x The unsigned short to write
+-- @param number x The unsigned short to write (16-bit)
 function file_methods:writeUShort(x)
 	checkluatype (x, TYPE_NUMBER)
 	unwrap(self):WriteUShort(x)
@@ -637,7 +637,7 @@ function file_methods:writeUInt64(x)
 end
 
 --- Returns whether the File object has reached the end of file or not.
--- @return boolean Whether the file has reached end or not.
+-- @return boolean Whether the file position has reached the EOF or not.
 function file_methods:endOfFile()
 	return unwrap(self):EndOfFile()
 end

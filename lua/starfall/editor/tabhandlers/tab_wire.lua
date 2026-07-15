@@ -230,7 +230,7 @@ function TabHandler:RegisterSettings()
 	if system.IsLinux() then
 		local label = vgui.Create("DLabel")
 		label:SetWrap(true)
-		label:SetText("Warning: You are running linux, you should make sure font is installed in your system or you wont be able to see it!")
+		label:SetText("Warning: You are running linux, you should make sure font is installed in your system or you won't be able to see it!")
 		label:SetPos(10, 0)
 		form:AddItem(label)
 	end
@@ -1048,7 +1048,7 @@ function PANEL:PaintLine(row, drawpos, leftOffset, drawonlytext)
 		end
 		nonwhitespace = true
 		if offset > self.Size[2] then return end
-		if offset < 0 then -- When there is part of line horizontally begining before our scrolled area
+		if offset < 0 then -- When there is part of line horizontally beginning before our scrolled area
 			local length = cell[1]:len()
 			if length > -offset then
 				local line = cell[1]:sub(1-offset)
@@ -2050,7 +2050,7 @@ function PANEL:CreateFindWindow()
 	-- Replace all button
 	local ReplaceAll = vgui.Create("DButton", replacetab)
 	ReplaceAll:SetText("Replace All")
-	ReplaceAll:SetToolTip("Replace all occurences of the match in the entire file, and close the Find window.")
+	ReplaceAll:SetToolTip("Replace all occurrences of the match in the entire file, and close the Find window.")
 	ReplaceAll:SetPos(233, 54)
 	ReplaceAll:SetSize(70, 20)
 	ReplaceAll.DoClick = function(pnl)

@@ -4,7 +4,7 @@ local checkluatype = SF.CheckLuaType
 
 --- Midi Library
 -- Polls midi event information from midi devices.
--- Requires a custom binary -> https://github.com/FPtje/gmcl_midi/releases/tag/v0.2.0
+-- Requires a custom binary -> https://github.com/FPtje/gmcl_midi/releases/latest
 -- GNU/Linux and MacOS users will have to compile their own binaries.
 -- Instructions here -> https://github.com/FPtje/gmcl_midi/blob/master/Compiling.md
 -- @name midi
@@ -24,14 +24,14 @@ instance:AddHook("deinitialize", function()
 	midi_library.closeAllPorts()
 end)
 
---- Event hook for midi devices.  
+--- Event hook for midi devices.
 -- Everytime a midi device outputs a signal, the callback function on the hook is called.
 -- Read up on the MIDI protocol to make better sense of everything -> https://ccrma.stanford.edu/~craig/articles/linuxmidi/misc/essenmidi.html
 -- @name MIDI
 -- @class hook
 -- @client
 -- @libtbl midi_library
--- @param number time the exact systime which the event occured
+-- @param number time the exact systime at which the event occurred
 -- @param number command the command code of the event.  First 4 bits are the command code and last 4 are the channel
 -- @param number param1 Each command has their own set of parameters, see above
 -- @param number param2 Each command has their own set of parameters, see above
@@ -45,12 +45,12 @@ end)
 -- 0xE0 PITCH_BEND            : param1 = lsb(least signifigant bit);  param2 = msb(most signifigant bit)
 SF.hookAdd("MIDI", "midi")
 
---- Opens the midi port to make it available to grab events from.  This must be called before the hook.
+--- Opens the midi port to make it available to grab events from. This must be called before the hook.
 -- @param number port the midi port to open. Passing nothing defaults to 0.
 -- @return string the name of the midi device opened at the given port.
 function midi_library.openPort(port)
 	checkluatype(port, TYPE_NUMBER)
-	if midi_library.isPortOpen(port) then 
+	if midi_library.isPortOpen(port) then
 		SF.Throw("This port is already open!")
 	end
 	return midi.Open(port)

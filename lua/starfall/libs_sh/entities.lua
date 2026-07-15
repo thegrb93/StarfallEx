@@ -425,7 +425,7 @@ end
 if SERVER then
 	local props_library = instance.Libraries.prop
 	if props_library then
-		--- Checks if a user can manipulate anymore bones.
+		--- Checks if a user can manipulate any more bones.
 		-- @server
 		-- @return boolean True if user can manipulate bones, False if not.
 		function props_library.canManipulateBones()
@@ -1256,7 +1256,7 @@ function ents_methods:lookupBone(name)
 	return Ent_LookupBone(eunwrap(self), name)
 end
 
---- Returns the matrix of the entity's bone. Note: this method is slow/doesnt work well if the entity isn't animated.
+--- Returns the matrix of the entity's bone. Note: this method is slow/doesn't work well if the entity isn't animated.
 -- @shared
 -- @param number? bone Bone index. (def 0)
 -- @return VMatrix The matrix
@@ -1885,7 +1885,7 @@ function ents_methods:getCollisionBounds()
 	return vwrap(minvec), vwrap(maxvec)
 end
 
---- Returns axis-aligned bounding box (AABB) of a orientated bounding box (OBB) based on entity's rotation.
+--- Returns axis-aligned bounding box (AABB) of an orientated bounding box (OBB) based on entity's rotation.
 -- @shared
 -- @param Vector min Minimum extent of an OBB in local coordinates.
 -- @param Vector max Maximum extent of an OBB in local coordinates.
@@ -2115,7 +2115,7 @@ end
 -- @return Angle? The angle or nil if it doesn't exist
 function ents_methods:getDTAngle(key)
 	checkluatype(key, TYPE_NUMBER)
-	if key<0 or key>31 then SF.Throw("Key must be a int in range 0 - 31") end
+	if key<0 or key>31 then SF.Throw("Key must be an int in range 0 - 31") end
 	return awrap(Ent_GetDTAngle(eunwrap(self), key))
 end
 
@@ -2125,7 +2125,7 @@ end
 -- @return boolean? The boolean or nil if it doesn't exist
 function ents_methods:getDTBool(key)
 	checkluatype(key, TYPE_NUMBER)
-	if key<0 or key>31 then SF.Throw("Key must be a int in range 0 - 31") end
+	if key<0 or key>31 then SF.Throw("Key must be an int in range 0 - 31") end
 	return Ent_GetDTBool(eunwrap(self), key)
 end
 
@@ -2135,7 +2135,7 @@ end
 -- @return Entity? The entity or nil if it doesn't exist
 function ents_methods:getDTEntity(key)
 	checkluatype(key, TYPE_NUMBER)
-	if key<0 or key>31 then SF.Throw("Key must be a int in range 0 - 31") end
+	if key<0 or key>31 then SF.Throw("Key must be an int in range 0 - 31") end
 	return owrap(Ent_GetDTEntity(eunwrap(self), key))
 end
 
@@ -2145,7 +2145,7 @@ end
 -- @return number? The float or nil if it doesn't exist
 function ents_methods:getDTFloat(key)
 	checkluatype(key, TYPE_NUMBER)
-	if key<0 or key>31 then SF.Throw("Key must be a int in range 0 - 31") end
+	if key<0 or key>31 then SF.Throw("Key must be an int in range 0 - 31") end
 	return Ent_GetDTFloat(eunwrap(self), key)
 end
 
@@ -2155,7 +2155,7 @@ end
 -- @return number? The int or nil if it doesn't exist
 function ents_methods:getDTInt(key)
 	checkluatype(key, TYPE_NUMBER)
-	if key<0 or key>31 then SF.Throw("Key must be a int in range 0 - 31") end
+	if key<0 or key>31 then SF.Throw("Key must be an int in range 0 - 31") end
 	return Ent_GetDTInt(eunwrap(self), key)
 end
 
@@ -2165,7 +2165,7 @@ end
 -- @return string? The string or nil if it doesn't exist
 function ents_methods:getDTString(key)
 	checkluatype(key, TYPE_NUMBER)
-	if key<0 or key>31 then SF.Throw("Key must be a int in range 0 - 31") end
+	if key<0 or key>31 then SF.Throw("Key must be an int in range 0 - 31") end
 	return Ent_GetDTString(eunwrap(self), key)
 end
 
@@ -2175,7 +2175,7 @@ end
 -- @return Vector? The vector or nil if it doesn't exist
 function ents_methods:getDTVector(key)
 	checkluatype(key, TYPE_NUMBER)
-	if key<0 or key>31 then SF.Throw("Key must be a int in range 0 - 31") end
+	if key<0 or key>31 then SF.Throw("Key must be an int in range 0 - 31") end
 	return vwrap(Ent_GetDTVector(eunwrap(self), key))
 end
 

@@ -131,7 +131,7 @@ function nextbot_library:remove()
 	entList:remove(nb)
 end
 
---- Checks if a user can spawn anymore nextbots.
+--- Checks if a user can spawn any more nextbots.
 -- @server
 -- @return boolean True if user can spawn nextbots, False if not.
 function nextbot_library.canSpawn()
@@ -147,7 +147,7 @@ function nextbot_library.nextbotsLeft()
 	return entList:check(instance.player)
 end
 
---- Checks if a user can spawn anymore nextbots ragdolls.
+--- Checks if a user can spawn any more nextbot ragdolls.
 -- @server
 -- @return boolean True if user can spawn nextbots ragdolls, False if not.
 function nextbot_library.canSpawnRagdoll()

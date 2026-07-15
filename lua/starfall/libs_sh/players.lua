@@ -494,7 +494,7 @@ function player_methods:keyDownLast(key)
 	return Ply_KeyDownLast(unwrap(self), key)
 end
 
---- Gets wether a key was just pressed this tick.
+--- Gets whether a key was just pressed this tick.
 -- @shared
 -- @param number key Key to check. See IN_KEY table values.
 -- @return boolean Was their key pressed.
@@ -502,7 +502,7 @@ function player_methods:keyPressed(key)
 	return Ply_KeyPressed(unwrap(self), key)
 end
 
---- Gets wether a key was just released this tick.
+--- Gets whether a key was just released this tick.
 -- @shared
 -- @param number key Key to check. See IN_KEY table values.
 -- @return boolean Was their key released.
@@ -805,7 +805,7 @@ if CLIENT then
 		anim.range = anim.max - anim.min
 	end
 
-	--- Gets whether a animation is playing
+	--- Gets whether an animation is playing
 	-- @client
 	-- @return boolean If an animation is playing
 	function player_methods:isPlayingAnimation()

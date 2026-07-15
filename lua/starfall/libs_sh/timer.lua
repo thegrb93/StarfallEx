@@ -207,7 +207,7 @@ end
 
 --- Returns amount of time left (in seconds) before the timer executes its function.
 -- @param string name The timer name
--- @return number The amount of time left (in seconds). If the timer is paused, the amount will be negative. Nil if timer doesnt exist
+-- @return number The amount of time left (in seconds). If the timer is paused, the amount will be negative. Nil if timer doesn't exist
 function timer_library.timeleft(name)
 	checkluatype(name, TYPE_STRING)
 
@@ -216,7 +216,7 @@ end
 
 --- Returns amount of repetitions/executions left before the timer destroys itself.
 -- @param string name The timer name
--- @return number The amount of executions left. Nil if timer doesnt exist
+-- @return number The amount of executions left. Nil if timer doesn't exist
 function timer_library.repsleft(name)
 	checkluatype(name, TYPE_STRING)
 

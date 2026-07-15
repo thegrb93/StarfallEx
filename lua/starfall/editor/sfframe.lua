@@ -874,7 +874,7 @@ function Editor:InitComponents()
 
 	self.C.Menu:Dock(TOP)
 	self.C.TabHolder:Dock(FILL)
-	self.C.TabHolder.tabScroller:DockMargin(0, 0, 3, 0) -- We dont want default offset
+	self.C.TabHolder.tabScroller:DockMargin(0, 0, 3, 0) -- We don't want default offset
 	self.C.TabHolder.tabScroller:SetOverlap(-1)
 	self.C.TabHolder:SetPadding(0)
 	self.C.Menu.Paint = function(_, w, h)
@@ -1127,7 +1127,7 @@ function Editor:GetSettings()
 	AddCategory(themesPanel, "Themes", "icon16/page_white_paintbrush.png", "Theme settings.")
 
 	----- Tab settings
-	for k, v in pairs(SF.Editor.TabHandlers) do -- We let TabHandlers register their settings but only if they are current editor or arent editor at all
+	for k, v in pairs(SF.Editor.TabHandlers) do -- We let TabHandlers register their settings but only if they are current editor or aren't editor at all
 		if v.RegisterSettings and (not v.IsEditor or (v.IsEditor and SF.Editor.CurrentTabHandler:GetString() == k)) then
 			AddCategory(v:RegisterSettings())
 		end
@@ -1205,7 +1205,7 @@ function Editor:CreateThemesPanel()
 					local parsed, strId, error = SF.Editor.Themes.ParseTextMate(body)
 
 					if not parsed then
-						Derma_Message("A problem occured during parsing the XML file: " .. error, "SF Themes", "Close")
+						Derma_Message("A problem occurred during parsing the XML file: " .. error, "SF Themes", "Close")
 						return
 					end
 
@@ -1226,7 +1226,7 @@ function Editor:CreateThemesPanel()
 				local parsed, strId, error = SF.Editor.Themes.ParseTextMate(text)
 
 				if not parsed then
-					Derma_Message("A problem occured during parsing the XML file: " .. error, "SF Themes", "Close")
+					Derma_Message("A problem occurred during parsing the XML file: " .. error, "SF Themes", "Close")
 					return
 				end
 
@@ -1408,7 +1408,7 @@ function Editor:Validate(gotoerror)
 	end
 
 	local code = self:GetCode()
-	if #code < 1 then return true end -- We wont validate empty scripts
+	if #code < 1 then return true end -- We won't validate empty scripts
 	local err = SF.CompileString(code , "Validation", false)
 	local success = not isstring(err)
 	local row, message
@@ -1653,7 +1653,7 @@ function Editor:LoadFile(Line, forcenewtab)
 		str = SF.Editor.normalizeCode(str)
 		self:OpenCode(Line, str, str, forcenewtab)
 	else
-		SF.AddNotify(LocalPlayer(), "Erroring opening file: " .. Line, "ERROR", 7, "ERROR1")
+		SF.AddNotify(LocalPlayer(), "Error opening file: " .. Line, "ERROR", 7, "ERROR1")
 	end
 end
 
@@ -1666,7 +1666,7 @@ end
 ---Reloads the tab associated to the file at `filepath`, if there is one.
 ---@param tabIndex number The index of the tab to reload
 ---@param interactive boolean If the file has unsaved changed and interactive is true
----then prompt the user to overwrite the current unsaved changes, otherwise dont reload the file.
+---then prompt the user to overwrite the current unsaved changes, otherwise don't reload the file.
 function Editor:ReloadTab(tabIndex, interactive)
 	local activeTabIndex = self:GetActiveTabIndex()
 	local tab = self:GetTab(tabIndex)

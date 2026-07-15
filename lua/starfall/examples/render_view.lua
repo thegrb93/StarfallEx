@@ -2,7 +2,7 @@
 --@author Szymekk
 --@client
 
--- render.renderView allows to render the world into a render target
+-- render.renderView allows rendering the world into a render target
 -- Link the chip to a screen to see how it works
 
 setupPermissionRequest({ "render.renderscene", "render.renderView" }, "See an example of render.renderView.", true)

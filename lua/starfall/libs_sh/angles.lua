@@ -240,7 +240,7 @@ function ang_methods:setZero()
 	self[3] = 0
 end
 
---- Set's the angle's pitch and returns self.
+--- Sets the angle's pitch and returns self.
 -- @param number p The pitch
 -- @return Angle Angle after modification
 function ang_methods:setP(p)
@@ -248,7 +248,7 @@ function ang_methods:setP(p)
 	return self
 end
 
---- Set's the angle's yaw and returns self.
+--- Sets the angle's yaw and returns self.
 -- @param number y The yaw
 -- @return Angle Angle after modification
 function ang_methods:setY(y)
@@ -256,7 +256,7 @@ function ang_methods:setY(y)
 	return self
 end
 
---- Set's the angle's roll and returns self.
+--- Sets the angle's roll and returns self.
 -- @param number r The roll
 -- @return Angle Angle after modification
 function ang_methods:setR(r)

@@ -1148,7 +1148,7 @@ do
 	local gmod_hooks = {}
 
 	local function getHookFunc(instances, hookname, customargfunc, customretfunc)
-		--- There are 4 varients of hookfunc depending on if there are custom callbacks
+		--- There are 4 variants of hookfunc depending on if there are custom callbacks
 		if customargfunc then
 			if customretfunc then
 				return function(...)
@@ -1472,7 +1472,7 @@ SF.TYPENAME = {
 	[TYPE_MOVEDATA]         = "CMoveData",
 	[TYPE_RECIPIENTFILTER]  = "CRecipientFilter",
 	[TYPE_USERCMD]          = "CUserCmd",
-	[TYPE_SCRIPTEDVEHICLE]  = "ScriptedVehicle", -- Depricated, also TYPE Enum doesnt specify the name so this it is
+	[TYPE_SCRIPTEDVEHICLE]  = "ScriptedVehicle", -- Deprecated, also TYPE Enum doesn't specify the name so this it is
 	[TYPE_MATERIAL]         = "IMaterial",
 	[TYPE_PANEL]            = "Panel",
 	[TYPE_PARTICLE]         = "CLuaParticle",
@@ -1496,7 +1496,7 @@ SF.TYPENAME = {
 	[TYPE_PROJECTEDTEXTURE] = "ProjectedTexture",
 	[TYPE_PHYSCOLLIDE]      = "PhysCollide",
 	[TYPE_SURFACEINFO]      = "SurfaceInfo",
-	[TYPE_COLOR]            = "Color" -- TypeID doesnt return this but lets still add it
+	[TYPE_COLOR]            = "Color" -- TypeID doesn't return this but lets still add it
 }
 
 --- Returns corresponding name of the TypeID

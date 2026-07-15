@@ -14,7 +14,7 @@ local entList = SF.EntManager("props", "props", -1, "The number of props allowed
 local plyPropBurst = SF.BurstObject("props", "props", 4, 4, "Rate props can be spawned per second.", "Number of props that can be spawned in a short time.")
 
 
---- Library for creating and manipulating physics-less models AKA "Props".
+--- Library for creating and manipulating physical models (props).
 -- @name prop
 -- @class library
 -- @libtbl props_library
@@ -660,7 +660,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 	end
 end
 
---- Checks if a user can spawn anymore props.
+--- Checks if a user can spawn any more props.
 -- @server
 -- @return boolean True if user can spawn props, False if not.
 function props_library.canSpawn()

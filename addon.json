@@ -2,5 +2,5 @@
 	"title"		:	"StarfallEx",
 	"type"		:	"tool",
 	"tags"		:	[ "build", "fun" ],
-	"description":	"Lua scripting tool that allows users to program contraptions with lua."
+	"description":	"Lua scripting tool that allows users to program contraptions with Lua."
 }

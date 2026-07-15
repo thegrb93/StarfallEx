@@ -107,7 +107,7 @@ end
 -- @param Vector startpos The ray start
 -- @param Vector endpos The ray end
 -- @param Vector? mins If not nil, will define a lower bound of the ray's hull
--- @param Vector? maxs If not nil, will define a upper bound of the ray's hull
+-- @param Vector? maxs If not nil, will define an upper bound of the ray's hull
 -- @param function? filter Optional function to filter results
 -- @return table An array of found entities
 function find_library.inRay(startpos, endpos, mins, maxs, filter)
