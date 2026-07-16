@@ -83,7 +83,7 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 
 	if player:IsWorld() then
 		player = SF.Superuser
-	elseif ppdata.files[mainfile].superuser then
+	elseif SERVER and ppdata.files[mainfile].superuser then
 		local ok, message = hook.Run("StarfallCanSuperUser", player)
 		if ok == false then return false, { message = message or "StarfallCanSuperUser blocked this superuser request!", traceback = "" } end
 		if ok ~= true and not SF.SuperUsers:contains(player:SteamID()) then return false, { message = "Player is not in sf_super_users cvar list!", traceback = "" } end

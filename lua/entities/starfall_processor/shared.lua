@@ -40,6 +40,7 @@ function ENT:Compile(sfdata)
 	self.error = nil
 
 	local ok, instance = SF.Instance.Compile(sfdata.files, sfdata.mainfile, self.owner, self)
+	if instance.player == SF.Superuser then sfdata.owner = game.GetWorld() end
 	if not ok then self:Error(instance) return end
 
 	if newdata then
