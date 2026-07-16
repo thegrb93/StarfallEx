@@ -338,7 +338,7 @@ string_library.normalizePath = SF.NormalizePath
 --- Receives zero or more integers, converts each one to its corresponding UTF-8 byte sequence
 -- and returns a string with the concatenation of all these sequences
 -- @class function
--- @param ... codepoints Unicode code points to be converted in to a UTF-8 string
+-- @param ... codepoints Unicode code points to be converted into a UTF-8 string
 -- @return string UTF-8 string generated from given arguments
 string_library.utf8char = utf8.char
 

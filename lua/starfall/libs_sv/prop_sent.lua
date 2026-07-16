@@ -1,4 +1,4 @@
--- Simple helper function that provides model if it doesnt exist
+-- Simple helper function that provides model if it doesn't exist
 local function registerSent(class, data)
 	list.Set("starfall_creatable_sent", class, data)
 end

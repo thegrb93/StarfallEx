@@ -382,7 +382,7 @@ function ss_methods:readInt32()
 end
 
 --- Reads a 4 byte IEEE754 float from the byte stream and advances the buffer pointer.
--- @return number Float32 at this position
+-- @return number Float at this position (32-bit)
 function ss_methods:readFloat()
 	return UnpackIEEE754Float(string.byte(self:read(4), 1, 4))
 end
@@ -392,7 +392,7 @@ function ss_methods_big:readFloat()
 end
 
 --- Reads a 8 byte IEEE754 double from the byte stream and advances the buffer pointer.
--- @return number Double at this position
+-- @return number Double at this position (64-bit)
 function ss_methods:readDouble()
 	return UnpackIEEE754Double(string.byte(self:read(8), 1, 8))
 end
@@ -438,7 +438,7 @@ function ss_methods:readString()
 	return string.sub(s, 1, #s-1)
 end
 
---- Writes a byte to the buffer and advances the buffer pointer.
+--- Writes a signed byte to the buffer and advances the buffer pointer.
 -- @param number x Int8 to write
 function ss_methods:writeInt8(x)
 	if x==math_huge or x==-math_huge or x~=x then error("Can't convert error float to integer!", 2) end
@@ -446,13 +446,13 @@ function ss_methods:writeInt8(x)
 	self:write(string.char(x%0x100))
 end
 
---- Writes a unsigned byte to the buffer and advances the buffer pointer.
+--- Writes an unsigned byte to the buffer and advances the buffer pointer.
 -- @name ss_methods.writeUInt8
 -- @class function
 -- @param number x UInt8 to write
 ss_methods.writeUInt8 = ss_methods.writeInt8
 
---- Writes a short to the buffer and advances the buffer pointer.
+--- Writes a signed short to the buffer and advances the buffer pointer.
 -- @param number x Int16 to write
 function ss_methods:writeInt16(x)
 	if x==math_huge or x==-math_huge or x~=x then error("Can't convert error float to integer!", 2) end
@@ -465,13 +465,13 @@ function ss_methods_big:writeInt16(x)
 	self:write(string.char(bit_rshift(x, 8)%0x100, x%0x100))
 end
 
---- Writes a unsigned short to the buffer and advances the buffer pointer.
+--- Writes an unsigned short to the buffer and advances the buffer pointer.
 -- @name ss_methods.writeUInt16
 -- @class function
 -- @param number x UInt16 to write
 ss_methods.writeUInt16 = ss_methods.writeInt16
 
---- Writes an int to the buffer and advances the buffer pointer.
+--- Writes a signed integer to the buffer and advances the buffer pointer.
 -- @param number x Int32 to write
 function ss_methods:writeInt32(x)
 	if x==math_huge or x==-math_huge or x~=x then error("Can't convert error float to integer!", 2) end
@@ -484,14 +484,14 @@ function ss_methods_big:writeInt32(x)
 	self:write(string.char(bit_rshift(x, 24)%0x100, bit_rshift(x, 16)%0x100, bit_rshift(x, 8)%0x100, x%0x100))
 end
 
---- Writes a unsigned long to the buffer and advances the buffer pointer.
+--- Writes an unsigned integer to the buffer and advances the buffer pointer.
 -- @name ss_methods.writeUInt32
 -- @class function
 -- @param number x UInt32 to write
 ss_methods.writeUInt32 = ss_methods.writeInt32
 
 --- Writes a 4 byte IEEE754 float to the byte stream and advances the buffer pointer.
--- @param number x The float to write
+-- @param number x The float to write (32-bit)
 function ss_methods:writeFloat(x)
 	self:write(string.char(PackIEEE754Float(x)))
 end
@@ -501,7 +501,7 @@ function ss_methods_big:writeFloat(x)
 end
 
 --- Writes a 8 byte IEEE754 double to the byte stream and advances the buffer pointer.
--- @param number x The double to write
+-- @param number x The double to write (64-bit)
 function ss_methods:writeDouble(x)
 	self:write(string.char(PackIEEE754Double(x)))
 end
@@ -510,7 +510,7 @@ function ss_methods_big:writeDouble(x)
 	self:write(string.char(h,g,f,e,d,c,b,a))
 end
 
---- Writes a string to the buffer putting a null at the end and advances the buffer pointer.
+--- Writes a null-terminated string to the buffer and advances the buffer pointer.
 -- @param string str The string of bytes to write
 function ss_methods:writeString(str)
 	self:write(str)
@@ -526,7 +526,7 @@ local function writeEntity(self, instance, e)
 	self:writeInt16(ent:EntIndex())
 	self:writeInt32(ent:GetCreationID())
 end
-	
+
 --- Reads an entity from the byte stream and advances the buffer pointer.
 -- @name ss_methods.readEntity
 -- @class function

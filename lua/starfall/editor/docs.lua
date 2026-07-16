@@ -239,17 +239,17 @@ local parseAttributes = {
 		end
 	end,
 
-	--- Overrides the [src] link which would normally go to the SF github.
+	--- Overrides the [src] link which would normally go to the SF GitHub.
 	-- This would be for addons extending SF and wanting to link to their repos.
 	-- The links would be something like https://github.com/User/Repo/.../file.lua
 	-- It will be a direct link to a page and the line number that SF finds will be appended to it.
-	-- Only github links are allowed.
+	-- Only GitHub links are allowed.
 	["src"] = function(parsing, value)
 		local link = string_match(value, "https://github.com/(.+)")
 		if link then
 			parsing.path = link .. string_match(parsing.path, "(#L[%d%-]+)")
 		else
-			ErrorNoHalt("Invalid src override (" .. value .. ") in file: " .. curfile .. ", make sure it's a github link!\n")
+			ErrorNoHalt("Invalid src override (" .. value .. ") in file: " .. curfile .. ", make sure it's a GitHub link!\n")
 		end
 	end
 }

@@ -253,7 +253,7 @@ function color_methods:set(b)
 	self[4] = b[4]
 end
 
---- Set's the color's red channel and returns self.
+--- Sets the color's red channel and returns self.
 -- @param number r The red
 -- @return Color Color after modification
 function color_methods:setR(r)
@@ -261,7 +261,7 @@ function color_methods:setR(r)
 	return self
 end
 
---- Set's the color's green and returns self.
+--- Sets the color's green and returns self.
 -- @param number g The green
 -- @return Color Color after modification
 function color_methods:setG(g)
@@ -269,7 +269,7 @@ function color_methods:setG(g)
 	return self
 end
 
---- Set's the color's blue and returns self.
+--- Sets the color's blue and returns self.
 -- @param number b The blue
 -- @return Color Color after modification
 function color_methods:setB(b)
@@ -277,7 +277,7 @@ function color_methods:setB(b)
 	return self
 end
 
---- Set's the color's alpha and returns it.
+--- Sets the color's alpha and returns it.
 -- @param number a The alpha
 -- @return Color Color after modification
 function color_methods:setA(a)

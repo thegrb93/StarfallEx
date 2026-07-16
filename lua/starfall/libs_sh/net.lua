@@ -186,8 +186,8 @@ end
 
 --- Send a net message from client->server, or server->client.
 -- @shared
--- @param Player|table|nil target Optional target location to send the net message. Player or table of targets. If nil, sends to server on client
--- @param boolean? unreliable Optional choose whether it's more important for the message to actually reach its destination (false) or reach it as fast as possible (true).
+-- @param Player|table|nil target On server-side: Optional target location to send the net message to, can be a player or table of players, or nil to broadcast to all players; On client-side: This argument is ignored, it will send to the server.
+-- @param boolean? unreliable Optional. Whether it's more important for the message to actually reach its destination (false), or reach it as fast as possible (true). Default is false.
 function net_library.send(target, unreliable)
 	if unreliable~=nil then checkluatype(unreliable, TYPE_BOOL) end
 	if not netStarted then SF.Throw("net message not started", 2) end
@@ -225,7 +225,7 @@ if SERVER then
 	--- Send net message to all players within the visible area of a vector
 	-- @server
 	-- @param Vector pos A vector within the PVS area to send a message
-	-- @param boolean? unreliable Optional choose whether it's more important for the message to actually reach its destination (false) or reach it as fast as possible (true).
+	-- @param boolean? unreliable Optional. Whether it's more important for the message to actually reach its destination (false), or reach it as fast as possible (true). Default is false.
 	function net_library.sendPVS(pos, unreliable)
 		if not netStarted then SF.Throw("net message not started", 2) end
 		pos = vunwrap1(pos)
@@ -590,7 +590,7 @@ function net_library.writeEntity(t)
 	write{net.WriteUInt, 32, ent:GetCreationID(), 32}
 end
 
---- Reads a entity from the net message
+--- Reads an entity from the net message
 -- @shared
 -- @param function? callback (Client only) optional callback to be ran whenever the entity becomes valid; returns nothing if this is used. The callback passes the entity if it succeeds or nil if it fails.
 -- @return Entity? The entity that was read or nil if callback used

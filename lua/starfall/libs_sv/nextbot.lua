@@ -131,9 +131,9 @@ function nextbot_library:remove()
 	entList:remove(nb)
 end
 
---- Checks if a user can spawn anymore nextbots.
+--- Checks if you can spawn any more nextbots
 -- @server
--- @return boolean True if user can spawn nextbots, False if not.
+-- @return boolean Returns true if you can spawn nextbots, false if not
 function nextbot_library.canSpawn()
 	if not SF.Permissions.hasAccess(instance, nil, "nextbot.create") then return false end
 	return entList:check(instance.player) > 0
@@ -147,17 +147,17 @@ function nextbot_library.nextbotsLeft()
 	return entList:check(instance.player)
 end
 
---- Checks if a user can spawn anymore nextbots ragdolls.
+--- Checks if you can spawn any more nextbot ragdolls
 -- @server
--- @return boolean True if user can spawn nextbots ragdolls, False if not.
+-- @return boolean Returns true if you can spawn nextbot ragdolls, false if not
 function nextbot_library.canSpawnRagdoll()
 	if not SF.Permissions.hasAccess(instance, nil, "nextbot.ragdollOnDeath") then return false end
 	return SF.NextBotRagdolls:check(instance.player) > 0
 end
 
---- Checks how many ragdolls the nextbots can spawn.
+--- Returns how many nextbot ragdolls you can spawn
 -- @server
--- @return number Number how many ragdoll can be spawned.
+-- @return number Amount of nextbot ragdolls that can be spawned
 function nextbot_library.ragdollsLeft()
 	if not SF.Permissions.hasAccess(instance,  nil, "nextbot.ragdollOnDeath") then return 0 end
 	return SF.NextBotRagdolls:check(instance.player)

@@ -439,13 +439,13 @@ function EDITOR:SyntaxColorLine(row)
 					end
 				else
 					if val == "function" then
-						tokenname = "notfound" -- we wont color if there is no (
+						tokenname = "notfound" -- we won't color if there is no (
 						local pos = self.position -- We are saving that, so we can move tokenizer back
 						local c = self.character
 						local td = self.tokendata
 						if self:NextPattern("%s*[({'\"]") then -- we are checking if there is ( after name, or if single parameter function with string literal or table literal
 							tokenname = "function"
-							self.position = pos -- We dont want to move tokenizer as we were just checking without parsing
+							self.position = pos -- We don't want to move tokenizer as we were just checking without parsing
 							self.character = c
 							self.tokendata = td
 						end
@@ -514,7 +514,7 @@ function EDITOR:SyntaxColorLine(row)
 		elseif self:NextPattern("%[=*%[") then -- Multiline strings
 			local reps = #self.tokendata:match("%[(=*)%[")
 			local ending = "%]"..string.rep("=",reps).."%]"
-			while self.character do -- Find the ending ]] if it isnt really multline(who does that?! Shame on you!)
+			while self.character do -- Find the ending ]] if it isn't really multline(who does that?! Shame on you!)
 				if self:NextPattern(ending) then
 					tokenname = "string"
 					break
@@ -583,7 +583,7 @@ function EDITOR:SyntaxColorLine(row)
 				tokenname = "comment"
 				self:NextPattern("[^@]*") -- Skip everything BEFORE @
 				addToken(tokenname, self.tokendata)
-				self.tokendata = "" -- we dont need that anymore as we already added it
+				self.tokendata = "" -- we don't need that anymore as we already added it
 
 				self:NextPattern("[%S]*") -- Find first word
 				if directives[self.tokendata:sub(2)] then -- Search directives created with SF.Preprocessor.SetGlobalDirective

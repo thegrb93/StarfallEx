@@ -142,7 +142,7 @@ math_library.deg = math.deg
 -- @return number Distance between the two points
 math_library.distance = math.Distance
 
---- Calculates the progress of a value fraction, taking in to account given easing fractions.
+--- Calculates the progress of a value fraction, taking into account given easing fractions.
 -- @class function
 -- @param number progress Fraction of the progress to ease
 -- @param number easeIn Fraction of how much easing to begin with

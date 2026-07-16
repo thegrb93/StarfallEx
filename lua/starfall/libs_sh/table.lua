@@ -65,7 +65,7 @@ table_library.count = table.Count
 -- @param table tbl The table to empty
 table_library.empty = table.Empty
 
---- Inserts a value in to the given table even if the table is non-existent
+--- Inserts a value into the given table even if the table is non-existent
 -- @class function
 -- @param table tbl Table to insert value in to. If not supplied, will create a table
 -- @param any val Value to insert

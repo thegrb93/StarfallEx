@@ -906,7 +906,7 @@ end
 --- Gets the current draw color set with render.setColor().
 -- @return Color The current draw color
 function render_library.getColor()
-	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end 
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	local drawClr = surface.GetDrawColor()
 	return setmetatable({drawClr.r, drawClr.g, drawClr.b, drawClr.a}, col_meta)
 end
@@ -979,7 +979,7 @@ end
 --- Also supports image URLs or image data (These will create a rendertarget for the $basetexture): https://en.wikipedia.org/wiki/Data_URI_scheme
 --- Make sure to store the material to use it rather than calling this slow function repeatedly.
 --- NOTE: This no longer supports material names. Use texture names instead (Textures are .vtf, material are .vmt)
--- @param string tx Texture file path, a http url, or image data: https://en.wikipedia.org/wiki/Data_URI_scheme
+-- @param string tx Texture file path, or http URL, or image data: https://en.wikipedia.org/wiki/Data_URI_scheme
 -- @param function? cb An optional callback called when loading is done. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture.
 -- @param function? done An optional callback called when the image is done loading. Passes the material, url
 -- @return Material The material. Use with render.setMaterial to draw with it.
@@ -996,7 +996,7 @@ function render_library.createMaterial(tx, cb, done)
 	return m
 end
 
---- Releases the texture. Required if you reach the maximum url textures.
+--- Releases the texture. Required if you reach the maximum URL textures.
 -- @param Material mat The material object
 function render_library.destroyTexture(mat)
 	mat:destroy()
@@ -1512,7 +1512,7 @@ local drawTriangle
 do
 	local mesh_Position, mesh_Color, mesh_AdvanceVertex =
 		mesh.Position, mesh.Color, mesh.AdvanceVertex
-	
+
 	local v1_vec, v2_vec, v3_vec = Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0)
 
 	drawTriangle = function(x1, y1, x2, y2, x3, y3)
@@ -1541,7 +1541,7 @@ render_library.drawTriangle = function(x1, y1, x2, y2, x3, y3)
 	mesh_Begin(MATERIAL_TRIANGLES, 1)
 		local success, err = pcall(drawTriangle, x1, y1, x2, y2, x3, y3)
 	mesh_End()
-	if not success then 
+	if not success then
 		error(err, 2)
 	end
 end
@@ -1596,7 +1596,7 @@ local drawTexturedRectUV
 do
 	local mesh_Position, mesh_Color, mesh_TexCoord, mesh_AdvanceVertex =
 		mesh.Position, mesh.Color, mesh.TexCoord, mesh.AdvanceVertex
-	
+
 	drawTexturedRectUV = function(startU, startV, endU, endV)
 		local r, g, b, a = Col_Unpack(currentcolor)
 		mesh_Position( quad_v1 ); mesh_Color( r, g, b, a ); mesh_TexCoord( 0, startU, startV ); mesh_AdvanceVertex();
@@ -1664,7 +1664,7 @@ local drawTexturedTriangleUV
 do
 	local mesh_Position, mesh_Color, mesh_TexCoord, mesh_AdvanceVertex =
 		mesh.Position, mesh.Color, mesh.TexCoord, mesh.AdvanceVertex
-	
+
 	local v1_vec, v2_vec, v3_vec = Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0)
 
 	drawTexturedTriangleUV = function(vert1, vert2, vert3)
@@ -1687,7 +1687,7 @@ render_library.drawTexturedTriangleUV = function(vert1, vert2, vert3)
 	mesh_Begin(MATERIAL_TRIANGLES, 1)
 		local success, err = pcall(drawTexturedTriangleUV, vert1, vert2, vert3)
 	mesh_End()
-	if not success then 
+	if not success then
 		error(err, 2)
 	end
 end
@@ -2165,7 +2165,7 @@ local draw3DQuadUV
 do
 	local mesh_Position, mesh_Color, mesh_TexCoord, mesh_AdvanceVertex =
 		mesh.Position, mesh.Color, mesh.TexCoord, mesh.AdvanceVertex
-	
+
 	draw3DQuadUV = function(vert1, vert2, vert3, vert4)
 		local r, g, b, a = Col_Unpack(currentcolor)
 		Vec_SetUnpacked(quad_v1, vert1[1], vert1[2], vert1[3])
@@ -2196,7 +2196,7 @@ local draw3DTriangle
 do
 	local mesh_Position, mesh_Color, mesh_AdvanceVertex =
 		mesh.Position, mesh.Color, mesh.AdvanceVertex
-	
+
 	local v1_vec, v2_vec, v3_vec = Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0)
 
 	draw3DTriangle = function(vert1, vert2, vert3)
@@ -2220,7 +2220,7 @@ render_library.draw3DTriangle = function(vert1, vert2, vert3)
 	mesh_Begin(MATERIAL_TRIANGLES, 1)
 		local success, err = pcall(draw3DTriangle, vert1, vert2, vert3)
 	mesh_End()
-	if not success then 
+	if not success then
 		error(err, 2)
 	end
 end
@@ -2229,7 +2229,7 @@ local draw3DTriangleUV
 do
 	local mesh_Position, mesh_Color, mesh_TexCoord, mesh_AdvanceVertex =
 		mesh.Position, mesh.Color, mesh.TexCoord, mesh.AdvanceVertex
-	
+
 	local v1_vec, v2_vec, v3_vec = Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0)
 
 	draw3DTriangleUV = function(vert1, vert2, vert3)
@@ -2252,7 +2252,7 @@ render_library.draw3DTriangleUV = function(vert1, vert2, vert3)
 	mesh_Begin(MATERIAL_TRIANGLES, 1)
 		local success, err = pcall(draw3DTriangleUV, vert1, vert2, vert3)
 	mesh_End()
-	if not success then 
+	if not success then
 		error(err, 2)
 	end
 end
@@ -2783,7 +2783,7 @@ function render_library.screenShake(amplitude, frequency, duration)
 	util.ScreenShake(vector_zero, amplitude, frequency, clamp(duration, 0, 10), 0)
 end
 
---- Set's the depth range of the upcoming render.
+--- Sets the depth range of the upcoming render.
 -- @param number min The minimum depth of the upcoming render. 0.0 = render normally; 1.0 = render nothing.
 -- @param number max The maximum depth of the upcoming render. 0.0 = render everything (through walls); 1.0 = render normally.
 function render_library.depthRange(min, max)
@@ -2799,7 +2799,7 @@ end
 function render_library.pixelVisible(position, radius)
 	position = vunwrap1(position)
 	checkluatype(radius, TYPE_NUMBER)
-	
+
 	local PixVis = pixhandle_bank:use(instance.player)
 	renderdata.usedPixelVis[#renderdata.usedPixelVis + 1] = PixVis
 	return util.PixelVisible(position, radius, PixVis)

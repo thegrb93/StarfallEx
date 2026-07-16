@@ -43,7 +43,7 @@ else
 end
 
 
---- Library for creating and manipulating physics-less models AKA "Holograms".
+--- Library for creating and manipulating physics-less models (holograms).
 -- @name hologram
 -- @class library
 -- @libtbl hologram_library
@@ -150,8 +150,8 @@ function hologram_library.create(pos, ang, model, scale)
 	return wrap(holoent)
 end
 
---- Checks if a user can spawn anymore holograms.
--- @return boolean True if user can spawn holograms, False if not.
+--- Checks if you can spawn any more holograms
+-- @return boolean Returns true if you can spawn holograms, false if not
 function hologram_library.canSpawn()
 	if not SF.Permissions.hasAccess(instance,  nil, "hologram.create") then return false end
 	return entList:check(instance.player) > 0
@@ -229,11 +229,11 @@ else
 		checkpermission(instance, holo, "hologram.setRenderProperty")
 
 		Ent_SetAngles(holo, aunwrap1(ang))
-		
+
 		local sfParent = SF.Parent.Get(holo)
 		if sfParent and Ent_IsValid(sfParent.parent) then sfParent:updateTransform() end
 	end
-	
+
 	--- Sets the hologram's position local to its parent.
 	-- @shared
 	-- @param Vector vec New position
@@ -255,7 +255,7 @@ else
 		checkpermission(instance, holo, "hologram.setRenderProperty")
 
 		Ent_SetLocalAngles(holo, aunwrap1(ang))
-		
+
 		local sfParent = SF.Parent.Get(holo)
 		if sfParent and Ent_IsValid(sfParent.parent) then sfParent:updateTransform() end
 	end
@@ -520,7 +520,7 @@ end
 function hologram_methods:setRenderGroup(group)
 	local holo = unwrap(self)
 	checkpermission(instance, holo, "entities.setRenderProperty")
-	
+
 	if group then
 		checkluatype(group, TYPE_NUMBER)
 		if not SF.allowedRenderGroups[group] then SF.Throw("Invalid rendergroup!") end

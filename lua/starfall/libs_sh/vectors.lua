@@ -356,7 +356,7 @@ function vec_methods:vdiv(v)
 	self[3] = self[3] / v[3]
 end
 
---- Set's all vector fields to 0.
+--- Sets all vector fields to 0.
 -- Self-Modifies. Does not return anything
 function vec_methods:setZero()
 	self[1] = 0
@@ -364,7 +364,7 @@ function vec_methods:setZero()
 	self[3] = 0
 end
 
---- Set's the vector's x coordinate and returns the vector after modifying.
+--- Sets the vector's x coordinate and returns the vector after modifying.
 -- @param number x The x coordinate
 -- @return Vector Modified vector after setting X.
 function vec_methods:setX(x)
@@ -372,7 +372,7 @@ function vec_methods:setX(x)
 	return self
 end
 
---- Set's the vector's y coordinate and returns the vector after modifying.
+--- Sets the vector's y coordinate and returns the vector after modifying.
 -- @param number y The y coordinate
 -- @return Vector Modified vector after setting Y.
 function vec_methods:setY(y)
@@ -380,7 +380,7 @@ function vec_methods:setY(y)
 	return self
 end
 
---- Set's the vector's z coordinate and returns the vector after modifying.
+--- Sets the vector's z coordinate and returns the vector after modifying.
 -- @param number z The z coordinate
 -- @return Vector Modified vector after setting Z.
 function vec_methods:setZ(z)

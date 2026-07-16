@@ -39,8 +39,8 @@ end
 -- The most common way to update parts of your code are events, or so called `hooks`.
 -- As one of their arguments they take a function to execute when something happens, that function is commonly referred to as a `callback`
 -- There are many types of hooks. Some will run when a player enters a vehicle or presses a key.
--- The `Tick` event will execute every game update (by default rougly 33.3 times per second) and each time that happens, it will call the `callback` we provided
--- Note that multiple `callbacks`, can be attached to the same event by making use of the second parameter (unique name), if the name is the same, it will be overriden
+-- The `Tick` event will execute every game update (frequency depends on tick rate) and each time that happens, it will call the `callback` we provided
+-- Note that multiple `callbacks`, can be attached to the same event by making use of the second parameter (unique name), if the name is the same, it will be overridden
 hook.add("Tick", "UpdateHologram", update_hologram)
 
 -- Another common way to update parts of your code are `timers` accessible via the `timer` library.
