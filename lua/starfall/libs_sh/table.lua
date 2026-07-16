@@ -90,7 +90,7 @@ table_library.getWinningKey = table.GetWinningKey
 -- @param any val Value to search for
 -- @return boolean Returns true if the table has that value, false otherwise
 table_library.hasValue = table.HasValue
-	
+
 --- Checks if a table contains any value.
 -- @class function
 -- @param table tbl Table to check

@@ -108,16 +108,16 @@ end
 -- @param string path String path to the sound file
 -- @return number Number duration in seconds
 function sound_library.duration(path)
-    checkluatype(path, TYPE_STRING)
-    return SoundDuration(path)
+	checkluatype(path, TYPE_STRING)
+	return SoundDuration(path)
 end
 
 --- Returns true if the sound or sound property exists.
 -- @param string path String path to the sound file
 -- @return boolean True if exists, false if not
 function sound_library.exists(path)
-    checkluatype(path, TYPE_STRING)
-    return istable(sound.GetProperties(path)) or file.Exists("sound/" .. path, "GAME")
+	checkluatype(path, TYPE_STRING)
+	return istable(sound.GetProperties(path)) or file.Exists("sound/" .. path, "GAME")
 end
 
 --------------------------------------------------

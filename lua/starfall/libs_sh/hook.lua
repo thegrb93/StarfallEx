@@ -88,7 +88,7 @@ if SERVER then
 	-- @server
 	-- @param Player ply The player who has unfrozen an entity
 	-- @param Entity ent The unfrozen entity
-	-- @param PhysObj physobj The physics object of the unfrozen entity 
+	-- @param PhysObj physobj The physics object of the unfrozen entity
 	add("PlayerUnfrozeObject")
 
 	--- Called when a player dies
@@ -168,7 +168,7 @@ if SERVER then
 	-- @param boolean teamChat True if team chat
 	-- @return string? New text. "" to stop from displaying. Nil to keep original.
 	add("PlayerSay", nil, nil, returnOnlyOnYourself, true)
-	
+
 	-- Serverside implementation of playerchat
 	gameevent.Listen("player_say")
 	add("player_say", "playerchat", function(instance, data)
@@ -290,7 +290,7 @@ else
 	-- @client
 	-- @param boolean isTeamChat Whether they're typing in team chat
 	add("StartChat")
-	
+
 	--- Called when the local player closes their chat window.
 	-- @name FinishChat
 	-- @class hook
@@ -882,4 +882,3 @@ end
 -- @name Render
 -- @class hook
 -- @client
-

@@ -122,10 +122,10 @@ if SERVER then
 	local timeoutCvar = CreateConVar("sf_moneyrequest_timeout", 30, FCVAR_ARCHIVE, "Amount of time in seconds until a StarfallEx money request expires.", 5, 600)
 
 	util.AddNetworkString("sf_moneyrequest2")
-	
+
 	givemoneyBurst = SF.BurstObject("givemoney", "money giving", 0.5, 2, "The rate at which the cooldown for giving out that can be made for a single player decreases per second. Lower is longer, higher is shorter.", "Number of times a single player can give out money in a short time.")
 	moneyrequestBurst = SF.BurstObject("moneyrequest", "money request", 0.5, 1, "The rate at which the cooldown for money requests that can be made for a single player decreases per second. Lower is longer, higher is shorter.", "Number of money requests that can be made by a single player in a short time.")
-	
+
 	registerprivilege("darkrp.moneyPrinterHooks", "Get own money printer info", "Allows the user to know when their own money printers catch fire or print money (and how much was printed)")
 	registerprivilege("darkrp.playerWalletChanged", "Be notified of wallet changes", "Allows the user to know when their own wallet changes")
 	registerprivilege("darkrp.lockdownHooks", "Know when lockdowns begin and end", "Allows the user to know when a lockdown begins or ends")
@@ -133,7 +133,7 @@ if SERVER then
 	registerprivilege("darkrp.lockpickHooks", "Know when they start picking a lock", "Allows the user to know when they start or finish lockpicking")
 	registerprivilege("darkrp.requestMoney", "Ask players for money", "Allows the user to prompt other users for money (similar to E2 moneyRequest)")
 	registerprivilege("darkrp.giveMoney", "Give players money", "Allows the user to give other users money")
-	
+
 	manager.requests = SF.EntityTable("MoneyRequests")
 	function requestClass:accept()
 		local sender, receiver, amount, instance = self.sender, self.receiver, self.amount, self.instance
@@ -166,7 +166,7 @@ if SERVER then
 			end
 		net.Send(self.sender)
 	end
-	
+
 	function manager:exists(sender, receiver)
 		return self.requests[sender] ~= nil and self.requests[sender][receiver] ~= nil
 	end
@@ -183,7 +183,7 @@ if SERVER then
 
 		local request = requestClass:new(sender, receiver, amount, message, expiry, instance, callbackSuccess, callbackFailure)
 		requestsForSender[receiver] = request
-		
+
 		request:send()
 		printDebug("SF: Sent a money request.", request)
 	end
@@ -219,23 +219,23 @@ if SERVER then
 	function manager:pop(sender, receiver, force)
 		local requestsForPlayer = self.requests[sender]
 		if not requestsForPlayer then return end
-		
+
 		local request = requestsForPlayer[receiver]
 		-- Don't pop an expired request
 		if not force and (request and request.expiry < CurTime()) then return end
 		requestsForPlayer[receiver] = nil
-		
+
 		if next(requestsForPlayer) == nil then
 			self.requests[sender] = nil
 			if next(self.requests) == nil then hook.Remove("Think", "SF_DarkRpMoneyRequests") end
 		end
-		
+
 		if not request then return end
 		if request.instance and request.instance.error then
 			printDebug("SF: Attempted to pop money request but the instance was dead.", request)
 			return
 		end
-		
+
 		return request
 	end
 
@@ -384,7 +384,7 @@ else
 		end
 		self:Open()
 	end
-	
+
 	-- Display the money request prompt when notified
 	function manager:receive()
 		local receiver, amount, expiry, length = net.ReadEntity(), net.ReadUInt(32), net.ReadFloat(), net.ReadUInt(8)
@@ -464,7 +464,7 @@ if SERVER then
 		end
 		return true, {instance.Types.Entity.Wrap(moneyprinter), amount}
 	end)
-	
+
 	--- Called when a player receives money. DarkRP only.
 	-- Will only be called if the recipient is the owner of the chip, or if the chip is running in superuser mode.
 	-- @name PlayerWalletChanged
@@ -481,7 +481,7 @@ if SERVER then
 		end
 		return true, {ply and instance.Types.Player.Wrap(ply) or nil, amount, wallet}
 	end)
-	
+
 	--- Called when a lockdown has ended. DarkRP only.
 	-- @name LockdownEnded
 	-- @class hook
@@ -663,14 +663,14 @@ if SERVER then
 			return ewrap(Entity(entIndex))
 		end
 	end
-	
+
 	--- Get the number of jail positions in the current map.
 	-- @server
 	-- @return number The number of jail positions in the current map.
 	function darkrp_library.jailPosCount()
 		return assertsafety(DarkRP.jailPosCount())
 	end
-	
+
 	--- Make one player give money to the other player.
 	-- This is subject to a burst limit. Use "darkrp.canGiveMoney" to check if you can give out money that tick.
 	-- Only works if the sender is the owner of the chip, or if the chip is running in superuser mode.
@@ -692,7 +692,7 @@ if SERVER then
 			SF.Throw("sender can't afford to pay "..DarkRP.formatMoney(amount), 2)
 		end
 	end
-	
+
 	--- Request money from a player.
 	-- This is subject to a burst limit, and a limit of one money request per sender per receiver at a time. Use "darkrp.canMakeMoneyRequest" to check if you can request money that tick for that player.
 	-- @server
@@ -772,7 +772,7 @@ else
 		if instance.player ~= SF.Superuser and instance.player ~= LocalPlayer() then SF.Throw("may not use this function on anyone other than owner", 2) return end
 		DarkRP.openF1Menu()
 	end
-	
+
 	--- Close the F1 help menu.
 	-- Only works if the local player is the owner of the chip, or if the chip is running in superuser mode.
 	-- @client
@@ -780,7 +780,7 @@ else
 		if instance.player ~= SF.Superuser and instance.player ~= LocalPlayer() then SF.Throw("may not use this function on anyone other than owner", 2) return end
 		DarkRP.closeF1Menu()
 	end
-	
+
 	--- Open the F4 menu (the one where you can choose your job, buy shipments, ammo, money printers, etc). Roughly equivalent to pressing F4 (or running gm_showspare2), but won't close it if it's already open.
 	-- Only works if the local player is the owner of the chip, or if the chip is running in superuser mode.
 	-- @client
@@ -788,7 +788,7 @@ else
 		if instance.player ~= SF.Superuser and instance.player ~= LocalPlayer() then SF.Throw("may not use this function on anyone other than owner", 2) return end
 		DarkRP.openF4Menu()
 	end
-	
+
 	--- Close the F4 menu (the one where you can choose your job, buy shipments, ammo, money printers, etc).
 	-- Only works if the local player is the owner of the chip, or if the chip is running in superuser mode.
 	-- @client
@@ -796,7 +796,7 @@ else
 		if instance.player ~= SF.Superuser and instance.player ~= LocalPlayer() then SF.Throw("may not use this function on anyone other than owner", 2) return end
 		DarkRP.closeF4Menu()
 	end
-	
+
 	--- Toggle the state of the F4 menu (open or closed). Equivalent to pressing F4 (or running gm_showspare2).
 	-- Only works if the local player is the owner of the chip, or if the chip is running in superuser mode.
 	-- @client
@@ -804,7 +804,7 @@ else
 		if instance.player ~= SF.Superuser and instance.player ~= LocalPlayer() then SF.Throw("may not use this function on anyone other than owner", 2) return end
 		DarkRP.toggleF4Menu()
 	end
-	
+
 	--- Buy the door the local player is looking at, or open the menu if it's already bought. Equivalent to pressing F2 (or running gm_showteam).
 	-- Only works if the local player is the owner of the chip, or if the chip is running in superuser mode.
 	-- @client
@@ -812,7 +812,7 @@ else
 		if instance.player ~= SF.Superuser and instance.player ~= LocalPlayer() then SF.Throw("may not use this function on anyone other than owner", 2) return end
 		DarkRP.openKeysMenu()
 	end
-	
+
 	--- Open the DarkRP pocket menu. This refers to DarkRP's built-in "pocket", and probably not your server's custom inventory system.
 	-- Only works if the local player is the owner of the chip, or if the chip is running in superuser mode.
 	-- @client
@@ -937,7 +937,7 @@ if SERVER then
 		if instance.player ~= SF.Superuser and instance.player ~= ply then SF.Throw("may not use this function on anyone other than owner", 2) return end
 		assertsafety(ply:keysUnOwnAll())
 	end
-	
+
 	--- Returns the time left on a player's team ban. DarkRP only.
 	-- Only works if the player is the owner of the chip, or if the chip is running in superuser mode.
 	-- @server
@@ -950,7 +950,7 @@ if SERVER then
 		if instance.player ~= SF.Superuser and instance.player ~= ply then SF.Throw("may not use this function on anyone other than owner", 2) return end
 		return assertsafety(ply:teamBanTimeLeft())
 	end
-	
+
 	--- Give this player money.
 	-- This is subject to a burst limit. Use the darkrp.canGiveMoney function to check if you can request money that tick.
 	-- @server

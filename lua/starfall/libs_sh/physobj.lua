@@ -276,16 +276,16 @@ if SERVER then
 	end
 
 	--- Applies velocity to an object
-    -- @server
-    -- @param Vector vel The world velocity vector to apply
-    function physobj_methods:addVelocity(vel)
-        vel = vunwrap1(vel)
-        checkvector(vel)
+	-- @server
+	-- @param Vector vel The world velocity vector to apply
+	function physobj_methods:addVelocity(vel)
+		vel = vunwrap1(vel)
+		checkvector(vel)
 
-        local phys = unwrap(self)
-        checkpermission(instance, Phys_GetEntity(phys), "entities.applyForce")
-        Phys_AddVelocity(phys, vel)
-    end
+		local phys = unwrap(self)
+		checkpermission(instance, Phys_GetEntity(phys), "entities.applyForce")
+		Phys_AddVelocity(phys, vel)
+	end
 
 	--- Sets the buoyancy ratio of a physobject
 	-- @server
@@ -573,7 +573,7 @@ if SERVER then
 	function physobj_methods:getVolume()
 		return Phys_GetVolume(unwrap(self))
 	end
-	
+
 	--- Returns the stress of the entity.
 	-- @server
 	-- @return number External stress. Usually about the mass of the object if on the ground, usually 0 if in freefall.

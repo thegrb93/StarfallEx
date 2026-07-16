@@ -154,7 +154,7 @@ local function MenuOpen( ContextMenu, Option, Entity, Trace )
 
 
 	local instance = ent.instance
-	
+
 	if instance and instance.player == LocalPlayer() then
 		if ent:GetReuploadOnReload() then
 			SubMenu:AddOption("Disable reupload on reload", function ()
@@ -361,4 +361,3 @@ function SF.LinkEnt(self, ent, transmit)
 		if transmit then net.Send(transmit) else net.Broadcast() end
 	end
 end
-

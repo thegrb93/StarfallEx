@@ -226,4 +226,3 @@ sock:connect("sparkysandbox.org", 80, function()
 
 	sock:send("GET / HTTP/1.0\r\nHost: sparkysandbox.org\r\n\r\n", receiveData, error)
 end, error)
-

@@ -72,7 +72,7 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 		end
 	end
 	sanitizeTypeMeta("", {__index = sf_string_index})
-	
+
 	if not (WireLib and WireLib.PatchedDuplicator) then
 		if WireLib then WireLib.PatchedDuplicator = true end
 
@@ -360,7 +360,7 @@ SF.LimitObject = {
 			counters = SF.EntityTable("limit"..cvarname)
 		}
 		getmetatable(t.counters).__index = function(t,k) t[k]=0 return 0 end
-		
+
 		scale = scale or 1
 		local maxname = "sf_"..cvarname.."_max"..(CLIENT and "_cl" or "")
 		SF.CvarCallback(CreateConVar(maxname, tostring(max), FCVAR_ARCHIVE, maxhelp), function(val) t.max = val*scale if t.max<0 then t.max = math.huge end end, "number")
@@ -767,7 +767,7 @@ SF.Parent = {
 					data:applyTransform()
 					data:applyParent()
 					cleanup = false
-					
+
 					local sfParent = Ent_GetTable(child).sfParent
 					if sfParent then
 						sfParent:fix()
@@ -923,7 +923,7 @@ SF.HttpTextureRequest = {
 
 				local content_type = headers["Content-Type"] or headers["content-type"]
 				local data = util.Base64Encode(body, true)
-				
+
 				self.url = table.concat({"data:", content_type, ";base64,", data})
 
 				self:load()
@@ -987,7 +987,7 @@ SF.HttpTextureRequest = {
 				timer.Simple(0, function() self:destroy(true) end)
 			end)
 		end,
-		
+
 		destroy = function(self, success)
 			if self:badnewstate(self.DESTROY) then return end
 			if success then
@@ -1047,7 +1047,7 @@ SF.HttpTextureLoader = {
 			self.queue:push(request)
 			self.request = self.request_postInit
 		end,
-		
+
 		request_postInit = function(self, request)
 			self.queue:push(request)
 			if request == self.queue:front() then self:nextRequest() end
@@ -1089,8 +1089,8 @@ SF.Errormeta = {
 }
 
 SF.AutoGrowingTable = {
-    __index = function(t,k) local r=SF.AutoGrowingTable() t[k]=r return r end,
-    __call = function(t) return setmetatable({}, SF.AutoGrowingTable) end
+	__index = function(t,k) local r=SF.AutoGrowingTable() t[k]=r return r end,
+	__call = function(t) return setmetatable({}, SF.AutoGrowingTable) end
 }
 setmetatable(SF.AutoGrowingTable, SF.AutoGrowingTable)
 
@@ -1310,7 +1310,7 @@ do
 			instances[instance] = true
 		end
 	end
-	
+
 	function SF.HookRemoveInstance(instance, hookname)
 		local instances = registered_instances[hookname]
 		if instances and instances[instance] then
@@ -1594,17 +1594,17 @@ SF.WaitForEntity = {
 }
 
 function SF.WaitForAllArgs(numarg, func)
-    local inputs = {}
-    return function(...)
-        for i=1, numarg do
-            local v = select(i, ...)
-            if v~=nil then inputs[i]=v end
-        end
-        for i=1, numarg do
-            if inputs[i]==nil then return end
-        end
-        func(unpack(inputs))
-    end
+	local inputs = {}
+	return function(...)
+		for i=1, numarg do
+			local v = select(i, ...)
+			if v~=nil then inputs[i]=v end
+		end
+		for i=1, numarg do
+			if inputs[i]==nil then return end
+		end
+		func(unpack(inputs))
+	end
 end
 
 
@@ -1629,7 +1629,7 @@ do
 	local TYPE_NUMBER16NEG = 56
 	local TYPE_NUMBER32 = 57
 	local TYPE_NUMBER32NEG = 58
-	
+
 	local pairs_, instance_, tableLoopupCtr, tableLookup, ss
 
 	local typetostringfuncs = {}
@@ -1779,9 +1779,9 @@ do
 	stringtotypefuncs[TYPE_NUMBER16NEG] = function() return -ss:readUInt16() end
 	stringtotypefuncs[TYPE_NUMBER32] = function() return ss:readUInt32() end
 	stringtotypefuncs[TYPE_NUMBER32NEG] = function() return -ss:readUInt32() end
-	
+
 	--- Convert table to string data.
-	-- Only works with strings, numbers, tables, bools, 
+	-- Only works with strings, numbers, tables, bools,
 	function SF.TableToString(tbl, instance, sorted)
 		pairs_ = sorted and SortedPairs or pairs
 		instance_ = instance
@@ -1995,8 +1995,8 @@ end
 
 function SF.CheckVector(v)
 	if v[1]<-1e12 or v[1]>1e12 or v[1]~=v[1] or
-	   v[2]<-1e12 or v[2]>1e12 or v[2]~=v[2] or
-	   v[3]<-1e12 or v[3]>1e12 or v[3]~=v[3] then
+		v[2]<-1e12 or v[2]>1e12 or v[2]~=v[2] or
+		v[3]<-1e12 or v[3]>1e12 or v[3]~=v[3] then
 
 		SF.Throw("Input vector too large or NAN", 3)
 	end
@@ -2225,8 +2225,8 @@ do
 		dict.__index = dict
 
 		local aClass = { name = name, super = super, static = {},
-						 __instanceDict = dict, __declaredMethods = {},
-						 subclasses = setmetatable({}, {__mode='k'})  }
+						__instanceDict = dict, __declaredMethods = {},
+						subclasses = setmetatable({}, {__mode='k'})  }
 
 		if super then
 		setmetatable(aClass.static, {
@@ -2243,7 +2243,7 @@ do
 		end
 
 		setmetatable(aClass, { __index = aClass.static, __tostring = _tostring,
-							 __call = _call, __newindex = _declareInstanceMethod })
+							__call = _call, __newindex = _declareInstanceMethod })
 
 		return aClass
 	end
@@ -2270,8 +2270,8 @@ do
 
 		isInstanceOf = function(self, aClass)
 		return istable(aClass)
-			 and istable(self)
-			 and (self.class == aClass
+			and istable(self)
+			and (self.class == aClass
 				or istable(self.class)
 				and isfunction(self.class.isSubclassOf)
 				and self.class:isSubclassOf(aClass))
@@ -2500,7 +2500,7 @@ do
 		end
 		return init
 	end
-	
+
 	local function addModule(name, path, shouldrun)
 		local source, init
 		if SERVER then

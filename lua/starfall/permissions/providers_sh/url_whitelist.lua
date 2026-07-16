@@ -102,7 +102,7 @@ end
 local function loadUserWhitelist()
 	local filename = SERVER and "sf_url_whitelist.txt" or "starfall/cl_url_whitelist.txt"
 	local code = file.Read(filename, "DATA")
-	
+
 	if (code and code ~= "") then
 		local func = SF.CompileString(code, filename, false)
 		if isstring(func) then
@@ -121,4 +121,3 @@ function SF.ReloadUrlWhitelist()
 	loadUserWhitelist()
 end
 SF.ReloadUrlWhitelist()
-

@@ -51,7 +51,7 @@ http.get("https://raw.githubusercontent.com/thegrb93/StarfallEx/master/lua/starf
 		holo:setMesh(mymesh)
 		holo:setMeshMaterial(texture)
 		holo:setRenderBounds(Vector(-200),Vector(200))
-		
+
 		hook.add("postdrawopaquerenderables","mesh",renderHUD)
 		hook.add("render","mesh",renderScreen)
 	end

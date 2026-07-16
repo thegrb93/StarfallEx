@@ -28,7 +28,7 @@ local PVSLimitCvar = CreateConVar("sf_pvs_pointlimit", 16, FCVAR_ARCHIVE, "The n
 
 local PVSManager = {
 
-	__index = { 
+	__index = {
 		updateActiveTable = function(self)
 			table.Empty(self.PVSactiveTable)
 
@@ -62,7 +62,7 @@ local PVSManager = {
 					self:updateActiveTable()
 					self.preparingPVSUpdate = false
 				end)
-			end	
+			end
 		end,
 
 		clearInstCountTable = function(self, inst)
@@ -92,8 +92,8 @@ local PVSManager = {
 		end,
 
 		setPointToCountTable = function(self, inst, tply, id, pos)
-		
-		
+
+
 			self:checkCountTable(inst, tply, id, pos)
 			self.PVScountTable[inst.player][inst][tply][id] = pos
 
@@ -199,13 +199,13 @@ function player_methods:giveWeapon(weapon, noAmmo)
 	if noAmmo ~= nil then checkluatype(noAmmo, TYPE_BOOL) end
 
 	local ply = unwrap(self)
-    checkpermission(instance, ply, "player.giveweapon")
+	checkpermission(instance, ply, "player.giveweapon")
 
-    local wpnEntry = list.GetForEdit("Weapon", true)[weapon]
-    if not wpnEntry then SF.Throw(weapon .. " is not a Valid SWEP!") end
-    if not wpnEntry.Spawnable then SF.Throw(weapon .. " is not a Spawnable SWEP!") end
+	local wpnEntry = list.GetForEdit("Weapon", true)[weapon]
+	if not wpnEntry then SF.Throw(weapon .. " is not a Valid SWEP!") end
+	if not wpnEntry.Spawnable then SF.Throw(weapon .. " is not a Spawnable SWEP!") end
 
-    return wwrap(Ply_Give(ply, weapon, noAmmo))
+	return wwrap(Ply_Give(ply, weapon, noAmmo))
 end
 
 --- Drops the player's weapon
@@ -498,8 +498,8 @@ end
 function player_methods:setPVSPoint( ID, position )
 	checkluatype(ID, TYPE_NUMBER)
 	ID = math.floor(math.Clamp(ID,1,PVSLimitCvar:GetInt()))
-	if not (SF.IsHUDActive(instance.entity, unwrap(self) ) or unwrap(self) == instance.player) then 
-		SF.Throw("setPVS can only be used on owner or HUD connected players!") 
+	if not (SF.IsHUDActive(instance.entity, unwrap(self) ) or unwrap(self) == instance.player) then
+		SF.Throw("setPVS can only be used on owner or HUD connected players!")
 	end
 	if position ~= nil then position = vunwrap( position ) checkvector(position) end
 	PlayerPVSManager:setPointToCountTable(instance, unwrap(self), ID, position)

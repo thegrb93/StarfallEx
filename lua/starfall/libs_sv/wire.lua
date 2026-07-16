@@ -257,7 +257,7 @@ local SFToWire =
 {
 	NORMAL = function(data)
 		local dataType = TypeID( data )
-		
+
 		if dataType == TYPE_NUMBER then
 			return data
 		elseif dataType == TYPE_BOOL then
@@ -340,7 +340,7 @@ local sfTypeToWireTypeTable = {
 -- letter and contain only alphabetical characters or numbers but may not begin with a number.
 -- @param table names An array of input names. May be modified by the function.
 -- @param table types An array of input types. Can be shortcuts. May be modified by the function.
--- @param table? descriptions An optional array of input descriptions. 
+-- @param table? descriptions An optional array of input descriptions.
 function wire_library.adjustInputs(names, types, descriptions)
 	checkpermission(instance, nil, "wire.setInputs")
 
@@ -384,7 +384,7 @@ end
 -- letter and contain only alphabetical characters or numbers but may not begin with a number.
 -- @param table names An array of output names. May be modified by the function.
 -- @param table types An array of output types. Can be shortcuts. May be modified by the function.
--- @param table? descriptions An optional array of output descriptions. 
+-- @param table? descriptions An optional array of output descriptions.
 function wire_library.adjustOutputs(names, types, descriptions)
 	checkpermission(instance, nil, "wire.setOutputs")
 
@@ -582,7 +582,7 @@ local function parseEntity(ent, io)
 	end
 
 	local names, types = {}, {}
-	
+
 	if ent[io] then
 		for k, v in pairs(ent[io]) do
 			if isstring(k) and isstring(v.Type) and k ~= "" then

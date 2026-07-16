@@ -526,7 +526,7 @@ local function writeEntity(self, instance, e)
 	self:writeInt16(ent:EntIndex())
 	self:writeInt32(ent:GetCreationID())
 end
-	
+
 --- Reads an entity from the byte stream and advances the buffer pointer.
 -- @name ss_methods.readEntity
 -- @class function

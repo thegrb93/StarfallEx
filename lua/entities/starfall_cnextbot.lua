@@ -48,7 +48,7 @@ function ENT:GotoBehavior()
 	local ent_tbl = Ent_GetTable(self)
 
 	local startPerfTime = SysTime()
-	
+
 	self:StartActivity(ent_tbl.RUNACT)
 	ent_tbl.loco:SetDesiredSpeed(ent_tbl.MoveSpeed)
 
@@ -122,7 +122,7 @@ function ENT:OnInjured(dmginfo)
 		dmginfo:GetDamage(),
 		inst.WrapObject(dmginfo:GetAttacker()),
 		inst.WrapObject(dmginfo:GetInflictor()),
-		inst.Types.Vector.Wrap(dmginfo:GetDamagePosition()), 
+		inst.Types.Vector.Wrap(dmginfo:GetDamagePosition()),
 		inst.Types.Vector.Wrap(dmginfo:GetDamageForce()),
 		dmginfo:GetDamageType())
 end
@@ -130,7 +130,7 @@ end
 function ENT:OnKilled(dmginfo)
 	local ent_tbl = Ent_GetTable(self)
 	local inst = ent_tbl.instance
-	
+
 	if not ent_tbl.DeathCallbacks:isEmpty() then
 		ent_tbl.DeathCallbacks:run(inst,
 			dmginfo:GetDamage(),

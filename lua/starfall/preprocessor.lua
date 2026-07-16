@@ -23,7 +23,7 @@ SF.PreprocessData = {
 			self.includesdata[#self.includesdata + 1] = args
 			SF.PreprocessData.directives.include(self, args)
 		end,
-		
+
 		includedir = function(self, args)
 			if #args == 0 then return "Empty includedir directive" end
 			self.includedirs[#self.includedirs + 1] = args
@@ -70,7 +70,7 @@ SF.PreprocessData = {
 			if self.clientmain then
 				self.clientmain = processor:ResolvePath(self.clientmain, self.path) or error("Bad --@clientmain "..self.clientmain.." in file "..self.path)
 			end
-			
+
 			for _, incdata in ipairs(self.includesdata) do
 				incdata = processor:ResolvePath(incdata, self.path) or error("Bad --@includedata "..incdata.." in file "..self.path)
 				local fdata = processor.files[incdata]
@@ -202,7 +202,7 @@ SF.FileLoader = {
 				self.files[name] = cache
 				return
 			end
-			
+
 			local fdata = SF.PreprocessData(name)
 			self.files[name] = fdata
 			self.httpCache[url] = fdata

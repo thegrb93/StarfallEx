@@ -623,7 +623,7 @@ function material_methods:setTextureURL(key, url, cb, done)
 			instance:runFunction(done, self, url)
 		end
 	end
-	
+
 	SF.G_HttpTextureLoader:request(SF.HttpTextureRequest(url, instance, texture, callback, donecallback))
 end
 

@@ -928,7 +928,7 @@ function Editor:InitComponents()
 			end,
 			function( error )
 			end
-		 )
+		)
 
 		end
 
@@ -1660,7 +1660,7 @@ end
 ---Returns the value of the settings `ReloadBeforeUpload` of the editor.
 ---@return boolean
 function Editor:ShouldReloadBeforeUpload()
-    return self.autoReloadEnabled
+	return self.autoReloadEnabled
 end
 
 ---Reloads the tab associated to the file at `filepath`, if there is one.
@@ -2090,4 +2090,3 @@ concommand.Add("sf_userlist", function()
 	userPanel:SetDeleteOnClose(true)
 	userPanel:Open()
 end)
-

@@ -417,12 +417,12 @@ function math_library.bezierVectorCubic(r, v1, v2, v3, v4)
 	local r2 = r * r
 	local ri = 1 - r
 	local ri2 = ri * ri
-	
+
 	local c1 = ri2 * ri
 	local c2 = 3 * ri2 * r
 	local c3 = 3 * ri * r2
 	local c4 = r2 * r
-	
+
 	return setmetatable({
 	  c1*v1[1] + c2*v2[1] + c3*v3[1] + c4*v4[1],
 	  c1*v1[2] + c2*v2[2] + c3*v3[2] + c4*v4[2],
@@ -525,7 +525,7 @@ math_library.easeInOutQuad = math.ease.InOutQuad
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
 math_library.easeInOutQuart = math.ease.InOutQuart
-	
+
 --- Eases in and out by raising the fraction to the power of 5.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
@@ -616,7 +616,7 @@ math_library.easeOutSine = math.ease.OutSine
 -- @return number Number average of all values
 function math_library.mean( numbers )
 	checkluatype( numbers, TYPE_TABLE )
-	
+
 	local sum = 0
 
 	for i = 1, #numbers do

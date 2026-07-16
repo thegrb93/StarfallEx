@@ -11,6 +11,7 @@ indent_size = 4
 indent_style = tab
 trim_trailing_whitespace = false
 insert_final_newline = true
+max_line_length = unset
 
 # Lua source code files
 [**.lua]
@@ -18,6 +19,13 @@ indent_size = 4
 indent_style = tab
 trim_trailing_whitespace = true
 insert_final_newline = true
+
+# Plain text files
+[**.txt]
+indent_size = unset
+indent_style = unset
+trim_trailing_whitespace = false
+insert_final_newline = false
 
 # Markdown files
 [**.md]
@@ -39,3 +47,18 @@ indent_size = 2
 indent_style = space
 insert_final_newline = true
 trim_trailing_whitespace = true
+
+# Valve material files
+[**.vmt]
+indent_size = 4
+indent_style = tab
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Exclude binary files from formatting rules
+[*.{pdn,vtf,vtx,mdl,phy,vvd}]
+end_of_line = unset
+indent_size = unset
+indent_style = unset
+trim_trailing_whitespace = false
+insert_final_newline = false

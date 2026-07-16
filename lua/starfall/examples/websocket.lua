@@ -10,31 +10,31 @@
 local ws = WebSocket("ws.ifelse.io", 443, true)
 
 function ws:onConnected()
-    -- Print a message when connected, and the state.
-    -- See the SF Helper for more info on the websocket state
-    print("Socket connected", self:getState())
+	-- Print a message when connected, and the state.
+	-- See the SF Helper for more info on the websocket state
+	print("Socket connected", self:getState())
 
-    -- Send a message to the server
-    self:write("Test")
+	-- Send a message to the server
+	self:write("Test")
 end
 
 -- This is usually called twice, once when the socket gets an "error", which will pass true to this callback,
 -- and then another time for it finally "disconnecting" (which will pass false).
 function ws:onDisconnected(errored)
-    print("Socket disconnected", errored, self:getState())
+	print("Socket disconnected", errored, self:getState())
 end
 
 -- This is called whenever the socket receives a message.
 function ws:onMessage(msg)
-    print("Socket got a message: ", msg)
+	print("Socket got a message: ", msg)
 
-    if msg == "Test" then
-        -- Send another message
-        self:write("Exit")
-    elseif msg == "Exit" then
-        -- Close the socket
-        self:close()
-    end
+	if msg == "Test" then
+		-- Send another message
+		self:write("Exit")
+	elseif msg == "Exit" then
+		-- Close the socket
+		self:close()
+	end
 end
 
 -- Connect to the server

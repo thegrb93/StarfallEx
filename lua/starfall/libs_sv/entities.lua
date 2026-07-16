@@ -868,7 +868,7 @@ function ents_methods:setContents(contents)
 	if not Phys_IsValid(phys) then SF.Throw("Physics object is invalid", 2) end
 
 	checkluatype(contents, TYPE_NUMBER)
-	
+
 	checkpermission(instance, ent, "entities.setContents")
 	Phys_SetContents(phys, contents)
 end
@@ -943,7 +943,7 @@ function ents_methods:enableSphere(enabled, radius)
 			end
 			Ent_PhysicsInitSphere(ent, radius, phys:GetMaterial())
 			Ent_SetCollisionBounds(ent, Vector(-radius, -radius, -radius) , Vector(radius, radius, radius))
-	
+
 			-- https://github.com/daveth/makespherical/blob/80b702ba04ba4b64d6c378df8d405b2c113dec53/lua/weapons/gmod_tool/stools/makespherical.lua#L117
 			local info = {
 				obbcenter = ent.obbcenter,
@@ -953,7 +953,7 @@ function ents_methods:enableSphere(enabled, radius)
 				enabled = enabled,
 				isrenderoffset = 0
 			}
-			
+
 			duplicator.StoreEntityModifier(ent, "MakeSphericalCollisions", info)
 		end
 	else
@@ -1251,7 +1251,7 @@ function ents_methods:setPreventTransmit(target, prevent)
 			newtarget[i] = instance.Types.Player.Unwrap(pl)
 		end
 	end
-	
+
 	checkluatype(prevent, TYPE_BOOL)
 
 	Ent_SetPreventTransmit(ent, newtarget, prevent)

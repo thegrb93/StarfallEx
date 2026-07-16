@@ -864,7 +864,7 @@ env.STENCIL = {
 	["INCR"] = STENCIL_INCR or 7,
 	["DECR"] = STENCIL_DECR or 8
 }
-	
+
 --- ENUMs used by render.SetModelLighting
 -- @name builtins_library.BOX
 -- @class table

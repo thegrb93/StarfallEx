@@ -27,7 +27,7 @@ local bassSound = {
 				-- Sounds falls off with dist^2. Unfortunately, we still have to do the square root inbetween.
 				fadeMult = ((self.fadeMax - math_sqrt(distSqr)) / (self.fadeMax - self.fadeMin)) ^ 2
 			end
-		
+
 			if self.fadeMult ~= fadeMult then
 				self.fadeMult = fadeMult
 				self.sound:SetVolume(self.targetVolume * fadeMult)
@@ -332,7 +332,7 @@ function bass_methods:setFade(min, max, useSimpleFading)
 	soundData:setFade(min, max, useSimpleFading)
 end
 
---- Gets the fade distance of the sound in 3D space. 
+--- Gets the fade distance of the sound in 3D space.
 -- @return number The distance before the sound starts to fade.
 -- @return number The distance before the sound stops fading.
 -- @return boolean Whether or not this sound uses simple fading.
@@ -493,7 +493,7 @@ end
 
 --- Retrieves OGG media info tag, from a bass channel created by Bass:loadFile or Bass:loadURL, if available.
 --- CRITICAL NOTE: Tags aren't available immediately! Must use a timer to wait 100-500ms for BASS to parse metadata during stream init!!
--- @return table A list of available information in no particular order, or nil if no information is available. 
+-- @return table A list of available information in no particular order, or nil if no information is available.
 function bass_methods:getTagsOGG()
 	return getsnd(self):GetTagsOGG()
 end
@@ -531,7 +531,7 @@ function bass_methods:is3D()
 end
 
 --- Sets the 3D mode of the channel. This will affect Bass:get3DEnabled() but not Bass:is3D().
---- This feature requires the channel to be initially created in 3D mode, i.e. Bass:is3D() should return true or this function will do nothing. 
+--- This feature requires the channel to be initially created in 3D mode, i.e. Bass:is3D() should return true or this function will do nothing.
 -- @param boolean enable True or False to toggle 3D.
 function bass_methods:set3DEnabled(enable)
 	checkluatype(enable, TYPE_BOOLEAN)

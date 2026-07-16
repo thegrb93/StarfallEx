@@ -222,4 +222,3 @@ SF.Permissions.registerProvider({
 		"allow"
 	}
 })
-

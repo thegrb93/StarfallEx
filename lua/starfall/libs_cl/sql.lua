@@ -35,7 +35,7 @@ end
 function sql_library.tableExists(tabname)
 	checkpermission(instance, nil, "sql")
 	checkluatype(tabname, TYPE_STRING)
-	
+
 	return sql.TableExists(tabname)
 end
 
@@ -45,7 +45,7 @@ end
 function sql_library.tableRemove(tabname)
 	checkpermission(instance, nil, "sql")
 	checkluatype(tabname, TYPE_STRING)
-	
+
 	if not sql.TableExists(tabname) then return false end
 	sql.Query("DROP TABLE " .. tabname)
 	return true
@@ -59,7 +59,7 @@ function sql_library.SQLStr(str, bNoQuotes)
 	checkpermission(instance, nil, "sql")
 	checkluatype(str, TYPE_STRING)
 	checkluatype(bNoQuotes, TYPE_BOOL)
-	
+
 	return sql.SQLStr(str, bNoQuotes)
 end
 

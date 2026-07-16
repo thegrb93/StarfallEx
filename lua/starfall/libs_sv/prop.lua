@@ -687,14 +687,14 @@ end
 -- @server
 -- @return boolean Determines whether props will be cleaned
 function props_library.getPropClean()
-    return propConfig.clean
+	return propConfig.clean
 end
 
 --- Returns whether the props are undo-able
 -- @server
 -- @return boolean Determines whether props are undo-able
 function props_library.getPropUndo()
-    return propConfig.undo
+	return propConfig.undo
 end
 
 --- Sets whether the chip should remove created props when the chip is removed

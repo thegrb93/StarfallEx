@@ -42,13 +42,13 @@ end
 -- @shared
 -- @return table List of Vector points. This will usually be 4 corners of a quadrilateral in counter-clockwise order.
 function surfaceinfo_methods:getVertices()
-    local t = sunwrap(self):GetVertices()
-    local out = {}
-    if not t then return out end
-    for k,vec in ipairs(t) do
-        out[k] = vwrap(vec)
-    end
-    return out
+	local t = sunwrap(self):GetVertices()
+	local out = {}
+	if not t then return out end
+	for k,vec in ipairs(t) do
+		out[k] = vwrap(vec)
+	end
+	return out
 end
 
 --- Checks if the brush surface is a nodraw surface, meaning it will not be drawn by the engine.
@@ -56,7 +56,7 @@ end
 -- @shared
 -- @return boolean If this surface won't be drawn.
 function surfaceinfo_methods:isNoDraw()
-    return sunwrap(self):IsNoDraw()
+	return sunwrap(self):IsNoDraw()
 end
 
 --- Checks if the brush surface is displaying the skybox.
@@ -64,7 +64,7 @@ end
 -- @shared
 -- @return boolean If the surface is the sky.
 function surfaceinfo_methods:isSky()
-    return sunwrap(self):IsSky()
+	return sunwrap(self):IsSky()
 end
 
 --- Checks if the brush surface is water.
@@ -72,7 +72,7 @@ end
 -- @shared
 -- @return boolean If the surface is water.
 function surfaceinfo_methods:isWater()
-    return sunwrap(self):IsWater()
+	return sunwrap(self):IsWater()
 end
 
 end

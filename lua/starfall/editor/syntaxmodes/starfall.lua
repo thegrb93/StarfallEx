@@ -561,7 +561,7 @@ function EDITOR:SyntaxColorLine(row)
 				self:NextCharacter()
 			end
 		elseif self:NextPattern("%-%-") then -- Comments
-			
+
 			if self:NextPattern("%[=*%[") then -- Block comment
 				local reps = #self.tokendata:match("%[(=*)%[")
 				while self.character do

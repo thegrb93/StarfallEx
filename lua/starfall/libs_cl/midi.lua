@@ -24,7 +24,7 @@ instance:AddHook("deinitialize", function()
 	midi_library.closeAllPorts()
 end)
 
---- Event hook for midi devices.  
+--- Event hook for midi devices.
 -- Everytime a midi device outputs a signal, the callback function on the hook is called.
 -- Read up on the MIDI protocol to make better sense of everything -> https://ccrma.stanford.edu/~craig/articles/linuxmidi/misc/essenmidi.html
 -- @name MIDI
@@ -50,7 +50,7 @@ SF.hookAdd("MIDI", "midi")
 -- @return string the name of the midi device opened at the given port.
 function midi_library.openPort(port)
 	checkluatype(port, TYPE_NUMBER)
-	if midi_library.isPortOpen(port) then 
+	if midi_library.isPortOpen(port) then
 		SF.Throw("This port is already open!")
 	end
 	return midi.Open(port)

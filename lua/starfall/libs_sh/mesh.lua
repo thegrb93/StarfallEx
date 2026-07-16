@@ -300,7 +300,7 @@ do
 	function find_plane(p1, p2, p3)
 		local normal = (p3.vec - p1.vec):cross(p2.vec - p1.vec):getNormalized()
 		local dist = normal:dot(p1.vec)
-		return { a = normal.x, b = normal.y, c = normal.z, d = dist, n = normal } 
+		return { a = normal.x, b = normal.y, c = normal.z, d = dist, n = normal }
 	end
 
 	function face_vertices(face)
@@ -388,7 +388,7 @@ do
 			{ point3, point4, point1 },
 		}
 		for i, verts in ipairs(face_verts) do
-			local he_face = { plane = find_plane(verts[1], verts[2], verts[3]), points = { } } 
+			local he_face = { plane = find_plane(verts[1], verts[2], verts[3]), points = { } }
 			local he_f_edges = { }
 			for j = 1, 3 do
 				local he_f_edge = { face = he_face }
@@ -447,11 +447,11 @@ do
 
 		face.lightface = true
 		ret[#ret + 1] = face
-	
+
 		find_lightfaces(point, face.edge.twin.face, ret)
 		find_lightfaces(point, face.edge.next.twin.face, ret)
 		find_lightfaces(point, face.edge.next.next.twin.face, ret)
-	
+
 		return ret
 	end
 
@@ -471,7 +471,7 @@ do
 		for i, point in ipairs(points) do
 			if point.ignore then continue end
 			for j, face in ipairs(faces) do
-				face.points = face.points or { } 
+				face.points = face.points or { }
 				if dist_to_plane(point, face.plane) > 0 then
 					face.points[#face.points + 1] = point
 					point.face = face
@@ -502,7 +502,7 @@ do
 			-- If no points, the face is processed
 			if #curface.points == 0 then
 				curface.list_parent = face_list
-				face_list = { next = face_list, value = curface } 
+				face_list = { next = face_list, value = curface }
 
 				continue
 			end
@@ -592,7 +592,7 @@ do
 							lface.points[k1] = nil -- This is ok since we are not adding new keys
 						end
 
-						if thread_yield then 
+						if thread_yield then
 							iter2 = iter2 + 1
 							if iter2 % 100 == 0 then thread_yield() end
 						end
@@ -643,7 +643,7 @@ do
 				ret_points[#ret_points + 1] = vert.point
 			end
 			ret_faces[#ret_faces + 1] = face
-			
+
 			if #ret_faces % 100 == 0 and thread_yield then thread_yield() end
 		end
 
@@ -770,7 +770,7 @@ function mesh_library.findConvexHull(vertices, threaded)
 	end
 	local nvertices = #vertices
 	if nvertices < 4 then SF.Throw("Expected at least 4 vertices.", 2) end
-	
+
 	local newVertices = { }
 	for i = 1, nvertices do
 		checkluatype(vertices[i], TYPE_TABLE)
@@ -779,7 +779,7 @@ function mesh_library.findConvexHull(vertices, threaded)
 		else
 			newVertices[i] = vertices[i].pos
 		end
-		
+
 		if i % 100 == 0 and threaded then thread_yield() end
 	end
 
@@ -1132,7 +1132,7 @@ if CLIENT then
 	-- @class function
 	-- @param number index The slot index for the vertex, either 0 or 1.
 	-- @param number matrixId The matrix index for the vertex, in the range of 1 -> 53.
-	-- @param number weight How much influence that matrix will have on this vertex, in the range of 0 -> 1. Both weights on each vertex should sum to 1. 
+	-- @param number weight How much influence that matrix will have on this vertex, in the range of 0 -> 1. Both weights on each vertex should sum to 1.
 	mesh_library.writeBoneData = mesh.BoneData
 
 	--- Pushes the vertex data onto the render stack
@@ -1189,4 +1189,3 @@ if CLIENT then
 end
 
 end
-

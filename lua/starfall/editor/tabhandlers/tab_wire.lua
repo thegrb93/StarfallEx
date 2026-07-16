@@ -1551,8 +1551,8 @@ function PANEL:_OnTextChanged()
 					end
 				end
 				if unIndentedLast and
-				   unIndentedLast[1] == self.Caret[1] and 
-				   unIndentedLast[2] == self.Caret[2] and 
+				   unIndentedLast[1] == self.Caret[1] and
+				   unIndentedLast[2] == self.Caret[2] and
 				   string.match(text,"[%s%(%)]") == nil then
 					-- re-indent if the user types something else after those four things, but not if that's a space character or a '(' character
 					self:SetSelection(text)
@@ -1663,11 +1663,11 @@ function PANEL:Find(str, looped)
 		local text = line:sub(self.Start[2]) .. "\n"
 		text = text .. self:GetLinesAsText(self.Start[1] + 1)
  		if ignore_case then text = text:lower() end
- 
+
 		if not use_patterns then
 			str = string.PatternSafe(str)
 		end
- 
+
 		if whole_word_only then
 			str = "%f[%w_]" .. str .. "%f[^%w_]"
 		end
@@ -1677,7 +1677,7 @@ function PANEL:Find(str, looped)
  			self:HighlightFoundWord(nil, start - 1, stop - 1)
  			return true
  		end
- 
+
  		if wrap_around then
  			self:SetCaret({1, 1}, false)
 			return self:Find(_str, (looped or 0) + 1)
@@ -1693,11 +1693,11 @@ function PANEL:Find(str, looped)
 		text = string_reverse(text)
 
  		if ignore_case then text = text:lower() end
- 
+
 		if not use_patterns then
 			str = string.PatternSafe(str)
 		end
- 
+
  		if whole_word_only then
 			str = "%f[%w_]" .. str .. "%f[^%w_]"
  		end
@@ -1707,7 +1707,7 @@ function PANEL:Find(str, looped)
  			self:HighlightFoundWord( nil, -(start-1), -(stop+1) )
  			return true
  		end
- 
+
  		if wrap_around then
  			self:SetCaret( { #self.Rows,#self.Rows[#self.Rows] }, false )
 			return self:Find( _str, (looped or 0) + 1 )
@@ -2191,7 +2191,7 @@ function PANEL:DoUndo()
 		self.Undo[#self.Undo] = nil
 
 		self:SetCaret(self:SetArea(undo[1], undo[2], true, false, undo[3], undo[4]), false)
-		
+
 		if self.OnTextChanged then self:OnTextChanged() end
 	end
 end
@@ -2354,7 +2354,7 @@ function PANEL:ContextHelp()
 end
 
 function PANEL:Copy()
-	if not self:HasSelection() then 
+	if not self:HasSelection() then
 		local oldCaret = self:CopyPosition(self.Caret)
 
 		self.Start = { self.Caret[1], 1 }
@@ -2380,7 +2380,7 @@ function PANEL:Cut()
 
 	if not self:HasSelection() then
 		self.Start = { self.Caret[1], 1 }
-		
+
 		if self.Caret[1] < #self.Rows then
 			self.Caret = { self.Caret[1] + 1, 1 }
 		else
@@ -2454,7 +2454,7 @@ function PANEL:MoveSelection(dir)
 		self.Start = { nextRow , 1 }
 		self.Caret = { nextRow, #self.Rows[nextRow][1] + 1 }
 		local otherString = self:GetSelection()
-		
+
 		if dir == -1 then
 			self.Start = { startPos[1] + dir, 1 }
 			self.Caret = { endPos[1], #self.Rows[endPos[1]][1] + 1 }
@@ -2464,7 +2464,7 @@ function PANEL:MoveSelection(dir)
 			self.Caret = { endPos[1] + dir, #self.Rows[endPos[1] + dir][1] + 1 }
 			self:SetSelection(otherString .. "\n" .. thisString)
 		end
-		
+
 		startPos[1] = startPos[1] + dir
 		endPos[1] = endPos[1] + dir
 		self.Start = self:CopyPosition(startPos)
@@ -2573,7 +2573,7 @@ function PANEL:_OnKeyCodeTyped(code)
 		end
 
 	else
-		
+
 		if code == KEY_ENTER then
 			if self:AutocompleteKeybind(code) then return end
 			local row = self:GetRowText(self.Caret[1]):sub(1, self.Caret[2]-1)
@@ -2594,9 +2594,9 @@ function PANEL:_OnKeyCodeTyped(code)
 					return n - temp
 				end
 				local row = string_gsub(row,'%b""',"") -- erase strings on this line
-				if countMatches(row,{"{"},"}") > 0 or 
-					countMatches(row,{"%sthen%s","%sdo%s","[,%s%(]function[%s%(]","%selse%s"},"%send[%s%p]") > 0 or 
-					countMatches(row,{"%srepeat%s"},"%suntil%s") > 0 then 
+				if countMatches(row,{"{"},"}") > 0 or
+					countMatches(row,{"%sthen%s","%sdo%s","[,%s%(]function[%s%(]","%selse%s"},"%send[%s%p]") > 0 or
+					countMatches(row,{"%srepeat%s"},"%suntil%s") > 0 then
 						tabs = tabs .. indent_str
 				end
 			end
@@ -2612,7 +2612,7 @@ function PANEL:_OnKeyCodeTyped(code)
 			self:SetCaret(self.Caret)
 		elseif code == KEY_DOWN then
 			if self:AutocompleteKeybind(code) then return end
-			if self.Caret[1] >= #self.Rows then 
+			if self.Caret[1] >= #self.Rows then
 					self.Caret[2] = #self.Rows[self.Caret[1]][1]
 					self:SetCaret(self.Caret)
 				return
@@ -3008,7 +3008,7 @@ function PANEL:AutocompletePopulate()
 			end
 			break
 		end
-		
+
 		local prevWord = self:getWordPrevious()
 		if prevWord == "function" or prevWord == "local" then return end
 
@@ -3305,7 +3305,7 @@ function PANEL:AutocompleteCreate()
 
 	suggestioninfo:AddItem(desc)
 	suggestioninfo.desc = desc
-	
+
 	acPanel:SetSize(720, 300)
 
 	self.acPanel = acPanel
@@ -3422,7 +3422,7 @@ function PANEL:SyntaxColorLine(line)
 		["else"] = true,
 		["elseif"] = true,
 	}
-	for k,v in ipairs(cols) do 
+	for k,v in ipairs(cols) do
 		local text = v[1]
 		::redo::
 		if adds[text] then

@@ -87,7 +87,7 @@ local ReadStreamQueue = {
 				ErrorNoHalt("Receiving too many ReadStream requests!")
 				return
 			end
-			
+
 			for _, v in ipairs(queue) do
 				if v.identifier == stream.identifier then
 					ErrorNoHalt("Tried to start a new ReadStream for an already existing stream!")
@@ -323,7 +323,7 @@ function net.WriteStream(data, callback, dontcompress)
 
 	local stream = net.Stream.WriteStreams:Add(WritingDataItem(data, callback, compressed))
 	if not stream then return end
-	
+
 	--print("WriteStream", #stream.chunks, stream.identifier, compressed)
 	net.WriteUInt(#stream.chunks, 32)
 	net.WriteUInt(stream.identifier, 32)
@@ -347,7 +347,7 @@ function net.ReadStream(ply, callback)
 	if not isfunction(callback) then
 		error("bad argument #2 to 'ReadStream' (function expected, got " .. type(callback) .. ")", 2)
 	end
-	
+
 	local numchunks = net.ReadUInt(32)
 	if numchunks == nil then
 		return

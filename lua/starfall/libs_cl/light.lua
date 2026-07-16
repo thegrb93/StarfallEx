@@ -162,7 +162,7 @@ function light_methods:draw()
 	processLights(curtime)
 	if lightsUsed >= 32 then SF.Throw("Max number of dynamiclights reached", 2) end
 	lightsUsed = lightsUsed + 1
-	
+
 	local light = unwrap(self)
 	if not light.slot then
 		light.slot = getFreeSlot()

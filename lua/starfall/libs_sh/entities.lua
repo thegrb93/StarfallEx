@@ -1791,7 +1791,7 @@ end
 -- @return number The maximum value for this flex
 function ents_methods:getFlexBounds(flexid)
 	local ent = eunwrap(self)
-	
+
 	checkluatype(flexid, TYPE_NUMBER)
 	flexid = math.floor(flexid)
 
@@ -1810,7 +1810,7 @@ function ents_methods:setEyeTarget(pos)
 	local vec = vunwrap(pos)
 	checkvector(vec)
 	checkpermission(instance, ent, SERVER and "entities.canTool" or "entities.setRenderProperty")
-	
+
 	Ent_SetEyeTarget(ent, vec)
 end
 

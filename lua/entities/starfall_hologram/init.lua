@@ -87,4 +87,3 @@ SF.WaitForPlayerInit(function(ply)
 		end
 	end
 end)
-

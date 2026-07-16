@@ -906,7 +906,7 @@ end
 --- Gets the current draw color set with render.setColor().
 -- @return Color The current draw color
 function render_library.getColor()
-	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end 
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	local drawClr = surface.GetDrawColor()
 	return setmetatable({drawClr.r, drawClr.g, drawClr.b, drawClr.a}, col_meta)
 end
@@ -1512,7 +1512,7 @@ local drawTriangle
 do
 	local mesh_Position, mesh_Color, mesh_AdvanceVertex =
 		mesh.Position, mesh.Color, mesh.AdvanceVertex
-	
+
 	local v1_vec, v2_vec, v3_vec = Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0)
 
 	drawTriangle = function(x1, y1, x2, y2, x3, y3)
@@ -1541,7 +1541,7 @@ render_library.drawTriangle = function(x1, y1, x2, y2, x3, y3)
 	mesh_Begin(MATERIAL_TRIANGLES, 1)
 		local success, err = pcall(drawTriangle, x1, y1, x2, y2, x3, y3)
 	mesh_End()
-	if not success then 
+	if not success then
 		error(err, 2)
 	end
 end
@@ -1596,7 +1596,7 @@ local drawTexturedRectUV
 do
 	local mesh_Position, mesh_Color, mesh_TexCoord, mesh_AdvanceVertex =
 		mesh.Position, mesh.Color, mesh.TexCoord, mesh.AdvanceVertex
-	
+
 	drawTexturedRectUV = function(startU, startV, endU, endV)
 		local r, g, b, a = Col_Unpack(currentcolor)
 		mesh_Position( quad_v1 ); mesh_Color( r, g, b, a ); mesh_TexCoord( 0, startU, startV ); mesh_AdvanceVertex();
@@ -1664,7 +1664,7 @@ local drawTexturedTriangleUV
 do
 	local mesh_Position, mesh_Color, mesh_TexCoord, mesh_AdvanceVertex =
 		mesh.Position, mesh.Color, mesh.TexCoord, mesh.AdvanceVertex
-	
+
 	local v1_vec, v2_vec, v3_vec = Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0)
 
 	drawTexturedTriangleUV = function(vert1, vert2, vert3)
@@ -1687,7 +1687,7 @@ render_library.drawTexturedTriangleUV = function(vert1, vert2, vert3)
 	mesh_Begin(MATERIAL_TRIANGLES, 1)
 		local success, err = pcall(drawTexturedTriangleUV, vert1, vert2, vert3)
 	mesh_End()
-	if not success then 
+	if not success then
 		error(err, 2)
 	end
 end
@@ -2115,8 +2115,8 @@ end
 --- Begin drawing a multi-segment beam.
 -- @param number segmentCount The number of Beam Segments that this multi-segment Beam will contain
 function render_library.start3DBeam(segmentCount)
-    if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-    render.StartBeam(segmentCount)
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	render.StartBeam(segmentCount)
 end
 
 --- Adds a beam segment to the beam started by render.start3DBeam.
@@ -2125,14 +2125,14 @@ end
 -- @param number textureEnd The end coordinate of the texture used.
 -- @param Color color The color to be used.
 function render_library.add3DBeam(startPos, width, textureEnd, color)
-    if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-    render.AddBeam(vunwrap1(startPos), width, textureEnd, cunwrap1(color))
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	render.AddBeam(vunwrap1(startPos), width, textureEnd, cunwrap1(color))
 end
 
 --- Ends the beam mesh of a beam started with render.start3DBeam.
 function render_library.end3DBeam()
-    if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-    render.EndBeam()
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	render.EndBeam()
 end
 
 --- Draws 2 connected triangles.
@@ -2165,7 +2165,7 @@ local draw3DQuadUV
 do
 	local mesh_Position, mesh_Color, mesh_TexCoord, mesh_AdvanceVertex =
 		mesh.Position, mesh.Color, mesh.TexCoord, mesh.AdvanceVertex
-	
+
 	draw3DQuadUV = function(vert1, vert2, vert3, vert4)
 		local r, g, b, a = Col_Unpack(currentcolor)
 		Vec_SetUnpacked(quad_v1, vert1[1], vert1[2], vert1[3])
@@ -2196,7 +2196,7 @@ local draw3DTriangle
 do
 	local mesh_Position, mesh_Color, mesh_AdvanceVertex =
 		mesh.Position, mesh.Color, mesh.AdvanceVertex
-	
+
 	local v1_vec, v2_vec, v3_vec = Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0)
 
 	draw3DTriangle = function(vert1, vert2, vert3)
@@ -2220,7 +2220,7 @@ render_library.draw3DTriangle = function(vert1, vert2, vert3)
 	mesh_Begin(MATERIAL_TRIANGLES, 1)
 		local success, err = pcall(draw3DTriangle, vert1, vert2, vert3)
 	mesh_End()
-	if not success then 
+	if not success then
 		error(err, 2)
 	end
 end
@@ -2229,7 +2229,7 @@ local draw3DTriangleUV
 do
 	local mesh_Position, mesh_Color, mesh_TexCoord, mesh_AdvanceVertex =
 		mesh.Position, mesh.Color, mesh.TexCoord, mesh.AdvanceVertex
-	
+
 	local v1_vec, v2_vec, v3_vec = Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0)
 
 	draw3DTriangleUV = function(vert1, vert2, vert3)
@@ -2252,7 +2252,7 @@ render_library.draw3DTriangleUV = function(vert1, vert2, vert3)
 	mesh_Begin(MATERIAL_TRIANGLES, 1)
 		local success, err = pcall(draw3DTriangleUV, vert1, vert2, vert3)
 	mesh_End()
-	if not success then 
+	if not success then
 		error(err, 2)
 	end
 end
@@ -2799,7 +2799,7 @@ end
 function render_library.pixelVisible(position, radius)
 	position = vunwrap1(position)
 	checkluatype(radius, TYPE_NUMBER)
-	
+
 	local PixVis = pixhandle_bank:use(instance.player)
 	renderdata.usedPixelVis[#renderdata.usedPixelVis + 1] = PixVis
 	return util.PixelVisible(position, radius, PixVis)
