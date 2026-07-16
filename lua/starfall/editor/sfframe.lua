@@ -1896,7 +1896,7 @@ function PANEL:UpdatePlayers(players)
 		header:SetBackgroundColor(Color(0,0,0,20))
 		header:SetTooltip(tbl.name)
 
-		local blocked = SF.BlockedUsers:isBlocked(steamid)
+		local blocked = SF.BlockedUsers:contains(steamid)
 		local button = vgui.Create("StarfallButton", header)
 		button.active = blocked
 		button:SetText(blocked and "Unblock" or "Block")
@@ -1905,9 +1905,9 @@ function PANEL:UpdatePlayers(players)
 
 		button.DoClick = function()
 			if blocked then
-				SF.BlockedUsers:unblock(steamid)
+				SF.BlockedUsers:remove(steamid)
 			else
-				SF.BlockedUsers:block(steamid)
+				SF.BlockedUsers:add(steamid)
 			end
 			blocked = not blocked
 			button:SetText(blocked and "Unblock" or "Block")
@@ -2032,7 +2032,7 @@ end
 function PANEL:CheckPlayersChanged()
 	local players = {}
 	for k, v in pairs(player.GetAll()) do
-		if not table.IsEmpty(SF.playerInstances[v]) or SF.BlockedUsers:isBlocked(v:SteamID()) then
+		if not table.IsEmpty(SF.playerInstances[v]) or SF.BlockedUsers:contains(v:SteamID()) then
 			players[v] = true
 		end
 	end

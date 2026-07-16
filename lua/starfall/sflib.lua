@@ -584,13 +584,13 @@ local function steamIdToConsoleSafeName(steamid)
 	return Ent_IsValid(ply) and string.gsub(Ply_Nick(ply), '[%z\x01-\x1f\x7f;"\']', "") or ""
 end
 
---- Returns a class that can keep a list of blocked users
-SF.BlockedList = {
+--- Returns a class that can keep a list of users
+SF.SavedUserList = {
 	__index = {
 		toline = function(self, steamid, name)
 			return steamid..","..name.."\n"
 		end,
-		block = function(self, steamid)
+		add = function(self, steamid)
 			if self.list[steamid] then return end
 			local name = steamIdToConsoleSafeName(steamid)
 			self.list[steamid] = name
@@ -605,7 +605,7 @@ SF.BlockedList = {
 				self.onblock(steamid)
 			end
 		end,
-		unblock = function(self, steamid)
+		remove = function(self, steamid)
 			if not self.list[steamid] then return end
 			self.list[steamid] = nil
 
@@ -621,7 +621,7 @@ SF.BlockedList = {
 				self.onunblock(steamid)
 			end
 		end,
-		isBlocked = function(self, steamid)
+		contains = function(self, steamid)
 			return self.list[steamid] ~= nil
 		end,
 		readFile = function(self)
@@ -638,7 +638,7 @@ SF.BlockedList = {
 		end
 	},
 	__call = function(p, prefix, desc, filename, onblock, onunblock)
-		local blocked = setmetatable({
+		local obj = setmetatable({
 			list = {},
 			filename = filename,
 			onblock = onblock,
@@ -646,37 +646,37 @@ SF.BlockedList = {
 		}, p)
 
 		if filename then
-			blocked:readFile()
+			obj:readFile()
 		end
 
-		SF.SteamIDConcommand("sf_"..prefix.."_block", function(executor, id)
-			blocked:block(id)
-		end, "Block a user from " .. desc, false)
+		SF.SteamIDConcommand("sf_"..prefix.."_add", function(executor, id)
+			obj:add(id)
+		end, "Add a user to list of " .. desc, false)
 
-		SF.SteamIDConcommand("sf_"..prefix.."_unblock", function(executor, id)
-			blocked:unblock(id)
-		end, "Unblock a user from " .. desc, false,
+		SF.SteamIDConcommand("sf_"..prefix.."_remove", function(executor, id)
+			obj:remove(id)
+		end, "Remove a user from list of " .. desc, false,
 		function(cmd)
 			local tbl = {}
-			for steamid, name in pairs(blocked.list) do
+			for steamid, name in pairs(obj.list) do
 				table.insert(tbl, cmd.." \""..steamid.."\" // \""..name.."\"")
 			end
 			return tbl
 		end)
 
-		concommand.Add("sf_"..prefix.."_blocklist", function(executor, cmd, args)
+		concommand.Add("sf_"..prefix.."_list", function(executor, cmd, args)
 			local n = 0
-			for steamid, name in pairs(blocked.list) do
+			for steamid, name in pairs(obj.list) do
 				print("\""..steamid.."\" // \""..name.."\"")
 				n = n + 1
 			end
-			print("You have blocked "..n.." players from "..desc)
-		end, nil, "List players you have blocked from " .. desc)
+			print(n.." players contained in list of "..desc)
+		end, nil, "List the contents of " .. desc)
 
-		return blocked
+		return obj
 	end
 }
-setmetatable(SF.BlockedList, SF.BlockedList)
+setmetatable(SF.SavedUserList, SF.SavedUserList)
 
 
 SF.Parent = {

@@ -283,7 +283,7 @@ else
 	debugCvar = CreateConVar("sf_moneyrequest_verbose_cl", 1, FCVAR_ARCHIVE, "Prints information about money requests to console.", 0, 1)
 
 	-- Allow blocking/unblocking money requests from some players, to help mitigate abuse
-	SF.BlockedMoneyRequests = SF.BlockedList("moneyrequest", "sending you money requests")
+	SF.BlockedMoneyRequests = SF.SavedUserList("blocked_moneyrequest", "blocked users from sending you money requests")
 
 	-- The actual money request prompt itself
 	local function createMoneyRequestPanel(receiver, amount, expiry, message)
@@ -351,7 +351,7 @@ else
 		end
 		function self:OnClose()
 			if blockRequests:GetChecked() then
-				SF.BlockedMoneyRequests:block(receiverSteamID)
+				SF.BlockedMoneyRequests:add(receiverSteamID)
 			end
 		end
 		local me = LocalPlayer()
@@ -401,10 +401,10 @@ else
 			printDebug("SF: Ignoring malformed request.", request)
 		end
 		printDebug("SF: Received money request.", request)
-		if SF.BlockedUsers:isBlocked(receiver:SteamID()) then
+		if SF.BlockedUsers:contains(receiver:SteamID()) then
 			RunConsoleCommand("sf_moneyrequest", 0, "decline", receiver:EntIndex())
 			return printDebug("SF: Ignoring money request because the receiver is in \"SF.BlockedUsers\".", request)
-		elseif SF.BlockedMoneyRequests:isBlocked(receiver:SteamID()) then
+		elseif SF.BlockedMoneyRequests:contains(receiver:SteamID()) then
 			RunConsoleCommand("sf_moneyrequest", 0, "decline", receiver:EntIndex())
 			return printDebug("SF: Ignoring money request because the receiver is in \"SF.BlockedMoneyRequests\".", request)
 		end
