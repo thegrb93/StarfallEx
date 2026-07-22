@@ -2811,9 +2811,8 @@ end
 -- @param number textureIndex? Texture index to update. (optional, default is 0)
 function render_library.updateScreenEffectTexture(textureIndex)
 	checkpermission(instance, nil, "render.screeneffect")
-  if textureIndex == nil then textureIndex = 0 end
-	checkluatype(textureIndex, TYPE_NUMBER)
-  render.UpdateScreenEffectTexture(textureIndex)
+	if textureIndex ~= nil then checkluatype(textureIndex, TYPE_NUMBER) else textureIndex = 0 end
+	render.UpdateScreenEffectTexture(textureIndex)
 end
 
 --- Obtain an texture of the screen. You must call render.updateScreenEffectTexture in order to update this texture with the currently rendered scene
@@ -2821,9 +2820,8 @@ end
 -- @param number textureIndex? Texture index to update. (optional, default is 0)
 -- @return string Requested texture
 function render_library.getScreenEffectTexture(textureIndex)
-  if textureIndex == nil then textureIndex = 0 end
-	checkluatype(textureIndex, TYPE_NUMBER)
-  return render.GetScreenEffectTexture(textureIndex):GetName()
+	if textureIndex ~= nil then checkluatype(textureIndex, TYPE_NUMBER) else textureIndex = 0 end
+	return render.GetScreenEffectTexture(textureIndex):GetName()
 end
 
 end
