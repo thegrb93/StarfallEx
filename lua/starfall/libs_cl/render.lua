@@ -2812,13 +2812,13 @@ end
 function render_library.updateScreenEffectTexture(textureIndex)
 	checkpermission(instance, nil, "render.screeneffect")
 	if textureIndex ~= nil then
-      checkluatype(textureIndex, TYPE_NUMBER)
-      if textureIndex < 0 or textureIndex > 3 then
-          SF.Throw("Invalid screen effect texture index: "..textureIndex, 2)
-      end
-  else
-      textureIndex = 0
-  end
+		checkluatype(textureIndex, TYPE_NUMBER)
+		if textureIndex < 0 or textureIndex > 3 then
+			SF.Throw("Invalid screen effect texture index: "..textureIndex, 2)
+		end
+	else
+		textureIndex = 0
+	end
 	render.UpdateScreenEffectTexture(textureIndex)
 end
 
@@ -2828,13 +2828,13 @@ end
 -- @return string Requested texture
 function render_library.getScreenEffectTexture(textureIndex)
 	if textureIndex ~= nil then
-      checkluatype(textureIndex, TYPE_NUMBER)
-      if textureIndex < 0 or textureIndex > 3 then
-          SF.Throw("Invalid screen effect texture index: "..textureIndex, 2)
-      end
-  else
-      textureIndex = 0
-  end
+		checkluatype(textureIndex, TYPE_NUMBER)
+		if textureIndex < 0 or textureIndex > 3 then
+			SF.Throw("Invalid screen effect texture index: "..textureIndex, 2)
+		end
+	else
+		textureIndex = 0
+	end
 	return render.GetScreenEffectTexture(textureIndex):GetName()
 end
 
