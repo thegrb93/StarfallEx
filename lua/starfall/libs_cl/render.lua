@@ -27,6 +27,7 @@ registerprivilege("render.fog", "Render Fog", "Allows the user to control fog", 
 registerprivilege("render.hud", "Render Hud", "Allows the user to render to your hud", { client = { default = 5 } })
 registerprivilege("render.calcview", "Render CalcView", "Allows the use of the CalcView hook", { client = { default = 5 } })
 registerprivilege("render.screenshake", "Render Screen Shake", "Allows screen shaking", { client = { default = 5 } })
+registerprivilege("render.screeneffect", "Screenspace effects", "Allows the use of screenspace effects", { client = { default = 5 } })
 
 local cv_max_fonts = CreateConVar("sf_render_maxfonts", "30", { FCVAR_ARCHIVE })
 local cv_max_maxrenderviewsperframe = CreateConVar("sf_render_maxrenderviewsperframe", "2", { FCVAR_ARCHIVE })
@@ -2803,6 +2804,38 @@ function render_library.pixelVisible(position, radius)
 	local PixVis = pixhandle_bank:use(instance.player)
 	renderdata.usedPixelVis[#renderdata.usedPixelVis + 1] = PixVis
 	return util.PixelVisible(position, radius, PixVis)
+end
+
+--- Copies the entire screen to the screen effect texture, which can be acquired via render.getScreenEffectTexture (Requires HUD)
+-- @client
+-- @param number textureIndex? Texture index to update. (optional, default is 0)
+function render_library.updateScreenEffectTexture(textureIndex)
+	checkpermission(instance, nil, "render.screeneffect")
+	if textureIndex ~= nil then
+		checkluatype(textureIndex, TYPE_NUMBER)
+		if textureIndex < 0 or textureIndex > 3 then
+			SF.Throw("Invalid screen effect texture index: "..textureIndex, 2)
+		end
+	else
+		textureIndex = 0
+	end
+	render.UpdateScreenEffectTexture(textureIndex)
+end
+
+--- Obtain an texture of the screen. You must call render.updateScreenEffectTexture in order to update this texture with the currently rendered scene
+-- @client
+-- @param number textureIndex? Texture index to update. (optional, default is 0)
+-- @return string Requested texture
+function render_library.getScreenEffectTexture(textureIndex)
+	if textureIndex ~= nil then
+		checkluatype(textureIndex, TYPE_NUMBER)
+		if textureIndex < 0 or textureIndex > 3 then
+			SF.Throw("Invalid screen effect texture index: "..textureIndex, 2)
+		end
+	else
+		textureIndex = 0
+	end
+	return render.GetScreenEffectTexture(textureIndex):GetName()
 end
 
 end
