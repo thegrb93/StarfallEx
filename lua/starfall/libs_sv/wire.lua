@@ -257,7 +257,7 @@ local SFToWire =
 {
 	NORMAL = function(data)
 		local dataType = TypeID( data )
-		
+
 		if dataType == TYPE_NUMBER then
 			return data
 		elseif dataType == TYPE_BOOL then
@@ -340,7 +340,7 @@ local sfTypeToWireTypeTable = {
 -- letter and contain only alphabetical characters or numbers but may not begin with a number.
 -- @param table names An array of input names. May be modified by the function.
 -- @param table types An array of input types. Can be shortcuts. May be modified by the function.
--- @param table? descriptions An optional array of input descriptions. 
+-- @param table? descriptions An optional array of input descriptions.
 function wire_library.adjustInputs(names, types, descriptions)
 	checkpermission(instance, nil, "wire.setInputs")
 
@@ -384,7 +384,7 @@ end
 -- letter and contain only alphabetical characters or numbers but may not begin with a number.
 -- @param table names An array of output names. May be modified by the function.
 -- @param table types An array of output types. Can be shortcuts. May be modified by the function.
--- @param table? descriptions An optional array of output descriptions. 
+-- @param table? descriptions An optional array of output descriptions.
 function wire_library.adjustOutputs(names, types, descriptions)
 	checkpermission(instance, nil, "wire.setOutputs")
 
@@ -582,7 +582,7 @@ local function parseEntity(ent, io)
 	end
 
 	local names, types = {}, {}
-	
+
 	if ent[io] then
 		for k, v in pairs(ent[io]) do
 			if isstring(k) and isstring(v.Type) and k ~= "" then
@@ -623,6 +623,49 @@ function wire_library.isConnected(ent, inputName)
 	local inputs = Ent_GetTable(ent).Inputs or SF.Throw("Entity has no inputs", 2)
 	local input = inputs[inputName] or SF.Throw("Invalid input: " .. inputName, 2)
 	return Ent_IsValid(input.Src)
+end
+
+--- Gets the source entity and output name that a given input is wired to
+-- @param Entity ent Entity with input
+-- @param string inputName Input name to check
+-- @return Entity? Source entity, or nil if not wired
+-- @return string? Output name on the source entity, or nil if not wired
+function wire_library.getInputSource(ent, inputName)
+	checkluatype(inputName, TYPE_STRING)
+	ent = eunwrap(ent)
+	checkpermission(instance, ent, "wire.getInputs")
+
+	local inputs = Ent_GetTable(ent).Inputs or SF.Throw("Entity has no inputs", 2)
+	local input = inputs[inputName] or SF.Throw("Invalid input: " .. inputName, 2)
+	if Ent_IsValid(input.Src) then
+		return owrap(input.Src), tostring(input.SrcId)
+	end
+end
+
+--- Gets all destination inputs that a given output is wired to
+-- @param Entity ent Entity with the output
+-- @param string outputName Name of the output to check
+-- @return table A table of destination connections. Each entry is a table with fields `Entity` (the destination entity) and `Name` (the input name on that entity). Returns an empty table if not wired.
+function wire_library.getOutputTargets(ent, outputName)
+	checkluatype(outputName, TYPE_STRING)
+	ent = eunwrap(ent)
+	checkpermission(instance, ent, "wire.getOutputs")
+
+	local outputs = Ent_GetTable(ent).Outputs or SF.Throw("Entity has no outputs", 2)
+	local output = outputs[outputName] or SF.Throw("Invalid output: " .. outputName, 2)
+
+	local destinations = {}
+	local connected = output.Connected or {}
+	for i = 1, #connected do
+		local conn = connected[i]
+		if Ent_IsValid(conn.Entity) then
+			destinations[#destinations + 1] = {
+				Entity = owrap(conn.Entity),
+				Name = tostring(conn.Name)
+			}
+		end
+	end
+	return destinations
 end
 
 --- Returns a wirelink to a wire entity
