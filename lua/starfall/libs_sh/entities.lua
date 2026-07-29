@@ -1068,15 +1068,27 @@ function ents_methods:isAlive()
 	return Ent_Alive(eunwrap(self))
 end
 
---- Returns the starfall or expression2's name
+--- Returns the starfall, wire gate, wire fpga or expression2's name
 -- @return string The name of the chip
 function ents_methods:getChipName()
 	local ent = eunwrap(self)
-	local GetGateName = Ent_GetTable(ent).GetGateName
+	local tbl = Ent_GetTable(ent)
+	local GetGateName = tbl.GetGateName
+	local GetOverlayData = tbl.GetOverlayData
+	local class = Ent_GetClass(ent)
 	if GetGateName then
 		return tostring(GetGateName(ent))
+	elseif class == "gmod_wire_fpga" then
+		local data = GetOverlayData and GetOverlayData(ent)
+		if not (data and data.name) then return "(none)" end
+		return tostring(data.name)
+	elseif class == "gmod_wire_gate" then
+		local data = GetOverlayData and GetOverlayData(ent)
+		if not (data and data.txt) then return "(none)" end
+		local lines = data.txt:Split("\n")
+		return lines[1]
 	else
-		SF.Throw("The entity is not a starfall or expression2!", 2)
+		SF.Throw("The entity is not a starfall, wire gate, wire fpga or expression2!", 2)
 	end
 end
 
