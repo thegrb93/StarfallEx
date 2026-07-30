@@ -1085,7 +1085,7 @@ function ents_methods:getChipName()
 	elseif class == "gmod_wire_gate" then
 		local data = GetOverlayData and GetOverlayData(ent)
 		if not (data and data.txt) then return "(none)" end
-		local lines = data.txt:Split("\n")
+		local lines = string.Split(data.txt, "\n")
 		return lines[1]
 	else
 		SF.Throw("The entity is not a starfall, wire gate, wire fpga or expression2!", 2)
