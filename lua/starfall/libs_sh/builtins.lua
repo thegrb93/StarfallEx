@@ -135,6 +135,46 @@ builtins_library.ipairs = ipairs
 -- @return any Nil as current index (for the constructor)
 builtins_library.pairs = pairs
 
+--- Returns an iterator function for a for loop that can be used to loop through a table in random order.
+-- @name builtins_library.randomPairs
+-- @class function
+-- @param table tbl Table to iterate over
+-- @return function Iterator function
+-- @return table Table being iterated over
+-- @return any Nil as current index (for the constructor)
+builtins_library.randomPairs = RandomPairs
+
+--- Returns an iterator function for a for loop that can be used to loop through a table alphabetically.
+-- @name builtins_library.sortedPairs
+-- @class function
+-- @param table tbl Table to iterate over
+-- @param boolean desc Reverse sorting order
+-- @return function Iterator function
+-- @return table Table being iterated over
+-- @return any Nil as current index (for the constructor)
+builtins_library.sortedPairs = SortedPairs
+
+--- Returns an iterator function for a for loop that can be used to loop through a table in order of member values, when the values of the table are also tables and contain that member.
+-- @name builtins_library.sortedPairsByMemberValue
+-- @class function
+-- @param table tbl Table to iterate over
+-- @param any memberKey Key of the value member to sort by
+-- @param boolean desc Reverse sorting order
+-- @return function Iterator function
+-- @return table Table being iterated over
+-- @return any Nil as current index (for the constructor)
+builtins_library.sortedPairsByMemberValue = SortedPairsByMemberValue
+
+--- Returns an iterator function for a for loop that can be used to loop through a table in order of its values.
+-- @name builtins_library.sortedPairsByValue
+-- @class function
+-- @param table tbl Table to iterate over
+-- @param boolean desc Reverse sorting order
+-- @return function Iterator function
+-- @return table Table being iterated over
+-- @return any Nil as current index (for the constructor)
+builtins_library.sortedPairsByValue = SortedPairsByValue
+
 --- Returns a string representing the name of the type of the passed object.
 -- @name builtins_library.type
 -- @param any obj Object to get type of
