@@ -149,7 +149,6 @@ function game_library.getWorld()
 end
 
 --- Returns a table with keys that are condensed model path names and value identifiers of said paths
--- @shared
 -- @return table List of valid playermodels
 function game_library.getPlayerModels()
 	local ret = {}
@@ -157,6 +156,14 @@ function game_library.getPlayerModels()
 		ret[k] = v
 	end
 	return ret
+end
+
+--- Returns the wind's velocity at a given position, as influenced by current map's env_wind entities
+-- @param Vector? pos The point to get wind speed at
+-- @return Vector The current wind velocity at a given position
+function game_library.getWindSpeed(pos)
+	if pos ~= nil then pos = vunwrap1(pos) end
+	return vwrap(game.GetWindSpeed(pos))
 end
 
 --- Given a 64bit SteamID will return a STEAM_0: style Steam ID
@@ -172,6 +179,12 @@ game_library.steamIDFrom64 = util.SteamIDFrom64
 -- @param string id The STEAM_0 style id
 -- @return string 64bit Steam ID
 game_library.steamIDTo64 = util.SteamIDTo64
+
+--- Returns the name of the currently running gamemode
+-- @name game_library.getActiveGamemode
+-- @class function
+-- @return string The name of the active gamemode
+game_library.getActiveGamemode = engine.ActiveGamemode
 
 if SERVER then
 
@@ -314,6 +327,20 @@ else
 	-- @return boolean If currently timing out
 	-- @return number Time since the connection started to timeout
 	game_library.isTimingOut = GetTimeoutInfo
+
+	--- Returns true if the game is currently recording a demo file (.dem)
+	-- @name game_library.isRecordingDemo
+	-- @client
+	-- @class function
+	-- @return boolean True if recording a demo
+	game_library.isRecordingDemo = engine.IsRecordingDemo
+
+	--- Returns whether the game menu overlay (main menu) is open or not
+	-- @name game_library.isGameUIVisible
+	-- @client
+	-- @class function
+	-- @return boolean True if the game UI is visible
+	game_library.isGameMenuVisible = gui.IsGameUIVisible
 
 end
 
