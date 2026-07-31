@@ -335,12 +335,12 @@ else
 	-- @return boolean True if recording a demo
 	game_library.isRecordingDemo = engine.IsRecordingDemo
 
-	--- Returns whether the game menu overlay (main menu) is open or not
-	-- @name game_library.isGameUIVisible
+	--- Returns whether the game menu overlay (escape/main menu) is open or not
+	-- @name game_library.isPauseMenuVisible
 	-- @client
 	-- @class function
 	-- @return boolean True if the game UI is visible
-	game_library.isGameMenuVisible = gui.IsGameUIVisible
+	game_library.isPauseMenuVisible = gui.IsGameUIVisible
 
 end
 
