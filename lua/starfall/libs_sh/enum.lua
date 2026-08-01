@@ -510,6 +510,7 @@ env.SIM = {
 -- @field ALT2
 -- @field ATTACK
 -- @field ATTACK2
+-- @field ATTACK3
 -- @field BACK
 -- @field DUCK
 -- @field FORWARD
@@ -536,6 +537,7 @@ env.IN_KEY = {
 	["ALT2"] = IN_ALT2,
 	["ATTACK"] = IN_ATTACK,
 	["ATTACK2"] = IN_ATTACK2,
+	["ATTACK3"] = 33554432, -- +attack3
 	["BACK"] = IN_BACK,
 	["DUCK"] = IN_DUCK,
 	["FORWARD"] = IN_FORWARD,
@@ -1217,7 +1219,7 @@ env.FSASYNC = {
 	STATUS_UNSERVICED = FSASYNC_STATUS_UNSERVICED
 }
 
---- Midi Command ENUMS
+--- MIDI command ENUMs
 -- @name midi_library.MIDI
 -- @class table
 -- @field NOTE_OFF
