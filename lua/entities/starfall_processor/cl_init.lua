@@ -133,10 +133,14 @@ hook.Add("StarfallError", "StarfallErrorReport", function(_, owner, client, main
 	local local_player = LocalPlayer()
 	if owner == local_player then
 		if Ent_IsWorld(client) or client == owner then
-			SF.AddNotify(owner, message, "ERROR", 7, "ERROR1")
+			if SF.CvarNotifyErrors:GetBool() then
+				SF.AddNotify(owner, message, "ERROR", 7, "ERROR1")
+			end
 		elseif client then
 			if should_notify then
-				SF.AddNotify(owner, string.format("Starfall '%s' errored for player %s", main_file, client:Nick()), "ERROR", 7, "SILENT")
+				if SF.CvarNotifyErrors:GetBool() then
+					SF.AddNotify(owner, string.format("Starfall '%s' errored for player %s", main_file, client:Nick()), "ERROR", 7, "SILENT")
+				end
 				print(message)
 			else
 				print(string.format("Starfall '%s' errored for player %s: %s", main_file, client:Nick(), message))
