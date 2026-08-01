@@ -3,7 +3,7 @@ local registerprivilege = SF.Permissions.registerPrivilege
 local IsValid = IsValid
 
 -- Create permission types.
-registerprivilege("particleEffect.attach", "Allow users to create particle effect", { client = {}, entities = {} })
+registerprivilege("particleEffect.attach", "Attach a particle effect", "Allows users to attach particle effects to entities", { client = {}, entities = {} })
 
 local plyCount = SF.LimitObject("particleeffects", "particle effects", 16, "The number of created particle effects via Starfall per client at once")
 SF.ResourceCounters.ParticleEffects = {icon = "icon16/asterisk_orange.png", count = function(ply) return plyCount:get(ply) end}
