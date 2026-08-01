@@ -26,6 +26,7 @@ registerprivilege("render.captureImage", "Render Capture Image", "Allows capturi
 registerprivilege("render.fog", "Render Fog", "Allows the user to control fog", { client = {} })
 registerprivilege("render.hud", "Render Hud", "Allows the user to render to your hud", { client = { default = 5 } })
 registerprivilege("render.calcview", "Render CalcView", "Allows the use of the CalcView hook", { client = { default = 5 } })
+registerprivilege("render.calcviewmodelview", "Render CalcViewModelView", "Allows the use of the CalcViewModelView hook", { client = { default = 5 } })
 registerprivilege("render.screenshake", "Render Screen Shake", "Allows screen shaking", { client = { default = 5 } })
 registerprivilege("render.screeneffect", "Screenspace effects", "Allows the use of screenspace effects", { client = { default = 5 } })
 
@@ -401,7 +402,7 @@ SF.hookAdd("PostDraw2DSkyBox", nil, hudPrepareSafeArgs, cleanupRender)
 -- @client
 SF.hookAdd("PostDrawSkyBox", nil, hudPrepareSafeArgs, cleanupRender)
 
---- Called when the engine wants to calculate the player's view. Only works if connected to Starfall HUD
+--- Called when the engine wants to calculate the player's view (only works if connected to Starfall HUD)
 -- @name CalcView
 -- @class hook
 -- @client
@@ -426,6 +427,31 @@ end, function(instance, tbl)
 		ret.drawviewer = t.drawviewer
 		ret.ortho  = t.ortho
 		return ret
+	end
+end)
+
+--- Called when the engine wants to calculate the viewmodel position and angle (only works if connected to Starfall HUD)
+-- @name CalcViewModelView
+-- @class hook
+-- @client
+-- @param Weapon wep The weapon entity
+-- @param Entity vm The viewmodel entity
+-- @param Vector oldPos Original position (before viewmodel bobbing and swaying)
+-- @param Angle oldAng Original angle (before viewmodel bobbing and swaying)
+-- @param Vector pos Current position
+-- @param Angle ang Current angle
+-- @return Vector New position
+-- @return Angle New angle
+SF.hookAdd("CalcViewModelView", nil, function(instance, wep, vm, oldPos, oldAng, pos, ang)
+	return instance.player == SF.Superuser or haspermission(instance, nil, "render.calcviewmodelview"),
+		{instance.Types.Weapon.Wrap(wep), instance.Types.Entity.Wrap(vm), instance.Types.Vector.Wrap(oldPos), instance.Types.Angle.Wrap(oldAng), instance.Types.Vector.Wrap(pos), instance.Types.Angle.Wrap(ang)}
+end, function(instance, tbl)
+	if tbl[1] and tbl[2] and tbl[3] then
+		local pos = instance.Types.Vector.Unwrap(tbl[2])
+		local ang = instance.Types.Angle.Unwrap(tbl[3])
+		if pos and ang then
+			return pos, ang
+		end
 	end
 end)
 
