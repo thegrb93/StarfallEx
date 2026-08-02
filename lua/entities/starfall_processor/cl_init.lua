@@ -128,17 +128,34 @@ else
 	end
 end
 
+-- For 'sf_notify_cl 2': messages matching these substrings won't show notifications
+local silenced_messages = {
+	"CPU usage exceeded",
+	"User has blocked this player",
+	"Killed by user",
+	"Blocked by user",
+}
+
+-- Returns true if the error message should trigger a notification at 'sf_notify_cl 2'
+local function isNotifiable(message)
+	for i = 1, #silenced_messages do
+		if string.find(message, silenced_messages[i], 1, true) then return end
+	end
+	return true
+end
+
 hook.Add("StarfallError", "StarfallErrorReport", function(_, owner, client, main_file, message, traceback, should_notify)
 	if not Ent_IsValid(owner) then return end
 	local local_player = LocalPlayer()
 	if owner == local_player then
+		local notify_level = SF.CvarNotifyErrors:GetInt()
 		if Ent_IsWorld(client) or client == owner then
-			if SF.CvarNotifyErrors:GetBool() then
+			if notify_level ~= 0 and (notify_level ~= 2 or isNotifiable(message)) then
 				SF.AddNotify(owner, message, "ERROR", 7, "ERROR1")
 			end
 		elseif client then
 			if should_notify then
-				if SF.CvarNotifyErrors:GetBool() then
+				if notify_level >= 2 and (notify_level == 3 or isNotifiable(message)) then
 					SF.AddNotify(owner, string.format("Starfall '%s' errored for player %s", main_file, client:Nick()), "ERROR", 7, "SILENT")
 				end
 				print(message)
