@@ -131,6 +131,7 @@ end
 -- For 'sf_notify_cl 2': messages matching these substrings won't show notifications
 local silenced_messages = {
 	"CPU usage exceeded",
+	"RAM usage exceeded",
 	"User has blocked this player",
 	"Killed by user",
 	"Blocked by user",
