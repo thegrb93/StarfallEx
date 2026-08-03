@@ -8,6 +8,8 @@ local pcall = pcall
 local setmetatable = setmetatable
 local dgetmeta = debug.getmetatable
 local checkluatype = SF.CheckLuaType
+local checkvector = SF.CheckVector
+local checkangle = SF.CheckAngle
 local haspermission = SF.Permissions.hasAccess
 local registerprivilege = SF.Permissions.registerPrivilege
 local COL_META,ENT_META,VEC_META = FindMetaTable("Color"),FindMetaTable("Entity"),FindMetaTable("Vector")
@@ -419,8 +421,8 @@ end, function(instance, tbl)
 	local t = tbl[2]
 	if tbl[1] and istable(t) then
 		local ret = {}
-		if t.origin then pcall(function() ret.origin = instance.Types.Vector.Unwrap(t.origin) end) end
-		if t.angles then pcall(function() ret.angles = instance.Types.Angle.Unwrap(t.angles) end) end
+		if t.origin then pcall(function() ret.origin = checkvector(instance.Types.Vector.Unwrap(t.origin)) end) end
+		if t.angles then pcall(function() ret.angles = checkangle(instance.Types.Angle.Unwrap(t.angles)) end) end
 		ret.fov = t.fov
 		ret.znear = t.znear
 		ret.zfar = t.zfar
@@ -440,17 +442,19 @@ end)
 -- @param Angle oldAng Original angle (before viewmodel bobbing and swaying)
 -- @param Vector pos Current position
 -- @param Angle ang Current angle
--- @return Vector New position
--- @return Angle New angle
+-- @return Vector New position (you must return a value)
+-- @return Angle New angle (you must return a value)
 SF.hookAdd("CalcViewModelView", nil, function(instance, wep, vm, oldPos, oldAng, pos, ang)
 	return instance.player == SF.Superuser or haspermission(instance, nil, "render.calcviewmodelview"),
 		{instance.Types.Weapon.Wrap(wep), instance.Types.Entity.Wrap(vm), instance.Types.Vector.Wrap(oldPos), instance.Types.Angle.Wrap(oldAng), instance.Types.Vector.Wrap(pos), instance.Types.Angle.Wrap(ang)}
-end, function(instance, tbl)
-	if tbl[1] and tbl[2] and tbl[3] then
-		local pos = instance.Types.Vector.Unwrap(tbl[2])
-		local ang = instance.Types.Angle.Unwrap(tbl[3])
-		if pos and ang then
-			return pos, ang
+	end, function(instance, tbl)
+	local pos, ang = tbl[2], tbl[3]
+	if tbl[1] and istable(pos) and istable(ang) then
+		local newPos, newAng
+		pcall(function() newPos = checkvector(instance.Types.Vector.Unwrap(pos)) end)
+		pcall(function() newAng = checkangle(instance.Types.Angle.Unwrap(ang)) end)
+		if newPos and newAng then
+			return newPos, newAng
 		end
 	end
 end)
