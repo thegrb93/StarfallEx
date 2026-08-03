@@ -421,8 +421,8 @@ end, function(instance, tbl)
 	local t = tbl[2]
 	if tbl[1] and istable(t) then
 		local ret = {}
-		if t.origin then pcall(function() ret.origin = checkvector(instance.Types.Vector.Unwrap(t.origin)) end) end
-		if t.angles then pcall(function() ret.angles = checkangle(instance.Types.Angle.Unwrap(t.angles)) end) end
+		if t.origin then pcall(function() ret.origin = instance.Types.Vector.Unwrap(checkvector(t.origin)) end) end
+		if t.angles then pcall(function() ret.angles = instance.Types.Angle.Unwrap(checkangle(t.angles)) end) end
 		ret.fov = t.fov
 		ret.znear = t.znear
 		ret.zfar = t.zfar
@@ -452,8 +452,8 @@ SF.hookAdd("CalcViewModelView", nil, function(instance, wep, vm, oldPos, oldAng,
 	if tbl[1] and istable(pos) and istable(ang) then
 		local newPos, newAng
 		if pcall(function()
-			newPos = checkvector(instance.Types.Vector.Unwrap(pos))
-			newAng = checkangle(instance.Types.Angle.Unwrap(ang))
+			newPos = instance.Types.Vector.Unwrap(checkvector(pos))
+			newAng = instance.Types.Angle.Unwrap(checkangle(ang))
 		end) and newPos and newAng then
 			return newPos, newAng
 		end
