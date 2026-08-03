@@ -451,9 +451,10 @@ SF.hookAdd("CalcViewModelView", nil, function(instance, wep, vm, oldPos, oldAng,
 	local pos, ang = tbl[2], tbl[3]
 	if tbl[1] and istable(pos) and istable(ang) then
 		local newPos, newAng
-		pcall(function() newPos = checkvector(instance.Types.Vector.Unwrap(pos)) end)
-		pcall(function() newAng = checkangle(instance.Types.Angle.Unwrap(ang)) end)
-		if newPos and newAng then
+		if pcall(function()
+			newPos = checkvector(instance.Types.Vector.Unwrap(pos))
+			newAng = checkangle(instance.Types.Angle.Unwrap(ang))
+		end) and newPos and newAng then
 			return newPos, newAng
 		end
 	end
