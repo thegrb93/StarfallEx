@@ -135,6 +135,24 @@ builtins_library.ipairs = ipairs
 -- @return any Nil as current index (for the constructor)
 builtins_library.pairs = pairs
 
+--- Returns an iterator function for a for loop that will return the values of the specified table in a sorted order.
+-- @param table tbl Table to iterate over
+-- @param function? predicate A function that passes two entries to be sorted
+-- The entries are two tables representing the keyvalue pair of each entry
+-- e.g. The default predicate = function(a, b) return a[1]<b[1] end
+-- @return function Iterator function
+function builtins_library.sortedPairs(tbl, predicate)
+	checkluatype(tbl, TYPE_TABLE)
+	if predicate~=nil then checkluatype(predicate, TYPE_FUNCTION) else predicate = function(a,b) return a[1]<b[1] end end
+
+	local sortedTbl = {}
+	for k, v in pairs(tbl) do sortedTbl[#sortedTbl+1] = {k, v} end
+	table.sort(sortedTbl, predicate)
+
+	local i = 0
+	return function() i = i + 1 return unpack(sortedTbl[i] or {}) end
+end
+
 --- Returns a string representing the name of the type of the passed object.
 -- @name builtins_library.type
 -- @param any obj Object to get type of
