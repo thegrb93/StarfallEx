@@ -151,7 +151,7 @@ hook.Add("StarfallError", "StarfallErrorReport", function(_, owner, client, main
 	if owner == local_player then
 		local notify_level = SF.CvarNotifyErrors:GetInt()
 		if Ent_IsWorld(client) or client == owner then
-			if notify_level ~= 0 and (notify_level ~= 2 or isNotifiable(message)) then
+			if notify_level ~= 0 then
 				SF.AddNotify(owner, message, "ERROR", 7, "ERROR1")
 			end
 		elseif client then
