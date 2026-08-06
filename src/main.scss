@@ -272,9 +272,9 @@ code {
   float: right;
   text-align: right;
   font-size: 15px;
-  top: 10px;
-  right: 10px;
-  position: absolute;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 .sf-reference {
   color: #059de3;
