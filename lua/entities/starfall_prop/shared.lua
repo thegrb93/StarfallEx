@@ -17,4 +17,3 @@ function ENT:SetupDataTables()
 		self:NetworkVarNotify( "PhysMaterial", self.OnPhysMaterialChanged )
 	end
 end
-

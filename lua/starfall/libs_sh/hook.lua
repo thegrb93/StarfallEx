@@ -896,4 +896,3 @@ end
 -- @name Render
 -- @class hook
 -- @client
-

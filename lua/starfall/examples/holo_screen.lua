@@ -15,10 +15,10 @@ local fps_delta = 1/FPS -- Calculate how many ms in between frames to be used wi
 render.createRenderTarget("screenRT")
 
 -- Create a new material, we will set the hologram's material to this later
-local screenMat = material.create("UnlitGeneric") 
+local screenMat = material.create("UnlitGeneric")
 
 -- Set the material's texture to the render target that we've just created
-screenMat:setTextureRenderTarget("$basetexture", "screenRT") 
+screenMat:setTextureRenderTarget("$basetexture", "screenRT")
 
 -- Clear the material's flags
 screenMat:setInt("$flags", 0)
@@ -43,7 +43,7 @@ hook.add("renderoffscreen", "", function()
 
     render.selectRenderTarget("screenRT") -- select our render target
     render.clear() -- clear the screen, if we don't do this then whatever we draw will be drawn on top of our last frame
-    
+
     -- Do all your drawing from here on as you would normally with a regular screen
     -- Keep in mind that we are using a render target which is 1024x1024 pixels, whereas a screen would be 512x512 pixels
     -- Draw a funky box that oscillates back and forth in the middle of the screen.

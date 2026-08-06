@@ -223,4 +223,3 @@ SF.WaitForPlayerInit(function(ply)
 		v:SendCode(ply)
 	end
 end)
-

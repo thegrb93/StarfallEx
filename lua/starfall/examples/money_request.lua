@@ -102,7 +102,7 @@ elseif CLIENT then
         local offset = self.pressed and 4 or 3
         render.drawText(self.x+offset, self.y+offset, self.text)
     end
-    
+
     local menu = class("Menu")
     function menu:initialize(products)
         self.buttons = {}

@@ -31,4 +31,3 @@ hook.add("render","",function()
     render.setRenderTargetTexture("myrendertarget")
     render.drawTexturedRect(0,0,512,512)
 end)
-

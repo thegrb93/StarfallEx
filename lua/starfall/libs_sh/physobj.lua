@@ -278,16 +278,16 @@ if SERVER then
 	end
 
 	--- Applies velocity to an object
-    -- @server
-    -- @param Vector vel The world velocity vector to apply
-    function physobj_methods:addVelocity(vel)
-        vel = vunwrap1(vel)
-        checkvector(vel)
+	-- @server
+	-- @param Vector vel The world velocity vector to apply
+	function physobj_methods:addVelocity(vel)
+		vel = vunwrap1(vel)
+		checkvector(vel)
 
-        local phys = unwrap(self)
-        checkpermission(instance, Phys_GetEntity(phys), "entities.applyForce")
-        Phys_AddVelocity(phys, vel)
-    end
+		local phys = unwrap(self)
+		checkpermission(instance, Phys_GetEntity(phys), "entities.applyForce")
+		Phys_AddVelocity(phys, vel)
+	end
 
 	--- Sets the buoyancy ratio of a physobject
 	-- @server
@@ -586,7 +586,7 @@ if SERVER then
 
 	--- Calculates the linear and angular impulse on the object's center of mass for an offset impulse.
 	-- The outputs can be used with PhysObj:applyForceCenter and PhysObj:applyTorque, respectively.
-	-- 
+	--
 	-- Be careful to convert the angular impulse to world frame (PhysObj:localToWorldVector)
 	-- if you are going to use it with applyTorque.
 	-- @server

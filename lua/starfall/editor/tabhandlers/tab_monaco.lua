@@ -68,7 +68,7 @@ MonacoSetting.settings = {
 function MonacoSetting:applyAll()
 	local settings = {}
 	for k, v in ipairs(self.settings) do settings[k]=v.js end
-	
+
 	TabHandler.html:RunJavascript([[
 	sfeditor.updateOptions({
 		autoDetectHighContrast: false,
@@ -228,7 +228,7 @@ function TabHandler:FinishedLoading()
 end
 
 function TabHandler:DocsFinished()
-	
+
 end
 
 function TabHandler:GetActiveTab()

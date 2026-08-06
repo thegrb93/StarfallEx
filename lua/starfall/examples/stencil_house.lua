@@ -3,7 +3,7 @@
 --@shared
 
 if SERVER then
-    
+
     local template = {
         affected = {
             { pos = Vector(-23, -23, 23), ang = Angle(0, 45, 0),  mdl = "models/props_interiors/Furniture_Couch02a.mdl" },
@@ -24,24 +24,24 @@ if SERVER then
             { pos = Vector(0, 0, 143.5),  ang = Angle(0, 0, 0),   mdl = "models/hunter/misc/squarecap2x2x2.mdl" },
         }
     }
-    
+
     local affected_ents = {}
     local spawnProps = coroutine.wrap(function()
         for category, category_props in pairs(template) do
             for _, data in ipairs(category_props) do
                 local pos, ang = localToWorld(data.pos, data.ang, chip():getPos(), chip():getAngles())
                 local ent = prop.create(pos, ang, data.mdl, true)
-                
+
                 if category == "affected" then
                     table.insert(affected_ents, ent)
                 end
-                
+
                 coroutine.yield()
             end
         end
         return true
     end)
-    
+
     local ply_queue = {}
     local function sendEnts(target)
         if not target and #ply_queue < 1 then return end
@@ -52,7 +52,7 @@ if SERVER then
             end
         net.send(target or ply_queue)
     end
-    
+
     hook.add("ClientInitialized", "NetworkEnts", function(ply)
         if #affected_ents == #template.affected then
             sendEnts(ply)
@@ -60,7 +60,7 @@ if SERVER then
             table.insert(ply_queue, ply)
         end
     end)
-    
+
     hook.add("Tick", "SpawnProps", function()
         while prop.canSpawn() do
             if spawnProps() then
@@ -70,9 +70,9 @@ if SERVER then
             end
         end
     end)
-    
+
 else
-    
+
     local function resetStencil()
         render.setStencilWriteMask(0xFF)
         render.setStencilTestMask(0xFF)
@@ -83,20 +83,20 @@ else
         render.setStencilZFailOperation(STENCIL.KEEP)
         render.clearStencil()
     end
-    
+
     local ents = {}
     local function drawEnts()
         for _, ent in ipairs(ents) do
             ent:draw()
         end
     end
-    
+
     local function noDrawEnts(hide)
         for _, ent in ipairs(ents) do
             ent:setNoDraw(hide)
         end
     end
-    
+
     local modes = {
         {
             name = "Normal",
@@ -155,31 +155,31 @@ else
             post = function() noDrawEnts(false) end
         }
     }
-    
+
     local current_mode, mode_data
     local function changeMode(id)
         if mode_data and mode_data.post then
             mode_data.post()
         end
-        
+
         current_mode = id or current_mode % #modes + 1
         mode_data = modes[current_mode]
-        
+
         if mode_data.pre then
             mode_data.pre()
         end
-        
+
         if mode_data.draw then
             hook.add("PostDrawOpaqueRenderables", "DrawProps", mode_data.draw)
         else
             hook.remove("PostDrawOpaqueRenderables", "DrawProps")
         end
     end
-    
+
     hook.add("InputPressed", "ChangeMode", function(key)
         if key == KEY.E then changeMode() end
     end)
-    
+
     if player() == owner() then enableHud(nil, true) end
     hook.add("DrawHUD", "", function()
         if not current_mode then
@@ -194,7 +194,7 @@ else
             render.drawText(522, 290, "Press E to change the mode")
         end
     end)
-    
+
     net.receive("", function()
         local count = net.readUInt(8)
         for i = 1, count do
@@ -207,5 +207,5 @@ else
             end)
         end
     end)
-    
+
 end

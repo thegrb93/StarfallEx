@@ -22,18 +22,18 @@ hook.add("renderscene", "render_view", function(origin, angles)
 
     if not render.isInRenderView() and screenEnt then
         render.selectRenderTarget(rtName)
-        
+
         render.enableClipping(true)
-        
+
         local clipNormal = screenEnt:getUp()
         render.pushCustomClipPlane(clipNormal, (screenEnt:getPos() + clipNormal):dot(clipNormal))
-        
+
         local localOrigin = screenEnt:worldToLocal(origin)
         local reflectedOrigin = screenEnt:localToWorld(localOrigin * Vector(1, 1, -1))
-        
+
         local localAng = screenEnt:worldToLocalAngles(angles)
         local reflectedAngle = screenEnt:localToWorldAngles(Angle(-localAng.p, localAng.y, -localAng.r + 180))
-        
+
         render.renderView({
             origin = reflectedOrigin,
             angles = reflectedAngle,
@@ -45,9 +45,9 @@ hook.add("renderscene", "render_view", function(origin, angles)
             drawviewmodel = false,
             drawviewer = true,
         })
-        
+
         render.popCustomClipPlane()
-        
+
         render.selectRenderTarget()
     end
 end)

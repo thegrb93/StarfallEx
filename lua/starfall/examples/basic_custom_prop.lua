@@ -23,7 +23,7 @@ for i = 1, fidelity do
     local t = math.pi*2 / fidelity * i
     local cos = x/2 + math.cos(t) * x/4
     local sin = y/2 + math.sin(t) * y/4
-    
+
     table.insert(convexes[2], Vector(cos, sin, z))
     table.insert(convexes[2], Vector(cos, sin, z*2))
 end

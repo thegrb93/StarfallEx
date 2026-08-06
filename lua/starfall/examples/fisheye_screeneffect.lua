@@ -26,4 +26,3 @@ hook.add("DrawHUD", "FisheyeEffect", function()
     render.setMaterial(fisheye)
     render.drawTexturedRect(0, 0, render.getGameResolution())
 end)
-

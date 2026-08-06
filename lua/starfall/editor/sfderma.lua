@@ -233,7 +233,7 @@ local function moveFile(fileNode, toNode)
 	end
 
 	local sourceName = string.GetFileFromFilename(sourcePath)
-	
+
 	if file.Exists(toNode:GetFolder() .. "/" .. sourceName, "Data") then
 		SF.AddNotify(LocalPlayer(), "Failed to move " .. sourceName .. ", it already exists in: " .. toNode:GetFolder(), "ERROR", 7, "ERROR1")
 		return false
@@ -1144,7 +1144,7 @@ SF.Editor.Query = function(...)
 		local button = vgui.Create("StarfallButton",buttonContainer)
 		button:SetText(buttons[I])
 		button:SetAutoSize(false)
-		button.DoClick = function() 
+		button.DoClick = function()
 			buttons[I+1]()
 			frame:Close()
 		end
@@ -1302,13 +1302,13 @@ function PANEL:ParseFontString(str)
 
 	local str = string.gsub(str,"%-%-.-\n","") -- erase comments
 
-	local name, size, weight, antialias, 
-		  additive, shadow, outline, blursize, 
-		  extended, scanlines = string.match(str, 
-		  	string.format("render.createFont%%s*%%(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s%%)",
-		  		STRING, NUMBER, NUMBER, BOOLEAN, BOOLEAN, BOOLEAN, BOOLEAN, NUMBER, BOOLEAN, NUMBER
-		  	)
-		  )
+	local name, size, weight, antialias,
+		additive, shadow, outline, blursize,
+		extended, scanlines = string.match(str,
+			string.format("render.createFont%%s*%%(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s%%)",
+				STRING, NUMBER, NUMBER, BOOLEAN, BOOLEAN, BOOLEAN, BOOLEAN, NUMBER, BOOLEAN, NUMBER
+			)
+		)
 
 	if not name or not size or not weight or not antialias or not additive
 		or not shadow or not outline or not blursize
@@ -1327,7 +1327,7 @@ function PANEL:ParseFontString(str)
 	tab.additive = additive == "true"
 	tab.extended = extended == "true"
 	tab.outline = outline == "true"
-	return tab 
+	return tab
 end
 
 function PANEL:Init()
@@ -1345,9 +1345,9 @@ function PANEL:Init()
 	function preview:Paint()
 		local w,h = self:GetSize()
 		draw.SimpleText(
-			"This is a preview of the font", 
-			self.font, w/2, h/2, 
-			Color(255,255,255,255), 
+			"This is a preview of the font",
+			self.font, w/2, h/2,
+			Color(255,255,255,255),
 			TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER
 		)
 	end
@@ -1356,14 +1356,14 @@ function PANEL:Init()
 	------------------- copy buttons
 	local btns = {
 		-- {"button text", onclick}
-		{"Copy One-Liner", function() 
-			SetClipboardText(self:BuildFontString(self.fontSettings,false,false,true)) 
+		{"Copy One-Liner", function()
+			SetClipboardText(self:BuildFontString(self.fontSettings,false,false,true))
 		end},
 		{"Copy Formatted",function()
 			SetClipboardText(self:BuildFontString(self.fontSettings,true,false,true))
 		end},
-		{"Copy Formatted w/ Tips",function() 
-			SetClipboardText(self:BuildFontString(self.fontSettings,true,true,true)) 
+		{"Copy Formatted w/ Tips",function()
+			SetClipboardText(self:BuildFontString(self.fontSettings,true,true,true))
 		end}
 	}
 	local btnPanel = vgui.Create( "DPanel", self )
