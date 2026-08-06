@@ -61,7 +61,7 @@ SF.PreprocessData = {
 			for wholedirective, directive, args in string.gmatch(self.code, "(%-%-@(%w+)([^\r\n]*))") do
 				local func = SF.PreprocessData.directives[directive]
 				if func then
-					local err = func(self, string.Trim(args))
+					local err = func(self, SF.SafeStringLib.Trim(args))
 					if err then error("In file "..self.path..":"..self:FindError(err, wholedirective)..", "..err) end
 				end
 			end
