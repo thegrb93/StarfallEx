@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local haspermission = SF.Permissions.hasAccess
 local registerprivilege = SF.Permissions.registerPrivilege
@@ -88,7 +88,7 @@ if SERVER then
 	-- @server
 	-- @param Player ply The player who has unfrozen an entity
 	-- @param Entity ent The unfrozen entity
-	-- @param PhysObj physobj The physics object of the unfrozen entity 
+	-- @param PhysObj physobj The physics object of the unfrozen entity
 	add("PlayerUnfrozeObject")
 
 	--- Called when a player dies
@@ -168,7 +168,7 @@ if SERVER then
 	-- @param boolean teamChat True if team chat
 	-- @return string? New text. "" to stop from displaying. Nil to keep original.
 	add("PlayerSay", nil, nil, returnOnlyOnYourself, true)
-	
+
 	-- Serverside implementation of playerchat
 	gameevent.Listen("player_say")
 	add("player_say", "playerchat", function(instance, data)
@@ -290,7 +290,7 @@ else
 	-- @client
 	-- @param boolean isTeamChat Whether they're typing in team chat
 	add("StartChat")
-	
+
 	--- Called when the local player closes their chat window.
 	-- @name FinishChat
 	-- @class hook
@@ -553,7 +553,8 @@ add("PropBreak")
 -- @shared
 -- @param Entity ent The entity that fired the bullet
 -- @param table data The bullet data. See http://wiki.facepunch.com/gmod/Structures/Bullet
--- @return function? Optional callback to called as if it were the Bullet structure's Callback. Called before the bullet deals damage with attacker, traceResult.
+-- @return function? Optional callback to called as if it were the Bullet structure's Callback.
+-- Called before the bullet deals damage with attacker, traceResult.
 add("EntityFireBullets", nil, function(instance, ent, data)
 	return true, { instance.WrapObject(ent), SF.StructWrapper(instance, data, "Bullet") }
 end, function(instance, ret, ent, data)
@@ -570,19 +571,29 @@ end, true)
 -- @class hook
 -- @shared
 -- @param Entity ent The entity that fired the bullet
--- @param table data A table containing Trace (See http://wiki.facepunch.com/gmod/Structures/TraceResult) and AmmoType, Tracer, Damage, Force, Attacker, TracerName (see http://wiki.facepunch.com/gmod/Structures/Bullet)
+-- @param table data A table containing:
+-- Trace - see http://wiki.facepunch.com/gmod/Structures/TraceResult
+-- AmmoType
+-- Tracer
+-- Damage
+-- Force
+-- Attacker
+-- TracerName - see http://wiki.facepunch.com/gmod/Structures/Bullet
 add("PostEntityFireBullets", nil, function(instance, ent, data)
 	local ret = SF.StructWrapper(instance, data, "Bullet")
 	ret.Trace = SF.StructWrapper(instance, data.Trace, "TraceResult")
 	return true, {instance.WrapObject(ent), ret}
 end)
 
---- Called whenever a sound has been played. This will not be called clientside if the server played the sound without the client also calling Entity:EmitSound.
+--- Called whenever a sound has been played.
+-- This will not be called clientside if the server played the sound without the client also calling Entity:EmitSound.
 -- @name EntityEmitSound
 -- @class hook
 -- @shared
--- @param table data Information about the played sound. Changes done to this table can be applied by returning true from this hook. See https://wiki.facepunch.com/gmod/Structures/EmitSoundInfo.
--- @return boolean? Return false to prevent the sound from playing or nothing to play the sound without altering it.
+-- @param table data Information about the played sound.
+-- Changes done to this table can be applied by returning true from this hook.
+-- See https://wiki.facepunch.com/gmod/Structures/EmitSoundInfo
+-- @return boolean? Return false to prevent the sound from playing, or nothing to play the sound without altering it.
 add("EntityEmitSound", nil, function(instance, data)
 	return true, {SF.StructWrapper(instance, data, "EmitSoundInfo")}
 end, function(instance, ret, data)
@@ -623,7 +634,8 @@ add("Tick")
 -- @param CUserCmd cmd The UserCmd being processed
 add("StartCommand")
 
---- Called each UserCmd for each player to transfer information from the UserCmd to the CMoveData before the move is processed.
+--- Called each UserCmd for each player to transfer information from the UserCmd to the CMoveData before the move is
+-- processed.
 -- @name SetupMove
 -- @class hook
 -- @shared
@@ -640,12 +652,13 @@ add("SetupMove")
 -- @param CMoveData move The MoveData being processed
 add("FinishMove")
 
---- Called when starfall chip errors
+--- Called when Starfall chip errors
 -- @name StarfallError
 -- @class hook
 -- @shared
 -- @param Entity ent Starfall chip that errored
--- @param Player|Entity ply Who's fault it errored. World-entity if it was a server error, or player that the script errored if on client
+-- @param Player|Entity ply Whose fault it errored.
+-- World-entity if it was a server error, or player that the script errored if on client.
 -- @param string err Error message
 add("StarfallError", nil, function(instance, ent, owner, errply, _, err)
 	return true, {instance.WrapObject(ent), instance.WrapObject(errply), err}
@@ -764,14 +777,14 @@ local hookrun = hook_library.run
 --- Run a hook remotely.
 -- This will call the hook "remote" on either a specified entity or all instances on the server/client
 -- @shared
--- @param Entity? recipient Starfall entity to call the hook on. Nil to run on every starfall entity
+-- @param Entity? recipient Starfall entity to call the hook on. Nil to run on every Starfall entity
 -- @param ... payload Parameters that will be passed when calling hook functions
 -- @return table A list of the resultset of each called hook
 function hook_library.runRemote(recipient, ...)
 	local recipients
 	if recipient then
 		local ent = eunwrap(recipient)
-		if not ent.instance then SF.Throw("Entity has no starfall instance", 2) end
+		if not ent.instance then SF.Throw("Entity has no Starfall instance", 2) end
 		recipients = {
 			[ent.instance] = true
 		}
@@ -824,35 +837,36 @@ end
 
 -- Hooks below are not simple gmod hooks and are called by other events in other files.
 
---- Think hook. Called each frame on the client and each game tick on the server.
+--- Think hook. Called each frame on the client, and each game tick on the server.
 -- @name Think
 -- @class hook
 -- @shared
 
---- Called when the starfall chip is removed
+--- Called when the Starfall chip is removed.
 -- @name Removed
 -- @class hook
 -- @shared
 
---- Called after the starfall chip is duplicated and the duplication is finished.
+--- Called after the Starfall chip is duplicated and the duplication is finished.
 -- @name DupeFinished
 -- @class hook
 -- @server
 -- @param table entTbl A table of entities duped with the chip mapped to their previous indices.
 
---- Called after a client's starfall has initialized. Use this to know when it's safe to send net messages to the client.
+--- Called after a client-side has been initialized.
+-- Use this to know when it's safe to send net messages to the client.
 -- @name ClientInitialized
 -- @class hook
 -- @server
 -- @param Player ply The player that initialized
 
---- Called when a component is linked to the starfall
+--- Called when a component is linked to the Starfall
 -- @name ComponentLinked
 -- @class hook
 -- @shared
 -- @param Entity ent The component entity
 
---- Called when a component is unlinked to the starfall
+--- Called when a component is unlinked to the Starfall
 -- @name ComponentUnlinked
 -- @class hook
 -- @shared

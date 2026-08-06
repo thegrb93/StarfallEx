@@ -25,7 +25,7 @@ else
 
 				-- CRITICAL NOTE: Tags aren't available immediately!
 				-- Must use a timer to wait 100-500ms for BASS to parse metadata during stream init
-				timer.simple( 0.3, function()					
+				timer.simple( 0.3, function()
 					-- Try all tag formats (BASS auto-detects format)
 					local tags = snd:getTagsID3()		-- ID3v1 only (NOT ID3v2)
 					if not tags or not next(tags) then

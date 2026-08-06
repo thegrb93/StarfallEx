@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local checkvalidnumber = SF.CheckValidNumber
 local checkvector = SF.CheckVector
@@ -28,7 +28,7 @@ local PVSLimitCvar = CreateConVar("sf_pvs_pointlimit", 16, FCVAR_ARCHIVE, "The n
 
 local PVSManager = {
 
-	__index = { 
+	__index = {
 		updateActiveTable = function(self)
 			table.Empty(self.PVSactiveTable)
 
@@ -62,7 +62,7 @@ local PVSManager = {
 					self:updateActiveTable()
 					self.preparingPVSUpdate = false
 				end)
-			end	
+			end
 		end,
 
 		clearInstCountTable = function(self, inst)
@@ -92,8 +92,8 @@ local PVSManager = {
 		end,
 
 		setPointToCountTable = function(self, inst, tply, id, pos)
-		
-		
+
+
 			self:checkCountTable(inst, tply, id, pos)
 			self.PVScountTable[inst.player][inst][tply][id] = pos
 
@@ -192,7 +192,7 @@ end
 
 --- Gives the player a weapon
 -- @param string weapon The class name of the weapon to give
--- @param boolean? noAmmo Prevent giving ammo on weapon spawn?, Defaults to false.
+-- @param boolean? noAmmo Prevent giving ammo on weapon spawn? (default: false)
 -- @return Weapon The weapon
 function player_methods:giveWeapon(weapon, noAmmo)
 	checkluatype(weapon, TYPE_STRING)
@@ -312,7 +312,7 @@ end
 --- Forces the player to say the first argument
 -- Only works on the chip's owner.
 -- @param string text The text to force the player to say
--- @param boolean? teamOnly Team chat only?, Defaults to false.
+-- @param boolean? teamOnly Team chat only? (default: false)
 function player_methods:say(text, teamOnly)
 	checkluatype(text, TYPE_STRING)
 	if teamOnly~=nil then checkluatype(teamOnly, TYPE_BOOL) end
@@ -353,7 +353,8 @@ function player_methods:setHealth(val)
 	ply:SetHealth(val)
 end
 
---- Sets the maximum health for player. Note, that you can still set player's health above this amount with Player:setHealth.
+--- Sets the maximum health for player. Note, that you can still set player's health above this amount with
+-- Player:setHealth.
 -- @server
 -- @param number val New max health value.
 function player_methods:setMaxHealth(val)
@@ -473,7 +474,7 @@ function player_methods:setWeaponColor(col)
 end
 
 --- Kills the target.
---- Requires 'entities.setHealth' permission.
+-- Requires 'entities.setHealth' permission.
 function player_methods:kill()
 	local ent = unwrap(self)
 	checkpermission(instance, ent, "entities.setHealth")
@@ -483,7 +484,7 @@ function player_methods:kill()
 end
 
 --- Attempts to force the target into a vehicle.
---- Requires 'player.enterVehicle' permission on the player.
+-- Requires 'player.enterVehicle' permission on the player.
 -- @param Vehicle vehicle
 function player_methods:enterVehicle(vehicle)
 	local ent = unwrap(self)
@@ -498,8 +499,8 @@ end
 function player_methods:setPVSPoint( ID, position )
 	checkluatype(ID, TYPE_NUMBER)
 	ID = math.floor(math.Clamp(ID,1,PVSLimitCvar:GetInt()))
-	if not (SF.IsHUDActive(instance.entity, unwrap(self) ) or unwrap(self) == instance.player) then 
-		SF.Throw("setPVS can only be used on owner or HUD connected players!") 
+	if not (SF.IsHUDActive(instance.entity, unwrap(self) ) or unwrap(self) == instance.player) then
+		SF.Throw("setPVS can only be used on owner or HUD connected players!")
 	end
 	if position ~= nil then position = vunwrap( position ) checkvector(position) end
 	PlayerPVSManager:setPointToCountTable(instance, unwrap(self), ID, position)

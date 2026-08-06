@@ -195,7 +195,7 @@ net.Receive("starfall_processor_used", function(len)
 	end
 end)
 
-SF.BlockedUsers = SF.SavedUserList("blocked_users", "blocked users from running clientside starfall code", "sf_blockedusers.txt",
+SF.BlockedUsers = SF.SavedUserList("blocked_users", "blocked users from running clientside Starfall code", "sf_blockedusers.txt",
 	function(steamid)
 		local ply = player.GetBySteamID(steamid)
 		if not ply then return end
@@ -220,9 +220,9 @@ SF.SteamIDConcommand("sf_kill_cl", function( executor, ply )
 	for instance, _ in pairs( SF.playerInstances[ply] ) do
 		instance:Error( { message = "Killed by user", traceback = "" } )
 	end
-end, "Terminates a user's starfall chips clientside.", true)
+end, "Terminates a user's Starfall chips clientside.", true)
 
----Terminates a user's starfall chips. Admin only
+---Terminates a user's Starfall chips. Admin only
 SF.SteamIDConcommand("sf_kill", function( executor, ply )
 	if not executor:IsAdmin() then return end
 	for instance, _ in pairs( SF.playerInstances[ply] ) do
@@ -230,4 +230,4 @@ SF.SteamIDConcommand("sf_kill", function( executor, ply )
 		net.WriteEntity( instance.entity )
 		net.SendToServer()
 	end
-end, "Admin Only. Terminate a user's starfall chips.", true )
+end, "Admin Only. Terminate a user's Starfall chips.", true )

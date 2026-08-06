@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 
@@ -61,7 +61,8 @@ end
 
 --- Runs a new http GET request
 -- @param string url HTTP resource URL
--- @param function callbackSuccess The function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)
+-- @param function callbackSuccess The function to be called on request success, taking the arguments body (string),
+-- length (number), headers (table) and code (number)
 -- @param function? callbackFail The function to be called on request fail, taking the failing reason as an argument
 -- @param table? headers GET headers to be sent
 function http_library.get(url, callbackSuccess, callbackFail, headers)
@@ -90,8 +91,10 @@ end
 
 --- Runs a new http POST request
 -- @param string url HTTP resource URL
--- @param table? payload Optional POST payload to be sent, can be both table and string. When table is used, the request body is encoded as application/x-www-form-urlencoded
--- @param function? callbackSuccess Optional function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)
+-- @param table? payload Optional POST payload to be sent, can be both table and string.
+-- When table is used, the request body is encoded as application/x-www-form-urlencoded
+-- @param function? callbackSuccess Optional function to be called on request success,
+-- taking the arguments body (string), length (number), headers (table) and code (number)
 -- @param function? callbackFail Optional function to be called on request fail, taking the failing reason as an argument
 -- @param table? headers Optional POST headers to be sent
 function http_library.post(url, payload, callbackSuccess, callbackFail, headers)
@@ -168,16 +171,24 @@ local VALID_METHODS = {
 	OPTIONS = true
 }
 
---- Runs a new http request. Wraps HTTP() directly. Official documentation for each parameter can be found here: https://wiki.facepunch.com/gmod/Structures/HTTPRequest
+--- Runs a new HTTP request. Wraps HTTP() directly. Official documentation for each parameter can be found here:
+-- https://wiki.facepunch.com/gmod/Structures/HTTPRequest
 -- @param string url HTTP resource URL
--- @param string method Request method, case insensitive. Possible values are: GET, POST, HEAD, PUT, DELETE, PATCH, OPTIONS
--- @param function? success Function to be called on success, taking arguments code (number), body (string), and headers (table)
--- @param function? failed Function to be called on failure, taking argument reason (string)
+-- @param string method Request method, case insensitive.
+-- Possible values are: GET, POST, HEAD, PUT, DELETE, PATCH, OPTIONS
+-- @param function? success Optional callback to be invoked on success. With arguments:
+-- 1. number code
+-- 2. string body
+-- 3. table headers
+-- @param function? failed Optional callback to be invoked on failure. With argument:
+-- 1. string reason
 -- @param string? body Body string for POST data. If set, will override parameters
--- @param table? parameters KeyValue table for URL parameters. This is only applicable to the following request methods: GET, POST (sent in body, so if body is set, parameters are ignored), and HEAD
--- @param string? type Content type for body. (Default: "text/plain; charset=utf-8")
+-- @param table? parameters KeyValue table for URL parameters.
+-- This is only applicable to the following request methods:
+-- HEAD, GET, and POST (sent in body, so if body argument is set, this argument will be ignored)
+-- @param string? type Content type for body (default: "text/plain; charset=utf-8")
 -- @param table? headers KeyValue table for headers
--- @param number? timeout The timeout for the connection. Clamped between [0.1, 300]. (Default: 60)
+-- @param number? timeout The timeout for the connection. Clamped between [0.1, 300] (default: 60)
 function http_library.request(url, method, success, failed, body, parameters, type, headers, timeout)
 	checkluatype(url, TYPE_STRING)
 	checkpermission(instance, url, "http.request")

@@ -155,7 +155,8 @@ function particleef_methods:isFinished()
 end
 
 
---- Sets the sort origin for given particle effect system. This is used as a helper to determine which particles are in front of which.
+--- Sets the sort origin for given particle effect system.
+-- This is used as a helper to determine which particles are in front of which.
 -- @param Vector origin Sort Origin
 function particleef_methods:setSortOrigin(origin)
 	local uw = unwrap(self)

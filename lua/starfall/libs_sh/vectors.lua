@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local dgetmeta = debug.getmetatable
 local Unpack = FindMetaTable("Vector").Unpack
@@ -236,7 +236,8 @@ function vec_methods:getDistance(v)
 	return math_sqrt((v[1]-self[1])^2 + (v[2]-self[2])^2 + (v[3]-self[3])^2)
 end
 
---- Returns the squared distance of 2 vectors, this is faster Vector:getDistance as calculating the square root is an expensive process.
+--- Returns the squared distance of 2 vectors, this is faster Vector:getDistance as calculating the square root is an
+-- expensive process.
 -- @param Vector v Second Vector
 -- @return number Vector distance from v
 function vec_methods:getDistanceSqr(v)
@@ -292,14 +293,15 @@ function vec_methods:getLength2D()
 	return math_sqrt(self[1]^2 + self[2]^2)
 end
 
---- Returns the length squared of the vector in two dimensions, without the Z axis. ( Saves computation by skipping the square root )
+--- Returns the length squared of the vector in two dimensions, without the Z axis.
+-- ( Saves computation by skipping the square root )
 -- @return number Length squared.
 function vec_methods:getLength2DSqr()
 	return (self[1]^2 + self[2]^2)
 end
 
 --- Add v to this vector
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param Vector v Vector to add
 function vec_methods:add(v)
 	self[1] = self[1] + v[1]
@@ -308,7 +310,7 @@ function vec_methods:add(v)
 end
 
 --- Subtract v from this Vector.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param Vector v Vector to subtract.
 function vec_methods:sub(v)
 	self[1] = self[1] - v[1]
@@ -317,7 +319,7 @@ function vec_methods:sub(v)
 end
 
 --- Scalar Multiplication of the vector.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param number n Scalar to multiply with.
 function vec_methods:mul(n)
 	checkluatype(n, TYPE_NUMBER)
@@ -328,7 +330,7 @@ function vec_methods:mul(n)
 end
 
 --- "Scalar Division" of the vector.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param number n Scalar to divide by.
 function vec_methods:div(n)
 	checkluatype(n, TYPE_NUMBER)
@@ -339,7 +341,7 @@ function vec_methods:div(n)
 end
 
 --- Multiply self with a Vector.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param Vector v Vector to multiply with
 function vec_methods:vmul(v)
 	self[1] = self[1] * v[1]
@@ -348,7 +350,7 @@ function vec_methods:vmul(v)
 end
 
 --- Divide self by a Vector.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param Vector v Vector to divide by
 function vec_methods:vdiv(v)
 	self[1] = self[1] / v[1]
@@ -357,7 +359,7 @@ function vec_methods:vdiv(v)
 end
 
 --- Sets all vector fields to 0.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 function vec_methods:setZero()
 	self[1] = 0
 	self[2] = 0
@@ -389,7 +391,7 @@ function vec_methods:setZ(z)
 end
 
 --- Normalise the vector, same direction, length 1.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 function vec_methods:normalize()
 	local len = math_sqrt(self[1]^2 + self[2]^2 + self[3]^2)
 
@@ -402,7 +404,7 @@ local math_sin, math_cos = math.sin, math.cos
 local deg2rad = math.pi/180
 
 --- Rotate the vector by Angle b.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param Angle b Angle to rotate by.
 function vec_methods:rotate(b)
 	checktype(b, ang_meta)
@@ -463,8 +465,8 @@ function vec_methods:rotateAroundAxis(axis, degrees, radians)
 end
 
 --- Round the vector values.
--- Self-Modifies. Does not return anything
--- @param number idp (Default 0) The integer decimal place to round to.
+-- Self-modifies. Does not return anything
+-- @param number idp The integer decimal place to round to (default: 0)
 function vec_methods:round(idp)
 	self[1] = math.Round(self[1], idp)
 	self[2] = math.Round(self[2], idp)
@@ -478,7 +480,7 @@ function vec_methods:clone()
 end
 
 --- Copies the values from the second vector to the first vector.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param Vector v Second Vector
 function vec_methods:set(v)
 	self[1] = v[1]

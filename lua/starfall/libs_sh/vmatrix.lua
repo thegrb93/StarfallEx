@@ -87,7 +87,7 @@ function vmatrix_methods:getField(row, column)
 end
 
 --- Rotate the matrix
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param Angle ang Angle to rotate by
 function vmatrix_methods:rotate(ang)
 	unwrap(self):Rotate(aunwrap1(ang))
@@ -134,21 +134,21 @@ function vmatrix_methods:getUp()
 end
 
 --- Sets the scale
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param Vector vec New scale
 function vmatrix_methods:setScale(vec)
 	unwrap(self):SetScale(vunwrap1(vec))
 end
 
 --- Scale the matrix
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param Vector vec Vector to scale by
 function vmatrix_methods:scale(vec)
 	unwrap(self):Scale(vunwrap1(vec))
 end
 
 --- Scales the absolute translation
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param number num Amount to scale by
 function vmatrix_methods:scaleTranslation(num)
 	checkluatype (num, TYPE_NUMBER)
@@ -156,42 +156,42 @@ function vmatrix_methods:scaleTranslation(num)
 end
 
 --- Sets the angles
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param Angle ang New angles
 function vmatrix_methods:setAngles(ang)
 	unwrap(self):SetAngles(aunwrap1(ang))
 end
 
 --- Sets the translation
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param Vector vec New translation
 function vmatrix_methods:setTranslation(vec)
 	unwrap(self):SetTranslation(vunwrap1(vec))
 end
 
 --- Sets the forward direction of the matrix. First column
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param Vector forward The forward vector
 function vmatrix_methods:setForward(forward)
 	unwrap(self):SetForward(vunwrap1(forward))
 end
 
 --- Sets the right direction of the matrix. Negated second column
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param Vector right The right vector
 function vmatrix_methods:setRight(right)
 	unwrap(self):SetRight(vunwrap1(right))
 end
 
 --- Sets the up direction of the matrix. Third column
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param Vector up The up vector
 function vmatrix_methods:setUp(up)
 	unwrap(self):SetUp(vunwrap1(up))
 end
 
 --- Sets a specific field in the matrix
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param number row A number from 1 to 4
 -- @param number column A number from 1 to 4
 -- @param number value Value to set
@@ -212,21 +212,21 @@ function vmatrix_methods:unpack()
 end
 
 --- Allows you to set all 16 fields in row-major order
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param ...number fields The 16 fields
 function vmatrix_methods:setUnpacked(...)
 	unwrap(self):SetUnpacked(...)
 end
 
 --- Copies the values from the second matrix to the first matrix.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param VMatrix src Second matrix
 function vmatrix_methods:set(src)
 	unwrap(self):Set(unwrap(src))
 end
 
 --- Initializes the matrix as Identity matrix
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 function vmatrix_methods:setIdentity()
 	unwrap(self):Identity()
 end
@@ -237,21 +237,22 @@ function vmatrix_methods:isIdentity()
 	return unwrap(self):IsIdentity()
 end
 
---- Returns whether the matrix is a rotation matrix or not. Checks if the forward, right and up vectors are orthogonal and normalized.
+--- Returns whether the matrix is a rotation matrix or not. Checks if the forward,
+-- right and up vectors are orthogonal and normalized.
 -- @return boolean True/False
 function vmatrix_methods:isRotationMatrix()
 	return unwrap(self):IsRotationMatrix()
 end
 
 --- Inverts the matrix. Inverting the matrix will fail if its determinant is 0 or close to 0
--- Self-Modifies.
+-- Self-modifies.
 -- @return boolean Whether the matrix was inverted or not
 function vmatrix_methods:invert()
 	return unwrap(self):Invert()
 end
 
 --- Inverts the matrix efficiently for translations and rotations
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 function vmatrix_methods:invertTR()
 	unwrap(self):InvertTR()
 end
@@ -269,7 +270,7 @@ function vmatrix_methods:toTable()
 end
 
 --- Sets the rotation or the matrix to the rotation by an axis and angle
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param Vector axis The normalized axis of rotation
 -- @param number ang The angle of rotation in radians
 function vmatrix_methods:setAxisAngle(axis, ang)

@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local ENT_META = FindMetaTable("Entity")
 local WEP_META = FindMetaTable("Weapon")

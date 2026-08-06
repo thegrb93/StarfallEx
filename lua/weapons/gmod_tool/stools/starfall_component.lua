@@ -212,14 +212,14 @@ function TOOL:RightClick(trace)
 
 			SF.LinkEnt(self.Component, ent)
 			self:SetStage(0)
-			SF.AddNotify(ply, "Linked to starfall successfully.", "GENERIC" , 4, "DRIP2")
+			SF.AddNotify(ply, "Linked to Starfall successfully.", "GENERIC" , 4, "DRIP2")
 			return true
 
 		elseif self.Component:GetClass()=="starfall_hud" and ent:GetClass()=="starfall_processor" then
 
 			SF.LinkEnt(self.Component, ent)
 			self:SetStage(0)
-			SF.AddNotify(ply, "Linked to starfall successfully.", "GENERIC" , 4, "DRIP2")
+			SF.AddNotify(ply, "Linked to Starfall successfully.", "GENERIC" , 4, "DRIP2")
 			return true
 
 		elseif self.Component:GetClass()=="starfall_hud" and ent:IsVehicle() then

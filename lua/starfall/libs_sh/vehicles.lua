@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 local ENT_META,PLY_META,VEH_META = FindMetaTable("Entity"),FindMetaTable("Player"),FindMetaTable("Vehicle")
@@ -209,7 +209,7 @@ if SERVER then
 
 	--- Allows passengers of a vehicle to aim and use things by clicking on them
 	-- @param boolean enabled Whether to enable the ability to use by clicking
-	-- @param number? key Optional IN_KEY alternate control for using (default IN_KEY.ATTACK)
+	-- @param number? key Optional IN_KEY alternate control for using (default: IN_KEY.ATTACK)
 	function vehicle_methods:useEnable(enabled, key)
 		local veh = unwrap(self)
 		checkluatype(enabled, TYPE_BOOL)

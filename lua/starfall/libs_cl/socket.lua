@@ -224,7 +224,8 @@ socket_proxy.udp4 = create_proxy_function(socket.udp4)
 -- @return string? The error string if errored, else nil
 socket_proxy.udp6 = create_proxy_function(socket.udp6)
 
---- This function is a shortcut that creates and returns a TCP client object connected to a remote address at a given port.
+--- This function is a shortcut that creates and returns a TCP client object connected to a remote address at a given
+-- port.
 -- Optionally, the user can also specify the local address and port to bind (locaddr and locport), or restrict the socket family to "inet" or "inet6".
 -- Without specifying family to connect, whether a tcp or tcp6 connection is created depends on your system configuration.
 -- @name socket_library.connect
@@ -238,7 +239,8 @@ socket_proxy.udp6 = create_proxy_function(socket.udp6)
 -- @return string? error Error string if the previous return was nil, else nil
 socket_proxy.connect = create_proxy_function(socket.connect)
 
---- This function is a shortcut that creates and returns a TCP client object connected to a remote address at a given port.
+--- This function is a shortcut that creates and returns a TCP client object connected to a remote address at a given
+-- port.
 -- Optionally, the user can also specify the local address and port to bind (locaddr and locport)
 -- @name socket_library.connect4
 -- @class function
@@ -250,7 +252,8 @@ socket_proxy.connect = create_proxy_function(socket.connect)
 -- @return string? error Error string if the previous return was nil, else nil
 socket_proxy.connect4 = create_proxy_function(socket.connect4)
 
---- This function is a shortcut that creates and returns a TCP client object connected to a remote address at a given port.
+--- This function is a shortcut that creates and returns a TCP client object connected to a remote address at a given
+-- port.
 -- Optionally, the user can also specify the local address and port to bind (locaddr and locport)
 -- @name socket_library.connect6
 -- @class function

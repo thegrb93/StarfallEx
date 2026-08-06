@@ -72,7 +72,7 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 		end
 	end
 	sanitizeTypeMeta("", {__index = sf_string_index})
-	
+
 	if not (WireLib and WireLib.PatchedDuplicator) then
 		if WireLib then WireLib.PatchedDuplicator = true end
 
@@ -275,7 +275,7 @@ SF.BurstObject = {
 			return self:calc(obj)
 		end,
 		get = function(self, ply)
-			if ply~=SF.Superuser and not Ent_IsValid(ply) then SF.Throw("Invalid starfall user", 4) end
+			if ply~=SF.Superuser and not Ent_IsValid(ply) then SF.Throw("Invalid Starfall user", 4) end
 			local obj = self.objects[ply]
 			if not obj then
 				obj = {
@@ -318,7 +318,7 @@ SF.LimitObject = {
 				end
 				self.counters[ply] = new
 			else
-				SF.Throw("Invalid starfall user", 3)
+				SF.Throw("Invalid Starfall user", 3)
 			end
 		end,
 		checkuse = function(self, ply, amount)
@@ -328,7 +328,7 @@ SF.LimitObject = {
 					SF.Throw("The ".. self.name .." limit has been reached. (".. self.max ..")", 3)
 				end
 			else
-				SF.Throw("Invalid starfall user", 3)
+				SF.Throw("Invalid Starfall user", 3)
 			end
 		end,
 		check = function(self, ply)
@@ -336,7 +336,7 @@ SF.LimitObject = {
 			if Ent_IsValid(ply) then
 				return self.max - self.counters[ply]
 			else
-				SF.Throw("Invalid starfall user", 3)
+				SF.Throw("Invalid Starfall user", 3)
 			end
 		end,
 		free = function(self, ply, amount)
@@ -360,7 +360,7 @@ SF.LimitObject = {
 			counters = SF.EntityTable("limit"..cvarname)
 		}
 		getmetatable(t.counters).__index = function(t,k) t[k]=0 return 0 end
-		
+
 		scale = scale or 1
 		local maxname = "sf_"..cvarname.."_max"..(CLIENT and "_cl" or "")
 		SF.CvarCallback(CreateConVar(maxname, tostring(max), FCVAR_ARCHIVE, maxhelp), function(val) t.max = val*scale if t.max<0 then t.max = math.huge end end, "number")
@@ -767,7 +767,7 @@ SF.Parent = {
 					data:applyTransform()
 					data:applyParent()
 					cleanup = false
-					
+
 					local sfParent = Ent_GetTable(child).sfParent
 					if sfParent then
 						sfParent:fix()
@@ -923,7 +923,7 @@ SF.HttpTextureRequest = {
 
 				local content_type = headers["Content-Type"] or headers["content-type"]
 				local data = util.Base64Encode(body, true)
-				
+
 				self.url = table.concat({"data:", content_type, ";base64,", data})
 
 				self:load()
@@ -987,7 +987,7 @@ SF.HttpTextureRequest = {
 				timer.Simple(0, function() self:destroy(true) end)
 			end)
 		end,
-		
+
 		destroy = function(self, success)
 			if self:badnewstate(self.DESTROY) then return end
 			if success then
@@ -1047,7 +1047,7 @@ SF.HttpTextureLoader = {
 			self.queue:push(request)
 			self.request = self.request_postInit
 		end,
-		
+
 		request_postInit = function(self, request)
 			self.queue:push(request)
 			if request == self.queue:front() then self:nextRequest() end
@@ -1261,9 +1261,9 @@ do
 	-- @shared
 	-- @param hookname The hook name. In-SF hookname will be lowercased
 	-- @param customargfunc Optional custom function
-	-- Returns true if the hook should be called, then extra arguements to be passed to the starfall hooks
+	-- Returns true if the hook should be called, then extra arguements to be passed to the Starfall hooks
 	-- @param customretfunc Optional custom function
-	-- Takes values returned from starfall hook and returns what should be passed to the gmod hook
+	-- Takes values returned from a Starfall hook and returns what should be passed to the gmod hook
 	-- @param gmoverride Whether this hook should override the gamemode function (makes the hook run last, but adds a little overhead)
 	function SF.hookAdd(realname, hookname, customargfunc, customretfunc, gmoverride)
 		hookname = (hookname or realname):lower()
@@ -1310,7 +1310,7 @@ do
 			instances[instance] = true
 		end
 	end
-	
+
 	function SF.HookRemoveInstance(instance, hookname)
 		local instances = registered_instances[hookname]
 		if instances and instances[instance] then
@@ -1629,7 +1629,7 @@ do
 	local TYPE_NUMBER16NEG = 56
 	local TYPE_NUMBER32 = 57
 	local TYPE_NUMBER32NEG = 58
-	
+
 	local pairs_, instance_, tableLoopupCtr, tableLookup, ss
 
 	local typetostringfuncs = {}
@@ -1779,9 +1779,9 @@ do
 	stringtotypefuncs[TYPE_NUMBER16NEG] = function() return -ss:readUInt16() end
 	stringtotypefuncs[TYPE_NUMBER32] = function() return ss:readUInt32() end
 	stringtotypefuncs[TYPE_NUMBER32NEG] = function() return -ss:readUInt32() end
-	
+
 	--- Convert table to string data.
-	-- Only works with strings, numbers, tables, bools, 
+	-- Only works with strings, numbers, tables, bools,
 	function SF.TableToString(tbl, instance, sorted)
 		pairs_ = sorted and SortedPairs or pairs
 		instance_ = instance
@@ -2500,7 +2500,7 @@ do
 		end
 		return init
 	end
-	
+
 	local function addModule(name, path, shouldrun)
 		local source, init
 		if SERVER then

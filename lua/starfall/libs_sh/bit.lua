@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local math_huge = math.huge
 local math_frexp = math.frexp
@@ -177,7 +177,7 @@ local function UnpackIEEE754Double(b8, b7, b6, b5, b4, b3, b2, b1)
 end
 
 --- Sets the endianness of the string stream
--- @param string endian The endianness of number types. "big" or "little" (default "little")
+-- @param string endian The endianness of number types (e.g. "big" or "little")
 function ss_methods:setEndian(endian)
 	if endian == "little" then
 		debug.setmetatable(self, ss_meta)
@@ -530,7 +530,8 @@ end
 --- Reads an entity from the byte stream and advances the buffer pointer.
 -- @name ss_methods.readEntity
 -- @class function
--- @param function? callback (Client only) optional callback to be ran whenever the entity becomes valid; returns nothing if this is used. The callback passes the entity if it succeeds or nil if it fails.
+-- @param function? callback (Client only) optional callback to be ran whenever the entity becomes valid; returns
+-- nothing if this is used. The callback passes the entity if it succeeds or nil if it fails.
 -- @return Entity The entity that was read
 local function readEntity(self, instance, callback)
 	local index = self:readUInt16()
@@ -641,7 +642,7 @@ bit_library.tobit = bit.tobit
 --- Returns the hexadecimal representation of the number with the specified digits.
 -- @class function
 -- @param number value The value to be normalized.
--- @param number? digits The number of digits. Optional. (default 8)
+-- @param number? digits Optional number of digits (default: 8)
 -- @return string Hex string.
 bit_library.tohex = bit.tohex
 
@@ -649,9 +650,9 @@ bit_library.tohex = bit.tohex
 --- Creates a StringStream object
 -- @name bit_library.stringstream
 -- @class function
--- @param string? stream String to set the initial buffer to (default "")
--- @param number? i The initial buffer pointer (default 1)
--- @param string? endian The endianness of number types. "big" or "little" (default "little")
+-- @param string? stream String to set the initial buffer to (default: "")
+-- @param number? i The initial buffer pointer (default: 1)
+-- @param string? endian The endianness of number types, "big" or "little" (default: "little")
 -- @return StringStream StringStream object
 function bit_library.stringstream(stream, i, endian)
 	local ret = SF.StringStream(stream, i, endian)
@@ -692,7 +693,8 @@ function bit_library.compress(s)
 end
 
 --- Decompresses a string using LZMA.
--- XZ Utils will always produce streamed (i.e. the decompressed size is not specified in the header) LZMA data. If you're trying to compress data from outside of GMod and then decompress it inside of GMod, it probably won't work unless you use the older, deprecated 'LZMA Utils', or util.Compress.
+-- XZ Utils will always produce streamed (i.e. the decompressed size is not specified in the header) LZMA data.
+-- If you're trying to compress data from outside of GMod and then decompress it inside of GMod, it probably won't work unless you use the older, deprecated 'LZMA Utils', or util.Compress.
 -- @param string s String to decompress
 -- @param number? maxSize Maximum allowed size of decompressed data
 -- @return string? Decompressed string, or nil if decompression failed

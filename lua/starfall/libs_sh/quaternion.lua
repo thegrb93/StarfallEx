@@ -449,7 +449,7 @@ end
 -------------------------------------
 
 --- Set components of the quaternion
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param number r R component
 -- @param number i I component
 -- @param number j J component
@@ -474,7 +474,7 @@ function quat_methods:clone()
 end
 
 --- Copies components of the second quaternion to the first quaternion.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param Quaternion quat Quaternion to copy from
 function quat_methods:set(quat)
 	quatPack(self, quatUnpack(quat))
@@ -523,7 +523,7 @@ function quat_methods:getExp()
 end
 
 --- Raises Euler's constant e to the quaternion's power.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 function quat_methods:exp()
 	quatExp(self)
 end
@@ -537,7 +537,7 @@ function quat_methods:getLog()
 end
 
 --- Calculates natural logarithm of the quaternion.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 function quat_methods:log()
 	quatLog(self)
 end
@@ -603,7 +603,7 @@ function quat_methods:getConjugate()
 end
 
 --- Conjugates the quaternion.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 function quat_methods:conjugate()
 	quatConj(self)
 end
@@ -617,7 +617,7 @@ function quat_methods:getInverse()
 end
 
 --- Calculates inverse of the quaternion.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 function quat_methods:inverse()
 	quatInv(self)
 end
@@ -631,7 +631,7 @@ function quat_methods:getMod()
 end
 
 --- Contains quaternion's represented rotation within an angle between 0 and 180 degrees.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 function quat_methods:mod()
 	quatMod(self)
 end
@@ -645,7 +645,7 @@ function quat_methods:getNormalized()
 end
 
 --- Normalizes the quaternion.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 function quat_methods:normalize()
 	quatNorm(self)
 end
@@ -819,7 +819,8 @@ function vec_methods:getQuaternionFromAxis(ang)
 end
 
 -- credits: https://github.com/cder0xff
---- Constructs a quaternion from the rotation vector. Vector direction is axis of rotation, it's magnitude is angle in degrees
+--- Constructs a quaternion from the rotation vector. Vector direction is axis of rotation,
+-- it's magnitude is angle in degrees
 -- @return Quaternion Rotated quaternion
 function vec_methods:getQuaternionFromRotation()
 	local vec_len = self:getLengthSqr()

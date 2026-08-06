@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local net = net
 local checkluatype = SF.CheckLuaType
 local IsValid = FindMetaTable("Entity").IsValid
@@ -186,8 +186,12 @@ end
 
 --- Send a net message from client->server, or server->client.
 -- @shared
--- @param Player|table|nil target On server-side: Optional target location to send the net message to, can be a player or table of players, or nil to broadcast to all players; On client-side: This argument is ignored, it will send to the server.
--- @param boolean? unreliable Optional. Whether it's more important for the message to actually reach its destination (false), or reach it as fast as possible (true). Default is false.
+-- @param Player|table|nil target Destination targets.
+-- On server-side: Optional target location to send the net message to, can be a player or table of players, or nil to broadcast to all players.
+-- On client-side: This argument is ignored (it sends to the server).
+-- @param boolean? unreliable Optional flag;
+-- false (default): The message is marked as reliable and will try to reach its destination.
+-- true: For performance, reach the destination as fast as possible (message may not arrive).
 function net_library.send(target, unreliable)
 	if unreliable~=nil then checkluatype(unreliable, TYPE_BOOL) end
 	if not netStarted then SF.Throw("net message not started", 2) end
@@ -225,7 +229,9 @@ if SERVER then
 	--- Send net message to all players within the visible area of a vector
 	-- @server
 	-- @param Vector pos A vector within the PVS area to send a message
-	-- @param boolean? unreliable Optional. Whether it's more important for the message to actually reach its destination (false), or reach it as fast as possible (true). Default is false.
+	-- @param boolean? unreliable Optional flag;
+	-- false (default): The message is marked as reliable and will try to reach its destination.
+	-- true: For performance, reach the destination as fast as possible (message may not arrive).
 	function net_library.sendPVS(pos, unreliable)
 		if not netStarted then SF.Throw("net message not started", 2) end
 		pos = vunwrap1(pos)
@@ -254,7 +260,7 @@ function net_library.writeType(v)
 end
 
 --- Reads an object from a net message automatically typing it
---- Will throw an error if invalid type is read. Make sure to pcall it
+-- Will throw an error if invalid type is read. Make sure to pcall it
 -- @shared
 -- @return any The object
 function net_library.readType()
@@ -274,7 +280,7 @@ function net_library.writeTable(t)
 end
 
 --- Reads an table from a net message automatically typing it
---- Will throw an error if invalid type is read. Make sure to pcall it
+-- Will throw an error if invalid type is read. Make sure to pcall it
 -- @shared
 -- @return table The table
 function net_library.readTable()
@@ -323,10 +329,10 @@ function net_library.readData(n)
 	return net.ReadData(n)
 end
 
---- Streams up to 64MB strings. Anything over 20MB with compression enabled will throw cpu quota
+--- Streams up to 64MB strings. Anything over 20MB with compression enabled will throw CPU quota
 -- @shared
 -- @param string str The string to be written
--- @param boolean? compress Compress the data. True by default
+-- @param boolean? compress Compress the data (default: true)
 function net_library.writeStream(str, compress)
 	if not netStarted then SF.Throw("net message not started", 2) end
 	checkluatype (str, TYPE_STRING)
@@ -339,7 +345,8 @@ end
 
 --- Reads a large string stream from the net message.
 -- @shared
--- @param function cb Callback to run when the stream is finished. The first parameter in the callback is the data. Will be nil if transfer fails or is cancelled
+-- @param function cb Callback to run when the stream is finished. The first parameter in the callback is the data.
+-- Will be nil if transfer fails or is cancelled
 function net_library.readStream(cb)
 	checkluatype (cb, TYPE_FUNCTION)
 	if plyStreams.readStream then SF.Throw("The previous stream must finish before reading another.", 2) end
@@ -423,7 +430,7 @@ end
 
 --- Writes an unsigned 64-bit integer to the net message
 -- @shared
--- @param string t The 64-bit integer written as a string because lua numbers can't hold 64-bit ints
+-- @param string t The 64-bit integer written as a string because Lua numbers can't hold 64-bit ints
 function net_library.writeUInt64(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
 
@@ -592,7 +599,8 @@ end
 
 --- Reads an entity from the net message
 -- @shared
--- @param function? callback (Client only) optional callback to be ran whenever the entity becomes valid; returns nothing if this is used. The callback passes the entity if it succeeds or nil if it fails.
+-- @param function? callback (Client only) optional callback to be ran whenever the entity becomes valid; returns
+-- nothing if this is used. The callback passes the entity if it succeeds or nil if it fails.
 -- @return Entity? The entity that was read or nil if callback used
 function net_library.readEntity(callback)
 	local index = net.ReadUInt(16)
@@ -609,10 +617,13 @@ function net_library.readEntity(callback)
 	end
 end
 
---- Like glua net.Receive, adds a callback that is called when a net message with the matching name is received. If this happens, the net hook won't be called.
+--- Like glua net.Receive, adds a callback that is called when a net message with the matching name is received.
+-- If this happens, the net hook won't be called.
 -- @shared
 -- @param string name The name of the net message
--- @param function func The callback or nil to remove callback. (len - length of the net message, ply - player that sent it or nil if clientside)
+-- @param function func The callback, or nil to remove a callback. With arguments:
+-- 1. Length of the net message (in bits)
+-- 2. Player that sent the net message (only present on server-side; absent on client-side)
 function net_library.receive(name, func)
 	checkluatype (name, TYPE_STRING)
 	if func~=nil then checkluatype (func, TYPE_FUNCTION) end
@@ -658,4 +669,4 @@ end
 -- @class hook
 -- @param string name Name of the arriving net message
 -- @param number len Length of the arriving net message in bits
--- @param Player? ply On server, the player that sent the message. Nil on client.
+-- @param Player? ply On server-side, the player that sent the message; Absent on client-side.
