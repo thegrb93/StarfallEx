@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local checkvector = SF.CheckVector
 local registerprivilege = SF.Permissions.registerPrivilege
@@ -268,8 +268,8 @@ if sound_library then
 	--- Emits a sound not attached to any entity at the specified position
 	-- @param string snd Sound path
 	-- @param Vector position Where the sound originates from
-	-- @param number? soundLevel Default 75
-	-- @param number? pitchPercent Default 100
+	-- @param number? lvl Default 75
+	-- @param number? pitch Default 100
 	-- @param number? volume Default 1
 	-- @param number? channel Default CHAN_AUTO or CHAN_WEAPON for weapons
 	-- @param number? dsp Default 1 DSP preset
@@ -294,12 +294,13 @@ end
 
 --- Plays a sound on the entity
 -- @param string snd Sound path
--- @param number? soundLevel Default 75
--- @param number? pitchPercent Default 100
+-- @param number? lvl Default 75
+-- @param number? pitch Default 100
 -- @param number? volume Default 1
 -- @param number? channel Default CHAN_AUTO or CHAN_WEAPON for weapons
 -- @param number? dsp Default 1 DSP preset
--- @param boolean? nofilter (Optional) Boolean Make the sound play for everyone regardless of range or location. Only affects Server-side sounds.
+-- @param boolean? nofilter (Optional) Boolean Make the sound play for everyone regardless of range or location.
+-- Only affects Server-side sounds.
 function ents_methods:emitSound(snd, lvl, pitch, volume, channel, dsp, nofilter)
 	checkluatype(snd, TYPE_STRING)
 	if nofilter~=nil then checkluatype(nofilter, TYPE_BOOL) end
@@ -337,7 +338,8 @@ function ents_methods:stopSound(snd)
 	Ent_StopSound(ent, snd)
 end
 
---- Returns a list of components linked to a processor. Can also return vehicles linked to a HUD, but only through the server.
+--- Returns a list of components linked to a processor. Can also return vehicles linked to a HUD,
+-- but only through the server.
 -- @return table A list of components linked to the entity
 function ents_methods:getLinkedComponents()
 	local ent = eunwrap(self)
@@ -376,10 +378,13 @@ function ents_methods:disablePhysgun(disabled)
 	end
 end
 
---- Parents or unparents an entity. Only holograms can be parented to players and clientside holograms can only be parented in the CLIENT realm.
+--- Parents or unparents an entity.
+-- Only holograms can be parented to players, and client-side holograms can only be parented on the client-side.
 -- @param Entity? parent Entity parent (nil to unparent)
--- @param number|string|nil attachment Optional attachment name or ID.
--- @param number|string|nil bone Optional bone name or ID. Can't be used at the same time as attachment
+-- @param number|string|nil attachment Optional attachment name or index.
+-- Can't be used at the same time as bone.
+-- @param number|string|nil bone Optional bone name or index.
+-- Can't be used at the same time as attachment.
 function ents_methods:setParent(parent, attachment, bone)
 	local child = eunwrap(self)
 	checkpermission(instance, child, "entities.setParent")
@@ -602,7 +607,9 @@ function ents_methods:setColor4Part(r,g,b,a)
 	if SERVER then duplicator.StoreEntityModifier(ent, "colour", { Color = {r = r, g = g, b = b, a = a}, RenderMode = rendermode }) end
 end
 
---- Sets the whether an entity should be drawn or not. If serverside, will also prevent networking the entity to the client. Don't use serverside on a starfall if you want its client code to work.
+--- Sets the whether an entity should be drawn or not.
+-- If serverside, will also prevent networking the entity to the client.
+-- Don't use serverside on a Starfall if you want its client code to work.
 -- @shared
 -- @param boolean draw Whether to draw the entity or not.
 function ents_methods:setNoDraw(draw)
@@ -1068,7 +1075,7 @@ function ents_methods:isAlive()
 	return Ent_Alive(eunwrap(self))
 end
 
---- Returns the starfall, wire gate, wire fpga or expression2's name
+--- Returns the Starfall, Wire Gate, Wire FPGA, or Expression2's chip name
 -- @return string The name of the chip
 function ents_methods:getChipName()
 	local ent = eunwrap(self)
@@ -1088,16 +1095,16 @@ function ents_methods:getChipName()
 		local lines = string.Split(data.txt, "\n")
 		return lines[1]
 	else
-		SF.Throw("The entity is not a starfall, wire gate, wire fpga or expression2!", 2)
+		SF.Throw("The entity is not a Starfall nor Wire Gate nor Wire FPGA nor Expression2!", 2)
 	end
 end
 
 --- Gets the author of the specified starfall.
 -- @shared
--- @return string The author of the starfall chip.
+-- @return string The author of the Starfall chip.
 function ents_methods:getChipAuthor()
 	local ent_tbl = Ent_GetTable(eunwrap(self))
-	if not ent_tbl.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
+	if not ent_tbl.Starfall then SF.Throw("The entity isn't a Starfall chip", 2) end
 
 	return tostring(ent_tbl.author)
 end
@@ -1109,14 +1116,14 @@ end
 -- @return number Current quota used this Think
 function ents_methods:getQuotaUsed()
 	local ent_tbl = Ent_GetTable(eunwrap(self))
-	if not ent_tbl.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
+	if not ent_tbl.Starfall then SF.Throw("The entity isn't a Starfall chip", 2) end
 
 	return ent_tbl.instance and ent_tbl.instance.perf.cpuTotal or 0
 end
 
---- Gets the Average CPU Time in the buffer of the specified starfall or expression2.
+--- Gets the Average CPU Time in the buffer of the specified Starfall or Expression2.
 -- @shared
--- @return number Average CPU Time of the buffer of the specified starfall or expression2.
+-- @return number Average CPU Time of the buffer of the specified Starfall or Expression2.
 function ents_methods:getQuotaAverage()
 	local ent = eunwrap(self)
 	local ent_tbl = Ent_GetTable(ent)
@@ -1125,14 +1132,14 @@ function ents_methods:getQuotaAverage()
 	elseif Ent_GetClass(ent)=="gmod_wire_expression2" then
 		return SERVER and (ent_tbl.context and ent_tbl.context.timebench or 0) or (ent_tbl.GetOverlayData(ent).timebench or 0)
 	else
-		SF.Throw("The entity isn't a starfall or expression2 chip", 2)
+		SF.Throw("The entity isn't a Starfall or Expression2 chip", 2)
 	end
 end
 
---- Gets the CPU Time max of the specified starfall of the specified starfall or expression2.
--- CPU Time is stored in a buffer of N elements, if the average of this exceeds quotaMax, the chip will error.
+--- Gets the max CPU time of the specified Starfall or Expression2 chip.
+-- CPU time is stored in a buffer of N elements, if the average of this exceeds quotaMax, the chip will error.
 -- @shared
--- @return number Max SysTime allowed to take for execution of the chip in a Think.
+-- @return number Max SysTime allowed to take for execution of the chip in a Think hook.
 function ents_methods:getQuotaMax()
 	local ent = eunwrap(self)
 	local ent_tbl = Ent_GetTable(ent)
@@ -1142,13 +1149,13 @@ function ents_methods:getQuotaMax()
 	elseif Ent_GetClass(ent)=="gmod_wire_expression2" then
 		return GetConVarNumber("wire_expression2_quotatime")
 	else
-		SF.Throw("The entity isn't a starfall or expression2 chip", 2)
+		SF.Throw("The entity isn't a Starfall or Expression2 chip", 2)
 	end
 end
 
---- Return if the entity has a starfall instance or E2 instance
+--- Determines whether the entity has a Starfall or E2 instance
 -- @shared
--- @return boolean if has starfall instance or E2 instance
+-- @return boolean True if the entity has Starfall or E2 instance
 function ents_methods:hasInstance()
 	local ent = eunwrap(self)
 	local ent_tbl = Ent_GetTable(ent)
@@ -1163,14 +1170,14 @@ function ents_methods:hasInstance()
 end
 
 if SERVER then
-	--- Gets all players the specified starfall errored for.
-	-- This excludes the owner of the starfall chip.
+	--- Gets all players the specified Starfall errored for.
+	-- This excludes the owner of the Starfall chip.
 	-- @server
 	-- @return table A table containing the errored players.
 	function ents_methods:getErroredPlayers()
 		local ent = eunwrap(self)
 		local ent_tbl = Ent_GetTable(ent)
-		if not ent_tbl.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
+		if not ent_tbl.Starfall then SF.Throw("The entity isn't a Starfall chip", 2) end
 
 		local plys = {}
 		for ply, _ in pairs(ent_tbl.ErroredPlayers) do
@@ -1203,7 +1210,7 @@ if SERVER then
 	end
 
 	--- Stops the entity from being saved on duplication or map save.
-	-- @param boolean? allowDupe Set to true to re-enable duplicating (default false)
+	-- @param boolean? allowDupe Set to true to re-enable duplicating (default: false)
 	-- @server
 	function ents_methods:doNotDuplicate(allowDupe)
 		local ent = eunwrap(self)
@@ -1254,7 +1261,7 @@ end
 
 --- Returns how submerged the entity is in water
 -- @shared
--- @return number The water level. 0 none, 1 slightly, 2 at least halfway, 3 all the way
+-- @return number The water level (0 none, 1 slightly, 2 at least halfway, 3 fully submerged)
 function ents_methods:getWaterLevel()
 	return Ent_WaterLevel(eunwrap(self))
 end
@@ -1268,9 +1275,10 @@ function ents_methods:lookupBone(name)
 	return Ent_LookupBone(eunwrap(self), name)
 end
 
---- Returns the matrix of the entity's bone. Note: this method is slow, and doesn't work well if the entity isn't animated.
+--- Returns the matrix of the entity's bone.
+-- Note: this method is slow, and doesn't work well if the entity isn't animated.
 -- @shared
--- @param number? bone Bone index. Default is 0.
+-- @param number? bone Bone index (default: 0)
 -- @return VMatrix The matrix
 function ents_methods:getBoneMatrix(bone)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
@@ -1334,7 +1342,7 @@ end
 
 --- Returns the name of an entity's bone
 -- @shared
--- @param number? bone Bone index. (def 0)
+-- @param number? bone Bone index (default: 0)
 -- @return string Name of the bone
 function ents_methods:getBoneName(bone)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
@@ -1343,7 +1351,7 @@ end
 
 --- Returns the parent index of an entity's bone
 -- @shared
--- @param number? bone Bone index. (def 0)
+-- @param number? bone Bone index (default: 0)
 -- @return number Parent index of the bone. Returns -1 on error
 function ents_methods:getBoneParent(bone)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
@@ -1371,7 +1379,7 @@ end
 
 --- Returns the bone's position and angle in world coordinates
 -- @shared
--- @param number? bone Bone index. (def 0)
+-- @param number? bone Bone index (default: 0)
 -- @return Vector Position of the bone
 -- @return Angle Angle of the bone
 function ents_methods:getBonePosition(bone)
@@ -1383,7 +1391,7 @@ end
 
 --- Returns the manipulate angle of the bone (relative to its default angle)
 -- @shared
--- @param number bone Bone index. (def 0)
+-- @param number bone Bone index (default: 0)
 -- @return Angle Manipulate angle of the bone
 function ents_methods:getManipulateBoneAngles(bone)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
@@ -1392,7 +1400,7 @@ end
 
 --- Returns the number manipulate jiggle of the bone (0 - 255)
 -- @shared
--- @param number? bone Bone index. (def 0)
+-- @param number? bone Bone index (default: 0)
 -- @return number Manipulate jiggle of the bone
 function ents_methods:getManipulateBoneJiggle(bone)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
@@ -1401,7 +1409,7 @@ end
 
 --- Returns the vector manipulate position of the bone (relative to its default position)
 -- @shared
--- @param number bone Bone index. (def 0)
+-- @param number bone Bone index (default: 0)
 -- @return Vector Manipulate position of the bone
 function ents_methods:getManipulateBonePosition(bone)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
@@ -1410,7 +1418,7 @@ end
 
 --- Returns the vector manipulate scale of the bone
 -- @shared
--- @param number bone Bone index. (def 0)
+-- @param number bone Bone index (default: 0)
 -- @return Vector Manipulate scale of the bone
 function ents_methods:getManipulateBoneScale(bone)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
@@ -1749,7 +1757,8 @@ function ents_methods:getFlexName(id)
 	return Ent_GetFlexName(eunwrap(self), id)
 end
 
---- Returns whether or not the the entity has had flex manipulations performed with Entity:setFlexWeight or Entity:setFlexScale.
+--- Returns whether or not the the entity has had flex manipulations performed with Entity:setFlexWeight or
+-- Entity:setFlexScale.
 -- @return boolean True if the entity has flex manipulations, false otherwise.
 function ents_methods:hasFlexManipulations()
 	return Ent_HasFlexManipulatior(eunwrap(self))
@@ -1833,7 +1842,8 @@ function ents_methods:getFlexBounds(flexid)
 	return Ent_GetFlexBounds(ent, flexid)
 end
 
---- Overrides the look position for an entity's eyes. The target position will be in world coordinates for NPCs, but it will be in local coordinates relative to the eyes attachment for ragdolls.
+--- Overrides the look position for an entity's eyes. The target position will be in world coordinates for NPCs,
+-- but it will be in local coordinates relative to the eyes attachment for ragdolls.
 --  Setting the target position to Vector(0,0,0) will remove the override entirely.
 -- @param Vector pos The position to look at
 function ents_methods:setEyeTarget(pos)
@@ -2022,7 +2032,8 @@ function ents_methods:isEffectActive(effect)
 	return Ent_IsEffectActive(eunwrap(self), effect)
 end
 
---- Marks entity as persistent, disallowing players from physgunning it. Persistent entities save on server shutdown when sbox_persist is set
+--- Marks entity as persistent, disallowing players from physgunning it.
+-- Persistent entities save on server shutdown when sbox_persist is set
 -- @shared
 -- @param boolean persist True to make persistent
 function ents_methods:setPersistent(persist)
@@ -2039,7 +2050,8 @@ function ents_methods:getPersistent()
 	return Ent_GetPersistent(eunwrap(self))
 end
 
---- Returns the game assigned owner of an entity. This doesn't take CPPI into account and will return nil for most standard entities.
+--- Returns the game assigned owner of an entity. This doesn't take CPPI into account and will return nil for most
+-- standard entities.
 -- Used on entities with custom physics like held SWEPs and fired bullets in which case player entity should be returned.
 -- @shared
 -- @return Entity Owner
@@ -2229,14 +2241,16 @@ function ents_methods:getNWVarTable()
 	return instance.Sanitize(Ent_GetNWVarTable(eunwrap(self)))
 end
 
---- Returns the distance between the center of the entity's bounding box and whichever corner of the bounding box is farthest away.
+--- Returns the distance between the center of the entity's bounding box and whichever corner of the bounding box is
+-- farthest away.
 -- @shared
 -- @return number The radius of the bounding box, or 0 for some entities such as worldspawn
 function ents_methods:getBoundingRadius()
 	return Ent_BoundingRadius(eunwrap(self))
 end
 
---- Returns whether the entity is dormant or not, i.e. whether or not information about the entity is being sent to your client. Not to be confused with PhysObj:isAsleep
+--- Returns whether the entity is dormant or not, i.e. whether or not information about the entity is being sent to
+-- your client. Not to be confused with PhysObj:isAsleep
 -- Clientside, this will usually be true if the object is outside of your PVS (potentially visible set).
 -- Serverside, this will almost always be false.
 -- @shared
@@ -2245,11 +2259,13 @@ function ents_methods:isDormant()
 	return Ent_IsDormant(eunwrap(self))
 end
 
---- Performs a Ray-Orientated Bounding Box intersection from the given position to the origin of the OBBox with the entity and returns the hit position on the OBBox.
+--- Performs a Ray-Orientated Bounding Box intersection from the given position to the origin of the OBBox with the
+-- entity and returns the hit position on the OBBox.
 -- This relies on the entity having a collision mesh (not a physics object) and will be affected by SOLID_NONE
 -- @shared
--- @param Vector The vector to start the intersection from.
--- @return Vector The nearest hit point of the entity's bounding box in world coordinates, or Vector(0, 0, 0) for some entities such as worldspawn.
+-- @param Vector pos The vector to start the intersection from.
+-- @return Vector The nearest hit point of the entity's bounding box in world coordinates, or Vector(0, 0,
+-- 0) for some entities such as worldspawn.
 function ents_methods:getNearestPoint(pos)
 	return vwrap(Ent_NearestPoint(eunwrap(self), vunwrap1(pos)))
 end
@@ -2258,7 +2274,8 @@ end
 -- These tables are not the same between the client and the server, and different entities may have different fields.
 -- @shared
 -- @param boolean showAll If set, shows all variables, not just the ones for save.
--- @return table A table containing all save values in key/value format. The value may be a sequential table (starting to 1) if the field in question is an array in engine.
+-- @return table A table containing all save values in key/value format.
+-- The value may be a sequential table (starting to 1) if the field in question is an array in engine.
 function ents_methods:getSaveTable(showAll)
 	return instance.Sanitize(Ent_GetSaveTable(eunwrap(self), showAll and true or false))
 end
@@ -2273,7 +2290,8 @@ function ents_methods:getInternalVariable(variableName)
 	return istable(result) and instance.Sanitize(result) or owrap(result)
 end
 
---- Returns entity's map creation ID. Unlike Entity:entIndex or Entity:getCreationID, it will always be the same on same map, no matter how much you clean up or restart it.
+--- Returns entity's map creation ID. Unlike Entity:entIndex or Entity:getCreationID,
+-- it will always be the same on same map, no matter how much you clean up or restart it.
 -- @shared
 -- @return number The map creation ID or -1 if the entity is not compiled into the map.
 function ents_methods:mapCreationID()

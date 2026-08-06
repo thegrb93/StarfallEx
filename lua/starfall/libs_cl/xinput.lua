@@ -57,7 +57,10 @@ SF.hookAdd("xinputTrigger", "xinputtrigger")
 -- @param number when The timer.realtime() at which this event occurred.
 SF.hookAdd("xinputStick", "xinputstick")
 
---- A simpler, hook-based, and more-powerful controller input library. Inputs are not lost between rendered frames, and there is support for rumble. Note: the client must have the XInput lua binary module installed in order to access this library. See more at https://github.com/mitterdoo/garrysmod-xinput
+--- A simpler, hook-based, and more-powerful controller input library.
+-- Inputs are not lost between rendered frames, and there is support for rumble.
+-- Note: the client must have the XInput Lua binary module installed in order to access this library.
+-- See more at https://github.com/mitterdoo/garrysmod-xinput
 -- @name xinput
 -- @class library
 -- @libtbl xinput_library
@@ -88,7 +91,8 @@ local xinput_library = instance.Libraries.xinput
 -- @name xinput_library.getState
 -- @class function
 -- @param number id Controller number. Starts at 0
--- @return table Table containing all input data of the controller, or false if the controller is not connected. The table uses this struct: https://github.com/mitterdoo/garrysmod-xinput#xinput_gamepad
+-- @return table Table containing all input data of the controller, or false if the controller is not connected.
+-- The table uses this struct: https://github.com/mitterdoo/garrysmod-xinput#xinput_gamepad
 xinput_library.getState = xinput.getState
 
 --- Gets whether the button on the controller is currently pushed down.
@@ -127,7 +131,8 @@ xinput_library.getBatteryLevel = xinput.getBatteryLevel
 --- Gets all of the connected controllers.
 -- @name xinput_library.getControllers
 -- @class function
--- @return table A table where each key is the ID of the controller that is connected. Disconnected controllers are not placed in the table.
+-- @return table A table where each key is the ID of the controller that is connected.
+-- Disconnected controllers are not placed in the table.
 xinput_library.getControllers = xinput.getControllers
 
 --- Sets the rumble on the controller.

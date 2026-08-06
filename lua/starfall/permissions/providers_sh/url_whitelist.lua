@@ -90,7 +90,7 @@ end
 
 local function loadDefaultWhitelist()
 	local filename = "starfall/starfall_whitelist_default.lua"
-	-- Clientside lua files can't be file.Read if client doesn't have addon installed
+	-- Clientside Lua files can't be file.Read if client doesn't have addon installed
 	local func = CompileFile( filename )
 	if func then
 		runWhitelist(filename, func)

@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local dgetmeta = debug.getmetatable
 local Unpack = FindMetaTable("Angle").Unpack
@@ -80,6 +80,7 @@ end
 
 --- Gets a value at a key in the angle
 -- Can be indexed with: 1, 2, 3, p, y, r, pitch, yaw, roll. 1,2,3 is most efficient.
+-- @param Angle t The angle
 -- @param number|string k
 -- @return number|function|nil Value
 function ang_meta.__index(t, k)
@@ -94,6 +95,7 @@ end
 local table_concat = table.concat
 
 --- Turns an angle into a string.
+-- @param Angle a The angle
 -- @return string String representing the angle.
 function ang_meta.__tostring(a)
 	return table_concat(a, ' ', 1, 3)
@@ -136,6 +138,7 @@ function ang_meta.__div(a, b)
 end
 
 --- Unary Minus metamethod (Negative)
+-- @param Angle a The angle
 -- @return Angle Negative angle.
 function ang_meta.__unm(a)
 	return wrap({ -a[1], -a[2], -a[3] })
@@ -195,7 +198,6 @@ end
 -- @param number? rad Number of radians or nil if degrees.
 -- @return Angle The modified angle
 function ang_methods:rotateAroundAxis(v, deg, rad)
-
 	if rad then
 		checkluatype (rad, TYPE_NUMBER)
 		deg = math.deg(rad)
@@ -209,8 +211,8 @@ function ang_methods:rotateAroundAxis(v, deg, rad)
 end
 
 --- Round the angle values.
--- Self-Modifies. Does not return anything
--- @param number? idp (Default 0) The integer decimal place to round to.
+-- Self-modifies. Does not return anything
+-- @param number? idp The integer decimal place to round to (default: 0)
 function ang_methods:round(idp)
 	self[1] = math.Round(self[1], idp)
 	self[2] = math.Round(self[2], idp)
@@ -224,7 +226,7 @@ function ang_methods:clone()
 end
 
 --- Copies p,y,r from angle to another.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param Angle b The angle to copy from.
 function ang_methods:set(b)
 	self[1] = b[1]
@@ -233,7 +235,7 @@ function ang_methods:set(b)
 end
 
 --- Sets p,y,r to 0. This is faster than doing it manually.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 function ang_methods:setZero()
 	self[1] = 0
 	self[2] = 0

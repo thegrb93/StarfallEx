@@ -10,7 +10,7 @@ registerprivilege("bass.play2D", "Play sounds in global game context with `bass`
 local plyCount = SF.LimitObject("bass", "bass sounds", 20, "The number of sounds allowed to be playing via Starfall client at once")
 SF.ResourceCounters.Bass = {icon = "icon16/sound_add.png", count = function(ply) return plyCount:get(ply) end}
 
-local bassSounds = {} -- { [IGModAudioChannel] = baseSound, ... } -- Contains extra data for each starfall sound.
+local bassSounds = {} -- { [IGModAudioChannel] = baseSound, ... } -- Contains extra data for each Starfall sound.
 local bassSimpleFadeSounds = {} -- { [IGModAudioChannel] = baseSound, ... } -- A list of sounds that need to be manually controlled through 'simple fading'.
 
 --- Returns a bass sound with custom fading capability
@@ -27,7 +27,7 @@ local bassSound = {
 				-- Sounds falls off with dist^2. Unfortunately, we still have to do the square root inbetween.
 				fadeMult = ((self.fadeMax - math_sqrt(distSqr)) / (self.fadeMax - self.fadeMin)) ^ 2
 			end
-		
+
 			if self.fadeMult ~= fadeMult then
 				self.fadeMult = fadeMult
 				self.sound:SetVolume(self.targetVolume * fadeMult)
@@ -120,13 +120,15 @@ local function deleteSound(ply, snd)
 end
 
 
---- `bass` library is intended to be used only on client side. It's good for streaming local and remote sound files and playing them directly in player's "2D" context.
+--- `bass` library is intended to be used only on client side.
+-- It's good for streaming local and remote sound files and playing them directly in player's "2D" context.
 -- @name bass
 -- @class library
 -- @libtbl bass_library
 SF.RegisterLibrary("bass")
 
---- For playing music there is `Bass` type. You can pause and set current playback time in it. If you're looking to apply DSP effects on present game sounds, use `Sound` instead.
+--- For playing music there is `Bass` type. You can pause and set current playback time in it.
+-- If you're looking to apply DSP effects on present game sounds, use `Sound` instead.
 -- @name Bass
 -- @class type
 -- @libtbl bass_methods
@@ -197,7 +199,9 @@ end
 -- 2D sounds require a HUD connection.
 -- @param string path File path to play from.
 -- @param string flags Flags for the sound (`3d`, `mono`, `noplay`, `noblock`).
--- @param function callback Function which is called when the sound is loaded. It'll get 3 arguments: `Bass` object, error number and name.
+-- Multiple flags can be separated by a space.
+-- @param function callback Function which is called when the sound is loaded.
+-- It'll get 3 arguments: `Bass` object, error number and name.
 function bass_library.loadFile(path, flags, callback)
 	checkpermission(instance, nil, "bass.loadFile")
 
@@ -214,8 +218,11 @@ end
 --- Loads a sound as a Bass object from a URL.
 -- 2D sounds require a HUD connection.
 -- @param string path URL path to play from.
--- @param string flags Flags for the sound (`3d`, `mono`, `noplay`, `noblock`). noblock will fail if the webserver doesn't provide file length.
--- @param function callback Function which is called when the sound is loaded. It'll get 3 arguments: `Bass` object, error number and name.
+-- @param string flags Flags for the sound (`3d`, `mono`, `noplay`, `noblock`).
+-- noblock will fail if the webserver doesn't provide file length.
+-- Multiple flags can be separated by a space.
+-- @param function callback Function which is called when the sound is loaded.
+-- It'll get 3 arguments: `Bass` object, error number and name.
 function bass_library.loadURL(path, flags, callback)
 	checkpermission(instance, path, "bass.loadURL")
 
@@ -320,7 +327,7 @@ end
 -- If simple fading is disabled, the sound will start to fade, then lock its volume once max distance is reached. It will almost always be faintly heard.
 -- @param number min The distance where the sound starts to fade. (50-1,000)
 -- @param number max The maximal distance, as described above. (min-20,000 for simple fading, 5,000-200,000 for non-simple fading)
--- @param boolean? useSimpleFading Whether to use simple fading for this sound. True by default.
+-- @param boolean? useSimpleFading Whether to use simple fading for this sound (default: true)
 function bass_methods:setFade(min, max, useSimpleFading)
 	checkluatype(min, TYPE_NUMBER)
 	checkluatype(max, TYPE_NUMBER)
@@ -332,7 +339,7 @@ function bass_methods:setFade(min, max, useSimpleFading)
 	soundData:setFade(min, max, useSimpleFading)
 end
 
---- Gets the fade distance of the sound in 3D space. 
+--- Gets the fade distance of the sound in 3D space.
 -- @return number The distance before the sound starts to fade.
 -- @return number The distance before the sound stops fading.
 -- @return boolean Whether or not this sound uses simple fading.
@@ -362,7 +369,7 @@ end
 
 --- Sets the current playback time of the sound. Requires the 'noblock' flag.
 -- @param number time Sound playback time in seconds.
--- @param boolean? dontDecode Skip decoding to set time, which is much faster but less accurate. True by default.
+-- @param boolean? dontDecode Skip decoding to set time, which is much faster but less accurate (default: true)
 function bass_methods:setTime(time, dontDecode)
 	checkluatype(time, TYPE_NUMBER)
 	getsnd(self):SetTime(time, dontDecode ~= false)
@@ -381,7 +388,8 @@ function bass_methods:getFileName()
 end
 
 --- Perform fast Fourier transform algorithm to compute the DFT of the sound.
--- @param number n Number of consecutive audio samples, between 0 and 7. Depending on this parameter you will get 256*2^n samples.
+-- @param number n Number of consecutive audio samples, between 0 and 7.
+-- Depending on this parameter you will get 256*2^n samples.
 -- @return table Table containing DFT magnitudes, each between 0 and 1.
 function bass_methods:getFFT(n)
 	local arr = {}
@@ -393,7 +401,7 @@ end
 -- @return boolean Is the audio stream block streamed or not.
 function bass_methods:isBlockStreamed()
 	local uw = getsnd(self)
-	if not uw:IsOnline() then SF.Throw("The Bass Object isn't playing an online audio stream!", 2) end
+	if not uw:IsOnline() then SF.Throw("The Bass object isn't playing an online audio stream!", 2) end
 	return uw:IsBlockStreamed()
 end
 
@@ -423,7 +431,8 @@ function bass_methods:getPan()
 end
 
 --- Sets the relative volume of the left and right channels.
--- @param number pan Relative integer volume between the left and right channels. Values must be -1 to 1 for relative left to right.
+-- @param number pan Relative integer volume between the left and right channels.
+-- Values must be -1 to 1 for relative left to right.
 function bass_methods:setPan(pan)
 	checkluatype(pan, TYPE_NUMBER)
 
@@ -445,7 +454,8 @@ function bass_methods:getAverageBitRate()
 	return getsnd(self):GetAverageBitRate()
 end
 
---- Returns the buffered time of the sound channel in seconds, for online streaming sound channels (Bass:loadURL()). For offline channels this will be equivalent to Bass:getLength().
+--- Returns the buffered time of the sound channel in seconds, for online streaming sound channels (Bass:loadURL()).
+-- For offline channels this will be equivalent to Bass:getLength().
 -- @return number The current buffered time of the stream, in seconds.
 function bass_methods:getBufferedTime()
 	local uw = getsnd(self)
@@ -461,51 +471,60 @@ function bass_methods:getSamplingRate()
 end
 
 --- Retrieves HTTP headers from a bass stream channel created by Bass:loadURL(), if available.
---- Of special interest here are headers such as icy-name, icy-br, ice-audio-info, icy-genre.
---- CRITICAL NOTE: Tags aren't available immediately! Must use a timer to wait 100-500ms for BASS to parse metadata during stream init!!
+-- CRITICAL NOTE: Tags aren't available immediately!
+-- Must use a timer to wait 100-500ms for BASS to parse metadata during stream init!
 -- @return table A list of HTTP headers or nil if no information is available.
 function bass_methods:getTagsHTTP()
 	return getsnd(self):GetTagsHTTP()
 end
 
---- Retrieves the ID3 version 1 info from a bass channel created by Bass:loadFile or Bass:loadURL, if available. ID3v2 is not supported.
---- CRITICAL NOTE: Tags aren't available immediately! Must use a timer to wait 100-500ms for BASS to parse metadata during stream init!!
+--- Retrieves the ID3 version 1 info from a bass channel created by Bass:loadFile or Bass:loadURL, if available.
+-- ID3v2 is not supported.
+-- CRITICAL NOTE: Tags aren't available immediately!
+-- Must use a timer to wait 100-500ms for BASS to parse metadata during stream init!
 -- @return table A table containing the information, or nil if no information is available.
--- (The table will always have the following keys, filled out based on what is available: "album", "artist", "comment", "genre", "id", "title", "year")
+-- The table will always have the following keys (filled out based on what is available):
+-- "album", "artist", "comment", "genre", "id", "title", "year"
 function bass_methods:getTagsID3()
 	return getsnd(self):GetTagsID3()
 end
 
 --- Retrieves ICY metadata from a bass stream channel created by Bass:loadURL, if available.
---- CRITICAL NOTE: Tags aren't available immediately! Must use a timer to wait 100-500ms for BASS to parse metadata during stream init!!
+-- CRITICAL NOTE: Tags aren't available immediately!
+-- Must use a timer to wait 100-500ms for BASS to parse metadata during stream init!
 -- @return string The meta information, or nil if no information is available.
 function bass_methods:getTagsMeta()
 	return getsnd(self):GetTagsMeta()
 end
 
 --- Retrieves .m4a media info, from a bass channel created by Bass:loadFile or Bass:loadURL, if available.
---- CRITICAL NOTE: Tags aren't available immediately! Must use a timer to wait 100-500ms for BASS to parse metadata during stream init!!
+-- CRITICAL NOTE: Tags aren't available immediately!
+-- Must use a timer to wait 100-500ms for BASS to parse metadata during stream init!
 -- @return table A list of available information in no particular order, or nil if no information is available.
 function bass_methods:getTagsMP4()
 	return getsnd(self):GetTagsMP4()
 end
 
 --- Retrieves OGG media info tag, from a bass channel created by Bass:loadFile or Bass:loadURL, if available.
---- CRITICAL NOTE: Tags aren't available immediately! Must use a timer to wait 100-500ms for BASS to parse metadata during stream init!!
--- @return table A list of available information in no particular order, or nil if no information is available. 
+-- CRITICAL NOTE: Tags aren't available immediately!
+-- Must use a timer to wait 100-500ms for BASS to parse metadata during stream init!
+-- @return table A list of available information in no particular order, or nil if no information is available.
 function bass_methods:getTagsOGG()
 	return getsnd(self):GetTagsOGG()
 end
 
---- Retrieves OGG Vendor tag, usually containing the application that created the file, from a bass channel created by Bass:loadFile or Bass:loadURL, if available.
---- CRITICAL NOTE: Tags aren't available immediately! Must use a timer to wait 100-500ms for BASS to parse metadata during stream init!!
+--- Retrieves OGG Vendor tag, usually containing the application that created the file,
+-- from a bass channel created by Bass:loadFile or Bass:loadURL, if available.
+-- CRITICAL NOTE: Tags aren't available immediately!
+-- Must use a timer to wait 100-500ms for BASS to parse metadata during stream init!
 -- @return string The OGG vendor tag, or nil if no information is available.
 function bass_methods:getTagsVendor()
 	return getsnd(self):GetTagsVendor()
 end
 
 --- Retrieves .WMA media info, from a bass channel created by Bass:loadFile or Bass:loadURL, if available.
---- CRITICAL NOTE: Tags aren't available immediately! Must use a timer to wait 100-500ms for BASS to parse metadata during stream init!!
+-- CRITICAL NOTE: Tags aren't available immediately!
+-- Must use a timer to wait 100-500ms for BASS to parse metadata during stream init!
 -- @return table A list of available information in no particular order, or nil if no information is available.
 function bass_methods:getTagsWMA()
 	return getsnd(self):GetTagsWMA()
@@ -542,7 +561,8 @@ function bass_methods:get3DEnabled()
 end
 
 --- Returns the state of the sound.
--- @return number The state enum of the sound. https://wiki.facepunch.com/gmod/Enums/GMOD_CHANNEL
+-- @return number The state enum of the sound.
+-- See https://wiki.facepunch.com/gmod/Enums/GMOD_CHANNEL
 function bass_methods:getState()
 	return getsnd(self):GetState()
 end
@@ -573,9 +593,12 @@ function bass_methods:isStalled()
 end
 
 --- Sets 3D cone of the sound channel.
--- @param number innerAngle The angle of the inside projection cone in degrees. Range is from 0 (no cone) to 360 (sphere), -1 = leave current.
--- @param number outerAngle The angle of the outside projection cone in degrees. Range is from 0 (no cone) to 360 (sphere), -1 = leave current.
--- @param number outerVolume The delta-volume outside the outer projection cone. Range is from 0 (silent) to 1 (same as inside the cone), less than 0 = leave current.
+-- @param number innerAngle The angle of the inside projection cone in degrees.
+-- Range is from 0 (no cone) to 360 (sphere), -1 = leave current.
+-- @param number outerAngle The angle of the outside projection cone in degrees.
+-- Range is from 0 (no cone) to 360 (sphere), -1 = leave current.
+-- @param number outerVolume The delta-volume outside the outer projection cone.
+-- Range is from 0 (silent) to 1 (same as inside the cone), less than 0 = leave current.
 function bass_methods:set3DCone(innerAngle, outerAngle, outerVolume)
 	checkluatype(innerAngle, TYPE_NUMBER)
 	checkluatype(outerAngle, TYPE_NUMBER)

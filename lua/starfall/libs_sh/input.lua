@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local registerprivilege = SF.Permissions.registerPrivilege
 local haspermission = SF.Permissions.hasAccess
 local checkluatype = SF.CheckLuaType
@@ -50,9 +50,9 @@ end
 registerprivilege("input", "Input", "Allows the user to see what buttons you're pressing.", { client = {} })
 registerprivilege("input.chat", "Input", "Allows the user to see your chat keypresses.", { client = { default = 1 } })
 registerprivilege("input.bindings", "Input", "Allows the user to see your bindings.", { client = { default = 1 } })
-registerprivilege("input.emulate", "Input", "Allows starfall to emulate user input.", { client = { default = 1 } })
-registerprivilege("input.lockcontrols", "Input", "Allows starfall to lock game control input.", { client = { default = 5 } })
-registerprivilege("input.enablecursor", "Input", "Allows starfall to enable the game's cursor.", { client = { default = 5 } })
+registerprivilege("input.emulate", "Input", "Allows Starfall to emulate user input.", { client = { default = 1 } })
+registerprivilege("input.lockcontrols", "Input", "Allows Starfall to lock game control input.", { client = { default = 5 } })
+registerprivilege("input.enablecursor", "Input", "Allows Starfall to enable the game's cursor.", { client = { default = 5 } })
 
 local controlsLocked = false
 local function unlockControls(instance)

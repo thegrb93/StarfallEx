@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 local Ent_IsValid = FindMetaTable("Entity").IsValid
@@ -50,7 +50,7 @@ end)
 -- @param Vector pos Initial entity position
 -- @param Angle ang Initial entity angles
 -- @param string model Model path
--- @param boolean? frozen True to spawn the entity in a frozen state. Default is false.
+-- @param boolean? frozen True to spawn the entity in a frozen state (default: false)
 -- @return Entity The prop object
 function props_library.create(pos, ang, model, frozen)
 
@@ -111,7 +111,7 @@ end
 --- Creates a ragdoll
 -- @server
 -- @param string model Model path
--- @param boolean? frozen True to spawn the entity in a frozen state. Default is false.
+-- @param boolean? frozen True to spawn the entity in a frozen state (default: false)
 -- @return Entity The ragdoll entity
 function props_library.createRagdoll(model, frozen)
 	checkpermission(instance, nil, "prop.createRagdoll")
@@ -170,7 +170,7 @@ end
 -- @param Vector pos The position to spawn the prop
 -- @param Angle ang The angles to spawn the prop
 -- @param table meshConvexes The table of tables of vertices that make up the physics mesh {{v1,v2,...},{v1,v2,...},...}
--- @param boolean? frozen True to spawn the entity in a frozen state. Default is false.
+-- @param boolean? frozen True to spawn the entity in a frozen state (default: false)
 -- @return Entity The prop object
 function props_library.createCustom(pos, ang, meshConvexes, frozen)
 	pos = SF.clampPos(vunwrap1(pos))
@@ -232,7 +232,7 @@ local allowed_components = {
 	["starfall_screen"] = true,
 	["starfall_hud"] = true,
 }
---- Creates starfall component
+--- Creates a Starfall component
 -- Allowed components:
 -- starfall_hud
 -- starfall_screen
@@ -240,7 +240,7 @@ local allowed_components = {
 -- @param Angle ang Angle of created component
 -- @param string class Class of created component
 -- @param string model Model of created component
--- @param boolean? frozen True to spawn the entity in a frozen state. Default is false.
+-- @param boolean? frozen True to spawn the entity in a frozen state (default: false)
 -- @server
 -- @return Entity Component entity
 function props_library.createComponent(pos, ang, class, model, frozen)
@@ -339,7 +339,7 @@ end
 -- @param Vector pos Position of created seat
 -- @param Angle ang Angle of created seat
 -- @param string model Model of created seat
--- @param boolean? frozen True to spawn the entity in a frozen state. Default is false.
+-- @param boolean? frozen True to spawn the entity in a frozen state (default: false)
 -- @server
 -- @return Entity The seat object
 function props_library.createSeat(pos, ang, model, frozen)
@@ -403,8 +403,9 @@ end
 -- @param Vector pos Position of created sent
 -- @param Angle ang Angle of created sent
 -- @param string class Class of created sent
--- @param boolean? frozen True to spawn the entity in a frozen state. Default is false.
--- @param table? data Optional table, additional entity data to be supplied to certain SENTs. See prop.SENT_Data_Structures table in Docs for list of SENTs
+-- @param boolean? frozen True to spawn the entity in a frozen state (default: false)
+-- @param table? data Optional table, additional entity data to be supplied to certain SENTs.
+-- See prop.SENT_Data_Structures table in Docs for list of SENTs
 -- @server
 -- @return Entity The sent object
 function props_library.createSent(pos, ang, class, frozen, data)

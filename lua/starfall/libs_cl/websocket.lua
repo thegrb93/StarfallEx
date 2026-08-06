@@ -15,7 +15,7 @@ local function make_js(address)
 		sf_websocket.onclose = function()        { sf.on_close(false);                    };
 		sf_websocket.onerror = function()        { sf.on_close(true);                     };
 
-		// Exposed functions to lua
+		// Exposed functions to Lua
 		sf.send = function(data) { sf_websocket.send(data); };
 
 		console.log("SF: Opened websocket to ]] .. address .. [[");
@@ -114,8 +114,8 @@ local websocket_list = {}
 --- Also see the websocket example.
 -- @name builtins_library.WebSocket
 -- @param string domain Domain of the websocket server.
--- @param number? port Port of the websocket server. (Default 443)
--- @param boolean? secure Whether to use secure connection (wss). (Default false)
+-- @param number? port Port of the websocket server (default: 443)
+-- @param boolean? secure Whether to use secure/wss connection (default: false)
 -- @param string? path Optional path of the websocket.
 -- @return WebSocket The websocket object. Use WebSocket:connect() to connect.
 function instance.env.WebSocket(domain, port, secure, path)

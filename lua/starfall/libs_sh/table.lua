@@ -29,7 +29,9 @@ end
 --- Changes all keys to sequential integers. This creates a new table object and does not affect the original.
 -- @class function
 -- @param table tbl The original table to modify
--- @param boolean? saveKeys Optional save the keys within each member table. This will insert a new field __key into each value, and should not be used if the table contains non-table values. Defaults to false
+-- @param boolean? saveKeys Optional save the keys within each member table.
+-- This will insert a new field __key into each value, and should not be used if the table contains non-table values.
+-- Default: false
 -- @return table Table with integer keys
 table_library.clearKeys = table.ClearKeys
 
@@ -42,9 +44,9 @@ table_library.collapseKeyValue = table.CollapseKeyValue
 --- Concatenates the contents of a table to a string.
 -- @class function
 -- @param table tbl The table to concatenate
--- @param string? concatenator A seperator to insert between each string. Defaults to ""
--- @param number? startPos Optional key to start at. Defaults to 1
--- @param number? endPos Optional key to end at. Defaults to #tbl
+-- @param string? concatenator A seperator to insert between each string (default: "")
+-- @param number? startPos Optional key to start at (default: 1)
+-- @param number? endPos Optional key to end at (default: `#tbl`)
 -- @return string Concatenated string
 table_library.concat = table.concat
 
@@ -54,7 +56,8 @@ table_library.concat = table.concat
 -- @param table target The table to write to
 table_library.copyFromTo = table.CopyFromTo
 
---- Counts the amount of keys in a table. This should only be used when a table is not numerically and sequentially indexed, for those table consider # operator
+--- Counts the amount of keys in a table. This should only be used when a table is not numerically and sequentially
+-- indexed, for those table consider # operator
 -- @class function
 -- @param table tbl The table to count the keys of
 -- @return number The number of keyvalue pairs
@@ -90,7 +93,7 @@ table_library.getWinningKey = table.GetWinningKey
 -- @param any val Value to search for
 -- @return boolean Returns true if the table has that value, false otherwise
 table_library.hasValue = table.HasValue
-	
+
 --- Checks if a table contains any value.
 -- @class function
 -- @param table tbl Table to check
@@ -106,9 +109,10 @@ table_library.inherit = table.Inherit
 
 --- Inserts a value into a table at the end of the table or at the given position.
 -- @class function
--- @param table tbl The table to insert the variable into
--- @param any pos The position in the table to insert the variable. If the third argument is not provided, this argument becomes the value to insert at the end of given table
--- @param any val The variable to insert into the table
+-- @param table a The table to insert the variable into
+-- @param any b The position in the table to insert the variable.
+-- If the third argument is not provided, this argument becomes the value to insert at the end of given table.
+-- @param any c The variable to insert into the table
 -- @return number The index the variable was placed at.
 table_library.insert = function(a,b,c) if c~=nil then b = math.Clamp(b, 1, 2^31-1) return table.insert(a,b,c) else return table.insert(a,b) end end
 
@@ -154,11 +158,12 @@ table_library.random = table.Random
 --- Removes a value from a table and shifts any other values down to fill the gap.
 -- @class function
 -- @param table tbl The table to remove the value from
--- @param number? index Optional index of the value to remove. Defaults to #tbl
+-- @param number? index Optional index of the value to remove (default: `#tbl`)
 -- @return any The value that was removed
 table_library.remove = table.remove
 
---- Removes the first instance of a given value from the specified table with table.remove, then returns the key that the value was found at
+--- Removes the first instance of a given value from the specified table with table.remove,
+-- then returns the key that the value was found at
 -- @class function
 -- @param table tbl The table that will be searched
 -- @param any val The value to find within the table
@@ -179,7 +184,8 @@ table_library.shuffle = table.Shuffle
 --- Sorts a table either ascending or by the given sort function
 -- @class function
 -- @param table tbl The table to sort
--- @param function? sorter If specified, the function will be called with 2 parameters each. Return true in this function if you want the first parameter to come first in the sorted array
+-- @param function? sorter If specified, the function will be called with 2 parameters each.
+-- Return true in this function if you want the first parameter to come first in the sorted array
 function table_library.sort(tbl, sorter)
 	if debug.getinfo(128) then error("stack overflow") end
 	return table.sort(tbl, sorter)
@@ -188,14 +194,14 @@ end
 --- Returns a list of keys sorted based on values of those keys.
 -- @class function
 -- @param table tbl Table to sort. All values of this table must be of same type
--- @param boolean? descending Optional, should the order be descending? Defaults to false
+-- @param boolean? descending Optional, should the order be descending? (default: false)
 table_library.sortByKey = table.SortByKey
 
 --- Sorts a table by a named member.
 -- @class function
 -- @param table tbl Table to sort
 -- @param any member The key used to identify the member
--- @param boolean? ascending Optional, should be ascending? Defaults to false
+-- @param boolean? ascending Optional, should be ascending? (default: false)
 table_library.sortByMember = table.SortByMember
 
 --- Sorts a table in reverse order from table.sort
@@ -208,11 +214,12 @@ table_library.sortDesc = table.SortDesc
 -- @class function
 -- @param table tbl The table to iterate over
 -- @param string? displayName Optional name for the table
--- @param boolean? niceFormatting Optional, adds new lines and tabs to the string. Defaults to false
+-- @param boolean? niceFormatting Optional, adds new lines and tabs to the string (default: false)
 -- @return string The table formatted as a string
 table_library.toString = table.ToString
 
---- Creates a deep copy and returns that copy. This function does NOT copy userdata, such as Vectors and Angles!
+--- Creates a deep copy and returns that copy.
+-- This function does NOT copy userdata, such as Vectors and Angles!
 -- @class function
 -- @param table tbl The table to be copied
 -- @param table? lookup_table An optional lookup table for cyclic reference detection

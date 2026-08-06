@@ -43,7 +43,7 @@ local generic_lua_types = {
 	["nil"] = true -- For nullable / optional values
 }
 
-local sf_types = Docs.Types -- Get the types from documentation rather than the lua state
+local sf_types = Docs.Types -- Get the types from documentation rather than the Lua state
 local function valid_sftype(type1)
 	if sf_types[type1] or generic_lua_types[type1] then return true end
 

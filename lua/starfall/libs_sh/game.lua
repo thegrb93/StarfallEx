@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 
@@ -159,7 +159,10 @@ function game_library.getPlayerModels()
 end
 
 --- Returns the wind's velocity at a given position, as influenced by current map's env_wind entities
--- @param Vector? pos Optional position to get wind speed at. If specified, wind controllers with windradius other than -1 will be taken into account, if the point is within their radius. If omitted, only the global wind controller will be used (if one exists). This argument will be ignored on client-side and will be treated as nil because the position of env_wind is not currently networked to clients
+-- @param Vector? pos Optional position to get wind speed at.
+-- If specified, wind controllers with windradius other than -1 will be taken into account, if the point is within their radius.
+-- If omitted, only the global wind controller is used (if one exists).
+-- Ignored on client-side as env_wind position is not networked.
 -- @return Vector The current wind velocity at a given position
 function game_library.getWindSpeed(pos)
 	if pos ~= nil then pos = vunwrap1(pos) end

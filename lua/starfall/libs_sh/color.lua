@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local dgetmeta = debug.getmetatable
 local COL_META = FindMetaTable("Color")
@@ -75,10 +75,10 @@ color_meta.QuickUnwrap1 = QuickUnwrapper()
 -- E.g. Color(255,0,0) Color("#FF0000") Color()
 -- @name builtins_library.Color
 -- @class function
--- @param number|string|nil r Red component or string hexadecimal color. Defaults to 255.
--- @param number? g Green component. Defaults to 255.
--- @param number? b Blue component. Defaults to 255.
--- @param number? a Alpha component. Defaults to 255.
+-- @param number|string|nil r Red component or string hexadecimal color (default: 255)
+-- @param number? g Green component (default: 255)
+-- @param number? b Blue component (default: 255)
+-- @param number? a Alpha component (default: 255)
 -- @return Color New color
 function instance.env.Color(r, g, b, a)
 	if isstring(r) then
@@ -105,6 +105,7 @@ end
 local rgb = { r = 1, g = 2, b = 3, a = 4, h = 1, s = 2, v = 3, l = 3 }
 
 --- Sets a value at a key in the color
+-- @param Color t The color
 -- @param number|string k Key. Number or string
 -- @param number v Value.
 function color_meta.__newindex(t, k, v)
@@ -116,6 +117,7 @@ function color_meta.__newindex(t, k, v)
 end
 
 --- Gets a value at a key in the color
+-- @param Color t The color
 -- @param number|string k Key. Number or string
 -- @return number Value at the index
 function color_meta.__index(t, k)
@@ -128,43 +130,46 @@ function color_meta.__index(t, k)
 end
 
 --- Turns the color into a string
+-- @param Color c The color
 -- @return string String representation of the color
 function color_meta.__tostring(c)
 	return c[1] .. " " .. c[2] .. " " .. c[3] .. " " .. c[4]
 end
 
 --- Concatenation metamethod
+-- @param Color|string a First value
+-- @param Color|string b Second value
 -- @return string Adds two colors into one string-representation
 function color_meta.__concat(a, b)
 	return tostring(a) .. tostring(b)
 end
 
 --- Equivalence metamethod
--- @param Color c1 Initial color.
--- @param Color c2 Color to check against.
+-- @param Color a Initial color.
+-- @param Color b Color to check against.
 -- @return boolean Whether their fields are equal
 function color_meta.__eq(a, b)
 	return a[1]==b[1] and a[2]==b[2] and a[3]==b[3] and a[4]==b[4]
 end
 
 --- Addition metamethod
--- @param Color c1 Initial color.
--- @param Color c2 Color to add to the first.
+-- @param Color a Initial color.
+-- @param Color b Color to add to the first.
 -- @return Color Resultant color.
 function color_meta.__add(a, b)
 	return wrap({ a[1] + b[1], a[2] + b[2], a[3] + b[3], a[4] + b[4] })
 end
 
 --- Subtraction metamethod
--- @param Color c1 Initial color.
--- @param Color c2 Color to subtract.
+-- @param Color a Initial color.
+-- @param Color b Color to subtract.
 -- @return Color Resultant color.
 function color_meta.__sub(a, b)
 	return wrap({ a[1]-b[1], a[2]-b[2], a[3]-b[3], a[4]-b[4] })
 end
 
 --- Multiplication metamethod
--- @param number|Color a Number or Color multiplicant
+-- @param number|Color a Number or Color multiplicand
 -- @param number|Color b Number or Color multiplier
 -- @return Color Multiplied color.
 function color_meta.__mul(a, b)
@@ -216,7 +221,7 @@ function color_methods:hsvToRGB()
 end
 
 --- Returns a hexadecimal string representation of the color
--- @param boolean? alpha Optional boolean whether to include the alpha channel, False by default
+-- @param boolean? alpha Optional boolean whether to include the alpha channel (default: false)
 -- @return string String hexadecimal color
 function color_methods:toHex(alpha)
 	if alpha~=nil then checkluatype(alpha, TYPE_BOOL) end
@@ -228,8 +233,8 @@ function color_methods:toHex(alpha)
 end
 
 --- Round the color values.
--- Self-Modifies. Does not return anything
--- @param number? idp (Default 0) The integer decimal place to round to.
+-- Self-modifies. Does not return anything
+-- @param number? idp The integer decimal place to round to (default: 0)
 function color_methods:round(idp)
 	self[1] = math.Round(self[1], idp)
 	self[2] = math.Round(self[2], idp)
@@ -244,7 +249,7 @@ function color_methods:clone()
 end
 
 --- Copies r,g,b,a from color to another.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param Color b The color to copy from.
 function color_methods:set(b)
 	self[1] = b[1]

@@ -435,8 +435,12 @@ end
 
 --- Creates/Modifies wire inputs/outputs. All wire ports must begin with an uppercase
 -- letter and contain only alphabetical characters or numbers but may not begin with a number.
--- @param table? inputs (Optional) A key-value table with input port names as keys and types as values. e.g. {MyInput="number"} or {MyInput={type="number"}}. If nil, input ports won't be changed. If you use the latter syntax for defining ports, you can also specify description alongside the type, ex. {MyInput={type="number", description="Description for this input."}}
--- @param table? outputs (Optional) A key-value table with output port names as keys and types as values. The above behavior for inputs also applies for outputs.
+-- @param table? inputs (Optional) A key-value table with input port names as keys and types as values. e.g.
+-- {MyInput="number"} or {MyInput={type="number"}}. If nil, input ports won't be changed.
+-- If you use the latter syntax for defining ports, you can also specify description alongside the type,
+-- ex. {MyInput={type="number", description="Description for this input."}}
+-- @param table? outputs (Optional) A key-value table with output port names as keys and types as values.
+-- The above behavior for inputs also applies for outputs.
 function wire_library.adjustPorts(inputs, outputs)
 	if inputs ~= nil then
 		checkluatype(inputs, TYPE_TABLE)
@@ -511,7 +515,9 @@ local ValidWireMat = { 	["cable/rope"] = true, ["cable/cable2"] = true, ["cable/
 -- @param string outputname Output to be wired. May be "entity" or "wirelink" to specify an entity/wirelink output
 -- @param number? width Width of the wire(optional)
 -- @param Color? color Color of the wire(optional)
--- @param string? materialName Material of the wire(optional), Valid materials are cable/rope, cable/cable2, cable/xbeam, cable/redlaser, cable/blue_elec, cable/physbeam, cable/hydra, arrowire/arrowire, arrowire/arrowire2
+-- @param string? material Material of the wire(optional), Valid materials are cable/rope, cable/cable2,
+-- cable/xbeam, cable/redlaser, cable/blue_elec, cable/physbeam, cable/hydra, arrowire/arrowire,
+-- arrowire/arrowire2
 function wire_library.create(entI, entO, inputname, outputname, width, color, material)
 	checkluatype(inputname, TYPE_STRING)
 	checkluatype(outputname, TYPE_STRING)
@@ -645,7 +651,8 @@ end
 --- Gets all destination inputs that a given output is wired to
 -- @param Entity ent Entity with the output
 -- @param string outputName Name of the output to check
--- @return table A table of destination connections. Each entry is a table with fields `Entity` (the destination entity) and `Name` (the input name on that entity). Returns an empty table if not wired.
+-- @return table A table of destination connections. Each entry is a table with fields `Entity` (the destination
+-- entity) and `Name` (the input name on that entity). Returns an empty table if not wired.
 function wire_library.getOutputTargets(ent, outputName)
 	checkluatype(outputName, TYPE_STRING)
 	ent = eunwrap(ent)

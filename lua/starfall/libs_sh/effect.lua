@@ -1,6 +1,5 @@
 -- Global to all Starfalls
 local clamp = math.Clamp
-local floor = math.floor
 local checkluatype = SF.CheckLuaType
 local checknumber = SF.CheckNumber
 local checkvector = SF.CheckVector

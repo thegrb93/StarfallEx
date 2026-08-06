@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 local IsValid = FindMetaTable("Entity").IsValid
@@ -92,7 +92,7 @@ function constr_methods:isValid()
 end
 
 --- Stops the constraint from being saved on duplication or map save.
--- @param boolean? allowDupe Set to true to re-enable duplicating (default false)
+-- @param boolean? allowDupe Set to true to re-enable duplicating (default: false)
 -- @server
 function constr_methods:doNotDuplicate(allowDupe)
 	if allowDupe then
@@ -148,13 +148,15 @@ function constraint_library.weld(e1, e2, bone1, bone2, force_lim, nocollide)
 	end
 end
 
---- Axis two entities. v1 in e1's coordinates and v2 in e2's coordinates (or laxis in e1's coordinates again) define the axis
+--- Axis two entities. v1 in e1's coordinates and v2 in e2's coordinates (or laxis in e1's coordinates again) define
+-- the axis
 -- @param Entity e1 The first entity
 -- @param Entity e2 The second entity
 -- @param number? bone1 Number bone of the first entity. Default 0
 -- @param number? bone2 Number bone of the second entity. Default 0
 -- @param Vector v1 Position to center the axis, local to e1's space coordinates
--- @param Vector v2 The second position defining the axis, local to e2's space coordinates. The laxis may be specified instead which is local to e1's space coordinates
+-- @param Vector v2 The second position defining the axis, local to e2's space coordinates.
+-- The laxis may be specified instead which is local to e1's space coordinates
 -- @param number? force_lim Amount of force until it breaks, 0 = Unbreakable. Default 0
 -- @param number? torque_lim Amount of torque until it breaks, 0 = Unbreakable. Default 0
 -- @param number? friction Friction of the constraint. Default 0
@@ -245,7 +247,8 @@ end
 -- @param Vector? minv Vector defining minimum rotation angle based on world axes. Default Vec(0)
 -- @param Vector? maxv Vector defining maximum rotation angle based on world axes. Default Vec(0)
 -- @param Vector? frictionv Vector defining rotational friction, local to the constraint. Default Vec(0)
--- @param boolean? rotateonly If True, ballsocket will only affect the rotation allowing for free movement, otherwise it will limit both - rotation and movement. Default false
+-- @param boolean? rotateonly If true, ballsocket will only affect the rotation allowing for free movement.
+-- Otherwise it will limit both - rotation and movement. Default false
 -- @param boolean? nocollide Bool whether or not to nocollide the two entities. Default false
 -- @return Constraint The constraint entity
 -- @server
@@ -349,7 +352,7 @@ end
 -- @param number? addlength Amount to add to the base length of the rope. Default 0
 -- @param number? force_lim Amount of force until it breaks, 0 = Unbreakable. Default 0
 -- @param number? width Width of the rope. Default 0
--- @param string? materialName Material of the rope
+-- @param string? material Material of the rope
 -- @param boolean? rigid Whether the rope is rigid. Default false
 -- @param Color? color The color of the rope. Default white
 -- @return Constraint The constraint entity

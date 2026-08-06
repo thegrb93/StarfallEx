@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local checkvalidnumber = SF.CheckValidNumber
 local registerprivilege = SF.Permissions.registerPrivilege
@@ -315,7 +315,7 @@ end
 
 --- Returns whether the player belongs to a usergroup
 -- @shared
--- @param string groupName Group to check against
+-- @param string group Group to check against
 -- @return boolean True if player belongs to group
 function player_methods:isUserGroup(group)
 	return Ply_IsUserGroup(unwrap(self), group)
@@ -550,9 +550,9 @@ if CLIENT then
 		return Ply_IsMuted(unwrap(self))
 	end
 
-	--- Returns whether the player is heard by the local player.
+	--- Returns whether the player is heard by the local player
 	-- @client
-	-- @return boolean Whether they are speaking and able to be heard by LocalPlayer
+	-- @return boolean Whether they are speaking and able to be heard by local player
 	function player_methods:isSpeaking()
 		return Ply_IsSpeaking(unwrap(self))
 	end
@@ -566,10 +566,11 @@ if CLIENT then
 
 	--- Plays gesture animations on a player
 	-- @client
-	-- @param string|number animation Sequence string or act number. https://wiki.facepunch.com/gmod/Enums/ACT
-	-- @param boolean? loop Optional boolean (Default true), should the gesture loop
-	-- @param number? slot Optional int (Default GESTURE_SLOT.CUSTOM), the gesture slot to use. GESTURE_SLOT table values
-	-- @param number? weight Optional float (Default 1), the weight of the gesture. Ranging from 0-1
+	-- @param string|number animation Sequence string or ACT number.
+	-- See https://wiki.facepunch.com/gmod/Enums/ACT
+	-- @param boolean? loop Optional boolean (default: true), should the gesture loop
+	-- @param number? slot Optional int (default: GESTURE_SLOT.CUSTOM), the gesture slot to use
+	-- @param number? weight Optional float (default: 1), the weight of the gesture (from 0 to 1)
 	function player_methods:playGesture(animation, loop, slot, weight)
 		local ply = unwrap(self)
 		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
@@ -596,7 +597,7 @@ if CLIENT then
 
 	--- Resets gesture animations on a player
 	-- @client
-	-- @param number? slot Optional int (Default GESTURE_SLOT.CUSTOM), the gesture slot to use. GESTURE_SLOT table values
+	-- @param number? slot Optional int (default: GESTURE_SLOT.CUSTOM), the gesture slot to use
 	function player_methods:resetGesture(slot)
 		local ply = unwrap(self)
 		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
@@ -608,8 +609,8 @@ if CLIENT then
 
 	--- Sets the weight of the gesture animation in the given gesture slot
 	-- @client
-	-- @param number? slot Optional int (Default GESTURE_SLOT.CUSTOM), the gesture slot to use. GESTURE_SLOT table values
-	-- @param number? weight Optional float (Default 1), the weight of the gesture. Ranging from 0-1
+	-- @param number? slot Optional int (default: GESTURE_SLOT.CUSTOM), the gesture slot to use
+	-- @param number? weight Optional float from 0 to 1 (default: 1), the weight of the gesture
 	function player_methods:setGestureWeight(slot, weight)
 		local ply = unwrap(self)
 		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
@@ -623,11 +624,11 @@ if CLIENT then
 	--- Plays an animation on the player
 	-- @client
 	-- @param number|string seq Sequence number or string name
-	-- @param number? progress Optional float (Default 0), the progress of the animation. Ranging from 0-1
-	-- @param number? rate Optional float (Default 1), the playback rate of the animation
-	-- @param boolean? loop Optional boolean (Default false), should the animation loop
-	-- @param boolean? auto_advance Optional boolean (Default true), should the animation handle advancing itself
-	-- @param number|string|nil act Optional number or string name (Default sequence value), the activity the player should use
+	-- @param number? progress Optional float from 0 to 1 (default: 0), the progress of the animation
+	-- @param number? rate Optional float (default: 1), the playback rate of the animation
+	-- @param boolean? loop Optional boolean (default: false), should the animation loop
+	-- @param boolean? auto_advance Optional boolean (default: true), should the animation handle advancing itself
+	-- @param number|string|nil act Optional number or string name (default: current animation sequence), the activity the player should use
 	function player_methods:setAnimation(seq, progress, rate, loop, auto_advance, act)
 		local ply = unwrap(self)
 		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end
@@ -679,7 +680,7 @@ if CLIENT then
 
 	--- Sets the animation activity
 	-- @client
-	-- @param number|string|nil act Activity, nil to use the current animation sequence
+	-- @param number|string|nil act Activity, or nil to use the current animation sequence
 	function player_methods:setAnimationActivity(act)
 		local ply = unwrap(self)
 		if instance.owner ~= ply then checkpermission(instance, ply, "entities.setRenderProperty") end

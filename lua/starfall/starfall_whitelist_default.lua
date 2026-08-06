@@ -1,4 +1,4 @@
--- These are urls allowed to be accessed by users' starfalls
+-- These are URLs allowed to be accessed by users' Starfall chips
 
 -----------------------------------------
 -- https://github.com/Metastruct/gurl/ --

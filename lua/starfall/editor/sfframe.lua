@@ -859,7 +859,7 @@ function Editor:InitComponents()
 	if Editor.LayoutVar:GetInt() == 1 then -- Browser on right
 		self.C.Divider:SetRight(self.C.Browser)
 		self.C.Divider:SetLeft(self.C.MainPane)
-	else --Browser on left(Default)
+	else --Browser on left (default)
 		self.C.Divider:SetLeft(self.C.Browser)
 		self.C.Divider:SetRight(self.C.MainPane)
 	end
@@ -1022,7 +1022,7 @@ function Editor:InitComponents()
 	end
 
 	self.C.Credit:SetTextColor(Color(0, 0, 0, 255))
-	self.C.Credit:SetText("\t\tCREDITS\n\n\tEditor by: \tSyranide and Shandolum\n\n\tTabs (and more) added by Divran.\n\n\tFixed for GMod13 By Ninja101\n\n\tModified for starfall by D.ツ") -- Sure why not ;)
+	self.C.Credit:SetText("\t\tCREDITS\n\n\tEditor by: \tSyranide and Shandolum\n\n\tTabs (and more) added by Divran.\n\n\tFixed for GMod13 By Ninja101\n\n\tModified for Starfall by D.ツ") -- Sure why not ;)
 	self.C.Credit:SetMultiline(true)
 	self.C.Credit:SetVisible(false)
 	self.C.Credit:SetEditable(false)

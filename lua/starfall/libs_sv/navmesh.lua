@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 
@@ -229,9 +229,13 @@ return function(instance)
 	-- This function will ignore blocked NavAreas.
 	-- See navmesh.getNavArea for a function that does see blocked areas.
 	-- @param Vector pos The position to look from
-	-- @param number maxDist Maximum distance from the given position that the function will look for a CNavArea (Default 10000)
-	-- @param boolean checkLOS If this is set to true then the function will internally do a trace from the starting position to each potential CNavArea with a MASK_NPCSOLID_BRUSHONLY. If the trace fails then the CNavArea is ignored. If this is set to false then the function will find the closest CNavArea through anything, including the world. (Default false)
-	-- @param boolean checkGround If checkGround is true then this function will internally call navmesh.getNavArea to check if there is a CNavArea directly below the position, and return it if so, before checking anywhere else. (Default true)
+	-- @param number maxDist Maximum distance from the given position that the function will look for a CNavArea (default: 10000)
+	-- @param boolean checkLOS If this is set to true then the function will internally do a trace from the starting position to each potential CNavArea with a MASK_NPCSOLID_BRUSHONLY.
+	-- If the trace fails then the CNavArea is ignored.
+	-- If this is set to false then the function will find the closest CNavArea through anything, including the world.
+	-- Default: false
+	-- @param boolean checkGround If checkGround is true then this function will internally call navmesh.getNavArea to check if there is a CNavArea directly below the position, and return it if so, before checking anywhere else.
+	-- Default: true
 	-- @return NavArea The closest NavArea found with the given parameters, or a NULL NavArea if one was not found.
 	function navmesh_library.getNearestNavArea(pos, maxDist, checkLOS, checkGround)
 		return lnavwrap( navmesh.GetNearestNavArea( vunwrap1(pos), nil, maxDist, checkLOS, checkGround ) )
@@ -582,8 +586,8 @@ return function(instance)
 
 	--- Returns whether the nav area is blocked or not, i.e. whether it can be walked through or not.
 	-- @name navarea_methods.isBlocked
-	-- @param number? teamID The team ID to test, -2 = any team. Only 2 actual teams are available, 0 and 1. (Default -2)
-	-- @param boolean? ignoreNavBlockers Whether to ignore func_nav_blocker entities. (Default false)
+	-- @param number? teamID The team ID to test, -2 = any team. Only 2 actual teams are available, 0 and 1 (default: -2)
+	-- @param boolean? ignoreNavBlockers Whether to ignore func_nav_blocker entities (default: false)
 	-- @return boolean Whether the area is blocked or not
 	function lnavarea_methods:isBlocked(teamID, ignoreNavBlockers)
 		if teamID~=nil then checkluatype(teamID, TYPE_NUMBER) end
@@ -610,7 +614,7 @@ return function(instance)
 	--- Returns if this position overlaps the NavArea within the given tolerance.
 	-- @name navarea_methods.isOverlapping
 	-- @param Vector pos The position to test.
-	-- @param number? tolerance The tolerance of the overlapping, set to 0 for no tolerance. (Default 0)
+	-- @param number? tolerance The tolerance of the overlapping, set to 0 for no tolerance (default: 0)
 	-- @return number Whether the given position overlaps the NavArea or not.
 	function lnavarea_methods:isOverlapping(pos, tolerance)
 		if tolerance~=nil then checkluatype(tolerance, TYPE_NUMBER) end
@@ -629,7 +633,7 @@ return function(instance)
 	--- Returns whether this CNavArea can see given position.
 	-- @name navarea_methods.isPartiallyVisible
 	-- @param Vector pos The position to test.
-	-- @param Entity? ignoreEnt If set, the given entity will be ignored when doing LOS tests (Default NULL)
+	-- @param Entity? ignoreEnt If set, the given entity will be ignored when doing LOS tests (default: NULL)
 	-- @return boolean Whether the given position is visible from this area
 	function lnavarea_methods:isPartiallyVisible(pos, ignoreEnt)
 		return lnavunwrap(self):IsPartiallyVisible( vunwrap1(pos), eunwrap(ignoreEnt) )

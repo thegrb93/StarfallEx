@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 
 
@@ -179,7 +179,8 @@ function particleem_methods:setBBox(mins, maxs)
 	peunwrap(self):SetBBox(vunwrap1(mins), vunwrap2(maxs))
 end
 
---- This function sets the the distance between the render camera and the emitter at which the particles should start fading and at which distance fade ends ( alpha becomes 0 ).
+--- This function sets the the distance between the render camera and the emitter at which the particles should start
+-- fading and at which distance fade ends ( alpha becomes 0 ).
 -- @param number distanceMin
 -- @param number distanceMax
 function particleem_methods:setNearClip(distanceMin, distanceMax)

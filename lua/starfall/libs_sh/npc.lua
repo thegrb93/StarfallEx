@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 local ENT_META = FindMetaTable("Entity")
@@ -8,10 +8,10 @@ local NPC_META = FindMetaTable("NPC")
 local lagCompensated
 if SERVER then
 	-- Register privileges
-	registerprivilege("npcs.modify", "Modify", "Allows the user to modify npcs", { entities = {} })
-	registerprivilege("npcs.giveweapon", "Give weapon", "Allows the user to give npcs weapons", { entities = {} })
+	registerprivilege("npcs.modify", "Modify", "Allows the user to modify NPCs", { entities = {} })
+	registerprivilege("npcs.giveweapon", "Give weapon", "Allows the user to give NPCs weapons", { entities = {} })
 
-	lagCompensated = SF.EntManager("npcs_lag_compensated", "lag compensated npcs", 40, "The number of npcs allowed to be lag compensated")
+	lagCompensated = SF.EntManager("npcs_lag_compensated", "lag compensated npcs", 40, "The number of NPCs allowed to be lag compensated")
 end
 
 
@@ -44,9 +44,9 @@ end)
 
 if SERVER then
 
-	--- Sets an npc's hitboxes to compensate for lag, but limited number of npcs can be set due to high processing needed
+	--- Sets an NPC's hitboxes to compensate for lag, but limited number of NPCs can be set due to high processing needed
 	-- @server
-	-- @param boolean compensate Whether to make an npc's hitboxes compensate lag
+	-- @param boolean compensate Whether to make an NPC's hitboxes compensate lag
 	function npc_methods:setLagCompensated(compensate)
 		local npc = unwrap(self)
 		checkpermission(instance, npc, "npcs.modify")
@@ -60,14 +60,14 @@ if SERVER then
 		end
 	end
 
-	--- Gets whether an npc is lag compensated
+	--- Gets whether an NPC is lag compensated
 	-- @server
-	-- @return boolean Whether the npc is lag compensated
+	-- @return boolean Whether the NPC is lag compensated
 	function npc_methods:isLagCompensated()
 		return Ent_IsLagCompensated(unwrap(self))
 	end
 
-	--- Adds a relationship to the npc
+	--- Adds a relationship to the NPC
 	-- @server
 	-- @param string str The relationship string. http://wiki.facepunch.com/gmod/NPC:AddRelationship
 	function npc_methods:addRelationship(str)
@@ -88,7 +88,7 @@ if SERVER then
 		[D_LI] = "like",
 		[D_NU] = "neutral",
 	}
-	--- Adds a relationship to the npc with an entity
+	--- Adds a relationship to the NPC with an entity
 	-- @server
 	-- @param Entity ent The target entity
 	-- @param string disp String of the relationship. ("hate", "fear", "like", "neutral")
@@ -102,15 +102,15 @@ if SERVER then
 		Npc_AddEntityRelationship(npc, target, relation, priority)
 	end
 
-	--- Gets the npc's relationship to the target
+	--- Gets the NPC's relationship to the target
 	-- @server
 	-- @param Entity ent Target entity
-	-- @return string Relationship of the npc with the target
+	-- @return string Relationship of the NPC with the target
 	function npc_methods:getRelationship(ent)
 		return dispositions[unwrap(self):Disposition(eunwrap(ent))]
 	end
 
-	--- Gives the npc a weapon
+	--- Gives the NPC a weapon
 	-- @server
 	-- @param string wep The classname of the weapon
 	function npc_methods:giveWeapon(wep)
@@ -134,7 +134,7 @@ if SERVER then
 		Npc_Give(npc, wep)
 	end
 
-	--- Tell the npc to fight this
+	--- Tell the NPC to fight this
 	-- @server
 	-- @param Entity ent Target entity
 	function npc_methods:setEnemy(ent)
@@ -143,14 +143,14 @@ if SERVER then
 		Npc_SetTarget(npc, eunwrap(ent))
 	end
 
-	--- Gets what the npc is fighting
+	--- Gets what the NPC is fighting
 	-- @server
-	-- @return Entity Entity the npc is fighting
+	-- @return Entity Entity the NPC is fighting
 	function npc_methods:getEnemy()
 		return owrap(Npc_GetEnemy(unwrap(self)))
 	end
 
-	--- Stops the npc
+	--- Stops the NPC
 	-- @server
 	function npc_methods:stop()
 		local npc = unwrap(self)
@@ -158,7 +158,7 @@ if SERVER then
 		Npc_SetSchedule(npc, SCHED_NONE)
 	end
 
-	--- Makes the npc do a melee attack
+	--- Makes the NPC do a melee attack
 	-- @server
 	function npc_methods:attackMelee()
 		local npc = unwrap(self)
@@ -166,7 +166,7 @@ if SERVER then
 		Npc_SetSchedule(npc, SCHED_MELEE_ATTACK1)
 	end
 
-	--- Makes the npc do a ranged attack
+	--- Makes the NPC do a ranged attack
 	-- @server
 	function npc_methods:attackRange()
 		local npc = unwrap(self)
@@ -174,7 +174,7 @@ if SERVER then
 		Npc_SetSchedule(npc, SCHED_RANGE_ATTACK1)
 	end
 
-	--- Makes the npc walk to a destination
+	--- Makes the NPC walk to a destination
 	-- @server
 	-- @param Vector vec The position of the destination
 	function npc_methods:goWalk(vec)
@@ -184,7 +184,7 @@ if SERVER then
 		Npc_SetSchedule(npc, SCHED_FORCED_GO)
 	end
 
-	--- Makes the npc run to a destination
+	--- Makes the NPC run to a destination
 	-- @server
 	-- @param Vector vec The position of the destination
 	function npc_methods:goRun(vec)

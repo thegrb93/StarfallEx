@@ -34,8 +34,8 @@ end
 --- Returns the given string's characters in their numeric ASCII representation.
 -- @class function
 -- @param string str The string to get the chars from
--- @param number? start The first character of the string to get the byte of. Defaults to 1
--- @param number? end The last character of the string to get the byte of. Defaults to 'start'
+-- @param number? start The first character of the string to get the byte of (default: 1)
+-- @param number? end The last character of the string to get the byte of (default: `start` value)
 -- @return ... Vararg numerical bytes
 string_library.byte = sfstring.byte
 
@@ -54,7 +54,7 @@ string_library.comma = sfstring.Comma
 --- Returns the binary bytecode of the given function.
 -- @class function
 -- @param function func The function to get the bytecode of
--- @param boolean? strip True to strip the debug data, false to keep it. Defaults to false
+-- @param boolean? strip True to strip the debug data, false to keep it (default: false)
 -- @return string The bytecode
 string_library.dump = sfstring.dump
 
@@ -69,29 +69,32 @@ string_library.endsWith = sfstring.EndsWith
 -- @class function
 -- @param string separator The separator that will split the string
 -- @param string str The string to split up
--- @param boolean? patterns Set this to true if your separator is a pattern. Defaults to false
+-- @param boolean? patterns Set this to true if your separator is a pattern (default: false)
 -- @return table Table with the separated strings in numerical sequential order
 string_library.explode = sfstring.Explode
 
---- Attempts to find the specified substring in a string, uses Patterns by default. https://wiki.facepunch.com/gmod/Patterns
+--- Attempts to find the specified substring in a string, uses Patterns by default.
+-- https://wiki.facepunch.com/gmod/Patterns
 -- @class function
 -- @param string haystack The string to search in
 -- @param string needle The string to find, can contain patterns if enabled
 -- @param number? start The position to start the search from, negative start position will be relative to the end position
--- @param boolean? noPatterns Disable patterns. Defaults to false
+-- @param boolean? noPatterns Disable patterns (default: false)
 -- @return number? Starting position of the found text, or nil if the text wasn't found
 -- @return number? Ending position of found text, or nil if the text wasn't found
 -- @return string? Matched text for each group if patterns are enabled and used, or nil if the text wasn't found
 string_library.find = sfstring.find
 
---- Formats the specified values into the string given. http://www.cplusplus.com/reference/cstdio/printf/
+--- Formats the specified values into the string given.
+-- http://www.cplusplus.com/reference/cstdio/printf/
 -- @class function
 -- @param string str The string to be formatted
 -- @param ... params Vararg values to be formatted into the string
 -- @return string The formatted string
 string_library.format = sfstring.format
 
---- Returns the time as a formatted string or table. http://www.cplusplus.com/reference/cstdio/printf/
+--- Returns the time as a formatted string or table.
+-- http://www.cplusplus.com/reference/cstdio/printf/
 -- If format is not specified, the table will contain the following keys: ms (milliseconds); s (seconds); m (minutes); h (hours).
 -- @class function
 -- @param number time The time in seconds to format
@@ -128,13 +131,16 @@ string_library.gmatch = sfstring.gmatch
 -- @class function
 -- @param string str String which should be modified.
 -- @param string pattern The pattern that defines what should be matched and eventually be replaced.
--- @param string|table|function replacement If string: matched sequence will be replaced with it; If table: matched sequence will be used as key; If function: matches will be passed as parameters to the function (return to replace)
+-- @param string|table|function replacement If string: matched sequence will be replaced with it;
+-- If table: matched sequence will be used as key;
+-- If function: matches will be passed as parameters to the function (return to replace)
 -- @param number? max Optional maximum number of replacements to be made
 -- @return string String with replaced parts
 -- @return number Replacements count
 string_library.gsub = sfstring.gsub
 
---- Escapes special characters for JavaScript in a string, making the string safe for inclusion in to JavaScript strings.
+--- Escapes special characters for JavaScript in a string, making the string safe for inclusion in to JavaScript
+-- strings.
 -- @class function
 -- @param string str The string that should be escaped
 -- @return string The safe string
@@ -163,7 +169,8 @@ string_library.lower = sfstring.lower
 -- @class function
 -- @param string str String which should be searched in for matches
 -- @param string pattern The pattern that defines what should be matched
--- @param number? start The start index to start the matching from, negative to start the match from a position relative to the end. Default 1
+-- @param number? start The start index to start the matching from.
+-- Negative values start relative to the end (default: 1)
 -- @return ... Vararg matched string(s)
 string_library.match = sfstring.match
 
@@ -258,7 +265,8 @@ string_library.stripExtension = sfstring.StripExtension
 -- @class function
 -- @param string str The string you'll take a sub-string out of
 -- @param number startPos The position of the first character that will be included in the sub-string
--- @param number? endPos The position of the last character to be included in the sub-string. It can be negative to count from the end
+-- @param number? endPos The position of the last character to be included in the sub-string.
+-- It can be negative to count from the end
 -- @return string The sub-string
 string_library.sub = sfstring.sub
 
@@ -276,7 +284,7 @@ string_library.toMinutesSecondsMilliseconds = sfstring.ToMinutesSecondsMilliseco
 
 --- Converts time to hours, minutes and seconds string.
 -- @class function
--- @param number time Time in seconds
+-- @param number seconds Time in seconds
 -- @return string Given time in "HH:MM:SS" format
 function string_library.toHoursMinutesSeconds( seconds )
 	local formattedTime = sfstring.FormattedTime( seconds )
@@ -285,7 +293,7 @@ end
 
 --- Converts time to hours, minutes, seconds and milliseconds string.
 -- @class function
--- @param number time Time in seconds
+-- @param number seconds Time in seconds
 -- @return string Returns given time in "HH:MM:SS.MS" format
 function string_library.toHoursMinutesSecondsMilliseconds( seconds )
 	local formattedTime = sfstring.FormattedTime( seconds )
@@ -303,21 +311,21 @@ string_library.toTable = sfstring.ToTable
 --- Removes leading and trailing spaces/characters of a string
 -- @class function
 -- @param string str The string to trim
--- @param string? char Optional character to be trimmed. Defaults to space character
+-- @param string? char Optional character to be trimmed (default: "%s*")
 -- @return string Trimmed string
 string_library.trim = sfstring.Trim
 
 --- Removes leading spaces/characters from a string
 -- @class function
 -- @param string str The string to trim
--- @param string? char Optional character to be trimmed. Defaults to space character
+-- @param string? char Optional character to be trimmed (default: "%s*")
 -- @return string Trimmed string
 string_library.trimLeft = sfstring.TrimLeft
 
 --- Removes trailing spaces/characters from a string.
 -- @class function
 -- @param string str The string to trim
--- @param string char Optional character to be trimmed. Defaults to space character
+-- @param string char Optional character to be trimmed (default: "%s*")
 -- @return string Trimmed string
 string_library.trimRight = sfstring.TrimRight
 
@@ -335,8 +343,7 @@ string_library.normalizePath = SF.NormalizePath
 
 
 
---- Receives zero or more integers, converts each one to its corresponding UTF-8 byte sequence
--- and returns a string with the concatenation of all these sequences
+--- Receives zero or more integers, converts each one to its corresponding UTF-8 byte sequence and returns a string with the concatenation of all these sequences
 -- @class function
 -- @param ... codepoints Unicode code points to be converted into a UTF-8 string
 -- @return string UTF-8 string generated from given arguments

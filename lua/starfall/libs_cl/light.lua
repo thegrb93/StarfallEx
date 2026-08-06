@@ -162,7 +162,7 @@ function light_methods:draw()
 	processLights(curtime)
 	if lightsUsed >= 32 then SF.Throw("Max number of dynamiclights reached", 2) end
 	lightsUsed = lightsUsed + 1
-	
+
 	local light = unwrap(self)
 	if not light.slot then
 		light.slot = getFreeSlot()
@@ -360,7 +360,8 @@ function projectedtexture_methods:getNoCull()
 end
 
 --- Gets the orthographic settings of the Projected Texture
--- @return boolean orthographic Whether or not the Projected Texture is actually orthographic. If false, then the other value are not returned.
+-- @return boolean orthographic Whether or not the Projected Texture is actually orthographic.
+-- If false, then the other value are not returned.
 -- @return number left
 -- @return number top
 -- @return number right

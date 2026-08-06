@@ -275,7 +275,7 @@ SF.BurstObject = {
 			return self:calc(obj)
 		end,
 		get = function(self, ply)
-			if ply~=SF.Superuser and not Ent_IsValid(ply) then SF.Throw("Invalid starfall user", 4) end
+			if ply~=SF.Superuser and not Ent_IsValid(ply) then SF.Throw("Invalid Starfall user", 4) end
 			local obj = self.objects[ply]
 			if not obj then
 				obj = {
@@ -318,7 +318,7 @@ SF.LimitObject = {
 				end
 				self.counters[ply] = new
 			else
-				SF.Throw("Invalid starfall user", 3)
+				SF.Throw("Invalid Starfall user", 3)
 			end
 		end,
 		checkuse = function(self, ply, amount)
@@ -328,7 +328,7 @@ SF.LimitObject = {
 					SF.Throw("The ".. self.name .." limit has been reached. (".. self.max ..")", 3)
 				end
 			else
-				SF.Throw("Invalid starfall user", 3)
+				SF.Throw("Invalid Starfall user", 3)
 			end
 		end,
 		check = function(self, ply)
@@ -336,7 +336,7 @@ SF.LimitObject = {
 			if Ent_IsValid(ply) then
 				return self.max - self.counters[ply]
 			else
-				SF.Throw("Invalid starfall user", 3)
+				SF.Throw("Invalid Starfall user", 3)
 			end
 		end,
 		free = function(self, ply, amount)
@@ -1261,9 +1261,9 @@ do
 	-- @shared
 	-- @param hookname The hook name. In-SF hookname will be lowercased
 	-- @param customargfunc Optional custom function
-	-- Returns true if the hook should be called, then extra arguements to be passed to the starfall hooks
+	-- Returns true if the hook should be called, then extra arguements to be passed to the Starfall hooks
 	-- @param customretfunc Optional custom function
-	-- Takes values returned from starfall hook and returns what should be passed to the gmod hook
+	-- Takes values returned from a Starfall hook and returns what should be passed to the gmod hook
 	-- @param gmoverride Whether this hook should override the gamemode function (makes the hook run last, but adds a little overhead)
 	function SF.hookAdd(realname, hookname, customargfunc, customretfunc, gmoverride)
 		hookname = string.lower(hookname or realname)

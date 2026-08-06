@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local PHYS_META = FindMetaTable("PhysObj")
 
@@ -89,7 +89,7 @@ function physobj_methods:getAABB()
 end
 
 --- Gets the velocity of the physics object at an arbitrary point in its local reference frame
---- This includes velocity at the point induced by rotational velocity
+-- This includes velocity at the point induced by rotational velocity
 -- @shared
 -- @param Vector vec The point to get velocity of in local reference frame
 -- @return Vector Vector Local velocity of the physics object at the point
@@ -160,13 +160,15 @@ function physobj_methods:localToWorldVector(vec)
 	return vwrap(Phys_LocalToWorldVector(unwrap(self), vunwrap1(vec)))
 end
 
---- Returns a table of MeshVertex structures where each 3 vertices represent a triangle. See: http://wiki.facepunch.com/gmod/Structures/MeshVertex
+--- Returns a table of MeshVertex structures where each 3 vertices represent a triangle.
+-- See: http://wiki.facepunch.com/gmod/Structures/MeshVertex
 -- @return table Table of MeshVertex structures
 function physobj_methods:getMesh()
 	return instance.Sanitize(Phys_GetMesh(unwrap(self)))
 end
 
---- Returns a structured table, the physics mesh of the physics object. See: http://wiki.facepunch.com/gmod/Structures/MeshVertex
+--- Returns a structured table, the physics mesh of the physics object.
+-- See: http://wiki.facepunch.com/gmod/Structures/MeshVertex
 -- @return table Table of MeshVertex structures
 function physobj_methods:getMeshConvexes()
 	return instance.Sanitize(Phys_GetMeshConvexes(unwrap(self)))
@@ -573,7 +575,7 @@ if SERVER then
 	function physobj_methods:getVolume()
 		return Phys_GetVolume(unwrap(self))
 	end
-	
+
 	--- Returns the stress of the entity.
 	-- @server
 	-- @return number External stress. Usually about the mass of the object if on the ground, usually 0 if in freefall.
@@ -583,10 +585,10 @@ if SERVER then
 	end
 
 	--- Calculates the linear and angular impulse on the object's center of mass for an offset impulse.
-	--- The outputs can be used with PhysObj:applyForceCenter and PhysObj:applyTorque, respectively.
-	---
-	--- Be careful to convert the angular impulse to world frame (PhysObj:localToWorldVector)
-	--- if you are going to use it with applyTorque.
+	-- The outputs can be used with PhysObj:applyForceCenter and PhysObj:applyTorque, respectively.
+	-- 
+	-- Be careful to convert the angular impulse to world frame (PhysObj:localToWorldVector)
+	-- if you are going to use it with applyTorque.
 	-- @server
 	-- @param Vector impulse The impulse acting on the object in world coordinates (kg*source_unit/s)
 	-- @param Vector position The location of the impulse in world coordinates
@@ -605,7 +607,7 @@ if SERVER then
 	end
 
 	--- Calculates the linear and angular velocities on the center of mass for an offset impulse.
-	--- The outputs can be directly passed to PhysObj:addVelocity and PhysObj:addAngleVelocity, respectively.
+	-- The outputs can be directly passed to PhysObj:addVelocity and PhysObj:addAngleVelocity, respectively.
 	-- @server
 	-- @param Vector impulse The impulse acting on the object in world coordinates (kg*source_unit/s)
 	-- @param Vector position The location of the impulse in world coordinates

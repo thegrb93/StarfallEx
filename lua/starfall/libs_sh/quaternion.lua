@@ -213,6 +213,7 @@ end
 local rijk = { r = 1, i = 2, j = 3, k = 4 }
 
 --- Newindex metamethod
+-- @param Quaternion t The quaternion
 -- @param number|string k
 -- @param number v
 function quat_meta.__newindex(t, k, v)
@@ -247,6 +248,7 @@ end
 
 --- Index metamethod
 -- Can be indexed with: 1, 2, 3, 4, r, i, j, k, rr, ri, rj, rk, rrr, rijk, kjir, etc. Numerical lookup is the most efficient
+-- @param Quaternion t The quaternion
 -- @param number|string k
 -- @return number Found value
 function quat_meta.__index(t, k)
@@ -426,6 +428,7 @@ function quat_meta.__sub(lhs, rhs)
 end
 
 --- Unary minus metamethod
+-- @param Quaternion q The quaternion
 -- @return Quaternion Negated quaternion
 function quat_meta.__unm(q)
 	return wrap({ -q[1], -q[2], -q[3], -q[4] })
@@ -449,7 +452,7 @@ end
 -------------------------------------
 
 --- Set components of the quaternion
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param number r R component
 -- @param number i I component
 -- @param number j J component
@@ -474,7 +477,7 @@ function quat_methods:clone()
 end
 
 --- Copies components of the second quaternion to the first quaternion.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 -- @param Quaternion quat Quaternion to copy from
 function quat_methods:set(quat)
 	quatPack(self, quatUnpack(quat))
@@ -523,7 +526,7 @@ function quat_methods:getExp()
 end
 
 --- Raises Euler's constant e to the quaternion's power.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 function quat_methods:exp()
 	quatExp(self)
 end
@@ -537,7 +540,7 @@ function quat_methods:getLog()
 end
 
 --- Calculates natural logarithm of the quaternion.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 function quat_methods:log()
 	quatLog(self)
 end
@@ -603,7 +606,7 @@ function quat_methods:getConjugate()
 end
 
 --- Conjugates the quaternion.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 function quat_methods:conjugate()
 	quatConj(self)
 end
@@ -617,7 +620,7 @@ function quat_methods:getInverse()
 end
 
 --- Calculates inverse of the quaternion.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 function quat_methods:inverse()
 	quatInv(self)
 end
@@ -631,7 +634,7 @@ function quat_methods:getMod()
 end
 
 --- Contains quaternion's represented rotation within an angle between 0 and 180 degrees.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 function quat_methods:mod()
 	quatMod(self)
 end
@@ -645,7 +648,7 @@ function quat_methods:getNormalized()
 end
 
 --- Normalizes the quaternion.
--- Self-Modifies. Does not return anything
+-- Self-modifies. Does not return anything
 function quat_methods:normalize()
 	quatNorm(self)
 end
@@ -667,7 +670,7 @@ end
 
 -- credits: Malte Clasen (https://stackoverflow.com/a/1556470)
 --- Converts quaternion to a matrix
--- @param boolean? Optional bool, normalizes the quaternion
+-- @param boolean? normalize Optional bool, normalizes the quaternion
 -- @return VMatrix Transformation matrix
 function quat_methods:getMatrix(normalize)
 	local quat
@@ -819,7 +822,8 @@ function vec_methods:getQuaternionFromAxis(ang)
 end
 
 -- credits: https://github.com/cder0xff
---- Constructs a quaternion from the rotation vector. Vector direction is axis of rotation, it's magnitude is angle in degrees
+--- Constructs a quaternion from the rotation vector. Vector direction is axis of rotation,
+-- it's magnitude is angle in degrees
 -- @return Quaternion Rotated quaternion
 function vec_methods:getQuaternionFromRotation()
 	local vec_len = self:getLengthSqr()

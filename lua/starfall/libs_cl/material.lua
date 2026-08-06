@@ -176,8 +176,8 @@ end
 SF.RegisterLibrary("material")
 
 --- The `Material` type is used to control shaders in rendering.
---- For a list of shader parameters, see https://developer.valvesoftware.com/wiki/Category:List_of_Shader_Parameters
---- For a list of $flags and $flags2, see https://developer.valvesoftware.com/wiki/Material_Flags
+-- For a list of shader parameters, see https://developer.valvesoftware.com/wiki/Category:List_of_Shader_Parameters
+-- For a list of $flags and $flags2, see https://developer.valvesoftware.com/wiki/Material_Flags
 -- @name Material
 -- @class type
 -- @libtbl material_methods
@@ -208,9 +208,9 @@ instance:AddHook("deinitialize", function()
 	end
 end)
 
---- Loads a .vmt material or existing material. Throws an error if the material fails to load
---- Existing created materials can be loaded with ! prepended to the name
---- Can't be modified
+--- Loads a .vmt material or existing material. Throws an error if the material fails to load.
+-- Existing created materials can be loaded with ! prepended to the name.
+-- Can't be modified.
 -- @param string path The path of the material (don't include .vmt in the path)
 -- @return Material The material object. Can't be modified.
 function material_library.load(path)
@@ -243,7 +243,8 @@ end
 
 --- Returns a material's engine name
 -- @param string path The path of the material (don't include .vmt in the path)
--- @return string The name of a material. If this material is user created, add ! to the beginning of this to use it with entity.setMaterial
+-- @return string The name of a material.
+-- If this material is user created, prepend ! to the beginning of the name to use it with Entity:setMaterial(string)
 function material_library.getName(path)
 	checkluatype(path, TYPE_STRING)
 	return Material(path):GetName()
@@ -346,14 +347,14 @@ function material_library.getVectorLinear(path, key)
 end
 
 --- Creates a new blank material
--- @param string shader The shader of the material. Must be one of
---- UnlitGeneric
---- VertexLitGeneric
---- Refract_DX90
---- Water_DX90
---- Sky_DX9
---- gmodscreenspace
---- Modulate_DX9
+-- @param string shader The shader of the material. Must be one of:
+-- UnlitGeneric
+-- VertexLitGeneric
+-- Refract_DX90
+-- Water_DX90
+-- Sky_DX9
+-- gmodscreenspace
+-- Modulate_DX9
 -- @return Material The Material created.
 function material_library.create(shader)
 	checkluatype(shader, TYPE_STRING)
@@ -365,10 +366,11 @@ function material_library.create(shader)
 end
 
 local image_params = {["nocull"] = true,["alphatest"] = true,["mips"] = true,["noclamp"] = true,["smooth"] = true,["ignorez"] = true,["vertexlitgeneric"] = true}
---- Creates a .jpg or .png material from file
---- Can't be modified
+--- Creates a .jpg or .png material from file.
+-- Can't be modified.
 -- @param string path The path to the image file, must be a jpg or png image
--- @param string params The shader parameters to apply to the material. See https://wiki.facepunch.com/gmod/Material_Parameters
+-- @param string params The shader parameters to apply to the material.
+-- See https://wiki.facepunch.com/gmod/Material_Parameters
 -- @return Material The Material created.
 function material_library.createFromImage(path, params)
 	checkluatype(path, TYPE_STRING)
@@ -413,7 +415,8 @@ end
 
 --- Returns the material's engine name
 -- @name material_methods.getName
--- @return string The name of the material. If this material is user created, add ! to the beginning of this to use it with entity.setMaterial
+-- @return string The name of the material.
+-- If this material is user created, prepend ! to the beginning of the name to use it with Entity:setMaterial(string)
 function lmaterial_methods:getName()
 	return lunwrap(self):GetName()
 end
@@ -562,7 +565,7 @@ function material_methods:setString(key, v)
 end
 
 --- Sets a texture keyvalue
--- @param string key The key name to set. $basetexture is the key name for most purposes.
+-- @param string key The key name to set. For most purposes, use "$basetexture".
 -- @param string v The texture name to set it to.
 function material_methods:setTexture(key, v)
 	checkkey(key)
@@ -571,12 +574,19 @@ function material_methods:setTexture(key, v)
 	unwrap(self):SetTexture(key, v)
 end
 
---- Loads an online image or base64 data to the specified texture key
--- If the texture in key is not set to a rendertarget, a rendertarget will be created and used.
--- @param string key The key name to set. $basetexture is the key name for most purposes.
--- @param string url The URL or base64 data
--- @param function? cb An optional callback called when image is loaded. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h, pixelated to reposition the image in the texture. Setting the optional 'pixelated' argument to True tells the image to use nearest-neighbor interpolation
--- @param function? done An optional callback called when the image is done loading. Passes the material, url
+--- Loads an online image or base64-encoded image data to the specified texture key.
+-- If the texture in key is not set to a RenderTarget, then it will be created and used.
+-- @param string key The key name to set. For most purposes, use "$basetexture".
+-- @param string url The image HTTP URL, or image data:
+-- https://en.wikipedia.org/wiki/Data_URI_scheme
+-- https://base64.guru/converter/encode/image
+-- @param function? cb An optional callback to invoke when the image is loaded.
+-- Passes nil if it fails; otherwise, passes (material, url, width, height, layout) on success.
+-- The layout argument is a function(x, y, w, h, pixelated), you can call this to reposition the image in the texture.
+-- Set pixelated to true to use nearest-neighbor interpolation.
+-- @param function? done An optional callback to invoke when the image is done loading. With arguments:
+-- 1. Material object
+-- 2. URL string
 function material_methods:setTextureURL(key, url, cb, done)
 	checkkey(key)
 	checkluatype(url, TYPE_STRING)
@@ -627,15 +637,15 @@ function material_methods:setTextureURL(key, url, cb, done)
 	SF.G_HttpTextureLoader:request(SF.HttpTextureRequest(url, instance, texture, callback, donecallback))
 end
 
---- Sets a rendertarget texture to the specified texture key
--- @param string key The key name to set. $basetexture is the key name for most purposes.
--- @param string name The name of the rendertarget
+--- Sets a RenderTarget texture to the specified texture key
+-- @param string key The key name to set. For most purposes, use "$basetexture".
+-- @param string name The name of the RenderTarget
 function material_methods:setTextureRenderTarget(key, name)
 	checkkey(key)
 	checkluatype(name, TYPE_STRING)
 
 	local rt = instance.data.render.rendertargets[name]
-	if not rt then SF.Throw("Invalid rendertarget: "..name, 2) end
+	if not rt then SF.Throw("Invalid RenderTarget: "..name, 2) end
 
 	local m = unwrap(self)
 	m:SetTexture(key, rt)

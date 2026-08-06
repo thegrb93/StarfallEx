@@ -195,8 +195,9 @@ local file_methods, file_meta, wrap, unwrap = instance.Types.File.Methods, insta
 
 --- Opens and returns a file
 -- @param string path Filepath relative to data/sf_filedata/.
--- @param string mode The file mode to use. See lua manual for explanation
--- @return File? File object or nil if it failed
+-- @param string mode The file mode to use (usually "rb" or "wb").
+-- See Lua manual for explanation.
+-- @return File? File object, or nil if it failed
 function file_library.open(path, mode)
 	checkpermission (instance, path, "file.open")
 	checkluatype (path, TYPE_STRING)
@@ -243,7 +244,10 @@ end
 
 --- Reads a file asynchronously. Can only read 'sf_file_asyncmax' files at a time
 -- @param string path Filepath relative to data/sf_filedata/.
--- @param function callback A callback function for when the read operation finishes. It has 3 arguments: `filename` string, `status` number and `data` string
+-- @param function callback A callback function for when the read operation finishes. With arguments:
+-- 1. string filename
+-- 2. number status
+-- 3. string data
 function file_library.asyncRead(path, callback)
 	checkpermission (instance, path, "file.read")
 	checkluatype (path, TYPE_STRING)
@@ -280,7 +284,7 @@ local function checkExtension(filename)
 	if not allowedExtensions[string.GetExtensionFromFilename(filename)] then SF.Throw("Invalid file extension!", 3) end
 end
 
---- Writes to a file. Throws an error if it failed to write
+--- Writes to a file. Throws an error if it failed to write.
 -- @param string path Filepath relative to data/sf_filedata/.
 -- @param string data The data to write
 function file_library.write(path, data)
@@ -296,7 +300,7 @@ function file_library.write(path, data)
 	f:Close()
 end
 
---- Reads a temp file's data if it exists. Otherwise returns nil
+--- Reads a temp file's data if it exists. Returns nil if it failed.
 -- @param string filename The temp file name. Must be only a file and not a path
 -- @return string? The data of the temp file or nil if it doesn't exist
 function file_library.readTemp(filename)
@@ -473,7 +477,7 @@ function file_library.findInGame(path, sorting)
 end
 
 --- Returns when the file or folder was last modified in Unix time.
---- Can then be used with something like os.date for a human-readable date.
+-- Can then be used with something like os.date for a human-readable date.
 -- @param string path Filepath relative to data/sf_filedata/.
 -- @return number Last modified time in Unix time
 function file_library.time(path)
@@ -592,7 +596,7 @@ function file_methods:readUShort()
 end
 
 --- Reads an unsigned 64-bit integer and advances the file position
---- Note: Since Lua cannot store full 64-bit integers, this function returns a string.
+-- Note: Since Lua cannot store full 64-bit integers, this function returns a string.
 -- @return string UInt64 number
 function file_methods:readUInt64()
 	return unwrap(self):ReadUInt64()
@@ -662,7 +666,7 @@ function file_methods:writeUShort(x)
 end
 
 --- Writes an unsigned 64-bit integer and advances the file position
---- Note: Since Lua cannot store full 64-bit integers, this function takes a string.
+-- Note: Since Lua cannot store full 64-bit integers, this function takes a string.
 -- @param string x The unsigned 64-bit integer to write
 function file_methods:writeUInt64(x)
 	checkluatype (x, TYPE_STRING)

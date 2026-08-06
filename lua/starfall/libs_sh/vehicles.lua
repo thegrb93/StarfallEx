@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 local ENT_META,PLY_META,VEH_META = FindMetaTable("Entity"),FindMetaTable("Player"),FindMetaTable("Vehicle")
@@ -97,7 +97,7 @@ end
 
 
 --- Forces the vehicles camera into third person or first person
--- @param boolean thirdPerson
+-- @param boolean enabled
 function vehicle_methods:setThirdPersonMode(enabled)
 	local veh = unwrap(self)
 
@@ -114,7 +114,7 @@ function vehicle_methods:getThirdPersonMode()
 end
 
 --- Sets the third person camera distance
--- @param number distance
+-- @param number dist
 function vehicle_methods:setCameraDistance(dist)
 	local veh = unwrap(self)
 
@@ -209,7 +209,7 @@ if SERVER then
 
 	--- Allows passengers of a vehicle to aim and use things by clicking on them
 	-- @param boolean enabled Whether to enable the ability to use by clicking
-	-- @param number? key Optional IN_KEY alternate control for using (default IN_KEY.ATTACK)
+	-- @param number? key Optional IN_KEY alternate control for using (default: IN_KEY.ATTACK)
 	function vehicle_methods:useEnable(enabled, key)
 		local veh = unwrap(self)
 		checkluatype(enabled, TYPE_BOOL)
