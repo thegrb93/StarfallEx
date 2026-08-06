@@ -90,8 +90,7 @@ function coroutine_library.wrap(func)
 	return wrappedFunc
 end
 
---- Resumes a suspended coroutine. Note that, in contrast to Lua's native coroutine.resume function,
--- it will not run in protected mode and can throw an error.
+--- Resumes a suspended coroutine. Note that, in contrast to Lua's native `coroutine.resume` function, it will not run in protected mode and can throw an error.
 -- @param thread thread The coroutine to resume
 -- @param ... args Optional parameters that will be passed to the coroutine
 -- @return ... Any values the coroutine is returning to the main thread

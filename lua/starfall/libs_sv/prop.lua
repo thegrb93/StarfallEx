@@ -399,15 +399,15 @@ function props_library.createSeat(pos, ang, model, frozen)
 	return owrap(prop)
 end
 
---- Creates a sent.
--- @param Vector pos Position of created sent
--- @param Angle ang Angle of created sent
--- @param string class Class of created sent
+--- Creates a SENT.
+-- @param Vector pos Position of created SENT
+-- @param Angle ang Angle of created SENT
+-- @param string class Class of created SENT
 -- @param boolean? frozen True to spawn the entity in a frozen state (default: false)
 -- @param table? data Optional table, additional entity data to be supplied to certain SENTs.
--- See the prop.SENT_Data_Structures table in Docs for a list of SENTs
+-- See the `prop.SENT_Data_Structures` table in docs for a list of common SENTs
 -- @server
--- @return Entity The sent object
+-- @return Entity The SENT object
 function props_library.createSent(pos, ang, class, frozen, data)
 	checkpermission(instance,  nil, "prop.create")
 

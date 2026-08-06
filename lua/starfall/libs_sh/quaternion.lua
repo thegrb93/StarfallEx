@@ -827,8 +827,7 @@ function vec_methods:getQuaternionFromAxis(ang)
 end
 
 -- credits: https://github.com/cder0xff
---- Constructs a quaternion from the rotation vector. Vector direction is axis of rotation,
--- its magnitude is the angle in degrees
+--- Constructs a quaternion from the rotation vector. Vector direction is axis of rotation, its magnitude is the angle in degrees
 -- @return Quaternion Rotated quaternion
 function vec_methods:getQuaternionFromRotation()
 	local vec_len = self:getLengthSqr()

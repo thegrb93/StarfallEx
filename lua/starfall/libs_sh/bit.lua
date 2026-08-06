@@ -531,8 +531,7 @@ end
 --- Reads an entity from the byte stream and advances the buffer pointer.
 -- @name ss_methods.readEntity
 -- @class function
--- @param function? callback (Client only) optional callback to be ran whenever the entity becomes valid; returns
--- nothing if this is used. The callback passes the entity if it succeeds, or nil if it fails.
+-- @param function? callback (Client only) Optional callback to be ran whenever the entity becomes valid; returns nothing if this is used. The callback passes the entity if it succeeds, or nil if it fails.
 -- @return Entity The entity that was read
 local function readEntity(self, instance, callback)
 	local index = self:readUInt16()

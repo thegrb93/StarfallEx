@@ -515,10 +515,17 @@ local ValidWireMat = { 	["cable/rope"] = true, ["cable/cable2"] = true, ["cable/
 -- @param Entity entO Entity with output
 -- @param string inputname Input to be wired
 -- @param string outputname Output to be wired. May be "entity" or "wirelink" to specify an entity/wirelink output
--- @param number? width Width of the wire (optional)
--- @param Color? color Color of the wire (optional)
--- @param string? material Material of the wire (optional), Valid materials are cable/rope, cable/cable2,
--- cable/xbeam, cable/redlaser, cable/blue_elec, cable/physbeam, cable/hydra, arrowire/arrowire,
+-- @param number? width Width of the wire (default: 0)
+-- @param Color? color Color of the wire (default: `Color(255, 255, 255)`)
+-- @param string? material Material of the wire (default: "cable/rope"). Valid materials:
+-- cable/rope
+-- cable/cable2
+-- cable/xbeam
+-- cable/redlaser
+-- cable/blue_elec
+-- cable/physbeam
+-- cable/hydra
+-- arrowire/arrowire
 -- arrowire/arrowire2
 function wire_library.create(entI, entO, inputname, outputname, width, color, material)
 	checkluatype(inputname, TYPE_STRING)

@@ -353,8 +353,8 @@ function player_methods:setHealth(val)
 	ply:SetHealth(val)
 end
 
---- Sets the maximum health for the player. Note that you can still set the player's health above this amount with
--- Player:setHealth.
+--- Sets the maximum health for the player.
+-- Note that you can still set the player's health above this amount with `Player:setHealth`.
 -- @server
 -- @param number val New max health value.
 function player_methods:setMaxHealth(val)

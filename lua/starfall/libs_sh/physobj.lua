@@ -589,8 +589,7 @@ if SERVER then
 
 	--- Calculates the linear and angular impulse on the object's center of mass for an offset impulse.
 	-- The outputs can be used with `PhysObj:applyForceCenter` and `PhysObj:applyTorque`, respectively.
-	-- Be careful to convert the angular impulse to world frame (`PhysObj:localToWorldVector`)
-	-- if you are going to use it with applyTorque.
+	-- Be careful to convert the angular impulse to world frame (`PhysObj:localToWorldVector`) if you are going to use it with `PhysObj:applyTorque`.
 	-- @server
 	-- @param Vector impulse The impulse acting on the object in world coordinates (kg*source_unit/s)
 	-- @param Vector position The location of the impulse in world coordinates

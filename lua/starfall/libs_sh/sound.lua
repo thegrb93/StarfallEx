@@ -149,7 +149,7 @@ function sound_methods:destroy()
 end
 
 --- Sets the volume of the sound. Won't work unless the sound is playing.
--- @param number vol Volume to set to (between 0 and 1)
+-- @param number vol Volume to set to (from 0 and 1)
 -- @param number? fade Time in seconds to transition to this new volume (default: 0)
 function sound_methods:setVolume(vol, fade)
 	checkluatype(vol, TYPE_NUMBER)
@@ -166,7 +166,7 @@ function sound_methods:setVolume(vol, fade)
 end
 
 --- Sets the pitch of the sound. Won't work unless the sound is playing.
--- @param number pitch Pitch to set to (between 0 and 255)
+-- @param number pitch Pitch to set to (from 0 to 255)
 -- @param number? fade Time in seconds to transition to this new pitch (default: 0)
 function sound_methods:setPitch(pitch, fade)
 	checkluatype(pitch, TYPE_NUMBER)
@@ -189,7 +189,7 @@ function sound_methods:isPlaying()
 end
 
 --- Sets the sound level in dB. Won't work if the sound is already playing.
--- @param number level dB level.
+-- @param number level dB level (from 0 to 511).
 -- See https://developer.valvesoftware.com/wiki/Soundscripts#SoundLevel
 function sound_methods:setSoundLevel(level)
 	checkluatype(level, TYPE_NUMBER)
@@ -203,7 +203,7 @@ function sound_methods:getSoundLevel()
 end
 
 --- Sets the sound DSP value
--- @param number dsp DSP value (0 - 133).
+-- @param number dsp DSP value (from 0 to 133).
 -- See https://developer.valvesoftware.com/wiki/Dsp_presets
 function sound_methods:setDSP(dsp)
 	checkluatype(dsp, TYPE_NUMBER)
@@ -211,7 +211,7 @@ function sound_methods:setDSP(dsp)
 end
 
 --- Gets the sound DSP value
--- @return number DSP value (0 - 133).
+-- @return number DSP value (from 0 to 133).
 function sound_methods:getDSP()
 	return unwrap(self):GetDSP()
 end

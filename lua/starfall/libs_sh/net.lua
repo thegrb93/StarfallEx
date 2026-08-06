@@ -603,7 +603,7 @@ end
 
 --- Reads an entity from the net message
 -- @shared
--- @param function? callback (Client only) optional callback to be invoked whenever the entity becomes valid; returns nothing if this is used.
+-- @param function? callback (Client only) Optional callback to be invoked whenever the entity becomes valid; returns nothing if this is used.
 -- The callback passes the entity if it succeeds, or nil if it fails.
 -- @return Entity? The entity that was read, or nil if callback used
 function net_library.readEntity(callback)

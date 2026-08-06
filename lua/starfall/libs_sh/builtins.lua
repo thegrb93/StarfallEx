@@ -1,6 +1,6 @@
 -- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
-local dgetmeta = debug.getmetatable
+local dgetmeta, dsetmeta = debug.getmetatable, debug.setmetatable
 local IsValid = FindMetaTable("Entity").IsValid
 
 SF.Permissions.registerPrivilege("console.command", "Console command", "Allows the Starfall to run console commands")
@@ -992,7 +992,7 @@ function builtins_library.loadstring(code, identifier)
 	if env ~= nil then checkluatype(env, TYPE_TABLE) end
 	local retval = SF.CompileString(code, "SF:" .. identifier, false)
 	if isfunction(retval) then
-		return setfenv(retval, instance.env)
+		return setfenv(retval, env or instance.env)
 	end
 	return nil, tostring(retval)
 end

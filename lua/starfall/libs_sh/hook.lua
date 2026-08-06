@@ -648,7 +648,7 @@ add("PostEntityFireBullets", nil, function(instance, ent, data)
 end)
 
 --- Called whenever a sound has been played.
--- This will not be called client-side if the server played the sound without the client also calling Entity:EmitSound
+-- This will not be called client-side if the server played the sound without the client also calling `Entity:emitSound`
 -- See also https://wiki.facepunch.com/gmod/GM:EntityEmitSound
 -- @name EntityEmitSound
 -- @class hook
@@ -701,8 +701,7 @@ add("Tick")
 -- @param CUserCmd cmd The UserCmd being processed
 add("StartCommand")
 
---- Called each UserCmd for each player to transfer information from the UserCmd to the CMoveData before the move is
--- processed.
+--- Called each UserCmd for each player to transfer information from the UserCmd to the CMoveData before the move is processed.
 -- See also https://wiki.facepunch.com/gmod/GM:SetupMove
 -- @name SetupMove
 -- @class hook
@@ -926,7 +925,7 @@ end
 -- @server
 -- @param table entTbl A table of entities duped with the chip mapped to their previous indices.
 
---- Called after the client side has been initialized.
+--- Called after a client-side has been initialized.
 -- Use this to know when it's safe to send net messages to the client.
 -- @name ClientInitialized
 -- @class hook

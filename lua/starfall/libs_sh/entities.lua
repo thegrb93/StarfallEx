@@ -305,7 +305,7 @@ end
 -- @param number? pitch Default is 100
 -- @param number? volume Default is 1
 -- @param number? channel Default CHAN_AUTO or CHAN_WEAPON for weapons.
-	-- See https://wiki.facepunch.com/gmod/Enums/CHAN
+-- See https://wiki.facepunch.com/gmod/Enums/CHAN
 -- @param number? dsp DSP preset (default: 1)
 -- @param boolean? nofilter Pass true to make the sound play for everyone regardless of range or location.
 -- Only affects server-side sounds.
@@ -2267,7 +2267,8 @@ function ents_methods:getNWVarTable()
 	return instance.Sanitize(Ent_GetNWVarTable(eunwrap(self)))
 end
 
---- Returns the distance between the center of the entity's bounding box and whichever corner of the bounding box is farthest away.
+--- Returns the distance between the center of the entity's bounding box and whichever corner of the bounding box is
+-- farthest away.
 -- @shared
 -- @return number The radius of the bounding box, or 0 for some entities such as worldspawn
 function ents_methods:getBoundingRadius()
