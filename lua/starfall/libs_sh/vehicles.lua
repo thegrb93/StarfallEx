@@ -97,7 +97,7 @@ end
 
 
 --- Forces the vehicles camera into third person or first person
--- @param boolean thirdPerson
+-- @param boolean enabled
 function vehicle_methods:setThirdPersonMode(enabled)
 	local veh = unwrap(self)
 
@@ -114,7 +114,7 @@ function vehicle_methods:getThirdPersonMode()
 end
 
 --- Sets the third person camera distance
--- @param number distance
+-- @param number dist
 function vehicle_methods:setCameraDistance(dist)
 	local veh = unwrap(self)
 

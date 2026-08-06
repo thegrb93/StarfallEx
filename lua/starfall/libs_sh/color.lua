@@ -105,6 +105,7 @@ end
 local rgb = { r = 1, g = 2, b = 3, a = 4, h = 1, s = 2, v = 3, l = 3 }
 
 --- Sets a value at a key in the color
+-- @param Color t The color
 -- @param number|string k Key. Number or string
 -- @param number v Value.
 function color_meta.__newindex(t, k, v)
@@ -116,6 +117,7 @@ function color_meta.__newindex(t, k, v)
 end
 
 --- Gets a value at a key in the color
+-- @param Color t The color
 -- @param number|string k Key. Number or string
 -- @return number Value at the index
 function color_meta.__index(t, k)
@@ -128,36 +130,39 @@ function color_meta.__index(t, k)
 end
 
 --- Turns the color into a string
+-- @param Color c The color
 -- @return string String representation of the color
 function color_meta.__tostring(c)
 	return c[1] .. " " .. c[2] .. " " .. c[3] .. " " .. c[4]
 end
 
 --- Concatenation metamethod
+-- @param Color|string a First value
+-- @param Color|string b Second value
 -- @return string Adds two colors into one string-representation
 function color_meta.__concat(a, b)
 	return tostring(a) .. tostring(b)
 end
 
 --- Equivalence metamethod
--- @param Color c1 Initial color.
--- @param Color c2 Color to check against.
+-- @param Color a Initial color.
+-- @param Color b Color to check against.
 -- @return boolean Whether their fields are equal
 function color_meta.__eq(a, b)
 	return a[1]==b[1] and a[2]==b[2] and a[3]==b[3] and a[4]==b[4]
 end
 
 --- Addition metamethod
--- @param Color c1 Initial color.
--- @param Color c2 Color to add to the first.
+-- @param Color a Initial color.
+-- @param Color b Color to add to the first.
 -- @return Color Resultant color.
 function color_meta.__add(a, b)
 	return wrap({ a[1] + b[1], a[2] + b[2], a[3] + b[3], a[4] + b[4] })
 end
 
 --- Subtraction metamethod
--- @param Color c1 Initial color.
--- @param Color c2 Color to subtract.
+-- @param Color a Initial color.
+-- @param Color b Color to subtract.
 -- @return Color Resultant color.
 function color_meta.__sub(a, b)
 	return wrap({ a[1]-b[1], a[2]-b[2], a[3]-b[3], a[4]-b[4] })

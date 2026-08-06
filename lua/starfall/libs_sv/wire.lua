@@ -515,7 +515,7 @@ local ValidWireMat = { 	["cable/rope"] = true, ["cable/cable2"] = true, ["cable/
 -- @param string outputname Output to be wired. May be "entity" or "wirelink" to specify an entity/wirelink output
 -- @param number? width Width of the wire(optional)
 -- @param Color? color Color of the wire(optional)
--- @param string? materialName Material of the wire(optional), Valid materials are cable/rope, cable/cable2,
+-- @param string? material Material of the wire(optional), Valid materials are cable/rope, cable/cable2,
 -- cable/xbeam, cable/redlaser, cable/blue_elec, cable/physbeam, cable/hydra, arrowire/arrowire,
 -- arrowire/arrowire2
 function wire_library.create(entI, entO, inputname, outputname, width, color, material)

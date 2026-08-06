@@ -87,7 +87,7 @@ end
 
 --- Resumes a suspended coroutine. Note that, in contrast to Lua's native coroutine.resume function,
 -- it will not run in protected mode and can throw an error.
--- @param thread coroutine to resume
+-- @param thread thread coroutine to resume
 -- @param ... args Optional parameters that will be passed to the coroutine
 -- @return ... Any values the coroutine is returning to the main thread
 function coroutine_library.resume(thread, ...)
@@ -109,7 +109,7 @@ function coroutine_library.yield(...)
 end
 
 --- Returns the status of the coroutine.
--- @param thread coroutine The coroutine
+-- @param thread thread The coroutine
 -- @return string Either "suspended", "running", "normal" or "dead"
 function coroutine_library.status(thread)
 	local thread = unwrap(thread).thread

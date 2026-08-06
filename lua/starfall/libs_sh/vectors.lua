@@ -98,6 +98,7 @@ local math_min = math.min
 
 --- Gets a value at a key in the vector
 -- Can be indexed with: 1, 2, 3, x, y, z, xx, xy, xz, xxx, xyz, zyx, etc.. 1,2,3 is most efficient.
+-- @param Vector t The vector
 -- @param number|string k to get the value at
 -- @return number|function|Vector|nil The value at the index
 function vec_meta.__index(t, k)
@@ -124,6 +125,7 @@ end
 local table_concat = table.concat
 
 --- Turns a vector into a string.
+-- @param Vector a The vector
 -- @return string String representation of the vector.
 function vec_meta.__tostring(a)
 	return table_concat(a, ' ', 1, 3)
@@ -186,6 +188,7 @@ function vec_meta.__sub(a, b)
 end
 
 --- Unary Minus metamethod (Negative)
+-- @param Vector a The vector
 -- @return Vector Negative vector.
 function vec_meta.__unm(a)
 	return wrap({ -a[1], -a[2], -a[3] })

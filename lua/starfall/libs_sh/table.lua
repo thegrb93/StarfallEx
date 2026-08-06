@@ -109,10 +109,10 @@ table_library.inherit = table.Inherit
 
 --- Inserts a value into a table at the end of the table or at the given position.
 -- @class function
--- @param table tbl The table to insert the variable into
--- @param any pos The position in the table to insert the variable.
+-- @param table a The table to insert the variable into
+-- @param any b The position in the table to insert the variable.
 -- If the third argument is not provided, this argument becomes the value to insert at the end of given table.
--- @param any val The variable to insert into the table
+-- @param any c The variable to insert into the table
 -- @return number The index the variable was placed at.
 table_library.insert = function(a,b,c) if c~=nil then b = math.Clamp(b, 1, 2^31-1) return table.insert(a,b,c) else return table.insert(a,b) end end
 

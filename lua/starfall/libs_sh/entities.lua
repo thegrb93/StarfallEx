@@ -268,8 +268,8 @@ if sound_library then
 	--- Emits a sound not attached to any entity at the specified position
 	-- @param string snd Sound path
 	-- @param Vector position Where the sound originates from
-	-- @param number? soundLevel Default 75
-	-- @param number? pitchPercent Default 100
+	-- @param number? lvl Default 75
+	-- @param number? pitch Default 100
 	-- @param number? volume Default 1
 	-- @param number? channel Default CHAN_AUTO or CHAN_WEAPON for weapons
 	-- @param number? dsp Default 1 DSP preset
@@ -294,8 +294,8 @@ end
 
 --- Plays a sound on the entity
 -- @param string snd Sound path
--- @param number? soundLevel Default 75
--- @param number? pitchPercent Default 100
+-- @param number? lvl Default 75
+-- @param number? pitch Default 100
 -- @param number? volume Default 1
 -- @param number? channel Default CHAN_AUTO or CHAN_WEAPON for weapons
 -- @param number? dsp Default 1 DSP preset
@@ -2232,7 +2232,7 @@ end
 -- entity and returns the hit position on the OBBox.
 -- This relies on the entity having a collision mesh (not a physics object) and will be affected by SOLID_NONE
 -- @shared
--- @param Vector The vector to start the intersection from.
+-- @param Vector pos The vector to start the intersection from.
 -- @return Vector The nearest hit point of the entity's bounding box in world coordinates, or Vector(0, 0,
 -- 0) for some entities such as worldspawn.
 function ents_methods:getNearestPoint(pos)

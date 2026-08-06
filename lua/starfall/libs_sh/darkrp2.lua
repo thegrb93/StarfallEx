@@ -605,7 +605,7 @@ local ents_methods, ewrap, eunwrap = ent_meta.Methods, ent_meta.Wrap, ent_meta.U
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 --- Format a number as a money value. Includes currency symbol.
--- @param number amount The money to format, e.g. 100000.
+-- @param number n The money to format, e.g. 100000.
 -- @return string The money as a nice string, e.g. "$100,000".
 function darkrp_library.formatMoney(n)
 	checkluatype(n, TYPE_NUMBER)
@@ -644,7 +644,7 @@ function darkrp_library.getCustomShipments()
 end
 
 --- Get whether a DarkRPVar is blacklisted from being read by Starfall.
--- @param string var The name of the variable
+-- @param string k The name of the variable
 -- @return boolean If the variable is blacklisted
 function darkrp_library.isDarkRPVarBlacklisted(k)
 	checkluatype(k, TYPE_STRING)
@@ -1011,7 +1011,7 @@ end
 -- For money specifically, you may optionally use Player:getMoney instead.
 -- Some variables may be blacklisted so that you can't read their value.
 -- @param Player ply The player
--- @param string var The name of the variable.
+-- @param string k The name of the variable.
 -- @return any The value of the DarkRP var.
 function darkrp_library.getDarkRPVar(ply, k)
 	checkluatype(k, TYPE_STRING)
@@ -1042,6 +1042,7 @@ end
 
 --- Whether the player has a certain DarkRP privilege.
 -- @param Player ply The player
+-- @param string priv The privilege name
 -- @return boolean Whether the player has the privilege.
 function darkrp_library.hasDarkRPPrivilege(ply, priv)
 	checkluatype(priv, TYPE_STRING)

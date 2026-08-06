@@ -213,6 +213,7 @@ end
 local rijk = { r = 1, i = 2, j = 3, k = 4 }
 
 --- Newindex metamethod
+-- @param Quaternion t The quaternion
 -- @param number|string k
 -- @param number v
 function quat_meta.__newindex(t, k, v)
@@ -247,6 +248,7 @@ end
 
 --- Index metamethod
 -- Can be indexed with: 1, 2, 3, 4, r, i, j, k, rr, ri, rj, rk, rrr, rijk, kjir, etc. Numerical lookup is the most efficient
+-- @param Quaternion t The quaternion
 -- @param number|string k
 -- @return number Found value
 function quat_meta.__index(t, k)
@@ -426,6 +428,7 @@ function quat_meta.__sub(lhs, rhs)
 end
 
 --- Unary minus metamethod
+-- @param Quaternion q The quaternion
 -- @return Quaternion Negated quaternion
 function quat_meta.__unm(q)
 	return wrap({ -q[1], -q[2], -q[3], -q[4] })
@@ -667,7 +670,7 @@ end
 
 -- credits: Malte Clasen (https://stackoverflow.com/a/1556470)
 --- Converts quaternion to a matrix
--- @param boolean? Optional bool, normalizes the quaternion
+-- @param boolean? normalize Optional bool, normalizes the quaternion
 -- @return VMatrix Transformation matrix
 function quat_methods:getMatrix(normalize)
 	local quat

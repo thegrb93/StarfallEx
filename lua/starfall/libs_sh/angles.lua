@@ -80,6 +80,7 @@ end
 
 --- Gets a value at a key in the angle
 -- Can be indexed with: 1, 2, 3, p, y, r, pitch, yaw, roll. 1,2,3 is most efficient.
+-- @param Angle t The angle
 -- @param number|string k
 -- @return number|function|nil Value
 function ang_meta.__index(t, k)
@@ -94,6 +95,7 @@ end
 local table_concat = table.concat
 
 --- Turns an angle into a string.
+-- @param Angle a The angle
 -- @return string String representing the angle.
 function ang_meta.__tostring(a)
 	return table_concat(a, ' ', 1, 3)
@@ -136,6 +138,7 @@ function ang_meta.__div(a, b)
 end
 
 --- Unary Minus metamethod (Negative)
+-- @param Angle a The angle
 -- @return Angle Negative angle.
 function ang_meta.__unm(a)
 	return wrap({ -a[1], -a[2], -a[3] })

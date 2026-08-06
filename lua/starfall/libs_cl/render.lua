@@ -628,7 +628,7 @@ function render_library.clearStencil()
 end
 
 --- Suppresses or enables any engine lighting for any upcoming render operation.
--- @param boolean suppress True to suppress false to enable.
+-- @param boolean enable True to suppress false to enable.
 function render_library.suppressEngineLighting(enable)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	render.SuppressEngineLighting(enable)
@@ -668,7 +668,7 @@ end
 -- @param number g Value of the green channel to clear the current RT with.
 -- @param number b Value of the blue channel to clear the current RT with.
 -- @param number a Value of the alpha channel to clear the current RT with.
--- @param boolean Clear the depth buffer.
+-- @param boolean depth Clear the depth buffer.
 function render_library.clearBuffersObeyStencil(r, g, b, a, depth)
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
@@ -2078,7 +2078,7 @@ end
 -- @param Vector pos Position of the sprite.
 -- @param number width Width of the sprite.
 -- @param number height Height of the sprite.
--- @param Color? Color tint to give the sprite. Default: white
+-- @param Color? color Color tint to give the sprite. Default: white
 function render_library.draw3DSprite(pos, width, height, color)
 	render.DrawSprite(vunwrap1(pos), width, height, color)
 end

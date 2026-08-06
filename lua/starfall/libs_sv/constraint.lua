@@ -352,7 +352,7 @@ end
 -- @param number? addlength Amount to add to the base length of the rope. Default 0
 -- @param number? force_lim Amount of force until it breaks, 0 = Unbreakable. Default 0
 -- @param number? width Width of the rope. Default 0
--- @param string? materialName Material of the rope
+-- @param string? material Material of the rope
 -- @param boolean? rigid Whether the rope is rigid. Default false
 -- @param Color? color The color of the rope. Default white
 -- @return Constraint The constraint entity

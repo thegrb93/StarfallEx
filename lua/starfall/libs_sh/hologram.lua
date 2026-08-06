@@ -197,7 +197,7 @@ if SERVER then
 
 	--- Sets the hologram's movetype
 	-- @server
-	-- @param number Movetype to set, either MOVETYPE.NOCLIP (default) or MOVETYPE.NONE
+	-- @param number move Movetype to set, either MOVETYPE.NOCLIP (default) or MOVETYPE.NONE
 	function hologram_methods:setMoveType(move)
 		if move ~= MOVETYPE_NONE and move ~= MOVETYPE_NOCLIP then
 			SF.Throw("Invalid movetype provided, must be either MOVETYPE.NOCLIP or MOVETYPE.NONE", 2)

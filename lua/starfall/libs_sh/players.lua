@@ -315,7 +315,7 @@ end
 
 --- Returns whether the player belongs to a usergroup
 -- @shared
--- @param string groupName Group to check against
+-- @param string group Group to check against
 -- @return boolean True if player belongs to group
 function player_methods:isUserGroup(group)
 	return Ply_IsUserGroup(unwrap(self), group)

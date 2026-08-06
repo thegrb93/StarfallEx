@@ -284,7 +284,7 @@ string_library.toMinutesSecondsMilliseconds = sfstring.ToMinutesSecondsMilliseco
 
 --- Converts time to hours, minutes and seconds string.
 -- @class function
--- @param number time Time in seconds
+-- @param number seconds Time in seconds
 -- @return string Given time in "HH:MM:SS" format
 function string_library.toHoursMinutesSeconds( seconds )
 	local formattedTime = sfstring.FormattedTime( seconds )
@@ -293,7 +293,7 @@ end
 
 --- Converts time to hours, minutes, seconds and milliseconds string.
 -- @class function
--- @param number time Time in seconds
+-- @param number seconds Time in seconds
 -- @return string Returns given time in "HH:MM:SS.MS" format
 function string_library.toHoursMinutesSecondsMilliseconds( seconds )
 	local formattedTime = sfstring.FormattedTime( seconds )
