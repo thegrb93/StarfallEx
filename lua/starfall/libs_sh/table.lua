@@ -188,7 +188,7 @@ table_library.shuffle = table.Shuffle
 -- Return true in this function if you want the first parameter to come first in the sorted array
 function table_library.sort(tbl, sorter)
 	if debug.getinfo(128) then error("stack overflow") end
-	return table.sort(tbl, sorter)
+	table.sort(tbl, sorter)
 end
 
 --- Returns a list of keys sorted based on values of those keys.
