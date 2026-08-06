@@ -117,10 +117,10 @@ end
 --- Welds two entities
 -- @param Entity e1 The first entity
 -- @param Entity e2 The second entity
--- @param number? bone1 Number bone of the first entity. Default 0
--- @param number? bone2 Number bone of the second entity. Default 0
--- @param number? force_lim Max force the weld can take before breaking. Default 0
--- @param boolean? nocollide Bool whether or not to nocollide the two entities. Default false
+-- @param number? bone1 Number bone of the first entity (default: 0)
+-- @param number? bone2 Number bone of the second entity (default: 0)
+-- @param number? force_lim Max force the weld can take before breaking (default: 0)
+-- @param boolean? nocollide Bool whether or not to nocollide the two entities (default: false)
 -- @return Constraint The constraint entity
 -- @server
 function constraint_library.weld(e1, e2, bone1, bone2, force_lim, nocollide)
@@ -148,19 +148,19 @@ function constraint_library.weld(e1, e2, bone1, bone2, force_lim, nocollide)
 	end
 end
 
---- Axis two entities. v1 in e1's coordinates and v2 in e2's coordinates (or laxis in e1's coordinates again) define
--- the axis
+--- Axis two entities.
+-- v1 in e1's coordinates and v2 in e2's coordinates (or laxis in e1's coordinates again) define the axis
 -- @param Entity e1 The first entity
 -- @param Entity e2 The second entity
--- @param number? bone1 Number bone of the first entity. Default 0
--- @param number? bone2 Number bone of the second entity. Default 0
+-- @param number? bone1 Number bone of the first entity (default: 0)
+-- @param number? bone2 Number bone of the second entity (default: 0)
 -- @param Vector v1 Position to center the axis, local to e1's space coordinates
 -- @param Vector v2 The second position defining the axis, local to e2's space coordinates.
 -- The laxis may be specified instead which is local to e1's space coordinates
--- @param number? force_lim Amount of force until it breaks, 0 = Unbreakable. Default 0
--- @param number? torque_lim Amount of torque until it breaks, 0 = Unbreakable. Default 0
--- @param number? friction Friction of the constraint. Default 0
--- @param boolean? nocollide Bool whether or not to nocollide the two entities. Default false
+-- @param number? force_lim Amount of force until it breaks (default: 0 = unbreakable)
+-- @param number? torque_lim Amount of torque until it breaks (default: 0 = unbreakable)
+-- @param number? friction Friction of the constraint (default: 0)
+-- @param boolean? nocollide Bool whether or not to nocollide the two entities (default: false)
 -- @param Vector? laxis Optional second position of the constraint, same as v2 but local to e1
 -- @return Constraint The constraint entity
 -- @server
@@ -196,15 +196,16 @@ function constraint_library.axis(e1, e2, bone1, bone2, v1, v2, force_lim, torque
 	end
 end
 
---- Ballsocket two entities together. For more options, see constraint.ballsocketadv
+--- Ballsocket two entities together.
+-- For more options, see constraint.ballsocketadv
 -- @param Entity e1 The first entity
 -- @param Entity e2 The second entity
--- @param number? bone1 Number bone of the first entity. Default 0
--- @param number? bone2 Number bone of the second entity. Default 0
+-- @param number? bone1 Number bone of the first entity (default: 0)
+-- @param number? bone2 Number bone of the second entity (default: 0)
 -- @param Vector pos Position of the joint, relative to the second entity
--- @param number? force_lim Amount of force until it breaks, 0 = Unbreakable. Default 0
--- @param number? torque_lim Amount of torque until it breaks, 0 = Unbreakable. Default 0
--- @param boolean? nocollide Bool whether or not to nocollide the two entities. Default false
+-- @param number? force_lim Amount of force until it breaks (default: 0 = unbreakable)
+-- @param number? torque_lim Amount of torque until it breaks (default: 0 = unbreakable)
+-- @param boolean? nocollide Bool whether or not to nocollide the two entities (default: false)
 -- @return Constraint The constraint entity
 -- @server
 function constraint_library.ballsocket(e1, e2, bone1, bone2, pos, force_lim, torque_lim, nocollide)
@@ -238,18 +239,18 @@ end
 --- Ballsocket two entities together with more options
 -- @param Entity e1 The first entity
 -- @param Entity e2 The second entity
--- @param number? bone1 Number bone of the first entity. Default 0
--- @param number? bone2 Number bone of the second entity. Default 0
+-- @param number? bone1 Number bone of the first entity (default: 0)
+-- @param number? bone2 Number bone of the second entity (default: 0)
 -- @param Vector v1 Position on the first entity, in its local space coordinates
 -- @param Vector v2 Position on the second entity, in its local space coordinates
--- @param number? force_lim Amount of force until it breaks, 0 = Unbreakable. Default 0
--- @param number? torque_lim Amount of torque until it breaks, 0 = Unbreakable. Default 0
--- @param Vector? minv Vector defining minimum rotation angle based on world axes. Default Vec(0)
--- @param Vector? maxv Vector defining maximum rotation angle based on world axes. Default Vec(0)
--- @param Vector? frictionv Vector defining rotational friction, local to the constraint. Default Vec(0)
+-- @param number? force_lim Amount of force until it breaks (default: 0 = unbreakable)
+-- @param number? torque_lim Amount of torque until it breaks (default: 0 = unbreakable)
+-- @param Vector? minv Vector defining minimum rotation angle based on world axes (default: `Vector()`)
+-- @param Vector? maxv Vector defining maximum rotation angle based on world axes (default: `Vector()`)
+-- @param Vector? frictionv Vector defining rotational friction, local to the constraint (default: `Vector()`)
 -- @param boolean? rotateonly If true, ballsocket will only affect the rotation allowing for free movement.
--- Otherwise it will limit both - rotation and movement. Default false
--- @param boolean? nocollide Bool whether or not to nocollide the two entities. Default false
+-- Otherwise it will limit both - rotation and movement (default: false)
+-- @param boolean? nocollide Bool whether or not to nocollide the two entities (default: false)
 -- @return Constraint The constraint entity
 -- @server
 function constraint_library.ballsocketadv(e1, e2, bone1, bone2, v1, v2, force_lim, torque_lim, minv, maxv, frictionv, rotateonly, nocollide)
@@ -289,15 +290,15 @@ end
 -- @param number index Index of the elastic constraint
 -- @param Entity e1 The first entity
 -- @param Entity e2 The second entity
--- @param number? bone1 Number bone of the first entity. Default 0
--- @param number? bone2 Number bone of the second entity. Default 0
+-- @param number? bone1 Number bone of the first entity (default: 0)
+-- @param number? bone2 Number bone of the second entity (default: 0)
 -- @param Vector v1 Position on the first entity, in its local space coordinates
 -- @param Vector v2 Position on the second entity, in its local space coordinates
--- @param number? const Constant of the constraint. Default 1000
--- @param number? damp Damping of the constraint. Default 100
--- @param number? rdamp Rotational damping of the constraint. Default 0
--- @param number? width Width of the created constraint. Default 0
--- @param boolean? stretch True to mark as stretch-only. Default false
+-- @param number? const Constant of the constraint (default: 1000)
+-- @param number? damp Damping of the constraint (default: 100)
+-- @param number? rdamp Rotational damping of the constraint (default: 0)
+-- @param number? width Width of the created constraint (default: 0)
+-- @param boolean? stretch True to mark as stretch-only (default: false)
 -- @return Constraint The constraint entity
 -- @server
 function constraint_library.elastic(index, e1, e2, bone1, bone2, v1, v2, const, damp, rdamp, width, stretch)
@@ -344,17 +345,17 @@ end
 -- @param number index Index of the rope constraint
 -- @param Entity e1 The first entity
 -- @param Entity e2 The second entity
--- @param number? bone1 Number bone of the first entity. Default 0
--- @param number? bone2 Number bone of the second entity. Default 0
+-- @param number? bone1 Number bone of the first entity (default: 0)
+-- @param number? bone2 Number bone of the second entity (default: 0)
 -- @param Vector v1 Position on the first entity, in its local space coordinates
 -- @param Vector v2 Position on the second entity, in its local space coordinates
--- @param number? length Length of the created rope. Default 0
--- @param number? addlength Amount to add to the base length of the rope. Default 0
--- @param number? force_lim Amount of force until it breaks, 0 = Unbreakable. Default 0
--- @param number? width Width of the rope. Default 0
+-- @param number? length Length of the created rope (default: 0)
+-- @param number? addlength Amount to add to the base length of the rope (default: 0)
+-- @param number? force_lim Amount of force until it breaks (default: 0 = unbreakable)
+-- @param number? width Width of the rope (default: 0)
 -- @param string? material Material of the rope
--- @param boolean? rigid Whether the rope is rigid. Default false
--- @param Color? color The color of the rope. Default white
+-- @param boolean? rigid Whether the rope is rigid (default: false)
+-- @param Color? color The color of the rope (default: white color)
 -- @return Constraint The constraint entity
 -- @server
 function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, addlength, force_lim, width, material, rigid, color)
@@ -402,11 +403,11 @@ end
 --- Sliders two entities
 -- @param Entity e1 The first entity
 -- @param Entity e2 The second entity
--- @param number? bone1 Number bone of the first entity. Default 0
--- @param number? bone2 Number bone of the second entity. Default 0
+-- @param number? bone1 Number bone of the first entity (default: 0)
+-- @param number? bone2 Number bone of the second entity (default: 0)
 -- @param Vector v1 Position on the first entity, in its local space coordinates
 -- @param Vector v2 Position on the second entity, in its local space coordinates
--- @param number? width Width of the slider. Default 0
+-- @param number? width Width of the slider (default: 0)
 -- @return Constraint The constraint entity
 -- @server
 function constraint_library.slider(e1, e2, bone1, bone2, v1, v2, width)
@@ -439,8 +440,8 @@ end
 --- Nocollides two entities
 -- @param Entity e1 The first entity
 -- @param Entity e2 The second entity
--- @param number? bone1 Number bone of the first entity. Default 0
--- @param number? bone2 Number bone of the second entity. Default 0
+-- @param number? bone1 Number bone of the first entity (default: 0)
+-- @param number? bone2 Number bone of the second entity (default: 0)
 -- @return Constraint The constraint entity
 -- @server
 function constraint_library.nocollide(e1, e2, bone1, bone2)
@@ -469,8 +470,8 @@ end
 --- Applies a keepupright constraint on an entity
 -- @param Entity e The entity
 -- @param Angle ang The upright angle
--- @param number bone Number bone of the entity. Default 0
--- @param number lim The strength of the constraint. Default 5000
+-- @param number bone Number bone of the entity (default: 0)
+-- @param number lim The strength of the constraint (default: 5000)
 -- @return Constraint The constraint entity
 -- @server
 function constraint_library.keepupright(e, ang, bone, lim)
@@ -497,7 +498,7 @@ end
 --- Sets the length of an elastic attached to the entity
 -- @param number index Index of the elastic constraint
 -- @param Entity e Entity that has the constraint
--- @param number length New length of the constraint
+-- @param number length New length of the constraint (must be positive or 0)
 -- @return Constraint The constraint entity
 -- @server
 function constraint_library.setElasticLength(index, e, length)
@@ -519,7 +520,7 @@ end
 --- Sets the damping of an elastic attached to the entity
 -- @param number index Index of the elastic constraint
 -- @param Entity e Entity that has the elastic
--- @param number damping New Damping value of the elastic
+-- @param number damping New Damping value of the elastic (must be positive or 0)
 -- @return Constraint The constraint entity
 -- @server
 function constraint_library.setElasticDamping(index, e, damping)
@@ -541,7 +542,7 @@ end
 --- Sets the constant of an elastic attached to the entity
 -- @param number index Index of the elastic constraint
 -- @param Entity e Entity that has the elastic
--- @param number constant New constant value of the elastic
+-- @param number constant New constant value of the elastic (must be positive or 0)
 -- @return Constraint The constraint entity
 -- @server
 function constraint_library.setElasticConstant(index, e, constant)
