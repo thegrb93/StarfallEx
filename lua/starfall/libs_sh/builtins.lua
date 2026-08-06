@@ -1,6 +1,6 @@
 -- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
-local dgetmeta, dsetmeta = debug.getmetatable, debug.setmetatable
+local dgetmeta = debug.getmetatable
 local IsValid = FindMetaTable("Entity").IsValid
 
 SF.Permissions.registerPrivilege("console.command", "Console command", "Allows the Starfall to run console commands")
