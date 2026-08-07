@@ -274,7 +274,8 @@ if sound_library then
 	-- @param number? lvl Default is 75
 	-- @param number? pitch Default is 100
 	-- @param number? volume Default is 1
-	-- @param number? channel Default is CHAN_AUTO or CHAN_WEAPON for weapons
+	-- @param number? channel Default is CHAN_AUTO or CHAN_WEAPON for weapons.
+	-- See https://wiki.facepunch.com/gmod/Enums/CHAN
 	-- @param number? dsp DSP preset (default: 1)
 	-- @param boolean? nofilter Pass true to make the sound play for everyone regardless of range or location.
 	-- Only affects server-side sounds.
@@ -301,7 +302,8 @@ end
 -- @param number? lvl Default is 75
 -- @param number? pitch Default is 100
 -- @param number? volume Default is 1
--- @param number? channel Default CHAN_AUTO or CHAN_WEAPON for weapons
+-- @param number? channel Default CHAN_AUTO or CHAN_WEAPON for weapons.
+	-- See https://wiki.facepunch.com/gmod/Enums/CHAN
 -- @param number? dsp DSP preset (default: 1)
 -- @param boolean? nofilter Pass true to make the sound play for everyone regardless of range or location.
 -- Only affects server-side sounds.
