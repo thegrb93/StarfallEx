@@ -6,6 +6,7 @@ local timer_count = SF.LimitObject("timer", "timer", 200, "The number of concurr
 
 
 --- Deals with time and timers.
+-- https://wiki.facepunch.com/gmod/timer
 -- @name timer
 -- @class library
 -- @libtbl timer_library

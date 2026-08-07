@@ -3,6 +3,7 @@ local checkluatype = SF.CheckLuaType
 local coroutine = coroutine
 
 --- Coroutine library
+-- https://wiki.facepunch.com/gmod/coroutine
 -- @name coroutine
 -- @class library
 -- @libtbl coroutine_library
