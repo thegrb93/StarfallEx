@@ -330,7 +330,7 @@ function ents_methods:emitSound(snd, lvl, pitch, volume, channel, dsp, nofilter)
 end
 
 --- Stops a sound on the entity
--- @param string snd string Soundscript path. See http://wiki.facepunch.com/gmod/Entity:StopSound
+-- @param string snd string Soundscript path. See https://wiki.facepunch.com/gmod/Entity:StopSound
 function ents_methods:stopSound(snd)
 	checkluatype(snd, TYPE_STRING)
 
@@ -563,7 +563,7 @@ function ents_methods:manipulateBoneJiggle(bone, state)
 	Ent_ManipulateBoneJiggle(ent, bone, state)
 end
 
---- Toggles the entitys inverse kinematics
+--- Toggles the entity's inverse kinematics
 -- @shared
 -- @param boolean enabled
 function ents_methods:setIK(enabled)
@@ -576,7 +576,7 @@ end
 
 --- Sets the color of the entity
 -- @shared
--- @param Color clr New color
+-- @param Color clr New color (can be a table with r/g/b/a fields, all are optional, and default to 255)
 function ents_methods:setColor(clr)
 	local ent = eunwrap(self)
 	if SERVER and ent == instance.player then
@@ -594,11 +594,11 @@ end
 
 --- Sets the color of the entity
 -- @shared
--- @param number r Red 0 - 255
--- @param number g Green 0 - 255
--- @param number b Blue 0 - 255
--- @param number a Alpha 0 - 255
-function ents_methods:setColor4Part(r,g,b,a)
+-- @param number? r Red (0 - 255, default: 255)
+-- @param number? g Green (0 - 255, default: 255)
+-- @param number? b Blue (0 - 255, default: 255)
+-- @param number? a Alpha (0 - 255, default: 255)
+function ents_methods:setColor4Part(r, g, b, a)
 	local ent = eunwrap(self)
 	if SERVER and ent == instance.player then
 		checkpermission(instance, ent, "entities.setPlayerRenderProperty")
@@ -614,8 +614,8 @@ function ents_methods:setColor4Part(r,g,b,a)
 end
 
 --- Sets the whether an entity should be drawn or not.
--- If serverside, will also prevent networking the entity to the client.
--- Don't use serverside on a Starfall if you want its client code to work.
+-- If server-side, will also prevent networking the entity to the client.
+-- Don't use server-side on a Starfall if you want its client code to work.
 -- @shared
 -- @param boolean draw Whether to draw the entity or not.
 function ents_methods:setNoDraw(draw)
@@ -627,7 +627,7 @@ end
 
 --- Checks whether the entity should be drawn
 -- @shared
--- @return boolean True if should draw, False otherwise
+-- @return boolean True if should draw, otherwise false
 function ents_methods:getNoDraw()
 	return Ent_GetNoDraw(eunwrap(self))
 end
@@ -674,14 +674,14 @@ function ents_methods:setSubMaterial(index, material)
 	end
 end
 
--- Invalid bodygroup IDs can cause crashes, so it's necessary to check that they are within range.
+-- Invalid bodygroup indices can cause crashes, so it's necessary to check that they are within 32-bit range.
 local checkbodygroup
 do
 	local maxid = 2^31-1 -- Maximum signed 32-bit integer ("long") value
 	local minid = 0 -- One can go lower, but there's no point since the negative indexes are never used.
 	function checkbodygroup(id)
 		if id < minid or id > maxid then
-			SF.Throw("invalid bodygroup id", 3)
+			SF.Throw("invalid bodygroup index", 3)
 		end
 	end
 	SF.CheckBodygroup = checkbodygroup
@@ -689,8 +689,8 @@ end
 
 --- Sets the bodygroup of the entity
 -- @shared
--- @param number bodygroup The ID of the bodygroup you're setting.
--- @param number value The value you're setting the bodygroup to.
+-- @param number bodygroup The index of the bodygroup
+-- @param number value The value to set the bodygroup to
 function ents_methods:setBodygroup(bodygroup, value)
 	checkluatype(bodygroup, TYPE_NUMBER)
 	checkbodygroup(bodygroup)
@@ -718,7 +718,8 @@ end
 
 --- Returns a list of all bodygroups of the entity
 -- @shared
--- @return table Bodygroups as a table of BodyGroupDatas. https://wiki.facepunch.com/gmod/Structures/BodyGroupData
+-- @return table Bodygroups as a table of BodyGroupDatas.
+-- https://wiki.facepunch.com/gmod/Structures/BodyGroupData
 function ents_methods:getBodygroups()
 	return Ent_GetBodyGroups(eunwrap(self))
 end
@@ -768,9 +769,9 @@ function ents_methods:setSkin(skinIndex)
 	Ent_SetSkin(ent, skinIndex)
 end
 
---- Gets the skin number of the entity
+--- Gets the skin index of the entity
 -- @shared
--- @return number Skin number
+-- @return number Skin index
 function ents_methods:getSkin()
 	return Ent_GetSkin(eunwrap(self))
 end
@@ -784,7 +785,8 @@ end
 
 --- Sets the render mode of the entity
 -- @shared
--- @param number rendermode Rendermode to use. http://wiki.facepunch.com/gmod/Enums/RENDERMODE
+-- @param number rendermode Render mode to use.
+-- https://wiki.facepunch.com/gmod/Enums/RENDERMODE
 function ents_methods:setRenderMode(rendermode)
 	checkluatype(rendermode, TYPE_NUMBER)
 
@@ -801,14 +803,16 @@ end
 
 --- Gets the render mode of the entity
 -- @shared
--- @return number rendermode https://wiki.facepunch.com/gmod/Enums/RENDERMODE
+-- @return number Render mode
+-- https://wiki.facepunch.com/gmod/Enums/RENDERMODE
 function ents_methods:getRenderMode()
 	return Ent_GetRenderMode(eunwrap(self))
 end
 
 --- Sets the renderfx of the entity, most effects require entity's alpha to be less than 255 to take effect
 -- @shared
--- @param number renderfx Renderfx to use. http://wiki.facepunch.com/gmod/Enums/kRenderFx
+-- @param number renderfx RenderFX to use.
+-- https://wiki.facepunch.com/gmod/Enums/kRenderFx
 function ents_methods:setRenderFX(renderfx)
 	checkluatype(renderfx, TYPE_NUMBER)
 
@@ -826,7 +830,8 @@ end
 
 --- Gets the renderfx of the entity
 -- @shared
--- @return number Renderfx, https://wiki.facepunch.com/gmod/Enums/kRenderFx
+-- @return number RenderFX
+-- https://wiki.facepunch.com/gmod/Enums/kRenderFx
 function ents_methods:getRenderFX()
 	return Ent_GetRenderFX(eunwrap(self))
 end
@@ -878,19 +883,22 @@ function ents_methods:getAttachments()
 end
 
 --- Gets the collision group enum of the entity
--- @return number The collision group enum of the entity. https://wiki.facepunch.com/gmod/Enums/COLLISION_GROUP
+-- @return number The collision group enum of the entity.
+-- https://wiki.facepunch.com/gmod/Enums/COLLISION_GROUP
 function ents_methods:getCollisionGroup()
 	return Ent_GetCollisionGroup(eunwrap(self))
 end
 
 --- Gets the solid enum of the entity
--- @return number The solid enum of the entity. https://wiki.facepunch.com/gmod/Enums/SOLID
+-- @return number The solid enum of the entity.
+-- https://wiki.facepunch.com/gmod/Enums/SOLID
 function ents_methods:getSolid()
 	return Ent_GetSolid(eunwrap(self))
 end
 
 --- Gets the solid flag enum of the entity
--- @return number The solid flag enum of the entity. https://wiki.facepunch.com/gmod/Enums/FSOLID
+-- @return number The solid flag enum of the entity.
+-- https://wiki.facepunch.com/gmod/Enums/FSOLID
 function ents_methods:getSolidFlags()
 	return Ent_GetSolidFlags(eunwrap(self))
 end
@@ -902,21 +910,22 @@ function ents_methods:isSolid()
 end
 
 --- Gets the movetype enum of the entity
--- @return number The movetype enum of the entity. https://wiki.facepunch.com/gmod/Enums/MOVETYPE
+-- @return number The movetype enum of the entity.
+-- https://wiki.facepunch.com/gmod/Enums/MOVETYPE
 function ents_methods:getMoveType()
 	return Ent_GetMoveType(eunwrap(self))
 end
 
---- Converts a ragdoll bone id to the corresponding physobject id
--- @param number boneid The ragdoll boneid
--- @return number The physobj id
+--- Converts a ragdoll bone index to the corresponding PhysObject bone index
+-- @param number boneid The ragdoll bone index
+-- @return number The PhysObject bone index
 function ents_methods:translateBoneToPhysBone(boneid)
 	return Ent_TranslateBoneToPhysBone(eunwrap(self), boneid)
 end
 
---- Converts a physobject id to the corresponding ragdoll bone id
--- @param number boneid The physobject id
--- @return number The ragdoll bone id
+--- Converts a PhysObject bone index to the corresponding ragdoll bone index
+-- @param number boneid The PhysObject bone index
+-- @return number The ragdoll bone index
 function ents_methods:translatePhysBoneToBone(boneid)
 	return Ent_TranslatePhysBoneToBone(eunwrap(self), boneid)
 end

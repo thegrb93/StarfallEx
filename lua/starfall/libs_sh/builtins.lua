@@ -744,7 +744,7 @@ else
 
 	--- Prints a message to your chat, console, or the center of your screen (only visible to owner, but visible to everyone if superuser)
 	-- @client
-	-- @param number mtype How the message should be displayed. See http://wiki.facepunch.com/gmod/Enums/HUD
+	-- @param number mtype How the message should be displayed. See https://wiki.facepunch.com/gmod/Enums/HUD
 	-- @param string text The message text.
 	function builtins_library.printMessage(mtype, text)
 		checkluatype(text, TYPE_STRING)
