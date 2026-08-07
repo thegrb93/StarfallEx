@@ -26,7 +26,8 @@ else
 	SF.softLockProtectionOwner = CreateConVar("sf_timebuffersoftlock_cl_owner", 1, FCVAR_ARCHIVE, "Enable Cpu-time limiting on your own chips.")
 	SF.softLockProtectionSuperUser = CreateConVar("sf_timebuffersoftlock_superuser", 0, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Determines whether CPU checks should be done for superusers as well?")
 	SF.RamCap = CreateConVar("sf_ram_max_cl", 1500000, FCVAR_ARCHIVE, "If ram exceeds this limit (in kB), starfalls will be terminated")
-	SF.CvarEnabled = CreateConVar( "sf_enabled_cl", "1", { FCVAR_ARCHIVE, FCVAR_USERINFO, FCVAR_DONTRECORD }, "Enable clientside starfall" )
+	SF.CvarEnabled = CreateConVar("sf_enabled_cl", "1", { FCVAR_ARCHIVE, FCVAR_USERINFO, FCVAR_DONTRECORD }, "Enable clientside starfall")
+	SF.CvarNotifyErrors = CreateConVar("sf_notify_cl", "3", FCVAR_ARCHIVE, "Chip error notification level (0=off, 1=self only, 2=filter common spam, 3=all)")
 end
 local ramlimit
 SF.CvarCallback(SF.RamCap, function(val) ramlimit = val end, "number")
@@ -140,7 +141,7 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 
 		--owneronly directive
 		if CLIENT and fdata.owneronly and LocalPlayer() ~= player then continue end -- Don't compile owner-only files if not owner
-		
+
 		--realm directives
 		local serverorclient = fdata.serverorclient
 		if (serverorclient == "server" and CLIENT) or (serverorclient == "client" and SERVER) then continue end -- Don't compile files for other realm
@@ -205,7 +206,7 @@ function SF.Instance:CleanupWrappedEnt(ent)
 end
 
 function SF.Instance:CreateWrapper(metatable, typedata)
-	
+
 	local wrap, unwrap
 
 	-- Create wrapper based on what type of weakness specified
@@ -411,11 +412,11 @@ function SF.Instance:BuildEnvironment()
 
 		return RecursiveUnsanitize(original)
 	end
-	
+
 	for name, _ in pairs(SF.Libraries) do
 		self.Libraries[name] = {}
 	end
-	
+
 	for name, typedata in pairs(SF.Types) do
 		local methods = {}
 		local metatable = {__metatable = name, __index = methods, supertype = typedata.supertype, Methods = methods}
@@ -455,7 +456,7 @@ function SF.Instance:BuildEnvironment()
 			end
 		end
 	end
-	table.Inherit( self.env, self.Libraries ) 
+	table.Inherit( self.env, self.Libraries )
 	self.env._G = self.env
 	self:DoAliases()
 end
