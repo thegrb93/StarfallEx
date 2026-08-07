@@ -203,7 +203,7 @@ end
 -- @param string flags Flags for the sound (`3d`, `mono`, `noplay`, `noblock`).
 -- Multiple flags can be separated by a space.
 -- @param function callback Function which is invoked when the sound is loaded. With arguments:
--- 1. `Bass` object
+-- 1. `Bass` object (or nil in case of error)
 -- 2. number error code
 -- 3. string error name
 function bass_library.loadFile(path, flags, callback)
@@ -226,7 +226,7 @@ end
 -- noblock will fail if the webserver doesn't provide file length.
 -- Multiple flags can be separated by a space.
 -- @param function callback Function which is invoked when the sound is loaded. With arguments:
--- 1. `Bass` object
+-- 1. `Bass` object (or nil in case of error)
 -- 2. number error code
 -- 3. string error name
 function bass_library.loadURL(path, flags, callback)
