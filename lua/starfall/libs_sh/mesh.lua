@@ -757,7 +757,7 @@ end
 
 --- Finds the convex hull of provided vertices table.
 -- @param table vertices The table of vertices (vectors) or vertex data
--- (http://wiki.facepunch.com/gmod/Structures/MeshVertex)
+-- (https://wiki.facepunch.com/gmod/Structures/MeshVertex)
 -- @param boolean? threaded Optional bool, use threading object that can be used to run algorithm over time to prevent hitting quota limit
 -- @return table The mesh table which can be passed to mesh.createFromTable
 -- @return table The table of vertices which can be passed to prop.createCustom
@@ -853,7 +853,7 @@ if CLIENT then
 	}
 
 	--- Creates a mesh from vertex data.
-	-- @param table vertices Table containing vertex data. http://wiki.facepunch.com/gmod/Structures/MeshVertex
+	-- @param table vertices Table containing vertex data. https://wiki.facepunch.com/gmod/Structures/MeshVertex
 	-- @param boolean? threaded Optional bool, use threading object that can be used to load the mesh over time to prevent hitting quota limit. The thread will yield with number of vertices remaining to be processed. After 0 is yielded, the final expensive phase starts.
 	-- @return Mesh Mesh object
 	-- @client

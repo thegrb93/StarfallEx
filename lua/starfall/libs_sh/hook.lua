@@ -141,7 +141,7 @@ if SERVER then
 	-- @param number newTeam Index of the team the player has changed to.
 	add("PlayerChangedTeam")
 
-	--- Called when a players enters a vehicle
+	--- Called when a player enters a vehicle
 	-- @name PlayerEnteredVehicle
 	-- @class hook
 	-- @server
@@ -150,7 +150,7 @@ if SERVER then
 	-- @param number num Role. The seat number
 	add("PlayerEnteredVehicle")
 
-	--- Called when a players leaves a vehicle
+	--- Called when a player leaves a vehicle
 	-- @name PlayerLeaveVehicle
 	-- @class hook
 	-- @server
@@ -176,7 +176,7 @@ if SERVER then
 		return true, {instance.WrapObject(ply), data.text, data.teamonly, not (Ent_IsValid(ply) and ply:Alive())}
 	end)
 
-	--- Called when a players sprays their logo
+	--- Called when a player sprays their logo
 	-- @name PlayerSpray
 	-- @class hook
 	-- @server
@@ -192,7 +192,7 @@ if SERVER then
 	-- @param Entity ent Entity being used
 	add("PlayerUse")
 
-	--- Called when a players turns their flashlight on or off
+	--- Called when a player toggles their flashlight
 	-- @name PlayerSwitchFlashlight
 	-- @class hook
 	-- @server
@@ -200,7 +200,7 @@ if SERVER then
 	-- @param boolean state New flashlight state. True if on.
 	add("PlayerSwitchFlashlight")
 
-	--- Called when a wants to pick up a weapon
+	--- Called when a player wants to pick up a weapon
 	-- @name PlayerCanPickupWeapon
 	-- @class hook
 	-- @server
@@ -323,15 +323,15 @@ else
 		return false
 	end)
 
-	--- Called when a client-side entity gets created or re-created via lag/PVS
+	--- Called when a client-side entity gets created or re-created due to lag/PVS
 	-- @name NetworkEntityCreated
 	-- @class hook
 	-- @client
 	-- @param Entity ent New entity
 	add("NetworkEntityCreated")
 
-	--- Called when a client-side entity transmit state is changed. Usually when changing PVS
-	-- If you want client-side render changes to persist on an entity you have to re-apply them
+	--- Called when a client-side entity transmit state is changed. Usually when changing PVS.
+	-- If you want client-side render changes to persist on the entity, you have to re-apply them
 	-- each time it begins transmitting again
 	-- @name NotifyShouldTransmit
 	-- @class hook
@@ -340,7 +340,7 @@ else
 	-- @param boolean shouldtransmit Whether it is now transmitting or not
 	add("NotifyShouldTransmit")
 
-	-- Check serverside playerhurt for docs
+	-- Check server-side playerhurt for docs
 	gameevent.Listen("player_hurt")
 	SF.hookAdd("player_hurt", "playerhurt", function(instance, data)
 		return true, {instance.WrapObject(Player(data.userid)), instance.WrapObject(Player(data.attacker)), data.health}
@@ -391,7 +391,10 @@ else
 	-- @client
 	add("OnContextMenuClose")
 
-	--- Called whenever a CUserCmd is made for the local player. This runs twice per frame, one for movement one for camera. You can use cmd:getCommandNumber to check which one it is if you want to only run on one of them. Camera will have a 0 command number.
+	--- Called whenever a user command is created for the local player.
+	-- This runs twice per frame, once for movement, and once for camera.
+	-- You can use `CUserCmd:getCommandNumber` to check which one it is if you want to only run on one of them.
+	-- Camera has a command number = 0.
 	-- @name CreateMove
 	-- @class hook
 	-- @client
@@ -454,7 +457,7 @@ add("OnPlayerHitGround")
 -- @class hook
 -- @shared
 -- @param Player ply Player pressing the key
--- @param number key The key being pressed
+-- @param number key The key being pressed (see `IN_KEY` enum)
 add("KeyPress")
 
 --- Called when a player releases a key
@@ -462,7 +465,7 @@ add("KeyPress")
 -- @class hook
 -- @shared
 -- @param Player ply Player releasing the key
--- @param number key The key being released
+-- @param number key The key being released (see `IN_KEY` enum)
 add("KeyRelease")
 
 --- Called when a player punts with the gravity gun
@@ -553,7 +556,7 @@ add("PropBreak")
 -- @shared
 -- @param Entity ent The entity that fired the bullet
 -- @param table data The bullet data.
--- See http://wiki.facepunch.com/gmod/Structures/Bullet
+-- See https://wiki.facepunch.com/gmod/Structures/Bullet
 -- @return function? Optional callback to invoke before the bullet deals damage. With arguments:
 -- 1. `Entity` attacker
 -- 2. TraceResult: see http://wiki.facepunch.com/gmod/Structures/TraceResult
@@ -573,7 +576,7 @@ end, true)
 -- @class hook
 -- @shared
 -- @param Entity ent The entity that fired the bullet
--- @param table data A table containing:
+-- @param table data A table with structure:
 -- Trace: see http://wiki.facepunch.com/gmod/Structures/TraceResult
 -- AmmoType
 -- Tracer

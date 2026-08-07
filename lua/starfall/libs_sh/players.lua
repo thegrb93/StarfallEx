@@ -96,6 +96,7 @@ end)
 player_meta.GetPlayer = player_meta.Unwrap -- Backwards compat
 
 -- ------------------------------------------------------------------------- --
+
 --- Returns whether the player is alive
 -- @shared
 -- @return boolean True if player alive
@@ -103,93 +104,93 @@ function player_methods:isAlive()
 	return Ply_Alive(unwrap(self))
 end
 
---- Returns the players armor
+--- Returns the player's armor
 -- @shared
 -- @return number Armor
 function player_methods:getArmor()
 	return Ply_Armor(unwrap(self))
 end
 
---- Returns the players maximum armor capacity
+--- Returns the player's maximum armor capacity
 -- @shared
 -- @return number Armor limit
 function player_methods:getMaxArmor()
 	return Ply_GetMaxArmor(unwrap(self))
 end
 
---- Returns the players Crouched Walk Speed
+--- Returns the player's crouched walk speed
 -- @shared
--- @return number Crouch Walk Speed value
+-- @return number Crouch walk speed value
 function player_methods:getCrouchedWalkSpeed()
 	return Ply_GetCrouchedWalkSpeed(unwrap(self))
 end
 
---- Returns the players Duck Speed, a rate from 0-1 for how quickly they can crouch
+--- Returns the player's duck speed, a rate from 0-1 for how quickly they can crouch
 -- @shared
--- @return number Duck Speed value
+-- @return number Duck speed value
 function player_methods:getDuckSpeed()
 	return Ply_GetDuckSpeed(unwrap(self))
 end
 
---- Returns the players UnDuck Speed, a rate from 0-1 for how quickly they can uncrouch
+--- Returns the player's unduck speed, a rate from 0-1 for how quickly they can uncrouch
 -- @shared
--- @return number UnDuck Speed value
+-- @return number Unduck speed value
 function player_methods:getUnDuckSpeed()
 	return Ply_GetUnDuckSpeed(unwrap(self))
 end
 
---- Returns the players Ladder Climb Speed, probably unstable
+--- Returns the player's ladder climb speed, probably unstable
 -- @shared
--- @return number Ladder Climb Speed value
+-- @return number Ladder climb speed value
 function player_methods:getLadderClimbSpeed()
 	return Ply_GetLadderClimbSpeed(unwrap(self))
 end
 
---- Returns the players Max Speed, probably unstable
+--- Returns the player's max speed, probably unstable
 -- @shared
--- @return number Max Speed value
+-- @return number Max speed value
 function player_methods:getMaxSpeed()
 	return Ply_GetMaxSpeed(unwrap(self))
 end
 
---- Returns the players Run Speed, which is +speed
+--- Returns the player's run speed, which is +speed
 -- @shared
--- @return number Run Speed value
+-- @return number Run speed value
 function player_methods:getRunSpeed()
 	return Ply_GetRunSpeed(unwrap(self))
 end
 
---- Returns the players Slow Walk Speed, which is +walk
+--- Returns the player's slow walk speed, which is +walk
 -- @shared
--- @return number Slow Walk Speed value
+-- @return number Slow walk speed value
 function player_methods:getSlowWalkSpeed()
 	return Ply_GetSlowWalkSpeed(unwrap(self))
 end
 
---- Returns the players Walk Speed
+--- Returns the player's walk speed
 -- @shared
--- @return number Walk Speed value
+-- @return number Walk speed value
 function player_methods:getWalkSpeed()
 	return Ply_GetWalkSpeed(unwrap(self))
 end
 
---- Returns the players Jump Power
+--- Returns the player's jump power
 -- @shared
--- @return number Jump Power value
+-- @return number Jump power value
 function player_methods:getJumpPower()
 	return Ply_GetJumpPower(unwrap(self))
 end
 
---- Returns the players Friction
+--- Returns the player's friction
 -- @shared
 -- @return number Friction value
 function player_methods:getFriction()
 	return Ent_GetFriction(unwrap(self)) * cvars.Number("sv_friction")
 end
 
---- Returns the players Step Size
+--- Returns the player's step size
 -- @shared
--- @return number Step Size Value
+-- @return number Step size value
 function player_methods:getStepSize()
 	return Ply_GetStepSize(unwrap(self))
 end
@@ -342,12 +343,12 @@ function player_methods:getSteamID()
 	return Ply_SteamID(unwrap(self))
 end
 
---- Returns the player's SteamID64 / Community ID
--- In singleplayer, this will return no value serverside.
--- For bots, this will return 90071996842377216 (equivalent to STEAM_0:0:0) for the first bot to join, and adds 1 to the id for the bot id.
+--- Returns the player's SteamID64 / Community ID (or if specified, the game owner account ID).
+-- In singleplayer, this will return no value server-side.
+-- For bots, this will return 90071996842377216 (equivalent to STEAM_0:0:0) for the first bot to join, and incrementally adds 1 for each bot.
 -- Returns no value for bots client-side.
 -- @shared
--- @param boolean? owner Return the actual game owner account id
+-- @param boolean? owner Return the actual game owner account ID
 -- @return string SteamID64 aka Community ID
 function player_methods:getSteamID64(owner)
 	if owner then
@@ -359,14 +360,14 @@ end
 
 --- Returns the player's current team
 -- @shared
--- @return number Team Index, from TEAM enums or custom teams
+-- @return number Team index, from TEAM enums or custom teams
 function player_methods:getTeam()
 	return Ply_Team(unwrap(self))
 end
 
 --- Returns the name of the player's current team
 -- @shared
--- @return string Team Name
+-- @return string Team name
 function player_methods:getTeamName()
 	return team.GetName(Ply_Team(unwrap(self)))
 end
@@ -393,7 +394,7 @@ function player_methods:getViewEntity()
 end
 
 --- Returns the player's view model
--- In the Client realm, other players' viewmodels are not available unless they are being spectated
+-- In the client realm, other players' viewmodels are not available unless they are being spectated
 -- @shared
 -- @return Entity Player's view model
 function player_methods:getViewModel()
@@ -559,7 +560,7 @@ if CLIENT then
 
 	--- Returns the voice volume of the player
 	-- @client
-	-- @return number Returns the players voice volume, how loud the player's voice communication currently is, as a normal number.
+	-- @return number Returns the player's voice volume, how loud the player's voice communication currently is, as a normal number.
 	function player_methods:voiceVolume()
 		return Ply_VoiceVolume(unwrap(self))
 	end

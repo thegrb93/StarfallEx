@@ -69,7 +69,7 @@ if SERVER then
 
 	--- Adds a relationship to the NPC
 	-- @server
-	-- @param string str The relationship string. http://wiki.facepunch.com/gmod/NPC:AddRelationship
+	-- @param string str The relationship string. https://wiki.facepunch.com/gmod/NPC:AddRelationship
 	function npc_methods:addRelationship(str)
 		local npc = unwrap(self)
 		checkpermission(instance, npc, "npcs.modify")

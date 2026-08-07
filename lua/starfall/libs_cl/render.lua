@@ -738,7 +738,7 @@ function render_library.setStencilCompareFunction(compareFunction)
 end
 
 --- Sets the operation to be performed on the stencil buffer values if the compare function was not successful.
--- More: http://wiki.facepunch.com/gmod/render.SetStencilFailOperation
+-- More: https://wiki.facepunch.com/gmod/render.SetStencilFailOperation
 -- @param number operation
 function render_library.setStencilFailOperation(operation)
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
@@ -747,7 +747,7 @@ function render_library.setStencilFailOperation(operation)
 end
 
 --- Sets the operation to be performed on the stencil buffer values if the compare function was successful.
--- More: http://wiki.facepunch.com/gmod/render.SetStencilPassOperation
+-- More: https://wiki.facepunch.com/gmod/render.SetStencilPassOperation
 -- @param number operation
 function render_library.setStencilPassOperation(operation)
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
@@ -756,7 +756,7 @@ function render_library.setStencilPassOperation(operation)
 end
 
 --- Sets the operation to be performed on the stencil buffer values if the stencil test is passed but the depth buffer test fails.
--- More: http://wiki.facepunch.com/gmod/render.SetStencilZFailOperation
+-- More: https://wiki.facepunch.com/gmod/render.SetStencilZFailOperation
 -- @param number operation
 function render_library.setStencilZFailOperation(operation)
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
@@ -862,7 +862,7 @@ local viewmatrix_checktypes =
 local viewmatrix_checktypes_ignore = {origin = true, angles = true}
 
 --- Pushes a perspective matrix onto the view matrix stack.
--- @param table tbl The view matrix data. See http://wiki.facepunch.com/gmod/Structures/RenderCamData
+-- @param table tbl The view matrix data. See https://wiki.facepunch.com/gmod/Structures/RenderCamData
 function render_library.pushViewMatrix(tbl)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if #view_matrix_stack == MATRIX_STACK_LIMIT then SF.Throw("Pushed too many matrices", 2) end
@@ -1412,7 +1412,7 @@ function render_library.setTextureFromScreen(ent)
 end
 
 --- Sets the texture filtering function when viewing a close texture
--- @param number val The filter function to use http://wiki.facepunch.com/gmod/Enums/TEXFILTER
+-- @param number val The filter function to use https://wiki.facepunch.com/gmod/Enums/TEXFILTER
 function render_library.setFilterMag(val)
 	checkluatype (val, TYPE_NUMBER)
 	if renderdata.changedFilterMag then
@@ -1423,7 +1423,7 @@ function render_library.setFilterMag(val)
 end
 
 --- Sets the texture filtering function when viewing a far texture
--- @param number val The filter function to use http://wiki.facepunch.com/gmod/Enums/TEXFILTER
+-- @param number val The filter function to use https://wiki.facepunch.com/gmod/Enums/TEXFILTER
 function render_library.setFilterMin(val)
 	checkluatype (val, TYPE_NUMBER)
 	if renderdata.changedFilterMin then
@@ -2112,12 +2112,12 @@ end
 
 --- Enables or disables blend mode control. Read OpenGL or DirectX docs for more info
 -- @param boolean on Whether to control the blend mode of upcoming rendering
--- @param number? srcBlend http://wiki.facepunch.com/gmod/Enums/BLEND
+-- @param number? srcBlend https://wiki.facepunch.com/gmod/Enums/BLEND
 -- @param number? destBlend
--- @param number? blendFunc http://wiki.facepunch.com/gmod/Enums/BLENDFUNC
--- @param number? srcBlendAlpha http://wiki.facepunch.com/gmod/Enums/BLEND
+-- @param number? blendFunc https://wiki.facepunch.com/gmod/Enums/BLENDFUNC
+-- @param number? srcBlendAlpha https://wiki.facepunch.com/gmod/Enums/BLEND
 -- @param number? destBlendAlpha
--- @param number? blendFuncAlpha http://wiki.facepunch.com/gmod/Enums/BLENDFUNC
+-- @param number? blendFuncAlpha https://wiki.facepunch.com/gmod/Enums/BLENDFUNC
 function render_library.overrideBlend(on, srcBlend, destBlend, blendFunc, srcBlendAlpha, destBlendAlpha, blendFuncAlpha)
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 
@@ -2546,7 +2546,7 @@ end
 
 --- Renders the scene with the specified viewData to the current active render target.
 -- @param table tbl view The view data to be used in the rendering.
--- See http://wiki.facepunch.com/gmod/Structures/ViewData
+-- See https://wiki.facepunch.com/gmod/Structures/ViewData
 -- There's an additional key drawviewer used to tell the engine whether the local player model should be rendered.
 function render_library.renderView(tbl)
 	checkluatype(tbl, TYPE_TABLE)

@@ -534,7 +534,7 @@ end
 
 --- Allows detecting collisions on an entity.
 -- @param function func The callback function with argument:
--- 1. CollisionData table, see http://wiki.facepunch.com/gmod/Structures/CollisionData
+-- 1. CollisionData table, see https://wiki.facepunch.com/gmod/Structures/CollisionData
 -- @param string? name Optional name to distinguish multiple collision listeners and remove them individually later (default: "")
 function ents_methods:addCollisionListener(func, name)
 	checkluatype(func, TYPE_FUNCTION)
