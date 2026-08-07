@@ -201,9 +201,11 @@ if CLIENT then
 		return vwrap(mins), vwrap(maxs)
 	end
 
-	--- Sets the Level Of Detail model to use with this entity. This may not work for all models if the model doesn't include any LOD sub models.
-	-- This function works exactly like the clientside r_lod convar and takes priority over it.
-	-- -1 leaves the engine to automatically set the Level of Detail. The Level Of Detail may range from 0 to 8, with 0 being the highest quality and 8 the lowest.
+	--- Sets the level-of-detail model to use with this entity.
+	-- This may not work for all models if the model doesn't include any LOD sub models.
+	-- This function works exactly like the client-side r_lod convar and takes priority over it.
+	-- -1 leaves the engine to automatically set the level of detail.
+	-- The level of detail may range from 0 to 8, with 0 being the highest quality and 8 the lowest.
 	-- @client
 	-- @param number num The Level Of Detail model ID to use.
 	function ents_methods:setLOD(num)
@@ -214,7 +216,7 @@ if CLIENT then
 	end
 
 	local canDrawEntity = SF.CanDrawEntity
-	--- Returns whether or not the entity can be drawn using Entity.draw function
+	--- Returns whether or not the entity can be drawn using `Entity:draw` function
 	-- Checks Entity against a predefined class whitelist
 	-- Entities that have RenderOverride defined or are parented cannot be drawn
 	-- @client
@@ -224,7 +226,8 @@ if CLIENT then
 	end
 
 	--- Draws the entity, requires 3D rendering context
-	-- Only certain, whitelisted entities can be drawn. They can't be parented or have RenderOverride defined
+	-- Only certain, whitelisted entities can be drawn.
+	-- They can't be parented or have RenderOverride defined
 	-- Use Entity.canDraw to check if you can draw the entity
 	-- @client
 	function ents_methods:draw()
@@ -273,7 +276,8 @@ if sound_library then
 	-- @param number? volume Default 1
 	-- @param number? channel Default CHAN_AUTO or CHAN_WEAPON for weapons
 	-- @param number? dsp Default 1 DSP preset
-	-- @param boolean? nofilter (Optional) Boolean Make the sound play for everyone regardless of range or location. Only affects Server-side sounds.
+	-- @param boolean? nofilter Make the sound play for everyone regardless of range or location.
+	-- Only affects server-side sounds.
 	function sound_library.emitSound(snd, position, lvl, pitch, volume, channel, dsp, nofilter)
 		checkluatype(snd, TYPE_STRING)
 		if nofilter~=nil then checkluatype(nofilter, TYPE_BOOL) end
@@ -388,7 +392,7 @@ end
 function ents_methods:setParent(parent, attachment, bone)
 	local child = eunwrap(self)
 	checkpermission(instance, child, "entities.setParent")
-	if CLIENT and dgetmeta(child) ~= SF.Cl_Hologram_Meta then SF.Throw("Only clientside holograms can be parented in the CLIENT realm!", 2) end
+	if CLIENT and dgetmeta(child) ~= SF.Cl_Hologram_Meta then SF.Throw("Only client-side holograms can be parented in the CLIENT realm!", 2) end
 	if attachment ~= nil and bone ~= nil then SF.Throw("Arguments `attachment` and `bone` are mutually exclusive!", 2) end
 	if parent ~= nil then
 		parent = eunwrap(parent)
@@ -404,7 +408,7 @@ function ents_methods:setParent(parent, attachment, bone)
 			type = "bone"
 			param = bone
 		elseif attachment ~= nil then
-			if CLIENT then SF.Throw("Parenting to an attachment is not supported in clientside!", 2) end
+			if CLIENT then SF.Throw("Parenting to an attachment is not supported in client-side!", 2) end
 			if isstring(attachment) then
 				attachment = {attachment, Ent_LookupAttachment(parent, attachment)}
 				if attachment[2] < 1 then SF.Throw("Invalid attachment provided!", 2) end
@@ -925,7 +929,7 @@ end
 -- @return PhysObj The main physics object of the entity
 function ents_methods:getPhysicsObject()
 	local ent = eunwrap(self)
-	if Ent_IsWorld(ent) then SF.Throw("Cannot get the world physobj.", 2) end
+	if Ent_IsWorld(ent) then SF.Throw("Cannot get the world PhysObj.", 2) end
 	return pwrap(Ent_GetPhysicsObject(ent))
 end
 
