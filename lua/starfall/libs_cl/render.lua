@@ -886,7 +886,7 @@ local viewmatrix_checktypes_ignore = {origin = true, angles = true}
 
 --- Pushes a perspective matrix onto the view matrix stack.
 -- @param table tbl The view matrix data.
--- See also https://wiki.facepunch.com/gmod/Structures/RenderCamData
+-- See https://wiki.facepunch.com/gmod/Structures/RenderCamData
 function render_library.pushViewMatrix(tbl)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if #view_matrix_stack == MATRIX_STACK_LIMIT then SF.Throw("Pushed too many matrices", 2) end
