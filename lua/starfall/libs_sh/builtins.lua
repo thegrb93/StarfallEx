@@ -1036,7 +1036,7 @@ end
 
 local debug_library = instance.Libraries.debug
 
--- Returns a string containing a stack trace of the given thread
+--- Returns a string containing a stack trace of the given thread
 -- @param thread? A thread to get the stack trace of.
 -- If nil, this argument will be used as the message and the current thread becomes the target.
 -- @param string? message A message to be included at the beginning of the stack trace. Default: ""
@@ -1063,7 +1063,7 @@ function debug_library.traceback(thread, message, stacklevel)
 	end
 end
 
--- Returns a DebugInfo structure containing the passed function's info.
+--- Returns a DebugInfo structure containing the passed function's info.
 -- See https://wiki.facepunch.com/gmod/Structures/DebugInfo
 -- @param function|number funcOrStackLevel Function or stack level to get info about. Defaults to stack level 0.
 -- @param string? fields A string that specifies the information to be retrieved. Defaults to all (flnSu).
@@ -1079,8 +1079,8 @@ function debug_library.getinfo(funcOrStackLevel, fields)
 	end
 end
 
-if debug and debug.getlocal then
-	-- Returns the name of a function, or stack's locals
+if debug and isfunction(debug.getlocal) then
+	--- Returns the name of a function, or stack's locals
 	-- @param function|number funcOrStackLevel Function or stack level to get info about. Defaults to stack level 0.
 	-- @param number index The index of the local to get
 	-- @return string The name of the local
