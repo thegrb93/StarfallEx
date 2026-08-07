@@ -50,6 +50,7 @@ end
 SF.RegisterLibrary("hologram")
 
 --- Hologram type
+-- Created with `hologram.create` function
 -- @name Hologram
 -- @class type
 -- @libtbl hologram_methods

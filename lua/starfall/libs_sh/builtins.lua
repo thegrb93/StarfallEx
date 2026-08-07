@@ -17,13 +17,15 @@ else
 end
 
 
---- Lua os library https://wiki.garrysmod.com/page/Category:os
+--- Lua os library
+-- https://wiki.facepunch.com/gmod/os
 -- @name os
 -- @class library
 -- @libtbl os_library
 SF.RegisterLibrary("os")
 
---- Lua debug library https://wiki.garrysmod.com/page/Category:debug
+--- Lua debug library
+-- https://wiki.facepunch.com/gmod/debug
 -- @name debug
 -- @class library
 -- @libtbl debug_library

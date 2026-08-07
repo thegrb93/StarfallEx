@@ -173,7 +173,7 @@ setmetatable(socket_proxy, { __index = socket })
 -- The only other method supported by a master object is the close method.
 -- @name socket_library.tcp
 -- @class function
--- @return table New IPv4 TCP Master Object, or nil if error
+-- @return table New IPv4 TCP master object, or nil if error
 -- @return string? The error message, or nil if no error
 socket_proxy.tcp = create_proxy_function(socket.tcp)
 
@@ -182,7 +182,7 @@ socket_proxy.tcp = create_proxy_function(socket.tcp)
 -- The only other method supported by a master object is the close method.
 -- @name socket_library.tcp4
 -- @class function
--- @return table New IPv4 TCP Master Object, or nil if error
+-- @return table New IPv4 TCP master object, or nil if error
 -- @return string? The error message, or nil if no error
 socket_proxy.tcp4 = create_proxy_function(socket.tcp4)
 
@@ -192,7 +192,7 @@ socket_proxy.tcp4 = create_proxy_function(socket.tcp4)
 -- Note: The TCP object returned will have the option "ipv6-v6only" set to true.
 -- @name socket_library.tcp6
 -- @class function
--- @return table New IPv6 TCP Master Object, or nil if error
+-- @return table New IPv6 TCP master object, or nil if error
 -- @return string? The error message, or nil if no error
 socket_proxy.tcp6 = create_proxy_function(socket.tcp6)
 

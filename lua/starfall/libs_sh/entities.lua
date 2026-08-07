@@ -106,9 +106,9 @@ end
 if CLIENT then
 	instance.object_wrappers[FindMetaTable("NextBot")] = ewrap
 
-	--- Sets a hologram or custom_prop model to a custom Mesh
+	--- Sets a hologram or custom_prop model to use a custom mesh
 	-- @client
-	-- @param Mesh? mesh The mesh to set it to or nil to set back to normal
+	-- @param Mesh? mesh The mesh to set it to, or nil to set it back to normal
 	function ents_methods:setMesh(mesh)
 		local ent = eunwrap(self)
 		local ent_tbl = Ent_GetTable(ent)
@@ -125,7 +125,7 @@ if CLIENT then
 
 	--- Sets a hologram or custom_prop's custom mesh material
 	-- @client
-	-- @param Material? material The material to set it to or nil to set back to default
+	-- @param Material? material The material to set it to, or nil to set it back to default
 	function ents_methods:setMeshMaterial(material)
 		local ent = eunwrap(self)
 		local ent_tbl = Ent_GetTable(ent)
@@ -149,7 +149,7 @@ if CLIENT then
 	--- Sets the sheet color of a player-model
 	-- Can only be used on players, bots, ragdolls, holograms and Starfall NextBots
 	-- @client
-	-- @param Color|Vector clr RGB color to use, alpha channel not supported.
+	-- @param Color|Vector clr RGB color to use, alpha channel is not supported.
 	function ents_methods:setSheetColor(clr)
 		local ent = eunwrap(self)
 		checkpermission(instance, ent, "entities.setRenderProperty")
@@ -207,7 +207,7 @@ if CLIENT then
 	-- -1 leaves the engine to automatically set the level of detail.
 	-- The level of detail may range from 0 to 8, with 0 being the highest quality and 8 the lowest.
 	-- @client
-	-- @param number num The Level Of Detail model ID to use.
+	-- @param number num The level-of-detail model to use (from 0 to 8).
 	function ents_methods:setLOD(num)
 		local ent = eunwrap(self)
 		checkluatype(num, TYPE_NUMBER)
@@ -228,7 +228,7 @@ if CLIENT then
 	--- Draws the entity, requires 3D rendering context
 	-- Only certain, whitelisted entities can be drawn.
 	-- They can't be parented or have RenderOverride defined
-	-- Use Entity.canDraw to check if you can draw the entity
+	-- Use `Entity:canDraw` to check if you can draw the entity
 	-- @client
 	function ents_methods:draw()
 		if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
@@ -256,8 +256,8 @@ end, true)
 local sound_library = instance.Libraries.sound
 
 if sound_library then
-	--- Returns if a sound is able to be emitted from an entity
-	-- @return boolean If it is possible to emit a sound
+	--- Determines whether a sound is able to be emitted from an entity
+	-- @return boolean True if it is possible to emit a sound
 	function sound_library.canEmitSound()
 		return emitSoundBurst:check(instance.player) >= 1
 	end
@@ -271,12 +271,12 @@ if sound_library then
 	--- Emits a sound not attached to any entity at the specified position
 	-- @param string snd Sound path
 	-- @param Vector position Where the sound originates from
-	-- @param number? lvl Default 75
-	-- @param number? pitch Default 100
-	-- @param number? volume Default 1
-	-- @param number? channel Default CHAN_AUTO or CHAN_WEAPON for weapons
-	-- @param number? dsp Default 1 DSP preset
-	-- @param boolean? nofilter Make the sound play for everyone regardless of range or location.
+	-- @param number? lvl Default is 75
+	-- @param number? pitch Default is 100
+	-- @param number? volume Default is 1
+	-- @param number? channel Default is CHAN_AUTO or CHAN_WEAPON for weapons
+	-- @param number? dsp DSP preset (default: 1)
+	-- @param boolean? nofilter Pass true to make the sound play for everyone regardless of range or location.
 	-- Only affects server-side sounds.
 	function sound_library.emitSound(snd, position, lvl, pitch, volume, channel, dsp, nofilter)
 		checkluatype(snd, TYPE_STRING)
@@ -298,13 +298,13 @@ end
 
 --- Plays a sound on the entity
 -- @param string snd Sound path
--- @param number? lvl Default 75
--- @param number? pitch Default 100
--- @param number? volume Default 1
+-- @param number? lvl Default is 75
+-- @param number? pitch Default is 100
+-- @param number? volume Default is 1
 -- @param number? channel Default CHAN_AUTO or CHAN_WEAPON for weapons
--- @param number? dsp Default 1 DSP preset
--- @param boolean? nofilter (Optional) Boolean Make the sound play for everyone regardless of range or location.
--- Only affects Server-side sounds.
+-- @param number? dsp DSP preset (default: 1)
+-- @param boolean? nofilter Pass true to make the sound play for everyone regardless of range or location.
+-- Only affects server-side sounds.
 function ents_methods:emitSound(snd, lvl, pitch, volume, channel, dsp, nofilter)
 	checkluatype(snd, TYPE_STRING)
 	if nofilter~=nil then checkluatype(nofilter, TYPE_BOOL) end

@@ -69,7 +69,7 @@ end)
 --- Creates a ParticleEmitter data structure
 -- @param Vector position The particle emitter's position
 -- @param boolean use3D Create the emitter in 3D mode
--- @return ParticleEmitter? ParticleEmitter Object or nil if the engine max of 4097 was hit
+-- @return ParticleEmitter? Particle emitter object, or nil if the engine max of 4097 was hit
 function particle_library.create(position, use3D)
 	checkluatype(use3D, TYPE_BOOL)
 	checkpermission(instance, nil, "particle.create")

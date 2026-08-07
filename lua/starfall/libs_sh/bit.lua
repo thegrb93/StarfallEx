@@ -555,7 +555,8 @@ function ss_methods:getString()
 end
 
 
---- Bit library http://wiki.facepunch.com/gmod/Category:bit
+--- Bit library
+-- https://wiki.facepunch.com/gmod/bit
 -- @name bit
 -- @class library
 -- @libtbl bit_library

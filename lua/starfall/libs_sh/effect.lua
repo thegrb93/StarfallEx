@@ -21,6 +21,7 @@ local effect_blacklist = {
 SF.RegisterLibrary("effect")
 
 --- Effect type
+-- Created with `effect.create` function
 -- @name Effect
 -- @class type
 -- @libtbl effect_methods
@@ -46,7 +47,7 @@ instance:AddHook("initialize", function()
 end)
 
 --- Creates an effect data structure
--- @return Effect Effect Object
+-- @return Effect Effect object
 function effect_library.create()
 	return wrap(EffectData())
 end
