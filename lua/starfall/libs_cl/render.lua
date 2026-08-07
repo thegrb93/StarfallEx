@@ -1046,9 +1046,9 @@ end
 -- The layout argument is a function(x, y, w, h, pixelated), you can call this to reposition the image in the texture.
 -- Set pixelated to true to use nearest-neighbor interpolation.
 -- @param function? done An optional callback to invoke when the image is done loading. With arguments:
--- 1. Material object
+-- 1. `Material` object
 -- 2. URL string
--- @return Material The material. Use with render.setMaterial to draw with it.
+-- @return Material The material. Use with `render.setMaterial` to draw with it.
 function render_library.createMaterial(tx, cb, done)
 	checkluatype (tx, TYPE_STRING)
 
@@ -1214,18 +1214,18 @@ local defaultCM = {
 -- Alias: `render.setMaterialEffectColourModify`
 -- @param Material mat The material object to use the texture of, or the name of a RenderTarget to use instead.
 -- @param table cmStructure A table with the following structure:
--- addr (number, default: 0)
--- addg (number, default: 0)
--- addb (number, default: 0)
--- brightness (number, default: 0)
--- color (number, default: 1)
--- colour (number, default: 1)
--- contrast (number, default: 1)
--- inv (number, default: 0)
--- invert (number, default: 0)
--- mulr (number, default: 0)
--- mulg (number, default: 0)
--- mulb (number, default: 0)
+-- number addr (default: 0)
+-- number addg (default: 0)
+-- number addb (default: 0)
+-- number brightness (default: 0)
+-- number color (default: 1)
+-- number colour (default: 1)
+-- number contrast (default: 1)
+-- number inv (default: 0)
+-- number invert (default: 0)
+-- number mulr (default: 0)
+-- number mulg (default: 0)
+-- number mulb (default: 0)
 function render_library.setMaterialEffectColorModify(mat, cmStructure)
 
 	checkpermission(instance, nil, "render.effects")
@@ -1832,6 +1832,7 @@ function render_library.drawPixelsRGBA(w, h, dataR, dataG, dataB, dataA)
 	end
 	render.SetViewPort(0, 0, 1024, 1024)
 end
+
 --- Draws region of RGB color channel tables to current render target.
 -- @param number dstX Destination x coordinate
 -- @param number dstY Destination y coordinate
@@ -1855,6 +1856,7 @@ function render_library.drawPixelsSubrectRGB(dstX, dstY, srcX, srcY, srcW, srcH,
 	end
 	render.SetViewPort(0, 0, 1024, 1024)
 end
+
 --- Draws region of RGBA color channel tables to current render target.
 -- @param number dstX Destination x coordinate
 -- @param number dstY Destination y coordinate
@@ -1892,19 +1894,19 @@ end
 
 --- Creates a font. Does not require rendering hook
 -- @param string font Base font to use
--- @param number? size Font size. Default 16
--- @param number? weight Font weight. Default 400
--- @param boolean? antialias Antialias font? Default false
--- @param boolean? additive If true, adds brightness to pixels behind it rather than drawing over them. Default false
--- @param boolean? shadow Enable drop shadow? Default false
--- @param boolean? outline Enable outline? Default false
--- @param number? blursize The size of the blur Default 0
+-- @param number? size Font size (default: 16)
+-- @param number? weight Font weight (default: 400)
+-- @param boolean? antialias Antialias font? (default: false)
+-- @param boolean? additive If true, adds brightness to pixels behind it rather than drawing over them (default: false)
+-- @param boolean? shadow Enable drop shadow? (default: false)
+-- @param boolean? outline Enable outline? (default: false)
+-- @param number? blursize The size of the blur (default: 0)
 -- @param boolean? extended Allows the font to display glyphs outside of Latin-1 range.
--- Unicode code points above 0xFFFF are not supported. Required to use FontAwesome
+-- Unicode code points above 0xFFFF are not supported (make sure to use FontAwesome font).
 -- @param number? scanlines Scanline interval. Must be greater than 1 to work.
--- Shares uniqueness with blursize so you cannot create more than one scanline type of font with the same blursize. Default 0
+-- Shares uniqueness with blursize so you cannot create more than one scanline type of font with the same blursize (default: 0)
 -- @return string The font name that can be used with the rest of the font functions.
--- Base font can be one of (keep in mind that these may not exist on all clients if they are not shipped with Starfall):
+-- Base font can be one of (keep in mind that these may not exist on all clients if they are not shipped with GMod/Starfall):
 -- Akbar
 -- Coolvetica
 -- Roboto
@@ -1958,7 +1960,7 @@ end
 defaultFont = render_library.createFont("Default", 16, 400, false, false, false, false, 0, 0)
 
 --- Gets the size of the specified text.
--- Don't forget to call setFont before calling this function.
+-- Don't forget to call `render.setFont` before calling this function.
 -- @param string text Text to get the size of
 -- @return number width of the text
 -- @return number height of the text
@@ -1968,8 +1970,8 @@ function render_library.getTextSize(text)
 end
 
 --- Sets the font (used when drawing text)
--- @param string font The name of the font to use
--- Use a font created by render.createFont or use one of these already defined fonts:
+-- @param string font The name of the font to use.
+-- Use a font created by `render.createFont` or use one of these predefined fonts:
 -- DebugFixed
 -- DebugFixedSmall
 -- Default
@@ -2008,7 +2010,7 @@ end
 -- @param number x X coordinate
 -- @param number y Y coordinate
 -- @param string text Text to draw
--- @param number? alignment Horizontal text alignment. Default TEXT_ALIGN.LEFT
+-- @param number? alignment Horizontal text alignment (default: TEXT_ALIGN.LEFT)
 function render_library.drawText(x, y, text, alignment)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
@@ -2021,10 +2023,10 @@ end
 -- @param number x X coordinate
 -- @param number y Y coordinate
 -- @param string text Text to draw
--- @param number? xalign Horizontal text alignment. Default TEXT_ALIGN.LEFT
--- @param number? yalign Vertical text alignment. Default TEXT_ALIGN.TOP
--- @return number Width of the drawn text. Same as calling render.getTextSize
--- @return number Height of the drawn text. Same as calling render.getTextSize
+-- @param number? xalign Horizontal text alignment (default: TEXT_ALIGN.LEFT)
+-- @param number? yalign Vertical text alignment (default: TEXT_ALIGN.TOP)
+-- @return number Width of the drawn text. Same as calling `render.getTextSize`
+-- @return number Height of the drawn text. Same as calling `render.getTextSize`
 function render_library.drawSimpleText(x, y, text, xalign, yalign)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
@@ -2039,10 +2041,10 @@ end
 -- @param string text Text to draw
 -- @param number outlinewidth Width of the outline.
 -- @param Color outlinecolor The color of the text.
--- @param number? xalign Horizontal text alignment. Default TEXT_ALIGN.LEFT
--- @param number? yalign Vertical text alignment. Default TEXT_ALIGN.TOP
--- @return number Width of the drawn text. Same as calling render.getTextSize
--- @return number Height of the drawn text. Same as calling render.getTextSize
+-- @param number? xalign Horizontal text alignment (default: TEXT_ALIGN.LEFT)
+-- @param number? yalign Vertical text alignment (default: TEXT_ALIGN.TOP)
+-- @return number Width of the drawn text. Same as calling `render.getTextSize`
+-- @return number Height of the drawn text. Same as calling `render.getTextSize`
 function render_library.drawSimpleTextOutlined(x, y, text, outlinewidth, outlinecolor, xalign, yalign)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
@@ -2053,7 +2055,7 @@ end
 
 --- Constructs a markup object for quick styled text drawing.
 -- @param string str The markup string to parse
--- @param number? maxsize The max width of the markup. Default nil
+-- @param number? maxsize The max width of the markup (default: nil)
 -- @return Markup The markup object.
 -- See https://wiki.facepunch.com/gmod/markup.Parse
 function render_library.parseMarkup(str, maxsize)
@@ -2063,10 +2065,10 @@ end
 --- Draw the markup object
 -- @param number x number The x offset
 -- @param number y number The x offset
--- @param number? xAlign number The x TEXT_ALIGN. Default TEXT_ALIGN.LEFT
--- @param number? yAlign number The y TEXT_ALIGN. Default TEXT_ALIGN.TOP
--- @param number? alpha The alpha to draw it with. Default 255
--- @param number? contentAlign The content alignment TEXT_ALIGN. Default TEXT_ALIGN.LEFT
+-- @param number? xAlign number Horizontal text alignment (default: TEXT_ALIGN.LEFT)
+-- @param number? yAlign number Vertical text alignment (default: TEXT_ALIGN.TOP)
+-- @param number? alpha The alpha to draw it with (default: 255)
+-- @param number? contentAlign The content alignment (default: TEXT_ALIGN.LEFT)
 function markup_methods:draw(x, y, xAlign, yAlign, alpha, contentAlign)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	markunwrap(self):Draw(x, y, xAlign, yAlign, alpha, contentAlign)

@@ -1,7 +1,8 @@
 
 local checkluatype = SF.CheckLuaType
 
---- Lua math library https://wiki.garrysmod.com/page/Category:math
+--- Lua math library
+-- https://wiki.facepunch.com/gmod/math
 -- @name math
 -- @class library
 -- @field huge inf error-float. Represents infinity.
@@ -328,7 +329,7 @@ math_library.timeFraction = math.TimeFraction
 --- Rounds towards zero
 -- @class function
 -- @param number val The number to truncate
--- @param number? digits The amount of digits to keep after the point. Default 0
+-- @param number? digits The amount of digits to keep after the point (default: 0)
 -- @return number Rounded number
 math_library.truncate = math.Truncate
 
@@ -435,7 +436,7 @@ end
 -- @param string uniqueName The seed for the random value
 -- @param number Min The minimum value of the random range
 -- @param number Max The maximum value of the random range
--- @param number? additionalSeed The additional seed. Default 0
+-- @param number? additionalSeed The additional seed (default: 0)
 -- @return number The random float value
 function math_library.sharedRandom(uniqueName, Min, Max, additionalSeed)
 	checkluatype(uniqueName, TYPE_STRING)

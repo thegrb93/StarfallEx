@@ -2,20 +2,21 @@ local registerprivilege = SF.Permissions.registerPrivilege
 local checkluatype = SF.CheckLuaType
 local ENT_META = FindMetaTable("Entity")
 
---- NextBot type
--- @name NextBot
--- @class type
--- @server
--- @libtbl nb_methods
--- @libtbl nb_meta
-SF.RegisterType("NextBot", "entity", nil, FindMetaTable("NextBot"), "Entity")
-
 --- Library for spawning NextBots.
 -- @name nextbot
 -- @server
 -- @class library
 -- @libtbl nextbot_library
 SF.RegisterLibrary("nextbot")
+
+--- NextBot type
+-- Created with `nextbot.create` function
+-- @name NextBot
+-- @class type
+-- @server
+-- @libtbl nb_methods
+-- @libtbl nb_meta
+SF.RegisterType("NextBot", "entity", nil, FindMetaTable("NextBot"), "Entity")
 
 registerprivilege("nextbot.create", "Create a NextBot", "Allows the user to create a NextBot.")
 registerprivilege("nextbot.remove", "Remove a NextBot", "Allows the user to remove a NextBot.", {entities = {}})

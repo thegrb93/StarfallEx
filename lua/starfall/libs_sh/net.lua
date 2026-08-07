@@ -622,8 +622,8 @@ end
 -- @shared
 -- @param string name The name of the net message
 -- @param function func The callback, or nil to remove a callback. With arguments:
--- 1. Length of the net message (in bits)
--- 2. Player that sent the net message (only present on server-side; absent on client-side)
+-- 1. number length: Size of the net message (in bits)
+-- 2. `Player` sender: The player who sent the net message (only present on server-side; absent on client-side)
 function net_library.receive(name, func)
 	checkluatype (name, TYPE_STRING)
 	if func~=nil then checkluatype (func, TYPE_FUNCTION) end

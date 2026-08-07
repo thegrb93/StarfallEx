@@ -1170,7 +1170,7 @@ function ents_methods:setPhysicsUpdateListener(func)
 end
 
 --- Marks an entity as a trigger, setting callback functions to run whenever other objects enter or leave the bounds of the first entity.
--- The entity will still invoke the callbacks even if not solid and no physical collision occurs, unlike Entity:addCollisionListener.
+-- The entity will still invoke the callbacks even if not solid and no physical collision occurs, unlike `Entity:addCollisionListener`.
 -- Set both functions to nil to unmark this entity as a trigger.
 -- See https://developer.valvesoftware.com/wiki/Triggers
 --
@@ -1178,9 +1178,9 @@ end
 -- - starfall_prop
 -- - starfall_processor
 -- @param function? startTouchCB Optional StartTouch callback function. With argument:
--- 1. Entity object: the object entering our entity's bounds.
+-- 1. `Entity` object: The object entering our entity's bounds.
 -- @param function? endTouchCB Optional EndTouch callback function. With argument:
--- 1. Entity object: the object leaving our entity's bounds.
+-- 1. `Entity` object: The object leaving our entity's bounds.
 function ents_methods:setTriggerListener(startTouchCB, endTouchCB)
 	local ent = eunwrap(self)
 	checkpermission(instance, ent, "entities.canTool")

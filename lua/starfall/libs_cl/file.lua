@@ -194,7 +194,7 @@ local file_methods, file_meta, wrap, unwrap = instance.Types.File.Methods, insta
 
 
 --- Opens and returns a file
--- @param string path Filepath relative to data/sf_filedata/.
+-- @param string path File path relative to data/sf_filedata/.
 -- @param string mode The file mode to use (usually "rb" or "wb").
 -- See Lua manual for explanation.
 -- @return File? File object, or nil if it failed
@@ -225,7 +225,7 @@ function file_library.openInGame(path, mode)
 end
 
 --- Reads a file from path
--- @param string path Filepath relative to data/sf_filedata/.
+-- @param string path File path relative to data/sf_filedata/.
 -- @return string? Contents, or nil if error
 function file_library.read(path)
 	checkpermission (instance, path, "file.read")
@@ -234,7 +234,7 @@ function file_library.read(path)
 end
 
 --- Reads a file from path relative to base GMod directory
--- @param string path Filepath relative to GarrysMod/garrysmod/.
+-- @param string path File path relative to GarrysMod/garrysmod/.
 -- @return string? Contents or nil if error
 function file_library.readInGame(path)
 	if instance.player ~= LocalPlayer() then SF.Throw("Only chip owner can read game files", 2) end
@@ -243,11 +243,11 @@ function file_library.readInGame(path)
 end
 
 --- Reads a file asynchronously. Can only read 'sf_file_asyncmax' files at a time
--- @param string path Filepath relative to data/sf_filedata/.
+-- @param string path File path relative to data/sf_filedata/.
 -- @param function callback A callback function for when the read operation finishes. With arguments:
--- 1. string filename
--- 2. number status
--- 3. string data
+-- 1. string filename: The name of the file
+-- 2. number status: The status of the read operation (see FSASYNC enum)
+-- 3. string data: The data read from the file
 function file_library.asyncRead(path, callback)
 	checkpermission (instance, path, "file.read")
 	checkluatype (path, TYPE_STRING)
@@ -263,9 +263,9 @@ end
 --- Reads a file asynchronously from path relative to base GMod directory
 -- @param string path File path relative to GarrysMod/garrysmod/.
 -- @param function callback A callback function that runs when the read operation completes. With arguments:
--- 1. string filename - The name of the file
--- 2. number status - The status of the read operation (see FSASYNC enum)
--- 3. string data - The data read from the file
+-- 1. string filename: The name of the file
+-- 2. number status: The status of the read operation (see FSASYNC enum)
+-- 3. string data: The data read from the file
 function file_library.asyncReadInGame(path, callback)
 	if instance.player ~= LocalPlayer() then SF.Throw("Only chip owner can read game files", 2) end
 	checkluatype (path, TYPE_STRING)
@@ -285,7 +285,7 @@ local function checkExtension(filename)
 end
 
 --- Writes to a file. Throws an error if it failed to write.
--- @param string path Filepath relative to data/sf_filedata/.
+-- @param string path File path relative to data/sf_filedata/.
 -- @param string data The data to write
 function file_library.write(path, data)
 	checkpermission (instance, path, "file.write")
@@ -350,7 +350,7 @@ function file_library.existsTemp(filename)
 end
 
 --- Appends a string to the end of a file
--- @param string path Filepath relative to data/sf_filedata/.
+-- @param string path File path relative to data/sf_filedata/.
 -- @param string data String that will be appended to the file.
 function file_library.append(path, data)
 	checkpermission (instance, path, "file.write")
@@ -364,7 +364,7 @@ function file_library.append(path, data)
 end
 
 --- Checks if a file exists
--- @param string path Filepath relative to data/sf_filedata/.
+-- @param string path File path relative to data/sf_filedata/.
 -- @return boolean? True if exists, false if not, nil if error
 function file_library.exists(path)
 	checkpermission (instance, path, "file.exists")
@@ -373,7 +373,7 @@ function file_library.exists(path)
 end
 
 --- Checks if a file exists in path relative to gmod
--- @param string path Filepath in game folder
+-- @param string path File path in game folder
 -- @return boolean? True if exists, false if not, nil if error
 function file_library.existsInGame(path)
 	checkpermission (instance, path, "file.existsInGame")
@@ -382,7 +382,7 @@ function file_library.existsInGame(path)
 end
 
 --- Checks if a given file is a directory or not
--- @param string path Filepath relative to data/sf_filedata/.
+-- @param string path File path relative to data/sf_filedata/.
 -- @return boolean True if given path is a directory, false if it's a file
 function file_library.isDir(path)
 	checkpermission (instance, path, "file.isDir")
@@ -391,7 +391,7 @@ function file_library.isDir(path)
 end
 
 --- Deletes a file or directory
--- @param string path Filepath relative to data/sf_filedata/.
+-- @param string path File path relative to data/sf_filedata/.
 -- @param boolean? recursive If true, deletes directories recursively
 -- @return boolean? True if successful, nil if it wasn't found
 function file_library.delete(path, recursive)
@@ -428,7 +428,7 @@ function file_library.deleteTemp(filename)
 end
 
 --- Renames a file
--- @param string path Filepath relative to data/sf_filedata/.
+-- @param string path File path relative to data/sf_filedata/.
 -- @param string newPath New filepath relative to data/sf_filedata/.
 -- @return boolean? True if successful, nil if source not found
 function file_library.rename(path, newPath)
@@ -445,7 +445,7 @@ function file_library.rename(path, newPath)
 end
 
 --- Creates a directory
--- @param string path Filepath relative to data/sf_filedata/.
+-- @param string path File path relative to data/sf_filedata/.
 function file_library.createDir(path)
 	checkpermission (instance, path, "file.write")
 	checkluatype (path, TYPE_STRING)
@@ -478,7 +478,7 @@ end
 
 --- Returns when the file or folder was last modified in Unix time.
 -- Can then be used with something like os.date for a human-readable date.
--- @param string path Filepath relative to data/sf_filedata/.
+-- @param string path File path relative to data/sf_filedata/.
 -- @return number Last modified time in Unix time
 function file_library.time(path)
 	checkpermission (instance, path, "file.time")
@@ -487,7 +487,7 @@ function file_library.time(path)
 end
 
 --- Returns the size of the file in bytes
--- @param string path Filepath relative to data/sf_filedata/.
+-- @param string path File path relative to data/sf_filedata/.
 -- @return number Size in bytes
 function file_library.size(path)
 	checkpermission (instance, path, "file.size")

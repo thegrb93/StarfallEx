@@ -1,7 +1,8 @@
 
 local checkluatype = SF.CheckLuaType
 
---- Lua string library https://wiki.garrysmod.com/page/Category:string
+--- Lua string library
+-- https://wiki.facepunch.com/gmod/string
 -- @name string
 -- @class library
 -- @libtbl string_library

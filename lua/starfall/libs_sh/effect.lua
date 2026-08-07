@@ -112,23 +112,23 @@ local EFFECT_MEMBERS = {
 
 --- Creates an effect data structure
 -- @param string name The effect type name to create
--- @param table data The effect data table with keys:
--- angles - Angle angle of the effect
--- attachment - number Entity attachment id to attach to
--- color - number The color to set the effect (This is an 8 bit color integer specific to the effect implementation)
--- damagetype - number The damage type of the effect
--- entindex - number The entity index to set the effect to (SERVER only)
--- entity - Entity entity to set the effect to
--- flags - number Flags to add to the effect
--- hitbox - number The hitbox id of the effect
--- magnitude - number A magnitude value of the effect
--- materialindex - number The material index of the effect
--- normal - Vector A normal vector of the effect
--- origin - Vector The origin vector of the effect
--- radius - number The radius value of the effect
--- scale - number The scale value of the effect
--- start - Vector the start vector of the effect
--- surfaceprop - number The surfaceprop id of the effect
+-- @param table data The effect data table with the following structure:
+-- `Angle` angles: The angles of the effect
+-- number attachment: The entity attachment index to attach to
+-- number color: The color to set the effect (this is an 8 bit color integer specific to the effect implementation)
+-- number damagetype: The damage type of the effect
+-- number entindex: The entity index to set the effect to (SERVER only)
+-- `Entity` entity: The entity to set the effect to
+-- number flags: The flags to add to the effect
+-- number hitbox: The hitbox index of the effect
+-- number magnitude: The magnitude value of the effect
+-- number materialindex: The material index of the effect
+-- `Vector` normal: The normal vector of the effect
+-- `Vector` origin: The origin vector of the effect
+-- number radius: The radius value of the effect
+-- number scale: The scale value of the effect
+-- `Vector` start: The start vector of the effect
+-- number surfaceprop: The surfaceprop index of the effect
 function effect_library.create(name, data)
 	checkluatype(name, TYPE_STRING)
 	checkluatype(data, TYPE_TABLE)

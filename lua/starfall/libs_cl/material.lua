@@ -7,7 +7,7 @@ registerprivilege("material.load", "Load material", "Allows users to load a vmt 
 registerprivilege("material.create", "Create material", "Allows users to create a new custom material.", { client = {} })
 registerprivilege("material.imagecreate", "Create material from image", "Allows users to create a new material from an image file.", { client = {} })
 registerprivilege("material.urlcreate", "Create material from online image", "Allows users to create a new material from an online image.", { client = {}, urlwhitelist = {} })
-registerprivilege("material.datacreate", "Create material from base64 image data", "Allows users to create a new material from base64 image data.", { client = {} })
+registerprivilege("material.datacreate", "Create material from base64-encoded image data", "Allows users to create a new material from base64-encoded image data.", { client = {} })
 
 local cv_max_data_material_size = CreateConVar("sf_render_maxdatamaterialsize", "1000000", { FCVAR_ARCHIVE })
 
@@ -134,7 +134,7 @@ local material_bank = SF.ResourceHandler("render_usermaterials", "user materials
 	end,
 	function(shader, mat)
 		if shader == "UnlitGeneric" then
-			mat:SetInt("$flags",32816) --MATERIAL_VAR_VERTEXCOLOR + MATERIAL_VAR_VERTEXALPHA + MATERIAL_VAR_IGNOREZ
+			mat:SetInt("$flags",32816) -- MATERIAL_VAR_VERTEXCOLOR + MATERIAL_VAR_VERTEXALPHA + MATERIAL_VAR_IGNOREZ
 		end
 	end,
 	function(shader, material)
@@ -182,7 +182,7 @@ SF.RegisterLibrary("material")
 -- @class type
 -- @libtbl material_methods
 SF.RegisterType("Material", true, false, nil, "LockedMaterial")
-SF.RegisterType("LockedMaterial", true, false) --Material that can't be modified
+SF.RegisterType("LockedMaterial", true, false) -- Material that can't be modified
 
 
 return function(instance)
@@ -350,6 +350,7 @@ end
 -- @param string shader The shader of the material. Must be one of:
 -- UnlitGeneric
 -- VertexLitGeneric
+-- Wireframe
 -- Refract_DX90
 -- Water_DX90
 -- Sky_DX9
@@ -585,7 +586,7 @@ end
 -- The layout argument is a function(x, y, w, h, pixelated), you can call this to reposition the image in the texture.
 -- Set pixelated to true to use nearest-neighbor interpolation.
 -- @param function? done An optional callback to invoke when the image is done loading. With arguments:
--- 1. Material object
+-- 1. `Material` object
 -- 2. URL string
 function material_methods:setTextureURL(key, url, cb, done)
 	checkkey(key)

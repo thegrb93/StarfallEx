@@ -127,8 +127,10 @@ end
 -- @libtbl bass_library
 SF.RegisterLibrary("bass")
 
---- For playing music there is `Bass` type. You can pause and set current playback time in it.
--- If you're looking to apply DSP effects on present game sounds, use `Sound` instead.
+--- For playing music there is `Bass` type.
+-- You can pause and set current playback time in it.
+-- Created with `bass.loadFile` or `bass.loadURL` function.
+-- If you're looking to apply DSP effects on present game sounds, use `sound.create` instead.
 -- @name Bass
 -- @class type
 -- @libtbl bass_methods
@@ -200,8 +202,10 @@ end
 -- @param string path File path to play from.
 -- @param string flags Flags for the sound (`3d`, `mono`, `noplay`, `noblock`).
 -- Multiple flags can be separated by a space.
--- @param function callback Function which is called when the sound is loaded.
--- It'll get 3 arguments: `Bass` object, error number and name.
+-- @param function callback Function which is invoked when the sound is loaded. With arguments:
+-- 1. `Bass` object
+-- 2. number error code
+-- 3. string error name
 function bass_library.loadFile(path, flags, callback)
 	checkpermission(instance, nil, "bass.loadFile")
 
@@ -221,8 +225,10 @@ end
 -- @param string flags Flags for the sound (`3d`, `mono`, `noplay`, `noblock`).
 -- noblock will fail if the webserver doesn't provide file length.
 -- Multiple flags can be separated by a space.
--- @param function callback Function which is called when the sound is loaded.
--- It'll get 3 arguments: `Bass` object, error number and name.
+-- @param function callback Function which is invoked when the sound is loaded. With arguments:
+-- 1. `Bass` object
+-- 2. number error code
+-- 3. string error name
 function bass_library.loadURL(path, flags, callback)
 	checkpermission(instance, path, "bass.loadURL")
 

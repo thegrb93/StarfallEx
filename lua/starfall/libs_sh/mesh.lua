@@ -954,12 +954,22 @@ if CLIENT then
 		return tri
 	end
 
-	--- Returns a table of visual meshes of given model or nil if the model is invalid
+	--- Returns a table of visual meshes of given model, or nil if the model is invalid.
 	-- @param string model The full path to a model to get the visual meshes of.
-	-- @param number? lod The lod of the model to use. Default 0.
-	-- @param number? bodygroupMask The bodygroupMask of the model to use. Default 0.
-	-- @return table A table of tables with the following format:  string material - The material of the specific mesh table triangles - A table of MeshVertex structures ready to be fed into IMesh:BuildFromTriangles table verticies - A table of MeshVertex structures representing all the vertexes of the mesh. This table is used internally to generate the "triangles" table. Each MeshVertex structure returned also has an extra table of tables field called "weights" with the following data:  number boneID - The bone this vertex is attached to number weight - How "strong" this vertex is attached to the bone. A vertex can be attached to multiple bones at once.
-	-- @return table A table of tables with bone id keys with the following format:  number parent - The parent bone id Matrix matrix - pretransformed bone matrix
+	-- @param number? lod The LOD of the model to use (default: 0)
+	-- @param number? bodygroupMask The bodygroupMask of the model to use (default: 0)
+	-- @return table A table of tables with the following format:
+	-- string material - The material of the specific mesh
+	-- table triangles - A table of `MeshVertex` structures ready to be fed into `IMesh:BuildFromTriangles`
+	-- table verticies - A table of `MeshVertex` structures representing all the vertexes of the mesh
+	-- This table is used internally to generate the `triangles` table.
+	-- Each `MeshVertex` structure returned also has an extra table of tables field called `weights` with the following data:
+	-- number boneID - The bone index this vertex is attached to
+	-- number weight - How "strong" this vertex is attached to the bone
+	-- A vertex can be attached to multiple bones at once.
+	-- @return table A table of tables with bone index as keys with the following format:
+	-- number parent - The parent bone index
+	-- Matrix matrix - Pretransformed bone matrix
 	-- @client
 	function mesh_library.getModelMeshes(model, lod, bodygroupMask)
 		checkluatype(model, TYPE_STRING)

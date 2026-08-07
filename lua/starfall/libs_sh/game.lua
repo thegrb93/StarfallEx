@@ -105,7 +105,7 @@ game_library.getTickCount = engine.TickCount
 game_library.getIPAddress = game.GetIPAddress
 
 --- Checks if a model exists in the game files
--- @param string path Filepath in game folder
+-- @param string path File path in game folder
 -- @return boolean? True if exists, false if not, nil if error
 function game_library.modelExists(path)
 	checkluatype (path, TYPE_STRING)

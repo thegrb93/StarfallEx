@@ -555,8 +555,8 @@ add("PropBreak")
 -- @param table data The bullet data.
 -- See http://wiki.facepunch.com/gmod/Structures/Bullet
 -- @return function? Optional callback to invoke before the bullet deals damage. With arguments:
--- 1. Entity attacker
--- 2. TraceResult
+-- 1. `Entity` attacker
+-- 2. TraceResult: see http://wiki.facepunch.com/gmod/Structures/TraceResult
 add("EntityFireBullets", nil, function(instance, ent, data)
 	return true, { instance.WrapObject(ent), SF.StructWrapper(instance, data, "Bullet") }
 end, function(instance, ret, ent, data)
@@ -574,13 +574,13 @@ end, true)
 -- @shared
 -- @param Entity ent The entity that fired the bullet
 -- @param table data A table containing:
--- Trace - see http://wiki.facepunch.com/gmod/Structures/TraceResult
+-- Trace: see http://wiki.facepunch.com/gmod/Structures/TraceResult
 -- AmmoType
 -- Tracer
 -- Damage
 -- Force
 -- Attacker
--- TracerName - see http://wiki.facepunch.com/gmod/Structures/Bullet
+-- TracerName: see http://wiki.facepunch.com/gmod/Structures/Bullet
 add("PostEntityFireBullets", nil, function(instance, ent, data)
 	local ret = SF.StructWrapper(instance, data, "Bullet")
 	ret.Trace = SF.StructWrapper(instance, data.Trace, "TraceResult")

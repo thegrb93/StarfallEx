@@ -207,8 +207,8 @@ end)
 -- @param number pattach See PATTACH enum
 -- @param table? options Optional table of tables (indexes 1 to 64) having the following structure:
 -- number attachtype - The particle attach type (see PATTACH enum, default: `PATTACH.ABSORIGIN`).
--- Entity entity - The parent entity (default: NULL).
--- Vector position - The offset position for the given control point (default: nil).
+-- `Entity` entity - The parent entity (default: NULL).
+-- `Vector` position - The offset position for the given control point (default: nil).
 -- This only affects the control points of the particle effects, and will do nothing if the effect doesn't use control points.
 -- @return ParticleEffect ParticleEffect object.
 function particleef_library.attach(entity, name, pattach, options)

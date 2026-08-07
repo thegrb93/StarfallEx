@@ -1,7 +1,8 @@
 
 local dgetmeta = debug.getmetatable
 
---- Lua table library https://wiki.garrysmod.com/page/Category:table
+--- Lua table library
+-- https://wiki.facepunch.com/gmod/table
 -- @name table
 -- @class library
 -- @libtbl table_library
