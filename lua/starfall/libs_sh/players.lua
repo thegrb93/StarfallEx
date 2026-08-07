@@ -345,7 +345,7 @@ end
 --- Returns the player's SteamID64 / Community ID
 -- In singleplayer, this will return no value serverside.
 -- For bots, this will return 90071996842377216 (equivalent to STEAM_0:0:0) for the first bot to join, and adds 1 to the id for the bot id.
--- Returns no value for bots clientside.
+-- Returns no value for bots client-side.
 -- @shared
 -- @param boolean? owner Return the actual game owner account id
 -- @return string SteamID64 aka Community ID
@@ -465,7 +465,7 @@ function player_methods:isSprinting()
 end
 
 --- Returns whether the player is walking
--- In singleplayer, this will return false clientside
+-- In singleplayer, this will return false on client-side
 -- @shared
 -- @return boolean Whether they are walking
 function player_methods:isWalking()

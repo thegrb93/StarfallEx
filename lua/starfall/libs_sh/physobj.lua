@@ -217,7 +217,8 @@ function physobj_methods:isGravityEnabled()
 end
 
 if SERVER then
-	--- Sets the position of the physics object. Will cause interpolation of the entity in clientside, use entity.setPos to avoid this.
+	--- Sets the position of the physics object.
+	-- Will cause interpolation of the entity on client-side, use `Entity:setPos` to avoid this.
 	-- @server
 	-- @param Vector pos The position vector to set it to
 	function physobj_methods:setPos(pos)
@@ -229,7 +230,8 @@ if SERVER then
 		Phys_SetPos(phys, pos)
 	end
 
-	--- Sets the angles of the physics object. Will cause interpolation of the entity in clientside, use entity.setAngles to avoid this.
+	--- Sets the angles of the physics object.
+	-- Will cause interpolation of the entity on client-side, use `Entity:setAngles` to avoid this.
 	-- @server
 	-- @param Angle ang The angle to set it to
 	function physobj_methods:setAngles(ang)

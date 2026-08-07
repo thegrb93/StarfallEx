@@ -107,7 +107,7 @@ if SERVER then
 	-- @param Player ply Player that disconnected
 	add("PlayerDisconnected")
 
-	--- Called when a player gets hurt, uses the player_hurt game event clientside.
+	--- Called when a player gets hurt, uses the `player_hurt` game event client-side.
 	-- @name PlayerHurt
 	-- @class hook
 	-- @shared
@@ -132,12 +132,12 @@ if SERVER then
 	-- @param Player ply Player who spawned
 	add("PlayerSpawn")
 
-	--- Called when a player has changed team using Player:SetTeam
+	--- Called when a player has changed team using `Player:SetTeam`
 	-- @name PlayerChangedTeam
 	-- @class hook
 	-- @server
 	-- @param Player ply Player whose team has changed
-	-- @param number oldTeam Index of the team the player was originally in. See team.getName and the team library
+	-- @param number oldTeam Index of the team the player was originally in. See `team.getName` and the `team` library
 	-- @param number newTeam Index of the team the player has changed to.
 	add("PlayerChangedTeam")
 
@@ -273,7 +273,7 @@ if SERVER then
 	-- @param Entity inflictor Entity that did the killing
 	add("OnNPCKilled")
 
-	--- Called when the Entity:getWaterLevel of an entity is changed.
+	--- Called when the `Entity:getWaterLevel` of an entity is changed.
 	-- @name OnEntityWaterLevelChanged
 	-- @class hook
 	-- @server
@@ -323,15 +323,15 @@ else
 		return false
 	end)
 
-	--- Called when a clientside entity gets created or re-created via lag/PVS
+	--- Called when a client-side entity gets created or re-created via lag/PVS
 	-- @name NetworkEntityCreated
 	-- @class hook
 	-- @client
 	-- @param Entity ent New entity
 	add("NetworkEntityCreated")
 
-	--- Called when a clientside entity transmit state is changed. Usually when changing PVS
-	-- If you want clientside render changes to persist on an entity you have to re-apply them
+	--- Called when a client-side entity transmit state is changed. Usually when changing PVS
+	-- If you want client-side render changes to persist on an entity you have to re-apply them
 	-- each time it begins transmitting again
 	-- @name NotifyShouldTransmit
 	-- @class hook
@@ -537,7 +537,7 @@ end)
 -- @class hook
 -- @shared
 -- @param Entity ent Entity being removed
--- @param boolean fullupdate If clientside, will be true if the entity was removed by a fullupdate
+-- @param boolean fullupdate If client-side, will be true if the entity was removed by a full update
 
 --- Called when an entity is broken
 -- @name PropBreak
@@ -552,9 +552,11 @@ add("PropBreak")
 -- @class hook
 -- @shared
 -- @param Entity ent The entity that fired the bullet
--- @param table data The bullet data. See http://wiki.facepunch.com/gmod/Structures/Bullet
--- @return function? Optional callback to called as if it were the Bullet structure's Callback.
--- Called before the bullet deals damage with attacker, traceResult.
+-- @param table data The bullet data.
+-- See http://wiki.facepunch.com/gmod/Structures/Bullet
+-- @return function? Optional callback to invoke before the bullet deals damage. With arguments:
+-- 1. Entity attacker
+-- 2. TraceResult
 add("EntityFireBullets", nil, function(instance, ent, data)
 	return true, { instance.WrapObject(ent), SF.StructWrapper(instance, data, "Bullet") }
 end, function(instance, ret, ent, data)
@@ -586,7 +588,7 @@ add("PostEntityFireBullets", nil, function(instance, ent, data)
 end)
 
 --- Called whenever a sound has been played.
--- This will not be called clientside if the server played the sound without the client also calling Entity:EmitSound.
+-- This will not be called client-side if the server played the sound without the client also calling Entity:EmitSound
 -- @name EntityEmitSound
 -- @class hook
 -- @shared

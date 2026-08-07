@@ -305,10 +305,14 @@ end
 
 --- Sets a custom prop's physics simulation forces. Thrusters and balloons use this.
 -- This takes precedence over Entity.setCustomPropShadowForce and cannot be used together
--- @param Vector ang Angular Force (Torque)
--- @param Vector lin Linear Force
--- @param number mode The physics mode to use. 0 = Off (disables custom physics entirely), 1 = Local acceleration,
--- 2 = Local force, 3 = Global Acceleration, 4 = Global force
+-- @param Vector ang Angular force (torque)
+-- @param Vector lin Linear force
+-- @param number mode The physics mode to use.
+-- 0 = Off (disables custom physics entirely)
+-- 1 = Local acceleration
+-- 2 = Local force
+-- 3 = Global Acceleration
+-- 4 = Global force
 function ents_methods:setCustomPropForces(ang, lin, mode)
 	local ent = eunwrap(self)
 	local ent_tbl = Ent_GetTable(ent)
@@ -471,7 +475,8 @@ function ents_methods:applyForceOffset(force, position)
 	Phys_ApplyForceOffset(phys, force, position)
 end
 
---- Applies angular force to the entity (This function is garbage, use applyTorque instead)
+--- Applies angular force to the entity.
+-- (This function is garbage, use `Entity:applyTorque` instead)
 -- @param Angle ang The force angle
 function ents_methods:applyAngForce(ang)
 	local ent = eunwrap(self)
@@ -572,7 +577,8 @@ function ents_methods:setDrawShadow(draw)
 	Ent_DrawShadow(ent, draw)
 end
 
---- Sets the entity's position. No interpolation will occur clientside, use physobj.setPos to have interpolation.
+--- Sets the entity's position.
+-- No interpolation will occur client-side, use `PhysObj:setPos` to have interpolation.
 -- @param Vector vec New position
 function ents_methods:setPos(vec)
 	local ent = eunwrap(self)
@@ -642,7 +648,8 @@ function ents_methods:setRagdollPos(pos, ang, bone)
 	end
 end
 
---- Sets the entity's linear velocity. Physics entities, use physobj:setVelocity
+--- Sets the entity's linear velocity.
+-- Physics entities use `PhysObj:setVelocity`
 -- @param Vector vel New velocity
 function ents_methods:setVelocity(vel)
 	local ent = eunwrap(self)
@@ -727,7 +734,7 @@ function ents_methods:use(usetype, value)
 	Ent_Use(ent, instance.player, instance.entity, usetype, value)
 end
 
---- Sets the entity to be Solid or not.
+--- Sets the entity to be solid or not.
 -- @param boolean solid Should the entity be solid?
 function ents_methods:setSolid(solid)
 	local ent = eunwrap(self)
@@ -749,7 +756,7 @@ function ents_methods:setCollisionGroup(group)
 	Ent_SetCollisionGroup(ent, group)
 end
 
---- Sets the entity to collide with nothing but the world. Alias to entity:setCollisionGroup(COLLISION_GROUP.WORLD)
+--- Sets the entity to collide with nothing but the world. Alias to `Entity:setCollisionGroup(COLLISION_GROUP.WORLD)`
 -- @param boolean nocollide Whether to collide with nothing except world or not.
 function ents_methods:setNocollideAll(nocollide)
 	local ent = eunwrap(self)

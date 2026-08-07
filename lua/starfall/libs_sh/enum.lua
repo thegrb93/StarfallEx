@@ -3,7 +3,7 @@
 return function(instance)
 local env = instance.env
 
---- Notification library enums
+--- Notification library enums (used by `notification.addLegacy`)
 -- @name builtins_library.NOTIFY
 -- @class table
 -- @field GENERIC
@@ -19,7 +19,7 @@ env.NOTIFY = {
 	["CLEANUP"] = NOTIFY_CLEANUP
 }
 
---- Align enum for drawing text
+--- Align enum for drawing text (used by several functions, e.g. `render.drawSimpleText`, `Markup:draw`)
 -- @name builtins_library.TEXT_ALIGN
 -- @class table
 -- @field LEFT Align the text on the left
@@ -35,7 +35,7 @@ env.TEXT_ALIGN = {
 	["BOTTOM"] = TEXT_ALIGN_BOTTOM
 }
 
---- ENUMs of keyboard keys for use with input library
+--- ENUMs of keyboard keys for use with the `input` library
 -- @name builtins_library.KEY
 -- @class table
 -- @field FIRST
@@ -339,7 +339,7 @@ env.KEY = {
 	["COUNT"] = 106
 }
 
---- ENUMs of mouse buttons for use with input library
+--- ENUMs of mouse buttons for use with the `input` library
 -- @name builtins_library.MOUSE
 -- @class table
 -- @field MOUSE1
@@ -379,7 +379,7 @@ env.MOUSE = {
 	["LAST"] = 113
 }
 
---- PATTACH enum for particle library
+--- PATTACH enum for particle effect library (used by `particleEffect.attach`)
 -- @name builtins_library.PATTACH
 -- @class table
 -- @field ABSORIGIN
@@ -397,7 +397,7 @@ env.PATTACH = {
 	["WORLDORIGIN"] =  PATTACH_WORLDORIGIN,
 }
 
---- ENUMs of ef for use with hologram:addEffects hologram:removeEffects entity:isEffectActive
+--- ENUMs of EF for use with `Hologram:addEffects` `Hologram:removeEffects` `Entity:isEffectActive`
 -- @name builtins_library.EF
 -- @class table
 -- @field BONEMERGE
@@ -425,7 +425,7 @@ env.EF = {
 	FOLLOWBONE = EF_FOLLOWBONE
 }
 
---- ENUMs of physics object flags
+--- ENUMs of physics object flags (used by `PhysObj:addGameFlags`)
 -- @name builtins_library.FVPHYSICS
 -- @class table
 -- @field CONSTRAINT_STATIC
@@ -457,7 +457,7 @@ env.FVPHYSICS = {
 	["WAS_THROWN"] = FVPHYSICS_WAS_THROWN,
 }
 
---- ENUMs of entity move types
+--- ENUMs of entity move types (used by `Hologram:setMoveType`, `Entity:getMoveType`)
 -- @name builtins_library.MOVETYPE
 -- @class table
 -- @field NONE
@@ -487,7 +487,7 @@ env.MOVETYPE = {
 	CUSTOM = MOVETYPE_CUSTOM,
 }
 
---- ENUMs used by Entity.setCustomPropForces (Entity.PhysicsSimulate internally)
+--- ENUMs used by `Entity:setCustomPropForces` (`Entity.PhysicsSimulate` internally)
 -- @name builtins_library.SIM
 -- @class table
 -- @field NOTHING
@@ -503,7 +503,7 @@ env.SIM = {
 	GLOBAL_FORCE = SIM_GLOBAL_FORCE,
 }
 
---- ENUMs of in_keys for use with player:keyDown
+--- ENUMs of in_keys for use with `Player:keyDown`
 -- @name builtins_library.IN_KEY
 -- @class table
 -- @field ALT1
@@ -561,7 +561,7 @@ env.IN_KEY = {
 	["RUN"] = IN_RUN,
 }
 
---- ENUMs of gesture_slot for use with player:playGesture player:resetGesture
+--- ENUMs of gesture_slot for use with `Player:playGesture`, `Player:resetGesture`
 -- @name builtins_library.GESTURE_SLOT
 -- @class table
 -- @field ATTACK_AND_RELOAD
@@ -581,7 +581,7 @@ env.GESTURE_SLOT = {
 	["CUSTOM"] = GESTURE_SLOT_CUSTOM
 }
 
---- ENUMs of collision groups for use with entity:setCollisionGroup
+--- ENUMs of collision groups for use with `Entity:setCollisionGroup`
 -- @name builtins_library.COLLISION_GROUP
 -- @class table
 -- @field NONE
@@ -630,7 +630,7 @@ env.COLLISION_GROUP = {
 }
 
 
---- ENUMs of solid for use with entity:getSolid
+--- ENUMs of solid for use with `Entity:getSolid`
 -- @name builtins_library.SOLID
 -- @class table
 -- @field NONE
@@ -651,7 +651,7 @@ env.SOLID = {
 	["VPHYSICS"] = SOLID_VPHYSICS
 }
 
---- ENUMs of solid flags for use with entity:getSolidFlags
+--- ENUMs of solid flags for use with `Entity:getSolidFlags`
 -- @name builtins_library.FSOLID
 -- @class table
 -- @field CUSTOMRAYTEST
@@ -677,7 +677,7 @@ env.FSOLID = {
 	["TRIGGER_TOUCH_DEBRIS"] = FSOLID_TRIGGER_TOUCH_DEBRIS
 }
 
---- ENUMs of mesh types. To be used with mesh.generate.
+--- ENUMs of mesh types for use with `mesh.generate`
 -- @name builtins_library.MATERIAL
 -- @class table
 -- @field LINES
@@ -699,7 +699,7 @@ env.MATERIAL = {
 	["QUADS"] = MATERIAL_QUADS or 7
 }
 
---- ENUMs of fog modes to use with render.setFogMode.
+--- ENUMs of fog modes to use with `render.setFogMode`
 -- @name builtins_library.MATERIAL_FOG
 -- @class table
 -- @field NONE
@@ -711,7 +711,8 @@ env.MATERIAL_FOG = {
 	["LINEAR_BELOW_FOG_Z"] = MATERIAL_FOG_LINEAR_BELOW_FOG_Z or 2
 }
 
---- ENUMs used as trace masks in the trace library. These are simply combinations of the CONTENTS enums.
+--- ENUMs used as trace masks in the trace library.
+-- These are simply combinations of the CONTENTS enums.
 -- @name builtins_library.MASK
 -- @class table
 -- @field OPAQUE_AND_NPCS
@@ -759,7 +760,7 @@ env.MASK = {
 	["PLAYERSOLID"] = MASK_PLAYERSOLID
 }
 
---- ENUMs used as masks in the trace library.
+--- ENUMs for use as masks in the `trace.line` and `trace.hull`
 -- @name builtins_library.CONTENTS
 -- @class table
 -- @field CURRENT_270
@@ -829,7 +830,7 @@ env.CONTENTS = {
 	["WATER"] = CONTENTS_WATER
 }
 
---- ENUMs of stencil comparisons and operations
+--- ENUMs of stencil comparisons and operations for use with `render` library
 -- @name builtins_library.STENCIL
 -- @class table
 -- @field NEVER
@@ -867,7 +868,7 @@ env.STENCIL = {
 	["DECR"] = STENCIL_DECR or 8
 }
 
---- ENUMs used by render.SetModelLighting
+--- ENUMs used by `render.setModelLighting`
 -- @name builtins_library.BOX
 -- @class table
 -- @field FRONT
@@ -943,7 +944,7 @@ env.BLENDFUNC = {
 	MAX = BLENDFUNC_MAX,
 }
 
---- ENUMs of entity render modes to be used with Entity.setRenderMode
+--- ENUMs of entity render modes to be used with `Entity:setRenderMode`
 -- @name builtins_library.RENDERMODE
 -- @class table
 -- @field NORMAL
@@ -971,7 +972,7 @@ env.RENDERMODE = {
 	NONE = RENDERMODE_NONE
 }
 
---- ENUMs of entity renderfx to be used with Entity.setRenderFX
+--- ENUMs of entity renderfx to be used with `Entity:setRenderFX`
 -- @name builtins_library.RENDERFX
 -- @class table
 -- @field NONE
@@ -1027,7 +1028,7 @@ env.RENDERFX = {
 	PULSEFASTWIDER = kRenderFxPulseFastWider
 }
 
---- ENUMs of entity rendergroups
+--- ENUMs of entity rendergroups, for use with `Hologram:setRenderGroup`, `Entity:getRenderGroup`
 -- @name builtins_library.RENDERGROUP
 -- @class table
 -- @field STATIC_HUGE
@@ -1111,7 +1112,9 @@ env.VR = {
 	["BOOLEAN_TURRET"] = "boolean_turret",
 }
 
---- ENUMs describing surface material. Used in TraceResult
+--- ENUMs describing the surface material.
+-- For use with the `trace` library (`MatType` field in the `TraceResult` structure).
+-- https://wiki.facepunch.com/gmod/Structures/TraceResult#MatType
 -- @name builtins_library.MAT
 -- @class table
 -- @field ANTLION
@@ -1163,7 +1166,9 @@ env.MAT = {
 	WARPSHIELD = MAT_WARPSHIELD,
 }
 
---- Player and NPC hitgroup ENUMs
+--- ENUMs describing the hitgroup (not the same as hitbox).
+-- For use with the `trace` library (`HitGroup` field in the `TraceResult` structure).
+-- https://wiki.facepunch.com/gmod/Structures/TraceResult#HitGroup
 -- @name builtins_library.HITGROUP
 -- @class table
 -- @field GENERIC
@@ -1187,7 +1192,7 @@ env.HITGROUP = {
 	GEAR = HITGROUP_GEAR,
 }
 
---- file.asyncRead ENUMs
+--- ENUMs for use with `file.asyncRead`
 -- @name builtins_library.FSASYNC
 -- @class table
 -- @field ERR_NOT_MINE
@@ -1219,7 +1224,7 @@ env.FSASYNC = {
 	STATUS_UNSERVICED = FSASYNC_STATUS_UNSERVICED
 }
 
---- MIDI command ENUMs
+--- ENUMs representing MIDI command number (`midi` library)
 -- @name midi_library.MIDI
 -- @class table
 -- @field NOTE_OFF
@@ -1239,7 +1244,7 @@ env.MIDI = {
 	PITCH_BEND = 0xE0
 }
 
---- NavArea direction ENUMs
+--- ENUMs describing `NavArea` direction
 -- @name navmesh_library.NAV_DIR
 -- @class table
 -- @field NORTH 0
@@ -1253,7 +1258,7 @@ env.NAV_DIR = {
 	WEST = 3
 }
 
---- ENUMs used by NavArea:getAttributes and NavArea:hasAttributes
+--- ENUMs used by `NavArea:getAttributes` and `NavArea:hasAttributes`
 -- @name navmesh_library.NAV_MESH
 -- @class table
 -- @field INVALID The nav area is invalid.
@@ -1299,14 +1304,15 @@ env.NAV_MESH = {
 	NAV_BLOCKER = -2147483648
 }
 
---- ENUMs used by NavArea methods. These Enums correspond to each corner of a CNavArea
+--- ENUMs used by `NavArea` methods.
+-- (they correspond to each corner of a CNavArea)
 -- @name navmesh_library.NAV_CORNER
 -- @class table
 -- @field NORTH_WEST 0
 -- @field NORTH_EAST 1
 -- @field SOUTH_EAST 2
 -- @field SOUTH_WEST 3
--- @field NUM_CORNERS Represents all corners, only applicable to certain functions, such as NavArea:placeOnGround.
+-- @field NUM_CORNERS Represents all corners, only applicable to certain functions, such as `NavArea:placeOnGround`
 env.NAV_CORNER = {
 	NORTH_WEST = 0,
 	NORTH_EAST = 1,
@@ -1315,7 +1321,7 @@ env.NAV_CORNER = {
 	NUM_CORNERS = 4
 }
 
---- ENUMs used by NavArea:getParentHow.
+--- ENUMs used by `NavArea:getParentHow`
 -- @class table
 -- @name navmesh_library.NAV_TRAVERSE_TYPE
 -- @field GO_NORTH 0
@@ -1411,7 +1417,7 @@ env.DAMAGE = {
 	["MISSILEDEFENSE"] = 2147483648
 }
 
---- ENUMs used by Bass:getState()
+--- ENUMs used by `Bass:getState`
 -- @name builtins_library.GMOD_CHANNEL
 -- @class table
 -- @field STOPPED 0
@@ -1447,8 +1453,8 @@ units.SECOND = units.GMOD_TIME
 units.MINUTE = units.SECOND / 60
 units.HOUR = units.MINUTE / 60
 
---- ENUMs used by math.unitConversion. They represent conversion factors from gmod natural units (gmod length (3/4
--- inches), pounds, seconds)
+--- ENUMs used by `math.unitConversion`.
+-- They represent conversion factors from gmod natural units (gmod length (3/4 inches), pounds, seconds)
 -- @name builtins_library.UNIT
 -- @class table
 -- @field GMOD_LENGTH
