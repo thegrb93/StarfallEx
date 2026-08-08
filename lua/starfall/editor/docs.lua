@@ -121,15 +121,19 @@ end
 
 local processTypes = {
 	["type"] = function(data)
-		for k, v in ipairs(data.libtbl) do
-			methodstolib[v] = data.name
+		if data.libtbl then
+			for k, v in ipairs(data.libtbl) do
+				methodstolib[v] = data.name
+			end
 		end
 		Docs.Types[data.name] = data
 		data.methods = {}
 	end,
 	["library"] = function(data)
-		for k, v in ipairs(data.libtbl) do
-			methodstolib[v] = data.name
+		if data.libtbl then
+			for k, v in ipairs(data.libtbl) do
+				methodstolib[v] = data.name
+			end
 		end
 		Docs.Libraries[data.name] = data
 		data.tables = {}
