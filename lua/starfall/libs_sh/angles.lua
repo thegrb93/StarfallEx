@@ -4,7 +4,9 @@ local dgetmeta = debug.getmetatable
 local Unpack = FindMetaTable("Angle").Unpack
 local SetUnpacked = FindMetaTable("Angle").SetUnpacked
 
---- Angle Type
+--- Angle type
+-- Created with the `Angle` function.
+-- +Pitch is look down; +Yaw is look left. +Roll is tilt to the right.
 -- @name Angle
 -- @class type
 -- @field p The -90 to 90 pitch value of the euler angle. Can also be indexed with [1]

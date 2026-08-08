@@ -169,20 +169,27 @@ local function tex2str(t)
 	return t
 end
 
---- `material` library is allows creating material objects which are used for controlling shaders in rendering.
+--- `material` library allows creating `Material` objects which are used for controlling shaders in rendering.
 -- @name material
 -- @class library
 -- @libtbl material_library
 SF.RegisterLibrary("material")
 
 --- The `Material` type is used to control shaders in rendering.
+-- Created with `material.create` function.
 -- For a list of shader parameters, see https://developer.valvesoftware.com/wiki/Category:List_of_Shader_Parameters
 -- For a list of $flags and $flags2, see https://developer.valvesoftware.com/wiki/Material_Flags
 -- @name Material
 -- @class type
 -- @libtbl material_methods
 SF.RegisterType("Material", true, false, nil, "LockedMaterial")
-SF.RegisterType("LockedMaterial", true, false) -- Material that can't be modified
+
+--- LockedMaterial type.
+-- Created with `material.load` or `material.createFromImage` function.
+-- Material that can't be modified.
+-- @name LockedMaterial
+-- @class type
+SF.RegisterType("LockedMaterial", true, false)
 
 
 return function(instance)

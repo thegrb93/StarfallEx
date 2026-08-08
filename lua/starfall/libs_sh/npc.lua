@@ -15,7 +15,8 @@ if SERVER then
 end
 
 
---- Npc type
+--- NPC type
+-- Created with `prop.createSent` function, e.g. with class "npc_zombine"
 -- @name Npc
 -- @class type
 -- @libtbl npc_methods

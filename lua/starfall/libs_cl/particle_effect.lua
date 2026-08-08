@@ -15,6 +15,7 @@ SF.ResourceCounters.ParticleEffects = {icon = "icon16/asterisk_orange.png", coun
 SF.RegisterLibrary("particleEffect")
 
 --- ParticleEffect type
+-- Created with `particleEffect.attach` function
 -- @name ParticleEffect
 -- @class type
 -- @libtbl particleef_methods

@@ -153,8 +153,13 @@ local function quatFromAngle(ang)
 end
 
 
--- Based on Expression's 2 quaternion library: https://github.com/wiremod/wire/blob/master/lua/entities/gmod_wire_expression2/core/quaternion.lua
---- Quaternion type. Recently reworked, for full changelist visit: https://github.com/thegrb93/StarfallEx/pull/953
+-- Based on Expression's 2 quaternion library:
+-- https://github.com/wiremod/wire/blob/master/lua/entities/gmod_wire_expression2/core/quaternion.lua
+
+--- Quaternion type.
+-- Created with the `Quaternion` function.
+-- Recently reworked, for full changelist visit:
+-- https://github.com/thegrb93/StarfallEx/pull/953
 -- @name Quaternion
 -- @class type
 -- @field r The r value of the quaternion. Can also be indexed with [1]

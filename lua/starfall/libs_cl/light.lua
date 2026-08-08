@@ -79,12 +79,14 @@ local projectedLights = SF.EntManager("projectedlights", "projected lights", 20,
 SF.RegisterLibrary("light")
 
 --- Light type
+-- Created with `light.create` function
 -- @name Light
 -- @class type
 -- @libtbl light_methods
 SF.RegisterType("Light", true, false)
 
---- Projected Texture type
+--- ProjectedTexture type
+-- Created with `light.createProjected` function
 -- @name ProjectedTexture
 -- @class type
 -- @libtbl projectedtexture_methods

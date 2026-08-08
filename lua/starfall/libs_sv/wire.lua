@@ -23,13 +23,15 @@ registerprivilege("wire.getOutputs", "Get Outputs", "Allows the user to get Outp
 SF.RegisterLibrary("wire")
 
 --- Wirelink type
+-- Created with `wire.getWirelink` or `Entity:getWirelink` function
 -- @name Wirelink
 -- @class type
 -- @libtbl wirelink_methods
 -- @libtbl wirelink_meta
 SF.RegisterType("Wirelink", "entity")
 
---- Vector2 type for wire xv2
+--- Vector2 type (for Wiremod/E2 xv2)
+-- Created with the `Vector2` function
 -- @name Vector2
 -- @class type
 -- @libtbl vec2_meta

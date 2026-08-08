@@ -5,7 +5,8 @@ local PHYS_META = FindMetaTable("PhysObj")
 local checknumber = SF.CheckNumber
 local checkvector = SF.CheckVector
 
---- PhysObj Type
+--- PhysObj type
+-- Created with `Entity:getPhysicsObject` or `Entity:getPhysicsObjectNum` function
 -- @name PhysObj
 -- @class type
 -- @libtbl physobj_methods

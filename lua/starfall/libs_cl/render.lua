@@ -490,17 +490,18 @@ hook.Add("PreDrawHalos", "SF_DisableRenderViewClipping", function()
 	end
 end)
 
---- Render library. Screens are 512x512 units. Most functions require
--- that you be in the rendering hook to call, otherwise an error is
--- thrown. +x is right, +y is down
+--- Render library.
+-- Most functions must be called within the rendering hook to work, otherwise an error is thrown.
+-- Starfall screens have the resolution of either 512x512 or 1024x1024 pixels.
+-- +X is right, +Y is down.
 -- @name render
 -- @class library
 -- @libtbl render_library
 SF.RegisterLibrary("render")
 
 
---- The Markup type is used to easily format and draw text.
--- Use render.parseMarkup(str, maxwidth) to create one.
+--- Markup type is used to easily format and draw text.
+-- Created with `render.parseMarkup` function.
 -- @name Markup
 -- @class type
 -- @libtbl markup_methods

@@ -24,7 +24,8 @@ local entList = SF.EntManager("constraints", "constraints", 600, "The number of 
 -- @libtbl constraint_library
 SF.RegisterLibrary("constraint")
 
---- A constraint entity returned by constraint functions
+--- Constraint type
+-- Created with `constraint.weld` and other `constraint` functions
 -- @name Constraint
 -- @class type
 -- @libtbl constr_methods

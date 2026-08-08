@@ -678,6 +678,7 @@ SF.RegisterLibrary("mesh")
 
 if CLIENT then
 	--- Mesh type
+	-- Created with `mesh.createEmpty` or `mesh.createFromTable` function
 	-- @name Mesh
 	-- @class type
 	-- @client
