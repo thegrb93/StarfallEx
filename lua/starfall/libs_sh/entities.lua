@@ -1351,8 +1351,9 @@ function ents_methods:getChildBones(bone)
 
 	local bones = {}
 	for k = 0, bonecount - 1 do
-		if Ent_GetBoneParent(ent, k) ~= bone then continue end
-		bones[#bones + 1] = k
+		if Ent_GetBoneParent(ent, k) == bone then
+			bones[#bones + 1] = k
+		end
 	end
 	return bones
 end
