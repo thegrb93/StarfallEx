@@ -94,7 +94,8 @@ end
 
 local checkluatype = SF.CheckLuaType
 
---- Websocket Type. Create a websocket with WebSocket(...)
+--- WebSocket type
+-- Created with the `WebSocket` function
 -- @name WebSocket
 -- @class type
 -- @libtbl websocket_methods

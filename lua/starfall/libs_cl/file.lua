@@ -31,6 +31,7 @@ local cv_max_concurrent_reads = CreateConVar("sf_file_asyncmax", "10", { FCVAR_A
 SF.RegisterLibrary("file")
 
 --- File type
+-- Created with `file.open` function
 -- @name File
 -- @class type
 -- @libtbl file_methods

@@ -20,14 +20,21 @@ registerprivilege("navarea.openlist", "Modify NavArea Openlist", "Allows the use
 -- @libtbl navmesh_library
 SF.RegisterLibrary("navmesh")
 
---- NavArea type, returned by navmesh library functions
+--- NavArea type
+-- Created with `navmesh.createNavArea` function
 -- @name NavArea
 -- @class type
 -- @libtbl navarea_methods
 -- @libtbl navarea_meta
 -- @libtbl lnavarea_meta
 SF.RegisterType("NavArea", true, false, nil, "LockedNavArea")
-SF.RegisterType("LockedNavArea", true, false) -- NavArea that can't be modified.
+
+--- LockedNavArea type.
+-- Created with `navmesh.getNavArea` and other `navmesh` functions.
+-- NavArea that can't be modified.
+-- @name LockedNavArea
+-- @class type
+SF.RegisterType("LockedNavArea", true, false)
 
 local entList = SF.EntManager("navareas", "navareas", 40, "The number of CNavAreas allowed to spawn via Starfall", 1, true)
 

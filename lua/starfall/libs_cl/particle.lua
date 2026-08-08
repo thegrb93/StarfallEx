@@ -17,12 +17,14 @@ SF.ResourceCounters.ParticleEmitters = {icon = "icon16/asterisk_yellow.png", cou
 SF.RegisterLibrary("particle")
 
 --- ParticleEmitter type
+-- Created with `particle.create` function
 -- @name ParticleEmitter
 -- @class type
 -- @libtbl particleem_methods
 SF.RegisterType("ParticleEmitter", true, false)
 
 --- Particle type
+-- Created with `ParticleEmitter:add` function
 -- @name Particle
 -- @class type
 -- @libtbl particle_methods

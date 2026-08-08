@@ -5,6 +5,7 @@ local Unpack = FindMetaTable("Vector").Unpack
 local SetUnpacked = FindMetaTable("Vector").SetUnpacked
 
 --- Vector type
+-- Created with the `Vector` function
 -- @name Vector
 -- @class type
 -- @field x The x value of the vector. Can also be indexed with [1]

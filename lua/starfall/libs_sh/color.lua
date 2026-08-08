@@ -36,6 +36,7 @@ local hex_to_rgb = {
 }
 
 --- Color type
+-- Created with the `Color` function
 -- @name Color
 -- @class type
 -- @field r The 0-255 red value of the color. Can also be indexed with [1]

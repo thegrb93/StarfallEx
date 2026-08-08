@@ -23,7 +23,8 @@ end, true)
 -- @libtbl sound_library
 SF.RegisterLibrary("sound")
 
---- Sound type. Created with `sound.create` function.
+--- Sound type
+-- Created with `sound.create` function
 -- @name Sound
 -- @class type
 -- @libtbl sound_methods

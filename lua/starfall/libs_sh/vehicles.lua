@@ -58,6 +58,7 @@ if SERVER then
 end
 
 --- Vehicle type
+-- Created with `prop.createSeat` function
 -- @name Vehicle
 -- @class type
 -- @libtbl vehicle_methods

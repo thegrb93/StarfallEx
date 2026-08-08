@@ -46,7 +46,9 @@ hook.Add("PAC3ResetBones","SF_BoneManipulations",function(ent)
 end)
 
 
---- Entity type
+--- Entity type. Root type for all entities.
+-- Created with `prop.create` or `prop.createSent` function.
+-- See also `entity`, `find.all`, `find.byClass`, and `find.allPlayers` functions.
 -- @name Entity
 -- @class type
 -- @libtbl ents_methods

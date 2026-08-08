@@ -4,7 +4,9 @@ local ENT_META = FindMetaTable("Entity")
 local WEP_META = FindMetaTable("Weapon")
 
 
---- Weapon type
+--- Weapon type.
+-- Created with `prop.createSent` function, e.g. with class "weapon_shotgun".
+-- See also `Player:getActiveWeapon`, `Player:getWeapon`, and `Player:getWeapons` functions.
 -- @name Weapon
 -- @class type
 -- @libtbl weapon_methods

@@ -9,6 +9,10 @@ local coroutine = coroutine
 -- @libtbl coroutine_library
 SF.RegisterLibrary("coroutine")
 
+--- thread type
+-- Created with `coroutine.create` function
+-- @name thread
+-- @class type
 SF.RegisterType("thread", true, false)
 
 

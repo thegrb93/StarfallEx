@@ -70,6 +70,7 @@ if CLIENT then
 end
 
 --- Player type
+-- See also `player` and `find.allPlayers` functions
 -- @name Player
 -- @class type
 -- @libtbl player_methods

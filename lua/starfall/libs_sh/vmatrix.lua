@@ -4,6 +4,7 @@ local dgetmeta = debug.getmetatable
 
 
 --- VMatrix type
+-- Created with the `Matrix` function
 -- @name VMatrix
 -- @class type
 -- @libtbl vmatrix_methods
