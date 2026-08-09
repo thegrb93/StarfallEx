@@ -60,9 +60,7 @@ MonacoSetting.settings = {
 	MonacoSetting("lineNumbers", "sf_editor_monaco_linenumbers", "on"),
 	MonacoSetting("quickSuggestions", "sf_editor_monaco_suggestions", true),
 	MonacoSetting("tabSize", "sf_editor_monaco_tabsize", 4),
-	MonacoSetting("theme", "sf_editor_monaco_theme", "vs-dark"),
 	MonacoSetting("renderWhitespace", "sf_editor_monaco_whitespace", "all"),
-	MonacoSetting("wordBasedSuggestions", "sf_editor_monaco_wordsuggestion", "currentDocument"),
 	MonacoSetting("wordWrap", "sf_editor_monaco_wordwrap", "off"),
 }
 function MonacoSetting:applyAll()
@@ -74,6 +72,7 @@ function MonacoSetting:applyAll()
 		autoDetectHighContrast: false,
 		detectIndentation: false,
 		insertSpaces: false,
+		wordBasedSuggestions: "off",
 		]]..table.concat(settings, ",\n")..[[
 	});]])
 end
@@ -110,7 +109,7 @@ function TabHandler:AddSession(tab)
 	self.html:RunJavascript([[
 	{
 		let uri="]]..tab.uri..[[";
-		let m=monaco.editor.createModel("]]..string.JavascriptSafe(tab.code)..[[", "lua", uri);
+		let m=monaco.editor.createModel("]]..string.JavascriptSafe(tab.code)..[[", "starfall", uri);
 		m.pushEOL(monaco.editor.EndOfLineSequence.LF);
 		m.onDidChangeContent((event) => sf.updateCode(uri, m.getValue()));
 	}
@@ -193,9 +192,7 @@ function TabHandler:RegisterSettings()
 	setDoClick(form:CheckBox("Quick Suggestions", "sf_editor_monaco_suggestions"))
 
 	setCombo({form:ComboBox("Line number style", "sf_editor_monaco_linenumbers")}, {"on","relative","off"})
-	setCombo({form:ComboBox("Theme", "sf_editor_monaco_theme")}, {"vs","vs-dark","hc-black","hc-light"})
 	setCombo({form:ComboBox("Whitespace style", "sf_editor_monaco_whitespace")}, {"all","boundary","selection","trailing","none"})
-	setCombo({form:ComboBox("Word suggestions", "sf_editor_monaco_wordsuggestion")}, {"currentDocument","allDocuments","off"})
 	setCombo({form:ComboBox("Word wrap style", "sf_editor_monaco_wordwrap")}, {"on","off"})
 
 	select(2, form:TextEntry("Custom background image url:", "sf_editor_monaco_htmlbackground")):SetDark(false)
@@ -214,6 +211,8 @@ function TabHandler:FinishedLoading()
 	end
 
 	MonacoSetting:applyAll()
+	TabHandler:ApplyTheme(SF.Editor.Themes.CurrentTheme)
+	TabHandler:ApplyDocs()
 
 	for i = 1, SF.Editor.editor:GetNumTabs() do
 		local tab = SF.Editor.editor:GetTabContent(i)
@@ -227,8 +226,155 @@ function TabHandler:FinishedLoading()
 	end
 end
 
+-- Escapes a string for safe inclusion inside a double-quoted JS string
+local function jsEscape(s)
+	s = tostring(s)
+	return (s:gsub("[%z\1-\31\\\"]", function(c)
+		return string.format("\\u%04x", string.byte(c))
+	end))
+end
+
+-- Builds a compact docs payload (keywords + completions) from SF.Docs and pushes it to Monaco
+-- Each entry is: tag .. name .. "\3" .. signature .. "\3" .. description
+-- tag is "", "\1" (type method, suggested after `:`) or "\2lib." (library member)
+local function buildSignature(data)
+	local sig = "("
+	if data.params then
+		local params = {}
+		for i, param in ipairs(data.params) do
+			params[i] = (param.name or "?") .. (param.type and (": " .. param.type) or "")
+		end
+		sig = sig .. table.concat(params, ", ")
+	end
+	sig = sig .. ")"
+	if data.returns and data.returns[1] then
+		local rets = {}
+		for i, ret in ipairs(data.returns) do
+			rets[i] = ret.type or "any"
+		end
+		sig = sig .. " → " .. table.concat(rets, ", ")
+	end
+	return sig
+end
+
+local function buildDocText(data)
+	local doc = data.description or ""
+	if data.params then
+		for _, param in ipairs(data.params) do
+			if param.description and param.description ~= "" then
+				doc = doc .. "\n\n**" .. (param.name or "?") .. "**" .. (param.type and " (" .. param.type .. ")" or "") .. " — " .. param.description
+			end
+		end
+	end
+	if data.returns then
+		for _, ret in ipairs(data.returns) do
+			if ret.description and ret.description ~= "" then
+				doc = doc .. "\n\n**Returns**" .. (ret.type and " (" .. ret.type .. ")" or "") .. " — " .. ret.description
+			end
+		end
+	end
+	return doc
+end
+
+function TabHandler:ApplyDocs()
+	if not (SF.Docs and IsValid(self.html) and self.loaded) then return end
+
+	local parts, n = {}, 0
+	local seen = {}
+	local function add(name, tag, data)
+		local key = (tag or "") .. name
+		if seen[key] then return end
+		seen[key] = true
+		n = n + 1
+		local entry = key .. "\3" .. (data and buildSignature(data) or "") .. "\3" .. (data and buildDocText(data) or "")
+		parts[n] = '"'..jsEscape(entry)..'"'
+	end
+
+	-- Starfall types and their methods (also covers `:` calls)
+	for typeName, typeData in pairs(SF.Docs.Types) do
+		add(typeName, nil, typeData)
+		if typeData.methods then
+			for methodName, methodData in pairs(typeData.methods) do add(methodName, "\1", methodData) end
+		end
+	end
+
+	-- Libraries, their methods and fields
+	for libName, lib in pairs(SF.Docs.Libraries) do
+		if libName ~= "builtins" then
+			add(libName, nil, lib)
+			for methodName, methodData in pairs(lib.methods) do add(methodName, "\2"..libName..".", methodData) end
+			for fieldName, fieldData in pairs(lib.fields) do add(fieldName, "\2"..libName..".", fieldData) end
+		else
+			for methodName, methodData in pairs(lib.methods) do add(methodName, nil, methodData) end
+			for fieldName, fieldData in pairs(lib.fields) do add(fieldName, nil, fieldData) end
+		end
+	end
+
+	-- Builtin tables (e.g. player.getAll) and their fields
+	for tableName, tbl in pairs(SF.Docs.Libraries.builtins.tables) do
+		add(tableName, nil, tbl)
+		if tbl.fields then
+			for _, fieldData in pairs(tbl.fields) do add(fieldData.name, "\2"..tableName..".", fieldData) end
+		end
+	end
+
+	-- Hooks and directives
+	for hookName, hookData in pairs(SF.Docs.Hooks) do add(hookName, nil, hookData) end
+	for dirName, dirData in pairs(SF.Docs.Directives) do add(dirName, nil, dirData) end
+
+	self.html:RunJavascript("if(window.sfApplyDocs){sfApplyDocs(["..table.concat(parts, ",").."]);}")
+end
+
 function TabHandler:DocsFinished()
-	
+	self:ApplyDocs()
+end
+
+-- Converts a Starfall editor theme (SF.Editor.Themes) into Monaco theme rules and pushes them to Monaco
+local function colorHex(c)
+	return c and string.format("%02X%02X%02X", c.r, c.g, c.b) or nil
+end
+
+-- theme token name -> Monaco Monarch token type(s)
+local themeTokenMap = {
+	keyword = "keyword",
+	storageType = "keyword",
+	directive = "constant",
+	comment = "comment",
+	string = "string",
+	number = "number",
+	["function"] = "variable", -- function calls use the `variable` Monarch token
+	method = "variable",
+	library = "type", -- libraries/types use the `type` Monarch token
+	userfunction = "variable",
+	constant = "constant",
+	identifier = "identifier",
+	operator = "delimiter",
+	bracket = "delimiter.bracket",
+	notfound = ""
+}
+
+function TabHandler:ApplyTheme(theme)
+	if not (IsValid(self.html) and self.loaded) then return end
+	if not theme then return end
+
+	local rules, n = {}, 0
+	for sfName, monarchName in pairs(themeTokenMap) do
+		local entry = theme[sfName]
+		local hex = entry and colorHex(entry[1])
+		if hex then
+			n = n + 1
+			rules[n] = '{token:"'..monarchName..'",foreground:"'..hex..'"}'
+		end
+	end
+
+	local colors = {}
+	if theme.background then colors[#colors+1] = '"editor.background":"#'..colorHex(theme.background)..'"' end
+	if theme.line_highlight then colors[#colors+1] = '"editor.lineHighlightBackground":"#'..colorHex(theme.line_highlight)..'"' end
+	if theme.caret then colors[#colors+1] = '"editorCursor.foreground":"#'..colorHex(theme.caret)..'"' end
+	if theme.selection then colors[#colors+1] = '"editor.selectionBackground":"#'..colorHex(theme.selection)..'"' end
+	if theme.gutter_foreground then colors[#colors+1] = '"editorLineNumber.foreground":"#'..colorHex(theme.gutter_foreground)..'"' end
+
+	self.html:RunJavascript("if(window.sfApplyTheme){sfApplyTheme(["..table.concat(rules, ",").."],{"..table.concat(colors, ",").."});}")
 end
 
 function TabHandler:GetActiveTab()
@@ -259,7 +405,7 @@ function TabHandler:Init()
 	self.html:SetKeyboardInputEnabled(true)
 	self.html:SetMouseInputEnabled(true)
 	self.html:SetHTML(
-[[
+[=====[
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -282,14 +428,227 @@ require(["vs/editor/editor.main"], function () {
 
 	window.sfeditor = monaco.editor.create(editorElement, {
 		value: "",
-		language: "lua",
-		theme: "vs-dark"
+		language: "starfall",
+		theme: "vs-dark",
+		wordBasedSuggestions: "off"
 	});
 
 	window.addEventListener("resize", () => sfeditor.layout({
 		width: editorElement.offsetWidth,
 		height: editorElement.offsetHeight
 	}));
+
+	// --- Starfall highlighting + docs integration ---
+	const sfData = { keywords: [], items: [], methodItems: [] };
+	monaco.languages.register({ id: "starfall" });
+	monaco.languages.setLanguageConfiguration("starfall", {
+		comments: { lineComment: "--", blockComment: ["--[[", "]" + "]"] },
+		brackets: [["{", "}"], ["[", "]"], ["(", ")"]],
+		autoClosingPairs: [{open:"{",close:"}"},{open:"[",close:"]"},{open:"(",close:")"},{open:'"',close:'"'},{open:"'",close:"'"}],
+		surroundingPairs: [{open:"{",close:"}"},{open:"[",close:"]"},{open:"(",close:")"},{open:'"',close:'"'},{open:"'",close:"'"}]
+	});
+	const sfTokenizer = {
+		defaultToken: "",
+		tokenPostfix: ".lua",
+		keywords: ["and","break","do","else","elseif","end","false","for","function","goto","if","in","local","nil","not","or","repeat","return","then","true","until","while"],
+		sfkeywords: [],
+		brackets: [{token:"delimiter.bracket",open:"{",close:"}"},{token:"delimiter.array",open:"[",close:"]"},{token:"delimiter.parenthesis",open:"(",close:")"}],
+		operators: ["+","-","*","/","%","^","#","==","~=","<=",">=","<",">","=",";",":",",",".","..","..."],
+		symbols: /[=><!~?:&|+\-*\/\^%]+/,
+		escapes: /\\(?:[abfnrtv\\"']|x[0-9A-Fa-f]{1,4}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})/,
+		tokenizer: {
+			root: [
+				[/--@\w+/, "keyword"],
+				[/[a-zA-Z_]\w*(?=\s*\()/, { cases: { "@keywords": "keyword", "@default": "variable" } }],
+				[/[a-zA-Z_]\w*/, { cases: { "@sfkeywords": "type", "@keywords": "keyword", "@default": "identifier" } }],
+				{ include: "@whitespace" },
+				[/(,)(\s*)([a-zA-Z_]\w*)(\s*)(:)(?!:)/, ["delimiter", "", "key", "", "delimiter"]],
+				[/({)(\s*)([a-zA-Z_]\w*)(\s*)(:)(?!:)/, ["@brackets", "", "key", "", "delimiter"]],
+				[/[{}()\[\]]/, "@brackets"],
+				[/@symbols/, { cases: { "@operators": "delimiter", "@default": "" } }],
+				[/\d*\.\d+([eE][\-+]?\d+)?/, "number.float"],
+				[/0[xX][0-9a-fA-F_]*[0-9a-fA-F]/, "number.hex"],
+				[/\d+?/, "number"],
+				[/[;,.]/, "delimiter"],
+				[/"([^"\\]|\\.)*$/, "string.invalid"],
+				[/'([^'\\]|\\.)*$/, "string.invalid"],
+				[/"/, "string", '@string."'],
+				[/'/, "string", "@string.'"]
+			],
+			whitespace: [
+				[/[ \t\r\n]+/, ""],
+				[/--\[([=]*)\[/, "comment", "@comment.$1"],
+				[/--.*$/, "comment"]
+			],
+			comment: [
+				[/[^\]]+/, "comment"],
+				[/\]([=]*)\]/, { cases: { "$1==$S2": { token: "comment", next: "@pop" }, "@default": "comment" } }],
+				[/./, "comment"]
+			],
+			string: [
+				[/[^\\"']+/, "string"],
+				[/@escapes/, "string.escape"],
+				[/\\./, "string.escape.invalid"],
+				[/["']/, { cases: { "$#==$S2": { token: "string", next: "@pop" }, "@default": "string" } }]
+			]
+		}
+	};
+	monaco.languages.setMonarchTokensProvider("starfall", sfTokenizer);
+	const sfApplyLang = () => {
+		// Update keywords in the tokenizer and re-register
+		if (sfTokenizer) {
+			sfTokenizer.sfkeywords = sfData.keywords;
+			monaco.languages.setMonarchTokensProvider("starfall", sfTokenizer);
+		}
+		// Force re-tokenization
+		monaco.editor.getModels().forEach(m => {
+			if (m.getLanguageId() === "starfall") {
+				const v = m.getValue();
+				m.setValue("");
+				m.setValue(v);
+			}
+		});
+	};
+	// Applies a generated Starfall theme (rules + colors JSON from Lua)
+	window.sfApplyTheme = (rules, colors) => {
+		monaco.editor.defineTheme("starfall", {
+			base: "vs-dark",
+			inherit: true,
+			rules: rules,
+			colors: colors
+		});
+		monaco.editor.setTheme("starfall");
+	};
+	// Scans the document for user-defined functions and local variables
+	const sfScanLocals = model => {
+		const text = model.getValue();
+		const items = [];
+		const seen = {};
+		const K = monaco.languages.CompletionItemKind;
+		const add = (name, kind, detail) => {
+			if (seen[name]) return;
+			seen[name] = true;
+			const item = { label: name, kind: kind, insertText: name, filterText: name, sortText: "0" + name };
+			if (detail) item.detail = detail;
+			items.push(item);
+		};
+		let m;
+		// function foo(a, b) / local function foo(a, b)
+		const reFunc = /(?:^|[^\w.:])function\s+([A-Za-z_]\w*)\s*\(([^)]*)\)/g;
+		while ((m = reFunc.exec(text)) !== null) add(m[1], K.Function, "(" + m[2].trim() + ")");
+		// foo = function(a, b) / local foo = function(a, b)
+		const reFuncAssign = /(?:^|[^\w.:])([A-Za-z_]\w*)\s*=\s*function\s*\(([^)]*)\)/g;
+		while ((m = reFuncAssign.exec(text)) !== null) add(m[1], K.Function, "(" + m[2].trim() + ")");
+		// local x = ... / local x, y = ...
+		const reLocal = /(?:^|[^\w.:])local\s+([A-Za-z_]\w*(?:\s*,\s*[A-Za-z_]\w*)*)\s*=(?!=)/g;
+		while ((m = reLocal.exec(text)) !== null) {
+			const names = m[1].split(/\s*,\s*/);
+			for (const name of names) add(name, K.Variable);
+		}
+		return items;
+	};
+	monaco.languages.registerCompletionItemProvider("starfall", {
+		triggerCharacters: [".", ":"],
+		provideCompletionItems: (model, position) => {
+			const word = model.getWordUntilPosition(position);
+			const range = new monaco.Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn);
+			const line = model.getLineContent(position.lineNumber).substring(0, word.startColumn - 1);
+			let items;
+			if (/:\w*$/.test(line)) {
+				// After `:` only type methods make sense
+				items = sfData.methodItems;
+			} else {
+				// After `lib.` only that library's members make sense
+				const libMatch = line.match(/([A-Za-z_]\w*)\.(\w*)$/);
+				if (libMatch && sfData.libItems[ libMatch[1] ]) {
+					items = sfData.libItems[ libMatch[1] ];
+				} else if (libMatch) {
+					items = []; // Unknown table, don't suggest anything
+				} else {
+					// Bare word: user-defined locals first, then docs
+					items = sfScanLocals(model).concat(sfData.items);
+				}
+			}
+			return { suggestions: items.map(c => Object.assign({ range: range }, c)) };
+		}
+	});
+	monaco.languages.registerHoverProvider("starfall", {
+		provideHover: (model, position) => {
+			const word = model.getWordAtPosition(position);
+			if (!word) return null;
+			const name = word.word;
+			const line = model.getLineContent(position.lineNumber).substring(0, word.startColumn - 1);
+			let entry;
+			// `lib.member` hover: resolve against that library first
+			const libMatch = line.match(/([A-Za-z_]\w*)\.$/);
+			if (libMatch && sfData.libHover[libMatch[1]]) {
+				entry = sfData.libHover[libMatch[1]][name];
+			}
+			if (!entry) entry = sfData.hover[name];
+			if (!entry) return null;
+			const contents = [{ value: "```lua\n" + (libMatch ? libMatch[1] + "." : "") + name + entry.sig + "\n```" }];
+			if (entry.doc !== "") contents.push({ value: entry.doc });
+			return {
+				contents: contents,
+				range: new monaco.Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn)
+			};
+		}
+	});
+	window.sfApplyDocs = words => {
+		sfData.keywords = [];
+		sfData.items = [];
+		sfData.methodItems = [];
+		sfData.libItems = {};
+		sfData.hover = {};
+		sfData.libHover = {};
+		const K = monaco.languages.CompletionItemKind;
+		const seen = {};
+		for (const w of words) {
+			const fields = w.split("\3");
+			const tagged = fields[0];
+			const signature = fields[1] || "";
+			const description = fields[2] || "";
+			const tag = tagged.charCodeAt(0);
+			let name, kind, lib;
+			if (tag === 1) { // Type method
+				name = tagged.slice(1);
+				kind = K.Method;
+			} else if (tag === 2) { // Library member "lib.name"
+				const dot = tagged.indexOf(".", 1);
+				lib = tagged.slice(1, dot);
+				name = tagged.slice(dot + 1);
+				kind = K.Function;
+			} else { // Global
+				name = tagged;
+				kind = K.Function;
+			}
+			const item = {
+				label: name,
+				kind: kind,
+				insertText: name,
+				filterText: name,
+				sortText: "1" + name,
+				detail: signature !== "" ? signature : undefined,
+				documentation: description !== "" ? { value: description } : undefined
+			};
+			const hoverEntry = { sig: signature, doc: description };
+			if (tag === 1) {
+				sfData.methodItems.push(item);
+				if (!sfData.hover[name]) sfData.hover[name] = hoverEntry;
+			} else if (tag === 2) {
+				(sfData.libItems[lib] = sfData.libItems[lib] || []).push(item);
+				(sfData.libHover[lib] = sfData.libHover[lib] || {})[name] = hoverEntry;
+			}
+			if (!seen[name]) {
+				seen[name] = true;
+				sfData.keywords.push(name);
+				sfData.items.push(item);
+				if (!sfData.hover[name]) sfData.hover[name] = hoverEntry;
+			}
+		}
+		// Re-apply Monarch so the new keyword table takes effect
+		sfApplyLang();
+	};
 
 	sfeditor.addAction({
 		id: "sf-new-tab",
@@ -347,7 +706,7 @@ require(["vs/editor/editor.main"], function () {
 </body>
 </html>
 
-]])
+]=====])
 
 	self.html:AddFunction("sf", "newTab", function() SF.Editor.editor:NewTab() end)
 	self.html:AddFunction("sf", "save", function(saveas) self:SaveTab(saveas) end)
@@ -389,6 +748,7 @@ function PANEL:SetCode(code)
 end
 
 function PANEL:OnThemeChange(theme)
+	TabHandler:ApplyTheme(theme)
 end
 
 function PANEL:OnFocusChanged(gained)
