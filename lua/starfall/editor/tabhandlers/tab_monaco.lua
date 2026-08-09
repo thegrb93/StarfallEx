@@ -450,10 +450,10 @@ require(["vs/editor/editor.main"], function () {
 	const sfTokenizer = {
 		defaultToken: "",
 		tokenPostfix: ".lua",
-		keywords: ["and","break","do","else","elseif","end","false","for","function","goto","if","in","local","nil","not","or","repeat","return","then","true","until","while"],
+		keywords: ["and","break","continue","do","else","elseif","end","false","for","function","goto","if","in","local","nil","not","or","repeat","return","then","true","until","while"],
 		sfkeywords: [],
 		brackets: [{token:"delimiter.bracket",open:"{",close:"}"},{token:"delimiter.array",open:"[",close:"]"},{token:"delimiter.parenthesis",open:"(",close:")"}],
-		operators: ["+","-","*","/","%","^","#","==","~=","<=",">=","<",">","=",";",":",",",".","..","..."],
+		operators: ["+","-","*","/","%","^","#","==","~=","!=","<=",">=","<",">","=",";",":",",",".","..","...","&&","||","!"],
 		symbols: /[=><!~?:&|+\-*\/\^%]+/,
 		escapes: /\\(?:[abfnrtv\\"']|x[0-9A-Fa-f]{1,4}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})/,
 		tokenizer: {
@@ -478,11 +478,18 @@ require(["vs/editor/editor.main"], function () {
 			whitespace: [
 				[/[ \t\r\n]+/, ""],
 				[/--\[([=]*)\[/, "comment", "@comment.$1"],
-				[/--.*$/, "comment"]
+				[/--.*$/, "comment"],
+				[/\/\*/, "comment", "@gluacomment"],
+				[/\/\/.*$/, "comment"]
 			],
 			comment: [
 				[/[^\]]+/, "comment"],
 				[/\]([=]*)\]/, { cases: { "$1==$S2": { token: "comment", next: "@pop" }, "@default": "comment" } }],
+				[/./, "comment"]
+			],
+			gluacomment: [
+				[/[^\*]+/, "comment"],
+				[/\*\//, "comment", "@pop"],
 				[/./, "comment"]
 			],
 			string: [
