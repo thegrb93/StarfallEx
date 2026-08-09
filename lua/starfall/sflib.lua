@@ -1509,8 +1509,10 @@ function SF.TypeName(typeid)
 end
 
 function SF.CheckLuaType(val, typ, level, msg)
+	if not isnumber(typ) then
+		SF.Throw("CheckLuaType received an invalid type ID: " .. tostring(typ), (level or 1) + 2, true)
+	end
 	if TypeID(val) ~= typ then
-		assert(isnumber(typ))
 		level = (level or 1) + 2
 		SF.ThrowTypeError(SF.TypeName(typ), SF.GetType(val), level, msg)
 	end
