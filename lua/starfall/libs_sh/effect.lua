@@ -5,13 +5,21 @@ local checkluatype = SF.CheckLuaType
 -- Register Privileges
 SF.Permissions.registerPrivilege("effect.play", "Effect", "Allows the user to play effects", { client = {} })
 
-local plyEffectBurst = SF.BurstObject("effects", "effects", 60, 5, "Rate effects can be spawned per second.", "Number of effects that can be spawned in a short time.")
+local plyEffectBurst = SF.BurstObject("effects", "effects", 30, 5, "The rate at which effects can be spawned per second.", "Number of effects that can be spawned in a short time.")
 
 SF.ResourceCounters.Effects = {icon = "icon16/bullet_star.png", count = function(ply) return plyEffectBurst.max-plyEffectBurst:check(ply) end}
 
 local effect_blacklist = {
 	dof_node = true
 }
+
+
+-- Per-tick per-player spawn limit to prevent single-frame flooding
+local EFFECT_PER_TICK_LIMIT = 16
+local plyEffectTick = {}
+hook.Add("PlayerDisconnected", "SF_EffectTickCleanup", function(ply)
+	plyEffectTick[ply] = nil
+end)
 
 
 --- Effects library.
@@ -30,6 +38,7 @@ SF.RegisterType("Effect", true, false)
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 local checkvector = SF.CheckVector
+local clampPos = SF.clampPos
 
 local effect_library = instance.Libraries.effect
 local effect_methods, effect_meta, wrap, unwrap = instance.Types.Effect.Methods, instance.Types.Effect, instance.Types.Effect.Wrap, instance.Types.Effect.Unwrap
@@ -103,11 +112,24 @@ function effect_methods:play(eff)
 	checkpermission(instance, nil, "effect.play")
 	plyEffectBurst:use(instance.player, 1)
 
-	eff = eff:lower()
-	if effect_blacklist[eff] then SF.Throw("Effect ("..eff..") is blacklisted", 2) end
-	if hook.Run( "Starfall_CanEffect", eff, instance ) == false then SF.Throw("Effect ("..eff..") has been blocked from running", 2) end
+	-- Per-tick per-player limit to prevent single-frame flooding
+	local ply = instance.player
+	local curTick = engine.TickCount()
+	local tickData = plyEffectTick[ply]
+	if not tickData or tickData.tick ~= curTick then
+		plyEffectTick[ply] = { tick = curTick, count = 1 }
+	else
+		tickData.count = tickData.count + 1
+		if tickData.count > EFFECT_PER_TICK_LIMIT then
+			SF.Throw("Effect rate exceeded (" .. EFFECT_PER_TICK_LIMIT .. " per frame)", 2)
+		end
+	end
 
-	util.Effect(eff,unwrap(self))
+	eff = string.lower(eff)
+	if effect_blacklist[eff] then SF.Throw("Effect ("..eff..") is blacklisted", 2) end
+	if hook.Run("Starfall_CanEffect", eff, instance) == false then SF.Throw("Effect ("..eff..") has been blocked from running", 2) end
+
+	util.Effect(eff, unwrap(self))
 end
 
 --- Returns the effect's angle
@@ -216,7 +238,7 @@ end
 -- @param number attachment The new attachment ID of the effect
 function effect_methods:setAttachment(attachment)
 	checkluatype(attachment, TYPE_NUMBER)
-	unwrap(self):SetAttachment(attachment)
+	unwrap(self):SetAttachment(math.Clamp(math.floor(attachment), 0, 31))
 end
 
 --- Sets the effect's color
@@ -224,21 +246,21 @@ end
 -- @param number color The color represented by a byte 0-255.
 function effect_methods:setColor(color)
 	checkluatype(color, TYPE_NUMBER)
-	unwrap(self):SetColor(color)
+	unwrap(self):SetColor(math.Clamp(math.floor(color), 0, 0xFF))
 end
 
 --- Sets the effect's damage type
 -- @param number dmgtype The damage type, see the DMG enums
 function effect_methods:setDamageType(dmgtype)
 	checkluatype(dmgtype, TYPE_NUMBER)
-	unwrap(self):SetDamageType(dmgtype)
+	unwrap(self):SetDamageType(math.Clamp(math.floor(dmgtype), 0, 0x80000000)) -- max DMG value (DMG_MISSILEDEFENSE)
 end
 
 --- Sets the effect's entity index
 -- @param number index The entity index
 function effect_methods:setEntIndex(index)
 	checkluatype(index, TYPE_NUMBER)
-	unwrap(self):SetEntIndex(index)
+	unwrap(self):SetEntIndex(math.Clamp(math.floor(index), 0, 0x2000))
 end
 
 --- Sets the effect's entity
@@ -251,61 +273,67 @@ end
 -- @param number flags The flags
 function effect_methods:setFlags(flags)
 	checkluatype(flags, TYPE_NUMBER)
-	unwrap(self):SetFlags(flags)
+	unwrap(self):SetFlags(math.Clamp(math.floor(flags), 0, 0xFF))
 end
 
 --- Sets the effect's hitbox
 -- @param number hitbox The hitbox
 function effect_methods:setHitBox(hitbox)
 	checkluatype(hitbox, TYPE_NUMBER)
-	unwrap(self):SetHitBox(hitbox)
+	unwrap(self):SetHitBox(math.Clamp(math.floor(hitbox), 0, 0x7FF))
 end
 
 --- Sets the effect's magnitude
 -- @param number magnitude The magnitude
 function effect_methods:setMagnitude(magnitude)
 	checkluatype(magnitude, TYPE_NUMBER)
-	unwrap(self):SetMagnitude(magnitude)
+	unwrap(self):SetMagnitude(math.Clamp(magnitude, 0, 0x3FF))
 end
 
 --- Sets the effect's material index
 -- @param number mat The material index
 function effect_methods:setMaterialIndex(mat)
 	checkluatype(mat, TYPE_NUMBER)
-	unwrap(self):SetMaterialIndex(mat)
+	unwrap(self):SetMaterialIndex(math.Clamp(math.floor(mat), 0, 0xFFF))
 end
 
 --- Sets the effect's normal
 -- @param Vector normal The vector normal
 function effect_methods:setNormal(normal)
-	unwrap(self):SetNormal(vunwrap1(normal))
+	local normal_vec = vunwrap1(normal)
+	checkvector(normal_vec)
+	unwrap(self):SetNormal(normal_vec)
 end
 
 --- Sets the effect's origin
 -- @param Vector origin The vector origin
 function effect_methods:setOrigin(origin)
-	unwrap(self):SetOrigin(vunwrap1(origin))
+	local origin_vec = vunwrap1(origin)
+	checkvector(origin_vec)
+	unwrap(self):SetOrigin(origin_vec)
 end
 
 --- Sets the effect's radius
 -- @param number radius The radius
 function effect_methods:setRadius(radius)
 	checkluatype(radius, TYPE_NUMBER)
-	unwrap(self):SetRadius(radius)
+	unwrap(self):SetRadius(math.Clamp(radius, 0, 0x3FF))
 end
 
 --- Sets the effect's scale
 -- @param number scale The number scale
 function effect_methods:setScale(scale)
 	checkluatype(scale, TYPE_NUMBER)
-	unwrap(self):SetScale(scale)
+	unwrap(self):SetScale(math.Clamp(scale, 0, 0xFF))
 end
 
 --- Sets the effect's start pos
 -- Limited to world bounds (+-16386 on every axis) and has horrible networking precision. (17 bit float per component)
 -- @param Vector start The vector start
 function effect_methods:setStart(start)
-	unwrap(self):SetStart(vunwrap1(start))
+	local start_vec = vunwrap1(start)
+	checkvector(start_vec)
+	unwrap(self):SetStart(clampPos(start_vec))
 end
 
 --- Sets the effect's surface property
@@ -313,7 +341,7 @@ end
 -- @param number prop The surface property index
 function effect_methods:setSurfaceProp(prop)
 	checkluatype(prop, TYPE_NUMBER)
-	unwrap(self):SetSurfaceProp(prop)
+	unwrap(self):SetSurfaceProp(math.Clamp(math.floor(prop), -1, 254)) -- -1 means invalid value
 end
 
 end
