@@ -1157,8 +1157,10 @@ do
 						local canrun, customargs = customargfunc(instance, ...)
 						if canrun then
 							local tbl = instance:runScriptHookForResult(hookname, unpack(customargs))
-							local sane = {customretfunc(instance, tbl, ...)}
-							if #sane > 0 then result = sane end
+							if tbl[1] then
+								local sane = {customretfunc(instance, tbl, ...)}
+								if #sane > 0 then result = sane end
+							end
 						end
 					end
 					if result then
@@ -1181,8 +1183,10 @@ do
 					local result
 					for instance, _ in pairs(instances) do
 						local tbl = instance:runScriptHookForResult(hookname, unpack(instance.Sanitize({...})))
-						local sane = {customretfunc(instance, tbl, ...)}
-						if #sane > 0 then result = sane end
+						if tbl[1] then
+							local sane = {customretfunc(instance, tbl, ...)}
+							if #sane > 0 then result = sane end
+						end
 					end
 					if result then
 						return unpack(result)
@@ -1997,23 +2001,12 @@ function SF.CheckVector(v)
 	   v[3] < -1e12 or v[3] > 1e12 or v[3] ~= v[3] then
 		SF.Throw("Input vector too large or NaN", 3)
 	end
-	return v
-end
-
-function SF.CheckAngle(a)
-	if a[1] < -180 or a[1] > 180 or a[1] ~= a[1] or
-	   a[2] < -180 or a[2] > 180 or a[2] ~= a[2] or
-	   a[3] < -180 or a[3] > 180 or a[3] ~= a[3] then
-		SF.Throw("Input angle too large or NaN", 3)
-	end
-	return a
 end
 
 function SF.CheckNumber(n)
 	if n < -1e12 or n > 1e12 or n ~= n then
 		SF.Throw("Input number too large or NaN", 3)
 	end
-	return n
 end
 
 local dumbtrace = {

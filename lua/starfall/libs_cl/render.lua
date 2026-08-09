@@ -9,7 +9,6 @@ local setmetatable = setmetatable
 local dgetmeta = debug.getmetatable
 local checkluatype = SF.CheckLuaType
 local checkvector = SF.CheckVector
-local checkangle = SF.CheckAngle
 local haspermission = SF.Permissions.hasAccess
 local registerprivilege = SF.Permissions.registerPrivilege
 local COL_META,ENT_META,VEC_META = FindMetaTable("Color"),FindMetaTable("Entity"),FindMetaTable("Vector")
@@ -421,8 +420,14 @@ end, function(instance, tbl)
 	local t = tbl[2]
 	if tbl[1] and istable(t) then
 		local ret = {}
-		if t.origin then pcall(function() ret.origin = instance.Types.Vector.Unwrap(checkvector(t.origin)) end) end
-		if t.angles then pcall(function() ret.angles = instance.Types.Angle.Unwrap(checkangle(t.angles)) end) end
+		local ok, err = pcall(function()
+			if t.origin~=nil then ret.origin = instance.Types.Vector.Unwrap(t.origin) checkvector(t.origin) end
+			if t.angles~=nil then ret.angles = instance.Types.Angle.Unwrap(t.angles) checkvector(t.angles) end
+		end)
+		if not ok then
+			instance:Error(SF.MakeError("CalcView hook invalid origin or angles! "..tostring(err)))
+			return
+		end
 		ret.fov = t.fov
 		ret.znear = t.znear
 		ret.zfar = t.zfar
@@ -449,13 +454,17 @@ SF.hookAdd("CalcViewModelView", nil, function(instance, wep, vm, oldPos, oldAng,
 		{instance.Types.Weapon.Wrap(wep), instance.Types.Entity.Wrap(vm), instance.Types.Vector.Wrap(oldPos), instance.Types.Angle.Wrap(oldAng), instance.Types.Vector.Wrap(pos), instance.Types.Angle.Wrap(ang)}
 	end, function(instance, tbl)
 	local pos, ang = tbl[2], tbl[3]
-	if tbl[1] and istable(pos) and istable(ang) then
-		local newPos, newAng
-		if pcall(function()
-			newPos = instance.Types.Vector.Unwrap(checkvector(pos))
-			newAng = instance.Types.Angle.Unwrap(checkangle(ang))
-		end) and newPos and newAng then
-			return newPos, newAng
+	if tbl[1] and pos~=nil and ang~=nil then
+		local ok, err = pcall(function()
+			pos = instance.Types.Vector.Unwrap(pos)
+			checkvector(pos)
+			ang = instance.Types.Angle.Unwrap(ang)
+			checkvector(ang)
+		end)
+		if ok then
+			return pos, ang
+		else
+			instance:Error(SF.MakeError("CalcViewModelView hook returned invalid type! "..tostring(err)))
 		end
 	end
 end)
