@@ -300,7 +300,6 @@ end
 -- @param number scale The number scale
 function effect_methods:setScale(scale)
 	checkluatype(scale, TYPE_NUMBER)
-	if scale ~= scale or scale < -100 or scale > 100 then SF.Throw("Scale is out of range (-100, 100): "..scale, 2) end
 	unwrap(self):SetScale(scale)
 end
 
