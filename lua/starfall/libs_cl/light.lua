@@ -496,7 +496,7 @@ function projectedtexture_methods:setHorizontalFOV(fov)
 	ptunwrap(self):SetHorizontalFOV(fov)
 end
 
---- Sets whether or not the Projected Texture lights world geometry
+--- Sets if the Projected Texture should light the world geometry
 -- Will not take effect until ProjectedTexture:update() is called.
 -- @param boolean enable
 function projectedtexture_methods:setLightWorld(enable)
