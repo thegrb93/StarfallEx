@@ -1157,8 +1157,10 @@ do
 						local canrun, customargs = customargfunc(instance, ...)
 						if canrun then
 							local tbl = instance:runScriptHookForResult(hookname, unpack(customargs))
-							local sane = {customretfunc(instance, tbl, ...)}
-							if #sane > 0 then result = sane end
+							if tbl[1] then
+								local sane = {customretfunc(instance, tbl, ...)}
+								if #sane > 0 then result = sane end
+							end
 						end
 					end
 					if result then
@@ -1181,8 +1183,10 @@ do
 					local result
 					for instance, _ in pairs(instances) do
 						local tbl = instance:runScriptHookForResult(hookname, unpack(instance.Sanitize({...})))
-						local sane = {customretfunc(instance, tbl, ...)}
-						if #sane > 0 then result = sane end
+						if tbl[1] then
+							local sane = {customretfunc(instance, tbl, ...)}
+							if #sane > 0 then result = sane end
+						end
 					end
 					if result then
 						return unpack(result)
@@ -1988,27 +1992,24 @@ function SF.ParentChainTooLong(parent, child)
 end
 
 -- This function clamps the position before moving the entity
-local minx, miny, minz = -16384, -16384, -16384
-local maxx, maxy, maxz = 16384, 16384, 16384
 function SF.clampPos(pos)
-	pos.x = math_Clamp(pos.x, minx, maxx)
-	pos.y = math_Clamp(pos.y, miny, maxy)
-	pos.z = math_Clamp(pos.z, minz, maxz)
+	pos.x = math_Clamp(pos.x, -16384, 16384)
+	pos.y = math_Clamp(pos.y, -16384, 16384)
+	pos.z = math_Clamp(pos.z, -16384, 16384)
 	return pos
 end
 
 function SF.CheckVector(v)
-	if v[1]<-1e12 or v[1]>1e12 or v[1]~=v[1] or
-		v[2]<-1e12 or v[2]>1e12 or v[2]~=v[2] or
-		v[3]<-1e12 or v[3]>1e12 or v[3]~=v[3] then
-
-		SF.Throw("Input vector too large or NAN", 3)
+	if v[1] < -1e12 or v[1] > 1e12 or v[1] ~= v[1] or
+	   v[2] < -1e12 or v[2] > 1e12 or v[2] ~= v[2] or
+	   v[3] < -1e12 or v[3] > 1e12 or v[3] ~= v[3] then
+		SF.Throw("Input vector too large or NaN", 3)
 	end
 end
 
 function SF.CheckNumber(n)
-	if n<-1e12 or n>1e12 or n~=n then
-		SF.Throw("Input number too large or NAN", 3)
+	if n < -1e12 or n > 1e12 or n ~= n then
+		SF.Throw("Input number too large or NaN", 3)
 	end
 end
 
