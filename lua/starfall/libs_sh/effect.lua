@@ -265,6 +265,7 @@ end
 -- @param number magnitude The magnitude
 function effect_methods:setMagnitude(magnitude)
 	checkluatype(magnitude, TYPE_NUMBER)
+	magnitude = math.Clamp(magnitude, 0, 1023)
 	unwrap(self):SetMagnitude(magnitude)
 end
 
@@ -291,6 +292,7 @@ end
 -- @param number radius The radius
 function effect_methods:setRadius(radius)
 	checkluatype(radius, TYPE_NUMBER)
+	radius = math.Clamp(radius, 0, 1023)
 	unwrap(self):SetRadius(radius)
 end
 
@@ -298,6 +300,7 @@ end
 -- @param number scale The number scale
 function effect_methods:setScale(scale)
 	checkluatype(scale, TYPE_NUMBER)
+	scale = math.Clamp(scale, -100, 100)
 	unwrap(self):SetScale(scale)
 end
 
