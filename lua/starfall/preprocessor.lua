@@ -41,9 +41,18 @@ SF.PreprocessData = {
 
 		name = function(self, args) self.scriptname = string.sub(args, 1, 64) end,
 		author = function(self, args) self.scriptauthor = string.sub(args, 1, 64) end,
-		server = function(self, args) self.serverorclient = "server" end,
-		client = function(self, args) self.serverorclient = "client" end,
-		shared = function(self, args) self.serverorclient = nil end,
+		server = function(self, args)
+			if self.serverorclient == "client" or self.hasSharedDirective then return "Conflicting realm directives --@server/--@client/--@shared" end
+			self.serverorclient = "server"
+		end,
+		client = function(self, args)
+			if self.serverorclient == "server" or self.hasSharedDirective then return "Conflicting realm directives --@server/--@client/--@shared" end
+			self.serverorclient = "client"
+		end,
+		shared = function(self, args)
+			if self.serverorclient then return "Conflicting realm directives --@server/--@client/--@shared" end
+			self.hasSharedDirective = true
+		end,
 		clientmain = function(self, args) self.clientmain = args end,
 		superuser = function(self, args) self.superuser = true end,
 		owneronly = function(self, args) self.owneronly = true end,
