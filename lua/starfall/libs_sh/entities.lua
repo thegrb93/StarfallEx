@@ -218,7 +218,7 @@ if CLIENT then
 	end
 
 	local canDrawEntity = SF.CanDrawEntity
-	--- Returns whether or not the entity can be drawn using `Entity:draw` function
+	--- Determines if the entity can be drawn using `Entity:draw` function
 	-- Checks Entity against a predefined class whitelist
 	-- Entities that have RenderOverride defined or are parented cannot be drawn
 	-- @client
@@ -1308,13 +1308,13 @@ if CLIENT then
 --- Sets the bone matrix of given bone to given matrix.
 -- Call `Entity:setupBones` to apply all changes.
 -- @client
--- @param number bone The bone ID
+-- @param number? bone The bone index (default: 0)
 -- @param VMatrix matrix The matrix to set
 function ents_methods:setBoneMatrix(bone, matrix)
 	local matrix = munwrap(matrix)
 	local ent = eunwrap(self)
 
-	checkluatype(bone, TYPE_NUMBER)
+	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
 	checkpermission(instance, ent, "entities.setRenderProperty")
 
 	bone = math.Clamp(math.floor(bone), 0, Ent_GetBoneCount(ent)-1)
@@ -1340,6 +1340,7 @@ end
 
 --- Invokes the BuildBonePositions of an entity.
 -- Should be called after setting all bone matrices.
+-- See also `Entity:setBoneMatrix` function.
 -- @client
 function ents_methods:setupBones()
 	Ent_SetupBones(eunwrap(self))
@@ -1445,7 +1446,7 @@ function ents_methods:getManipulateBoneScale(bone)
 	return vwrap(Ent_GetManipulateBoneScale(eunwrap(self), bone))
 end
 
---- Returns the x, y, z size of the entity's outer bounding box (local to the entity)
+--- Returns the OBB size of the entity's outer bounding box (local to the entity)
 -- @shared
 -- @return Vector The outer bounding box size
 function ents_methods:obbSize()
@@ -1683,20 +1684,20 @@ function ents_methods:getSequenceCount()
 	return Ent_GetSequenceCount(eunwrap(self))
 end
 
---- Returns true if the entity is a nextbot
--- @return boolean Whether it is a nextbot
+--- Returns true if the entity is a NextBot
+-- @return boolean Whether it is a NextBot
 function ents_methods:isNextBot()
 	return Ent_IsNextBot(eunwrap(self))
 end
 
---- Checks whether the animation is playing
--- @return boolean True if the animation is currently playing, otherwise false
+--- Determines whether the animation is playing
+-- @return boolean Whether the animation is currently playing
 function ents_methods:isSequenceFinished()
 	return Ent_IsSequenceFinished(eunwrap(self))
 end
 
 --- Get the length of an animation
--- @param number? id (Optional) The id of the sequence, or will default to the currently playing sequence
+-- @param number? id Optional index of the sequence (default: currently playing sequence)
 -- @return number Length of the animation in seconds
 function ents_methods:sequenceDuration(id)
 	local ent = eunwrap(self)
@@ -1728,21 +1729,21 @@ function ents_methods:getPoseCount()
 	return Ent_GetNumPoseParameters(eunwrap(self))
 end
 
---- Returns pose index corresponding to the given name
+--- Gets the pose index corresponding to the given name
 -- @param string pose Pose name
--- @return number Pose index or -1 if not found
+-- @return number Pose index, or -1 if not found
 function ents_methods:getPoseIndex(pose)
 	return Ent_LookupPoseParameter(eunwrap(self), pose)
 end
 
---- Returns pose name corresponding to the given index
+--- Gets the pose name corresponding to the given index
 -- @param number id Pose index (starting from 0)
--- @return string Pose name or empty string if not found
+-- @return string Pose name, or empty string if not found
 function ents_methods:getPoseName(id)
 	return Ent_GetPoseParameterName(eunwrap(self), id)
 end
 
---- Returns pose value range
+--- Returns the pose value range
 -- @param number id Pose index (starting from 0)
 -- @return number? Minimum pose value, or nil if pose not found
 -- @return number? Maximum pose value, or nil if pose not found
@@ -1750,8 +1751,8 @@ function ents_methods:getPoseRange(id)
 	return Ent_GetPoseParameterRange(eunwrap(self), id)
 end
 
---- Returns a table of flexname -> flexid pairs for use in flex functions.
--- @return table Table of flexes
+--- Gets a table where keys are flex name and values are their flex index, for use in flex functions.
+-- @return table Table of flex name->index pairs
 function ents_methods:getFlexes()
 	local ent = eunwrap(self)
 	local flexes = {}
@@ -1761,30 +1762,30 @@ function ents_methods:getFlexes()
 	return flexes
 end
 
---- Returns the ID of the flex based on given name.
--- @param string name The name of the flex to get the ID of. Case sensitive.
--- @return number The ID of the flex based on given name.
+--- Gets the index of the flex based on given name.
+-- @param string name The name of the flex to get the index of. Case sensitive.
+-- @return number The index of the flex based on given name.
 function ents_methods:getFlexByName(name)
 	checkluatype(name, TYPE_STRING)
 	return Ent_GetFlexIDByName(eunwrap(self), name)
 end
 
---- Returns flex name.
--- @param number id The flex id to look up name of.
+--- Gets the flex name corresponding to the given index.
+-- @param number id The flex index to look up name of.
 -- @return string The flex name
 function ents_methods:getFlexName(id)
 	checkluatype(id, TYPE_NUMBER)
 	return Ent_GetFlexName(eunwrap(self), id)
 end
 
---- Returns whether or not the the entity has had flex manipulations performed with `Entity:setFlexWeight` or `Entity:setFlexScale`.
--- @return boolean True if the entity has flex manipulations, false otherwise.
+--- Determines if the entity has had flex manipulations performed with `Entity:setFlexWeight` or `Entity:setFlexScale`.
+-- @return boolean Whether the entity has flex manipulations
 function ents_methods:hasFlexManipulations()
 	return Ent_HasFlexManipulatior(eunwrap(self))
 end
 
 --- Gets the weight (value) of a flex.
--- @param number flexid The id of the flex
+-- @param number flexid The index of the flex
 -- @return number The weight of the flex
 function ents_methods:getFlexWeight(flexid)
 	local ent = eunwrap(self)
@@ -1800,7 +1801,7 @@ function ents_methods:getFlexWeight(flexid)
 end
 
 --- Sets the weight (value) of a flex.
--- @param number flexid The id of the flex
+-- @param number flexid The index of the flex
 -- @param number weight The weight of the flex
 function ents_methods:setFlexWeight(flexid, weight)
 	local ent = eunwrap(self)
@@ -1845,7 +1846,7 @@ end
 
 --- Gets the acceptable value range for the flex controller, as defined by the model
 -- @shared
--- @param number flexid The id of the flex
+-- @param number flexid The index of the flex
 -- @return number The minimum value for this flex
 -- @return number The maximum value for this flex
 function ents_methods:getFlexBounds(flexid)
@@ -1874,14 +1875,15 @@ function ents_methods:setEyeTarget(pos)
 	Ent_SetEyeTarget(ent, vec)
 end
 
---- Gets the model of an entity. For prop_effect, see ent:getEffectModel()
+--- Gets the model of an entity.
+-- For `prop_effect` entities, see `Entity:getEffectModel()`
 -- @shared
 -- @return string Model of the entity
 function ents_methods:getModel()
 	return Ent_GetModel(eunwrap(self))
 end
 
---- Gets the model of the effect on prop_effect entities
+--- Gets the model of the effect on `prop_effect` entities.
 -- @shared
 -- @return string Model of the effect
 function ents_methods:getEffectModel()
@@ -1894,8 +1896,9 @@ function ents_methods:getEffectModel()
 	return Ent_GetModel(Ent_GetTable(ent).AttachedEntity)
 end
 
---- Returns the entity's model bounds. This is different than the collision bounds/hull.
--- This is not scaled with Entity:setModelScale and will return the model's original, unmodified mins and maxs.
+--- Returns the entity's model bounds.
+-- This is different than the collision bounds/hull.
+-- This is not scaled with `Entity:setModelScale` and will return the model's original, unmodified mins and maxs.
 -- @shared
 -- @return Vector Minimum vector of the bounds
 -- @return Vector Maximum vector of the bounds
@@ -1927,7 +1930,7 @@ function ents_methods:getModelScale()
 end
 
 --- Returns the entity's model render bounds.
--- Unlike Entity:getModelBounds, bounds returning by this function will not be affected by animations (at compile time).
+-- Unlike `Entity:getModelBounds`, bounds returning by this function will not be affected by animations (at compile time).
 -- @shared
 -- @return Vector The minimum vector of the bounds
 -- @return Vector The maximum vector of the bounds

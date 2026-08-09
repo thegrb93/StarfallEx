@@ -559,14 +559,14 @@ function bass_methods:getFlags()
 	return bassSounds[getsnd(self)].flags
 end
 
---- Returns whether or not the sound is 2D.
--- @return boolean True if the sound is 2D.
+--- Determines if the sound is 2D.
+-- @return boolean Whether the sound is 2D.
 function bass_methods:is2D()
 	return not getsnd(self):Is3D()
 end
 
---- Returns whether or not the sound is 3D.
--- @return boolean True if the sound is 3D.
+--- Determines if the sound is 3D.
+-- @return boolean Whether the sound is 3D.
 function bass_methods:is3D()
 	return getsnd(self):Is3D()
 end
@@ -584,33 +584,37 @@ function bass_methods:get3DEnabled()
 end
 
 --- Returns the state of the sound.
--- @return number The state enum of the sound.
+-- @return number The state enum of the sound:
+-- 0 = channel is stopped
+-- 1 = channel is playing
+-- 2 = channel is paused
+-- 3 = channel is buffering
 -- See https://wiki.facepunch.com/gmod/Enums/GMOD_CHANNEL
 function bass_methods:getState()
 	return getsnd(self):GetState()
 end
 
---- Returns whether or not the sound is stopped.
--- Only true if the `noplay` flag is used and `Bass:play` hasn't been called yet, since `Bass:stop` will destroy the sound channel.
--- @return boolean True if the sound is stopped.
+--- Determines if the sound is stopped.
+-- Only true if the `noplay` flag is used, and `Bass:play` hasn't been called yet, since `Bass:stop` will destroy the sound channel.
+-- @return boolean Whether the sound is stopped.
 function bass_methods:isStopped()
 	return getsnd(self):GetState() == GMOD_CHANNEL_STOPPED
 end
 
---- Returns whether or not the sound is playing.
--- @return boolean True if the sound is playing.
+--- Determines if the sound is playing.
+-- @return boolean Whether the sound is playing.
 function bass_methods:isPlaying()
 	return getsnd(self):GetState() == GMOD_CHANNEL_PLAYING
 end
 
---- Returns whether or not the sound is paused.
--- @return boolean True if the sound is paused.
+--- Determines if the sound is paused.
+-- @return boolean Whether the sound is paused.
 function bass_methods:isPaused()
 	return getsnd(self):GetState() == GMOD_CHANNEL_PAUSED
 end
 
---- Returns whether or not the sound is stalled.
--- @return boolean True if the sound is stalled.
+--- Determines if the sound is stalled.
+-- @return boolean Whether the sound is stalled.
 function bass_methods:isStalled()
 	return getsnd(self):GetState() == GMOD_CHANNEL_STALLED
 end
