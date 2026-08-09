@@ -410,7 +410,9 @@ function bass_methods:getFileName()
 end
 
 --- Perform fast Fourier transform (FFT) algorithm to compute the DFT of the sound.
--- @param number n Number of consecutive audio samples, between 0 and 7.
+-- See also https://wiki.facepunch.com/gmod/IGModAudioChannel:FFT
+-- @param number n Number of consecutive audio samples, between 0 and 7 (see FFT enum).
+-- See also https://wiki.facepunch.com/gmod/Enums/FFT
 -- Depending on this parameter you will get 256*2^n samples.
 -- @return table Table containing DFT magnitudes, each between 0 and 1.
 function bass_methods:getFFT(n)
@@ -489,7 +491,7 @@ function bass_methods:getBufferedTime()
 end
 
 --- Returns the sample rate for currently playing sound.
--- @return number The sample rate in Hz. This should always be 44100.
+-- @return number The sample rate in Hz (this should always be 44100).
 function bass_methods:getSamplingRate()
 	return getsnd(self):GetSamplingRate()
 end
@@ -584,12 +586,12 @@ function bass_methods:get3DEnabled()
 end
 
 --- Returns the state of the sound.
+-- See https://wiki.facepunch.com/gmod/Enums/GMOD_CHANNEL
 -- @return number The state enum of the sound:
 -- 0 = channel is stopped
 -- 1 = channel is playing
 -- 2 = channel is paused
 -- 3 = channel is buffering
--- See https://wiki.facepunch.com/gmod/Enums/GMOD_CHANNEL
 function bass_methods:getState()
 	return getsnd(self):GetState()
 end
