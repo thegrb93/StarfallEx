@@ -78,7 +78,7 @@ end
 -- On the server, the default is the chip owner (`owner()`).
 -- On the client, it is the local player.
 -- @name builtins_library.player
--- @param num? number The UserID of the player to retrieve.
+-- @param number? num The UserID of the player to retrieve.
 -- @return Player The wrapped player entity, or NULL if no player exists with the given UserID.
 function builtins_library.player(num)
 	if num~=nil then
@@ -118,14 +118,14 @@ builtins_library.tostring = tostring
 -- @name builtins_library.tonumber
 -- @class function
 -- @param any value Either a string or a number to convert into a number.
--- @param number? base The numerical base of the digits in the string. Must be between 2 and 36 (default: 10)
--- @return number? The number representation of the input value or nil if it couldn't be converted.
+-- @param number? base The numerical base of the digits in the string (from 2 to 36, default: 10).
+-- @return number? The number representation of the input value, or nil if it couldn't be converted.
 builtins_library.tonumber = tonumber
 
 --- Returns an iterator triplet to sequentially traverse integer key-value pairs from index 1 up to the first nil value.
 -- @name builtins_library.ipairs
 -- @class function
--- @param tbl table The table to iterate over
+-- @param table tbl The table to iterate over
 -- @return function The iterator generator function
 -- @return table The table being iterated over
 -- @return number The initial index control variable (0)
@@ -134,7 +134,7 @@ builtins_library.ipairs = ipairs
 --- Returns an iterator triplet to traverse all key-value pairs of a table in an unspecified order.
 -- @name builtins_library.pairs
 -- @class function
--- @param tbl table The table to iterate over
+-- @param table tbl The table to iterate over
 -- @return function The iterator generator function (`next`)
 -- @return table The table being iterated over
 -- @return nil Initial control variable (`nil`)
@@ -143,8 +143,8 @@ builtins_library.pairs = pairs
 --- Returns an iterator function that traverses a table in a sorted order.
 -- The sorting is determined by an optional `predicate` function
 -- Each argument passed to the predicate is an array containing the key-value pair: `{key, value}`
--- @param tbl table The table to iterate over
--- @param predicate? function An optional comparator function
+-- @param table tbl The table to iterate over
+-- @param function? predicate An optional comparator function
 -- Defaults to sorting by keys in ascending order:
 -- `function(a, b) return a[1] < b[1] end`
 -- @return function A stateful iterator yielding sorted `key, value` pairs.
@@ -175,8 +175,8 @@ end
 -- Returns `nil` when no more pairs remain.
 -- @name builtins_library.next
 -- @class function
--- @param tbl table The table to traverse
--- @param? k any The previous key. If `nil` or omitted, iteration starts at the beginning
+-- @param table tbl The table to traverse
+-- @param any? k The previous key. If `nil` or omitted, iteration starts at the beginning
 -- @return any The next key, or `nil` if the end of the table is reached
 -- @return any The corresponding value for the next key, or `nil` when no more pairs remain
 builtins_library.next = next
@@ -186,9 +186,9 @@ builtins_library.next = next
 -- Keep in mind you can only unpack up to 8000 values (LuaJIT limit).
 -- @name builtins_library.unpack
 -- @class function
--- @param tbl table The table/array to unpack
--- @param startIndex? number The index to start from (default: 1)
--- @param endIndex? number The index to end at (default: `#tbl`)
+-- @param table tbl The table/array to unpack
+-- @param number? startIndex The index to start from (default: 1)
+-- @param number? endIndex The index to end at (default: `#tbl`)
 -- @return ... any The unpacked table elements
 builtins_library.unpack = unpack
 
@@ -820,7 +820,9 @@ else
 end
 
 --- Returns the source code of and compiled function for specified script.
--- @param string path Path of file. Can be absolute or relative to calling file. Must be '--@include'-ed.
+-- See also `getScripts` function.
+-- @param string path File path. Can be absolute, or relative to caller location.
+-- See also `--@include`, `--@includedir`, and `--@includedata` directives.
 -- @return string? Source code, or nil if could not be found
 -- @return function? Compiled function, or nil if could not be found
 function builtins_library.getScript(path)
@@ -831,7 +833,8 @@ function builtins_library.getScript(path)
 end
 
 --- Returns the source code of and compiled functions for the scripts used by the chip.
--- @param Entity? ent Optional target entity. Default: chip()
+-- See also `getScript`, and `shareScripts` functions.
+-- @param Entity? ent Optional target entity (default: `chip()`)
 -- @return table Table where keys are paths and values are strings
 -- @return table? Table where keys are paths and values are functions, or nil if another chip was specified
 function builtins_library.getScripts(ent)
@@ -854,7 +857,8 @@ function builtins_library.getScripts(ent)
 	return instance.Sanitize(instance.source), funcs
 end
 
---- Sets the chip to allow other chips to view its sources
+--- Sets the chip to allow other chips to view its sources.
+-- See also `getScripts` function.
 -- @param boolean enable If true, allow sharing scripts
 function builtins_library.shareScripts(enable)
 	checkluatype(enable, TYPE_BOOL)
@@ -863,7 +867,8 @@ end
 
 --- Runs an included script and caches the result.
 -- The path must be an actual path, including the file extension and using slashes for directory separators instead of periods.
--- @param string path The file path to include. Make sure to --@include it
+-- See also `--@include`, and `--@includedir` directives.
+-- @param string path The file path to include; make sure to `--@include` it
 -- @param ... args Optional arguments to provide to the script (access them using vararg ...)
 -- @return any Return value of the script
 function builtins_library.require(path, ...)
@@ -877,7 +882,8 @@ end
 
 --- Runs all included scripts in a directory and caches the results.
 -- The path must be an actual path, including the file extension and using slashes for directory separators instead of periods.
--- @param string path The directory to include. Make sure to --@includedir it
+-- See also `--@include`, and `--@includedir` directives.
+-- @param string path The directory to include; make sure to `--@includedir` it
 -- @param table? loadpriority Table of files that should be loaded before any others in the directory
 -- @return table Table of return values of the scripts
 function builtins_library.requiredir(path, loadpriority)
@@ -918,8 +924,9 @@ function builtins_library.requiredir(path, loadpriority)
 end
 
 --- Runs an included script, but does not cache the result.
--- Pretty much like standard Lua dofile()
--- @param string path The file path to include. Make sure to --@include it
+-- Pretty much like standard Lua `dofile` function.
+-- See also `--@include`, and `--@includedir` directives.
+-- @param string path The file path to include; make sure to `--@include` it
 -- @param ... args Optional arguments to provide to the script (access them using vararg ...)
 -- @return ... Return value(s) of the script
 function builtins_library.dofile(path, ...)
@@ -931,8 +938,9 @@ function builtins_library.dofile(path, ...)
 	return (instance.scripts[path] or SF.Throw("Can't find file '" .. path .. "' (did you forget to --@include it?)", 2))(...)
 end
 
---- Runs all included scripts in directory, but does not cache the result.
--- @param string path The directory to include. Make sure to --@includedir it
+--- Runs all included scripts in the given directory, but does not cache the result.
+-- See also `--@include`, and `--@includedir` directives.
+-- @param string path The directory to include; make sure to `--@includedir` it
 -- @param table loadpriority Table of files that should be loaded before any others in the directory
 -- @return table Table of return values of the scripts
 function builtins_library.dodir(path, loadpriority)
@@ -1025,7 +1033,7 @@ end
 ]]
 
 --- Returns the methods table for a specified Starfall type
--- @param sfType string The name of the Starfall type (e.g., "Entity", "Vector")
+-- @param string sfType The name of the Starfall type (e.g., "Entity", "Vector")
 -- @return table? The methods table for the type, or `nil` if the type doesn't exist
 function builtins_library.getMethods(sfType)
 	checkluatype(sfType, TYPE_STRING)
@@ -1039,10 +1047,10 @@ end
 local debug_library = instance.Libraries.debug
 
 --- Returns a string containing a stack trace of the given thread
--- @param thread? A thread to get the stack trace of.
+-- @param thread? thread A thread to get the stack trace of.
 -- If nil, this argument will be used as the message and the current thread becomes the target.
--- @param string? message A message to be included at the beginning of the stack trace. Default: ""
--- @param number? stacklevel Which position in the execution stack to start the traceback at. Default: 1
+-- @param string? message A message to be included at the beginning of the stack trace (default: "").
+-- @param number? stacklevel Which position in the execution stack to start the traceback at (default: 1).
 -- @return string A dump of the execution stack.
 function debug_library.traceback(thread, message, stacklevel)
 	local ok, t = pcall(instance.Types.thread.Unwrap, thread)
@@ -1065,11 +1073,11 @@ function debug_library.traceback(thread, message, stacklevel)
 	end
 end
 
---- Returns a DebugInfo structure containing the passed function's info.
+--- Returns a `DebugInfo` structure containing the passed function's info.
 -- See https://wiki.facepunch.com/gmod/Structures/DebugInfo
--- @param function|number funcOrStackLevel Function or stack level to get info about. Defaults to stack level 0.
--- @param string? fields A string that specifies the information to be retrieved. Defaults to all (flnSu).
--- @return table DebugInfo table
+-- @param function|number funcOrStackLevel Function or stack level to get info about (default: 0).
+-- @param string? fields A string that specifies the information to be retrieved (default: "flnSu").
+-- @return table `DebugInfo` table
 function debug_library.getinfo(funcOrStackLevel, fields)
 	if not isfunction(funcOrStackLevel) and not isnumber(funcOrStackLevel) then SF.ThrowTypeError("function or number", SF.GetType(TfuncOrStackLevel), 2) end
 	if fields~=nil then checkluatype(fields, TYPE_STRING) end
@@ -1083,7 +1091,7 @@ end
 
 if debug and isfunction(debug.getlocal) then
 	--- Returns the name of a function, or stack's locals
-	-- @param function|number funcOrStackLevel Function or stack level to get info about. Defaults to stack level 0.
+	-- @param function|number funcOrStackLevel Function or stack level to get info about (default: 0)
 	-- @param number index The index of the local to get
 	-- @return string The name of the local
 	function debug_library.getlocal(funcOrStackLevel, index)
@@ -1105,15 +1113,16 @@ local function get_retvals_vararg(...)
 	return {...}, select('#', ...)
 end
 
---- Lua's pcall with SF throw implementation
+--- Similar to Lua `pcall` with SF throw implementation.
 -- Calls a function and catches an error that can be thrown while the execution of the call.
--- @param function func Function to be executed and of which the errors should be caught of
+-- @param function|table value Function to be executed and of which the errors should be caught of.
+-- Can be a table, it will try to invoke the `__call` metamethod.
 -- @param ... arguments Arguments to call the function with.
 -- @return boolean If the function had no errors occur within it.
 -- @return ... If an error occurred, this will be a string containing the error message.
 -- Otherwise, this will be the return values of the function passed in.
-function builtins_library.pcall(func, ...)
-	local vret, j = get_retvals_vararg(pcall(func, ...))
+function builtins_library.pcall(value, ...)
+	local vret, j = get_retvals_vararg(pcall(value, ...))
 
 	if vret[1] then return unpack(vret, 1, j) end
 
@@ -1135,7 +1144,7 @@ local function xpcall_Callback(err)
 	return {err, debug.traceback(tostring(err), 2)} -- only way to return 2 values; level 2 to branch
 end
 
---- Lua's xpcall with SF throw implementation, and a traceback for debugging.
+--- Similar to Lua `xpcall` with SF throw implementation, and a traceback for debugging.
 -- Attempts to call the first function. If the execution succeeds, this returns true followed by the returns of the function.
 -- If execution fails, this returns false and the second function is called with the error message, and the stack trace.
 -- @param function func The function to call initially.
@@ -1164,10 +1173,10 @@ function builtins_library.xpcall(func, callback, ...)
 	return false, callback(instance.Sanitize({err})[1], traceback)
 end
 
---- Try to execute a function and catch possible exceptions
--- Similar to xpcall, but a bit more in-depth
+--- Try to execute a function and catch possible exceptions.
+-- Similar to `xpcall`, but a bit more in-depth.
 -- @param function func Function to execute
--- @param function? catch Optional function to execute in case func fails
+-- @param function? catch Optional function to execute in case the function throws an error
 function builtins_library.try(func, catch)
 	local ok, err = pcall(func)
 	if ok then return end
@@ -1193,7 +1202,7 @@ function builtins_library.throw(msg, level, uncatchable)
 	SF.Throw(msg, 1 + (level or 1), uncatchable)
 end
 
---- Throws an error. Similar to 'throw', but throws whatever you want instead of an SF Error.
+--- Throws an error. Similar to `throw`, but throws whatever you want instead of an SF Error.
 -- @name builtins_library.error
 -- @class function
 -- @param string msg Message string
@@ -1311,72 +1320,89 @@ builtins_library.class = SF.Class
 end
 
 --- Mark a file to be included in the upload.
--- URL is also supported, e.g. --@include http://mydomain.com/myfile as myfile.txt
--- This is required to use the file in require() and dofile()
+-- URL is also supported, e.g. `--@include http://mydomain.com/myfile as myfile.txt`
+-- This is required to use the file in `require` and `dofile`.
 -- @name include
 -- @class directive
 -- @param path Path to the file, or URL of the single-file library to be included
 
 --- Mark a directory to be included in the upload.
--- This is optional to include all files in the directory in require() and dofile()
+-- This is equivalent to manually `--@include`-ing all files from the given directory.
+-- It will include all files in the directory (make sure they are all valid Lua syntax).
+-- Allows you to use the files with `requiredir`, `require`, and `dofile` functions.
 -- @name includedir
 -- @class directive
 -- @param path Path to the directory
 
 --- Mark a file to be included in the upload.
--- Different from include in that the file does not have to have valid syntax.
--- Cannot be used with require() or dofile(), can only be used with getScripts().
+-- Different from `--@include` in that the file does not have to have valid Lua syntax.
+-- Cannot be used with `require` or `dofile`, can only be used with `getScripts`.
 -- @name includedata
 -- @class directive
 -- @param path Path to the file
 
---- Set the name of the script.
--- This will become the name of the tab and will show on the overlay of the processor. --@name Awesome script
+--- Set the name of the chip/script.
+-- This will become the name of the tab, and will show on the overlay of the processor.
+-- `--@name Awesome script`
 -- @name name
 -- @class directive
 -- @param name Name of the script
 
 --- Set the author of the script.
--- This will set the author that will be shown on the overlay of the processor. --@author TheAuthor
+-- This will set the author that will be shown on the overlay of the processor.
+-- `--@author TheAuthor`
 -- @name author
 -- @class directive
 -- @param author Author of the script
 
---- Set the model of the processor entity. --@model models/props_junk/watermelon01.mdl
+--- Set the model of the processor entity.
+-- `--@model models/props_junk/watermelon01.mdl`
 -- @name model
 -- @class directive
 -- @param model String of the model
 
---- Precaches models that may take a while to load (max 16). --@precachemodel models/props_junk/watermelon01.mdl
+--- Precache a model that may take a while to load (max 16).
+-- `--@precachemodel models/props_junk/watermelon01.mdl`
 -- @name precachemodel
 -- @class directive
 -- @param model String of the model to precache
 
---- Set the current file to only run on the server. Shared is default. --@server
+--- Set the current file to only run on the server.
+-- `--@shared` is default.
+-- Clients will not receive this file.
 -- @name server
 -- @class directive
 
---- Set the current file to only run on the client. Shared is default. --@client
+--- Set the current file to only run on the client.
+-- `--@shared` is default.
+-- Make sure to `--@include` the file as well.
 -- @name client
 -- @class directive
 
---- Set the current file to run on both the server and client. This is enabled by default. --@shared
+--- Set the current file to run on both the server and client.
+-- This is the default realm, unless otherwise specified with `--@client` or `--@server`.
 -- @name shared
 -- @class directive
 
---- Set the client file to run as main. Can only be used in the main file. The client file must be --@include'ed.
--- The main file will not be sent to the client if you use this directive.
+--- Set which file to run as client main.
+-- Can only be used in the main file.
+-- Also, the client file must be `--@include`-ed.
+-- The main file will not be sent to the client when using this directive.
+-- ```
 -- --@include somefile.txt
 -- --@clientmain somefile.txt
+-- ```
 -- @name clientmain
 -- @class directive
 -- @param filename The file to run as main on client
 
---- Lets the chip run with no restrictions and the chip owner becomes SF.Superuser. Can only be used in the main file.
--- --@superuser
+--- Allows the chip to run with no restrictions, and the chip owner becomes the world entity.
+-- Can only be used in the main file.
+-- `--@superuser`
 -- @name superuser
 -- @class directive
 
---- Set the current file to only be sent to the owner. --@owneronly
+--- Mark the current file to only be sent to the owner.
+-- Other clients will not receive this file.
 -- @name owneronly
 -- @class directive

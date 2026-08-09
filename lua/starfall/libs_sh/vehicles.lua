@@ -57,8 +57,9 @@ if SERVER then
 	}
 end
 
---- Vehicle type
--- Created with `prop.createSeat` function
+--- Vehicle type.
+-- Inherits all functions from `Entity` type.
+-- Created with `prop.createSeat` function.
 -- @name Vehicle
 -- @class type
 -- @libtbl vehicle_methods

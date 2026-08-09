@@ -105,7 +105,7 @@ local scale_identity = Vector(1,1,1)
 -- @param Angle ang The angle to create the hologram
 -- @param string model The model to give the hologram
 -- @param Vector? scale (Optional) The scale to give the hologram
--- @return Hologram? The hologram object or nil if it failed to create
+-- @return Hologram? The hologram object, or nil if it failed to create
 function hologram_library.create(pos, ang, model, scale)
 	checkpermission(instance, nil, "hologram.create")
 	checkluatype(model, TYPE_STRING)

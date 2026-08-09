@@ -232,7 +232,7 @@ end
 --- Gets a texture from a material
 -- @param string path The path of the material (don't include .vmt in the path)
 -- @param string texture The texture key to get
--- @return string? The texture's name or nil if texture key isn't found
+-- @return string? The texture's name, or nil if texture key isn't found
 function material_library.getTexture(path, texture)
 	checkluatype(path, TYPE_STRING)
 	checkluatype(texture, TYPE_STRING)
@@ -296,7 +296,7 @@ end
 --- Returns a float keyvalue of a material
 -- @param string path The path of the material (don't include .vmt in the path)
 -- @param string key The key to get the float from
--- @return number? The float value or nil if it doesn't exist
+-- @return number? The float value, or nil if it doesn't exist
 function material_library.getFloat(path, key)
 	checkluatype(path, TYPE_STRING)
 	checkluatype(key, TYPE_STRING)
@@ -306,7 +306,7 @@ end
 --- Returns an int keyvalue of a material
 -- @param string path The path of the material (don't include .vmt in the path)
 -- @param string key The key to get the int from
--- @return number? The int value or nil if it doesn't exist
+-- @return number? The int value, or nil if it doesn't exist
 function material_library.getInt(path, key)
 	checkluatype(path, TYPE_STRING)
 	checkluatype(key, TYPE_STRING)
@@ -316,7 +316,7 @@ end
 --- Returns a matrix keyvalue of a material
 -- @param string path The path of the material (don't include .vmt in the path)
 -- @param string key The key to get the matrix from
--- @return VMatrix? The matrix value or nil if it doesn't exist
+-- @return VMatrix? The matrix value, or nil if it doesn't exist
 function material_library.getMatrix(path, key)
 	checkluatype(path, TYPE_STRING)
 	checkluatype(key, TYPE_STRING)
@@ -326,7 +326,7 @@ end
 --- Returns a string keyvalue
 -- @param string path The path of the material (don't include .vmt in the path)
 -- @param string key The key to get the string from
--- @return string? The string value or nil if it doesn't exist
+-- @return string? The string value, or nil if it doesn't exist
 function material_library.getString(path, key)
 	checkluatype(path, TYPE_STRING)
 	checkluatype(key, TYPE_STRING)
@@ -336,7 +336,7 @@ end
 --- Returns a vector keyvalue of a material
 -- @param string path The path of the material (don't include .vmt in the path)
 -- @param string key The key to get the vector from
--- @return Vector? The vector value or nil if it doesn't exist
+-- @return Vector? The vector value, or nil if it doesn't exist
 function material_library.getVector(path, key)
 	checkluatype(path, TYPE_STRING)
 	checkluatype(key, TYPE_STRING)
@@ -346,7 +346,7 @@ end
 --- Returns a linear color-corrected vector keyvalue of a material
 -- @param string path The path of the material (don't include .vmt in the path)
 -- @param string key The key to get the vector from
--- @return Vector? The vector value or nil if it doesn't exist
+-- @return Vector? The vector value, or nil if it doesn't exist
 function material_library.getVectorLinear(path, key)
 	checkluatype(path, TYPE_STRING)
 	checkluatype(key, TYPE_STRING)
@@ -464,7 +464,7 @@ end
 --- Returns a float keyvalue
 -- @name material_methods.getFloat
 -- @param string key The key to get the float from
--- @return number? The float value or nil if it doesn't exist
+-- @return number? The float value, or nil if it doesn't exist
 function lmaterial_methods:getFloat(key)
 	checkluatype(key, TYPE_STRING)
 	return lunwrap(self):GetFloat(key)
@@ -473,7 +473,7 @@ end
 --- Returns an int keyvalue
 -- @name material_methods.getInt
 -- @param string key The key to get the int from
--- @return number? The int value or nil if it doesn't exist
+-- @return number? The int value, or nil if it doesn't exist
 function lmaterial_methods:getInt(key)
 	checkluatype(key, TYPE_STRING)
 	return lunwrap(self):GetInt(key)
@@ -489,7 +489,7 @@ end
 --- Returns a matrix keyvalue
 -- @name material_methods.getMatrix
 -- @param string key The key to get the matrix from
--- @return VMatrix? The matrix value or nil if it doesn't exist
+-- @return VMatrix? The matrix value, or nil if it doesn't exist
 function lmaterial_methods:getMatrix(key)
 	checkluatype(key, TYPE_STRING)
 	return mwrap(lunwrap(self):GetMatrix(key))
@@ -498,7 +498,7 @@ end
 --- Returns a string keyvalue
 -- @name material_methods.getString
 -- @param string key The key to get the string from
--- @return string? The string value or nil if it doesn't exist
+-- @return string? The string value, or nil if it doesn't exist
 function lmaterial_methods:getString(key)
 	checkluatype(key, TYPE_STRING)
 	return lunwrap(self):GetString(key)
@@ -507,7 +507,7 @@ end
 --- Returns a texture id keyvalue
 -- @name material_methods.getTexture
 -- @param string key The key to get the texture from
--- @return string? The string id of the texture or nil if it doesn't exist
+-- @return string? The string id of the texture, or nil if it doesn't exist
 function lmaterial_methods:getTexture(key)
 	checkluatype(key, TYPE_STRING)
 	local tex = lunwrap(self):GetTexture(key)
@@ -517,7 +517,7 @@ end
 --- Returns a vector keyvalue
 -- @name material_methods.getVector
 -- @param string key The key to get the vector from
--- @return Vector? The vector value or nil if it doesn't exist
+-- @return Vector? The vector value, or nil if it doesn't exist
 function lmaterial_methods:getVector(key)
 	checkluatype(key, TYPE_STRING)
 	return vwrap(lunwrap(self):GetVector(key))
@@ -526,7 +526,7 @@ end
 --- Returns a linear color-corrected vector keyvalue
 -- @name material_methods.getVectorLinear
 -- @param string key The key to get the vector from
--- @return Vector? The vector value or nil if it doesn't exist
+-- @return Vector? The vector value, or nil if it doesn't exist
 function lmaterial_methods:getVectorLinear(key)
 	checkluatype(key, TYPE_STRING)
 	return vwrap(lunwrap(self):GetVectorLinear(key))

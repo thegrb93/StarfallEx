@@ -9,6 +9,7 @@ local math_max = math.max
 local bit_rshift = bit.rshift
 
 --- StringStream type
+-- Created with `bit.stringstream` function
 -- @name StringStream
 -- @class type
 -- @libtbl ss_methods
@@ -531,7 +532,7 @@ end
 -- @name ss_methods.readEntity
 -- @class function
 -- @param function? callback (Client only) optional callback to be ran whenever the entity becomes valid; returns
--- nothing if this is used. The callback passes the entity if it succeeds or nil if it fails.
+-- nothing if this is used. The callback passes the entity if it succeeds, or nil if it fails.
 -- @return Entity The entity that was read
 local function readEntity(self, instance, callback)
 	local index = self:readUInt16()
@@ -566,6 +567,7 @@ SF.RegisterLibrary("bit")
 return function(instance)
 
 local bit_library = instance.Libraries.bit
+
 --- Returns the arithmetically shifted value.
 -- @class function
 -- @param number value The value to be manipulated.
@@ -634,7 +636,7 @@ bit_library.ror = bit.ror
 -- @return number Right shifted value
 bit_library.rshift = bit_rshift
 
---- Normalizes the specified value and clamps it in the range of a signed 32bit integer.
+--- Normalizes the specified value and clamps it in the range of a signed 32-bit integer.
 -- @class function
 -- @param number value The value to be normalized.
 -- @return number Bit swapped value
@@ -648,7 +650,7 @@ bit_library.tobit = bit.tobit
 bit_library.tohex = bit.tohex
 
 
---- Creates a StringStream object
+--- Creates a `StringStream` object
 -- @name bit_library.stringstream
 -- @class function
 -- @param string? stream String to set the initial buffer to (default: "")
@@ -667,6 +669,7 @@ function bit_library.stringstream(stream, i, endian)
 end
 
 --- Converts a table to string serializing data types as best as it can
+-- See also `bit.stringToTable` function
 -- @param table t The table to serialize
 -- @return string Serialized data
 function bit_library.tableToString(t)
@@ -675,6 +678,7 @@ function bit_library.tableToString(t)
 end
 
 --- Converts serialized string data to table
+-- See also `bit.tableToString` function
 -- @param string s The serialized string data
 -- @return table The deserialized table
 function bit_library.stringToTable(s)
@@ -683,6 +687,7 @@ function bit_library.stringToTable(s)
 end
 
 --- Compresses a string using LZMA.
+-- See also `bit.decompress` function.
 -- @param string s String to compress
 -- @return string? Compressed string, or nil if compression failed
 function bit_library.compress(s)
@@ -694,8 +699,9 @@ function bit_library.compress(s)
 end
 
 --- Decompresses a string using LZMA.
--- XZ Utils will always produce streamed (i.e. the decompressed size is not specified in the header) LZMA data.
--- If you're trying to compress data from outside of GMod and then decompress it inside of GMod, it probably won't work unless you use the older, deprecated 'LZMA Utils', or util.Compress.
+-- XZ Utils will always produce streamed LZMA data (i.e. the decompressed size is not specified in the header).
+-- If you're trying to compress data from outside of GMod and then decompress it inside of GMod, it probably won't work unless you use the older, deprecated 'LZMA Utils', or `bit.compress`.
+-- See also `bit.compress` function.
 -- @param string s String to decompress
 -- @param number? maxSize Maximum allowed size of decompressed data
 -- @return string? Decompressed string, or nil if decompression failed

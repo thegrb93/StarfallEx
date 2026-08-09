@@ -96,7 +96,7 @@ end
 -- ------------------------- Methods ------------------------- --
 
 --- Gets the owner of the entity
--- @return Entity? Owner or nil if no owner
+-- @return Entity? Returns the entity's owner if there is one
 function ents_methods:getOwner()
 	local ent = eunwrap(self)
 
@@ -1216,7 +1216,8 @@ if SERVER then
 		Ent_SetHealth(ent, val)
 	end
 
-	--- Sets the maximum health for entity. Note, that you can still set entity's health above this amount with Entity:setHealth.
+	--- Sets the maximum health for entity.
+	-- Note: You can still set entity's health above this amount with `Entity:setHealth`.
 	-- @server
 	-- @param number val New max health value.
 	function ents_methods:setMaxHealth(val)
@@ -1248,7 +1249,7 @@ function ents_methods:entIndex()
 	return Ent_EntIndex(eunwrap(self))
 end
 
---- Returns entity's creation ID (similar to entIndex, but increments monotonically)
+--- Returns entity's creation ID (similar to `Entity:entIndex`, but increments monotonically)
 -- @shared
 -- @return number The creation ID
 function ents_methods:getCreationID()
@@ -1293,7 +1294,7 @@ function ents_methods:lookupBone(name)
 end
 
 --- Returns the matrix of the entity's bone.
--- Note: this method is slow, and doesn't work well if the entity isn't animated.
+-- Note: This method is slow, and doesn't work well if the entity isn't animated.
 -- @shared
 -- @param number? bone Bone index (default: 0)
 -- @return VMatrix The matrix
@@ -1304,7 +1305,8 @@ function ents_methods:getBoneMatrix(bone)
 end
 
 if CLIENT then
---- Sets the bone matrix of given bone to given matrix. Call setupBones to apply all changes.
+--- Sets the bone matrix of given bone to given matrix.
+-- Call `Entity:setupBones` to apply all changes.
 -- @client
 -- @param number bone The bone ID
 -- @param VMatrix matrix The matrix to set
@@ -1336,7 +1338,8 @@ function ents_methods:setBoneMatrix(bone, matrix)
 	end
 end
 
---- Invokes the BuildBonePositions of an entity. Should be called after setting all bone matrices.
+--- Invokes the BuildBonePositions of an entity.
+-- Should be called after setting all bone matrices.
 -- @client
 function ents_methods:setupBones()
 	Ent_SetupBones(eunwrap(self))
@@ -1635,7 +1638,7 @@ end
 
 --- Gets the animation number from the animation name
 -- @param string animation Name of the animation
--- @return number Animation index or -1 if invalid
+-- @return number Animation index, or -1 if invalid
 function ents_methods:lookupSequence(animation)
 	checkluatype(animation, TYPE_STRING)
 	return Ent_LookupSequence(eunwrap(self), animation)
@@ -1648,7 +1651,7 @@ function ents_methods:getSequence()
 end
 
 --- Gets the name of a sequence
--- @param number id The id of the animation
+-- @param number id The index of the animation (starts at 0)
 -- @return string The sequence name
 function ents_methods:getSequenceName(id)
 	checkluatype(id, TYPE_NUMBER)
@@ -1656,7 +1659,7 @@ function ents_methods:getSequenceName(id)
 end
 
 --- Gets various information about the specified animation
--- @param number id The ID of the animation
+-- @param number id The index of the animation (starts at 0)
 -- @return table Animation info
 function ents_methods:getSequenceInfo(id)
 	local ent = eunwrap(self)
@@ -1669,7 +1672,7 @@ function ents_methods:getSequenceInfo(id)
 end
 
 --- Returns all animations of the entity
--- @return table List of animations, starts at index 0 where value is the animation's name
+-- @return table List of animations (starts at index 0, where value is the animation's name)
 function ents_methods:getSequenceList()
 	return Ent_GetSequenceList(eunwrap(self))
 end
@@ -1687,7 +1690,7 @@ function ents_methods:isNextBot()
 end
 
 --- Checks whether the animation is playing
--- @return boolean True if the animation is currently playing, False otherwise
+-- @return boolean True if the animation is currently playing, otherwise false
 function ents_methods:isSequenceFinished()
 	return Ent_IsSequenceFinished(eunwrap(self))
 end
@@ -1741,8 +1744,8 @@ end
 
 --- Returns pose value range
 -- @param number id Pose index (starting from 0)
--- @return number? Minimum pose value or nil if pose not found
--- @return number? Maximum pose value or nil if pose not found
+-- @return number? Minimum pose value, or nil if pose not found
+-- @return number? Maximum pose value, or nil if pose not found
 function ents_methods:getPoseRange(id)
 	return Ent_GetPoseParameterRange(eunwrap(self), id)
 end
@@ -1774,8 +1777,7 @@ function ents_methods:getFlexName(id)
 	return Ent_GetFlexName(eunwrap(self), id)
 end
 
---- Returns whether or not the the entity has had flex manipulations performed with Entity:setFlexWeight or
--- Entity:setFlexScale.
+--- Returns whether or not the the entity has had flex manipulations performed with `Entity:setFlexWeight` or `Entity:setFlexScale`.
 -- @return boolean True if the entity has flex manipulations, false otherwise.
 function ents_methods:hasFlexManipulations()
 	return Ent_HasFlexManipulatior(eunwrap(self))
@@ -1859,9 +1861,9 @@ function ents_methods:getFlexBounds(flexid)
 	return Ent_GetFlexBounds(ent, flexid)
 end
 
---- Overrides the look position for an entity's eyes. The target position will be in world coordinates for NPCs,
--- but it will be in local coordinates relative to the eyes attachment for ragdolls.
---  Setting the target position to Vector(0,0,0) will remove the override entirely.
+--- Overrides the look position for an entity's eyes.
+-- The target position will be in world coordinates for NPCs, but it will be in local coordinates relative to the eyes attachment for ragdolls.
+-- Setting the target position to `Vector()` will remove the override entirely.
 -- @param Vector pos The position to look at
 function ents_methods:setEyeTarget(pos)
 	local ent = eunwrap(self)
@@ -1904,7 +1906,8 @@ end
 
 --- Returns the contents of the entity's current model
 -- @shared
--- @return number Contents of the entity's model. https://wiki.facepunch.com/gmod/Enums/CONTENTS
+-- @return number Contents of the entity's model.
+-- See https://wiki.facepunch.com/gmod/Enums/CONTENTS
 function ents_methods:getModelContents()
 	return Ent_GetModelContents(eunwrap(self))
 end
@@ -1934,7 +1937,7 @@ function ents_methods:getModelRenderBounds()
 end
 
 --- Returns an entity's collision bounding box.
--- In most cases, this will return the same bounding box as Entity:getModelBounds, unless the entity does not have a physics mesh or it has a PhysObj different from the default.
+-- In most cases, this will return the same bounding box as `Entity:getModelBounds`, unless the entity does not have a physics mesh or it has a `PhysObj` different from the default.
 -- @shared
 -- @return Vector The minimum vector of the collision bounds
 -- @return Vector The maximum vector of the collision bounds
@@ -2042,8 +2045,8 @@ end
 
 --- Checks if an engine effect is applied to the entity
 -- @shared
--- @param number effect The effect to check. EF table values
--- @return boolean True or false
+-- @param number effect The effect to check. See `EF` enum.
+-- @return boolean True if the engine effect is applied to the entity, otherwise false
 function ents_methods:isEffectActive(effect)
 	checkluatype(effect, TYPE_NUMBER)
 	return Ent_IsEffectActive(eunwrap(self), effect)
@@ -2067,8 +2070,8 @@ function ents_methods:getPersistent()
 	return Ent_GetPersistent(eunwrap(self))
 end
 
---- Returns the game assigned owner of an entity. This doesn't take CPPI into account and will return nil for most
--- standard entities.
+--- Returns the game assigned owner of an entity.
+-- This doesn't take CPPI into account and will return nil for most standard entities.
 -- Used on entities with custom physics like held SWEPs and fired bullets in which case player entity should be returned.
 -- @shared
 -- @return Entity Owner
@@ -2130,7 +2133,8 @@ end
 -- @shared
 -- @param number hitbox The number of the hit box.
 -- @param number hitboxset The number of the hit box set. This should be 0 in most cases.
--- @return number The hitbox group of given hitbox. See https://wiki.facepunch.com/gmod/Enums/HITGROUP
+-- @return number The hitbox group of given hitbox.
+-- See https://wiki.facepunch.com/gmod/Enums/HITGROUP
 function ents_methods:getHitBoxHitGroup(hitbox, hitboxset)
 	checkluatype(hitbox, TYPE_NUMBER)
 	checkluatype(hitboxset, TYPE_NUMBER)
@@ -2139,7 +2143,7 @@ end
 
 --- Returns a table of brushes surfaces for brush model entities.
 -- @shared
--- @return table Table of SurfaceInfos if the entity has a brush model, or no value otherwise.
+-- @return table Table of `SurfaceInfo` values if the entity has a brush model, or no value otherwise.
 function ents_methods:getBrushSurfaces()
 	local t = Ent_GetBrushSurfaces(eunwrap(self))
 	if not t then return end
@@ -2152,7 +2156,7 @@ end
 
 --- Returns info about the given brush plane
 -- @shared
--- @param number id Plane index. Starts from 0
+-- @param number id Plane index (starts at 0)
 -- @return Vector The origin of the plane
 -- @return Vector The normal of the plane
 -- @return number The distance to the plane
@@ -2171,8 +2175,8 @@ end
 
 --- Gets a datatable angle
 -- @shared
--- @param number key The number key. Valid keys are 0 - 31
--- @return Angle? The angle or nil if it doesn't exist
+-- @param number key The number key (from 0 to 31).
+-- @return Angle? The angle, or nil if it doesn't exist
 function ents_methods:getDTAngle(key)
 	checkluatype(key, TYPE_NUMBER)
 	if key<0 or key>31 then SF.Throw("Key must be an int in range 0 - 31") end
@@ -2181,8 +2185,8 @@ end
 
 --- Gets a datatable boolean
 -- @shared
--- @param number key The number key. Valid keys are 0 - 31
--- @return boolean? The boolean or nil if it doesn't exist
+-- @param number key The number key (from 0 to 31).
+-- @return boolean? The boolean, or nil if it doesn't exist
 function ents_methods:getDTBool(key)
 	checkluatype(key, TYPE_NUMBER)
 	if key<0 or key>31 then SF.Throw("Key must be an int in range 0 - 31") end
@@ -2191,8 +2195,8 @@ end
 
 --- Gets a datatable entity
 -- @shared
--- @param number key The number key. Valid keys are 0 - 31
--- @return Entity? The entity or nil if it doesn't exist
+-- @param number key The number key (from 0 to 31).
+-- @return Entity? The entity, or nil if it doesn't exist
 function ents_methods:getDTEntity(key)
 	checkluatype(key, TYPE_NUMBER)
 	if key<0 or key>31 then SF.Throw("Key must be an int in range 0 - 31") end
@@ -2201,8 +2205,8 @@ end
 
 --- Gets a datatable float
 -- @shared
--- @param number key The number key. Valid keys are 0 - 31
--- @return number? The float or nil if it doesn't exist
+-- @param number key The number key (from 0 to 31).
+-- @return number? The float, or nil if it doesn't exist
 function ents_methods:getDTFloat(key)
 	checkluatype(key, TYPE_NUMBER)
 	if key<0 or key>31 then SF.Throw("Key must be an int in range 0 - 31") end
@@ -2211,8 +2215,8 @@ end
 
 --- Gets a datatable int
 -- @shared
--- @param number key The number key. Valid keys are 0 - 31
--- @return number? The int or nil if it doesn't exist
+-- @param number key The number key (from 0 to 31).
+-- @return number? The int, or nil if it doesn't exist
 function ents_methods:getDTInt(key)
 	checkluatype(key, TYPE_NUMBER)
 	if key<0 or key>31 then SF.Throw("Key must be an int in range 0 - 31") end
@@ -2221,8 +2225,8 @@ end
 
 --- Gets a datatable string
 -- @shared
--- @param number key The number key. Valid keys are 0 - 31
--- @return string? The string or nil if it doesn't exist
+-- @param number key The number key (from 0 to 31).
+-- @return string? The string, or nil if it doesn't exist
 function ents_methods:getDTString(key)
 	checkluatype(key, TYPE_NUMBER)
 	if key<0 or key>31 then SF.Throw("Key must be an int in range 0 - 31") end
@@ -2231,8 +2235,8 @@ end
 
 --- Gets a datatable vector
 -- @shared
--- @param number key The number key. Valid keys are 0 - 31
--- @return Vector? The vector or nil if it doesn't exist
+-- @param number key The number key (from 0 to 31).
+-- @return Vector? The vector, or nil if it doesn't exist
 function ents_methods:getDTVector(key)
 	checkluatype(key, TYPE_NUMBER)
 	if key<0 or key>31 then SF.Throw("Key must be an int in range 0 - 31") end
@@ -2242,7 +2246,7 @@ end
 --- Gets a networked variable of an entity
 -- @shared
 -- @param string key The string key to get
--- @return any The object associated with that key or nil if it's not set
+-- @return any The object associated with that key, or nil if it's not set
 function ents_methods:getNWVar(key)
 	checkluatype(key, TYPE_STRING)
 	-- GetNW* returns whatever the key is tied to regardless of the function name
@@ -2258,18 +2262,17 @@ function ents_methods:getNWVarTable()
 	return instance.Sanitize(Ent_GetNWVarTable(eunwrap(self)))
 end
 
---- Returns the distance between the center of the entity's bounding box and whichever corner of the bounding box is
--- farthest away.
+--- Returns the distance between the center of the entity's bounding box and whichever corner of the bounding box is farthest away.
 -- @shared
 -- @return number The radius of the bounding box, or 0 for some entities such as worldspawn
 function ents_methods:getBoundingRadius()
 	return Ent_BoundingRadius(eunwrap(self))
 end
 
---- Returns whether the entity is dormant or not, i.e. whether or not information about the entity is being sent to
--- your client. Not to be confused with PhysObj:isAsleep
--- Clientside, this will usually be true if the object is outside of your PVS (potentially visible set).
--- Serverside, this will almost always be false.
+--- Returns whether the entity is dormant or not, i.e. whether or not information about the entity is being sent to your client.
+-- Not to be confused with `PhysObj:isAsleep`.
+-- On client-side, this will usually be true if the object is outside of your PVS (potentially visible set).
+-- On server-side, this will almost always be false.
 -- @shared
 -- @return boolean Whether entity is dormant or not.
 function ents_methods:isDormant()
@@ -2278,11 +2281,10 @@ end
 
 --- Performs a Ray-Orientated Bounding Box intersection from the given position to the origin of the OBBox with the
 -- entity and returns the hit position on the OBBox.
--- This relies on the entity having a collision mesh (not a physics object) and will be affected by SOLID_NONE
+-- This relies on the entity having a collision mesh (not a physics object) and will be affected by `SOLID.NONE`
 -- @shared
 -- @param Vector pos The vector to start the intersection from.
--- @return Vector The nearest hit point of the entity's bounding box in world coordinates, or Vector(0, 0,
--- 0) for some entities such as worldspawn.
+-- @return Vector The nearest hit point of the entity's bounding box in world coordinates, or `Vector()` for some entities such as worldspawn.
 function ents_methods:getNearestPoint(pos)
 	return vwrap(Ent_NearestPoint(eunwrap(self), vunwrap1(pos)))
 end
@@ -2307,8 +2309,7 @@ function ents_methods:getInternalVariable(variableName)
 	return istable(result) and instance.Sanitize(result) or owrap(result)
 end
 
---- Returns entity's map creation ID. Unlike Entity:entIndex or Entity:getCreationID,
--- it will always be the same on same map, no matter how much you clean up or restart it.
+--- Returns entity's map creation ID. Unlike `Entity:entIndex` or `Entity:getCreationID`, it will always be the same on same map, no matter how much you clean up or restart it.
 -- @shared
 -- @return number The map creation ID or -1 if the entity is not compiled into the map.
 function ents_methods:mapCreationID()
@@ -2317,7 +2318,7 @@ end
 
 --- Returns entity's networked variables table (data table).
 -- @shared
--- @return table? The networked variables table of the entity or nil if it doesn't have one.
+-- @return table? The networked variables table of the entity, or nil if it doesn't have any.
 function ents_methods:getNetworkVars()
 	local ent = eunwrap(self)
 	local ent_tbl = Ent_GetTable(ent)

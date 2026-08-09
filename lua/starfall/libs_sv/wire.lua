@@ -23,7 +23,7 @@ registerprivilege("wire.getOutputs", "Get Outputs", "Allows the user to get Outp
 SF.RegisterLibrary("wire")
 
 --- Wirelink type
--- Created with `wire.getWirelink` or `Entity:getWirelink` function
+-- Created with `wire.self`, `wire.getWirelink`, or `Entity:getWirelink` function
 -- @name Wirelink
 -- @class type
 -- @libtbl wirelink_methods
@@ -810,6 +810,7 @@ ents_methods.getWirelink = wire_library.getWirelink
 -- ------------------------- Wirelink ------------------------- --
 
 --- Retrieves an output value or highspeed cell address value
+-- @param Wirelink self The wirelink
 -- @param string|number k Name of output or index of cell
 -- @return any Value of the output or cell
 wirelink_meta.__index = function(self, k)
@@ -826,6 +827,7 @@ wirelink_meta.__index = function(self, k)
 end
 
 --- Writes to an input or highspeed cell address
+-- @param Wirelink self The wirelink
 -- @param string|number k Name of input or index of cell
 -- @param any v Value to set input or cell
 wirelink_meta.__newindex = function(self, k, v)

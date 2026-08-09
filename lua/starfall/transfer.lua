@@ -237,8 +237,8 @@ else
 	end
 
 	---Push code to a Starfall chip owned by this user
-	---@param sf Entity The Starfall chip entity
-	---@param sfdata any
+	---@param Entity sf The Starfall chip entity
+	---@param any sfdata
 	function SF.PushStarfall(sf, sfdata)
 		net.Start("starfall_upload_push")
 			net.WriteEntity(sf)

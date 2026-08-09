@@ -316,7 +316,7 @@ function bass_methods:getFadeMultiplier()
 end
 
 --- Sets the pitch of the sound.
--- @param number pitch? Pitch to apply (from 0 to 100, default: 1).
+-- @param number? pitch Pitch to apply (from 0 to 100, default: 1).
 function bass_methods:setPitch(pitch)
 	if pitch ~= nil then checkluatype(pitch, TYPE_NUMBER) else pitch = 1 end
 	getsnd(self):SetPlaybackRate(math.Clamp(pitch, 0, 100))
@@ -363,7 +363,7 @@ end
 --- Gets the fade distance of the sound in 3D space.
 -- @return number The distance before the sound starts to fade.
 -- @return number The distance before the sound stops fading.
--- @return boolean Whether or not this sound uses simple fading.
+-- @return boolean Returns whether this sound uses simple fading.
 function bass_methods:getFade()
 	local sndData = bassSounds[getsnd(self)]
 
@@ -497,7 +497,7 @@ end
 --- Retrieves HTTP headers from a bass stream channel created by `bass.loadURL`, if available.
 -- CRITICAL NOTE: Tags aren't available immediately!
 -- Must use a timer to wait 100-500ms for BASS to parse metadata during stream init!
--- @return table A list of HTTP headers or nil if no information is available.
+-- @return table A list of HTTP headers, or nil if no information is available.
 function bass_methods:getTagsHTTP()
 	return getsnd(self):GetTagsHTTP()
 end

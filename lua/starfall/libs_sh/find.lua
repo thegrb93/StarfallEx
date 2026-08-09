@@ -286,7 +286,7 @@ end
 
 --- Returns entity that has given Entity:mapCreationID.
 -- @param number num Entity's creation id
--- @return Entity? The found entity or nil if not found
+-- @return Entity? The found entity, or nil if not found
 function find_library.getMapCreatedEntity(num)
 	checkluatype(num, TYPE_NUMBER)
 	return owrap(ents.GetMapCreatedEntity(num))

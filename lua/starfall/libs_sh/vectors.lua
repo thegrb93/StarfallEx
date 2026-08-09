@@ -447,8 +447,8 @@ end
 
 --- Return rotated vector by an axis
 -- @param Vector axis Axis the rotate around
--- @param number? degrees Angle to rotate by in degrees or nil if radians.
--- @param number? radians Angle to rotate by in radians or nil if degrees.
+-- @param number? degrees Angle to rotate by in degrees, or nil if radians.
+-- @param number? radians Angle to rotate by in radians, or nil if degrees.
 -- @return Vector Rotated vector
 function vec_methods:rotateAroundAxis(axis, degrees, radians)
 	if degrees then

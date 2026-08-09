@@ -1259,12 +1259,13 @@ do
 
 	--- Add a GMod hook so that SF gets access to it
 	-- @shared
-	-- @param hookname The hook name. In-SF hookname will be lowercased
-	-- @param customargfunc Optional custom function
+	-- @param string realname The hook name. In-SF hookname will be lowercased
+	-- @param string? hookname Optional hookname. Defaults to realname
+	-- @param function? customargfunc Optional custom function
 	-- Returns true if the hook should be called, then extra arguements to be passed to the Starfall hooks
-	-- @param customretfunc Optional custom function
+	-- @param function? customretfunc Optional custom function
 	-- Takes values returned from a Starfall hook and returns what should be passed to the gmod hook
-	-- @param gmoverride Whether this hook should override the gamemode function (makes the hook run last, but adds a little overhead)
+	-- @param boolean? gmoverride Whether this hook should override the gamemode function (makes the hook run last, but adds a little overhead)
 	function SF.hookAdd(realname, hookname, customargfunc, customretfunc, gmoverride)
 		hookname = string.lower(hookname or realname)
 		registered_instances[hookname] = {}
@@ -1430,19 +1431,20 @@ function SF.DeleteFolder(folder)
 end
 
 --- Throws an error like the throw function in builtins
--- @param msg Message
--- @param level Which level in the stacktrace to blame
--- @param uncatchable Makes this exception uncatchable
+-- @param string? msg Message
+-- @param number? level Which level in the stacktrace to blame
+-- @param boolean? uncatchable Makes this exception uncatchable
+-- @param any userdata Any userdata to attach to the error
 function SF.Throw(msg, level, uncatchable, userdata)
 	local level = 1 + (level or 1)
 	error(SF.MakeError(msg, level, uncatchable, true, userdata), level)
 end
 
 --- Throws a type error
--- @param expected The expected type name
--- @param got The type name that was provided
--- @param level The stack level
--- @param msg Optional error message
+-- @param string expected The expected type name
+-- @param string got The type name that was provided
+-- @param number level The stack level
+-- @param string? msg Optional error message
 function SF.ThrowTypeError(expected, got, level, msg)
 	local level = 1 + (level or 1)
 	local funcname = debug.getinfo(level-1, "n").name or "<unnamed>"
@@ -1500,8 +1502,8 @@ SF.TYPENAME = {
 }
 
 --- Returns corresponding name of the TypeID
--- @param typeid The TYPE
--- @return String name
+-- @param number typeid The TYPE
+-- @return string Type name
 function SF.TypeName(typeid)
 	return assert(SF.TYPENAME[typeid], "Type not defined")
 end
@@ -1822,7 +1824,7 @@ do
 end
 
 --- Gets the type of val.
--- @param val The value to be checked.
+-- @param any val The value to be checked.
 function SF.GetType(val)
 	local meta = dgetmeta(val)
 	return meta and isstring(meta.__metatable) and meta.__metatable or type(val)
@@ -1845,7 +1847,7 @@ SF.allowedRenderGroups = {
 }
 
 --- Checks that the material isn't malicious
--- @param Material The path to the material
+-- @param Material material The path to the material
 -- @return The material object or false if it's invalid
 function SF.CheckMaterial(material)
 	if material == "" then return end

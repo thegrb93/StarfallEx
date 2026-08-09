@@ -236,7 +236,7 @@ end
 
 --- Reads a file from path relative to base GMod directory
 -- @param string path File path relative to GarrysMod/garrysmod/.
--- @return string? Contents or nil if error
+-- @return string? Contents, or nil if error
 function file_library.readInGame(path)
 	if instance.player ~= LocalPlayer() then SF.Throw("Only chip owner can read game files", 2) end
 	checkluatype (path, TYPE_STRING)
@@ -303,7 +303,7 @@ end
 
 --- Reads a temp file's data if it exists. Returns nil if it failed.
 -- @param string filename The temp file name. Must be only a file and not a path
--- @return string? The data of the temp file or nil if it doesn't exist
+-- @return string? The data of the temp file, or nil if it doesn't exist
 function file_library.readTemp(filename)
 	checkluatype(filename, TYPE_STRING)
 
@@ -336,7 +336,7 @@ end
 
 --- Returns the path of a temp file if it exists. Otherwise returns nil
 -- @param string filename The temp file name. Must be only a file and not a path
--- @return string? The path to the temp file or nil if it doesn't exist
+-- @return string? The path to the temp file, or nil if it doesn't exist
 function file_library.existsTemp(filename)
 	checkluatype(filename, TYPE_STRING)
 

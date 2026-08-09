@@ -336,7 +336,7 @@ end
 
 --- Sets the state of the mouse cursor
 -- @client
--- @param boolean enabled Whether or not the cursor should be enabled
+-- @param boolean enabled Whether the cursor should be enabled
 function input_library.enableCursor(enabled)
 	checkluatype(enabled, TYPE_BOOL)
 	checkpermission(instance, nil, "input.enablecursor")

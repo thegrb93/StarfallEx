@@ -24,8 +24,8 @@ registerprivilege("entities.enableDrag", "Set Drag", "Allows the user to disable
 registerprivilege("entities.setDamping", "Set Damping", "Allows the user to change entity's air friction damping", { entities = {} })
 registerprivilege("entities.remove", "Remove", "Allows the user to remove entities", { entities = {} })
 registerprivilege("entities.ignite", "Ignite", "Allows the user to ignite entities", { entities = {} })
-registerprivilege("entities.canTool", "CanTool", "Whether or not the user can use the toolgun on the entity", { entities = {} })
-registerprivilege("entities.use", "Use", "Whether or not the user can use the entity", { entities = {} })
+registerprivilege("entities.canTool", "CanTool", "Whether the user can use the toolgun on the entity", { entities = {} })
+registerprivilege("entities.use", "Use", "Whether the user can use the entity", { entities = {} })
 registerprivilege("entities.getTable", "GetTable", "Allows the user to get an entity's table", { entities = {}, usergroups = { default = 1 } })
 registerprivilege("entities.preventTransmit","Prevent Transmit","Allows the user to hide an entity from any client", { entities = {}, usergroups = { default = 1 } })
 
@@ -613,7 +613,7 @@ end
 --- Sets the entity's ragdoll position and angles without modifying the skeleton pose
 -- @param Vector? pos New position or use nil to only set angles
 -- @param Angle? ang New angles or use nil to only set position
--- @param number? bone The origin bone to use or nil to use the entity origin
+-- @param number? bone The origin bone to use, or nil to use the entity origin
 function ents_methods:setRagdollPos(pos, ang, bone)
 	local ent = eunwrap(self)
 	checkpermission(instance, ent, "entities.setPos")
@@ -1122,7 +1122,7 @@ function ents_methods:setUnbreakable(on)
 end
 
 --- Check if the given Entity or Vector is within this entity's PVS (Potentially Visible Set).
--- See: https://developer.valvesoftware.com/wiki/PVS
+-- See https://developer.valvesoftware.com/wiki/PVS
 -- @param Entity|Vector other Entity or Vector to test
 -- @return boolean If the Entity/Vector is within the PVS
 function ents_methods:testPVS(other)
@@ -1270,7 +1270,7 @@ function ents_methods:getVar(key)
 end
 
 --- Sets the entity to be used as the light origin position for this entity.
--- @param Entity? lightOrigin The lighting entity or nil to reset.
+-- @param Entity? lightOrigin The lighting entity, or nil to reset.
 function ents_methods:setLightingOriginEntity(lightOrigin)
 	local ent = eunwrap(self)
 	checkpermission(instance, ent, "entities.setRenderProperty")

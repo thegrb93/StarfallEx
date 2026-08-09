@@ -30,7 +30,7 @@ SF.RegisterLibrary("navmesh")
 SF.RegisterType("NavArea", true, false, nil, "LockedNavArea")
 
 --- LockedNavArea type.
--- Created with `navmesh.getNavArea` and other `navmesh` functions.
+-- Created with `navmesh.getNavArea` or other `navmesh` functions.
 -- NavArea that can't be modified.
 -- @name LockedNavArea
 -- @class type
@@ -153,7 +153,7 @@ return function(instance)
 	--- Creates a new NavArea
 	-- @param Vector corner The first corner of the new NavArea
 	-- @param Vector opposite_corner The opposite (diagonally) corner of the new NavArea
-	-- @return NavArea? The new NavArea or nil if we failed for some reason
+	-- @return NavArea? The new NavArea, or nil if we failed for some reason
 	function navmesh_library.createNavArea(corner, opposite_corner)
 		checkpermission(instance, nil, "navarea.create")
 		entList:checkuse(instance.player, 1)
@@ -174,10 +174,10 @@ return function(instance)
 		return height, vwrap(normal)
 	end
 
-	--- Returns an integer indexed table of all `NavArea`s on the current map.
+	--- Returns an integer indexed table of all `NavArea` values on the current map.
 	-- If the map doesn't have a navmesh generated then this will return an empty table.
 	-- The navareas will be immutable.
-	-- @return table A table of all the `NavArea`s on the current map
+	-- @return table A table of all the `NavArea` values on the current map
 	function navmesh_library.getAllNavAreas()
 		local out = {}
 		for idx, navarea in ipairs(navmesh.GetAllNavAreas()) do
@@ -191,7 +191,7 @@ return function(instance)
 	-- @param number radius Radius to search within (max 100000)
 	-- @param number stepdown Maximum fall distance allowed (max 50000)
 	-- @param number stepup Maximum jump height allowed (max 50000)
-	-- @return table A table of immutable `NavArea`s
+	-- @return table A table of immutable `NavArea` values
 	function navmesh_library.find(pos, radius, stepdown, stepup)
 		checkluatype(radius, TYPE_NUMBER)
 		checkluatype(stepdown, TYPE_NUMBER)
@@ -215,9 +215,9 @@ return function(instance)
 	-- @return number The highest ID of all nav areas on the map.
 	navmesh_library.getNavAreaCount = navmesh.GetNavAreaCount
 
-	--- Returns the NavArea at the given id.
-	-- @param number id ID of the NavArea to get. Starts with 1.
-	-- @return NavArea The NavArea with given ID.
+	--- Returns the NavArea at the given index.
+	-- @param number id Index of the NavArea to get (starts at 1).
+	-- @return NavArea The NavArea with the given index.
 	function navmesh_library.getNavAreaByID(id)
 		checkluatype(id, TYPE_NUMBER)
 		return lnavwrap( navmesh.GetNavAreaByID(id) )
@@ -237,7 +237,7 @@ return function(instance)
 	-- See navmesh.getNavArea for a function that does see blocked areas.
 	-- @param Vector pos The position to look from
 	-- @param number maxDist Maximum distance from the given position that the function will look for a CNavArea (default: 10000)
-	-- @param boolean checkLOS If this is set to true then the function will internally do a trace from the starting position to each potential CNavArea with a MASK_NPCSOLID_BRUSHONLY.
+	-- @param boolean checkLOS If this is set to true then the function will internally do a trace from the starting position to each potential CNavArea with a `MASK.NPCSOLID_BRUSHONLY`.
 	-- If the trace fails then the CNavArea is ignored.
 	-- If this is set to false then the function will find the closest CNavArea through anything, including the world.
 	-- Default: false
@@ -256,7 +256,7 @@ return function(instance)
 
 	--- Returns whether this area is in the Open List.
 	-- Used in pathfinding via the A* algorithm.
-	-- More information can be found here: https://wiki.facepunch.com/gmod/Simple_Pathfinding
+	-- See also https://wiki.facepunch.com/gmod/Simple_Pathfinding
 	-- @name navarea_methods.isOpen
 	-- @return boolean Whether this area is in the Open List.
 	function lnavarea_methods:isOpen()
@@ -265,7 +265,7 @@ return function(instance)
 
 	--- Returns whether the Open List is empty or not.
 	-- Used in pathfinding via the A* algorithm.
-	-- More information can be found here: https://wiki.facepunch.com/gmod/Simple_Pathfinding
+	-- See also https://wiki.facepunch.com/gmod/Simple_Pathfinding
 	-- @name navarea_methods.isOpenListEmpty
 	-- @return boolean Whether the Open List is empty or not.
 	function lnavarea_methods:isOpenListEmpty()
