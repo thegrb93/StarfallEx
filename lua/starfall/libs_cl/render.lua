@@ -2866,23 +2866,27 @@ end
 
 --- Get the mode of the current calculated fog.
 -- See https://wiki.facepunch.com/gmod/Enums/MATERIAL_FOG
+-- @class function
 -- @return number return the fog mode.
 render_library.getFogMode = render.GetFogMode
 
 --- Get the color of the current calculated fog
+-- @class function
 -- @return number The red channel value.
 -- @return number The green channel value.
 -- @return number The blue channel value.
 render_library.getFogColor = render.GetFogColor
 
 --- Get the distances of the current calculated fog
+-- @class function
 -- @return number The start distance of the fog.
 -- @return number The end distance of the fog.
 -- @return number The height of the fog.
 render_library.getFogDistances = render.GetFogDistances
 
 --- Get the maximum density of the current calculated fog
--- @return number The maximum density of the fog (0-1).
+-- @class function
+-- @return number The maximum density of the fog (from 0 to 1).
 render_library.getFogDensity = render.GetFogMaxDensity
 
 --- Checks whether the hardware supports HDR

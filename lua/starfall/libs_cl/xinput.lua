@@ -7,7 +7,7 @@ local checkluatype = SF.CheckLuaType
 -- @name XInputConnected
 -- @class hook
 -- @param number id Controller index (starts at 0).
--- @param number when The timer.realtime() at which this event occurred.
+-- @param number when The `timer.realtime()` at which this event occurred.
 SF.hookAdd("xinputConnected", "xinputconnected")
 
 --- Called when a controller has been disconnected. Client must have XInput Lua binary installed.
@@ -15,7 +15,7 @@ SF.hookAdd("xinputConnected", "xinputconnected")
 -- @name XInputDisconnected
 -- @class hook
 -- @param number id Controller index (starts at 0).
--- @param number when The timer.realtime() at which this event occurred.
+-- @param number when The `timer.realtime()` at which this event occurred.
 SF.hookAdd("xinputDisconnected", "xinputdisconnected")
 
 --- Called when a controller button has been pressed. Client must have XInput Lua binary installed.
@@ -24,7 +24,7 @@ SF.hookAdd("xinputDisconnected", "xinputdisconnected")
 -- @class hook
 -- @param number id Controller index (starts at 0).
 -- @param number button The button that was pushed. See https://github.com/mitterdoo/garrysmod-xinput#xinput_gamepad_
--- @param number when The timer.realtime() at which this event occurred.
+-- @param number when The `timer.realtime()` at which this event occurred.
 SF.hookAdd("xinputPressed", "xinputpressed")
 
 --- Called when a controller button has been released. Client must have XInput Lua binary installed.
@@ -33,7 +33,7 @@ SF.hookAdd("xinputPressed", "xinputpressed")
 -- @class hook
 -- @param number id Controller index (starts at 0).
 -- @param number button The button that was released. See https://github.com/mitterdoo/garrysmod-xinput#xinput_gamepad_
--- @param number when The timer.realtime() at which this event occurred.
+-- @param number when The `timer.realtime()` at which this event occurred.
 SF.hookAdd("xinputReleased", "xinputreleased")
 
 --- Called when a trigger on the controller has moved. Client must have XInput Lua binary installed.
@@ -41,9 +41,9 @@ SF.hookAdd("xinputReleased", "xinputreleased")
 -- @name XInputTrigger
 -- @class hook
 -- @param number id Controller index (starts at 0).
--- @param number value The position of the trigger. 0-255 inclusive
--- @param number trigger The trigger that was moved. 0 is left
--- @param number when The timer.realtime() at which this event occurred.
+-- @param number value The position of the trigger (from 0 to 255 inclusive).
+-- @param number trigger The trigger that was moved (0 is left).
+-- @param number when The `timer.realtime()` at which this event occurred.
 SF.hookAdd("xinputTrigger", "xinputtrigger")
 
 --- Called when a stick on the controller has moved. Client must have XInput Lua binary installed.
@@ -51,16 +51,16 @@ SF.hookAdd("xinputTrigger", "xinputtrigger")
 -- @name XInputStick
 -- @class hook
 -- @param number id Controller index (starts at 0).
--- @param number x The X coordinate of the stick. -32768 - 32767 inclusive
--- @param number y The Y coordinate of the stick. -32768 - 32767 inclusive
--- @param number stick The stick that was moved. 0 is left
--- @param number when The timer.realtime() at which this event occurred.
+-- @param number x The X coordinate of the stick (from -32768 to 32767 inclusive).
+-- @param number y The Y coordinate of the stick (from -32768 to 32767 inclusive).
+-- @param number stick The stick that was moved (0 is left).
+-- @param number when The `timer.realtime()` at which this event occurred.
 SF.hookAdd("xinputStick", "xinputstick")
 
 --- A simpler, hook-based, and more powerful controller input library.
 -- Inputs are not lost between rendered frames, and there is support for rumble.
--- Note: the client must have the XInput Lua binary module installed in order to access this library.
--- See more at https://github.com/mitterdoo/garrysmod-xinput
+-- Note: Client must have the XInput Lua binary module installed in order to access this library.
+-- See also https://github.com/mitterdoo/garrysmod-xinput
 -- @name xinput
 -- @class library
 -- @libtbl xinput_library
