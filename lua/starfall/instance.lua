@@ -25,7 +25,7 @@ else
 	SF.softLockProtection = CreateConVar("sf_timebuffersoftlock_cl", 1, FCVAR_ARCHIVE, "Enable Cpu-time limiting on other player's chips.")
 	SF.softLockProtectionOwner = CreateConVar("sf_timebuffersoftlock_cl_owner", 1, FCVAR_ARCHIVE, "Enable Cpu-time limiting on your own chips.")
 	SF.softLockProtectionSuperUser = CreateConVar("sf_timebuffersoftlock_superuser", 0, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Determines whether CPU checks should be done for superusers as well?")
-	SF.RamCap = CreateConVar("sf_ram_max_cl", 1500000, FCVAR_ARCHIVE, "If ram exceeds this limit (in kB), starfalls will be terminated")
+	SF.RamCap = CreateConVar("sf_ram_max_cl", 1500000, FCVAR_ARCHIVE, "If RAM exceeds this limit (in kB), Starfalls will be terminated")
 	SF.CvarEnabled = CreateConVar("sf_enabled_cl", "1", { FCVAR_ARCHIVE, FCVAR_USERINFO, FCVAR_DONTRECORD }, "Enable clientside starfall")
 	SF.CvarNotifyErrors = CreateConVar("sf_notify_cl", "3", FCVAR_ARCHIVE, "Chip error notification level (0=off, 1=self only, 2=filter common spam, 3=all)")
 end
