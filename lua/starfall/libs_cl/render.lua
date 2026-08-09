@@ -8,6 +8,7 @@ local pcall = pcall
 local setmetatable = setmetatable
 local dgetmeta = debug.getmetatable
 local checkluatype = SF.CheckLuaType
+local checkvector = SF.CheckVector
 local haspermission = SF.Permissions.hasAccess
 local registerprivilege = SF.Permissions.registerPrivilege
 local COL_META,ENT_META,VEC_META = FindMetaTable("Color"),FindMetaTable("Entity"),FindMetaTable("Vector")
@@ -26,6 +27,7 @@ registerprivilege("render.captureImage", "Render Capture Image", "Allows capturi
 registerprivilege("render.fog", "Render Fog", "Allows the user to control fog", { client = {} })
 registerprivilege("render.hud", "Render Hud", "Allows the user to render to your hud", { client = { default = 5 } })
 registerprivilege("render.calcview", "Render CalcView", "Allows the use of the CalcView hook", { client = { default = 5 } })
+registerprivilege("render.calcviewmodelview", "Render CalcViewModelView", "Allows the use of the CalcViewModelView hook", { client = { default = 5 } })
 registerprivilege("render.screenshake", "Render Screen Shake", "Allows screen shaking", { client = { default = 5 } })
 registerprivilege("render.screeneffect", "Screenspace effects", "Allows the use of screenspace effects", { client = { default = 5 } })
 
@@ -401,7 +403,7 @@ SF.hookAdd("PostDraw2DSkyBox", nil, hudPrepareSafeArgs, cleanupRender)
 -- @client
 SF.hookAdd("PostDrawSkyBox", nil, hudPrepareSafeArgs, cleanupRender)
 
---- Called when the engine wants to calculate the player's view. Only works if connected to Starfall HUD
+--- Called when the engine wants to calculate the player's view (only works if connected to Starfall HUD)
 -- @name CalcView
 -- @class hook
 -- @client
@@ -418,14 +420,52 @@ end, function(instance, tbl)
 	local t = tbl[2]
 	if tbl[1] and istable(t) then
 		local ret = {}
-		if t.origin then pcall(function() ret.origin = instance.Types.Vector.Unwrap(t.origin) end) end
-		if t.angles then pcall(function() ret.angles = instance.Types.Angle.Unwrap(t.angles) end) end
+		local ok, err = pcall(function()
+			if t.origin~=nil then ret.origin = instance.Types.Vector.Unwrap(t.origin) checkvector(t.origin) end
+			if t.angles~=nil then ret.angles = instance.Types.Angle.Unwrap(t.angles) checkvector(t.angles) end
+		end)
+		if not ok then
+			instance:Error(SF.MakeError("CalcView hook invalid origin or angles! "..tostring(err)))
+			return
+		end
 		ret.fov = t.fov
 		ret.znear = t.znear
 		ret.zfar = t.zfar
 		ret.drawviewer = t.drawviewer
 		ret.ortho  = t.ortho
 		return ret
+	end
+end)
+
+--- Called when the engine wants to calculate the viewmodel position and angle (only works if connected to Starfall HUD)
+-- @name CalcViewModelView
+-- @class hook
+-- @client
+-- @param Weapon wep The weapon entity
+-- @param Entity vm The viewmodel entity
+-- @param Vector oldPos Original position (before viewmodel bobbing and swaying)
+-- @param Angle oldAng Original angle (before viewmodel bobbing and swaying)
+-- @param Vector pos Current position
+-- @param Angle ang Current angle
+-- @return Vector New position (you must return a value)
+-- @return Angle New angle (you must return a value)
+SF.hookAdd("CalcViewModelView", nil, function(instance, wep, vm, oldPos, oldAng, pos, ang)
+	return instance.player == SF.Superuser or haspermission(instance, nil, "render.calcviewmodelview"),
+		{instance.Types.Weapon.Wrap(wep), instance.Types.Entity.Wrap(vm), instance.Types.Vector.Wrap(oldPos), instance.Types.Angle.Wrap(oldAng), instance.Types.Vector.Wrap(pos), instance.Types.Angle.Wrap(ang)}
+	end, function(instance, tbl)
+	local pos, ang = tbl[2], tbl[3]
+	if tbl[1] and pos~=nil and ang~=nil then
+		local ok, err = pcall(function()
+			pos = instance.Types.Vector.Unwrap(pos)
+			checkvector(pos)
+			ang = instance.Types.Angle.Unwrap(ang)
+			checkvector(ang)
+		end)
+		if ok then
+			return pos, ang
+		else
+			instance:Error(SF.MakeError("CalcViewModelView hook returned invalid type! "..tostring(err)))
+		end
 	end
 end)
 
