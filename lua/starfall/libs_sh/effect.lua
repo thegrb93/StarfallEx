@@ -3,6 +3,8 @@ local clamp = math.Clamp
 local floor = math.floor
 local checkluatype = SF.CheckLuaType
 local checknumber = SF.CheckNumber
+local checkvector = SF.CheckVector
+local clampPos = SF.clampPos
 
 -- Register Privileges
 SF.Permissions.registerPrivilege("effect.play", "Effect", "Allows the user to play effects", { client = {} })
@@ -11,17 +13,14 @@ local plyEffectBurst = SF.BurstObject("effects", "effects", 30, 5, "The rate at 
 
 SF.ResourceCounters.Effects = { icon = "icon16/bullet_star.png", count = function(ply) return plyEffectBurst.max - plyEffectBurst:check(ply) end }
 
--- Effect blacklist.
+-- Effect blacklist (must be lowercase).
 local EFFECT_BLACKLIST = {
 	dof_node = true,
-	teslahitboxes = true,
+	--teslahitboxes = true,
 }
 
 -- Global hard caps for effect data. Values outside these ranges can crash the engine.
 local GLOBAL_EFFECT_LIMITS = {
-	magnitude = 1023,
-	scale = 128,
-	radius = 1023,
 	damage = DMG_MISSILEDEFENSE,
 	flags = 255,
 	surfaceprop_min = -1,
@@ -29,18 +28,27 @@ local GLOBAL_EFFECT_LIMITS = {
 }
 
 -- Effect-specific overrides for known expensive/dangerous effects.
-local EFFECT_SPECIFIC_LIMITS = {
+-- Index: effect name (lowercase) -> { magnitude = {min,max}, scale = {min,max}, radius = {min,max} }
+local EFFECT_LIMITS = {
 	teslahitboxes = {
-		magnitude = 32,
-		scale = 16,
-		radius = 512,
+		magnitude = { 0, 32 },
+		radius    = { 0, 512 },
+		scale     = { 0, 16 },
 	},
+}
+
+-- Default min/max for fields not listed in EFFECT_LIMITS.
+local DEFAULT_LIMITS = {
+	magnitude = { 0, 1023 },
+	radius    = { 0, 1023 },
+	scale     = { -1e7, 1e7 },
 }
 
 -- Exposed, so addons can modify these if needed.
 SF.effect_blacklist = EFFECT_BLACKLIST
 SF.global_effect_limits = GLOBAL_EFFECT_LIMITS
-SF.effect_specific_limits = EFFECT_SPECIFIC_LIMITS
+SF.effect_limits = EFFECT_LIMITS
+SF.default_effect_limits = DEFAULT_LIMITS
 
 -- Hard per-frame effect limit.
 -- This prevents one chip from flooding the frame with expensive effects.
@@ -52,13 +60,17 @@ if CLIENT then
 	EFFECT_FRAME_LIMIT_CONVAR = CreateConVar("sf_effect_frame_limit", tostring(MAX_EFFECTS_PER_FRAME), FCVAR_ARCHIVE, "Maximum number of effects a single Starfall chip can spawn per frame")
 end
 
+-- Weak-keyed table mapping EffectData userdata -> effect name string.
+-- C++ userdata cannot have Lua fields attached, so we store the name here.
+local effectNames = setmetatable({}, { __mode = "k" })
+
 -- Instance-local effect frame counters, keyed by instance.
 -- Weak keys allow GC when instances are removed.
 local instanceEffectData = setmetatable({}, { __mode = "k" })
 
 if CLIENT then
 	hook.Add("PreRender", "SF_PreRender_ResetEffectFrameCount", function()
-		for _, d in pairs(instanceEffectData) do
+		for _, d in next, instanceEffectData do
 			d.frameCount = 0
 		end
 	end)
@@ -80,8 +92,6 @@ SF.RegisterType("Effect", true, false)
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
-local checkvector = SF.CheckVector
-local clampPos = SF.clampPos
 
 local effect_library = instance.Libraries.effect
 local effect_methods, effect_meta, wrap, unwrap = instance.Types.Effect.Methods, instance.Types.Effect, instance.Types.Effect.Wrap, instance.Types.Effect.Unwrap
@@ -94,18 +104,29 @@ local vunwrap1
 local aunwrap1
 local effectdata
 
--- Helper: get the limit for a key, using effect-specific overrides if available
-local function limitValue(specific, key, default)
-	local v = specific[key]
-	if v == nil then
-		return default
+local function getLimits(eff)
+	local name
+	if type(eff) == "string" then
+		name = eff
+	else
+		local ed = unwrap(eff)
+		name = effectNames[ed] or ""
 	end
-	return v
+	local limits = EFFECT_LIMITS[string.lower(name)]
+	if limits then return limits end
+	return DEFAULT_LIMITS
 end
 
-local function clampFloat(x, min, max)
-	checknumber(x)
-	return clamp(x, min, max)
+local function checkRange(value, min, max, field)
+	if value ~= value or value < min or value > max then
+		SF.Throw("Effect " .. field .. " must be between " .. min .. " and " .. max, 3)
+	end
+	return value
+end
+
+local function checkEffectField(eff, value, field)
+	local r = getLimits(eff)[field]
+	return checkRange(value, r[1], r[2], field)
 end
 
 local function clampInt(x, min, max)
@@ -127,15 +148,9 @@ end
 -- Sanitize all fields on an EffectData object before calling util.Effect.
 -- This is the critical crash-prevention step.
 local function sanitizeEffectData(ed, eff)
-	local specific = EFFECT_SPECIFIC_LIMITS[eff] or {}
-
-	local magMax = limitValue(specific, "magnitude", GLOBAL_EFFECT_LIMITS.magnitude)
-	local scaleMax = limitValue(specific, "scale", GLOBAL_EFFECT_LIMITS.scale)
-	local radiusMax = limitValue(specific, "radius", GLOBAL_EFFECT_LIMITS.radius)
-
-	ed:SetMagnitude(clampFloat(ed:GetMagnitude(), 0, magMax))
-	ed:SetScale(clampFloat(ed:GetScale(), 0, scaleMax))
-	ed:SetRadius(clampFloat(ed:GetRadius(), 0, radiusMax))
+	checkEffectField(eff, ed:GetMagnitude(), "magnitude")
+	checkEffectField(eff, ed:GetRadius(), "radius")
+	checkEffectField(eff, ed:GetScale(), "scale")
 
 	ed:SetDamageType(clampInt(ed:GetDamageType(), 0, GLOBAL_EFFECT_LIMITS.damage))
 	ed:SetSurfaceProp(clampInt(ed:GetSurfaceProp(), GLOBAL_EFFECT_LIMITS.surfaceprop_min, GLOBAL_EFFECT_LIMITS.surfaceprop_max))
@@ -233,7 +248,8 @@ function effect_methods:play(eff)
 
 	checkpermission(instance, nil, "effect.play")
 
-	if EFFECT_BLACKLIST[string.lower(eff)] then
+	eff = string.lower(eff)
+	if EFFECT_BLACKLIST[eff] then
 		SF.Throw("Effect (" .. eff .. ") is blacklisted", 2)
 	end
 
@@ -247,12 +263,17 @@ function effect_methods:play(eff)
 
 	if CLIENT then
 		local limit = EFFECT_FRAME_LIMIT_CONVAR and EFFECT_FRAME_LIMIT_CONVAR:GetInt() or MAX_EFFECTS_PER_FRAME
-		if effectdata.frameCount >= limit then
+		if limit > 0 and effectdata.frameCount >= limit then
 			SF.Throw("Too many effects spawned in one frame", 2)
 		end
 	end
 
 	local ed = unwrap(self)
+	if not IsValid(ed) then
+		SF.Throw("Invalid effect data", 2)
+	end
+
+	effectNames[ed] = eff
 
 	-- Sanitize before using burst so invalid data does not consume burst quota.
 	sanitizeEffectData(ed, eff)
@@ -421,7 +442,7 @@ end
 -- @param number magnitude The magnitude
 function effect_methods:setMagnitude(magnitude)
 	checkluatype(magnitude, TYPE_NUMBER)
-	unwrap(self):SetMagnitude(clampFloat(magnitude, 0, GLOBAL_EFFECT_LIMITS.magnitude))
+	unwrap(self):SetMagnitude(checkEffectField(self, magnitude, "magnitude"))
 end
 
 --- Sets the effect's material index
@@ -447,14 +468,14 @@ end
 -- @param number radius The radius
 function effect_methods:setRadius(radius)
 	checkluatype(radius, TYPE_NUMBER)
-	unwrap(self):SetRadius(clampFloat(radius, 0, GLOBAL_EFFECT_LIMITS.radius))
+	unwrap(self):SetRadius(checkEffectField(self, radius, "radius"))
 end
 
 --- Sets the effect's scale
 -- @param number scale The number scale
 function effect_methods:setScale(scale)
 	checkluatype(scale, TYPE_NUMBER)
-	unwrap(self):SetScale(clampFloat(scale, 0, GLOBAL_EFFECT_LIMITS.scale))
+	unwrap(self):SetScale(checkEffectField(self, scale, "scale"))
 end
 
 --- Sets the effect's start pos
