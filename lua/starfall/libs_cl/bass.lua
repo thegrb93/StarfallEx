@@ -578,7 +578,7 @@ end
 -- This feature requires the channel to be initially created in 3D mode, i.e. `Bass:is3D` should return true or this function will do nothing.
 -- @param boolean enable Specify whether to enable 3D.
 function bass_methods:set3DEnabled(enable)
-	checkluatype(enable, TYPE_BOOLEAN)
+	checkluatype(enable, TYPE_BOOL)
 
 	local uw = getsnd(self)
 	if not uw:Is3D() then SF.Throw("You cannot set the mode of a Bass object that isn't 3D! Please call is3D first!", 2) end
