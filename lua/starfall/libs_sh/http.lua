@@ -171,11 +171,11 @@ local VALID_METHODS = {
 	OPTIONS = true
 }
 
---- Runs a new HTTP request. Wraps HTTP() directly. Official documentation for each parameter can be found here:
+--- Runs a new HTTP request. Wraps `HTTP` directly. Official documentation for each parameter can be found here:
 -- https://wiki.facepunch.com/gmod/Structures/HTTPRequest
 -- @param string url HTTP resource URL
 -- @param string method Request method, case insensitive.
--- Possible values are: GET, POST, HEAD, PUT, DELETE, PATCH, OPTIONS
+-- Possible values are: `GET`, `POST`, `HEAD`, `PUT`, `DELETE`, `PATCH`, `OPTIONS`
 -- @param function? success Optional callback to be invoked on success. With arguments:
 -- 1. number code
 -- 2. string body
@@ -185,7 +185,7 @@ local VALID_METHODS = {
 -- @param string? body Body string for POST data. If set, will override parameters
 -- @param table? parameters KeyValue table for URL parameters.
 -- This is only applicable to the following request methods:
--- HEAD, GET, and POST (sent in body, so if body argument is set, this argument will be ignored)
+-- `HEAD`, `GET`, and `POST` (sent in body, so if body argument is set, this argument will be ignored)
 -- @param string? type Content type for body (default: "text/plain; charset=utf-8")
 -- @param table? headers KeyValue table for headers
 -- @param number? timeout The timeout for the connection. Clamped between [0.1, 300] (default: 60)
@@ -267,7 +267,8 @@ function http_library.request(url, method, success, failed, body, parameters, ty
 	HTTP(request)
 end
 
---- Converts data into base64 format or nil if the string is 0 length
+--- Converts data into base64 format, or nil if the string is 0 length
+-- See also `http.base64Decode` function
 -- @name http_library.base64Encode
 -- @class function
 -- @param string data The data to convert
@@ -281,6 +282,7 @@ function http_library.base64Encode(data)
 end
 
 --- Converts data from base64 format
+-- See also `http.base64Encode` function
 -- @name http_library.base64Decode
 -- @class function
 -- @param string data The data to convert
@@ -288,6 +290,7 @@ end
 http_library.base64Decode = util.Base64Decode
 
 --- Encodes illegal URL characters to be legal
+-- See also `http.urlDecode` function
 -- @param string data The data to convert
 -- @return string The converted data
 function http_library.urlEncode(data)
@@ -300,6 +303,7 @@ function http_library.urlEncode(data)
 end
 
 --- Decodes the % escaped chars in a URL
+-- See also `http.urlEncode` function
 -- @param string data The data to convert
 -- @return string The converted data
 function http_library.urlDecode(data)

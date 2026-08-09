@@ -2302,11 +2302,11 @@ render_library.draw3DTriangleUV = function(vert1, vert2, vert3)
 end
 
 
---- Gets a 2D cursor position where ply is aiming at the current rendered screen or nil if they aren't aiming at it.
+--- Gets a 2D cursor position where ply is aiming at the current rendered screen, or nil if they aren't aiming at it.
 -- @param Player? ply player to get cursor position from. Default player()
 -- @param Entity? screen An explicit screen to get the cursor pos of (default: the current rendering screen using 'render' hook)
--- @return number? X position or nil if the player is not aiming at the screen
--- @return number? Y position or nil if the player is not aiming at the screen
+-- @return number? X position, or nil if the player is not aiming at the screen
+-- @return number? Y position, or nil if the player is not aiming at the screen
 function render_library.cursorPos(ply, screen)
 	if ply~=nil then
 		ply = eunwrap(ply)
@@ -2702,7 +2702,7 @@ function render_library.getAmbientLightColor()
 end
 
 --- Sets the fog mode.
--- See: https://wiki.facepunch.com/gmod/Enums/MATERIAL_FOG
+-- See https://wiki.facepunch.com/gmod/Enums/MATERIAL_FOG
 -- @param number mode Fog mode
 function render_library.setFogMode(mode)
 	checkpermission(instance, nil, "render.fog")
@@ -2758,7 +2758,7 @@ function render_library.setFogHeight(height)
 end
 
 --- Get the mode of the current calculated fog.
--- See: https://wiki.facepunch.com/gmod/Enums/MATERIAL_FOG
+-- See https://wiki.facepunch.com/gmod/Enums/MATERIAL_FOG
 -- @return number Returns the fog mode.
 render_library.getFogMode = render.GetFogMode
 
@@ -2862,7 +2862,7 @@ end
 --- Copies the entire screen to the screen effect texture, which can be acquired via render.getScreenEffectTexture
 -- (Requires HUD)
 -- @client
--- @param number textureIndex? Texture index to update (default: 0)
+-- @param number? textureIndex Texture index to update (default: 0)
 function render_library.updateScreenEffectTexture(textureIndex)
 	checkpermission(instance, nil, "render.screeneffect")
 	if textureIndex ~= nil then
@@ -2879,7 +2879,7 @@ end
 --- Obtain an texture of the screen. You must call render.updateScreenEffectTexture in order to update this texture
 -- with the currently rendered scene
 -- @client
--- @param number textureIndex? Texture index to update (default: 0)
+-- @param number? textureIndex Texture index to update (default: 0)
 -- @return string Requested texture
 function render_library.getScreenEffectTexture(textureIndex)
 	if textureIndex ~= nil then

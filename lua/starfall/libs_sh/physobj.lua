@@ -133,28 +133,28 @@ function physobj_methods:getMaterial()
 	return Phys_GetMaterial(unwrap(self))
 end
 
---- Returns a vector in the local reference frame of the physicsobject from the world frame
+--- Returns a vector in the local reference frame of the `PhysObj` from the world frame
 -- @param Vector vec The vector to transform
 -- @return Vector The transformed vector
 function physobj_methods:worldToLocal(vec)
 	return vwrap(Phys_WorldToLocal(unwrap(self), vunwrap1(vec)))
 end
 
---- Returns a vector in the reference frame of the world from the local frame of the physicsobject
+--- Returns a vector in the reference frame of the world from the local frame of the `PhysObj`
 -- @param Vector vec The vector to transform
 -- @return Vector The transformed vector
 function physobj_methods:localToWorld(vec)
 	return vwrap(Phys_LocalToWorld(unwrap(self), vunwrap1(vec)))
 end
 
---- Returns a normal vector in the local reference frame of the physicsobject from the world frame
+--- Returns a normal vector in the local reference frame of the `PhysObj` from the world frame
 -- @param Vector vec The normal vector to transform
 -- @return Vector The transformed vector
 function physobj_methods:worldToLocalVector(vec)
 	return vwrap(Phys_WorldToLocalVector(unwrap(self), vunwrap1(vec)))
 end
 
---- Returns a normal vector in the reference frame of the world from the local frame of the physicsobject
+--- Returns a normal vector in the reference frame of the world from the local frame of the `PhysObj`
 -- @param Vector vec The normal vector to transform
 -- @return Vector The transformed vector
 function physobj_methods:localToWorldVector(vec)
@@ -162,14 +162,14 @@ function physobj_methods:localToWorldVector(vec)
 end
 
 --- Returns a table of MeshVertex structures where each 3 vertices represent a triangle.
--- See: https://wiki.facepunch.com/gmod/Structures/MeshVertex
+-- See https://wiki.facepunch.com/gmod/Structures/MeshVertex
 -- @return table Table of MeshVertex structures
 function physobj_methods:getMesh()
 	return instance.Sanitize(Phys_GetMesh(unwrap(self)))
 end
 
 --- Returns a structured table, the physics mesh of the physics object.
--- See: https://wiki.facepunch.com/gmod/Structures/MeshVertex
+-- See https://wiki.facepunch.com/gmod/Structures/MeshVertex
 -- @return table Table of MeshVertex structures
 function physobj_methods:getMeshConvexes()
 	return instance.Sanitize(Phys_GetMeshConvexes(unwrap(self)))
@@ -419,7 +419,7 @@ if SERVER then
 	-- FVPHYSICS.NO_IMPACT_DMG
 	-- FVPHYSICS.NO_NPC_IMPACT_DMG
 	-- FVPHYSICS.NO_PLAYER_PICKUP
-	-- @param number flags The flags to add. FVPHYSICS enum.
+	-- @param number flags The flags to add. See `FVPHYSICS` enum.
 	function physobj_methods:addGameFlags(flags)
 		checkluatype(flags, TYPE_NUMBER)
 		local phys = unwrap(self)
@@ -439,7 +439,7 @@ if SERVER then
 	-- FVPHYSICS.NO_IMPACT_DMG
 	-- FVPHYSICS.NO_NPC_IMPACT_DMG
 	-- FVPHYSICS.NO_PLAYER_PICKUP
-	-- @param number flags The flags to clear. FVPHYSICS enum.
+	-- @param number flags The flags to clear. See `FVPHYSICS` enum.
 	function physobj_methods:clearGameFlags(flags)
 		checkluatype(flags, TYPE_NUMBER)
 		local phys = unwrap(self)
@@ -453,7 +453,7 @@ if SERVER then
 	end
 
 	--- Returns whether the game flags of the physics object are set.
-	-- @param number flags The flags to test. FVPHYSICS enum.
+	-- @param number flags The flags to test. See `FVPHYSICS` enum.
 	-- @return boolean If the flags are set
 	function physobj_methods:hasGameFlags(flags)
 		checkluatype(flags, TYPE_NUMBER)
@@ -530,14 +530,14 @@ if SERVER then
 		Phys_Wake(phys)
 	end
 
-	--- Returns whether the physobj is asleep
+	--- Returns whether the `PhysObj` is asleep
 	-- @server
-	-- @return boolean If the physobj is asleep
+	-- @return boolean If the `PhysObj` is asleep
 	function physobj_methods:isAsleep()
 		return Phys_IsAsleep(unwrap(self))
 	end
 
-	--- Makes a physobj go to sleep. (like it's frozen but interacting wakes it back up)
+	--- Makes a `PhysObj` go to sleep (like it's frozen but interacting wakes it back up)
 	-- @server
 	function physobj_methods:sleep()
 		local phys = unwrap(self)
@@ -545,7 +545,7 @@ if SERVER then
 		Phys_Sleep(phys)
 	end
 
-	--- Makes a sleeping physobj wakeup
+	--- Makes a sleeping `PhysObj` wakeup
 	-- @server
 	function physobj_methods:wake()
 		local phys = unwrap(self)
@@ -553,9 +553,9 @@ if SERVER then
 		Phys_Wake(phys)
 	end
 
-	--- Returns table of tables of friction data of a contact against the physobj
+	--- Returns table of tables of friction data of a contact against the `PhysObj`
 	-- @server
-	-- @return table Table of tables of data. Each table will contain:
+	-- @return table Table of tables, each containing:
 	-- PhysObj Other - The other physics object we came in contact with
 	-- number EnergyAbsorbed -
 	-- number FrictionCoefficient -
@@ -572,9 +572,9 @@ if SERVER then
 		return result
 	end
 
-	--- Returns the volume in source units cubed. Or nil if the PhysObj is a generated sphere or box.
+	--- Returns the volume in source units cubed. Or nil if the `PhysObj` is a generated sphere or box.
 	-- @shared
-	-- @return number? The volume or nil if the PhysObj is a generated sphere or box.
+	-- @return number? The volume, or nil if the `PhysObj` is a generated sphere or box.
 	function physobj_methods:getVolume()
 		return Phys_GetVolume(unwrap(self))
 	end
@@ -588,15 +588,15 @@ if SERVER then
 	end
 
 	--- Calculates the linear and angular impulse on the object's center of mass for an offset impulse.
-	-- The outputs can be used with PhysObj:applyForceCenter and PhysObj:applyTorque, respectively.
+	-- The outputs can be used with `PhysObj:applyForceCenter` and `PhysObj:applyTorque`, respectively.
 	--
-	-- Be careful to convert the angular impulse to world frame (PhysObj:localToWorldVector)
+	-- Be careful to convert the angular impulse to world frame (`PhysObj:localToWorldVector`)
 	-- if you are going to use it with applyTorque.
 	-- @server
 	-- @param Vector impulse The impulse acting on the object in world coordinates (kg*source_unit/s)
 	-- @param Vector position The location of the impulse in world coordinates
-	-- @return Vector The calculated linear impulse on the physics object's center of mass in kg*source_unit/s. (World frame)
-	-- @return Vector The calculated angular impulse on the physics object's center of mass in kg*m^2*degrees/s. (Local frame)
+	-- @return Vector The calculated linear impulse on the physics object's center of mass in kg*source_unit/s. (world frame)
+	-- @return Vector The calculated angular impulse on the physics object's center of mass in kg*m^2*degrees/s. (local frame)
 	function physobj_methods:calculateForceOffset(impulse, position)
 		impulse = vunwrap1(impulse)
 		position = vunwrap2(position)
@@ -610,12 +610,12 @@ if SERVER then
 	end
 
 	--- Calculates the linear and angular velocities on the center of mass for an offset impulse.
-	-- The outputs can be directly passed to PhysObj:addVelocity and PhysObj:addAngleVelocity, respectively.
+	-- The outputs can be directly passed to `PhysObj:addVelocity` and `PhysObj:addAngleVelocity`, respectively.
 	-- @server
 	-- @param Vector impulse The impulse acting on the object in world coordinates (kg*source_unit/s)
 	-- @param Vector position The location of the impulse in world coordinates
-	-- @return Vector The calculated linear velocity from the impulse on the physics object's center of mass in source_unit/s. (World frame)
-	-- @return Vector The calculated angular velocity from the impulse on the physics object's center of mass in degrees/s. (Local frame)
+	-- @return Vector The calculated linear velocity from the impulse on the physics object's center of mass in source_unit/s. (world frame)
+	-- @return Vector The calculated angular velocity from the impulse on the physics object's center of mass in degrees/s. (local frame)
 	function physobj_methods:calculateVelocityOffset(impulse, position)
 		impulse = vunwrap1(impulse)
 		position = vunwrap2(position)

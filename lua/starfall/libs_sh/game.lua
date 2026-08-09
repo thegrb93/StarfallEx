@@ -169,18 +169,20 @@ function game_library.getWindSpeed(pos)
 	return vwrap(game.GetWindSpeed(pos))
 end
 
---- Given a 64bit SteamID will return a STEAM_0: style Steam ID
+--- Given a 64-bit SteamID will return a STEAM_0: style SteamID.
+-- See also `game.steamIDTo64` function.
 -- @name game_library.steamIDFrom64
 -- @class function
 -- @param string id The 64 bit Steam ID
 -- @return string STEAM_0 style Steam ID
 game_library.steamIDFrom64 = util.SteamIDFrom64
 
---- Given a STEAM_0 style Steam ID will return a 64bit Steam ID
+--- Given a STEAM_0 style SteamID will return a 64-bit SteamID.
+-- See also `game.steamIDFrom64` function.
 -- @name game_library.steamIDTo64
 -- @class function
 -- @param string id The STEAM_0 style id
--- @return string 64bit Steam ID
+-- @return string 64-bit Steam ID
 game_library.steamIDTo64 = util.SteamIDTo64
 
 --- Returns the name of the currently running gamemode
@@ -291,7 +293,7 @@ else
 	-- @return boolean True if the game is focused
 	game_library.hasFocus = system.HasFocus
 
-	--- Returns the direction and how obstructed the map's sun is or nil if it doesn't exist
+	--- Returns the direction and how obstructed the map's sun is, or nil if it doesn't exist
 	-- @client
 	-- @return Vector The direction of the sun
 	-- @return number How obstructed the sun is 0 to 1.

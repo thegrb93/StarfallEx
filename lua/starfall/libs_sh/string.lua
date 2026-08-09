@@ -59,7 +59,7 @@ string_library.comma = sfstring.Comma
 -- @return string The bytecode
 string_library.dump = sfstring.dump
 
---- Whether or not the second passed string matches the end of the first.
+--- Whether the second passed string matches the end of the first.
 -- @class function
 -- @param string str The string whose end is to be checked
 -- @param string end The string to be matched with the end of the first
@@ -245,7 +245,7 @@ string_library.setChar = sfstring.SetChar
 -- @return table Table with the separated strings in numerical sequential order
 string_library.split = sfstring.Split
 
---- Whether or not the first string starts with the second
+--- Whether the first string starts with the second
 -- @class function
 -- @param string str String to be checked
 -- @param string start String to check with

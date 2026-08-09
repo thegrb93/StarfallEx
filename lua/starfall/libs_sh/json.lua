@@ -22,7 +22,9 @@ local function CheckCyclic(tbl, parents)
 	end
 	parents[tbl] = nil
 end
+
 --- Convert table to JSON string
+-- See also `json.decode` function
 -- @param table tbl Table to encode
 -- @param boolean? prettyPrint Optional. If true, formats and indents the resulting JSON
 -- @return string JSON encoded string representation of the table
@@ -35,6 +37,7 @@ function json_library.encode(tbl, prettyPrint)
 end
 
 --- Convert JSON string to table
+-- See also `json.encode` function
 -- @param string s String to decode
 -- @param boolean? ignoreConversions Optional. If true, ignore string to number conversions for table keys
 -- @return table Table representing the JSON object

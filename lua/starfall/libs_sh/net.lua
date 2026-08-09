@@ -249,6 +249,7 @@ end
 net_library.abort = net_reset
 
 --- Writes an object to a net message automatically typing it
+-- See also `net.readType` function
 -- @shared
 -- @param any v The object to write
 function net_library.writeType(v)
@@ -261,6 +262,7 @@ end
 
 --- Reads an object from a net message automatically typing it
 -- Will throw an error if invalid type is read. Make sure to pcall it
+-- See also `net.writeType` function
 -- @shared
 -- @return any The object
 function net_library.readType()
@@ -268,6 +270,7 @@ function net_library.readType()
 end
 
 --- Writes a table to a net message automatically typing it.
+-- See also `net.readTable` function
 -- @shared
 -- @param table t The table to write
 function net_library.writeTable(t)
@@ -281,6 +284,7 @@ end
 
 --- Reads an table from a net message automatically typing it
 -- Will throw an error if invalid type is read. Make sure to pcall it
+-- See also `net.writeTable` function
 -- @shared
 -- @return table The table
 function net_library.readTable()
@@ -599,9 +603,9 @@ end
 
 --- Reads an entity from the net message
 -- @shared
--- @param function? callback (Client only) optional callback to be ran whenever the entity becomes valid; returns
--- nothing if this is used. The callback passes the entity if it succeeds or nil if it fails.
--- @return Entity? The entity that was read or nil if callback used
+-- @param function? callback (Client only) optional callback to be invoked whenever the entity becomes valid; returns nothing if this is used.
+-- The callback passes the entity if it succeeds, or nil if it fails.
+-- @return Entity? The entity that was read, or nil if callback used
 function net_library.readEntity(callback)
 	local index = net.ReadUInt(16)
 	local creationindex = net.ReadUInt(32)

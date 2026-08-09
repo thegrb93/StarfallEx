@@ -22,8 +22,8 @@ local joystick_library = instance.Libraries.joystick
 
 
 --- Gets the axis data value.
--- @param number enum Joystick number. Starts at 0
--- @param number axis Joystick axis number. Ranges from 0 to 7.
+-- @param number enum Joystick number (starts at 0).
+-- @param number axis Joystick axis number (from 0 to 7).
 -- @return number 0 - 65535 where 32767 is the middle.
 function joystick_library.getAxis(enum, axis)
 	refresh(enum)
@@ -31,8 +31,8 @@ function joystick_library.getAxis(enum, axis)
 end
 
 --- Gets the pov data value.
--- @param number enum Joystick number. Starts at 0
--- @param number pov Joystick pov number. Ranges from 0 to 7.
+-- @param number enum Joystick number (starts at 0).
+-- @param number pov Joystick pov number (from 0 to 7).
 -- @return number 0 - 65535 where 32767 is the middle.
 function joystick_library.getPov(enum, pov)
 	refresh(enum)
@@ -40,8 +40,8 @@ function joystick_library.getPov(enum, pov)
 end
 
 --- Returns if the button is pushed or not
--- @param number enum Joystick number. Starts at 0
--- @param number button Joystick button number. Starts at 0
+-- @param number enum Joystick number (starts at 0).
+-- @param number button Joystick button number (starts at 0).
 -- @return number 0 or 1
 function joystick_library.getButton(enum, button)
 	refresh(enum)
@@ -49,7 +49,7 @@ function joystick_library.getButton(enum, button)
 end
 
 --- Gets the hardware name of the joystick
--- @param number enum Joystick number. Starts at 0
+-- @param number enum Joystick number (starts at 0).
 -- @return string Name of the device
 function joystick_library.getName(enum)
 	refresh(enum)
@@ -63,7 +63,7 @@ function joystick_library.numJoysticks()
 end
 
 --- Gets the number of detected axes on a joystick
--- @param number enum Joystick number. Starts at 0
+-- @param number enum Joystick number (starts at 0).
 -- @return number Number of axes
 function joystick_library.numAxes(enum)
 	refresh(enum)
@@ -71,7 +71,7 @@ function joystick_library.numAxes(enum)
 end
 
 --- Gets the number of detected buttons on a joystick
--- @param number enum Joystick number. Starts at 0
+-- @param number enum Joystick number (starts at 0).
 -- @return number Number of buttons
 function joystick_library.numButtons(enum)
 	refresh(enum)
@@ -79,7 +79,7 @@ function joystick_library.numButtons(enum)
 end
 
 --- Gets the number of detected povs on a joystick
--- @param number enum Joystick number. Starts at 0
+-- @param number enum Joystick number (starts at 0).
 -- @return number Number of povs
 function joystick_library.numPovs(enum)
 	refresh(enum)

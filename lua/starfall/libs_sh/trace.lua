@@ -121,9 +121,9 @@ end
 -- @param Angle boxAngles The box's angles
 -- @param Vector boxMins The box min bounding vector
 -- @param Vector boxMaxs The box max bounding vector
--- @return Vector? Hit position or nil if not hit
--- @return Vector? Hit normal or nil if not hit
--- @return number? Hit fraction or nil if not hit
+-- @return Vector? Hit position, or nil if not hit
+-- @return Vector? Hit normal, or nil if not hit
+-- @return number? Hit fraction, or nil if not hit
 function trace_library.intersectRayWithOBB(rayStart, rayDelta, boxOrigin, boxAngles, boxMins, boxMaxs)
 	vec_SetUnpacked(start_vec, rayStart[1], rayStart[2], rayStart[3])
 	vec_SetUnpacked(endpos_vec, rayDelta[1], rayDelta[2], rayDelta[3])
@@ -149,12 +149,12 @@ function trace_library.isBoxIntersectingSphere(boxMins, boxMaxs, spherePos, sphe
 	return util.IsBoxIntersectingSphere(minbox_vec, maxbox_vec, origin_vec, sphereRadius)
 end
 
---- Does a ray plane intersection returning the position hit or nil if not hit
+--- Does a ray plane intersection returning the position hit, or nil if not hit
 -- @param Vector rayStart The origin of the ray
 -- @param Vector rayDelta The direction and length of the ray
 -- @param Vector planeOrigin The origin of the plane
 -- @param Vector planeNormal The normal of the plane
--- @return Vector? Hit position or nil if not hit
+-- @return Vector? Hit position, or nil if not hit
 function trace_library.intersectRayWithPlane(rayStart, rayDelta, planeOrigin, planeNormal)
 	vec_SetUnpacked(start_vec, rayStart[1], rayStart[2], rayStart[3])
 	vec_SetUnpacked(endpos_vec, rayDelta[1], rayDelta[2], rayDelta[3])

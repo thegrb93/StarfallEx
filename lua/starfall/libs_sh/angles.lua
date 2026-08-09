@@ -196,8 +196,8 @@ end
 
 --- Return Rotated angle around the specified axis.
 -- @param Vector v Vector axis
--- @param number? deg Number of degrees or nil if radians.
--- @param number? rad Number of radians or nil if degrees.
+-- @param number? deg Number of degrees, or nil if radians.
+-- @param number? rad Number of radians, or nil if degrees.
 -- @return Angle The modified angle
 function ang_methods:rotateAroundAxis(v, deg, rad)
 	if rad then

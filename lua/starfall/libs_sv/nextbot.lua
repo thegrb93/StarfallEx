@@ -9,8 +9,9 @@ local ENT_META = FindMetaTable("Entity")
 -- @libtbl nextbot_library
 SF.RegisterLibrary("nextbot")
 
---- NextBot type
--- Created with `nextbot.create` function
+--- NextBot type.
+-- Inherits all functions from Entity type.
+-- Created with `nextbot.create` function.
 -- @name NextBot
 -- @class type
 -- @server

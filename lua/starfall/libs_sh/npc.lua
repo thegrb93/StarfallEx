@@ -15,8 +15,9 @@ if SERVER then
 end
 
 
---- NPC type
--- Created with `prop.createSent` function, e.g. with class "npc_zombine"
+--- NPC type.
+-- Inherits all functions from `Entity` type.
+-- Created with `prop.createSent` function, e.g. with class "npc_zombine".
 -- @name Npc
 -- @class type
 -- @libtbl npc_methods
