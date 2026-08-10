@@ -286,9 +286,6 @@ function effect_methods:play(eff)
 	local limit = EFFECT_FRAME_LIMIT_CONVAR:GetInt()
 	-- Superusers bypass the limits.
 	if instance.player ~= SF.Superuser then
-		if SERVER and gamemode.Call("PlayerSpawnEffect", instance.player, eff) == false then
-			SF.Throw("Cannot spawn effect (" .. eff .. ")", 2)
-		end
 		if limit > 0 and effectdata.frameCount >= limit then
 			SF.Throw("Too many effects spawned in one frame", 2)
 		end
