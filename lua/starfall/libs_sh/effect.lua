@@ -9,7 +9,7 @@ local clampPos = SF.clampPos
 -- Register Privileges
 SF.Permissions.registerPrivilege("effect.play", "Effect", "Allows the user to play effects", { client = {} })
 
-local plyEffectBurst = SF.BurstObject("effects", "effects", 30, 5, "The rate at which effects can be spawned per second.", "Number of effects that can be spawned in a short time.")
+local plyEffectBurst = SF.BurstObject("effects", "effects", 60, 5, "The rate at which effects can be spawned per second.", "Number of effects that can be spawned in a short time.")
 
 SF.ResourceCounters.Effects = { icon = "icon16/bullet_star.png", count = function(ply) return plyEffectBurst.max - plyEffectBurst:check(ply) end }
 
