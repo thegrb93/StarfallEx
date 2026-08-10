@@ -208,6 +208,21 @@ function file_library.open(path, mode)
 	end
 end
 
+--- Opens a file from path relative to base GMod directory
+-- @param string path Filepath relative to GarrysMod/garrysmod/.
+-- @param string mode The file mode to use. See Lua manual for explanation
+-- @return File? File object, or no value if it failed
+function file_library.openInGame(path, mode)
+	if instance.player ~= LocalPlayer() then SF.Throw("Only chip owner can read game files") end
+	checkluatype (path, TYPE_STRING)
+	checkluatype (mode, TYPE_STRING)
+	local f = file.Open(SF.NormalizePath(path), mode, "GAME")
+	if f then
+		files[f] = true
+		return wrap(f)
+	end
+end
+
 --- Reads a file from path
 -- @param string path Filepath relative to data/sf_filedata/.
 -- @return string? Contents, or nil if error
@@ -238,6 +253,44 @@ function file_library.asyncRead(path, callback)
 	file.AsyncRead("sf_filedata/" .. SF.NormalizePath(path), "DATA", function(_, _, status, data)
 		concurrentreads = concurrentreads - 1
 		instance:runFunction(callback, path, status, data)
+	end)
+end
+
+--- Reads a file asynchronously from path relative to base GMod directory
+-- @param string path File path relative to GarrysMod/garrysmod/.
+-- @param function callback A callback function that runs when the read operation completes. With arguments:
+-- 1. string filename - The name of the file
+-- 2. number status - The status of the read operation (see FSASYNC enum)
+-- 3. string data - The data read from the file
+function file_library.asyncReadInGame(path, callback)
+	if instance.player ~= LocalPlayer() then SF.Throw("Only chip owner can read game files") end
+	checkluatype (path, TYPE_STRING)
+	checkluatype (callback, TYPE_FUNCTION)
+	if concurrentreads == cv_max_concurrent_reads:GetInt() then SF.Throw("Reading too many files asynchronously!", 2) end
+	concurrentreads = concurrentreads + 1
+	file.AsyncRead(SF.NormalizePath(path), "GAME", function(_, _, status, data)
+		concurrentreads = concurrentreads - 1
+		instance:runFunction(callback, path, status, data)
+	end)
+end
+
+--- Reads a temp file asynchronously
+-- @param string filename The temp file name. Must be only a file and not a path
+-- @param function callback A callback function for when the read operation finishes. It has 3 arguments: `filename` string, `status` number and `data` string
+function file_library.asyncReadTemp(filename, callback)
+	checkluatype(filename, TYPE_STRING)
+	checkluatype(callback, TYPE_FUNCTION)
+
+	if #filename > 128 then SF.Throw("Filename is too long!", 2) end
+	checkExtension(filename)
+	filename = string.lower(string.GetFileFromFilename(filename))
+
+	if concurrentreads == cv_max_concurrent_reads:GetInt() then SF.Throw("Reading too many files asynchronously!", 2) end
+	concurrentreads = concurrentreads + 1
+	local path = "sf_filedatatemp/"..instance.player:SteamID64().."/"..filename
+	file.AsyncRead(path, "DATA", function(_, _, status, data)
+		concurrentreads = concurrentreads - 1
+		instance:runFunction(callback, filename, status, data)
 	end)
 end
 
@@ -294,6 +347,29 @@ function file_library.writeTemp(filename, data)
 	local path = TempFileCache:Write(instance, filename, data)
 	tempfilewrites = tempfilewrites + 1
 	return path
+end
+
+--- Opens a temp file
+-- @param string filename The temp file name. Must be only a file and not a path
+-- @param string mode The file mode to use. See Lua manual for explanation
+-- @return File? File object, or no value if it failed
+function file_library.openTemp(filename, mode)
+	checkluatype(filename, TYPE_STRING)
+	checkluatype(mode, TYPE_STRING)
+
+	checkpermission (instance, nil, "file.writeTemp")
+
+	if #filename > 128 then SF.Throw("Filename is too long!", 2) end
+	checkExtension(filename)
+	filename = string.lower(string.GetFileFromFilename(filename))
+
+	local path = "sf_filedatatemp/"..instance.player:SteamID64().."/"..filename
+	file.CreateDir("sf_filedatatemp/"..instance.player:SteamID64())
+	local f = file.Open(path, mode, "DATA")
+	if f then
+		files[f] = true
+		return wrap(f)
+	end
 end
 
 --- Returns the path of a temp file if it exists. Otherwise returns nil
