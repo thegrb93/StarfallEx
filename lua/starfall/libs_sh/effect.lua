@@ -50,15 +50,16 @@ SF.global_effect_limits = GLOBAL_EFFECT_LIMITS
 SF.effect_limits = EFFECT_LIMITS
 SF.default_effect_limits = DEFAULT_LIMITS
 
--- Hard per-frame effect limit.
--- This prevents one chip from flooding the frame with expensive effects.
-local MAX_EFFECTS_PER_FRAME = 8
+-- Convar to limit the number of effects a single Starfall chip can create per frame/tick.
+-- Set to 0 to disable the limit (not recommended).
+-- Not enforced for superusers.
+-- This is intentionally set to 1 to conform to Garry design; read more in the effect_library.create function.
+local EFFECT_CREATE_LIMIT_CONVAR = CreateConVar("sf_effect_create_limit" .. (CLIENT and "_cl" or ""), "1", FCVAR_ARCHIVE, "Maximum number of effects a single Starfall chip can create per frame/tick. Set to 0 to disable the limit (not recommended). Not enforced for superusers.")
 
--- Client-side convar to tune the per-frame limit (if desired).
-local EFFECT_FRAME_LIMIT_CONVAR
-if CLIENT then
-	EFFECT_FRAME_LIMIT_CONVAR = CreateConVar("sf_effect_frame_limit", tostring(MAX_EFFECTS_PER_FRAME), FCVAR_ARCHIVE, "Maximum number of effects a single Starfall chip can spawn per frame")
-end
+-- Convar to tune the per-frame limit value.
+-- This prevents one chip from flooding the frame with expensive effects.
+-- Set to 0 to disable the per-frame limit (not recommended).
+local EFFECT_FRAME_LIMIT_CONVAR = CreateConVar("sf_effect_frame_limit" .. (CLIENT and "_cl" or ""), "10", FCVAR_ARCHIVE, "Maximum number of effects a single Starfall chip can play per frame/tick. Set to 0 to disable the limit (not recommended). Not enforced for superusers.")
 
 -- Weak-keyed table mapping EffectData userdata -> effect name string.
 -- C++ userdata cannot have Lua fields attached, so we store the name here.
@@ -68,13 +69,12 @@ local effectNames = setmetatable({}, { __mode = "k" })
 -- Weak keys allow GC when instances are removed.
 local instanceEffectData = setmetatable({}, { __mode = "k" })
 
-if CLIENT then
-	hook.Add("PreRender", "SF_PreRender_ResetEffectFrameCount", function()
-		for _, d in next, instanceEffectData do
-			d.frameCount = 0
-		end
-	end)
-end
+-- Reset effect frame counters every frame on client, or every tick on server.
+hook.Add(CLIENT and "PreRender" or "Tick", "SF_ResetEffectFrameCount", function()
+	for _, d in next, instanceEffectData do
+		d.createCount, d.frameCount = 0, 0
+	end
+end)
 
 
 --- Effects library.
@@ -102,7 +102,20 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 
 local vunwrap1
 local aunwrap1
+
+-- Effect data for this instance
 local effectdata
+
+instance:AddHook("initialize", function()
+	vunwrap1 = vec_meta.QuickUnwrap1
+	aunwrap1 = ang_meta.QuickUnwrap1
+	effectdata = { createCount = 0, frameCount = 0 }
+	instanceEffectData[instance] = effectdata
+end)
+
+instance:AddHook("deinitialize", function()
+	instanceEffectData[instance] = nil
+end)
 
 local function getLimits(eff)
 	local name
@@ -145,67 +158,69 @@ local function clampNormal(raw)
 	return n
 end
 
--- Sanitize all fields on an EffectData object before calling util.Effect.
+-- Unwrap and validate the EffectData userdata, throwing if invalid.
+local function checkEffectData(self)
+	local ed = unwrap(self)
+	if not IsValid(ed) then
+		SF.Throw("Invalid effect data", 3)
+	end
+	return ed
+end
+
+-- Sanitize all fields on an EffectData object before calling `util.Effect`.
 -- This is the critical crash-prevention step.
 local function sanitizeEffectData(ed, eff)
+	-- The reason we are checking these again is to ensure C++ object is actually within the limits.
+	-- These will throw if they are out of range. CEffectData is a shared ref, thanks Garry.
 	checkEffectField(eff, ed:GetMagnitude(), "magnitude")
 	checkEffectField(eff, ed:GetRadius(), "radius")
 	checkEffectField(eff, ed:GetScale(), "scale")
-
-	ed:SetDamageType(clampInt(ed:GetDamageType(), 0, GLOBAL_EFFECT_LIMITS.damage))
-	ed:SetSurfaceProp(clampInt(ed:GetSurfaceProp(), GLOBAL_EFFECT_LIMITS.surfaceprop_min, GLOBAL_EFFECT_LIMITS.surfaceprop_max))
-	ed:SetFlags(clampInt(ed:GetFlags(), 0, GLOBAL_EFFECT_LIMITS.flags))
-	ed:SetColor(clampInt(ed:GetColor(), 0, 255))
-
-	ed:SetAttachment(clampInt(ed:GetAttachment(), 0, 31))
-	ed:SetEntIndex(clampInt(ed:GetEntIndex(), 0, 8192))
-	ed:SetHitBox(clampInt(ed:GetHitBox(), 0, 2047))
-	ed:SetMaterialIndex(clampInt(ed:GetMaterialIndex(), 0, 4095))
-
-	ed:SetOrigin(clampPos(ed:GetOrigin()))
-	ed:SetStart(clampPos(ed:GetStart()))
-	ed:SetNormal(clampNormal(ed:GetNormal()))
+	-- The rest are clamped (within their setter function), but it might be a good idea to clamp them again.
 end
-
-instance:AddHook("initialize", function()
-	vunwrap1 = vec_meta.QuickUnwrap1
-	aunwrap1 = ang_meta.QuickUnwrap1
-	effectdata = { frameCount = 0 }
-	instanceEffectData[instance] = effectdata
-end)
-
-instance:AddHook("deinitialize", function()
-	instanceEffectData[instance] = nil
-end)
 
 --- Creates an effect data structure
 -- @return Effect Effect Object
 function effect_library.create()
-	if CLIENT then
-		local limit = EFFECT_FRAME_LIMIT_CONVAR and EFFECT_FRAME_LIMIT_CONVAR:GetInt() or MAX_EFFECTS_PER_FRAME
-		if effectdata.frameCount >= limit then
-			SF.Throw("Too many effects spawned in one frame", 2)
+	-- Superusers can create any number of effects.
+	if instance.player ~= SF.Superuser then
+		effectdata.createCount = effectdata.createCount + 1
+		local limit = EFFECT_CREATE_LIMIT_CONVAR:GetInt()
+		if limit > 0 and effectdata.createCount > limit then
+			SF.Throw("Effect create limit reached", 2)
 		end
-		effectdata.frameCount = effectdata.frameCount + 1
 	end
+	-- NOTE:
+	-- CEffectData is by-Garry-design a 'static singleton' (realloced every time with `EffectData()`).
+	-- This means you are not allowed to create multiple instances of it, such as storing them in a table.
+	-- Any setters, like SetMagnitude, will only modify the last created instance.
+	-- Thanks Garry.
 	return wrap(EffectData())
 end
 
---- Returns number of effects able to be created
+--- Returns number of effects able to be created (global burst quota)
 -- @return number Number of effects able to be created
 function effect_library.effectsLeft()
 	return plyEffectBurst:check(instance.player)
 end
 
---- Returns whether there are any effects able to be played
--- @return boolean If an effect can be played
+--- Returns whether a new effect can be created (passes both global burst and lifetime creation limits)
+-- @return boolean True if an effect can be created, false otherwise
 function effect_library.canCreate()
+	-- Superusers can create any number of effects.
+	if instance.player == SF.Superuser then return true end
 	if plyEffectBurst:check(instance.player) < 1 then return false end
-	if CLIENT then
-		local limit = EFFECT_FRAME_LIMIT_CONVAR and EFFECT_FRAME_LIMIT_CONVAR:GetInt() or MAX_EFFECTS_PER_FRAME
-		if effectdata.frameCount >= limit then return false end
-	end
-	return true
+	local limit = EFFECT_CREATE_LIMIT_CONVAR:GetInt()
+	return limit <= 0 or effectdata.createCount < limit
+end
+
+--- Returns whether a new effect can be played (passes both global burst and per-frame limits)
+-- @return boolean True if an effect can be played, false otherwise
+function effect_library.canPlay()
+	-- Superusers bypass the frame limit.
+	if instance.player == SF.Superuser then return true end
+	if plyEffectBurst:check(instance.player) < 1 then return false end
+	local limit = EFFECT_FRAME_LIMIT_CONVAR:GetInt()
+	return limit <= 0 or effectdata.frameCount < limit
 end
 
 --- Creates a "beam ring point" effect, like the AR2 orb explosion
@@ -225,7 +240,18 @@ function effect_library.beamRingPoint(pos, lifetime, startRad, endRad, width, am
 	checkvector(pos)
 
 	checkpermission(instance, nil, "effect.play")
-	plyEffectBurst:use(instance.player, 1)
+
+	-- Superusers bypass the limits.
+	if instance.player ~= SF.Superuser then
+		local limit = EFFECT_FRAME_LIMIT_CONVAR:GetInt()
+		if limit > 0 and effectdata.frameCount >= limit then
+			SF.Throw("Too many effects spawned in one frame", 2)
+		end
+		plyEffectBurst:use(instance.player, 1)
+		if limit > 0 then
+			effectdata.frameCount = effectdata.frameCount + 1
+		end
+	end
 
 	lifetime = math.Clamp(lifetime, 0, 25.6)
 	startRad = math.Clamp(startRad, -4096, 4096)
@@ -234,9 +260,9 @@ function effect_library.beamRingPoint(pos, lifetime, startRad, endRad, width, am
 	amplitude = math.Clamp(amplitude, 0, 64)
 
 	effects.BeamRingPoint(pos, lifetime, startRad, endRad, width, amplitude, cunwrap(color), {
-		speed = speed and math.Clamp(speed, 0, 255) or nil,
+		speed = speed and math.Clamp(speed, 0, 255),
 		flags = flags,
-		framerate = framerate and math.Clamp(framerate, 0, 255) or nil,
+		framerate = framerate and math.Clamp(framerate, 0, 255),
 		material = material
 	})
 end
@@ -257,31 +283,28 @@ function effect_methods:play(eff)
 		SF.Throw("Effect (" .. eff .. ") has been blocked from running", 2)
 	end
 
-	if instance.player ~= SF.Superuser and hook.Run("PlayerSpawnEffect", instance.player, eff) == false then
-		SF.Throw("Cannot spawn effect (" .. eff .. ")", 2)
-	end
-
-	if CLIENT then
-		local limit = EFFECT_FRAME_LIMIT_CONVAR and EFFECT_FRAME_LIMIT_CONVAR:GetInt() or MAX_EFFECTS_PER_FRAME
+	local limit = EFFECT_FRAME_LIMIT_CONVAR:GetInt()
+	-- Superusers bypass the limits.
+	if instance.player ~= SF.Superuser then
+		if hook.Run("PlayerSpawnEffect", instance.player, eff) == false then
+			SF.Throw("Cannot spawn effect (" .. eff .. ")", 2)
+		end
 		if limit > 0 and effectdata.frameCount >= limit then
 			SF.Throw("Too many effects spawned in one frame", 2)
 		end
 	end
 
-	local ed = unwrap(self)
-	if not IsValid(ed) then
-		SF.Throw("Invalid effect data", 2)
-	end
-
+	local ed = checkEffectData(self)
 	effectNames[ed] = eff
 
-	-- Sanitize before using burst so invalid data does not consume burst quota.
-	sanitizeEffectData(ed, eff)
-
-	plyEffectBurst:use(instance.player, 1)
-
-	if CLIENT then
-		effectdata.frameCount = effectdata.frameCount + 1
+	-- Superusers bypass the limits.
+	if instance.player ~= SF.Superuser then
+		-- Sanitize before using burst so invalid data does not consume burst quota.
+		sanitizeEffectData(ed, eff)
+		plyEffectBurst:use(instance.player, 1)
+		if limit > 0 then
+			effectdata.frameCount = effectdata.frameCount + 1
+		end
 	end
 
 	util.Effect(eff, ed)
@@ -290,110 +313,110 @@ end
 --- Returns the effect's angle
 -- @return Angle The effect's angle
 function effect_methods:getAngles()
-	return awrap(unwrap(self):GetAngles())
+	return awrap(checkEffectData(self):GetAngles())
 end
 
 --- Returns the effect's attachment
 -- @return number The effect's attachment ID
 function effect_methods:getAttachment()
-	return unwrap(self):GetAttachment()
+	return checkEffectData(self):GetAttachment()
 end
 
 --- Returns byte which represents the color of the effect.
 -- @return number The effect's color as a byte
 function effect_methods:getColor()
-	return unwrap(self):GetColor()
+	return checkEffectData(self):GetColor()
 end
 
 --- Returns the effect's damagetype
 -- @return number The effect's damagetype
 function effect_methods:getDamageType()
-	return unwrap(self):GetDamageType()
+	return checkEffectData(self):GetDamageType()
 end
 
 --- Returns the effect's entindex
 -- @return number The effect's entindex
 function effect_methods:getEntIndex()
-	return unwrap(self):GetEntIndex()
+	return checkEffectData(self):GetEntIndex()
 end
 
 --- Returns the effect's entity
 -- @return Entity The effect's entity
 function effect_methods:getEntity()
-	return ewrap(unwrap(self):GetEntity())
+	return ewrap(checkEffectData(self):GetEntity())
 end
 
 --- Returns the effect's flags
 -- @return number The effect's flags
 function effect_methods:getFlags()
-	return unwrap(self):GetFlags()
+	return checkEffectData(self):GetFlags()
 end
 
 --- Returns the effect's hitbox ID
 -- @return number The effect's hitbox ID
 function effect_methods:getHitBox()
-	return unwrap(self):GetHitBox()
+	return checkEffectData(self):GetHitBox()
 end
 
 --- Returns the effect's magnitude
 -- @return number The effect's magnitude
 function effect_methods:getMagnitude()
-	return unwrap(self):GetMagnitude()
+	return checkEffectData(self):GetMagnitude()
 end
 
 --- Returns the effect's material index
 -- @return number The effect's material index
 function effect_methods:getMaterialIndex()
-	return unwrap(self):GetMaterialIndex()
+	return checkEffectData(self):GetMaterialIndex()
 end
 
 --- Returns the effect's normal
 -- @return Vector The effect's normal
 function effect_methods:getNormal()
-	return vwrap(unwrap(self):GetNormal())
+	return vwrap(checkEffectData(self):GetNormal())
 end
 
 --- Returns the effect's origin
 -- @return Vector The effect's origin
 function effect_methods:getOrigin()
-	return vwrap(unwrap(self):GetOrigin())
+	return vwrap(checkEffectData(self):GetOrigin())
 end
 
 --- Returns the effect's radius
 -- @return number The effect's radius
 function effect_methods:getRadius()
-	return unwrap(self):GetRadius()
+	return checkEffectData(self):GetRadius()
 end
 
 --- Returns the effect's scale
 -- @return number The effect's scale
 function effect_methods:getScale()
-	return unwrap(self):GetScale()
+	return checkEffectData(self):GetScale()
 end
 
 --- Returns the effect's start position
 -- @return Vector The effect's start position
 function effect_methods:getStart()
-	return vwrap(unwrap(self):GetStart())
+	return vwrap(checkEffectData(self):GetStart())
 end
 
 --- Returns the effect's surface prop
 -- @return number The effect's surface property index
 function effect_methods:getSurfaceProp()
-	return unwrap(self):GetSurfaceProp()
+	return checkEffectData(self):GetSurfaceProp()
 end
 
 --- Sets the effect's angles
 -- @param Angle ang The angles
 function effect_methods:setAngles(ang)
-	unwrap(self):SetAngles(aunwrap1(ang))
+	checkEffectData(self):SetAngles(aunwrap1(ang))
 end
 
 --- Sets the effect's attachment
 -- @param number attachment The new attachment ID of the effect
 function effect_methods:setAttachment(attachment)
 	checkluatype(attachment, TYPE_NUMBER)
-	unwrap(self):SetAttachment(clampInt(attachment, 0, 31))
+	checkEffectData(self):SetAttachment(clampInt(attachment, 0, 31))
 end
 
 --- Sets the effect's color
@@ -401,88 +424,88 @@ end
 -- @param number color The color represented by a byte 0-255.
 function effect_methods:setColor(color)
 	checkluatype(color, TYPE_NUMBER)
-	unwrap(self):SetColor(clampInt(color, 0, 255))
+	checkEffectData(self):SetColor(clampInt(color, 0, 255))
 end
 
 --- Sets the effect's damage type
 -- @param number dmgtype The damage type, see the DMG enums
 function effect_methods:setDamageType(dmgtype)
 	checkluatype(dmgtype, TYPE_NUMBER)
-	unwrap(self):SetDamageType(clampInt(dmgtype, 0, GLOBAL_EFFECT_LIMITS.damage))
+	checkEffectData(self):SetDamageType(clampInt(dmgtype, 0, GLOBAL_EFFECT_LIMITS.damage))
 end
 
 --- Sets the effect's entity index
 -- @param number index The entity index
 function effect_methods:setEntIndex(index)
 	checkluatype(index, TYPE_NUMBER)
-	unwrap(self):SetEntIndex(clampInt(index, 0, 8192))
+	checkEffectData(self):SetEntIndex(clampInt(index, 0, 8192))
 end
 
 --- Sets the effect's entity
 -- @param Entity ent The entity
 function effect_methods:setEntity(ent)
-	unwrap(self):SetEntity(eunwrap(ent))
+	checkEffectData(self):SetEntity(eunwrap(ent))
 end
 
 --- Sets the effect's flags
 -- @param number flags The flags
 function effect_methods:setFlags(flags)
 	checkluatype(flags, TYPE_NUMBER)
-	unwrap(self):SetFlags(clampInt(flags, 0, GLOBAL_EFFECT_LIMITS.flags))
+	checkEffectData(self):SetFlags(clampInt(flags, 0, GLOBAL_EFFECT_LIMITS.flags))
 end
 
 --- Sets the effect's hitbox
 -- @param number hitbox The hitbox
 function effect_methods:setHitBox(hitbox)
 	checkluatype(hitbox, TYPE_NUMBER)
-	unwrap(self):SetHitBox(clampInt(hitbox, 0, 2047))
+	checkEffectData(self):SetHitBox(clampInt(hitbox, 0, 2047))
 end
 
 --- Sets the effect's magnitude
 -- @param number magnitude The magnitude
 function effect_methods:setMagnitude(magnitude)
 	checkluatype(magnitude, TYPE_NUMBER)
-	unwrap(self):SetMagnitude(checkEffectField(self, magnitude, "magnitude"))
+	checkEffectData(self):SetMagnitude(checkEffectField(self, magnitude, "magnitude"))
 end
 
 --- Sets the effect's material index
 -- @param number mat The material index
 function effect_methods:setMaterialIndex(mat)
 	checkluatype(mat, TYPE_NUMBER)
-	unwrap(self):SetMaterialIndex(clampInt(mat, 0, 4095))
+	checkEffectData(self):SetMaterialIndex(clampInt(mat, 0, 4095))
 end
 
 --- Sets the effect's normal
 -- @param Vector normal The vector normal
 function effect_methods:setNormal(normal)
-	unwrap(self):SetNormal(clampNormal(vunwrap1(normal)))
+	checkEffectData(self):SetNormal(clampNormal(vunwrap1(normal)))
 end
 
 --- Sets the effect's origin
 -- @param Vector origin The vector origin
 function effect_methods:setOrigin(origin)
-	unwrap(self):SetOrigin(clampPos(vunwrap1(origin)))
+	checkEffectData(self):SetOrigin(clampPos(vunwrap1(origin)))
 end
 
 --- Sets the effect's radius
 -- @param number radius The radius
 function effect_methods:setRadius(radius)
 	checkluatype(radius, TYPE_NUMBER)
-	unwrap(self):SetRadius(checkEffectField(self, radius, "radius"))
+	checkEffectData(self):SetRadius(checkEffectField(self, radius, "radius"))
 end
 
 --- Sets the effect's scale
 -- @param number scale The number scale
 function effect_methods:setScale(scale)
 	checkluatype(scale, TYPE_NUMBER)
-	unwrap(self):SetScale(checkEffectField(self, scale, "scale"))
+	checkEffectData(self):SetScale(checkEffectField(self, scale, "scale"))
 end
 
 --- Sets the effect's start pos
 -- Limited to world bounds (+-16386 on every axis) and has horrible networking precision. (17 bit float per component)
 -- @param Vector start The vector start
 function effect_methods:setStart(start)
-	unwrap(self):SetStart(clampPos(vunwrap1(start)))
+	checkEffectData(self):SetStart(clampPos(vunwrap1(start)))
 end
 
 --- Sets the effect's surface property
@@ -490,7 +513,7 @@ end
 -- @param number prop The surface property index
 function effect_methods:setSurfaceProp(prop)
 	checkluatype(prop, TYPE_NUMBER)
-	unwrap(self):SetSurfaceProp(clampInt(prop, GLOBAL_EFFECT_LIMITS.surfaceprop_min, GLOBAL_EFFECT_LIMITS.surfaceprop_max))
+	checkEffectData(self):SetSurfaceProp(clampInt(prop, GLOBAL_EFFECT_LIMITS.surfaceprop_min, GLOBAL_EFFECT_LIMITS.surfaceprop_max))
 end
 
 end
