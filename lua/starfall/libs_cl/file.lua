@@ -209,7 +209,7 @@ function file_library.open(path, mode)
 end
 
 --- Opens a file from path relative to base GMod directory
--- @param string path Filepath relative to GarrysMod/garrysmod/.
+-- @param string path File path relative to GarrysMod/garrysmod/.
 -- @param string mode The file mode to use. See Lua manual for explanation
 -- @return File? File object, or no value if it failed
 function file_library.openInGame(path, mode)
@@ -353,7 +353,7 @@ function file_library.writeTemp(filename, data)
 end
 
 --- Opens a temp file
--- @param string filename The temp file name. Must be only a file and not a path
+-- @param string filename The temp file name. Must be only a file name and not a path
 -- @param string mode The file mode to use. See Lua manual for explanation
 -- @return File? File object, or no value if it failed
 function file_library.openTemp(filename, mode)
