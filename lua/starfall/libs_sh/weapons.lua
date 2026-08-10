@@ -1,10 +1,13 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local ENT_META = FindMetaTable("Entity")
 local WEP_META = FindMetaTable("Weapon")
 
 
---- Weapon type
+--- Weapon type.
+-- Inherits all functions from `Entity` type.
+-- Created with `prop.createSent` function, e.g. with class "weapon_shotgun".
+-- See also `Player:getActiveWeapon`, `Player:getWeapon`, and `Player:getWeapons` functions.
 -- @name Weapon
 -- @class type
 -- @libtbl weapon_methods
@@ -141,7 +144,7 @@ if CLIENT then
 
 	--- Returns if the weapon is carried by the local player.
 	-- @client
-	-- @return boolean Whether or not the weapon is carried by the local player
+	-- @return boolean Whether the weapon is carried by the local player
 	function weapon_methods:isCarriedByLocalPlayer()
 		return Wep_IsCarriedByLocalPlayer(unwrap(self))
 	end

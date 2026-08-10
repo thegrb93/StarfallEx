@@ -17,7 +17,7 @@ hook.add("PostDrawTranslucentRenderables", "", function()
     m:setAngles((eyePos() - m:getTranslation()):getAngle() + Angle(90, 0, 0))
     m:rotate(Angle(0, 90, 0))
     m:setScale(Vector(scale, -scale))
-    
+
     render.pushMatrix(m)
         render.setColor(Color(255, 191, 20, 155))
         render.drawRect(-512, -128, 1024, 256)

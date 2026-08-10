@@ -1,7 +1,7 @@
 ---------------------------------------------------------------------
 -- SF Instance class.
--- Contains the compiled SF script and essential data. Essentially
--- the execution context.
+-- Contains the compiled SF script and essential data.
+-- Essentially the execution context.
 ---------------------------------------------------------------------
 
 local dsethook, dgethook = debug.sethook, debug.gethook
@@ -14,9 +14,9 @@ local Ent_IsValid, Ent_IsWorld = ENTMETA.IsValid, ENTMETA.IsWorld
 if SERVER then
 	SF.cpuQuota = CreateConVar("sf_timebuffer", 0.005, FCVAR_ARCHIVE, "The max average the CPU time can reach.")
 	SF.cpuBufferN = CreateConVar("sf_timebuffersize", 100, FCVAR_ARCHIVE, "The window width of the CPU time quota moving average.")
-	SF.softLockProtection = CreateConVar("sf_timebuffersoftlock", 1, FCVAR_ARCHIVE, "Consumes more cpu, but protects from freezing the game. Only turn this off if you want to use a profiler on your scripts.")
+	SF.softLockProtection = CreateConVar("sf_timebuffersoftlock", 1, FCVAR_ARCHIVE, "Consumes more CPU, but protects from freezing the game. Only turn this off if you want to use a profiler on your scripts.")
 	SF.softLockProtectionSuperUser = CreateConVar("sf_timebuffersoftlock_superuser", 0, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Determines whether CPU checks should be done for superusers as well?")
-	SF.RamCap = CreateConVar("sf_ram_max", 1500000, FCVAR_ARCHIVE, "If ram exceeds this limit (in kB), starfalls will be terminated")
+	SF.RamCap = CreateConVar("sf_ram_max", 1500000, FCVAR_ARCHIVE, "If RAM exceeds this limit (in kB), Starfalls will be terminated")
 	SF.SuperUsers = SF.SavedUserList("super_users", "users allowed to be superuser", "sf_superusers.txt")
 else
 	SF.cpuQuota = CreateConVar("sf_timebuffer_cl", 0.006, FCVAR_ARCHIVE, "The max average the CPU time can reach.")
@@ -25,7 +25,7 @@ else
 	SF.softLockProtection = CreateConVar("sf_timebuffersoftlock_cl", 1, FCVAR_ARCHIVE, "Enable Cpu-time limiting on other player's chips.")
 	SF.softLockProtectionOwner = CreateConVar("sf_timebuffersoftlock_cl_owner", 1, FCVAR_ARCHIVE, "Enable Cpu-time limiting on your own chips.")
 	SF.softLockProtectionSuperUser = CreateConVar("sf_timebuffersoftlock_superuser", 0, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Determines whether CPU checks should be done for superusers as well?")
-	SF.RamCap = CreateConVar("sf_ram_max_cl", 1500000, FCVAR_ARCHIVE, "If ram exceeds this limit (in kB), starfalls will be terminated")
+	SF.RamCap = CreateConVar("sf_ram_max_cl", 1500000, FCVAR_ARCHIVE, "If RAM exceeds this limit (in kB), Starfalls will be terminated")
 	SF.CvarEnabled = CreateConVar("sf_enabled_cl", "1", { FCVAR_ARCHIVE, FCVAR_USERINFO, FCVAR_DONTRECORD }, "Enable clientside starfall")
 	SF.CvarNotifyErrors = CreateConVar("sf_notify_cl", "3", FCVAR_ARCHIVE, "Chip error notification level (0=off, 1=self only, 2=filter common spam, 3=all)")
 end
@@ -101,7 +101,7 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 			instance:setCheckCpu(SF.softLockProtection:GetBool())
 		else
 			if SF.BlockedUsers:contains(player:SteamID()) then
-				return false, { message = "User has blocked this player's starfalls", traceback = "" }
+				return false, { message = "User has blocked this player's Starfalls", traceback = "" }
 			end
 
 			if LocalPlayer() == player then
@@ -488,7 +488,7 @@ function SF.Instance:DoAliases()
 	self.env.quotaMax = self.env.cpuMax
 end
 
--- Monitor average cpu and ram usage by instance
+-- Monitor average CPU and RAM usage by instance
 local CpuRamAverage = {
 	checkTotalPlayerCpu = function()
 		for pl, insts in pairs(SF.playerInstances) do
@@ -501,7 +501,7 @@ local CpuRamAverage = {
 			end
 
 			while cputotal>plquota do
-				-- Get highest average cpu instance
+				-- Get highest average CPU instance
 				local max, maxinst = 0, nil
 				for instance, _ in pairs(insts) do
 					if instance.perf.cpuAverage>=max then
@@ -511,7 +511,7 @@ local CpuRamAverage = {
 				end
 
 				if maxinst then
-					maxinst:Error(SF.MakeError("SF: Player cpu time limit reached!", 1))
+					maxinst:Error(SF.MakeError("SF: Player CPU time limit reached!", 1))
 					cputotal = cputotal - max
 					insts[maxinst] = nil -- In case of freak issue the Error function doesn't remove the instance
 				else
@@ -536,7 +536,7 @@ local CpuRamAverage = {
 			return self.ramAverage + (gcinfo() - self.ramAverage)*0.001
 		end,
 		check = function(self, forceThrow, noThrow)
-			-- Check ram and cleanup before checking cpu so time spent is measured
+			-- Check RAM and cleanup before checking CPU so time spent is measured
 			local ram = gcinfo()
 			if ram > self.ramLimit then
 				collectgarbage("step", 100)
@@ -547,7 +547,7 @@ local CpuRamAverage = {
 				return self:doError("RAM usage exceeded!", true, noThrow, forceThrow or ram > self.ramHardlimit)
 			end
 
-			-- Check cpu time spent
+			-- Check CPU time spent
 			local t = SysTime()
 			self.cpuTotal = self.cpuTotal + t - self.lastSampleTime
 			self.lastSampleTime = t
@@ -597,8 +597,8 @@ local CpuRamAverage = {
 setmetatable(CpuRamAverage, CpuRamAverage)
 
 --- Overridable hook for pcall-based hook systems
--- Gets called when inside a starfall context
--- @param running Are we executing a starfall context?
+-- Gets called when inside a Starfall context
+-- @param boolean running Are we executing a Starfall context?
 function SF.OnRunningOps(running)
 	-- override me
 end
@@ -616,11 +616,11 @@ function SF.Instance:setCheckCpu(runWithOps)
 		function self:checkCpu()
 			self.perf:check(true)
 		end
-		function self.checkCpuHook() --debug.sethook doesn't pass self, so need it as upvalue
+		function self.checkCpuHook() -- debug.sethook doesn't pass self, so need it as upvalue
 			self.perf:check()
 		end
 		function self:pushCpuCheck(callback)
-			self.cpustatestack[#self.cpustatestack + 1] = (dgethook() or false)
+			self.cpustatestack[#self.cpustatestack + 1] = dgethook()
 			local enabled = callback~=nil
 			if SF.runningOps ~= enabled then
 				SF.runningOps = enabled
@@ -629,7 +629,7 @@ function SF.Instance:setCheckCpu(runWithOps)
 			dsethook(callback, "", 2000)
 		end
 		function self:popCpuCheck()
-			local callback = (table.remove(self.cpustatestack) or nil)
+			local callback = table.remove(self.cpustatestack)
 			dsethook(callback, "", 2000)
 			local enabled = callback~=nil
 			if SF.runningOps ~= enabled then
@@ -668,7 +668,7 @@ function SF.Instance:runWithOps(func, ...)
 	if self.stackn == 0 then
 		self.perf:start()
 	elseif self.stackn == 128 then
-		return {false, SF.MakeError("sf stack overflow", 1, true, true)}
+		return {false, SF.MakeError("SF stack overflow", 1, true, true)}
 	end
 
 	self.stackn = self.stackn + 1
@@ -788,7 +788,6 @@ function SF.Instance:deinitialize()
 end
 
 hook.Add("Think", "SF_Think", function()
-
 	-- Check and attempt recovery from potential failures
 	if SF.runningOps then
 		SF.runningOps = false

@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 local haspermission = SF.Permissions.hasAccess
@@ -24,8 +24,8 @@ registerprivilege("entities.enableDrag", "Set Drag", "Allows the user to disable
 registerprivilege("entities.setDamping", "Set Damping", "Allows the user to change entity's air friction damping", { entities = {} })
 registerprivilege("entities.remove", "Remove", "Allows the user to remove entities", { entities = {} })
 registerprivilege("entities.ignite", "Ignite", "Allows the user to ignite entities", { entities = {} })
-registerprivilege("entities.canTool", "CanTool", "Whether or not the user can use the toolgun on the entity", { entities = {} })
-registerprivilege("entities.use", "Use", "Whether or not the user can use the entity", { entities = {} })
+registerprivilege("entities.canTool", "CanTool", "Whether the user can use the toolgun on the entity", { entities = {} })
+registerprivilege("entities.use", "Use", "Whether the user can use the entity", { entities = {} })
 registerprivilege("entities.getTable", "GetTable", "Allows the user to get an entity's table", { entities = {}, usergroups = { default = 1 } })
 registerprivilege("entities.preventTransmit","Prevent Transmit","Allows the user to hide an entity from any client", { entities = {}, usergroups = { default = 1 } })
 
@@ -33,7 +33,7 @@ local function table_find(tbl, val)
 	for i=1, #tbl do if tbl[i]==val then return i end end
 end
 
-local collisionListenerLimit = SF.LimitObject("collisionlistener", "collisionlistner", 128, "The number of concurrent starfall collision listeners")
+local collisionListenerLimit = SF.LimitObject("collisionlistener", "collisionlistner", 128, "The number of concurrent Starfall collision listeners")
 local base_physicscollide
 SF.GlobalCollisionListeners = {
 	__index = {
@@ -222,8 +222,11 @@ end)
 
 -- ------------------------- Methods ------------------------- --
 
---- Links starfall components to a starfall processor or vehicle. Screen can only connect to processor. HUD can connect to processor and vehicle.
--- @param Entity? e Entity to link the component to, a vehicle or starfall for huds, or a starfall for screens. nil to clear links.
+--- Links Starfall components to a Starfall processor, or a vehicle.
+-- Screen can only be linked to a Starfall processor.
+-- HUD can be linked to either a Starfall processor or a vehicle.
+-- @param Entity? e Entity to link the component to, a vehicle, or Starfall processor.
+-- nil to clear links.
 function ents_methods:linkComponent(e)
 	local ent = eunwrap(self)
 	checkpermission(instance, ent, "entities.canTool")
@@ -266,7 +269,7 @@ end
 
 --- Applies damage to an entity
 -- @param number amt Damage amount
--- @param Entity? attacker Damage attacker. Defaults to chip owner
+-- @param Entity? attacker Damage attacker (default: `owner()`)
 -- @param Entity? inflictor Damage inflictor
 -- @param number? dmgtype The damage type number enum
 -- @param Vector? pos The position of the damage
@@ -302,9 +305,14 @@ end
 
 --- Sets a custom prop's physics simulation forces. Thrusters and balloons use this.
 -- This takes precedence over Entity.setCustomPropShadowForce and cannot be used together
--- @param Vector ang Angular Force (Torque)
--- @param Vector lin Linear Force
--- @param number mode The physics mode to use. 0 = Off (disables custom physics entirely), 1 = Local acceleration, 2 = Local force, 3 = Global Acceleration, 4 = Global force
+-- @param Vector ang Angular force (torque)
+-- @param Vector lin Linear force
+-- @param number mode The physics mode to use.
+-- 0 = Off (disables custom physics entirely)
+-- 1 = Local acceleration
+-- 2 = Local force
+-- 3 = Global Acceleration
+-- 4 = Global force
 function ents_methods:setCustomPropForces(ang, lin, mode)
 	local ent = eunwrap(self)
 	local ent_tbl = Ent_GetTable(ent)
@@ -332,7 +340,8 @@ end
 --- Sets a custom prop's shadow forces, moving the entity to the desired position and angles
 -- This gets overridden by Entity.setCustomPropForces and cannot be used together
 -- See available parameters here: https://wiki.facepunch.com/gmod/PhysObj:ComputeShadowControl
--- @param table|boolean data Shadow physics data, excluding 'deltatime'. 'teleportdistance' higher than 0 requires 'entities.setPos'. Pass a falsy value to disable custom physics entirely
+-- @param table|boolean data Shadow physics data, excluding 'deltatime'. 'teleportdistance' higher than 0 requires
+-- 'entities.setPos'. Pass a falsy value to disable custom physics entirely
 function ents_methods:setCustomPropShadowForce(data)
 	local ent = eunwrap(self)
 	local ent_tbl = Ent_GetTable(ent)
@@ -408,7 +417,7 @@ function ents_methods:addAngleVelocity(angvel)
 	Phys_AddAngleVelocity(phys, angvel)
 end
 
---- Returns how much friction the entity has, default is 1 (100%)
+--- Returns how much friction the entity has; default is 1 (100%)
 -- @return number friction
 function ents_methods:getFriction()
 	return Ent_GetFriction(eunwrap(self))
@@ -466,7 +475,8 @@ function ents_methods:applyForceOffset(force, position)
 	Phys_ApplyForceOffset(phys, force, position)
 end
 
---- Applies angular force to the entity (This function is garbage, use applyTorque instead)
+--- Applies angular force to the entity.
+-- (This function is garbage, use `Entity:applyTorque` instead)
 -- @param Angle ang The force angle
 function ents_methods:applyAngForce(ang)
 	local ent = eunwrap(self)
@@ -523,8 +533,9 @@ function ents_methods:applyTorque(torque)
 end
 
 --- Allows detecting collisions on an entity.
--- @param function func The callback function with argument, table collsiondata, http://wiki.facepunch.com/gmod/Structures/CollisionData
--- @param string? name Optional name to distinguish multiple collision listeners and remove them individually later. (default: "")
+-- @param function func The callback function with argument:
+-- 1. CollisionData table, see https://wiki.facepunch.com/gmod/Structures/CollisionData
+-- @param string? name Optional name to distinguish multiple collision listeners and remove them individually later (default: "")
 function ents_methods:addCollisionListener(func, name)
 	checkluatype(func, TYPE_FUNCTION)
 	if name ~= nil then checkluatype(name, TYPE_STRING) else name = "" end
@@ -566,7 +577,8 @@ function ents_methods:setDrawShadow(draw)
 	Ent_DrawShadow(ent, draw)
 end
 
---- Sets the entity's position. No interpolation will occur clientside, use physobj.setPos to have interpolation.
+--- Sets the entity's position.
+-- No interpolation will occur client-side, use `PhysObj:setPos` to have interpolation.
 -- @param Vector vec New position
 function ents_methods:setPos(vec)
 	local ent = eunwrap(self)
@@ -601,7 +613,7 @@ end
 --- Sets the entity's ragdoll position and angles without modifying the skeleton pose
 -- @param Vector? pos New position or use nil to only set angles
 -- @param Angle? ang New angles or use nil to only set position
--- @param number? bone The origin bone to use or nil to use the entity origin
+-- @param number? bone The origin bone to use, or nil to use the entity origin
 function ents_methods:setRagdollPos(pos, ang, bone)
 	local ent = eunwrap(self)
 	checkpermission(instance, ent, "entities.setPos")
@@ -636,7 +648,8 @@ function ents_methods:setRagdollPos(pos, ang, bone)
 	end
 end
 
---- Sets the entity's linear velocity. Physics entities, use physobj:setVelocity
+--- Sets the entity's linear velocity.
+-- Physics entities use `PhysObj:setVelocity`
 -- @param Vector vel New velocity
 function ents_methods:setVelocity(vel)
 	local ent = eunwrap(self)
@@ -710,8 +723,8 @@ function ents_methods:extinguish()
 end
 
 --- Simulate a Use action on the entity by the chip owner
--- @param number? usetype The USE_ enum use type. (Default: USE_ON)
--- @param number? value The use value (Default: 0)
+-- @param number? usetype Optional USE enum type (default: USE.ON)
+-- @param number? value Optional use value (default: 0)
 function ents_methods:use(usetype, value)
 	local ent = eunwrap(self)
 	checkpermission(instance, ent, "entities.use")
@@ -721,7 +734,7 @@ function ents_methods:use(usetype, value)
 	Ent_Use(ent, instance.player, instance.entity, usetype, value)
 end
 
---- Sets the entity to be Solid or not.
+--- Sets the entity to be solid or not.
 -- @param boolean solid Should the entity be solid?
 function ents_methods:setSolid(solid)
 	local ent = eunwrap(self)
@@ -743,7 +756,7 @@ function ents_methods:setCollisionGroup(group)
 	Ent_SetCollisionGroup(ent, group)
 end
 
---- Sets the entity to collide with nothing but the world. Alias to entity:setCollisionGroup(COLLISION_GROUP.WORLD)
+--- Sets the entity to collide with nothing but the world. Alias to `Entity:setCollisionGroup(COLLISION_GROUP.WORLD)`
 -- @param boolean nocollide Whether to collide with nothing except world or not.
 function ents_methods:setNocollideAll(nocollide)
 	local ent = eunwrap(self)
@@ -913,7 +926,7 @@ function ents_methods:setUnFreezable(freezable)
 	Ent_SetUnFreezable(ent, freezable)
 end
 
---- Returns if the entity unfreezable
+--- Returns if the entity is unfreezable
 -- @return boolean unfreezable
 function ents_methods:getUnFreezable()
 	return Ent_GetUnFreezable(eunwrap(self))
@@ -989,7 +1002,8 @@ function ents_methods:isWeldedTo()
 end
 
 --- Gets a table of all constrained entities to each other
--- @param table? filter Optional constraint type filter table where keys are the type name and values are 'true'. "Wire" and "Parent" are used for wires and parents.
+-- @param table? filter Optional constraint type filter table where keys are the type name and values are 'true'.
+-- "Wire" and "Parent" are used for wires and parents.
 -- @return table All constrained entities
 function ents_methods:getAllConstrained(filter)
 	if filter ~= nil then checkluatype(filter, TYPE_TABLE) end
@@ -1107,7 +1121,8 @@ function ents_methods:setUnbreakable(on)
 	Ent_Fire(ent, "SetDamageFilter", on and "FilterDamage" or "", 0)
 end
 
---- Check if the given Entity or Vector is within this entity's PVS (Potentially Visible Set). See: https://developer.valvesoftware.com/wiki/PVS
+--- Check if the given Entity or Vector is within this entity's PVS (Potentially Visible Set).
+-- See https://developer.valvesoftware.com/wiki/PVS
 -- @param Entity|Vector other Entity or Vector to test
 -- @return boolean If the Entity/Vector is within the PVS
 function ents_methods:testPVS(other)
@@ -1131,12 +1146,11 @@ local physUpdateWhitelist = {
 }
 
 --- Set the function to run whenever the physics of the entity are updated.
---- This won't be called if the physics object goes asleep.
----
---- You can only use this function on these classes:
---- - starfall_prop
---- - starfall_processor
--- @param function|nil func The callback function. Use nil to remove an existing callback.
+-- This won't be called if the physics object goes asleep, or ceases to exist.
+-- You can only use this function on these classes:
+-- - starfall_prop
+-- - starfall_processor
+-- @param function? func Optional callback function. Use nil to remove an existing callback.
 function ents_methods:setPhysicsUpdateListener(func)
 	local ent = eunwrap(self)
 	checkpermission(instance, ent, "entities.canTool")
@@ -1156,15 +1170,17 @@ function ents_methods:setPhysicsUpdateListener(func)
 end
 
 --- Marks an entity as a trigger, setting callback functions to run whenever other objects enter or leave the bounds of the first entity.
---- The entity will still invoke the callbacks even if not solid and no physical collision occurs, unlike Entity:addCollisionListener.
---- Set both functiions to nil to unmark this entity as a trigger.
---- https://developer.valvesoftware.com/wiki/Triggers
----
---- You can only use this function on these classes:
---- - starfall_prop
---- - starfall_processor
--- @param function|nil startTouchCB The StartTouch callback function. Arguments: (Entity object), the object entering our entity's bounds.
--- @param function|nil endTouchCB The EndTouch callback function. Arguments: (Entity object), the object leaving our entity's bounds.
+-- The entity will still invoke the callbacks even if not solid and no physical collision occurs, unlike Entity:addCollisionListener.
+-- Set both functions to nil to unmark this entity as a trigger.
+-- See https://developer.valvesoftware.com/wiki/Triggers
+--
+-- You can only use this function on these classes:
+-- - starfall_prop
+-- - starfall_processor
+-- @param function? startTouchCB Optional StartTouch callback function. With argument:
+-- 1. Entity object: the object entering our entity's bounds.
+-- @param function? endTouchCB Optional EndTouch callback function. With argument:
+-- 1. Entity object: the object leaving our entity's bounds.
 function ents_methods:setTriggerListener(startTouchCB, endTouchCB)
 	local ent = eunwrap(self)
 	checkpermission(instance, ent, "entities.canTool")
@@ -1223,7 +1239,7 @@ function ents_methods:getVar(key)
 end
 
 --- Sets the entity to be used as the light origin position for this entity.
--- @param Entity? lightOrigin The lighting entity or nil to reset.
+-- @param Entity? lightOrigin The lighting entity, or nil to reset.
 function ents_methods:setLightingOriginEntity(lightOrigin)
 	local ent = eunwrap(self)
 	checkpermission(instance, ent, "entities.setRenderProperty")
@@ -1231,7 +1247,8 @@ function ents_methods:setLightingOriginEntity(lightOrigin)
 	Ent_SetLightingOriginEntity(ent, lightOrigin)
 end
 
---- Prevents an entity from being transmitted to one or more clients. In order to work, this function has to also be called on all the entity's children if any.
+--- Prevents an entity from being transmitted to one or more clients.
+-- In order to work, this function has to also be called on all the entity's children if any.
 -- @server
 -- @param Player|table target The player or table of players to target.
 -- @param boolean prevent Whether the entity should be prevented from being transmitted.

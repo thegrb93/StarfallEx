@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 
@@ -105,7 +105,7 @@ game_library.getTickCount = engine.TickCount
 game_library.getIPAddress = game.GetIPAddress
 
 --- Checks if a model exists in the game files
--- @param string path Filepath in game folder
+-- @param string path File path in game folder
 -- @return boolean? True if exists, false if not, nil if error
 function game_library.modelExists(path)
 	checkluatype (path, TYPE_STRING)
@@ -159,25 +159,30 @@ function game_library.getPlayerModels()
 end
 
 --- Returns the wind's velocity at a given position, as influenced by current map's env_wind entities
--- @param Vector? pos Optional position to get wind speed at. If specified, wind controllers with windradius other than -1 will be taken into account, if the point is within their radius. If omitted, only the global wind controller will be used (if one exists). This argument will be ignored on client-side and will be treated as nil because the position of env_wind is not currently networked to clients
+-- @param Vector? pos Optional position to get wind speed at.
+-- If specified, wind controllers with windradius other than -1 will be taken into account, if the point is within their radius.
+-- If omitted, only the global wind controller is used (if one exists).
+-- Ignored on client-side as env_wind position is not networked.
 -- @return Vector The current wind velocity at a given position
 function game_library.getWindSpeed(pos)
 	if pos ~= nil then pos = vunwrap1(pos) end
 	return vwrap(game.GetWindSpeed(pos))
 end
 
---- Given a 64bit SteamID will return a STEAM_0: style Steam ID
+--- Given a 64-bit SteamID will return a STEAM_0: style SteamID.
+-- See also `game.steamIDTo64` function.
 -- @name game_library.steamIDFrom64
 -- @class function
 -- @param string id The 64 bit Steam ID
 -- @return string STEAM_0 style Steam ID
 game_library.steamIDFrom64 = util.SteamIDFrom64
 
---- Given a STEAM_0 style Steam ID will return a 64bit Steam ID
+--- Given a STEAM_0 style SteamID will return a 64-bit SteamID.
+-- See also `game.steamIDFrom64` function.
 -- @name game_library.steamIDTo64
 -- @class function
 -- @param string id The STEAM_0 style id
--- @return string 64bit Steam ID
+-- @return string 64-bit Steam ID
 game_library.steamIDTo64 = util.SteamIDTo64
 
 --- Returns the name of the currently running gamemode
@@ -288,7 +293,7 @@ else
 	-- @return boolean True if the game is focused
 	game_library.hasFocus = system.HasFocus
 
-	--- Returns the direction and how obstructed the map's sun is or nil if it doesn't exist
+	--- Returns the direction and how obstructed the map's sun is, or nil if it doesn't exist
 	-- @client
 	-- @return Vector The direction of the sun
 	-- @return number How obstructed the sun is 0 to 1.

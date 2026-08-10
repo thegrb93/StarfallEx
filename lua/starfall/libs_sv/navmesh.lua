@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 
@@ -20,14 +20,21 @@ registerprivilege("navarea.openlist", "Modify NavArea Openlist", "Allows the use
 -- @libtbl navmesh_library
 SF.RegisterLibrary("navmesh")
 
---- NavArea type, returned by navmesh library functions
+--- NavArea type
+-- Created with `navmesh.createNavArea` function
 -- @name NavArea
 -- @class type
 -- @libtbl navarea_methods
 -- @libtbl navarea_meta
 -- @libtbl lnavarea_meta
 SF.RegisterType("NavArea", true, false, nil, "LockedNavArea")
-SF.RegisterType("LockedNavArea", true, false) -- NavArea that can't be modified.
+
+--- LockedNavArea type.
+-- Created with `navmesh.getNavArea` or other `navmesh` functions.
+-- NavArea that can't be modified.
+-- @name LockedNavArea
+-- @class type
+SF.RegisterType("LockedNavArea", true, false)
 
 local entList = SF.EntManager("navareas", "navareas", 40, "The number of CNavAreas allowed to spawn via Starfall", 1, true)
 
@@ -146,7 +153,7 @@ return function(instance)
 	--- Creates a new NavArea
 	-- @param Vector corner The first corner of the new NavArea
 	-- @param Vector opposite_corner The opposite (diagonally) corner of the new NavArea
-	-- @return NavArea? The new NavArea or nil if we failed for some reason
+	-- @return NavArea? The new NavArea, or nil if we failed for some reason
 	function navmesh_library.createNavArea(corner, opposite_corner)
 		checkpermission(instance, nil, "navarea.create")
 		entList:checkuse(instance.player, 1)
@@ -167,10 +174,10 @@ return function(instance)
 		return height, vwrap(normal)
 	end
 
-	--- Returns an integer indexed table of all `NavArea`s on the current map.
+	--- Returns an integer indexed table of all `NavArea` values on the current map.
 	-- If the map doesn't have a navmesh generated then this will return an empty table.
 	-- The navareas will be immutable.
-	-- @return table A table of all the `NavArea`s on the current map
+	-- @return table A table of all the `NavArea` values on the current map
 	function navmesh_library.getAllNavAreas()
 		local out = {}
 		for idx, navarea in ipairs(navmesh.GetAllNavAreas()) do
@@ -184,7 +191,7 @@ return function(instance)
 	-- @param number radius Radius to search within (max 100000)
 	-- @param number stepdown Maximum fall distance allowed (max 50000)
 	-- @param number stepup Maximum jump height allowed (max 50000)
-	-- @return table A table of immutable `NavArea`s
+	-- @return table A table of immutable `NavArea` values
 	function navmesh_library.find(pos, radius, stepdown, stepup)
 		checkluatype(radius, TYPE_NUMBER)
 		checkluatype(stepdown, TYPE_NUMBER)
@@ -208,9 +215,9 @@ return function(instance)
 	-- @return number The highest ID of all nav areas on the map.
 	navmesh_library.getNavAreaCount = navmesh.GetNavAreaCount
 
-	--- Returns the NavArea at the given id.
-	-- @param number id ID of the NavArea to get. Starts with 1.
-	-- @return NavArea The NavArea with given ID.
+	--- Returns the NavArea at the given index.
+	-- @param number id Index of the NavArea to get (starts at 1).
+	-- @return NavArea The NavArea with the given index.
 	function navmesh_library.getNavAreaByID(id)
 		checkluatype(id, TYPE_NUMBER)
 		return lnavwrap( navmesh.GetNavAreaByID(id) )
@@ -229,9 +236,13 @@ return function(instance)
 	-- This function will ignore blocked NavAreas.
 	-- See navmesh.getNavArea for a function that does see blocked areas.
 	-- @param Vector pos The position to look from
-	-- @param number maxDist Maximum distance from the given position that the function will look for a CNavArea (Default 10000)
-	-- @param boolean checkLOS If this is set to true then the function will internally do a trace from the starting position to each potential CNavArea with a MASK_NPCSOLID_BRUSHONLY. If the trace fails then the CNavArea is ignored. If this is set to false then the function will find the closest CNavArea through anything, including the world. (Default false)
-	-- @param boolean checkGround If checkGround is true then this function will internally call navmesh.getNavArea to check if there is a CNavArea directly below the position, and return it if so, before checking anywhere else. (Default true)
+	-- @param number maxDist Maximum distance from the given position that the function will look for a CNavArea (default: 10000)
+	-- @param boolean checkLOS If this is set to true then the function will internally do a trace from the starting position to each potential CNavArea with a `MASK.NPCSOLID_BRUSHONLY`.
+	-- If the trace fails then the CNavArea is ignored.
+	-- If this is set to false then the function will find the closest CNavArea through anything, including the world.
+	-- Default: false
+	-- @param boolean checkGround If checkGround is true then this function will internally call navmesh.getNavArea to check if there is a CNavArea directly below the position, and return it if so, before checking anywhere else.
+	-- Default: true
 	-- @return NavArea The closest NavArea found with the given parameters, or a NULL NavArea if one was not found.
 	function navmesh_library.getNearestNavArea(pos, maxDist, checkLOS, checkGround)
 		return lnavwrap( navmesh.GetNearestNavArea( vunwrap1(pos), nil, maxDist, checkLOS, checkGround ) )
@@ -245,7 +256,7 @@ return function(instance)
 
 	--- Returns whether this area is in the Open List.
 	-- Used in pathfinding via the A* algorithm.
-	-- More information can be found here: https://wiki.facepunch.com/gmod/Simple_Pathfinding
+	-- See also https://wiki.facepunch.com/gmod/Simple_Pathfinding
 	-- @name navarea_methods.isOpen
 	-- @return boolean Whether this area is in the Open List.
 	function lnavarea_methods:isOpen()
@@ -254,7 +265,7 @@ return function(instance)
 
 	--- Returns whether the Open List is empty or not.
 	-- Used in pathfinding via the A* algorithm.
-	-- More information can be found here: https://wiki.facepunch.com/gmod/Simple_Pathfinding
+	-- See also https://wiki.facepunch.com/gmod/Simple_Pathfinding
 	-- @name navarea_methods.isOpenListEmpty
 	-- @return boolean Whether the Open List is empty or not.
 	function lnavarea_methods:isOpenListEmpty()
@@ -562,8 +573,8 @@ return function(instance)
 
 	--- Returns whether the nav area is blocked or not, i.e. whether it can be walked through or not.
 	-- @name navarea_methods.isBlocked
-	-- @param number? teamID The team ID to test, -2 = any team. Only 2 actual teams are available, 0 and 1. (Default -2)
-	-- @param boolean? ignoreNavBlockers Whether to ignore func_nav_blocker entities. (Default false)
+	-- @param number? teamID The team ID to test, -2 = any team. Only 2 actual teams are available, 0 and 1 (default: -2)
+	-- @param boolean? ignoreNavBlockers Whether to ignore func_nav_blocker entities (default: false)
 	-- @return boolean Whether the area is blocked or not
 	function lnavarea_methods:isBlocked(teamID, ignoreNavBlockers)
 		checkluatype(teamID, TYPE_NUMBER)
@@ -590,7 +601,7 @@ return function(instance)
 	--- Returns if this position overlaps the NavArea within the given tolerance.
 	-- @name navarea_methods.isOverlapping
 	-- @param Vector pos The position to test.
-	-- @param number? tolerance The tolerance of the overlapping, set to 0 for no tolerance. (Default 0)
+	-- @param number? tolerance The tolerance of the overlapping, set to 0 for no tolerance (default: 0)
 	-- @return number Whether the given position overlaps the NavArea or not.
 	function lnavarea_methods:isOverlapping(pos, tolerance)
 		checkluatype(tolerance, TYPE_NUMBER)
@@ -609,7 +620,7 @@ return function(instance)
 	--- Returns whether this CNavArea can see given position.
 	-- @name navarea_methods.isPartiallyVisible
 	-- @param Vector pos The position to test.
-	-- @param Entity? ignoreEnt If set, the given entity will be ignored when doing LOS tests (Default NULL)
+	-- @param Entity? ignoreEnt If set, the given entity will be ignored when doing LOS tests (default: NULL)
 	-- @return boolean Whether the given position is visible from this area
 	function lnavarea_methods:isPartiallyVisible(pos, ignoreEnt)
 		return lnavunwrap(self):IsPartiallyVisible( vunwrap1(pos), eunwrap(ignoreEnt) )

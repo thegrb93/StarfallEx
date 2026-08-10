@@ -72,39 +72,39 @@ end
 
 local CustomPropQueue = SF.RingQueue(128)
 local CustomPropData = {
-    __index = {
-        send = function(self)
-            if not Ent_IsValid(self.prop) then return self:finish() end
-            net.Start("starfall_custom_prop")
-            net.WriteReliableEntity(self.prop)
+	__index = {
+		send = function(self)
+			if not Ent_IsValid(self.prop) then return self:finish() end
+			net.Start("starfall_custom_prop")
+			net.WriteReliableEntity(self.prop)
 
-            local stream = net.WriteStream(self.prop.sfmeshdata, function() self:finish() end, true)
-            if stream then
-                if self.recip then net.Send(self.recip) else net.Broadcast() end
-                -- Simple timeout. Will be ignored if finished before the timeout
-                timer.Create("SFCustomPropTimeout", 10, 1, function() self:finish() end)
-            else
-                net.Abort()
-                timer.Simple(1, function() self:send() end)
-            end
-        end,
-        finish = function(self)
-            if self.finished then return end
-            self.finished=true
-            CustomPropQueue:pop()
+			local stream = net.WriteStream(self.prop.sfmeshdata, function() self:finish() end, true)
+			if stream then
+				if self.recip then net.Send(self.recip) else net.Broadcast() end
+				-- Simple timeout. Will be ignored if finished before the timeout
+				timer.Create("SFCustomPropTimeout", 10, 1, function() self:finish() end)
+			else
+				net.Abort()
+				timer.Simple(1, function() self:send() end)
+			end
+		end,
+		finish = function(self)
+			if self.finished then return end
+			self.finished=true
+			CustomPropQueue:pop()
 			local nextdata = CustomPropQueue:front()
 			if nextdata then return nextdata:send() end
-        end
-    },
-    __call = function(t, prop, recip)
-        return setmetatable({prop = prop, recip = recip, finished = false}, t)
-    end
+		end
+	},
+	__call = function(t, prop, recip)
+		return setmetatable({prop = prop, recip = recip, finished = false}, t)
+	end
 }
 setmetatable(CustomPropData, CustomPropData)
 
 function ENT:TransmitData(recip)
 	local propdata = CustomPropData(self, recip)
-    CustomPropQueue:push(propdata)
+	CustomPropQueue:push(propdata)
 	if propdata == CustomPropQueue:front() then propdata:send() end
 end
 
@@ -208,13 +208,13 @@ local function createCustomProp(ply, pos, ang, sfmeshdata)
 
 	propent.sfmeshdata = sfmeshdata
 	propent:Spawn()
-	
+
 	local physobj = propent:GetPhysicsObject()
 	if not physobj:IsValid() then
 		propent:Remove()
 		SF.Throw("Custom prop has invalid physics!", 2)
 	end
-	
+
 	propent:SetPos(pos)
 	propent:SetAngles(ang)
 	propent:TransmitData()

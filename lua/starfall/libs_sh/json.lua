@@ -13,16 +13,18 @@ return function(instance)
 local json_library = instance.Libraries.json
 
 local function CheckCyclic(tbl, parents)
-    parents[tbl] = true
-    for _, v in pairs(tbl) do
-        if type(v) == "table" then
-            if parents[v] then SF.Throw("Cannot encode a table with cyclic references", 2) end
-            CheckCyclic(v, parents)
-        end
-    end
-    parents[tbl] = nil
+	parents[tbl] = true
+	for _, v in pairs(tbl) do
+		if type(v) == "table" then
+			if parents[v] then SF.Throw("Cannot encode a table with cyclic references", 2) end
+			CheckCyclic(v, parents)
+		end
+	end
+	parents[tbl] = nil
 end
+
 --- Convert table to JSON string
+-- See also `json.decode` function
 -- @param table tbl Table to encode
 -- @param boolean? prettyPrint Optional. If true, formats and indents the resulting JSON
 -- @return string JSON encoded string representation of the table
@@ -35,6 +37,7 @@ function json_library.encode(tbl, prettyPrint)
 end
 
 --- Convert JSON string to table
+-- See also `json.encode` function
 -- @param string s String to decode
 -- @param boolean? ignoreConversions Optional. If true, ignore string to number conversions for table keys
 -- @return table Table representing the JSON object

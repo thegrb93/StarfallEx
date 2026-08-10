@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 
 
@@ -21,6 +21,7 @@ local effect_blacklist = {
 SF.RegisterLibrary("effect")
 
 --- Effect type
+-- Created with `effect.create` function
 -- @name Effect
 -- @class type
 -- @libtbl effect_methods
@@ -46,7 +47,7 @@ instance:AddHook("initialize", function()
 end)
 
 --- Creates an effect data structure
--- @return Effect Effect Object
+-- @return Effect Effect object
 function effect_library.create()
 	return wrap(EffectData())
 end
@@ -78,10 +79,10 @@ end
 function effect_library.beamRingPoint(pos, lifetime, startRad, endRad, width, amplitude, color, speed, flags, framerate, material)
 	pos = vunwrap1(pos)
 	checkvector(pos)
-	
+
 	checkpermission(instance, nil, "effect.play")
 	plyEffectBurst:use(instance.player, 1)
-	
+
 	lifetime = math.Clamp(lifetime, 0, 25.6)
 	startRad = math.Clamp(startRad, -4096, 4096)
 	endRad = math.Clamp(endRad, -4096, 4096)

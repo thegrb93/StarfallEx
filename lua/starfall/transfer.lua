@@ -20,8 +20,8 @@ function net.ReadStarfall(ply, callback)
 		if isentity(owner) then sfdata.owner = owner end
 		if istable(files) then sfdata.files = files end
 
-		if not proc then callback(false, sfdata, "Invalid starfall processor entity") return end
-		if not owner then callback(false, sfdata, "Invalid starfall owner entity") return end
+		if not proc then callback(false, sfdata, "Invalid Starfall processor entity") return end
+		if not owner then callback(false, sfdata, "Invalid Starfall owner entity") return end
 		if not files then callback(false, sfdata, "Error transferring files") return end
 		callback(true, sfdata)
 	end)
@@ -98,7 +98,7 @@ end
 -- Legacy decoder
 function SF.DecompressFiles(data)
 	data = util.Decompress(data)
-	if not data or #data < 8 then error("Error decompressing starfall data!") end
+	if not data or #data < 8 then error("Error decompressing Starfall data!") end
 	local buff = SF.StringStream(data, 5)
 	local headers = {}
 	for i=1, buff:readUInt32() do
@@ -228,16 +228,16 @@ if SERVER then
 
 else
 
-	-- Sends starfall files to server
+	-- Sends Starfall files to server
 	function SF.SendStarfall(msg, sfdata, callback)
 		net.Start(msg)
 		net.WriteStarfall(sfdata, callback)
 		net.SendToServer()
 	end
 
-	---Push code to a starfall chip owned by this user
-	---@param sf Entity The starfall chip entity
-	---@param sfdata any
+	---Push code to a Starfall chip owned by this user
+	---@param Entity sf The Starfall chip entity
+	---@param any sfdata
 	function SF.PushStarfall(sf, sfdata)
 		net.Start("starfall_upload_push")
 			net.WriteEntity(sf)
@@ -245,7 +245,7 @@ else
 		net.SendToServer()
 	end
 
-	
+
 	function SF.SendError(chip, message, traceback)
 		local owner, is_blocked = chip.owner, false
 		if IsValid(owner) then

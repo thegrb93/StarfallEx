@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 
 -- Register privileges
@@ -53,18 +53,19 @@ local function convertFilter(filter)
 	end
 end
 
-local start_vec, endpos_vec, minbox_vec, maxbox_vec, origin_vec, angles_ang, normal_vec 
+local start_vec, endpos_vec, minbox_vec, maxbox_vec, origin_vec, angles_ang, normal_vec
 	= Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0), Angle(0, 0, 0), Vector(0, 0, 0)
 
 --- Does a line trace
 -- @param Vector start Start position
 -- @param Vector endpos End position
--- @param Entity|table|function|nil filter Entity/array of entities to filter, or a function callback with an entity argument that returns whether the trace should hit
+-- @param Entity|table|function|nil filter Optional entity/array of entities to filter, or a function callback with an entity argument that returns whether the trace should hit
 -- @param number? mask Trace mask
 -- @param number? colgroup The collision group of the trace
 -- @param boolean? ignworld Whether the trace should ignore world
 -- @param boolean? whitelist Make 'filter' param array act as a hit whitelist instead of blacklist
--- @return table Result of the trace https://wiki.facepunch.com/gmod/Structures/TraceResult
+-- @return table Result of the trace.
+-- See https://wiki.facepunch.com/gmod/Structures/TraceResult
 function trace_library.line(start, endpos, filter, mask, colgroup, ignworld, whitelist)
 	vec_SetUnpacked(start_vec, start[1], start[2], start[3])
 	vec_SetUnpacked(endpos_vec, endpos[1], endpos[2], endpos[3])
@@ -85,12 +86,13 @@ end
 -- @param Vector endpos End position
 -- @param Vector minbox Lower box corner
 -- @param Vector maxbox Upper box corner
--- @param Entity|table|function|nil filter Entity/array of entities to filter, or a function callback with an entity argument that returns whether the trace should hit
+-- @param Entity|table|function|nil filter Optional entity/array of entities to filter, or a function callback with an entity argument that returns whether the trace should hit
 -- @param number? mask Trace mask
 -- @param number? colgroup The collision group of the trace
 -- @param boolean? ignworld Whether the trace should ignore world
 -- @param boolean? whitelist Make 'filter' param array act as a hit whitelist instead of blacklist
--- @return table Result of the trace https://wiki.facepunch.com/gmod/Structures/TraceResult
+-- @return table Result of the trace.
+-- See https://wiki.facepunch.com/gmod/Structures/TraceResult
 function trace_library.hull(start, endpos, minbox, maxbox, filter, mask, colgroup, ignworld, whitelist)
 	vec_SetUnpacked(start_vec, start[1], start[2], start[3])
 	vec_SetUnpacked(endpos_vec, endpos[1], endpos[2], endpos[3])
@@ -119,9 +121,9 @@ end
 -- @param Angle boxAngles The box's angles
 -- @param Vector boxMins The box min bounding vector
 -- @param Vector boxMaxs The box max bounding vector
--- @return Vector? Hit position or nil if not hit
--- @return Vector? Hit normal or nil if not hit
--- @return number? Hit fraction or nil if not hit
+-- @return Vector? Hit position, or nil if not hit
+-- @return Vector? Hit normal, or nil if not hit
+-- @return number? Hit fraction, or nil if not hit
 function trace_library.intersectRayWithOBB(rayStart, rayDelta, boxOrigin, boxAngles, boxMins, boxMaxs)
 	vec_SetUnpacked(start_vec, rayStart[1], rayStart[2], rayStart[3])
 	vec_SetUnpacked(endpos_vec, rayDelta[1], rayDelta[2], rayDelta[3])
@@ -147,12 +149,12 @@ function trace_library.isBoxIntersectingSphere(boxMins, boxMaxs, spherePos, sphe
 	return util.IsBoxIntersectingSphere(minbox_vec, maxbox_vec, origin_vec, sphereRadius)
 end
 
---- Does a ray plane intersection returning the position hit or nil if not hit
+--- Does a ray plane intersection returning the position hit, or nil if not hit
 -- @param Vector rayStart The origin of the ray
 -- @param Vector rayDelta The direction and length of the ray
 -- @param Vector planeOrigin The origin of the plane
 -- @param Vector planeNormal The normal of the plane
--- @return Vector? Hit position or nil if not hit
+-- @return Vector? Hit position, or nil if not hit
 function trace_library.intersectRayWithPlane(rayStart, rayDelta, planeOrigin, planeNormal)
 	vec_SetUnpacked(start_vec, rayStart[1], rayStart[2], rayStart[3])
 	vec_SetUnpacked(endpos_vec, rayDelta[1], rayDelta[2], rayDelta[3])
@@ -167,7 +169,8 @@ end
 -- @param string name The decal name, see https://wiki.facepunch.com/gmod/util.Decal
 -- @param Vector start Start position
 -- @param Vector endpos End position
--- @param Entity|table|nil filter (Optional) Entity/array of entities to filter
+-- @param Entity|table|nil filter Optional. If set, the decal will not be able to be placed on the given entity.
+-- Can also be a table of entities.
 function trace_library.decal(name, start, endpos, filter)
 	checkpermission(instance, nil, "trace.decal")
 	checkluatype(name, TYPE_STRING)
@@ -241,7 +244,8 @@ function trace_library.pointContents(position)
 	return util_PointContents(endpos_vec)
 end
 
---- Calculates the aim vector from a 2D screen position. This is essentially a generic version of input.screenToVector, where you can define the view angles and screen size manually.
+--- Calculates the aim vector from a 2D screen position. This is essentially a generic version of input.screenToVector,
+-- where you can define the view angles and screen size manually.
 -- @param Angle viewAngles View angles
 -- @param number viewFOV View field of view
 -- @param number x X position on the screen

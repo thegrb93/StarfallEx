@@ -79,12 +79,14 @@ local projectedLights = SF.EntManager("projectedlights", "projected lights", 20,
 SF.RegisterLibrary("light")
 
 --- Light type
+-- Created with `light.create` function
 -- @name Light
 -- @class type
 -- @libtbl light_methods
 SF.RegisterType("Light", true, false)
 
---- Projected Texture type
+--- ProjectedTexture type
+-- Created with `light.createProjected` function
 -- @name ProjectedTexture
 -- @class type
 -- @libtbl projectedtexture_methods
@@ -131,9 +133,9 @@ instance:AddHook("deinitialize", function()
 	projectedLights:deinitialize(instance, true)
 end)
 
---- Creates a dynamic light (make sure to draw it)
+--- Creates a dynamic light (don't forget to draw it)
 -- @param Vector pos The position of the light
--- @param number size The size of the light. Must be lower than sf_light_maxsize
+-- @param number size The size of the light (must be lower than sf_light_maxsize)
 -- @param number brightness The brightness of the light
 -- @param Color color The color of the light
 -- @return Light Dynamic light
@@ -156,13 +158,15 @@ function light_library.create(pos, size, brightness, color)
 	return wrap(light)
 end
 
---- Draws the light. Typically used in the think hook. Will throw an error if it fails (use pcall)
+--- Draws the light.
+-- Typically used in the `Think` hook.
+-- Will throw an error if it fails (use `pcall`).
 function light_methods:draw()
 	local curtime = CurTime()
 	processLights(curtime)
 	if lightsUsed >= 32 then SF.Throw("Max number of dynamiclights reached", 2) end
 	lightsUsed = lightsUsed + 1
-	
+
 	local light = unwrap(self)
 	if not light.slot then
 		light.slot = getFreeSlot()
@@ -251,7 +255,8 @@ function light_methods:setSize(size)
 	unwrap(self).data.size = math.Clamp(size, 0, maxSize:GetFloat())
 end
 
---- Sets the flicker style of the light https://developer.valvesoftware.com/wiki/Light_dynamic#Appearances
+--- Sets the flicker style of the light
+-- See https://developer.valvesoftware.com/wiki/Light_dynamic#Appearances
 -- @param number style The number of the flicker style
 function light_methods:setStyle(style)
 	checkluatype(style, TYPE_NUMBER)
@@ -329,7 +334,7 @@ function projectedtexture_methods:getHorizontalFOV()
 	return ptunwrap(self):GetHorizontalFOV()
 end
 
---- Gets whether the Projected Texture is lighting world geometry or not
+--- Gets whether the Projected Texture is lighting world geometry
 -- @return boolean Lighting
 function projectedtexture_methods:getLightWorld()
 	return ptunwrap(self):GetLightWorld()
@@ -360,7 +365,8 @@ function projectedtexture_methods:getNoCull()
 end
 
 --- Gets the orthographic settings of the Projected Texture
--- @return boolean orthographic Whether or not the Projected Texture is actually orthographic. If false, then the other value are not returned.
+-- @return boolean orthographic Whether the Projected Texture is actually orthographic.
+-- If false, then the other value are not returned.
 -- @return number left
 -- @return number top
 -- @return number right
@@ -490,7 +496,7 @@ function projectedtexture_methods:setHorizontalFOV(fov)
 	ptunwrap(self):SetHorizontalFOV(fov)
 end
 
---- Sets whether or not the Projected Texture lights world geometry
+--- Sets if the Projected Texture should light the world geometry
 -- Will not take effect until ProjectedTexture:update() is called.
 -- @param boolean enable
 function projectedtexture_methods:setLightWorld(enable)

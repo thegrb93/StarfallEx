@@ -2,7 +2,7 @@
 --@author Sparky
 --@client
 
--- This example draws pixels to a rendertarget and then displays the result
+-- This example draws pixels to a RenderTarget and then displays the result
 
 render.createRenderTarget("myrendertarget")
 
@@ -31,4 +31,3 @@ hook.add("render","",function()
     render.setRenderTargetTexture("myrendertarget")
     render.drawTexturedRect(0,0,512,512)
 end)
-

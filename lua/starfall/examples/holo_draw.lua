@@ -12,17 +12,17 @@ if CLIENT then
     -- The first hologram can be completely hidden, but for the second method to work, the other hologram needs to render
     --holo1:setNoDraw(true)
     --holo2:setColor(Color(0,0,0,1))
-    
+
     render.createRenderTarget("canvas")
     hook.add("drawhud", "drawstuff", function()
         holo1:setAngles(Angle(45, timer.curtime() * 100, 0))
         holo2:setAngles(Angle(0, -timer.curtime() * 100, 0))
-        
+
         render.selectRenderTarget("canvas")
             render.clear(Color(0,0,0,0), true)
             render.setColor(Color(0,255,255))
             render.drawRectOutline(0, 0, 1024, 1024, 8)
-            
+
             render.pushViewMatrix({
                 type   = "3D",
                 origin = chip():getPos() + Vector(-30, 0, 40),
@@ -30,22 +30,22 @@ if CLIENT then
                 fov    = 60,
                 aspect = 1,
             })
-            
+
             -- FIRST METHOD: Render in fullbright or increased fullbright. May not work with all models, ragdolls in particular
             render.setLightingMode(1)
                 holo1:draw()
             render.setLightingMode(0)
-            
+
             holo2:draw()
-            
+
             render.popViewMatrix()
         render.selectRenderTarget()
-        
+
         render.setColor(Color(255,255,255))
         render.setRenderTargetTexture("canvas")
         render.drawTexturedRect(256, 256, 512, 512)
     end)
-    
+
     if player() == owner() then
         enableHud(nil, true)
     end

@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 
 
@@ -17,12 +17,14 @@ SF.ResourceCounters.ParticleEmitters = {icon = "icon16/asterisk_yellow.png", cou
 SF.RegisterLibrary("particle")
 
 --- ParticleEmitter type
+-- Created with `particle.create` function
 -- @name ParticleEmitter
 -- @class type
 -- @libtbl particleem_methods
 SF.RegisterType("ParticleEmitter", true, false)
 
 --- Particle type
+-- Created with `ParticleEmitter:add` function
 -- @name Particle
 -- @class type
 -- @libtbl particle_methods
@@ -69,7 +71,7 @@ end)
 --- Creates a ParticleEmitter data structure
 -- @param Vector position The particle emitter's position
 -- @param boolean use3D Create the emitter in 3D mode
--- @return ParticleEmitter? ParticleEmitter Object or nil if the engine max of 4097 was hit
+-- @return ParticleEmitter? Particle emitter object, or nil if the engine max of 4097 was hit
 function particle_library.create(position, use3D)
 	checkluatype(use3D, TYPE_BOOL)
 	checkpermission(instance, nil, "particle.create")
@@ -179,7 +181,8 @@ function particleem_methods:setBBox(mins, maxs)
 	peunwrap(self):SetBBox(vunwrap1(mins), vunwrap2(maxs))
 end
 
---- This function sets the the distance between the render camera and the emitter at which the particles should start fading and at which distance fade ends ( alpha becomes 0 ).
+--- This function sets the the distance between the render camera and the emitter at which the particles should start
+-- fading and at which distance fade ends ( alpha becomes 0 ).
 -- @param number distanceMin
 -- @param number distanceMax
 function particleem_methods:setNearClip(distanceMin, distanceMax)

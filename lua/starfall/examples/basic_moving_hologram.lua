@@ -26,12 +26,12 @@ holo:setAngVel(Angle(0,100,0))
 
 -- Let's create a function which we will be responsible for updating our hologram
 local function update_hologram()
-	-- Grab current position of the hologram and add to it a newly constructed vector object with the `X` axis set to 1
-	-- Most vector operations like adding, multiplying, etc. will not modify the components, but instead create a new object
-	local target_position = holo:getPos() + Vector(1, 0, 0)
-	
-	-- Set the hologram's position to the previously calculated vector `target_position`
-	holo:setPos(target_position)
+    -- Grab current position of the hologram and add to it a newly constructed vector object with the `X` axis set to 1
+    -- Most vector operations like adding, multiplying, etc. will not modify the components, but instead create a new object
+    local target_position = holo:getPos() + Vector(1, 0, 0)
+
+    -- Set the hologram's position to the previously calculated vector `target_position`
+    holo:setPos(target_position)
 end
 
 -- Starfall has a couple of ways to refresh or execute code. What we wrote so far will only ever be executed once - when the chip is initialized
@@ -47,18 +47,18 @@ hook.add("Tick", "UpdateHologram", update_hologram)
 -- There's two main types of timers, ones that execute a certain amount of times (or forever), and the `simple` timers that only execute once after a certain delay
 -- The following is a `simple` timer that will wait `2` seconds and then execute the provided `callback` (this time we pass in an anonymous function as the callback)
 timer.simple(2, function()
-	-- Detach the `update_hologram` function from the `Tick` event by targeting it with it's unique name, meaning it's `callback` will no longer be executed by this event
-	hook.remove("Tick", "UpdateHologram")
-	
-	-- Stop rotating the hologram by setting it's velocity back to the default 0,0,0
-	holo:setAngVel(Angle())
-	
-	-- One more timer for good measure, because it's a good thing to expose you to the jokingly called `callback hell`
-	-- As mentioned above, this is the other type that will execute the `callback` a certain amount of times (in this case `6`, while `0` would be infinite)
-	-- Remember that `timers` will always delay first, which means that the `callback` will be executed for the first time after a `1.2` second initial delay
-	timer.create("PlayAnimation", 1.2, 6, function(...)
-		-- Tell the game engine to set set a non-looping swinging animation to the G-Man's hologram and also play an adequate sound effect
-		holo:setAnimation("swing")
-		holo:emitSound("npc/zombie/claw_miss1.wav")
-	end)
+    -- Detach the `update_hologram` function from the `Tick` event by targeting it with it's unique name, meaning it's `callback` will no longer be executed by this event
+    hook.remove("Tick", "UpdateHologram")
+
+    -- Stop rotating the hologram by setting it's velocity back to the default 0,0,0
+    holo:setAngVel(Angle())
+
+    -- One more timer for good measure, because it's a good thing to expose you to the jokingly called `callback hell`
+    -- As mentioned above, this is the other type that will execute the `callback` a certain amount of times (in this case `6`, while `0` would be infinite)
+    -- Remember that `timers` will always delay first, which means that the `callback` will be executed for the first time after a `1.2` second initial delay
+    timer.create("PlayAnimation", 1.2, 6, function(...)
+        -- Tell the game engine to set set a non-looping swinging animation to the G-Man's hologram and also play an adequate sound effect
+        holo:setAnimation("swing")
+        holo:emitSound("npc/zombie/claw_miss1.wav")
+    end)
 end)

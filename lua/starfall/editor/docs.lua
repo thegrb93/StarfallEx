@@ -43,7 +43,7 @@ local generic_lua_types = {
 	["nil"] = true -- For nullable / optional values
 }
 
-local sf_types = Docs.Types -- Get the types from documentation rather than the lua state
+local sf_types = Docs.Types -- Get the types from documentation rather than the Lua state
 local function valid_sftype(type1)
 	if sf_types[type1] or generic_lua_types[type1] then return true end
 
@@ -121,15 +121,19 @@ end
 
 local processTypes = {
 	["type"] = function(data)
-		for k, v in ipairs(data.libtbl) do
-			methodstolib[v] = data.name
+		if data.libtbl then
+			for k, v in ipairs(data.libtbl) do
+				methodstolib[v] = data.name
+			end
 		end
 		Docs.Types[data.name] = data
 		data.methods = {}
 	end,
 	["library"] = function(data)
-		for k, v in ipairs(data.libtbl) do
-			methodstolib[v] = data.name
+		if data.libtbl then
+			for k, v in ipairs(data.libtbl) do
+				methodstolib[v] = data.name
+			end
 		end
 		Docs.Libraries[data.name] = data
 		data.tables = {}
@@ -286,7 +290,7 @@ end
 
 --- Scan function
 -- @param string src Source code
--- @param string file_name Source file name.
+-- @param string realm Source realm.
 local function scan(src, realm)
 	-- https://github.com/thegrb93/StarfallEx/blob/master/lua/starfall/...
 	local filePath = string_match(curfile, "starfall/(libs_.+/.*)") -- libs_sh/... path that will be used for links with [src] on the sfhelper to the github.

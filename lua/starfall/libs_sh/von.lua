@@ -806,6 +806,7 @@ return function(instance)
 local von_library = instance.Libraries.von
 
 --- Deserialize a string
+-- See also `von.serialize` function
 -- @param string str String to deserialize
 -- @return table Table
 function von_library.deserialize(str)
@@ -815,6 +816,7 @@ function von_library.deserialize(str)
 end
 
 --- Serialize a table
+-- See also `von.deserialize` function
 -- @param table tbl Table to serialize
 -- @param boolean? checkRecursive Enable checking for table recursion (default: false)
 -- @return string String encoded from the table

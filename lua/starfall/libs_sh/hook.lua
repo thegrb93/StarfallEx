@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local haspermission = SF.Permissions.hasAccess
 local registerprivilege = SF.Permissions.registerPrivilege
@@ -88,7 +88,7 @@ if SERVER then
 	-- @server
 	-- @param Player ply The player who has unfrozen an entity
 	-- @param Entity ent The unfrozen entity
-	-- @param PhysObj physobj The physics object of the unfrozen entity 
+	-- @param PhysObj physobj The physics object of the unfrozen entity
 	add("PlayerUnfrozeObject")
 
 	--- Called when a player dies
@@ -107,7 +107,7 @@ if SERVER then
 	-- @param Player ply Player that disconnected
 	add("PlayerDisconnected")
 
-	--- Called when a player gets hurt, uses the player_hurt game event clientside.
+	--- Called when a player gets hurt, uses the `player_hurt` game event client-side.
 	-- @name PlayerHurt
 	-- @class hook
 	-- @shared
@@ -132,16 +132,16 @@ if SERVER then
 	-- @param Player ply Player who spawned
 	add("PlayerSpawn")
 
-	--- Called when a player has changed team using Player:SetTeam
+	--- Called when a player has changed team using `Player:SetTeam`
 	-- @name PlayerChangedTeam
 	-- @class hook
 	-- @server
 	-- @param Player ply Player whose team has changed
-	-- @param number oldTeam Index of the team the player was originally in. See team.getName and the team library
+	-- @param number oldTeam Index of the team the player was originally in. See `team.getName` and the `team` library
 	-- @param number newTeam Index of the team the player has changed to.
 	add("PlayerChangedTeam")
 
-	--- Called when a players enters a vehicle
+	--- Called when a player enters a vehicle
 	-- @name PlayerEnteredVehicle
 	-- @class hook
 	-- @server
@@ -150,7 +150,7 @@ if SERVER then
 	-- @param number num Role. The seat number
 	add("PlayerEnteredVehicle")
 
-	--- Called when a players leaves a vehicle
+	--- Called when a player leaves a vehicle
 	-- @name PlayerLeaveVehicle
 	-- @class hook
 	-- @server
@@ -168,7 +168,7 @@ if SERVER then
 	-- @param boolean teamChat True if team chat
 	-- @return string? New text. "" to stop from displaying. Nil to keep original.
 	add("PlayerSay", nil, nil, returnOnlyOnYourself, true)
-	
+
 	-- Serverside implementation of playerchat
 	gameevent.Listen("player_say")
 	add("player_say", "playerchat", function(instance, data)
@@ -176,7 +176,7 @@ if SERVER then
 		return true, {instance.WrapObject(ply), data.text, data.teamonly, not (Ent_IsValid(ply) and ply:Alive())}
 	end)
 
-	--- Called when a players sprays their logo
+	--- Called when a player sprays their logo
 	-- @name PlayerSpray
 	-- @class hook
 	-- @server
@@ -192,7 +192,7 @@ if SERVER then
 	-- @param Entity ent Entity being used
 	add("PlayerUse")
 
-	--- Called when a players turns their flashlight on or off
+	--- Called when a player toggles their flashlight
 	-- @name PlayerSwitchFlashlight
 	-- @class hook
 	-- @server
@@ -200,7 +200,7 @@ if SERVER then
 	-- @param boolean state New flashlight state. True if on.
 	add("PlayerSwitchFlashlight")
 
-	--- Called when a wants to pick up a weapon
+	--- Called when a player wants to pick up a weapon
 	-- @name PlayerCanPickupWeapon
 	-- @class hook
 	-- @server
@@ -273,7 +273,7 @@ if SERVER then
 	-- @param Entity inflictor Entity that did the killing
 	add("OnNPCKilled")
 
-	--- Called when the Entity:getWaterLevel of an entity is changed.
+	--- Called when the `Entity:getWaterLevel` of an entity is changed.
 	-- @name OnEntityWaterLevelChanged
 	-- @class hook
 	-- @server
@@ -290,7 +290,7 @@ else
 	-- @client
 	-- @param boolean isTeamChat Whether they're typing in team chat
 	add("StartChat")
-	
+
 	--- Called when the local player closes their chat window.
 	-- @name FinishChat
 	-- @class hook
@@ -323,15 +323,15 @@ else
 		return false
 	end)
 
-	--- Called when a clientside entity gets created or re-created via lag/PVS
+	--- Called when a client-side entity gets created or re-created due to lag/PVS
 	-- @name NetworkEntityCreated
 	-- @class hook
 	-- @client
 	-- @param Entity ent New entity
 	add("NetworkEntityCreated")
 
-	--- Called when a clientside entity transmit state is changed. Usually when changing PVS
-	-- If you want clientside render changes to persist on an entity you have to re-apply them
+	--- Called when a client-side entity transmit state is changed. Usually when changing PVS.
+	-- If you want client-side render changes to persist on the entity, you have to re-apply them
 	-- each time it begins transmitting again
 	-- @name NotifyShouldTransmit
 	-- @class hook
@@ -340,7 +340,7 @@ else
 	-- @param boolean shouldtransmit Whether it is now transmitting or not
 	add("NotifyShouldTransmit")
 
-	-- Check serverside playerhurt for docs
+	-- Check server-side playerhurt for docs
 	gameevent.Listen("player_hurt")
 	SF.hookAdd("player_hurt", "playerhurt", function(instance, data)
 		return true, {instance.WrapObject(Player(data.userid)), instance.WrapObject(Player(data.attacker)), data.health}
@@ -391,7 +391,10 @@ else
 	-- @client
 	add("OnContextMenuClose")
 
-	--- Called whenever a CUserCmd is made for the local player. This runs twice per frame, one for movement one for camera. You can use cmd:getCommandNumber to check which one it is if you want to only run on one of them. Camera will have a 0 command number.
+	--- Called whenever a user command is created for the local player.
+	-- This runs twice per frame, once for movement, and once for camera.
+	-- You can use `CUserCmd:getCommandNumber` to check which one it is if you want to only run on one of them.
+	-- Camera has a command number = 0.
 	-- @name CreateMove
 	-- @class hook
 	-- @client
@@ -454,7 +457,7 @@ add("OnPlayerHitGround")
 -- @class hook
 -- @shared
 -- @param Player ply Player pressing the key
--- @param number key The key being pressed
+-- @param number key The key being pressed (see `IN_KEY` enum)
 add("KeyPress")
 
 --- Called when a player releases a key
@@ -462,7 +465,7 @@ add("KeyPress")
 -- @class hook
 -- @shared
 -- @param Player ply Player releasing the key
--- @param number key The key being released
+-- @param number key The key being released (see `IN_KEY` enum)
 add("KeyRelease")
 
 --- Called when a player punts with the gravity gun
@@ -537,7 +540,7 @@ end)
 -- @class hook
 -- @shared
 -- @param Entity ent Entity being removed
--- @param boolean fullupdate If clientside, will be true if the entity was removed by a fullupdate
+-- @param boolean fullupdate If client-side, will be true if the entity was removed by a full update
 
 --- Called when an entity is broken
 -- @name PropBreak
@@ -552,8 +555,11 @@ add("PropBreak")
 -- @class hook
 -- @shared
 -- @param Entity ent The entity that fired the bullet
--- @param table data The bullet data. See http://wiki.facepunch.com/gmod/Structures/Bullet
--- @return function? Optional callback to called as if it were the Bullet structure's Callback. Called before the bullet deals damage with attacker, traceResult.
+-- @param table data The bullet data.
+-- See https://wiki.facepunch.com/gmod/Structures/Bullet
+-- @return function? Optional callback to invoke before the bullet deals damage. With arguments:
+-- 1. Entity attacker
+-- 2. TraceResult structure - see https://wiki.facepunch.com/gmod/Structures/TraceResult
 add("EntityFireBullets", nil, function(instance, ent, data)
 	return true, { instance.WrapObject(ent), SF.StructWrapper(instance, data, "Bullet") }
 end, function(instance, ret, ent, data)
@@ -570,19 +576,29 @@ end, true)
 -- @class hook
 -- @shared
 -- @param Entity ent The entity that fired the bullet
--- @param table data A table containing Trace (See http://wiki.facepunch.com/gmod/Structures/TraceResult) and AmmoType, Tracer, Damage, Force, Attacker, TracerName (see http://wiki.facepunch.com/gmod/Structures/Bullet)
+-- @param table data A table containing:
+-- Trace - see https://wiki.facepunch.com/gmod/Structures/TraceResult
+-- AmmoType
+-- Tracer
+-- Damage
+-- Force
+-- Attacker
+-- TracerName - see https://wiki.facepunch.com/gmod/Structures/Bullet
 add("PostEntityFireBullets", nil, function(instance, ent, data)
 	local ret = SF.StructWrapper(instance, data, "Bullet")
 	ret.Trace = SF.StructWrapper(instance, data.Trace, "TraceResult")
 	return true, {instance.WrapObject(ent), ret}
 end)
 
---- Called whenever a sound has been played. This will not be called clientside if the server played the sound without the client also calling Entity:EmitSound.
+--- Called whenever a sound has been played.
+-- This will not be called client-side if the server played the sound without the client also calling Entity:EmitSound
 -- @name EntityEmitSound
 -- @class hook
 -- @shared
--- @param table data Information about the played sound. Changes done to this table can be applied by returning true from this hook. See https://wiki.facepunch.com/gmod/Structures/EmitSoundInfo.
--- @return boolean? Return false to prevent the sound from playing or nothing to play the sound without altering it.
+-- @param table data Information about the played sound.
+-- Changes done to this table can be applied by returning true from this hook.
+-- See https://wiki.facepunch.com/gmod/Structures/EmitSoundInfo
+-- @return boolean? Return false to prevent the sound from playing, or nothing to play the sound without altering it.
 add("EntityEmitSound", nil, function(instance, data)
 	return true, {SF.StructWrapper(instance, data, "EmitSoundInfo")}
 end, function(instance, ret, data)
@@ -623,7 +639,8 @@ add("Tick")
 -- @param CUserCmd cmd The UserCmd being processed
 add("StartCommand")
 
---- Called each UserCmd for each player to transfer information from the UserCmd to the CMoveData before the move is processed.
+--- Called each UserCmd for each player to transfer information from the UserCmd to the CMoveData before the move is
+-- processed.
 -- @name SetupMove
 -- @class hook
 -- @shared
@@ -640,12 +657,13 @@ add("SetupMove")
 -- @param CMoveData move The MoveData being processed
 add("FinishMove")
 
---- Called when starfall chip errors
+--- Called when Starfall chip errors
 -- @name StarfallError
 -- @class hook
 -- @shared
 -- @param Entity ent Starfall chip that errored
--- @param Player|Entity ply Who's fault it errored. World-entity if it was a server error, or player that the script errored if on client
+-- @param Player|Entity ply Whose fault it errored.
+-- World-entity if it was a server error, or player that the script errored if on client.
 -- @param string err Error message
 add("StarfallError", nil, function(instance, ent, owner, errply, _, err)
 	return true, {instance.WrapObject(ent), instance.WrapObject(errply), err}
@@ -764,14 +782,14 @@ local hookrun = hook_library.run
 --- Run a hook remotely.
 -- This will call the hook "remote" on either a specified entity or all instances on the server/client
 -- @shared
--- @param Entity? recipient Starfall entity to call the hook on. Nil to run on every starfall entity
+-- @param Entity? recipient Starfall entity to call the hook on. Nil to run on every Starfall entity
 -- @param ... payload Parameters that will be passed when calling hook functions
 -- @return table A list of the resultset of each called hook
 function hook_library.runRemote(recipient, ...)
 	local recipients
 	if recipient then
 		local ent = eunwrap(recipient)
-		if not ent.instance then SF.Throw("Entity has no starfall instance", 2) end
+		if not ent.instance then SF.Throw("Entity has no Starfall instance", 2) end
 		recipients = {
 			[ent.instance] = true
 		}
@@ -824,35 +842,36 @@ end
 
 -- Hooks below are not simple gmod hooks and are called by other events in other files.
 
---- Think hook. Called each frame on the client and each game tick on the server.
+--- Think hook. Called each frame on the client, and each game tick on the server.
 -- @name Think
 -- @class hook
 -- @shared
 
---- Called when the starfall chip is removed
+--- Called when the Starfall chip is removed.
 -- @name Removed
 -- @class hook
 -- @shared
 
---- Called after the starfall chip is duplicated and the duplication is finished.
+--- Called after the Starfall chip is duplicated and the duplication is finished.
 -- @name DupeFinished
 -- @class hook
 -- @server
 -- @param table entTbl A table of entities duped with the chip mapped to their previous indices.
 
---- Called after a client's starfall has initialized. Use this to know when it's safe to send net messages to the client.
+--- Called after a client-side has been initialized.
+-- Use this to know when it's safe to send net messages to the client.
 -- @name ClientInitialized
 -- @class hook
 -- @server
 -- @param Player ply The player that initialized
 
---- Called when a component is linked to the starfall
+--- Called when a component is linked to the Starfall
 -- @name ComponentLinked
 -- @class hook
 -- @shared
 -- @param Entity ent The component entity
 
---- Called when a component is unlinked to the starfall
+--- Called when a component is unlinked to the Starfall
 -- @name ComponentUnlinked
 -- @class hook
 -- @shared
@@ -882,4 +901,3 @@ end
 -- @name Render
 -- @class hook
 -- @client
-

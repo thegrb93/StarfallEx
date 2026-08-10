@@ -509,7 +509,7 @@ function Editor:GetActiveTabIndex()
 end
 
 ---Gets the index of the tab with the file at `filepath` opened
----@param filepath string The filepath of the tab to find
+---@param string filepath The filepath of the tab to find
 ---@return number index # The index of the tab, if found
 ---@return boolean found # Boolean indicating if we found the tab
 function Editor:GetTabIndexByFilePath(filepath)
@@ -859,7 +859,7 @@ function Editor:InitComponents()
 	if Editor.LayoutVar:GetInt() == 1 then -- Browser on right
 		self.C.Divider:SetRight(self.C.Browser)
 		self.C.Divider:SetLeft(self.C.MainPane)
-	else --Browser on left(Default)
+	else --Browser on left (default)
 		self.C.Divider:SetLeft(self.C.Browser)
 		self.C.Divider:SetRight(self.C.MainPane)
 	end
@@ -928,7 +928,7 @@ function Editor:InitComponents()
 			end,
 			function( error )
 			end
-		 )
+		)
 
 		end
 
@@ -1022,7 +1022,7 @@ function Editor:InitComponents()
 	end
 
 	self.C.Credit:SetTextColor(Color(0, 0, 0, 255))
-	self.C.Credit:SetText("\t\tCREDITS\n\n\tEditor by: \tSyranide and Shandolum\n\n\tTabs (and more) added by Divran.\n\n\tFixed for GMod13 By Ninja101\n\n\tModified for starfall by D.ツ") -- Sure why not ;)
+	self.C.Credit:SetText("\t\tCREDITS\n\n\tEditor by: \tSyranide and Shandolum\n\n\tTabs (and more) added by Divran.\n\n\tFixed for GMod13 By Ninja101\n\n\tModified for Starfall by D.ツ") -- Sure why not ;)
 	self.C.Credit:SetMultiline(true)
 	self.C.Credit:SetVisible(false)
 	self.C.Credit:SetEditable(false)
@@ -1539,7 +1539,7 @@ function Editor:GetTabContent(n)
 end
 
 ---Returns the associated `DTab` for the tab at index `n`
----@param n number Tab index
+---@param number n Tab index
 ---@return DTab # DTab of the associated tab
 ---https://wiki.facepunch.com/gmod/DPropertySheet:GetItems
 function Editor:GetTab(n)
@@ -1660,12 +1660,12 @@ end
 ---Returns the value of the settings `ReloadBeforeUpload` of the editor.
 ---@return boolean
 function Editor:ShouldReloadBeforeUpload()
-    return self.autoReloadEnabled
+	return self.autoReloadEnabled
 end
 
 ---Reloads the tab associated to the file at `filepath`, if there is one.
----@param tabIndex number The index of the tab to reload
----@param interactive boolean If the file has unsaved changed and interactive is true
+---@param number tabIndex The index of the tab to reload
+---@param boolean interactive If the file has unsaved changed and interactive is true
 ---then prompt the user to overwrite the current unsaved changes, otherwise don't reload the file.
 function Editor:ReloadTab(tabIndex, interactive)
 	local activeTabIndex = self:GetActiveTabIndex()
@@ -1730,8 +1730,8 @@ function Editor:ReloadTab(tabIndex, interactive)
 end
 
 ---Reloads the tab associated to the file at `filepath`, if there is one.
----@param filepath string The filepath of the file to reload
----@param interactive boolean See `Editor:ReloadTab`
+---@param string filepath The filepath of the file to reload
+---@param boolean interactive See `Editor:ReloadTab`
 function Editor:ReloadFile(filepath, interactive)
 	local tabIndex, tabFound = self:GetTabIndexByFilePath(filepath)
 	if not tabFound then return end
@@ -1739,7 +1739,7 @@ function Editor:ReloadFile(filepath, interactive)
 end
 
 ---Reload all tabs in the editor.
----@param interactive boolean See `Editor:ReloadTab`
+---@param boolean interactive See `Editor:ReloadTab`
 function Editor:ReloadTabs(interactive)
 	for i = 1, self:GetNumTabs() do
 		self:ReloadTab(i, interactive)
@@ -1748,7 +1748,7 @@ end
 
 ---Enables or disables the auto reload functionality of the editor.
 ---This should only be called by EditorFileAutoReload's change callback and the init function.
----@param enabled boolean Enable/Disable auto reload
+---@param boolean enabled Enable/Disable auto reload
 function Editor:setFileAutoReload(enabled)
 	self.autoReloadEnabled = enabled
 	if enabled then
@@ -1764,7 +1764,7 @@ end
 
 ---Sets the polling interval of the file auto reload
 ---This should only be called by EditorFileAutoReloadInterval's change callback.
----@param interval number Polling interval in seconds
+---@param number interval Polling interval in seconds
 function Editor:setFileAutoReloadInterval(interval)
 	self.autoReloadInterval = interval
 	if self.autoReloadEnabled then
@@ -2090,4 +2090,3 @@ concommand.Add("sf_userlist", function()
 	userPanel:SetDeleteOnClose(true)
 	userPanel:Open()
 end)
-

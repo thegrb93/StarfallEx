@@ -275,7 +275,7 @@ SF.BurstObject = {
 			return self:calc(obj)
 		end,
 		get = function(self, ply)
-			if ply~=SF.Superuser and not Ent_IsValid(ply) then SF.Throw("Invalid starfall user", 4) end
+			if ply~=SF.Superuser and not Ent_IsValid(ply) then SF.Throw("Invalid Starfall user", 4) end
 			local obj = self.objects[ply]
 			if not obj then
 				obj = {
@@ -318,7 +318,7 @@ SF.LimitObject = {
 				end
 				self.counters[ply] = new
 			else
-				SF.Throw("Invalid starfall user", 3)
+				SF.Throw("Invalid Starfall user", 3)
 			end
 		end,
 		checkuse = function(self, ply, amount)
@@ -328,7 +328,7 @@ SF.LimitObject = {
 					SF.Throw("The ".. self.name .." limit has been reached. (".. self.max ..")", 3)
 				end
 			else
-				SF.Throw("Invalid starfall user", 3)
+				SF.Throw("Invalid Starfall user", 3)
 			end
 		end,
 		check = function(self, ply)
@@ -336,7 +336,7 @@ SF.LimitObject = {
 			if Ent_IsValid(ply) then
 				return self.max - self.counters[ply]
 			else
-				SF.Throw("Invalid starfall user", 3)
+				SF.Throw("Invalid Starfall user", 3)
 			end
 		end,
 		free = function(self, ply, amount)
@@ -1089,8 +1089,8 @@ SF.Errormeta = {
 }
 
 SF.AutoGrowingTable = {
-    __index = function(t,k) local r=SF.AutoGrowingTable() t[k]=r return r end,
-    __call = function(t) return setmetatable({}, SF.AutoGrowingTable) end
+	__index = function(t,k) local r=SF.AutoGrowingTable() t[k]=r return r end,
+	__call = function(t) return setmetatable({}, SF.AutoGrowingTable) end
 }
 setmetatable(SF.AutoGrowingTable, SF.AutoGrowingTable)
 
@@ -1263,12 +1263,13 @@ do
 
 	--- Add a GMod hook so that SF gets access to it
 	-- @shared
-	-- @param hookname The hook name. In-SF hookname will be lowercased
-	-- @param customargfunc Optional custom function
-	-- Returns true if the hook should be called, then extra arguements to be passed to the starfall hooks
-	-- @param customretfunc Optional custom function
-	-- Takes values returned from starfall hook and returns what should be passed to the gmod hook
-	-- @param gmoverride Whether this hook should override the gamemode function (makes the hook run last, but adds a little overhead)
+	-- @param string realname The hook name. In-SF hookname will be lowercased
+	-- @param string? hookname Optional hookname. Defaults to realname
+	-- @param function? customargfunc Optional custom function
+	-- Returns true if the hook should be called, then extra arguements to be passed to the Starfall hooks
+	-- @param function? customretfunc Optional custom function
+	-- Takes values returned from a Starfall hook and returns what should be passed to the gmod hook
+	-- @param boolean? gmoverride Whether this hook should override the gamemode function (makes the hook run last, but adds a little overhead)
 	function SF.hookAdd(realname, hookname, customargfunc, customretfunc, gmoverride)
 		hookname = (hookname or realname):lower()
 		registered_instances[hookname] = {}
@@ -1434,19 +1435,20 @@ function SF.DeleteFolder(folder)
 end
 
 --- Throws an error like the throw function in builtins
--- @param msg Message
--- @param level Which level in the stacktrace to blame
--- @param uncatchable Makes this exception uncatchable
+-- @param string? msg Message
+-- @param number? level Which level in the stacktrace to blame
+-- @param boolean? uncatchable Makes this exception uncatchable
+-- @param any userdata Any userdata to attach to the error
 function SF.Throw(msg, level, uncatchable, userdata)
 	local level = 1 + (level or 1)
 	error(SF.MakeError(msg, level, uncatchable, true, userdata), level)
 end
 
 --- Throws a type error
--- @param expected The expected type name
--- @param got The type name that was provided
--- @param level The stack level
--- @param msg Optional error message
+-- @param string expected The expected type name
+-- @param string got The type name that was provided
+-- @param number level The stack level
+-- @param string? msg Optional error message
 function SF.ThrowTypeError(expected, got, level, msg)
 	local level = 1 + (level or 1)
 	local funcname = debug.getinfo(level-1, "n").name or "<unnamed>"
@@ -1504,15 +1506,17 @@ SF.TYPENAME = {
 }
 
 --- Returns corresponding name of the TypeID
--- @param typeid The TYPE
--- @return String name
+-- @param number typeid The TYPE
+-- @return string Type name
 function SF.TypeName(typeid)
 	return assert(SF.TYPENAME[typeid], "Type not defined")
 end
 
 function SF.CheckLuaType(val, typ, level, msg)
+	if not isnumber(typ) then
+		SF.Throw("CheckLuaType received an invalid type ID: " .. tostring(typ), (level or 1) + 2, true)
+	end
 	if TypeID(val) ~= typ then
-		assert(isnumber(typ))
 		level = (level or 1) + 2
 		SF.ThrowTypeError(SF.TypeName(typ), SF.GetType(val), level, msg)
 	end
@@ -1598,17 +1602,17 @@ SF.WaitForEntity = {
 }
 
 function SF.WaitForAllArgs(numarg, func)
-    local inputs = {}
-    return function(...)
-        for i=1, numarg do
-            local v = select(i, ...)
-            if v~=nil then inputs[i]=v end
-        end
-        for i=1, numarg do
-            if inputs[i]==nil then return end
-        end
-        func(unpack(inputs))
-    end
+	local inputs = {}
+	return function(...)
+		for i=1, numarg do
+			local v = select(i, ...)
+			if v~=nil then inputs[i]=v end
+		end
+		for i=1, numarg do
+			if inputs[i]==nil then return end
+		end
+		func(unpack(inputs))
+	end
 end
 
 
@@ -1826,7 +1830,7 @@ do
 end
 
 --- Gets the type of val.
--- @param val The value to be checked.
+-- @param any val The value to be checked.
 function SF.GetType(val)
 	local meta = dgetmeta(val)
 	return meta and isstring(meta.__metatable) and meta.__metatable or type(val)
@@ -1849,7 +1853,7 @@ SF.allowedRenderGroups = {
 }
 
 --- Checks that the material isn't malicious
--- @param Material The path to the material
+-- @param Material material The path to the material
 -- @return The material object or false if it's invalid
 function SF.CheckMaterial(material)
 	if material == "" then return end
@@ -2226,8 +2230,8 @@ do
 		dict.__index = dict
 
 		local aClass = { name = name, super = super, static = {},
-						 __instanceDict = dict, __declaredMethods = {},
-						 subclasses = setmetatable({}, {__mode='k'})  }
+						__instanceDict = dict, __declaredMethods = {},
+						subclasses = setmetatable({}, {__mode='k'})  }
 
 		if super then
 		setmetatable(aClass.static, {
@@ -2244,7 +2248,7 @@ do
 		end
 
 		setmetatable(aClass, { __index = aClass.static, __tostring = _tostring,
-							 __call = _call, __newindex = _declareInstanceMethod })
+							__call = _call, __newindex = _declareInstanceMethod })
 
 		return aClass
 	end
@@ -2271,8 +2275,8 @@ do
 
 		isInstanceOf = function(self, aClass)
 		return istable(aClass)
-			 and istable(self)
-			 and (self.class == aClass
+			and istable(self)
+			and (self.class == aClass
 				or istable(self.class)
 				and isfunction(self.class.isSubclassOf)
 				and self.class:isSubclassOf(aClass))

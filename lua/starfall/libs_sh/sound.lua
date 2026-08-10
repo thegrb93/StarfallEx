@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 
@@ -24,6 +24,7 @@ end, true)
 SF.RegisterLibrary("sound")
 
 --- Sound type
+-- Created with `sound.create` function
 -- @name Sound
 -- @class type
 -- @libtbl sound_methods
@@ -65,9 +66,10 @@ end)
 
 --- Creates a sound and attaches it to an entity
 -- @param Entity ent Entity to attach sound to.
--- @param string path Filepath to the sound file.
--- @param boolean? nofilter (Optional) Boolean Make the sound play for everyone regardless of range or location. Only affects Server-side sounds.
--- @return Sound Sound Object
+-- @param string path File path to the sound file.
+-- @param boolean? nofilter Pass true to make the sound play for everyone regardless of range or location.
+-- Only affects server-side sounds.
+-- @return Sound Sound object
 function sound_library.create(ent, path, nofilter)
 	checkluatype(path, TYPE_STRING)
 	if nofilter~=nil then checkluatype(nofilter, TYPE_BOOL) end
@@ -108,16 +110,16 @@ end
 -- @param string path String path to the sound file
 -- @return number Number duration in seconds
 function sound_library.duration(path)
-    checkluatype(path, TYPE_STRING)
-    return SoundDuration(path)
+	checkluatype(path, TYPE_STRING)
+	return SoundDuration(path)
 end
 
 --- Returns true if the sound or sound property exists.
 -- @param string path String path to the sound file
 -- @return boolean True if exists, false if not
 function sound_library.exists(path)
-    checkluatype(path, TYPE_STRING)
-    return istable(sound.GetProperties(path)) or file.Exists("sound/" .. path, "GAME")
+	checkluatype(path, TYPE_STRING)
+	return istable(sound.GetProperties(path)) or file.Exists("sound/" .. path, "GAME")
 end
 
 --------------------------------------------------
@@ -147,8 +149,8 @@ function sound_methods:destroy()
 end
 
 --- Sets the volume of the sound. Won't work unless the sound is playing.
--- @param number vol Volume to set to, between 0 and 1.
--- @param number? fade Time in seconds to transition to this new volume. Default 0
+-- @param number vol Volume to set to (between 0 and 1)
+-- @param number? fade Time in seconds to transition to this new volume (default: 0)
 function sound_methods:setVolume(vol, fade)
 	checkluatype(vol, TYPE_NUMBER)
 
@@ -164,8 +166,8 @@ function sound_methods:setVolume(vol, fade)
 end
 
 --- Sets the pitch of the sound. Won't work unless the sound is playing.
--- @param number pitch Pitch to set to, between 0 and 255.
--- @param number? fade Time in seconds to transition to this new pitch. Default 0
+-- @param number pitch Pitch to set to (between 0 and 255)
+-- @param number? fade Time in seconds to transition to this new pitch (default: 0)
 function sound_methods:setPitch(pitch, fade)
 	checkluatype(pitch, TYPE_NUMBER)
 
@@ -187,7 +189,8 @@ function sound_methods:isPlaying()
 end
 
 --- Sets the sound level in dB. Won't work if the sound is already playing.
--- @param number level dB level, for information on the value to use see https://developer.valvesoftware.com/wiki/Soundscripts#SoundLevel
+-- @param number level dB level.
+-- See https://developer.valvesoftware.com/wiki/Soundscripts#SoundLevel
 function sound_methods:setSoundLevel(level)
 	checkluatype(level, TYPE_NUMBER)
 	unwrap(self):SetSoundLevel(math.Clamp(level, 0, 511))
@@ -199,15 +202,16 @@ function sound_methods:getSoundLevel()
 	return unwrap(self):GetSoundLevel()
 end
 
---- Sets the sound dsp value
--- @param number dsp (0 - 133) DSP values. List can be found here https://developer.valvesoftware.com/wiki/Dsp_presets
+--- Sets the sound DSP value
+-- @param number dsp DSP value (0 - 133).
+-- See https://developer.valvesoftware.com/wiki/Dsp_presets
 function sound_methods:setDSP(dsp)
 	checkluatype(dsp, TYPE_NUMBER)
 	unwrap(self):SetDSP(math.Clamp(dsp, 0, 133))
 end
 
---- Gets the sound dsp value
--- @return number (0 - 133) DSP value.
+--- Gets the sound DSP value
+-- @return number DSP value (0 - 133).
 function sound_methods:getDSP()
 	return unwrap(self):GetDSP()
 end
