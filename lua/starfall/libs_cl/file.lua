@@ -275,8 +275,11 @@ function file_library.asyncReadInGame(path, callback)
 end
 
 --- Reads a temp file asynchronously
--- @param string filename The temp file name. Must be only a file and not a path
--- @param function callback A callback function for when the read operation finishes. It has 3 arguments: `filename` string, `status` number and `data` string
+-- @param string filename The temp file name. Must be only a file name and not a path
+-- @param function callback A callback function that runs when the read operation completes. With arguments:
+-- 1. string filename - The name of the file
+-- 2. number status - The status of the read operation (see FSASYNC enum)
+-- 3. string data - The data read from the file
 function file_library.asyncReadTemp(filename, callback)
 	checkluatype(filename, TYPE_STRING)
 	checkluatype(callback, TYPE_FUNCTION)
