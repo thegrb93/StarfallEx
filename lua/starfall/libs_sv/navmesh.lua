@@ -446,7 +446,7 @@ return function(instance)
 	-- @name navarea_methods.getExtentInfo
 	-- @return table Struct containing the above keys
 	function lnavarea_methods:getExtentInfo()
-		return SF.StructWrapper(instance, lnavunwrap(self):GetExtent(), "NavExtentInfo")
+		return SF.StructWrapper(instance, lnavunwrap(self):GetExtentInfo(), "NavExtentInfo")
 	end
 
 	--- Returns this CNavAreas unique ID.
