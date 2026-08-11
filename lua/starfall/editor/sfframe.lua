@@ -1409,15 +1409,18 @@ function Editor:Validate(gotoerror)
 
 	local code = self:GetCode()
 	if #code < 1 then return true end -- We won't validate empty scripts
-	local err = SF.CompileString(code , "Validation", false)
+	local ok, err = pcall(function()
+		SF.PreprocessData("Validation", code):Preprocess()
+	end)
+	if ok then err = SF.CompileString(code, "Validation", false) end
 	local success = not isstring(err)
 	local row, message
 	if success then
 		self:SetValidatorStatus("Validation successful!", 0, 110, 20, 255)
 	else
-		row = tonumber(err:match("%d+")) or 0
-		message = err:match(": .+$")
-		message = message and message:sub(3) or "Unknown"
+		row, message = err:match(":(%d+)[,:] (.+)$")
+		row = tonumber(row) or 0
+		message = message or "Unknown"
 		message = "Line "..row..":"..message
 		self.C.Val:SetBGColor(110, 0, 20, 255)
 		self.C.Val:SetText(" " .. message)
