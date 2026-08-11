@@ -22,7 +22,7 @@ AddCSLuaFile("xml.lua")
 
 if CLIENT then
 	SF.Editor.TabHandlers = { }
-	SF.Editor.CurrentTabHandler = CreateClientConVar("sf_editor_tab_editor", "wire", true, false)
+	SF.Editor.CurrentTabHandler = CreateClientConVar("sf_editor_tab_editor", "monaco", true, false)
 end
 
 local l = file.Find("starfall/editor/tabhandlers/tab_*.lua", "LUA")
