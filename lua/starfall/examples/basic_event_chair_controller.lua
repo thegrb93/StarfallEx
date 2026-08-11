@@ -7,12 +7,12 @@
 
 -- Create a frozen SENT `Seat_Jeep` 20 units above the chip
 local chair = prop.createSent(chip():getPos() + chip():getUp() * 20, Angle(), "Seat_Jeep", true)
--- Create a hologram in front of the chair with a scale of 0.75 on all axis
+-- Create a hologram in front of the chair with a scale of 0.75 on all axes
 local holo = holograms.create(chair:getPos() + chair:getForward() * 40, Angle(), "models/props_phx/games/chess/white_rook.mdl", Vector(0.75))
 
 -- Player that's currently sitting in the chair
 local driver
--- Due to the fact that `PlayerEnteredVehicle` has a `role` parameter, but `PlayerLeaveVehicle` doesn't we can easily distinguish between the 2 hooks.
+-- Due to the fact that `PlayerEnteredVehicle` has a `role` parameter, but `PlayerLeaveVehicle` doesn't, we can easily distinguish between the 2 hooks.
 -- If a `role` argument is present, set the `driver` variable to the provided player, otherwise set it to `role` (which will be `nil`)
 local function set_driver(ply, vehicle, role)
     if vehicle ~= chair then return end -- If the vehicle in question isn't our chair, exit without doing anything
@@ -46,7 +46,7 @@ hook.add("KeyRelease", "KeyRelease", function(ply, key)
     if ply ~= driver then return end -- If the player isn't our driver then we don't care
     if inputs[key] then -- Check if the key is one of allowed ones from the input map
 
-        -- Without this snippet, when player decides to press W and S at once, then release only one of them, the hologram will stop
+        -- Without this snippet, when the player decides to press W and S at once, then release only one of them, the hologram will stop
         -- This will simply check whether any other keys from our input map are pressed, if so, set the `acceleration` to the first found one:
         for input_key, force in pairs(inputs) do
             if ply:keyDown(input_key) then
@@ -66,6 +66,6 @@ hook.add("Tick", "Update", function()
     velocity = velocity + acceleration
     -- Create a new vector with Y axis based on the `velocity` and apply that to the hologram
     holo:setVel(Vector(0, velocity, 0))
-    -- Decrease the velocity, otherwise hologram will never stop
+    -- Decrease the velocity, otherwise the hologram will never stop
     velocity = velocity * 0.9
 end)

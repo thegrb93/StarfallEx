@@ -100,7 +100,9 @@ local function createTimer(name, delay, reps, func, simple)
 	timers[timername] = timerdata
 end
 
---- Creates (and starts) a timer
+--- Creates (and starts) a timer.
+-- Timers use `timer.curtime` internally.
+-- Due to this, they won't advance while the client is timing out from the server, or on an empty dedicated server due to hibernation (unless `sv_hibernate_think` is set to 1, or `delay` is set to 0).
 -- @param string name The timer name
 -- @param number delay The time, in seconds, to set the timer to.
 -- @param number reps The repetitions of the timer. 0 = infinite

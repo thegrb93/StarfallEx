@@ -38,7 +38,7 @@ hook.add("renderoffscreen", "", function()
     local now = timer.systime()
     if next_frame > now then return end
     next_frame = now + fps_delta
-    -- You can also get difference in these frames by subtracting now from last_frame,
+    -- You can also get the difference between these frames by subtracting now from last_frame,
     -- Or if you only need that, just use timer.frametime rather than storing the frames.
 
     render.selectRenderTarget("screenRT") -- select our render target

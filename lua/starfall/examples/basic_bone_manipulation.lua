@@ -3,7 +3,7 @@
 --@shared
 
 -- USAGE:
--- Place the chip on the ground, G-Man NPC will be spawned, networked to the clients and it's bones modified
+-- Place the chip on the ground, G-Man NPC will be spawned, networked to the clients and its bones modified
 
 if SERVER then -- Only execute code in this block on the `serverside`
 
@@ -14,7 +14,7 @@ if SERVER then -- Only execute code in this block on the `serverside`
     hook.add("ClientInitialized", "", function(ply)
         net.start("npc") -- Initialize a new network message called `npc`
         net.writeEntity(ent) -- Attach our entity to the net message
-        net.send(ply) -- Send the message only to the player which has already loaded the script on their client
+        net.send(ply) -- Send the message only to the player who has already loaded the script on their client
     end)
 
 else -- Only execute the code in this block on the `clientside`

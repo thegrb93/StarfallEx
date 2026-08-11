@@ -286,7 +286,7 @@ if SERVER then
 
 else
 
-	--- Returns if the game has focus or not, i.e. will return false if the game is minimized
+	--- Returns whether the game has focus, i.e. it will return false if the game is minimized
 	-- @name game_library.hasFocus
 	-- @client
 	-- @class function
@@ -325,7 +325,7 @@ else
 	-- @return number Frametime
 	game_library.realFrameTime = RealFrameTime
 
-	--- Returns if the client is currently timing out from the server
+	--- Returns whether the client is currently timing out from the server
 	-- @name game_library.isTimingOut
 	-- @client
 	-- @class function

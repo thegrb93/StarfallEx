@@ -47,7 +47,7 @@ function ENT:SetCustomModel(model)
 			self:GetPhysicsObject():EnableMotion(movable)
 		end
 		self:GetPhysicsObject():EnableMotion(false)
-		timer.Simple(0, remakeConstraints) -- Need timer or wont work
+		timer.Simple(0, remakeConstraints) -- Need a timer or it won't work
 	end
 end
 
@@ -183,7 +183,7 @@ util.AddNetworkString("starfall_processor_link")
 util.AddNetworkString("starfall_processor_kill")
 util.AddNetworkString("starfall_processor_clinit")
 
--- Request code from the chip. If the chip doesn't have code yet add player to list to send when there is code.
+-- Request code from the chip. If the chip doesn't have code yet, add the player to the list to send when there is code.
 net.Receive("starfall_processor_download", function(len, ply)
 	local proc = net.ReadEntity()
 	if Ent_IsValid(ply) and Ent_IsValid(proc) then

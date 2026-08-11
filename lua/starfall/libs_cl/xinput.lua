@@ -51,13 +51,13 @@ SF.hookAdd("xinputTrigger", "xinputtrigger")
 -- @name XInputStick
 -- @class hook
 -- @param number id Controller index (starts at 0).
--- @param number x The X coordinate of the trigger. -32768 - 32767 inclusive
--- @param number y The Y coordinate of the trigger. -32768 - 32767 inclusive
+-- @param number x The X coordinate of the stick. -32768 - 32767 inclusive
+-- @param number y The Y coordinate of the stick. -32768 - 32767 inclusive
 -- @param number stick The stick that was moved. 0 is left
 -- @param number when The timer.realtime() at which this event occurred.
 SF.hookAdd("xinputStick", "xinputstick")
 
---- A simpler, hook-based, and more-powerful controller input library.
+--- A simpler, hook-based, and more powerful controller input library.
 -- Inputs are not lost between rendered frames, and there is support for rumble.
 -- Note: the client must have the XInput Lua binary module installed in order to access this library.
 -- See more at https://github.com/mitterdoo/garrysmod-xinput
@@ -116,8 +116,8 @@ xinput_library.getTrigger = xinput.getTrigger
 -- @class function
 -- @param number id Controller index (starts at 0).
 -- @param number stick Which stick to use. 0 is left
--- @return number X Coordinate, Between -32768 - 32767 inclusive
--- @return number Y Coordinate, Between -32768 - 32767 inclusive
+-- @return number X coordinate, between -32768 and 32767 inclusive
+-- @return number Y coordinate, between -32768 and 32767 inclusive
 xinput_library.getStick = xinput.getStick
 
 --- Attempts to check the battery level of the controller.

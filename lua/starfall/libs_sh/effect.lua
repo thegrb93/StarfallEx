@@ -221,7 +221,7 @@ function effect_methods:setAttachment(attachment)
 end
 
 --- Sets the effect's color
--- Internally stored as an integer, but only first 8 bits are networked, effectively limiting this function to 0-255 range.
+-- Internally stored as an integer, but only the first 8 bits are networked, effectively limiting this function to the 0-255 range.
 -- @param number color The color represented by a byte 0-255.
 function effect_methods:setColor(color)
 	checkluatype(color, TYPE_NUMBER)
@@ -310,7 +310,7 @@ function effect_methods:setStart(start)
 end
 
 --- Sets the effect's surface property
--- Internally stored as an integer, but only first 8 bits are networked, effectively limiting this function to -1-254 range.(yes, that's not a mistake)
+-- Internally stored as an integer, but only the first 8 bits are networked, effectively limiting this function to the -1-254 range. (yes, that's not a mistake)
 -- @param number prop The surface property index
 function effect_methods:setSurfaceProp(prop)
 	checkluatype(prop, TYPE_NUMBER)

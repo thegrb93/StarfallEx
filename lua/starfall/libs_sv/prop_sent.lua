@@ -1,10 +1,10 @@
--- Simple helper function that provides model if it doesn't exist
+-- Simple helper function that provides a model if it doesn't exist
 local function registerSent(class, data)
 	list.Set("starfall_creatable_sent", class, data)
 end
 
 ----------------------------------------
--- Sent registering
+-- Registering SENTs
 local checkluatype = SF.CheckLuaType
 
 -- Basic Gmod sents
@@ -97,7 +97,7 @@ registerSent("gmod_thruster", {{
 ----------------------------------------
 -- Wiremod
 
--- Timer so that we are sure to check after wiremod initialized, if wire has a hook.run / call when it initialized change this
+-- Timer so that we check after Wiremod has initialized; if Wiremod has a hook.run/call when it initializes, change this
 timer.Simple(0, function()
 if WireLib then
 

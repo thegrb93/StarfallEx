@@ -3,7 +3,7 @@
 --@client
 
 -- Requires setup of the socket library
--- This example performs async GET request from an http server and prints the response.
+-- This example performs an async GET request from an http server and prints the response.
 
 -- Upon placing the chip, the socket will perform an http request and save the response to sf_filedata/httpdata.txt
 

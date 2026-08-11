@@ -23,7 +23,7 @@ registerprivilege("wire.getOutputs", "Get Outputs", "Allows the user to get Outp
 SF.RegisterLibrary("wire")
 
 --- Wirelink type
--- Created with `wire.self`, `wire.getWirelink`, or `Entity:getWirelink` function
+-- Created with `wire.self`, `wire.getWirelink`, or the `Entity:getWirelink` function
 -- @name Wirelink
 -- @class type
 -- @libtbl wirelink_methods
@@ -422,8 +422,8 @@ function wire_library.adjustOutputs(names, types, descriptions)
 		end
 	end
 
-	-- Restore wirelink and entity output if present, because these outputs are created by the Wire ToolGun
-	-- and breaks on every code update.
+	-- Restore the wirelink and entity outputs if present, because these outputs are created by the Wire ToolGun
+	-- and break on every code update.
 	for k,v in pairs( ent.Outputs ) do
 		if v.Name == "wirelink" or v.Name == "entity" then
 			table.insert(names_out, v.Name)
@@ -442,7 +442,7 @@ end
 -- If you use the latter syntax for defining ports, you can also specify description alongside the type,
 -- ex. {MyInput={type="number", description="Description for this input."}}
 -- @param table? outputs (Optional) A key-value table with output port names as keys and types as values.
--- The above behavior for inputs also applies for outputs.
+-- The above behavior for inputs also applies to outputs.
 function wire_library.adjustPorts(inputs, outputs)
 	if inputs ~= nil then
 		checkluatype(inputs, TYPE_TABLE)
@@ -515,9 +515,9 @@ local ValidWireMat = { 	["cable/rope"] = true, ["cable/cable2"] = true, ["cable/
 -- @param Entity entO Entity with output
 -- @param string inputname Input to be wired
 -- @param string outputname Output to be wired. May be "entity" or "wirelink" to specify an entity/wirelink output
--- @param number? width Width of the wire(optional)
--- @param Color? color Color of the wire(optional)
--- @param string? material Material of the wire(optional), Valid materials are cable/rope, cable/cable2,
+-- @param number? width Width of the wire (optional)
+-- @param Color? color Color of the wire (optional)
+-- @param string? material Material of the wire (optional), Valid materials are cable/rope, cable/cable2,
 -- cable/xbeam, cable/redlaser, cable/blue_elec, cable/physbeam, cable/hydra, arrowire/arrowire,
 -- arrowire/arrowire2
 function wire_library.create(entI, entO, inputname, outputname, width, color, material)
@@ -802,7 +802,7 @@ function wire_library.readCell(ent, index)
 	return readCell(ent, index)
 end
 
---- Returns an entities wirelink
+--- Returns an entity's wirelink
 -- @class function
 -- @return Wirelink Wirelink of the entity
 ents_methods.getWirelink = wire_library.getWirelink
@@ -842,13 +842,13 @@ wirelink_meta.__newindex = function(self, k, v)
 	end
 end
 
---- Checks if a wirelink is valid. (ie. doesn't point to an invalid entity)
+--- Checks if a wirelink is valid. (i.e. doesn't point to an invalid entity)
 -- @return boolean Whether the wirelink is valid
 function wirelink_methods:isValid()
 	return Ent_IsValid(wlunwrap(self))
 end
 
---- Returns current state of the specified input
+--- Returns the current state of the specified input
 -- @param string name Input name
 -- @return any Input value
 function wirelink_methods:inputValue(name)
@@ -856,7 +856,7 @@ function wirelink_methods:inputValue(name)
 	return readInput(getwl(self), name)
 end
 
---- Returns the type of input name, or nil if it doesn't exist
+--- Returns the type of the input name, or nil if it doesn't exist
 -- @param string name Input name to search for
 -- @return string Type of input
 function wirelink_methods:inputType(name)
@@ -868,7 +868,7 @@ function wirelink_methods:inputType(name)
 	end
 end
 
---- Returns the type of output name, or nil if it doesn't exist
+--- Returns the type of the output name, or nil if it doesn't exist
 -- @param string name Output name to search for
 -- @return string Type of output
 function wirelink_methods:outputType(name)
@@ -960,8 +960,8 @@ function wirelink_methods:getWiredToName(name)
 	end
 end
 
---- Ports table. Reads from this table will read from the wire input
--- of the same name. Writes will write to the wire output of the same name.
+--- Ports table. Reading from this table reads from the wire input
+-- of the same name. Writing to it writes to the wire output of the same name.
 -- @class table
 -- @name wire_library.ports
 wire_library.ports = setmetatable({}, {

@@ -9,7 +9,7 @@ local function setupFog(scale)
     -- distances have to be corrected according to skybox's scale
     local skybox_mul = scale or 1
 
-    -- only calculate fog properties once, in SetupWorldFog hook
+    -- only calculate fog properties once, in the SetupWorldFog hook
     if not scale then
         local chipPos = chip():getPos()
         local ownerPos = owner():getPos()

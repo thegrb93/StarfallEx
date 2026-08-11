@@ -15,7 +15,7 @@ hook.add( "postdrawopaquerenderables", "runtime", function()
 
     render.enableDepth( true )
 
-    --draw XYZ cross on right hand
+    --draw XYZ cross on the right hand
     local pos, ang = vr.getRightHandPos( ply ), vr.getRightHandAng( ply )
     render.setColor( Color( 255, 0, 0, 255 ) )
     render.draw3DWireframeBox( pos, ang, Vector( -0.1, -0.1, -0.1 ), Vector( 12, 0.1, 0.1 ) )
@@ -24,7 +24,7 @@ hook.add( "postdrawopaquerenderables", "runtime", function()
     render.setColor( Color( 0, 0, 255, 255 ) )
     render.draw3DWireframeBox( pos, ang, Vector( -0.1, -0.1, -0.1 ), Vector( 0.1, 0.1, 12 ) )
 
-    --draw XYZ cross on left hand
+    --draw XYZ cross on the left hand
     local pos, ang = vr.getLeftHandPos( ply ), vr.getLeftHandAng( ply )
     render.setColor( Color( 255, 0, 0, 255 ) )
     render.draw3DWireframeBox( pos, ang, Vector( -0.1, -0.1, -0.1 ), Vector( 12, 0.1, 0.1 ) )
@@ -33,7 +33,7 @@ hook.add( "postdrawopaquerenderables", "runtime", function()
     render.setColor( Color( 0, 0, 255, 255 ) )
     render.draw3DWireframeBox( pos, ang, Vector( -0.1, -0.1, -0.1 ), Vector( 0.1, 0.1, 12 ) )
 
-    --draw circle with left touchpad input (vive)
+    --draw circle with the left touchpad input (vive)
     local d = vr.getInput( VR.VECTOR2_WALKDIRECTION )
     if d then
         local pos, ang = vr.getLeftHandPos( ply ), vr.getLeftHandAng( ply )
@@ -54,7 +54,7 @@ hook.add( "postdrawopaquerenderables", "runtime", function()
         render.popMatrix()
 
     end
-    --draw circle with right touchpad input (vive)
+    --draw circle with the right touchpad input (vive)
     local d = vr.getInput( VR.VECTOR2_SMOOTHTURN )
     if d then
         local pos, ang = vr.getRightHandPos( ply ), vr.getRightHandAng( ply )

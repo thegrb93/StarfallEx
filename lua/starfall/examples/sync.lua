@@ -33,7 +33,7 @@ else
     end)
 
     -- The render hook is called every frame the client requires the screen to be rendered
-    -- If the client has 120 FPS then this hook will be called 120 in a second.
+    -- If the client has 120 FPS then this hook will be called 120 times a second.
     hook.add("render", "renderHook", function ()
         if randomNumber then
             render.setColor(Color(0, 255, 255, 255))

@@ -105,16 +105,16 @@ blacklist [[steamcommunity.com/linkfilter]]
 -----------------
 
 --  Note:
--- 	If you want to pullrequest additional rules add them below with name example and patterns
+-- 	If you want to pull request additional rules, add them below with a name, example, and patterns
 
 --  Note 2:
---  Patterns have ^ and $ forced, so don't add them and make sure your pattern matches whole url
---  "Simple" entries musn't contain slash at the end but all subdomains have to be added as separate entries
+--  Patterns have ^ and $ forced, so don't add them and make sure your pattern matches the whole URL
+--  "Simple" entries mustn't contain a slash at the end, but all subdomains have to be added as separate entries
 
 --  Note 3:
---  Sites that you wish to add musn't allow tracking user in any way
---  Those have to be trusted and have considerable userbase
---  Don't pullrequest your own domains
+--  Sites that you wish to add mustn't allow tracking the user in any way
+--  Those have to be trusted and have a considerable userbase
+--  Don't pull request your own domains
 
 -- Discord
 --- Examples:

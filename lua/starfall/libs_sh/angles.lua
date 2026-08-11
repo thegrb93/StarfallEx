@@ -170,7 +170,7 @@ function ang_meta.__sub(a, b)
 	return wrap({ a[1]-b[1], a[2]-b[2], a[3]-b[3] })
 end
 
---- Returns if p,y,r are all 0.
+--- Returns whether p, y, r are all 0.
 -- @return boolean If they are all zero
 function ang_methods:isZero()
 	return self[1]==0 and self[2]==0 and self[3]==0

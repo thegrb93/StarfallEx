@@ -43,7 +43,7 @@ function Particle:think()
     self.scale = self.scale - math.random(0.20, 0.30)
 end
 
--- draw method so that each pixel can be drawn by itself.
+-- A draw method so that each pixel can be drawn by itself.
 function Particle:draw()
     render.setColor(self.color)
     render.drawRect(self.x + 512, self.y + 780, self.scale, self.scale)

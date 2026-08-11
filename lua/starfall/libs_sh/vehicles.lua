@@ -109,7 +109,7 @@ function vehicle_methods:setThirdPersonMode(enabled)
 	Veh_SetThirdPersonMode(veh, enabled)
 end
 
---- Gets if third person mode is enabled or disabled
+--- Returns whether third person mode is enabled
 -- @return boolean true if third person mode is enabled, false if not
 function vehicle_methods:getThirdPersonMode()
 	return Veh_GetThirdPersonMode(unwrap(self))

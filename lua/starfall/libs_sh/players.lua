@@ -513,7 +513,7 @@ function player_methods:keyReleased(key)
 	return Ply_KeyReleased(unwrap(self), key)
 end
 
---- Returns if the player is taunting
+--- Returns whether the player is taunting
 -- @return boolean Is the player taunting
 function player_methods:isPlayingTaunt()
 	return Ply_IsPlayingTaunt(unwrap(self))

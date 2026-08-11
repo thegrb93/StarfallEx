@@ -7,7 +7,7 @@ if not hasPermission( "entities.setPos", chip() ) then
 end
 
 --[[
-This example code shows how smooth Setpos is achieved.
+This example code shows how smooth setPos() movement is achieved.
 
 You may have tried to directly setPos() an entity and saw how the movement was very choppy.
 
@@ -16,10 +16,10 @@ It can be good for other uses unless you want smooth motion with setPos().
 
 To do this, you need to setPos() the physicsObject of an entity.
 
-This retains the interpolation and makes motion looks smooth.
+This retains the interpolation and makes motion look smooth.
 
-As an example, The red box has setPos on itself.
-The greenbox has setPos on the physicsObject.
+As an example, the red box has setPos on itself.
+The green box has setPos on the physicsObject.
 
 ]]--
 
@@ -30,7 +30,7 @@ local function create( c )
     return p
 end
 
--- Localize our variables, makes code more efficient
+-- Localize our variables to make the code more efficient
 local smooth, normal
 
 -- Change prop positions every tick
@@ -40,9 +40,9 @@ hook.add( "tick", "runtime", function()
 
     -- Spawns prop when it doesn't exist
 
-    -- If the prop exists, setPos to the movement else try and respawn it
+    -- If the prop exists, setPos to the movement, else try and respawn it
     if isValid( normal ) then
-        -- This is setpos WITHOUT getting the entities getPhysicsObject()
+        -- This is setpos WITHOUT getting the entity's getPhysicsObject()
         -- There is NO interpolation!
         normal:setPos( motion )
     elseif prop.canSpawn() then
@@ -52,9 +52,9 @@ hook.add( "tick", "runtime", function()
     -- Movement code
     motion = motion + Vector( 0, 0, 48 )
 
-    -- If the prop exists, set the physobj position to the movement else try and respawn it
+    -- If the prop exists, set the physobj position to the movement, else try and respawn it
     if isValid( smooth ) and smooth:isValidPhys() then
-        -- This is setpos With getting the entities getPhysicsObject()
+        -- This is setpos with getting the entity's getPhysicsObject()
         -- Interpolation will work!
         smooth:getPhysicsObject():setPos( motion )
     elseif prop.canSpawn() then

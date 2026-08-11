@@ -15,7 +15,7 @@ local function checkWhitelist(instance, url, key)
 
 	local prefix, site, data = string.match(url,"^(%w-)://([^/]*)/?(.*)")
 	if not site then return false, "This url is malformed" end
-	site = site.."/"..(data or "") -- Make sure there is / at the end of site
+	site = site.."/"..(data or "") -- Make sure there is a / at the end of the site
 	return urlrestrictor:check(site), "This url is not whitelisted."
 end
 
@@ -90,7 +90,7 @@ end
 
 local function loadDefaultWhitelist()
 	local filename = "starfall/starfall_whitelist_default.lua"
-	-- Clientside Lua files can't be file.Read if client doesn't have addon installed
+	-- Clientside Lua files can't be file.Read if the client doesn't have the addon installed
 	local func = CompileFile( filename )
 	if func then
 		runWhitelist(filename, func)

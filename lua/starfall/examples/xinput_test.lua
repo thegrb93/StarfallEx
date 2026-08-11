@@ -26,7 +26,7 @@ hook.add("render", "", function()
 
     end
     local cx, cy = 100, 200 -- Center of the left dpad
-    local dist = 10 -- Distance between center, and the inside endpoints of the button line
+    local dist = 10 -- Distance between the center and the inside endpoints of the button line
     local size = 40 -- Length of a dpad button
     local wide = 10 -- Width of a dpad button
     local tsize = 100 -- Height of trigger
@@ -77,7 +77,7 @@ hook.add("render", "", function()
 
     local cursor_x, cursor_y = render.cursorPos()
     local useKey = input.lookupBinding("+use")
-    local held = cursor_x and input.isKeyDown(useKey) -- If cursor_x is nil (player isn't looking at screen), don't bother with slider maths)
+    local held = cursor_x and input.isKeyDown(useKey) -- If cursor_x is nil (player isn't looking at screen), don't bother with slider maths
 
     local bx1, by1, bw, bh = 400, 100, 40, 200
     local bx2, by2 = bx1 + bw, by1 + bh -- Get the boundary of the slider

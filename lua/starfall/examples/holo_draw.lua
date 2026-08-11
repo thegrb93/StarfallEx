@@ -3,7 +3,7 @@
 --@shared
 
 -- Certain hologram models may interfere with depth / alpha channel when drawn to a RenderTarget, rendering them transparent
--- Holograms drawn directly to HUD or a screen do not show these symptomps and the workaround is not necessary
+-- Holograms drawn directly to HUD or a screen do not show these symptoms and the workaround is not necessary
 -- One way of fixing this is to set the lighting mode, or if that doesn't work, exposing the hologram to env_projectedtexture
 
 if CLIENT then
@@ -57,7 +57,7 @@ else
         brightness = 0,
         Model = "models/maxofs2d/lamp_flashlight.mdl",
     })
-    -- Lamp can be entirely consealed, including disabling the collisions
+    -- The lamp can be entirely concealed, including disabling the collisions
     --lamp:setColor(Color(0,0,0,0))
     --lamp:setCollisionGroup(COLLISION_GROUP.IN_VEHICLE)
 end

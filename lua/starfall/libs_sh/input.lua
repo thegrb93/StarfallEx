@@ -111,20 +111,31 @@ local function CheckButtonPerms(instance, ply, button)
 end
 
 --- Called when a button is pressed
+-- See also https://wiki.facepunch.com/gmod/GM:PlayerButtonDown
 -- @client
 -- @name InputPressed
 -- @class hook
--- @param number button Number of the button
+-- @param number button The button code (see KEY and MOUSE enums)
+-- See also https://wiki.facepunch.com/gmod/Enums/BUTTON_CODE
+-- See also https://wiki.facepunch.com/gmod/Enums/KEY
+-- See also https://wiki.facepunch.com/gmod/Enums/MOUSE
+-- See also https://wiki.facepunch.com/gmod/Enums/JOYSTICK
 SF.hookAdd(PlayerButtonDown, "inputpressed", CheckButtonPerms)
 
 --- Called when a button is released
+-- See also https://wiki.facepunch.com/gmod/GM:PlayerButtonUp
 -- @client
 -- @name InputReleased
 -- @class hook
--- @param number button Number of the button
+-- @param number button The button code (see KEY and MOUSE enums)
+-- See also https://wiki.facepunch.com/gmod/Enums/BUTTON_CODE
+-- See also https://wiki.facepunch.com/gmod/Enums/KEY
+-- See also https://wiki.facepunch.com/gmod/Enums/MOUSE
+-- See also https://wiki.facepunch.com/gmod/Enums/JOYSTICK
 SF.hookAdd(PlayerButtonUp, "inputreleased", CheckButtonPerms)
 
 --- Called when a keybind is pressed
+-- See also https://wiki.facepunch.com/gmod/GM:PlayerBindPress
 -- @client
 -- @name InputBindPressed
 -- @class hook
@@ -141,6 +152,7 @@ function(instance, args, ply)
 end)
 
 --- Called when the mouse is moved
+-- See also https://wiki.facepunch.com/gmod/GM:InputMouseApply
 -- @client
 -- @name MouseMoved
 -- @class hook
@@ -157,6 +169,7 @@ SF.hookAdd("InputMouseApply", "mousemoved", function(instance, _, x, y)
 end)
 
 --- Called when the mouse wheel is rotated
+-- See also https://wiki.facepunch.com/gmod/GM:StartCommand
 -- @client
 -- @name MouseWheeled
 -- @class hook

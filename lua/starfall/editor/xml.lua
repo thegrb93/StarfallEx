@@ -155,7 +155,7 @@ SF.Editor.Themes.CreateXMLParser = function()
 			else
 				-- Normal tag
 
-				-- Need theck for embedded '>' in attribute value and extend
+				-- Need to check for embedded '>' in attribute value and extend
 				-- match recursively if necessary eg. <tag attr="123>456">
 
 				while 1 do
@@ -182,7 +182,7 @@ SF.Editor.Themes.CreateXMLParser = function()
 					-- End tag
 					if self._handler.endtag then
 						if attrs then
-							-- Shouldnt have any attributes in endtag
+							-- Shouldn't have any attributes in endtag
 							self:_err(string.format("%s (/%s)",
 											self._errstr.endTagErr,
 											tagname)
@@ -215,7 +215,7 @@ SF.Editor.Themes.CreateXMLParser = function()
 		end
 	end
 
-	-- Private attrobures/functions
+	-- Private attributes/functions
 
 	obj._handler    = simpleTreeHandler()
 	obj._stack      = {}

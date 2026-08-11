@@ -22,6 +22,7 @@ if SERVER then
 	-- Server hooks
 
 	--- Called when an entity is being picked up by a gravity gun
+	-- See also https://wiki.facepunch.com/gmod/GM:GravGunOnPickedUp
 	-- @name GravGunOnPickedUp
 	-- @class hook
 	-- @server
@@ -30,6 +31,7 @@ if SERVER then
 	add("GravGunOnPickedUp")
 
 	--- Called when an entity is being dropped by a gravity gun
+	-- See also https://wiki.facepunch.com/gmod/GM:GravGunOnDropped
 	-- @name GravGunOnDropped
 	-- @class hook
 	-- @server
@@ -38,6 +40,7 @@ if SERVER then
 	add("GravGunOnDropped")
 
 	--- Called when an entity is being picked up by +use
+	-- See also https://wiki.facepunch.com/gmod/GM:OnPlayerPhysicsPickup
 	-- @name OnPlayerPhysicsPickup
 	-- @class hook
 	-- @server
@@ -46,6 +49,7 @@ if SERVER then
 	add("OnPlayerPhysicsPickup")
 
 	--- Called when an entity is being dropped or thrown by +use
+	-- See also https://wiki.facepunch.com/gmod/GM:OnPlayerPhysicsDrop
 	-- @name OnPlayerPhysicsDrop
 	-- @class hook
 	-- @server
@@ -56,6 +60,7 @@ if SERVER then
 
 	--- Called when an entity is being frozen
 	-- Note this is not called for players or NPCs held with the physgun (bug)
+	-- See also https://wiki.facepunch.com/gmod/GM:OnPhysgunFreeze
 	-- @name OnPhysgunFreeze
 	-- @class hook
 	-- @server
@@ -66,6 +71,7 @@ if SERVER then
 	add("OnPhysgunFreeze")
 
 	--- Called when a player reloads their physgun
+	-- See also https://wiki.facepunch.com/gmod/GM:OnPhysgunReload
 	-- @name OnPhysgunReload
 	-- @class hook
 	-- @server
@@ -75,6 +81,7 @@ if SERVER then
 
 	--- Called when a player has successfully picked up an entity with their Physics Gun.
 	-- Not to be confused with PhysgunPickup which is a predicted hook
+	-- See also https://wiki.facepunch.com/gmod/GM:OnPhysgunPickup
 	-- @name OnPhysgunPickup
 	-- @class hook
 	-- @server
@@ -83,6 +90,7 @@ if SERVER then
 	add("OnPhysgunPickup")
 
 	--- Called when a player unfreezes an object
+	-- See also https://wiki.facepunch.com/gmod/GM:PlayerUnfrozeObject
 	-- @name PlayerUnfrozeObject
 	-- @class hook
 	-- @server
@@ -92,6 +100,7 @@ if SERVER then
 	add("PlayerUnfrozeObject")
 
 	--- Called when a player dies
+	-- See also https://wiki.facepunch.com/gmod/GM:PlayerDeath
 	-- @name PlayerDeath
 	-- @class hook
 	-- @server
@@ -101,6 +110,7 @@ if SERVER then
 	add("PlayerDeath")
 
 	--- Called when a player disconnects
+	-- See also https://wiki.facepunch.com/gmod/GM:PlayerDisconnected
 	-- @name PlayerDisconnected
 	-- @class hook
 	-- @server
@@ -108,6 +118,8 @@ if SERVER then
 	add("PlayerDisconnected")
 
 	--- Called when a player gets hurt, uses the `player_hurt` game event client-side.
+	-- See also https://wiki.facepunch.com/gmod/GM:PlayerHurt
+	-- See also https://wiki.facepunch.com/gmod/gameevent/player_hurt
 	-- @name PlayerHurt
 	-- @class hook
 	-- @shared
@@ -118,6 +130,7 @@ if SERVER then
 	add("PlayerHurt")
 
 	--- Called when a player spawns for the first time
+	-- See also https://wiki.facepunch.com/gmod/GM:PlayerInitialSpawn
 	-- @name PlayerInitialSpawn
 	-- @class hook
 	-- @server
@@ -126,6 +139,7 @@ if SERVER then
 	add("PlayerInitialSpawn")
 
 	--- Called when a player spawns
+	-- See also https://wiki.facepunch.com/gmod/GM:PlayerSpawn
 	-- @name PlayerSpawn
 	-- @class hook
 	-- @server
@@ -133,6 +147,7 @@ if SERVER then
 	add("PlayerSpawn")
 
 	--- Called when a player has changed team using `Player:SetTeam`
+	-- See also https://wiki.facepunch.com/gmod/GM:PlayerChangedTeam
 	-- @name PlayerChangedTeam
 	-- @class hook
 	-- @server
@@ -142,6 +157,7 @@ if SERVER then
 	add("PlayerChangedTeam")
 
 	--- Called when a player enters a vehicle
+	-- See also https://wiki.facepunch.com/gmod/GM:PlayerEnteredVehicle
 	-- @name PlayerEnteredVehicle
 	-- @class hook
 	-- @server
@@ -151,6 +167,7 @@ if SERVER then
 	add("PlayerEnteredVehicle")
 
 	--- Called when a player leaves a vehicle
+	-- See also https://wiki.facepunch.com/gmod/GM:PlayerLeaveVehicle
 	-- @name PlayerLeaveVehicle
 	-- @class hook
 	-- @server
@@ -160,6 +177,7 @@ if SERVER then
 
 
 	--- Called when a player sends a chat message
+	-- See also https://wiki.facepunch.com/gmod/GM:PlayerSay
 	-- @name PlayerSay
 	-- @class hook
 	-- @server
@@ -177,6 +195,7 @@ if SERVER then
 	end)
 
 	--- Called when a player sprays their logo
+	-- See also https://wiki.facepunch.com/gmod/GM:PlayerSpray
 	-- @name PlayerSpray
 	-- @class hook
 	-- @server
@@ -185,6 +204,7 @@ if SERVER then
 
 	--- Called when a player holds their use key and looks at an entity.
 	-- Will continuously run.
+	-- See also https://wiki.facepunch.com/gmod/GM:PlayerUse
 	-- @name PlayerUse
 	-- @server
 	-- @class hook
@@ -193,6 +213,7 @@ if SERVER then
 	add("PlayerUse")
 
 	--- Called when a player toggles their flashlight
+	-- See also https://wiki.facepunch.com/gmod/GM:PlayerSwitchFlashlight
 	-- @name PlayerSwitchFlashlight
 	-- @class hook
 	-- @server
@@ -201,6 +222,7 @@ if SERVER then
 	add("PlayerSwitchFlashlight")
 
 	--- Called when a player wants to pick up a weapon
+	-- See also https://wiki.facepunch.com/gmod/GM:PlayerCanPickupWeapon
 	-- @name PlayerCanPickupWeapon
 	-- @class hook
 	-- @server
@@ -212,6 +234,7 @@ if SERVER then
 	registerprivilege("entities.blockDamage", "Block Damage", "Allows the user to block incoming entity damage", { entities = {} })
 
 	--- Called when an entity is damaged
+	-- See also https://wiki.facepunch.com/gmod/GM:EntityTakeDamage
 	-- @name EntityTakeDamage
 	-- @class hook
 	-- @server
@@ -240,6 +263,7 @@ if SERVER then
 	end)
 
 	--- Called when an entity is damaged, after EntityTakeDamage is processed.
+	-- See also https://wiki.facepunch.com/gmod/GM:PostEntityTakeDamage
 	-- @name PostEntityTakeDamage
 	-- @class hook
 	-- @server
@@ -265,6 +289,7 @@ if SERVER then
 	end)
 
 	--- Called whenever an NPC is killed.
+	-- See also https://wiki.facepunch.com/gmod/GM:OnNPCKilled
 	-- @name OnNPCKilled
 	-- @class hook
 	-- @server
@@ -274,6 +299,7 @@ if SERVER then
 	add("OnNPCKilled")
 
 	--- Called when the `Entity:getWaterLevel` of an entity is changed.
+	-- See also https://wiki.facepunch.com/gmod/GM:OnEntityWaterLevelChanged
 	-- @name OnEntityWaterLevelChanged
 	-- @class hook
 	-- @server
@@ -285,6 +311,7 @@ else
 	-- Client hooks
 
 	--- Called when the local player opens their chat window.
+	-- See also https://wiki.facepunch.com/gmod/GM:StartChat
 	-- @name StartChat
 	-- @class hook
 	-- @client
@@ -292,12 +319,14 @@ else
 	add("StartChat")
 
 	--- Called when the local player closes their chat window.
+	-- See also https://wiki.facepunch.com/gmod/GM:FinishChat
 	-- @name FinishChat
 	-- @class hook
 	-- @client
 	add("FinishChat")
 
 	--- Called when a chat message is printed your chat window (chip owner only)
+	-- See also https://wiki.facepunch.com/gmod/GM:OnPlayerChat
 	-- @name PlayerChat
 	-- @class hook
 	-- @shared
@@ -312,6 +341,7 @@ else
 
 	--- Called when the player's chat box text changes.
 	-- Requires the 'input' permission.
+	-- See also https://wiki.facepunch.com/gmod/GM:ChatTextChanged
 	-- @name ChatTextChanged
 	-- @class hook
 	-- @client
@@ -324,6 +354,7 @@ else
 	end)
 
 	--- Called when a client-side entity gets created or re-created due to lag/PVS
+	-- See also https://wiki.facepunch.com/gmod/GM:NetworkEntityCreated
 	-- @name NetworkEntityCreated
 	-- @class hook
 	-- @client
@@ -333,6 +364,7 @@ else
 	--- Called when a client-side entity transmit state is changed. Usually when changing PVS.
 	-- If you want client-side render changes to persist on the entity, you have to re-apply them
 	-- each time it begins transmitting again
+	-- See also https://wiki.facepunch.com/gmod/GM:NotifyShouldTransmit
 	-- @name NotifyShouldTransmit
 	-- @class hook
 	-- @client
@@ -347,6 +379,7 @@ else
 	end)
 
 	--- Called when a player starts using voice chat.
+	-- See also https://wiki.facepunch.com/gmod/GM:PlayerStartVoice
 	-- @name PlayerStartVoice
 	-- @class hook
 	-- @client
@@ -359,6 +392,7 @@ else
 	end)
 
 	--- Allows modifying the player's mouse sensitivity
+	-- See also https://wiki.facepunch.com/gmod/GM:AdjustMouseSensitivity
 	-- @name AdjustMouseSensitivity
 	-- @class hook
 	-- @client
@@ -373,6 +407,7 @@ else
 	end)
 
 	--- Called when a player stops using voice chat.
+	-- See also https://wiki.facepunch.com/gmod/GM:PlayerEndVoice
 	-- @name PlayerEndVoice
 	-- @class hook
 	-- @client
@@ -380,12 +415,14 @@ else
 	add("PlayerEndVoice")
 
 	--- Called when the player opens the context menu
+	-- See also https://wiki.facepunch.com/gmod/GM:OnContextMenuOpen
 	-- @name OnContextMenuOpen
 	-- @class hook
 	-- @client
 	add("OnContextMenuOpen")
 
 	--- Called when the player closes the context menu
+	-- See also https://wiki.facepunch.com/gmod/GM:OnContextMenuClose
 	-- @name OnContextMenuClose
 	-- @class hook
 	-- @client
@@ -395,6 +432,7 @@ else
 	-- This runs twice per frame, once for movement, and once for camera.
 	-- You can use `CUserCmd:getCommandNumber` to check which one it is if you want to only run on one of them.
 	-- Camera has a command number = 0.
+	-- See also https://wiki.facepunch.com/gmod/GM:CreateMove
 	-- @name CreateMove
 	-- @class hook
 	-- @client
@@ -407,6 +445,7 @@ end
 -- Player hooks
 
 --- Called when a player toggles noclip
+-- See also https://wiki.facepunch.com/gmod/GM:PlayerNoClip
 -- @name PlayerNoClip
 -- @class hook
 -- @shared
@@ -415,6 +454,7 @@ end
 add("PlayerNoClip")
 
 --- Called whenever a player steps
+-- See also https://wiki.facepunch.com/gmod/GM:PlayerFootstep
 -- @name PlayerFootstep
 -- @class hook
 -- @shared
@@ -435,6 +475,7 @@ add("PlayerFootstep", nil, function(instance, ply, pos, foot, sound, volume)
 end, returnOnlyOnYourself )
 
 --- Called when a player jumps.
+-- See also https://wiki.facepunch.com/gmod/GM:OnPlayerJump
 -- @name OnPlayerJump
 -- @class hook
 -- @shared
@@ -443,6 +484,7 @@ end, returnOnlyOnYourself )
 add("OnPlayerJump")
 
 --- Called when a player makes contact with the ground after a jump or a fall.
+-- See also https://wiki.facepunch.com/gmod/GM:OnPlayerHitGround
 -- @name OnPlayerHitGround
 -- @class hook
 -- @shared
@@ -453,6 +495,7 @@ add("OnPlayerJump")
 add("OnPlayerHitGround")
 
 --- Called when a player presses a key
+-- See also https://wiki.facepunch.com/gmod/GM:KeyPress
 -- @name KeyPress
 -- @class hook
 -- @shared
@@ -461,6 +504,7 @@ add("OnPlayerHitGround")
 add("KeyPress")
 
 --- Called when a player releases a key
+-- See also https://wiki.facepunch.com/gmod/GM:KeyRelease
 -- @name KeyRelease
 -- @class hook
 -- @shared
@@ -469,6 +513,7 @@ add("KeyPress")
 add("KeyRelease")
 
 --- Called when a player punts with the gravity gun
+-- See also https://wiki.facepunch.com/gmod/GM:GravGunPunt
 -- @name GravGunPunt
 -- @class hook
 -- @shared
@@ -478,6 +523,7 @@ add("GravGunPunt")
 
 --- Called when an entity gets picked up by a physgun
 -- This hook is predicted.
+-- See also https://wiki.facepunch.com/gmod/GM:PhysgunPickup
 -- @name PhysgunPickup
 -- @class hook
 -- @shared
@@ -486,6 +532,7 @@ add("GravGunPunt")
 add("PhysgunPickup")
 
 --- Called when an entity being held by a physgun gets dropped
+-- See also https://wiki.facepunch.com/gmod/GM:PhysgunDrop
 -- @name PhysgunDrop
 -- @class hook
 -- @shared
@@ -494,6 +541,7 @@ add("PhysgunPickup")
 add("PhysgunDrop")
 
 --- Called when a player switches their weapon
+-- See also https://wiki.facepunch.com/gmod/GM:PlayerSwitchWeapon
 -- @name PlayerSwitchWeapon
 -- @class hook
 -- @shared
@@ -503,6 +551,7 @@ add("PhysgunDrop")
 add("PlayerSwitchWeapon", nil, nil, returnOnlyOnYourselfFalse)
 
 --- Called when a player's reserve ammo count changes.
+-- See also https://wiki.facepunch.com/gmod/GM:PlayerAmmoChanged
 -- @name PlayerAmmoChanged
 -- @class hook
 -- @shared
@@ -513,6 +562,7 @@ add("PlayerSwitchWeapon", nil, nil, returnOnlyOnYourselfFalse)
 add("PlayerAmmoChanged")
 
 --- Called when a player animation event occurs
+-- See also https://wiki.facepunch.com/gmod/GM:DoAnimationEvent
 -- @name DoAnimationEvent
 -- @class hook
 -- @shared
@@ -524,6 +574,7 @@ add("DoAnimationEvent")
 -- Entity hooks
 
 --- Called the next frame after an entity is created
+-- See also https://wiki.facepunch.com/gmod/GM:OnEntityCreated
 -- @name OnEntityCreated
 -- @class hook
 -- @shared
@@ -536,6 +587,7 @@ add("OnEntityCreated", nil, function(instance, ent)
 end)
 
 --- Called when an entity is removed
+-- See also https://wiki.facepunch.com/gmod/GM:EntityRemoved
 -- @name EntityRemoved
 -- @class hook
 -- @shared
@@ -543,6 +595,7 @@ end)
 -- @param boolean fullupdate If client-side, will be true if the entity was removed by a full update
 
 --- Called when an entity is broken
+-- See also https://wiki.facepunch.com/gmod/GM:PropBreak
 -- @name PropBreak
 -- @class hook
 -- @shared
@@ -551,6 +604,7 @@ end)
 add("PropBreak")
 
 --- Called every time a bullet is fired from an entity
+-- See also https://wiki.facepunch.com/gmod/GM:EntityFireBullets
 -- @name EntityFireBullets
 -- @class hook
 -- @shared
@@ -571,7 +625,8 @@ end, function(instance, ret, ent, data)
 	end
 end, true)
 
---- Called after a bullet is fired and it's trace has been calculated
+--- Called after a bullet is fired and its trace has been calculated
+-- See also https://wiki.facepunch.com/gmod/GM:PostEntityFireBullets
 -- @name PostEntityFireBullets
 -- @class hook
 -- @shared
@@ -592,6 +647,7 @@ end)
 
 --- Called whenever a sound has been played.
 -- This will not be called client-side if the server played the sound without the client also calling Entity:EmitSound
+-- See also https://wiki.facepunch.com/gmod/GM:EntityEmitSound
 -- @name EntityEmitSound
 -- @class hook
 -- @shared
@@ -610,6 +666,7 @@ end)
 -- Other
 
 --- Called when a player stops driving an entity
+-- See also https://wiki.facepunch.com/gmod/GM:EndEntityDriving
 -- @name EndEntityDriving
 -- @class hook
 -- @shared
@@ -618,6 +675,7 @@ end)
 add("EndEntityDriving")
 
 --- Called when a player starts driving an entity
+-- See also https://wiki.facepunch.com/gmod/GM:StartEntityDriving
 -- @name StartEntityDriving
 -- @class hook
 -- @shared
@@ -626,12 +684,14 @@ add("EndEntityDriving")
 add("StartEntityDriving")
 
 --- Tick hook. Called each game tick on both the server and client.
+-- See also https://wiki.facepunch.com/gmod/GM:Tick
 -- @name Tick
 -- @class hook
 -- @shared
 add("Tick")
 
 --- This is basically a shared version of createMove.
+-- See also https://wiki.facepunch.com/gmod/GM:StartCommand
 -- @name StartCommand
 -- @class hook
 -- @shared
@@ -641,6 +701,7 @@ add("StartCommand")
 
 --- Called each UserCmd for each player to transfer information from the UserCmd to the CMoveData before the move is
 -- processed.
+-- See also https://wiki.facepunch.com/gmod/GM:SetupMove
 -- @name SetupMove
 -- @class hook
 -- @shared
@@ -650,6 +711,7 @@ add("StartCommand")
 add("SetupMove")
 
 --- Called each UserCmd for each player after their move has been processed.
+-- See also https://wiki.facepunch.com/gmod/GM:FinishMove
 -- @name FinishMove
 -- @class hook
 -- @shared
@@ -672,6 +734,7 @@ end)
 -- Game Events
 
 --- Called when a player changes their Steam name. (Game Event)
+-- See also https://wiki.facepunch.com/gmod/gameevent/player_changename
 -- @name PlayerChangename
 -- @class hook
 -- @shared
@@ -684,6 +747,8 @@ add("player_changename", "playerchangename", function(instance, data)
 end)
 
 --- Called when a player connects to the server. (Game Event)
+-- See also https://wiki.facepunch.com/gmod/GM:PlayerConnect
+-- See also https://wiki.facepunch.com/gmod/gameevent/player_connect
 -- @name PlayerConnect
 -- @class hook
 -- @shared
@@ -697,6 +762,7 @@ add("player_connect", "playerconnect", function(instance, data)
 end)
 
 --- Called when a player disconnects from the server. (Game Event)
+-- See also https://wiki.facepunch.com/gmod/gameevent/player_disconnect
 -- @name PlayerDisconnect
 -- @class hook
 -- @shared
@@ -843,6 +909,7 @@ end
 -- Hooks below are not simple gmod hooks and are called by other events in other files.
 
 --- Think hook. Called each frame on the client, and each game tick on the server.
+-- See also https://wiki.facepunch.com/gmod/GM:Think
 -- @name Think
 -- @class hook
 -- @shared
@@ -858,7 +925,7 @@ end
 -- @server
 -- @param table entTbl A table of entities duped with the chip mapped to their previous indices.
 
---- Called after a client-side has been initialized.
+--- Called after the client side has been initialized.
 -- Use this to know when it's safe to send net messages to the client.
 -- @name ClientInitialized
 -- @class hook
@@ -897,7 +964,7 @@ end
 -- @param Player activator Player who used the screen or chip
 -- @param Entity used The screen or chip entity that was used
 
---- Called when a frame is requested to be drawn on screen. (2D/3D Context)
+--- Called when a frame is requested to be drawn on screen - 2D/3D context
 -- @name Render
 -- @class hook
 -- @client
