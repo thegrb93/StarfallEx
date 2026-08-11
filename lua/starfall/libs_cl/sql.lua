@@ -16,7 +16,7 @@ local sql_library = instance.Libraries.sql
 
 --- Performs a query on the local SQLite database.
 -- @param string query The query to execute.
--- @return table? Query results as a table, nil if the query returned no data.
+-- @return table? Query results as a table, or nil if the query returned no data.
 function sql_library.query(query)
 	checkpermission(instance, nil, "sql")
 	checkluatype(query, TYPE_STRING)

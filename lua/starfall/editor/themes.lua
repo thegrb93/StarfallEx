@@ -236,8 +236,8 @@ end
 
 --- Parses a TextMate XML theme file.
 -- @param string text The contents of XML file
--- @return Theme table that can be used with SF.Editor.Themes.AddTheme, nil if there was an error
--- @return Sanitized string identifier for the theme - a lowercase string without whitespace, nil if there was an error
+-- @return Theme table that can be used with SF.Editor.Themes.AddTheme, or nil if there was an error
+-- @return Sanitized string identifier for the theme - a lowercase string without whitespace, or nil if there was an error
 -- @return Parsing error string
 function SF.Editor.Themes.ParseTextMate(text)
 	local ok, themeTable, strId = pcall(parseTextMate, text)
