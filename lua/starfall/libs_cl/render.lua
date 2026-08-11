@@ -1919,7 +1919,10 @@ function render_library.drawLine(x1, y1, x2, y2)
 	surface.DrawLine(x1, y1, x2, y2)
 end
 
---- Creates a font. Does not require rendering hook
+--- Creates a font. Does not require rendering hook.
+-- See also https://wiki.facepunch.com/gmod/surface.CreateFont
+-- See also https://wiki.facepunch.com/gmod/Default_Fonts
+-- See also https://wiki.facepunch.com/gmod/Finding_the_Font_Name#findthefontsname
 -- @param string font Base font to use
 -- @param number? size Font size (default: 16)
 -- @param number? weight Font weight (default: 400)
@@ -1996,9 +1999,10 @@ function render_library.getTextSize(text)
 	return surface.GetTextSize(text)
 end
 
---- Sets the font (used when drawing text)
+--- Sets the font (used when drawing text).
+-- See also `render.createFont` function.
 -- @param string font The name of the font to use.
--- Use a font created by `render.createFont` or use one of these predefined fonts:
+-- Use a font created by `render.createFont`, or use one of these predefined fonts:
 -- DebugFixed
 -- DebugFixedSmall
 -- Default
