@@ -213,7 +213,7 @@ end
 -- @param string mode The file mode to use. See Lua manual for explanation
 -- @return File? File object, or no value if it failed
 function file_library.openInGame(path, mode)
-	if instance.player ~= LocalPlayer() then SF.Throw("Only chip owner can read game files") end
+	if instance.player ~= LocalPlayer() then SF.Throw("Only chip owner can read game files", 2) end
 	checkluatype (path, TYPE_STRING)
 	checkluatype (mode, TYPE_STRING)
 	local f = file.Open(SF.NormalizePath(path), mode, "GAME")
@@ -236,7 +236,7 @@ end
 -- @param string path Filepath relative to GarrysMod/garrysmod/.
 -- @return string? Contents or nil if error
 function file_library.readInGame(path)
-	if instance.player ~= LocalPlayer() then SF.Throw("Only chip owner can read game files") end
+	if instance.player ~= LocalPlayer() then SF.Throw("Only chip owner can read game files", 2) end
 	checkluatype (path, TYPE_STRING)
 	return file.Read(SF.NormalizePath(path), "GAME")
 end
@@ -263,7 +263,7 @@ end
 -- 2. number status - The status of the read operation (see FSASYNC enum)
 -- 3. string data - The data read from the file
 function file_library.asyncReadInGame(path, callback)
-	if instance.player ~= LocalPlayer() then SF.Throw("Only chip owner can read game files") end
+	if instance.player ~= LocalPlayer() then SF.Throw("Only chip owner can read game files", 2) end
 	checkluatype (path, TYPE_STRING)
 	checkluatype (callback, TYPE_FUNCTION)
 	if concurrentreads == cv_max_concurrent_reads:GetInt() then SF.Throw("Reading too many files asynchronously!", 2) end
