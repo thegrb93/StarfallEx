@@ -59,6 +59,10 @@ local plyPrecacheTimeBurst = SF.BurstObject("model_precache_time", "Model precac
 function SF.Instance.Compile(sfdata)
 	local code, mainfile, player, entity = sfdata.code, sfdata.mainfile, sfdata.owner, sfdata.proc
 
+	local ok, message = hook.Run("StarfallCanCompile", code, mainfile, player, entity)
+	if ok == false then return false, { message = message or "StarfallCanCompile hook returned false!", traceback = "" } end
+	if CLIENT and not SF.CvarEnabled:GetBool() then return false, { message = "Clientside disabled", traceback = "" } end
+
 	local instance = setmetatable({}, SF.Instance)
 	instance.entity = entity
 	instance.data = {}

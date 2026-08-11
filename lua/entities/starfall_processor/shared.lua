@@ -39,10 +39,6 @@ function ENT:Compile(sfdata)
 	if not (sfdata and sfdata.files and sfdata.files[sfdata.mainfile]) then return end
 	self.error = nil
 
-	local ok, message = hook.Run("StarfallCanCompile", sfdata.code, sfdata.mainfile, self.owner, self)
-	if ok == false then self:Error({ message = message or "StarfallCanCompile hook returned false!", traceback = "" }) return end
-	if CLIENT and not SF.CvarEnabled:GetBool() then self:Error({ message = "Clientside disabled", traceback = "" }) return end
-
 	local ok, instance = SF.Instance.Compile(sfdata)
 	if not ok then self:Error(instance) return end
 
