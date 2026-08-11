@@ -195,7 +195,7 @@ function light_methods:setDecay(decay)
 end
 
 --- Sets the light lifespan (Required for fade effect i.e. decay)
--- @param number dietime The how long the light will stay alive after turning it off.
+-- @param number dietime How long the light will stay alive after turning it off.
 function light_methods:setDieTime(dietime)
 	checkluatype(dietime, TYPE_NUMBER)
 	unwrap(self).dietime = math.max(dietime, 0)
@@ -272,7 +272,7 @@ function light_methods:setColor(col)
 	data.b = tonumber(col[3])
 end
 
---- Destroys the light object freeing up whatever slot it was using
+--- Destroys the light object, freeing up whatever slot it was using
 function light_methods:destroy()
 	local light = unwrap(self)
 	destroyLight(light)
@@ -316,7 +316,7 @@ function projectedtexture_methods:getConstantAttenuation()
 	return ptunwrap(self):GetConstantAttenuation()
 end
 
---- Gets if the Projected Texture is casting shadows
+--- Returns whether the Projected Texture is casting shadows
 -- @return boolean enabled
 function projectedtexture_methods:getEnableShadows()
 	return ptunwrap(self):GetEnableShadows()
@@ -366,11 +366,11 @@ end
 
 --- Gets the orthographic settings of the Projected Texture
 -- @return boolean orthographic Whether the Projected Texture is actually orthographic.
--- If false, then the other value are not returned.
+-- If false, then the other values are not returned.
 -- @return number left
 -- @return number top
 -- @return number right
--- @return number botom
+-- @return number bottom
 function projectedtexture_methods:getOrthographic()
 	return ptunwrap(self):GetOrthographic()
 end
@@ -510,7 +510,7 @@ function projectedtexture_methods:setLinearAttenuation(attenuation)
 	ptunwrap(self):SetLinearAttenuation(attenuation)
 end
 
---- Sets the distance at which the Projected Texture ends
+--- Sets the distance at which the Projected Texture starts
 -- A value of 0 will disable the Projected Texture
 -- Will not take effect until ProjectedTexture:update() is called.
 -- @param number nearZ
@@ -574,7 +574,7 @@ function projectedtexture_methods:setShadowSlopeScaleDepthBias(bias)
 end
 
 --- Sets the Projected Texture's target entity
--- If set, this will be the only entity that is lit, as well as the world
+-- If set, this will be the only entity that is lit (in addition to the world)
 -- Will not take effect until ProjectedTexture:update() is called.
 -- @param Entity ent
 function projectedtexture_methods:setTargetEntity(ent)
@@ -603,7 +603,7 @@ function projectedtexture_methods:setVerticalFOV(fov)
 	ptunwrap(self):SetVerticalFOV(fov)
 end
 
---- Updates the Projected Texture with whatever paremeters were previously set
+--- Updates the Projected Texture with whatever parameters were previously set
 function projectedtexture_methods:update()
 	ptunwrap(self):Update()
 end

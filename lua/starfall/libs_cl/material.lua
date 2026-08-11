@@ -265,7 +265,7 @@ function material_library.getShader(path)
 	return Material(path):GetShader()
 end
 
---- Returns the width of the member texture set for $basetexture of a material
+--- Returns the width of the texture set for the $basetexture of a material
 -- @param string path The path of the material (don't include .vmt in the path)
 -- @return number The basetexture's width
 function material_library.getWidth(path)
@@ -273,7 +273,7 @@ function material_library.getWidth(path)
 	return Material(path):Width()
 end
 
---- Returns the height of the member texture set for $basetexture of a material
+--- Returns the height of the texture set for the $basetexture of a material
 -- @param string path The path of the material (don't include .vmt in the path)
 -- @return number The basetexture's height
 function material_library.getHeight(path)
@@ -374,7 +374,7 @@ function material_library.create(shader)
 end
 
 local image_params = {["nocull"] = true,["alphatest"] = true,["mips"] = true,["noclamp"] = true,["smooth"] = true,["ignorez"] = true,["vertexlitgeneric"] = true}
---- Creates a .jpg or .png material from file.
+--- Creates a .jpg or .png material from a file.
 -- Can't be modified.
 -- @param string path The path to the image file, must be a jpg or png image
 -- @param string params The shader parameters to apply to the material.
@@ -403,7 +403,7 @@ function material_library.createFromImage(path, params)
 	return lwrap(m)
 end
 
---- Frees a user created material allowing you to create others
+--- Frees a user-created material, allowing you to create others
 function material_methods:destroy()
 	local m = unwrap(self)
 
@@ -436,14 +436,14 @@ function lmaterial_methods:getShader()
 	return lunwrap(self):GetShader()
 end
 
---- Gets the base texture set to the material's width
+--- Gets the width of the material's base texture
 -- @name material_methods.getWidth
 -- @return number The basetexture's width
 function lmaterial_methods:getWidth()
 	return lunwrap(self):Width()
 end
 
---- Gets the base texture set to the material's height
+--- Gets the height of the material's base texture
 -- @name material_methods.getHeight
 -- @return number The basetexture's height
 function lmaterial_methods:getHeight()
@@ -583,14 +583,14 @@ function material_methods:setTexture(key, v)
 end
 
 --- Loads an online image or base64-encoded image data to the specified texture key.
--- If the texture in key is not set to a RenderTarget, then it will be created and used.
+-- If the texture at key is not a RenderTarget, it will be created and used.
 -- @param string key The key name to set. For most purposes, use "$basetexture".
 -- @param string url The image HTTP URL, or image data:
 -- https://en.wikipedia.org/wiki/Data_URI_scheme
 -- https://base64.guru/converter/encode/image
 -- @param function? cb An optional callback to invoke when the image is loaded.
 -- Passes nil if it fails; otherwise, passes (material, url, width, height, layout) on success.
--- The layout argument is a function(x, y, w, h, pixelated), you can call this to reposition the image in the texture.
+-- The layout argument is a function(x, y, w, h, pixelated), which you can call to reposition the image in the texture.
 -- Set pixelated to true to use nearest-neighbor interpolation.
 -- @param function? done An optional callback to invoke when the image is done loading. With arguments:
 -- 1. `Material` object

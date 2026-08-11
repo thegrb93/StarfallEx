@@ -25,7 +25,7 @@ registerprivilege("render.renderscene", "Render Scene", "Allows the user to rend
 registerprivilege("render.effects", "Render Effects", "Allows the user to render special effects such as screen blur, color modification, and bloom", { client = {} })
 registerprivilege("render.captureImage", "Render Capture Image", "Allows capturing a RenderTarget into an image format", { client = { default = 1 } })
 registerprivilege("render.fog", "Render Fog", "Allows the user to control fog", { client = {} })
-registerprivilege("render.hud", "Render Hud", "Allows the user to render to your hud", { client = { default = 5 } })
+registerprivilege("render.hud", "Render Hud", "Allows the user to render to your HUD", { client = { default = 5 } })
 registerprivilege("render.calcview", "Render CalcView", "Allows the use of the CalcView hook", { client = { default = 5 } })
 registerprivilege("render.calcviewmodelview", "Render CalcViewModelView", "Allows the use of the CalcViewModelView hook", { client = { default = 5 } })
 registerprivilege("render.screenshake", "Render Screen Shake", "Allows screen shaking", { client = { default = 5 } })
@@ -160,7 +160,7 @@ local rt_bank = SF.ResourceHandler("render_rendertargets", "Render targets", "20
 	end
 )
 
-local pixhandle_bank = SF.ResourceHandler("render_pixvishandlesperframe", "Pixvis handles", "50", "How many render.isPixelVisible can be called per frame",
+local pixhandle_bank = SF.ResourceHandler("render_pixvishandlesperframe", "Pixvis handles", "50", "How many render.pixelVisible calls can be made per frame",
 	function()
 		return util.GetPixelVisibleHandle()
 	end
@@ -203,6 +203,7 @@ end
 
 --- Called when a frame is requested to be drawn - 2D context.
 -- Doesn't require a screen or HUD, but only works on RenderTargets.
+-- See also https://wiki.facepunch.com/gmod/GM:PreRender
 -- @name RenderOffscreen
 -- @class hook
 -- @client
@@ -215,7 +216,8 @@ SF.hookAdd("PreRender", "renderoffscreen", function(instance)
 end, cleanupRender)
 
 --- Called when a scene is requested to be drawn - 3D context.
--- This is used for the render.renderview function.
+-- This is used for the `render.renderView` function.
+-- See also https://wiki.facepunch.com/gmod/GM:RenderScene
 -- @name RenderScene
 -- @class hook
 -- @client
@@ -237,6 +239,7 @@ end)
 
 --- Called before entities are drawn.
 -- You can't render anything, but you can edit hologram matrices before they are drawn.
+-- See also https://wiki.facepunch.com/gmod/GM:PreDrawOpaqueRenderables
 -- @name HologramMatrix
 -- @class hook
 -- @client
@@ -245,12 +248,14 @@ SF.hookAdd("PreDrawOpaqueRenderables", "hologrammatrix", function(instance, draw
 end)
 
 --- Called when a frame is requested to be drawn on HUD - 2D context
+-- See also https://wiki.facepunch.com/gmod/GM:HUDPaint
 -- @name DrawHUD
 -- @class hook
 -- @client
 SF.hookAdd("HUDPaint", "drawhud", hudPrepareSafeArgs, cleanupRender)
 
 --- Called when the HUD element is attempting to be drawn
+-- See also https://wiki.facepunch.com/gmod/GM:HUDShouldDraw
 -- @name HUDShouldDraw
 -- @class hook
 -- @client
@@ -266,6 +271,7 @@ end, function(instance, args)
 end)
 
 --- Called before opaque entities are drawn (only works with HUD) - 3D context
+-- See also https://wiki.facepunch.com/gmod/GM:PreDrawOpaqueRenderables
 -- @name PreDrawOpaqueRenderables
 -- @class hook
 -- @client
@@ -276,6 +282,7 @@ end)
 SF.hookAdd("PreDrawOpaqueRenderables", nil, hudPrepareSafeArgs, cleanupRenderAllowTrueReturn)
 
 --- Called after opaque entities are drawn (only works with HUD) - 3D context
+-- See also https://wiki.facepunch.com/gmod/GM:PostDrawOpaqueRenderables
 -- @name PostDrawOpaqueRenderables
 -- @class hook
 -- @client
@@ -285,6 +292,7 @@ SF.hookAdd("PreDrawOpaqueRenderables", nil, hudPrepareSafeArgs, cleanupRenderAll
 SF.hookAdd("PostDrawOpaqueRenderables", nil, hudPrepareSafeArgs, cleanupRender)
 
 --- Called before translucent entities are drawn (only works with HUD) - 3D context
+-- See also https://wiki.facepunch.com/gmod/GM:PreDrawTranslucentRenderables
 -- @name PreDrawTranslucentRenderables
 -- @class hook
 -- @client
@@ -295,6 +303,7 @@ SF.hookAdd("PostDrawOpaqueRenderables", nil, hudPrepareSafeArgs, cleanupRender)
 SF.hookAdd("PreDrawTranslucentRenderables", nil, hudPrepareSafeArgs, cleanupRenderAllowTrueReturn)
 
 --- Called after translucent entities are drawn (only works with HUD) - 3D context
+-- See also https://wiki.facepunch.com/gmod/GM:PostDrawTranslucentRenderables
 -- @name PostDrawTranslucentRenderables
 -- @class hook
 -- @client
@@ -304,12 +313,14 @@ SF.hookAdd("PreDrawTranslucentRenderables", nil, hudPrepareSafeArgs, cleanupRend
 SF.hookAdd("PostDrawTranslucentRenderables", nil, hudPrepareSafeArgs, cleanupRender)
 
 --- Called before drawing HUD (2D Context)
+-- See also https://wiki.facepunch.com/gmod/GM:PreDrawHUD
 -- @name PreDrawHUD
 -- @class hook
 -- @client
 SF.hookAdd("PreDrawHUD", nil, hudPrepareSafeArgs, cleanupRender)
 
 --- Called after drawing HUD (2D Context)
+-- See also https://wiki.facepunch.com/gmod/GM:PostDrawHUD
 -- @name PostDrawHUD
 -- @class hook
 -- @client
@@ -321,6 +332,7 @@ SF.hookAdd("PostDrawHUD", nil, function(instance)
 end, cleanupRender)
 
 --- Called before drawing the player (only works with HUD) - 3D context
+-- See also https://wiki.facepunch.com/gmod/GM:PrePlayerDraw
 -- @name PreDrawPlayer
 -- @class hook
 -- @client
@@ -336,6 +348,7 @@ SF.hookAdd("PrePlayerDraw", "predrawplayer", function(instance, ply, flags)
 end, cleanupRenderAllowTrueReturn)
 
 --- Called after drawing the player (only works with HUD) - 3D context
+-- See also https://wiki.facepunch.com/gmod/GM:PostPlayerDraw
 -- @name PostDrawPlayer
 -- @class hook
 -- @client
@@ -350,12 +363,14 @@ SF.hookAdd("PostPlayerDraw", "postdrawplayer", function(instance, ply, flags)
 end, cleanupRender)
 
 --- Called before drawing the viewmodel rendergroup - 3D context
+-- See also https://wiki.facepunch.com/gmod/GM:PreDrawViewModels
 -- @name PreDrawViewModels
 -- @class hook
 -- @client
 SF.hookAdd("PreDrawViewModels", nil, hudPrepareSafeArgs, cleanupRender)
 
 --- Called when world fog is drawn.
+-- See also https://wiki.facepunch.com/gmod/GM:SetupWorldFog
 -- @name SetupWorldFog
 -- @class hook
 -- @client
@@ -372,6 +387,7 @@ end, function(instance)
 end)
 
 --- Called when skybox fog is drawn.
+-- See also https://wiki.facepunch.com/gmod/GM:SetupSkyboxFog
 -- @name SetupSkyboxFog
 -- @class hook
 -- @client
@@ -390,13 +406,15 @@ end)
 
 --- Called before the 3D skybox is drawn.
 -- This will not be called for maps with no 3D skybox, or when the 3D skybox is disabled
+-- See also https://wiki.facepunch.com/gmod/GM:PreDrawSkyBox
 -- @name PreDrawSkyBox
 -- @class hook
 -- @client
--- @return boolean Return true to not predraw the skybox both 2D and 3D
+-- @return boolean Return true to prevent the skybox from being drawn in both 2D and 3D
 SF.hookAdd("PreDrawSkyBox", nil, hudPrepareSafeArgs, cleanupRenderAllowTrueReturn)
 
 --- Called right after the 2D skybox has been drawn - allowing you to draw over it.
+-- See also https://wiki.facepunch.com/gmod/GM:PostDraw2DSkyBox
 -- @name PostDraw2DSkyBox
 -- @class hook
 -- @client
@@ -404,12 +422,14 @@ SF.hookAdd("PostDraw2DSkyBox", nil, hudPrepareSafeArgs, cleanupRender)
 
 --- Called after the 3D skybox is drawn.
 -- This will not be called if PreDrawSkyBox has prevented rendering of the skybox
+-- See also https://wiki.facepunch.com/gmod/GM:PostDrawSkyBox
 -- @name PostDrawSkyBox
 -- @class hook
 -- @client
 SF.hookAdd("PostDrawSkyBox", nil, hudPrepareSafeArgs, cleanupRender)
 
 --- Called when the engine wants to calculate the player's view (only works if connected to Starfall HUD)
+-- See also https://wiki.facepunch.com/gmod/GM:CalcView
 -- @name CalcView
 -- @class hook
 -- @client
@@ -444,6 +464,7 @@ end, function(instance, tbl)
 end)
 
 --- Called when the engine wants to calculate the viewmodel position and angle (only works if connected to Starfall HUD)
+-- See also https://wiki.facepunch.com/gmod/GM:CalcViewModelView
 -- @name CalcViewModelView
 -- @class hook
 -- @client
@@ -670,13 +691,14 @@ function render_library.clearStencil()
 end
 
 --- Suppresses or enables any engine lighting for any upcoming render operation.
--- @param boolean enable True to suppress false to enable.
+-- @param boolean enable True to suppress, false to enable.
 function render_library.suppressEngineLighting(enable)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	render.SuppressEngineLighting(enable)
 end
 
---- Sets the internal parameter INT_RENDERPARM_WRITE_DEPTH_TO_DESTALPHA. Allows creation of RTs with alpha masks.
+--- Sets the internal parameter INT_RENDERPARM_WRITE_DEPTH_TO_DESTALPHA.
+-- Allows creation of RenderTargets with alpha masks.
 -- Check https://wiki.facepunch.com/gmod/render.SetWriteDepthToDestAlpha for example.
 -- @param boolean enable True to write depth to destination alpha.
 function render_library.setWriteDepthToDestAlpha(enable)
@@ -687,7 +709,7 @@ end
 --- Sets up the ambient lighting for any upcoming render operation.
 -- Ambient lighting can be seen as a cube enclosing the object to be drawn,
 -- each of its faces representing a directional light source that shines towards the object.
--- @param number lightDirection The light source to edit, builtins.BOX enumeration.
+-- @param number lightDirection The light source to edit (see BOX enum).
 -- @param number r The red component of the light color.
 -- @param number g The green component of the light color.
 -- @param number b The blue component of the light color.
@@ -705,7 +727,7 @@ function render_library.resetModelLighting(r, g, b)
 	render.ResetModelLighting(r, g, b)
 end
 
---- Clears the current RenderTarget for obeying the current stencil buffer conditions.
+--- Clears the current RenderTarget while obeying the current stencil buffer conditions.
 -- @param number r Value of the red channel to clear the current RT with.
 -- @param number g Value of the green channel to clear the current RT with.
 -- @param number b Value of the blue channel to clear the current RT with.
@@ -807,7 +829,7 @@ end
 
 --- Pushes a matrix onto the model matrix stack.
 -- @param VMatrix transform The matrix
--- @param boolean? absolute Should the transformation be absolute with respect to world or multiplied with existing stack? (default: false)
+-- @param boolean? absolute Should the transformation be absolute with respect to the world or multiplied with the existing stack? (default: false)
 function render_library.pushMatrix(transform, absolute)
 	if absolute == nil then
 		absolute = renderdata.usingRT
@@ -863,7 +885,8 @@ local viewmatrix_checktypes =
 local viewmatrix_checktypes_ignore = {origin = true, angles = true}
 
 --- Pushes a perspective matrix onto the view matrix stack.
--- @param table tbl The view matrix data. See https://wiki.facepunch.com/gmod/Structures/RenderCamData
+-- @param table tbl The view matrix data.
+-- See also https://wiki.facepunch.com/gmod/Structures/RenderCamData
 function render_library.pushViewMatrix(tbl)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if #view_matrix_stack == MATRIX_STACK_LIMIT then SF.Throw("Pushed too many matrices", 2) end
@@ -921,9 +944,9 @@ function render_library.popViewMatrix()
 	cam.End3D() -- This fixes Vector:toScreen() breaking if you've pushed a viewmatrix beforehand. Yeah, it's stupid.
 end
 
---- Sets background color of screen
+--- Sets the background color of the screen
 -- @param Color col Color of background
--- @param Entity? screen (Optional) entity of screen
+-- @param Entity? screen Optional entity of screen
 function render_library.setBackgroundColor(col, screen)
 	if screen then
 		screen = eunwrap(screen)
@@ -941,13 +964,16 @@ function render_library.setBackgroundColor(col, screen)
 	end
 
 	local SetBackgroundColor = Ent_GetTable(screen).SetBackgroundColor
-	if SetBackgroundColor then --Fail silently on HUD etc
+	if SetBackgroundColor then -- Fails silently on HUD, etc.
 		SetBackgroundColor(screen, col.r, col.g, col.b, col.a)
 	end
 end
 
 --- Sets the lighting mode
--- @param number mode The lighting mode. 0 - Default, 1 - Fullbright, 2 - Increased Fullbright
+-- @param number mode The lighting mode.
+-- 0 - Default
+-- 1 - Fullbright
+-- 2 - Increased fullbright
 function render_library.setLightingMode(mode)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if mode ~= 0 and mode ~= 1 and mode ~= 2 then SF.Throw("Invalid mode.", 2) end
@@ -960,7 +986,7 @@ function render_library.setColor(clr)
 	render_library.setRGBA(clr[1], clr[2], clr[3], clr[4])
 end
 
---- Gets the current draw color set with render.setColor().
+--- Gets the current draw color set with `render.setColor`.
 -- @return Color The current draw color
 function render_library.getColor()
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
@@ -990,10 +1016,10 @@ local surface_SetDrawColor = surface.SetDrawColor
 local surface_SetTextColor = surface.SetTextColor
 
 --- Sets the draw color by RGBA values
--- @param number r Number, red value
--- @param number g Number, green value
--- @param number b Number, blue value
--- @param number a Number, alpha value
+-- @param number? r Number, red value (default: 255)
+-- @param number? g Number, green value (default: 255)
+-- @param number? b Number, blue value (default: 255)
+-- @param number? a Number, alpha value (default: 255)
 function render_library.setRGBA(r, g, b, a)
 	if r==nil then r=255 end
 	if g==nil then g=255 end
@@ -1005,7 +1031,7 @@ function render_library.setRGBA(r, g, b, a)
 end
 
 --- Gets the drawing tint.
--- Internally, calls render.getColorModulation and render.getBlend, multiplies the values by 255, then returns a color object.
+-- Internally, calls `render.getColorModulation` and `render.getBlend`, multiplies the values by 255.
 -- @return Color The current color & blend modulation as a color
 function render_library.getTint()
 	local r, g, b = render.GetColorModulation()
@@ -1015,8 +1041,8 @@ function render_library.getTint()
 end
 
 --- Gets the drawing tint.
--- Internally, calls render.getColorModulation and render.getBlend, multiplies the values by 255, then returns a color object.
--- @return number The red channel value. Color The current color & blend modulation as a color
+-- Internally, calls `render.getColorModulation` and `render.getBlend`, multiplies the values by 255.
+-- @return number The red channel value.
 -- @return number The green channel value.
 -- @return number The blue channel value.
 -- @return number The alpha channel value.
@@ -1028,7 +1054,7 @@ function render_library.getTintRGBA()
 end
 
 --- Sets the drawing tint.
--- Internally, calls render.setColorModulation and render.setBlend with the color parameters divided by 255.
+-- Internally, calls `render.setColorModulation` and `render.setBlend` with the color parameters divided by 255.
 -- @param Color c A color
 function render_library.setTint(c)
 	render.SetColorModulation(c[1] / 255, c[2] / 255, c[3] / 255)
@@ -1044,7 +1070,7 @@ end
 -- https://base64.guru/converter/encode/image
 -- @param function? cb An optional callback to invoke when the image is loaded.
 -- Passes nil if it fails; otherwise, passes (material, url, width, height, layout) on success.
--- The layout argument is a function(x, y, w, h, pixelated), you can call this to reposition the image in the texture.
+-- The layout argument is a function(x, y, w, h, pixelated), which you can call to reposition the image in the texture.
 -- Set pixelated to true to use nearest-neighbor interpolation.
 -- @param function? done An optional callback to invoke when the image is done loading. With arguments:
 -- 1. `Material` object
@@ -1358,7 +1384,7 @@ function render_library.selectRenderTarget(name)
 				view_matrix_stack[i] = nil
 			end
 			renderdata.usingRT = false
-			if renderdata.noStencil then -- Revert ALL stencil settings from screen
+			if renderdata.noStencil then -- Revert ALL stencil settings from the screen
 				render.SetStencilEnable(true)
 				render.SetStencilFailOperation(STENCILOPERATION_KEEP)
 				render.SetStencilZFailOperation(STENCILOPERATION_KEEP)
@@ -1435,7 +1461,7 @@ function render_library.setFilterMin(val)
 end
 
 --- Changes the cull mode
--- @param number mode Cull mode. 0 for counter clock wise, 1 for clock wise
+-- @param number mode Cull mode. 0 for counter-clockwise, 1 for clockwise
 function render_library.setCullMode(mode)
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 
@@ -1444,8 +1470,8 @@ end
 
 --- Clears the active render target
 -- @param Color? clr Color type to clear with. Default opaque black
--- @param boolean? clearDepth Boolean if should clear depth. Default false
--- @param boolean? clearStencil Boolean if should clear stencil. Default false
+-- @param boolean? clearDepth Boolean whether it should clear the depth. Default false
+-- @param boolean? clearStencil Boolean whether it should clear the stencil. Default false
 function render_library.clear(clr, clearDepth, clearStencil)
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 	if renderdata.usingRT then
@@ -1462,8 +1488,8 @@ end
 -- @param number g The green channel value.
 -- @param number b The blue channel value.
 -- @param number a The alpha channel value.
--- @param boolean? clearDepth Boolean if should clear depth. Default false
--- @param boolean? clearStencil Boolean if should clear stencil. Default false
+-- @param boolean? clearDepth Boolean whether it should clear the depth. Default false
+-- @param boolean? clearStencil Boolean whether it should clear the stencil. Default false
 function render_library.clearRGBA(r, g, b, a, clearDepth, clearStencil)
 	if not renderdata.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 	if renderdata.usingRT then
@@ -1513,7 +1539,7 @@ local function makeQuad(x, y, w, h)
 end
 
 --- Draws a rectangle using the current color
--- Faster, but uses integer coordinates and will get clipped by user's screen resolution
+-- Faster, but uses integer coordinates and will get clipped by the user's screen resolution
 -- @param number x Top left corner x
 -- @param number y Top left corner y
 -- @param number w Width
@@ -1535,8 +1561,8 @@ function render_library.drawRect(x, y, w, h)
 	render_DrawQuad(quad_v1, quad_v2, quad_v3, quad_v4, currentcolor)
 end
 
---- Draws a rotated, rectangle using the current color
--- Faster, but uses integer coordinates and will get clipped by user's screen resolution
+--- Draws a rotated rectangle using the current color
+-- Faster, but uses integer coordinates and will get clipped by the user's screen resolution
 -- @param number x X coordinate of center of rect
 -- @param number y Y coordinate of center of rect
 -- @param number w Width
@@ -1548,7 +1574,7 @@ function render_library.drawRectRotatedFast(x, y, w, h, rot)
 	surface.DrawTexturedRectRotated(x, y, w, h, rot)
 end
 
---- Draws a rotated, rectangle using the current color
+--- Draws a rotated rectangle using the current color
 -- @param number x X coordinate of center of rect
 -- @param number y Y coordinate of center of rect
 -- @param number w Width
@@ -1655,7 +1681,7 @@ render_library.drawTriangle = function(x1, y1, x2, y2, x3, y3)
 end
 
 --- Draws a textured rectangle
--- Faster, but uses integer coordinates and will get clipped by user's screen resolution
+-- Faster, but uses integer coordinates and will get clipped by the user's screen resolution
 -- @param number x Top left corner x
 -- @param number y Top left corner y
 -- @param number w Width
@@ -1677,7 +1703,7 @@ function render_library.drawTexturedRect(x, y, w, h)
 end
 
 --- Draws a textured rectangle with UV coordinates
--- Faster, but uses integer coordinates and will get clipped by user's screen resolution
+-- Faster, but uses integer coordinates and will get clipped by the user's screen resolution
 -- @param number x Top left corner x
 -- @param number y Top left corner y
 -- @param number w Width
@@ -1686,7 +1712,7 @@ end
 -- @param number startV Texture mapping at rectangle's origin V
 -- @param number endU Texture mapping at rectangle's end U
 -- @param number endV Texture mapping at rectangle's end V
--- @param boolean? UVHack If enabled, will scale the UVs to compensate for internal bug.
+-- @param boolean? UVHack If enabled, will scale the UVs to compensate for an internal bug.
 -- Should be true for user created materials.
 function render_library.drawTexturedRectUVFast(x, y, w, h, startU, startV, endU, endV, UVHack)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
@@ -1745,7 +1771,7 @@ function render_library.drawTexturedRectUV(x, y, w, h, startU, startV, endU, end
 end
 
 --- Draws a rotated, textured rectangle.
--- Faster, but uses integer coordinates and will get clipped by user's screen resolution
+-- Faster, but uses integer coordinates and will get clipped by the user's screen resolution
 -- @param number x X coordinate of center of rect
 -- @param number y Y coordinate of center of rect
 -- @param number w Width
@@ -1902,10 +1928,10 @@ end
 -- @param boolean? shadow Enable drop shadow? (default: false)
 -- @param boolean? outline Enable outline? (default: false)
 -- @param number? blursize The size of the blur (default: 0)
--- @param boolean? extended Allows the font to display glyphs outside of Latin-1 range.
+-- @param boolean? extended Allows the font to display glyphs outside the Latin-1 range.
 -- Unicode code points above 0xFFFF are not supported (make sure to use FontAwesome font).
 -- @param number? scanlines Scanline interval. Must be greater than 1 to work.
--- Shares uniqueness with blursize so you cannot create more than one scanline type of font with the same blursize (default: 0)
+-- Shares the blursize slot, so you cannot create more than one scanline font with the same blursize (default: 0)
 -- @return string The font name that can be used with the rest of the font functions.
 -- Base font can be one of (keep in mind that these may not exist on all clients if they are not shipped with GMod/Starfall):
 -- Akbar
@@ -2020,7 +2046,7 @@ function render_library.drawText(x, y, text, alignment)
 	draw.DrawText(text, font, x, y, currentcolor, alignment)
 end
 
---- Draws text more easily and quickly but no new lines or tabs.
+--- Draws text more easily and quickly, but with no new lines or tabs.
 -- @param number x X coordinate
 -- @param number y Y coordinate
 -- @param string text Text to draw
@@ -2036,7 +2062,7 @@ function render_library.drawSimpleText(x, y, text, xalign, yalign)
 	return draw.SimpleText(text, font, x, y, currentcolor, xalign, yalign)
 end
 
---- Draws outlined text more easily but no new lines or tabs.
+--- Draws outlined text more easily, but with no new lines or tabs.
 -- @param number x X coordinate
 -- @param number y Y coordinate
 -- @param string text Text to draw
@@ -2065,7 +2091,7 @@ end
 
 --- Draw the markup object
 -- @param number x number The x offset
--- @param number y number The x offset
+-- @param number y number The y offset
 -- @param number? xAlign number Horizontal text alignment (default: TEXT_ALIGN.LEFT)
 -- @param number? yAlign number Vertical text alignment (default: TEXT_ALIGN.TOP)
 -- @param number? alpha The alpha to draw it with (default: 255)
@@ -2180,7 +2206,7 @@ end
 -- @param number radius Radius of the sphere
 -- @param number longitudeSteps The amount of longitude steps. The larger this number is, the smoother the sphere is
 -- @param number latitudeSteps The amount of latitude steps. The larger this number is, the smoother the sphere is
--- @param boolean? writeZ Optional should the sphere be drawn with depth considered (default: true)
+-- @param boolean? writeZ Optional: whether the sphere should be drawn with depth considered (default: true)
 function render_library.draw3DWireframeSphere(pos, radius, longitudeSteps, latitudeSteps, writeZ)
 	if writeZ == nil then writeZ = true end
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
@@ -2192,7 +2218,7 @@ end
 --- Draws a 3D Line
 -- @param Vector startPos Starting position
 -- @param Vector endPos Ending position
--- @param boolean? writeZ Optional should the line be drawn with depth considered (default: true)
+-- @param boolean? writeZ Optional: whether the line should be drawn with depth considered (default: true)
 function render_library.draw3DLine(startPos, endPos, writeZ)
 	if writeZ == nil then writeZ = true end
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
@@ -2214,7 +2240,7 @@ end
 -- @param Angle angle Orientation of the box
 -- @param Vector mins Start position of the box, relative to origin.
 -- @param Vector maxs End position of the box, relative to origin.
--- @param boolean? writeZ Optional should the box be drawn with depth considered (default: true)
+-- @param boolean? writeZ Optional: whether the box should be drawn with depth considered (default: true)
 function render_library.draw3DWireframeBox(origin, angle, mins, maxs, writeZ)
 	if writeZ == nil then writeZ = true end
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
@@ -2333,8 +2359,8 @@ end
 
 --- Draws a triangle in 3D space
 -- @param Vector vert1 Position of the first vertex.
--- @param Vector vert2 Position of the the second vertex.
--- @param Vector vert3 Position of the the third vertex.
+-- @param Vector vert2 Position of the second vertex.
+-- @param Vector vert3 Position of the third vertex.
 render_library.draw3DTriangle = function(vert1, vert2, vert3)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	render_SetColorMaterial()
@@ -2505,7 +2531,7 @@ function render_library.readPixelRGBA(x, y)
 	return render.ReadPixel(x, y)
 end
 
---- Returns the render context's width and height. If a RenderTarget is selected, will return 1024, 1024
+--- Returns the render context's width and height. If a RenderTarget is selected, it will return 1024, 1024
 -- @class function
 -- @return number the X size of the current render context
 -- @return number the Y size of the current render context
@@ -2528,7 +2554,7 @@ end
 
 local startpos_vec, endpos_vec = Vector(0, 0, 0), Vector(0, 0, 0)
 
---- Does a trace and returns the color of the textel the trace hits.
+--- Does a trace and returns the color of the texel the trace hits.
 -- @param Vector startpos The starting vector
 -- @param Vector endpos The ending vector
 -- @return Color The color
@@ -2546,7 +2572,7 @@ function render_library.isHUDActive()
 end
 
 --- Renders the scene with the specified viewData to the current active render target.
--- @param table tbl view The view data to be used in the rendering.
+-- @param table tbl The view data to be used in the rendering.
 -- See https://wiki.facepunch.com/gmod/Structures/ViewData
 -- There's an additional key drawviewer used to tell the engine whether the local player model should be rendered.
 function render_library.renderView(tbl)
@@ -2718,9 +2744,9 @@ function render_library.enableClipping(state)
 	return prevState
 end
 
---- Pushes a new clipping plane of the clip plane stack.
+--- Pushes a new clipping plane onto the clip plane stack.
 -- @param Vector normal The normal of the clipping plane.
--- @param number distance The normal of the clipping plane.
+-- @param number distance The distance of the clipping plane from the origin.
 function render_library.pushCustomClipPlane(normal, distance)
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
@@ -2806,7 +2832,7 @@ function render_library.setFogDensity(density)
 	render.FogMaxDensity(density)
 end
 
---- Sets distance at which the fog will start appearing
+--- Sets the distance at which the fog will start appearing
 -- @param number distance Start distance
 function render_library.setFogStart(distance)
 	checkpermission(instance, nil, "render.fog")
@@ -2815,7 +2841,7 @@ function render_library.setFogStart(distance)
 	render.FogStart(distance)
 end
 
---- Sets distance at which the fog will reach it's target density
+--- Sets the distance at which the fog will reach its target density
 -- @param number distance End distance
 function render_library.setFogEnd(distance)
 	checkpermission(instance, nil, "render.fog")
@@ -2877,7 +2903,7 @@ function render_library.setChipOverlay(name)
 	instance.entity:SetCustomOverlay(rt)
 end
 
---- Using the custom screen model, sets the screen offset and size as long as its within bounds of -1024 to 1024 units
+--- Using the custom screen model, sets the screen offset and size as long as it's within the bounds of -1024 to 1024 units
 -- @param Entity screen The custom screen to be resized
 -- @param number x The x offset of the screen
 -- @param number y The y offset of the screen
@@ -2925,6 +2951,7 @@ function render_library.depthRange(min, max)
 end
 
 --- Returns the visibility of a sphere in the world.
+-- See also https://wiki.facepunch.com/gmod/util.PixelVisible
 -- @client
 -- @param Vector position
 -- @param number radius
@@ -2955,7 +2982,7 @@ function render_library.updateScreenEffectTexture(textureIndex)
 	render.UpdateScreenEffectTexture(textureIndex)
 end
 
---- Obtain an texture of the screen. You must call render.updateScreenEffectTexture in order to update this texture
+--- Obtains a texture of the screen. You must call render.updateScreenEffectTexture in order to update this texture
 -- with the currently rendered scene
 -- @client
 -- @param number? textureIndex Texture index to update (default: 0)
@@ -2974,13 +3001,13 @@ end
 
 end
 
----
--- @name render_library.Screen information table
+--- Screen information table
+-- @name render_library.Screen
 -- @class table
 -- @field Name Pretty name of model
 -- @field offset Offset of screen from prop
 -- @field RS Resolution/scale
--- @field RatioX Inverted Aspect ratio (height divided by width)
+-- @field RatioX Inverted aspect ratio (height divided by width)
 -- @field x1 Corner of screen in local coordinates (relative to offset?)
 -- @field x2 Corner of screen in local coordinates (relative to offset?)
 -- @field y1 Corner of screen in local coordinates (relative to offset?)
@@ -2989,7 +3016,7 @@ end
 -- @field rot Screen rotation
 
 --- Vertex format
--- @name render_library.Vertex Format
+-- @name render_library.Vertex
 -- @class table
 -- @field x X coordinate
 -- @field y Y coordinate

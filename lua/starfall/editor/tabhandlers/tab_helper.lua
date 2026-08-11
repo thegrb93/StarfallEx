@@ -1,5 +1,5 @@
 local TabHandler = {
-	ControlName = "sf_helper", -- Its name of vgui panel used by handler, there has to be one
+	ControlName = "sf_helper", -- It's the name of the vgui panel used by the handler, there has to be one
 	IsEditor = false, -- If it should be treated as editor of file, like ACE or Wire
  }
 local PANEL = {} -- It's our VGUI
@@ -8,7 +8,7 @@ local PANEL = {} -- It's our VGUI
 -- Handler part (Tab Handler)
 -------------------------------
 
-function TabHandler:Init() -- It's called when editor is initalized, you can create library map there etc
+function TabHandler:Init() -- It's called when the editor is initialized, you can create a library map there etc
 	http.Fetch(SF.Editor.HelperURL:GetString(), function(data)
 		self.htmldata = data
 		self:RefreshHelper()
@@ -140,7 +140,7 @@ function PANEL:Undock()
 	self:CloseTab()
 end
 
-function PANEL:GetCode() -- Return name of hanlder or code if it's editor
+function PANEL:GetCode() -- Return the name of the handler or code if it's an editor
 	return "--@name "..(self.title or "StarfallEx Reference")
 end
 

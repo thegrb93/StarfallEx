@@ -159,7 +159,7 @@ end
 
 if CLIENT then
 
-	--- Returns the a controller's input state, may return boolean, number or vector.
+	--- Returns a controller's input state. May return boolean, number, or vector.
 	-- @param string actionname ActionName to check control of, see the VR enums
 	-- @return boolean|Vector|number Boolean, Vector or Number of input
 	-- @client

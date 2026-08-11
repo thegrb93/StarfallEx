@@ -277,11 +277,11 @@ _deserialize = {
 
 			elseif c == ";" then
 				--	Lol, nothing!
-				--	Remenant from numbers, for faster parsing.
+				--	Remnant from numbers, for faster parsing.
 
 			--	OK, now, if it's on the numeric component, simply add everything encountered.
 			elseif numeric then
-				--	Find a variable and it's value
+				--	Find a variable and its value
 				val, i, lastType = d_findVariable(s, i, len, lastType, jobstate)
 				--	Add it to the table.
 				ret[ind] = val
@@ -346,7 +346,7 @@ _deserialize = {
 
 
 --	Numbers are weakly defined.
---	The declaration is not very explicit. It'll do it's best to parse the number.
+--	The declaration is not very explicit. It'll do its best to parse the number.
 --	Has various endings: \n, }, ~, : and ;, some of which will force the table deserializer to go one char backwards.
 	["number"] = function(s, i, len, unnecessaryEnd, jobstate)
 		local i, a = i or 1
@@ -522,7 +522,7 @@ _serialize = {
 	end,
 
 
---	Normal concatenations is a lot faster with small strings than table.concat
+--	Normal concatenations are a lot faster with small strings than table.concat
 --	Also, not so branched-ish.
 	["number"] = function(data, mustInitiate, isNumeric, isKey, isLast, first, jobstate)
 		--	If a number hasn't been written before, add the type prefix.

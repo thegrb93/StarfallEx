@@ -201,35 +201,35 @@ builtins_library.unpack = unpack
 -- @return table Returns the `tbl` with metatable set to `meta`
 builtins_library.setmetatable = setmetatable
 
---- Returns if the given input is a number
+--- Returns whether the given input is a number
 -- @name builtins_library.isnumber
 -- @class function
 -- @param any x Input to check
 -- @return boolean If the object is a number or not
 builtins_library.isnumber = isnumber
 
---- Returns if the given input is a string
+--- Returns whether the given input is a string
 -- @name builtins_library.isstring
 -- @class function
 -- @param any x Input to check
 -- @return boolean If the object is a string or not
 builtins_library.isstring = isstring
 
---- Returns if the given input is a table
+--- Returns whether the given input is a table
 -- @name builtins_library.istable
 -- @class function
 -- @param any x Input to check
 -- @return boolean If the object is a table or not
 builtins_library.istable = istable
 
---- Returns if the given input is a boolean
+--- Returns whether the given input is a boolean
 -- @name builtins_library.isbool
 -- @class function
 -- @param any x Input to check
 -- @return boolean If the object is a boolean or not
 builtins_library.isbool = isbool
 
---- Returns if the given input is a function
+--- Returns whether the given input is a function
 -- @name builtins_library.isfunction
 -- @class function
 -- @param any x Input to check
@@ -269,7 +269,7 @@ builtins_library.SERVER = SERVER
 -- @class field
 builtins_library.OWNER = CLIENT and instance.player == LocalPlayer()
 
---- Returns if this is the first time this hook was predicted.
+--- Returns whether this is the first time this hook was predicted.
 -- @name builtins_library.isFirstTimePredicted
 -- @class function
 -- @return boolean Whether this is the first time this hook was predicted
@@ -1219,7 +1219,7 @@ end
 -- @param ... args Any arguments to return if the assertion is successful
 builtins_library.assert = assert
 
---- Returns if the table has an isValid function and isValid returns true.
+--- Returns whether the table has an isValid function and isValid returns true.
 -- @param any object Table to check
 -- @return boolean If it is valid
 function builtins_library.isValid(object)
@@ -1266,7 +1266,7 @@ function builtins_library.localToWorld(localPos, localAng, originPos, originAngl
 end
 
 --- Sets the current instance to allow HUD drawing. Only works if player is in your vehicle or
--- if it's ran on yourself or if the player is connected to your hud and you want to disconnect them
+-- if it's run on yourself or if the player is connected to your hud and you want to disconnect them
 -- @param Player ply The player to enable the hud on. If CLIENT, will be forced to player()
 -- @param boolean active Whether hud hooks should be active. true to force on, false to force off.
 function builtins_library.enableHud(ply, active)

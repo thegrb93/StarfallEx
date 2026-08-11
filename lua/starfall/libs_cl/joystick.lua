@@ -39,7 +39,7 @@ function joystick_library.getPov(enum, pov)
 	return joystick.pov(enum, pov)
 end
 
---- Returns if the button is pushed or not
+--- Returns whether the button is pushed
 -- @param number enum Joystick number (starts at 0).
 -- @param number button Joystick button number (starts at 0).
 -- @return number 0 or 1

@@ -75,7 +75,7 @@ function TOOL:GetAngle( trace, model, disable_flat )
 	else
 		Ang = trace.HitNormal:Angle()
 	end
-	if self.GetGhostAngle then -- the tool as a function for getting the proper angle for the ghost
+	if self.GetGhostAngle then -- the tool has a function for getting the proper angle for the ghost
 		Ang = self:GetGhostAngle( trace )
 	elseif self.GhostAngle then -- the tool gives a fixed angle to add
 		Ang = Ang + self.GhostAngle
@@ -102,14 +102,14 @@ function TOOL:GetPos( ent, trace, model, disable_flat )
 	local createflat = self:GetClientNumber("createflat")
 	if disable_flat then createflat = 0 end
 
-	-- move the ghost to aline properly to where the device will be made
+	-- move the ghost to align properly to where the device will be made
 	local min = ent:OBBMins()
 	if self.GetGhostMin then -- tool has a function for getting the min
 		return ( trace.HitPos - trace.HitNormal * self:GetGhostMin( min, trace ) )
 	elseif self.GhostMin then -- tool gives the axis for the OBBmin to use
 		return ( trace.HitPos - trace.HitNormal * min[self.GhostMin] )
 	elseif self.ClientConVar.createflat and (createflat == 1) ~= ((string.find(model, "pcb") or string.find(model, "hunter")) ~= nil) then
-		-- Screens have odd models. If createflat is 1, or its 0 and its a PHX model, use max.x
+		-- Screens have odd models. If createflat is 1, or it's 0 and it's a PHX model, use max.x
 		return ( trace.HitPos + trace.HitNormal * ent:OBBMaxs().x )
 	else -- default to the z OBBmin
 		return ( trace.HitPos - trace.HitNormal * min.z )

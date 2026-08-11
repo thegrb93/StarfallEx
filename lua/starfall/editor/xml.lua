@@ -155,8 +155,8 @@ SF.Editor.Themes.CreateXMLParser = function()
             else
                 -- Normal tag
 
-                -- Need theck for embedded '>' in attribute value and extend
-                -- match recursively if necessary eg. <tag attr="123>456">
+				-- Need to check for embedded '>' in attribute value and extend
+				-- match recursively if necessary eg. <tag attr="123>456">
 
                 while 1 do
                     errstart, errend = string.find(tagstr, self._ATTRERR1)
@@ -178,44 +178,44 @@ SF.Editor.Themes.CreateXMLParser = function()
 
                 tagname, attrs = self:_parseTag(tagstr)
 
-                if (endt1=="/") then
-                    -- End tag
-                    if self._handler.endtag then
-                        if attrs then
-                            -- Shouldnt have any attributes in endtag
-                            self:_err(string.format("%s (/%s)",
-                                             self._errstr.endTagErr,
-                                             tagname)
-                                        , pos)
-                        end
-                        if table.remove(self._stack) ~= tagname then
-                            self:_err(string.format("%s (/%s)",
-                                             self._errstr.unmatchedTagErr,
-                                             tagname)
-                                        , pos)
-                        end
-                        self._handler:endtag(tagname, nil, match, endmatch)
-                    end
-                else
-                    -- Start Tag
-                    table.insert(self._stack, tagname)
-                    if self._handler.starttag then
-                        self._handler:starttag(tagname, attrs, match, endmatch)
-                    end
-                    -- Self-Closing Tag
-                    if (endt2=="/") then
-                        table.remove(self._stack)
-                        if self._handler.endtag then
-                            self._handler:endtag(tagname, nil, match, endmatch)
-                        end
-                    end
-                end
-            end
-            pos = endmatch + 1
-        end
-    end
+				if (endt1=="/") then
+					-- End tag
+					if self._handler.endtag then
+						if attrs then
+							-- Shouldn't have any attributes in endtag
+							self:_err(string.format("%s (/%s)",
+											self._errstr.endTagErr,
+											tagname)
+										, pos)
+						end
+						if table.remove(self._stack) ~= tagname then
+							self:_err(string.format("%s (/%s)",
+											self._errstr.unmatchedTagErr,
+											tagname)
+										, pos)
+						end
+						self._handler:endtag(tagname, nil, match, endmatch)
+					end
+				else
+					-- Start Tag
+					table.insert(self._stack, tagname)
+					if self._handler.starttag then
+						self._handler:starttag(tagname, attrs, match, endmatch)
+					end
+					-- Self-Closing Tag
+					if (endt2=="/") then
+						table.remove(self._stack)
+						if self._handler.endtag then
+							self._handler:endtag(tagname, nil, match, endmatch)
+						end
+					end
+				end
+			end
+			pos = endmatch + 1
+		end
+	end
 
-    -- Private attrobures/functions
+	-- Private attributes/functions
 
     obj._handler    = simpleTreeHandler()
     obj._stack      = {}

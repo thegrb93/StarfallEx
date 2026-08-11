@@ -457,7 +457,7 @@ function SF.Instance:BuildEnvironment()
 	self:DoAliases()
 end
 
--- Backward compatability
+-- Backward compatibility
 function SF.Instance:DoAliases()
 	self.env.holograms = self.env.hologram
 	self.env.sounds = self.env.sound
@@ -509,7 +509,7 @@ local CpuRamAverage = {
 				if maxinst then
 					maxinst:Error(SF.MakeError("SF: Player CPU time limit reached!", 1))
 					cputotal = cputotal - max
-					insts[maxinst] = nil -- In case of freak issue the Error function doesn't remove the instance
+					insts[maxinst] = nil -- In case of a freak issue, the Error function doesn't remove the instance
 				else
 					break -- Shouldn't ever happen but in case some freak numerical issue happens, prevent infinite loop
 				end

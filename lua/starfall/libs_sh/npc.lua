@@ -46,9 +46,9 @@ end)
 
 if SERVER then
 
-	--- Sets an NPC's hitboxes to compensate for lag, but limited number of NPCs can be set due to high processing needed
+	--- Sets an NPC's hitboxes to compensate for lag, but a limited number of NPCs can be set due to the high processing needed
 	-- @server
-	-- @param boolean compensate Whether to make an NPC's hitboxes compensate lag
+	-- @param boolean compensate Whether to make an NPC's hitboxes compensate for lag
 	function npc_methods:setLagCompensated(compensate)
 		local npc = unwrap(self)
 		checkpermission(instance, npc, "npcs.modify")

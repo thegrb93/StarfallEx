@@ -226,7 +226,7 @@ function net_library.send(target, unreliable)
 end
 
 if SERVER then
-	--- Send net message to all players within the visible area of a vector
+	--- Sends a net message to all players within the visible area of a vector
 	-- @server
 	-- @param Vector pos A vector within the PVS area to send a message
 	-- @param boolean? unreliable Optional flag;
@@ -282,7 +282,7 @@ function net_library.writeTable(t)
 	write{net.WriteData, #str*8, str, #str}
 end
 
---- Reads an table from a net message automatically typing it
+--- Reads a table from a net message, automatically typing it
 -- Will throw an error if invalid type is read. Make sure to pcall it
 -- See also `net.writeTable` function
 -- @shared
@@ -539,7 +539,7 @@ function net_library.readAngle()
 	return awrap(Angle(net.ReadFloat(), net.ReadFloat(), net.ReadFloat()))
 end
 
---- Writes an vector to the net message. Has significantly lower precision than writeFloat
+--- Writes a vector to the net message. Has significantly lower precision than writeFloat
 -- @shared
 -- @param Vector t The vector to be written
 function net_library.writeVector(t)
@@ -556,7 +556,7 @@ function net_library.readVector()
 	return vwrap(Vector(net.ReadFloat(), net.ReadFloat(), net.ReadFloat()))
 end
 
---- Writes an matrix to the net message
+--- Writes a matrix to the net message
 -- @shared
 -- @param VMatrix t The matrix to be written
 function net_library.writeMatrix(t)
@@ -576,7 +576,7 @@ function net_library.readMatrix()
 	return mwrap(m)
 end
 
---- Writes an color to the net message
+--- Writes a color to the net message
 -- @shared
 -- @param Color t The color to be written
 function net_library.writeColor(t)

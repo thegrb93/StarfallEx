@@ -56,30 +56,31 @@ function weapon_methods:maxClip2()
 	return Wep_GetMaxClip2(unwrap(self))
 end
 
---- Returns the sequence enumeration number that the weapon is playing. Must be used on a view model.
+--- Returns the currently active sequence number (ACT enum) that the weapon is playing.
+-- Must be used on a view model.
 -- @shared
--- @return number Current activity
+-- @return number Current activity, or 0 if the weapon doesn't have active sequence.
 function weapon_methods:getActivity()
 	return Wep_GetActivity(unwrap(self))
 end
 
 --- Returns the hold type of the weapon.
 -- @shared
--- @return string Holdtype
+-- @return string Hold type
 function weapon_methods:getHoldType()
 	return Wep_GetHoldType(unwrap(self))
 end
 
 --- Gets the next time the weapon can primary fire.
 -- @shared
--- @return number The time, relative to CurTime
+-- @return number The time, relative to `timer.curtime`
 function weapon_methods:getNextPrimaryFire()
 	return Wep_GetNextPrimaryFire(unwrap(self))
 end
 
 --- Gets the next time the weapon can secondary fire.
 -- @shared
--- @return number The time, relative to CurTime
+-- @return number The time, relative to `timer.curtime`
 function weapon_methods:getNextSecondaryFire()
 	return Wep_GetNextSecondaryFire(unwrap(self))
 end
@@ -142,7 +143,7 @@ if CLIENT then
 		return language.GetPhrase(Wep_GetPrintName(unwrap(self)))
 	end
 
-	--- Returns if the weapon is carried by the local player.
+	--- Returns whether the weapon is carried by the local player.
 	-- @client
 	-- @return boolean Whether the weapon is carried by the local player
 	function weapon_methods:isCarriedByLocalPlayer()

@@ -94,7 +94,7 @@ function sound_library.create(ent, path, nofilter)
 end
 
 
---- Returns if a sound is able to be created
+--- Returns whether a sound can be created
 -- @return boolean If it is possible to make a sound
 function sound_library.canCreate()
 	return plyCount:check(instance.player) > 0 and plySoundBurst:check(instance.player) >= 1

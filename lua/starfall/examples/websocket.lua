@@ -19,7 +19,7 @@ function ws:onConnected()
 end
 
 -- This is usually called twice, once when the socket gets an "error", which will pass true to this callback,
--- and then another time for it finally "disconnecting" (which will pass false).
+-- and then another time when it is finally "disconnecting" (which will pass false).
 function ws:onDisconnected(errored)
     print("Socket disconnected", errored, self:getState())
 end

@@ -10,8 +10,8 @@ local ENT_META = FindMetaTable("Entity")
 SF.RegisterLibrary("nextbot")
 
 --- NextBot type.
--- Inherits all functions from Entity type.
--- Created with `nextbot.create` function.
+-- Inherits all functions from the Entity type.
+-- Created with the `nextbot.create` function.
 -- @name NextBot
 -- @class type
 -- @server
@@ -191,7 +191,7 @@ end
 
 --- Returns the Vector the NextBot is trying to go to, set by setApproachPos
 -- @server
--- @return Vector? Where the NextBot is trying to go to if it exists, else returns nil.
+-- @return Vector? The position the NextBot is trying to go to, or nil if none is set.
 function nb_methods:getApproachPos()
 	local approachPos = Ent_GetTable(nbunwrap(self)).approachPos
 	if approachPos then return vwrap(approachPos) end
@@ -199,7 +199,7 @@ end
 
 --- Makes the NextBot try to go to a specified position using navmesh pathfinding.
 -- @server
--- @param Vector pos The position the NextBot will continuosly try to go to.
+-- @param Vector pos The position the NextBot will continuously try to go to.
 function nb_methods:setGotoPos(pos)
 	local nb = nbunwrap(self)
 	checkpermission(instance, nb, "nextbot.setGotoPos")
@@ -221,7 +221,7 @@ end
 
 --- Returns the Vector the NextBot is trying to go to, set by setGotoPos
 -- @server
--- @return Vector? Where the NextBot is trying to go to if it exists, else returns nil.
+-- @return Vector? The position the NextBot is trying to go to, or nil if none is set.
 function nb_methods:getGotoPos()
 	local goTo = Ent_GetTable(nbunwrap(self)).goTo
 	if goTo then return vwrap(goTo) end
@@ -229,7 +229,7 @@ end
 
 --- Makes the NextBot play a sequence.
 -- This takes priority over movement.
--- Will go to set pos after animation plays.
+-- Will go to the set position after the animation plays.
 -- @server
 -- @param string seq The name of the sequence to play.
 function nb_methods:playSequence(seq)
@@ -297,7 +297,7 @@ function nb_methods:getIdleAct()
 	return nb.IDLEACT
 end
 
---- Sets the NextBot's velocity. Seems to work only when used if NextBot is in air after using NextBot:jump()
+--- Sets the NextBot's velocity. Seems to work only when used if the NextBot is in the air after using NextBot:jump()
 -- @server
 -- @param Vector vel Velocity.
 function nb_methods:setVelocity(vel)
@@ -392,7 +392,7 @@ function nb_methods:addInjuredCallback(id, func)
 	nb.InjuredCallbacks:add(id, func)
 end
 
---- Removes a injury callback function from the NextBot.
+--- Removes an injury callback function from the NextBot.
 -- @server
 -- @param string id The unique ID of the callback to remove.
 function nb_methods:removeInjuredCallback(id)
@@ -438,7 +438,7 @@ function nb_methods:addLeaveGroundCallback(id, func)
 	nb.JumpCallbacks:add(id, func)
 end
 
---- Removes a landing callback function from the NextBot.
+--- Removes a leave-ground callback function from the NextBot.
 -- @server
 -- @param string id The unique ID of the callback to remove.
 function nb_methods:removeLeaveGroundCallback(id)
@@ -460,7 +460,7 @@ function nb_methods:addIgniteCallback(id, func)
 	nb.IgniteCallbacks:add(id, func)
 end
 
---- Removes a ignite callback function from the NextBot.
+--- Removes an ignite callback function from the NextBot.
 -- @server
 -- @param string id The unique ID of the callback to remove.
 function nb_methods:removeIgniteCallback(id)
@@ -518,11 +518,11 @@ function nb_methods:removeContactCallback(id)
 	nb.ContactCallbacks:remove(id)
 end
 
---- Adds a callback function that will be run when the NextBot create a ragdoll.
+--- Adds a callback function that will be run when the NextBot creates a ragdoll.
 -- Note: this will be called only if nb:ragdollOnDeath() is set to True
 -- @server
 -- @param string id The unique ID this callback will use.
--- @param function func The function to run when the NextBot create a ragdoll. The argument is:
+-- @param function func The function to run when the NextBot creates a ragdoll. The argument is:
 -- 1. The ragdoll entity the NextBot created.
 function nb_methods:addRagdollCreationCallback(id, func)
 	checkluatype(id, TYPE_STRING)
@@ -645,7 +645,7 @@ end
 
 --- Sets the height the NextBot is scared to fall from.
 -- @server
--- @param number val New height NextBot is afraid of (default: 200)
+-- @param number val New height the NextBot is afraid of (default: 200)
 function nb_methods:setDeathDropHeight(val)
 	checkluatype(val, TYPE_NUMBER)
 	local nb = nbunwrap(self)
@@ -679,7 +679,7 @@ function nb_methods:getStepHeight()
 	return Ent_GetTable(nb).loco:GetStepHeight()
 end
 
---- Return unit vector in XY plane describing our direction of motion - even if we are currently not moving
+--- Returns a unit vector in the XY plane describing the NextBot's direction of motion, even if it is currently not moving
 -- @server
 -- @return Vector A vector representing the X and Y movement.
 function nb_methods:getGroundMotionVector()
@@ -687,15 +687,15 @@ function nb_methods:getGroundMotionVector()
 	return vwrap(Ent_GetTable(nb).loco:GetGroundMotionVector())
 end
 
---- Returns whether the NextBot this locomotion is attached to is on ground or not.
+--- Returns whether the NextBot this locomotion is attached to is on the ground or not.
 -- @server
--- @return boolean Whether the NextBot is on ground or not.
+-- @return boolean Whether the NextBot is on the ground or not.
 function nb_methods:isOnGround()
 	local nb = nbunwrap(self)
 	return Ent_GetTable(nb).loco:IsOnGround()
 end
 
---- Returns whether this NextBot can reach and/or traverse/move in given NavArea.
+--- Returns whether this NextBot can reach and/or traverse/move in a given NavArea.
 -- @server
 -- @param NavArea nav NavArea to check.
 -- @return boolean Whether this NextBot can traverse given NavArea.
@@ -706,7 +706,7 @@ function nb_methods:isAreaTraversable(nav)
 	return Ent_GetTable(nb).loco:IsAreaTraversable(unav)
 end
 
---- Sets whether the NextBot is allowed try to to avoid obstacles or not. This is used during path generation.
+--- Sets whether the NextBot is allowed to try to avoid obstacles or not. This is used during path generation.
 -- Works similarly to nb_allow_avoiding convar. By default bots are allowed to try to avoid obstacles.
 -- @server
 -- @param boolean val Whether this NextBot should be allowed to try to avoid obstacles.
@@ -781,7 +781,7 @@ function nb_methods:getJumpHeight()
 	return Ent_GetTable(nb).loco:GetJumpHeight()
 end
 
---- Makes the NextBot jump across a gap. The NextBot must be on ground (Entity:isOnGround).
+--- Makes the NextBot jump across a gap. The NextBot must be on the ground (Entity:isOnGround).
 -- Its model must have the ACT_JUMP activity for proper animation.
 -- @server
 -- @param Vector landGoal The goal the NextBot should aim for.

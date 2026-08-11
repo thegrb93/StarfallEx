@@ -41,7 +41,7 @@ local PVSManager = {
 				end
 			end
 
-			if not table.IsEmpty(self.PVSactiveTable) then--activate/deactivate hook depending on whether or not active table is empty.
+			if not table.IsEmpty(self.PVSactiveTable) then--Activate/deactivate hook depending on whether the active table is empty.
 				hook.Add("SetupPlayerVisibility", "SF_SetupPlayerVisibility", function( ply, viewEntity )
 					local plyPVSes = self.PVSactiveTable[ ply ]
 					if plyPVSes then
@@ -160,7 +160,7 @@ instance:AddHook( "starfall_hud_disconnected", function( activator, ply )
 end)
 
 --- Lets you change the size of yourself if the server has sf_permissions_entity_owneraccess 1
--- @param number scale The scale to apply, will be truncated to the first two decimal places (min 0.01, max 100)
+-- @param number scale The scale to apply; it will be truncated to the first two decimal places (min 0.01, max 100)
 function player_methods:setModelScale(scale)
 	checkvalidnumber(scale)
 	local ply = unwrap(self)
@@ -258,7 +258,7 @@ function player_methods:setAmmo(amount, ammoType)
 	Ply_SetAmmo(ply, amount, ammoType)
 end
 
---- Removes all a player's ammo
+--- Removes all of a player's ammo
 function player_methods:stripAmmo()
 	local ply = unwrap(self)
 	checkpermission(instance, ply, "player.setammo")
@@ -309,7 +309,7 @@ function player_methods:isConnected()
 	return Ply_IsConnected(unwrap(self))
 end
 
---- Forces the player to say the first argument
+--- Forces the player to say the given text
 -- Only works on the chip's owner.
 -- @param string text The text to force the player to say
 -- @param boolean? teamOnly Team chat only? (default: false)
@@ -333,7 +333,7 @@ function player_methods:setArmor(val)
 	Ply_SetArmor(ent, val)
 end
 
---- Sets the maximum armor for player. You can still set a player's armor above this amount with Player:setArmor.
+--- Sets the maximum armor for the player. You can still set a player's armor above this amount with Player:setArmor.
 -- @param number val New max armor value.
 function player_methods:setMaxArmor(val)
 	local ent = unwrap(self)
@@ -353,7 +353,7 @@ function player_methods:setHealth(val)
 	ply:SetHealth(val)
 end
 
---- Sets the maximum health for player. Note, that you can still set player's health above this amount with
+--- Sets the maximum health for the player. Note that you can still set the player's health above this amount with
 -- Player:setHealth.
 -- @server
 -- @param number val New max health value.
@@ -366,7 +366,7 @@ function player_methods:setMaxHealth(val)
 end
 
 --- Sets Crouched Walk Speed
--- @param number val New Crouch Walk speed, This is a multiplier from 0 to 1.
+-- @param number val New crouch walk speed; this is a multiplier from 0 to 1.
 function player_methods:setCrouchedWalkSpeed(val)
 	local ent = unwrap(self)
 	checkpermission(instance, ent, "player.modifyMovementProperties")
@@ -375,7 +375,7 @@ function player_methods:setCrouchedWalkSpeed(val)
 end
 
 --- Sets Duck Speed
--- @param number val New Duck speed, This is a multiplier from 0 to 1.
+-- @param number val New duck speed; this is a multiplier from 0 to 1.
 function player_methods:setDuckSpeed(val)
 	local ent = unwrap(self)
 	checkpermission(instance, ent, "player.modifyMovementProperties")
@@ -384,7 +384,7 @@ function player_methods:setDuckSpeed(val)
 end
 
 --- Sets UnDuck Speed
--- @param number val New UnDuck speed, This is a multiplier from 0 to 1.
+-- @param number val New unduck speed; this is a multiplier from 0 to 1.
 function player_methods:setUnDuckSpeed(val)
 	local ent = unwrap(self)
 	checkpermission(instance, ent, "player.modifyMovementProperties")
@@ -392,7 +392,7 @@ function player_methods:setUnDuckSpeed(val)
 	Ply_SetUnDuckSpeed(ent, math.Clamp(val,0.005,0.995))
 end
 
---- Sets Ladder Climb Speed, probably unstable
+--- Sets Ladder Climb Speed (probably unstable)
 -- @param number val New Ladder Climb speed.
 function player_methods:setLadderClimbSpeed(val)
 	local ent = unwrap(self)
@@ -474,7 +474,7 @@ function player_methods:setWeaponColor(col)
 end
 
 --- Kills the target.
--- Requires 'entities.setHealth' permission.
+-- Requires the 'entities.setHealth' permission.
 function player_methods:kill()
 	local ent = unwrap(self)
 	checkpermission(instance, ent, "entities.setHealth")
@@ -484,7 +484,7 @@ function player_methods:kill()
 end
 
 --- Attempts to force the target into a vehicle.
--- Requires 'player.enterVehicle' permission on the player.
+-- Requires the 'player.enterVehicle' permission on the player.
 -- @param Vehicle vehicle
 function player_methods:enterVehicle(vehicle)
 	local ent = unwrap(self)
@@ -492,10 +492,10 @@ function player_methods:enterVehicle(vehicle)
 	Ply_EnterVehicle(ent, vhunwrap(vehicle))
 end
 
---- sets ID of a given point to add PVS points
--- can only be used on either the chip's owner, or HUD connected players.
--- @param number ID ID to set position of, clamped between 1 and the PVS Points limit.
--- @param Vector? position position to set the override point to, nil to delete this point if it exists.
+--- Sets the ID of a given point to add PVS points
+-- Can only be used on either the chip's owner or HUD-connected players.
+-- @param number ID ID to set the position of, clamped between 1 and the PVS points limit.
+-- @param Vector? position position to set the override point to, or nil to delete this point if it exists.
 function player_methods:setPVSPoint( ID, position )
 	checkluatype(ID, TYPE_NUMBER)
 	ID = math.floor(math.Clamp(ID,1,PVSLimitCvar:GetInt()))
@@ -532,7 +532,7 @@ function player_methods:setPos(vec, revive)
 	Ent_SetPos(ply, SF.clampPos(vunwrap1(vec)))
 end
 
---- Add the player's linear velocity.
+--- Adds to the player's linear velocity.
 -- @param Vector vel Add velocity
 function player_methods:addVelocity(vel)
 	local ply = unwrap(self)

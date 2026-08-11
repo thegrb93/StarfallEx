@@ -112,7 +112,7 @@ string_library.getExtensionFromFilename = sfstring.GetExtensionFromFilename
 --- Returns file name and extension.
 -- @class function
 -- @param string str File-path to get the file extensions from
--- @return string The filename along with it's extension
+-- @return string The filename along with its extension
 string_library.getFileFromFilename = sfstring.GetFileFromFilename
 
 --- Returns the path only from a file's path, excluding the file itself.
@@ -326,7 +326,7 @@ string_library.trimLeft = sfstring.TrimLeft
 --- Removes trailing spaces/characters from a string.
 -- @class function
 -- @param string str The string to trim
--- @param string char Optional character to be trimmed (default: "%s*")
+-- @param string? char Optional character to be trimmed (default: "%s*")
 -- @return string Trimmed string
 string_library.trimRight = sfstring.TrimRight
 

@@ -223,9 +223,9 @@ end)
 -- ------------------------- Methods ------------------------- --
 
 --- Links Starfall components to a Starfall processor, or a vehicle.
--- Screen can only be linked to a Starfall processor.
--- HUD can be linked to either a Starfall processor or a vehicle.
--- @param Entity? e Entity to link the component to, a vehicle, or Starfall processor.
+-- A screen can only be linked to a Starfall processor.
+-- A HUD can be linked to either a Starfall processor or a vehicle.
+-- @param Entity? e Entity to link the component to, a vehicle, or a Starfall processor.
 -- nil to clear links.
 function ents_methods:linkComponent(e)
 	local ent = eunwrap(self)
@@ -533,7 +533,7 @@ function ents_methods:applyTorque(torque)
 end
 
 --- Allows detecting collisions on an entity.
--- @param function func The callback function with argument:
+-- @param function func The callback function, called with the argument:
 -- 1. CollisionData table, see https://wiki.facepunch.com/gmod/Structures/CollisionData
 -- @param string? name Optional name to distinguish multiple collision listeners and remove them individually later (default: "")
 function ents_methods:addCollisionListener(func, name)
@@ -578,7 +578,7 @@ function ents_methods:setDrawShadow(draw)
 end
 
 --- Sets the entity's position.
--- No interpolation will occur client-side, use `PhysObj:setPos` to have interpolation.
+-- No interpolation will occur client-side; use `PhysObj:setPos` to get interpolation.
 -- @param Vector vec New position
 function ents_methods:setPos(vec)
 	local ent = eunwrap(self)
@@ -730,7 +730,7 @@ function ents_methods:use(usetype, value)
 	checkpermission(instance, ent, "entities.use")
 	if usetype~=nil then checkluatype(usetype, TYPE_NUMBER) end
 	if value~=nil then checkluatype(value, TYPE_NUMBER) end
-	if Ply_InVehicle(instance.player) and Ent_IsVehicle(ent) then return end -- Prevent source engine bug when using vehicle while in a vehicle
+	if Ply_InVehicle(instance.player) and Ent_IsVehicle(ent) then return end -- Prevent a Source engine bug when using a vehicle while in a vehicle
 	Ent_Use(ent, instance.player, instance.entity, usetype, value)
 end
 
@@ -757,7 +757,7 @@ function ents_methods:setCollisionGroup(group)
 end
 
 --- Sets the entity to collide with nothing but the world. Alias to `Entity:setCollisionGroup(COLLISION_GROUP.WORLD)`
--- @param boolean nocollide Whether to collide with nothing except world or not.
+-- @param boolean nocollide Whether to collide with nothing except the world or not.
 function ents_methods:setNocollideAll(nocollide)
 	local ent = eunwrap(self)
 	if Ent_IsPlayer(ent) then SF.Throw("Target is a player!", 2) end
@@ -824,27 +824,27 @@ function ents_methods:getPhysMaterial()
 	return Phys_GetMaterial(phys)
 end
 
---- Checks whether entity has physics
--- @return boolean If entity has physics
+--- Checks whether the entity has physics
+-- @return boolean If the entity has physics
 function ents_methods:isValidPhys()
 	return Phys_IsValid(Ent_GetPhysicsObject(eunwrap(self)))
 end
 
---- Returns true if the entity is being held by a player. Either by Physics gun, Gravity gun or Use-key.
+--- Returns true if the entity is being held by a player, either by the Physics Gun, Gravity Gun, or Use key.
 -- @server
 -- @return boolean If the entity is being held or not
 function ents_methods:isPlayerHolding()
 	return Ent_IsPlayerHolding(eunwrap(self))
 end
 
---- Returns if the entity is a constraint.
+--- Returns whether the entity is a constraint.
 -- @server
 -- @return boolean If the entity is a constraint
 function ents_methods:isConstraint()
 	return Ent_IsConstraint(eunwrap(self))
 end
 
---- Sets entity gravity
+--- Sets the entity's gravity
 -- @param boolean grav Should the entity respect gravity?
 function ents_methods:enableGravity(grav)
 	local ent = eunwrap(self)
@@ -858,7 +858,7 @@ function ents_methods:enableGravity(grav)
 	Phys_Wake(phys)
 end
 
---- Sets the entity drag state
+--- Sets the entity's drag state
 -- @param boolean drag Should the entity have air resistance?
 function ents_methods:enableDrag(drag)
 	local ent = eunwrap(self)
@@ -886,7 +886,7 @@ function ents_methods:setContents(contents)
 	Phys_SetContents(phys, contents)
 end
 
---- Sets the entity movement state
+--- Sets the entity's movement state
 -- @param boolean move Should the entity move?
 function ents_methods:enableMotion(move)
 	local ent = eunwrap(self)
@@ -900,14 +900,14 @@ function ents_methods:enableMotion(move)
 	Phys_Wake(phys)
 end
 
---- Sets the entity frozen state, same as `Entity.enableMotion` but inverted
+--- Sets the entity's frozen state, same as `Entity.enableMotion` but inverted
 -- @param boolean freeze Should the entity be frozen?
 function ents_methods:setFrozen(freeze)
 	self:enableMotion(not freeze)
 end
 
---- Checks the entities frozen state
--- @return boolean True if entity is frozen
+--- Checks the entity's frozen state
+-- @return boolean True if the entity is frozen
 function ents_methods:isFrozen()
 	local ent = eunwrap(self)
 	local phys = Ent_GetPhysicsObject(ent)
@@ -926,7 +926,7 @@ function ents_methods:setUnFreezable(freezable)
 	Ent_SetUnFreezable(ent, freezable)
 end
 
---- Returns if the entity is unfreezable
+--- Returns whether the entity is unfreezable
 -- @return boolean unfreezable
 function ents_methods:getUnFreezable()
 	return Ent_GetUnFreezable(eunwrap(self))
@@ -1001,7 +1001,7 @@ function ents_methods:isWeldedTo()
 	return nil
 end
 
---- Gets a table of all constrained entities to each other
+--- Gets a table of all entities constrained to each other
 -- @param table? filter Optional constraint type filter table where keys are the type name and values are 'true'.
 -- "Wire" and "Parent" are used for wires and parents.
 -- @return table All constrained entities
@@ -1062,7 +1062,7 @@ end
 --- Adds a trail to the entity with the specified attributes.
 -- @param number startSize The start size of the trail (0-128)
 -- @param number endSize The end size of the trail (0-128)
--- @param number length The length size of the trail
+-- @param number length The length of the trail
 -- @param string material The material of the trail
 -- @param Color color The color of the trail
 -- @param number? attachmentID Optional attachmentid the trail should attach to
@@ -1146,7 +1146,7 @@ local physUpdateWhitelist = {
 }
 
 --- Set the function to run whenever the physics of the entity are updated.
--- This won't be called if the physics object goes asleep, or ceases to exist.
+-- This won't be called if the physics object falls asleep, or ceases to exist.
 -- You can only use this function on these classes:
 -- - starfall_prop
 -- - starfall_processor

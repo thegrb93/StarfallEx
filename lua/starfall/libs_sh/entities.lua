@@ -615,7 +615,7 @@ function ents_methods:setColor4Part(r, g, b, a)
 	if SERVER then duplicator.StoreEntityModifier(ent, "colour", { Color = {r = r, g = g, b = b, a = a}, RenderMode = rendermode }) end
 end
 
---- Sets the whether an entity should be drawn or not.
+--- Sets whether an entity should be drawn or not.
 -- If server-side, will also prevent networking the entity to the client.
 -- Don't use server-side on a Starfall if you want its client code to work.
 -- @shared
@@ -859,7 +859,7 @@ function ents_methods:getAttachmentParent()
 	return Ent_GetParentAttachment(eunwrap(self))
 end
 
---- Gets the attachment index via the entity and it's attachment name
+--- Gets the attachment index via the entity and its attachment name
 -- @shared
 -- @param string name of the attachment to lookup
 -- @return number Number of the attachment index, or 0 if it doesn't exist
@@ -1073,12 +1073,12 @@ end
 
 --- Checks if the entity ONGROUND flag is set
 -- @shared
--- @return boolean If it's flag is set or not
+-- @return boolean If its flag is set or not
 function ents_methods:isOnGround()
 	return Ent_IsOnGround(eunwrap(self))
 end
 
---- Returns if the entity is ignited
+--- Returns whether the entity is ignited
 -- @shared
 -- @return boolean If the entity is on fire or not
 function ents_methods:isOnFire()
@@ -1412,7 +1412,7 @@ end
 
 --- Returns the manipulate angle of the bone (relative to its default angle)
 -- @shared
--- @param number bone Bone index (default: 0)
+-- @param number? bone Bone index (default: 0)
 -- @return Angle Manipulate angle of the bone
 function ents_methods:getManipulateBoneAngles(bone)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
@@ -1430,7 +1430,7 @@ end
 
 --- Returns the vector manipulate position of the bone (relative to its default position)
 -- @shared
--- @param number bone Bone index (default: 0)
+-- @param number? bone Bone index (default: 0)
 -- @return Vector Manipulate position of the bone
 function ents_methods:getManipulateBonePosition(bone)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
@@ -1439,7 +1439,7 @@ end
 
 --- Returns the vector manipulate scale of the bone
 -- @shared
--- @param number bone Bone index (default: 0)
+-- @param number? bone Bone index (default: 0)
 -- @return Vector Manipulate scale of the bone
 function ents_methods:getManipulateBoneScale(bone)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
@@ -1534,9 +1534,9 @@ function ents_methods:getMass()
 	return Phys_GetMass(phys)
 end
 
---- Returns the principle moments of inertia of the entity
+--- Returns the principal moments of inertia of the entity
 -- @shared
--- @return Vector The principle moments of inertia as a vector
+-- @return Vector The principal moments of inertia as a vector
 function ents_methods:getInertia()
 	local phys = Ent_GetPhysicsObject(eunwrap(self))
 	if not Phys_IsValid(phys) then SF.Throw("Physics object is invalid", 2) end

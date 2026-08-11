@@ -186,11 +186,11 @@ math_library.huge = math.huge
 -- @return string Binary number string. The length of this will always be a multiple of 3
 math_library.intToBin = math.IntToBin
 
---- Takes a normalised number and returns the floating point representation.
+--- Takes a normalized number and returns the floating point representation.
 -- @class function
 -- @param number normalizedFraction The value to get the normalized fraction and the exponent from
 -- @param number exponent The value to get the normalized fraction and the exponent from
--- @return number Floating point reperesentation
+-- @return number Floating point representation
 math_library.ldexp = math.ldexp
 
 --- With one argument, returns the natural logarithm of x (to base e).

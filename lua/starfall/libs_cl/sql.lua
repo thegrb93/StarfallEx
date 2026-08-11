@@ -53,7 +53,7 @@ end
 
 --- Escapes dangerous characters and symbols from user input used in an SQLite SQL Query.
 -- @param string str The string to be escaped.
--- @param boolean bNoQuotes Set this as true, and the function will not wrap the input string in apostrophes.
+-- @param boolean bNoQuotes Set this to true, and the function will not wrap the input string in apostrophes.
 -- @return string The escaped input.
 function sql_library.SQLStr(str, bNoQuotes)
 	checkpermission(instance, nil, "sql")

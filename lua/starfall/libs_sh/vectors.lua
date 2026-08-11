@@ -470,7 +470,7 @@ end
 
 --- Round the vector values.
 -- Self-modifies. Does not return anything
--- @param number idp The integer decimal place to round to (default: 0)
+-- @param number? idp The integer decimal place to round to (default: 0)
 function vec_methods:round(idp)
 	self[1] = math.Round(self[1], idp)
 	self[2] = math.Round(self[2], idp)

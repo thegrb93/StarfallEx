@@ -1027,7 +1027,7 @@ if CLIENT then
 		[MATERIAL_TRIANGLES] = function(count) return count end,
 		[MATERIAL_TRIANGLE_STRIP] = function(count) return count end
 	}
-	--- Generates mesh data. If an Mesh object is passed, it will populate that mesh with the data. Otherwise, it will render directly to renderer.
+	--- Generates mesh data. If a Mesh object is passed, it will populate that mesh with the data. Otherwise, it will render directly to renderer.
 	-- @param Mesh? mesh_obj Optional Mesh object, mesh to build. (default: nil)
 	-- @param number prim_type Int, primitive type, see MATERIAL
 	-- @param number prim_count Int, the amount of primitives

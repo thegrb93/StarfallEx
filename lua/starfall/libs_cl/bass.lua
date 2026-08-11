@@ -24,7 +24,7 @@ local bassSound = {
 			elseif distSqr >= self.fadeMax * self.fadeMax then
 				fadeMult = 0
 			else
-				-- Sounds falls off with dist^2. Unfortunately, we still have to do the square root inbetween.
+				-- Sound falls off with dist^2. Unfortunately, we still have to do the square root in between.
 				fadeMult = ((self.fadeMax - math_sqrt(distSqr)) / (self.fadeMax - self.fadeMin)) ^ 2
 			end
 
@@ -131,7 +131,7 @@ SF.RegisterLibrary("bass")
 --- `Bass` type.
 -- Created with `bass.loadFile` or `bass.loadURL` function.
 -- See also https://wiki.facepunch.com/gmod/IGModAudioChannel
--- If you're looking to apply DSP effects on present game sounds, use `sound.create` function instead.
+-- If you're looking to apply DSP effects to existing game sounds, use the `sound.create` function instead.
 -- @name Bass
 -- @class type
 -- @libtbl bass_methods
@@ -199,12 +199,12 @@ end
 
 
 --- Loads a sound as a `Bass` object from a file path.
--- By default, `Bass` sounds are 2D, which require a HUD connection; unless `3d` flag is used.
--- If you're looking to apply DSP effects on present game sounds, use `sound.create` function instead.
+-- By default, `Bass` sounds are 2D, which require a HUD connection; unless the `3d` flag is used.
+-- If you're looking to apply DSP effects to existing game sounds, use the `sound.create` function instead.
 -- See also https://wiki.facepunch.com/gmod/sound.PlayFile
 -- @param string path File path of the sound to play.
 -- @param string? flags Flags for the sound.
--- Can be one or more of following, separated by a space (" "):
+-- Can be one or more of the following, separated by a space (" "):
 -- `3d` - Makes the sound 3D, so you can set its position.
 -- `mono` - Forces the sound to have only one channel.
 -- `noplay` - Forces the sound not to play as soon as this function is called.
@@ -227,12 +227,12 @@ function bass_library.loadFile(path, flags, callback)
 end
 
 --- Loads a sound as a `Bass` object from external URL.
--- By default, `Bass` sounds are 2D, which require a HUD connection; unless `3d` flag is used.
--- If you're looking to apply DSP effects on present game sounds, use `sound.create` function instead.
+-- By default, `Bass` sounds are 2D, which require a HUD connection; unless the `3d` flag is used.
+-- If you're looking to apply DSP effects to existing game sounds, use the `sound.create` function instead.
 -- See also https://wiki.facepunch.com/gmod/sound.PlayURL
 -- @param string url URL of the sound to play. Can be a radio stream URL.
 -- @param string? flags Flags for the sound.
--- Can be one or more of following, separated by a space (" "):
+-- Can be one or more of the following, separated by a space (" "):
 -- `3d` - Makes the sound 3D, so you can set its position.
 -- `mono` - Forces the sound to have only one channel.
 -- `noplay` - Forces the sound not to play as soon as this function is called.
@@ -404,12 +404,12 @@ end
 
 --- Returns the filename for the sound channel.
 -- @return string The file name.
--- This will not always be what you have put into the `bass.loadURL` as first argument.
+-- This will not always be what you passed as the first argument to `bass.loadURL`.
 function bass_methods:getFileName()
 	return getsnd(self):GetFileName()
 end
 
---- Perform fast Fourier transform (FFT) algorithm to compute the DFT of the sound.
+--- Performs a fast Fourier transform (FFT) to compute the DFT of the sound.
 -- See also https://wiki.facepunch.com/gmod/IGModAudioChannel:FFT
 -- @param number n Number of consecutive audio samples, between 0 and 7 (see FFT enum).
 -- See also https://wiki.facepunch.com/gmod/Enums/FFT
@@ -455,7 +455,7 @@ function bass_methods:getPan()
 end
 
 --- Sets the relative volume of the left and right channels.
--- @param number pan Relative integer volume between the left and right channels.
+-- @param number pan Relative volume between the left and right channels.
 -- Values must be -1 to 1 for relative left to right.
 function bass_methods:setPan(pan)
 	checkluatype(pan, TYPE_NUMBER)
@@ -490,7 +490,7 @@ function bass_methods:getBufferedTime()
 	end
 end
 
---- Returns the sample rate for currently playing sound.
+--- Returns the sample rate for the currently playing sound.
 -- @return number The sample rate in Hz (this should always be 44100).
 function bass_methods:getSamplingRate()
 	return getsnd(self):GetSamplingRate()
@@ -523,7 +523,7 @@ function bass_methods:getTagsMeta()
 	return getsnd(self):GetTagsMeta()
 end
 
---- Retrieves .m4a media info, from a bass channel created by `bass.loadFile` or `bass.loadURL`, if available.
+--- Retrieves .m4a media info from a bass channel created by `bass.loadFile` or `bass.loadURL`, if available.
 -- CRITICAL NOTE: Tags aren't available immediately!
 -- Must use a timer to wait 100-500ms for BASS to parse metadata during stream init!
 -- @return table A list of available information in no particular order, or nil if no information is available.
@@ -531,7 +531,7 @@ function bass_methods:getTagsMP4()
 	return getsnd(self):GetTagsMP4()
 end
 
---- Retrieves OGG media info tag, from a bass channel created by `bass.loadFile` or `bass.loadURL`, if available.
+--- Retrieves the OGG media info tag from a bass channel created by `bass.loadFile` or `bass.loadURL`, if available.
 -- CRITICAL NOTE: Tags aren't available immediately!
 -- Must use a timer to wait 100-500ms for BASS to parse metadata during stream init!
 -- @return table A list of available information in no particular order, or nil if no information is available.
@@ -547,7 +547,7 @@ function bass_methods:getTagsVendor()
 	return getsnd(self):GetTagsVendor()
 end
 
---- Retrieves .WMA media info, from a bass channel created by `bass.loadFile` or `bass.loadURL`, if available.
+--- Retrieves .WMA media info from a bass channel created by `bass.loadFile` or `bass.loadURL`, if available.
 -- CRITICAL NOTE: Tags aren't available immediately!
 -- Must use a timer to wait 100-500ms for BASS to parse metadata during stream init!
 -- @return table A list of available information in no particular order, or nil if no information is available.
@@ -621,7 +621,7 @@ function bass_methods:isStalled()
 	return getsnd(self):GetState() == GMOD_CHANNEL_STALLED
 end
 
---- Sets 3D cone of the sound channel.
+--- Sets the 3D cone of the sound channel.
 -- Must have `3d` flag for this to have any effect.
 -- @param number innerAngle The angle of the inside projection cone in degrees.
 -- Range is from 0 (no cone) to 360 (sphere), -1 = leave current.

@@ -25,8 +25,8 @@ instance:AddHook("deinitialize", function()
 end)
 
 --- Event hook for MIDI devices.
--- Everytime a MIDI device outputs a signal, the callback function on the hook is called.
--- Read up on the MIDI protocol to make better sense of everything -> https://ccrma.stanford.edu/~craig/articles/linuxmidi/misc/essenmidi.html
+-- Every time a MIDI device outputs a signal, the callback function on the hook is called.
+-- Read up on the MIDI protocol to make better sense of the message format -> https://ccrma.stanford.edu/~craig/articles/linuxmidi/misc/essenmidi.html
 -- Commands and their parameters:
 -- 0x80 NOTE_OFF              : param1 = key;                         param2 = velocity
 -- 0x90 NOTE_ON               : param1 = key;                         param2 = velocity
@@ -34,7 +34,7 @@ end)
 -- 0xB0 CONTINUOUS_CONTROLLER : param1 = button_number;               param2 = button_value
 -- 0xC0 PATCH_CHANGE          : param1 = patch number;
 -- 0xD0 CHANNEL_PRESSURE      : param1 = pressure;
--- 0xE0 PITCH_BEND            : param1 = lsb(least signifigant bit);  param2 = msb(most signifigant bit)
+-- 0xE0 PITCH_BEND            : param1 = lsb(least significant bit);  param2 = msb(most significant bit)
 -- @name MIDI
 -- @class hook
 -- @client

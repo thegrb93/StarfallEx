@@ -1,5 +1,5 @@
 --[[
-Modified version of Wire Editor, you can find original code and it's licence on link below.
+Modified version of the Wire Editor; you can find the original code and its license on the link below.
 https://github.com/wiremod/wire
 File in use: https://github.com/wiremod/wire/blob/master/lua/wire/client/text_editor/sf_editor.lua
 ]]
@@ -137,7 +137,7 @@ function Editor:GetFont(fontName, size, antialiasing)
 	if not self.CreatedFonts[name] then
 		self.CreatedFonts[name] = true
 		createFont(name, fontName, size, antialiasing)
-		timer.Simple(0, function() createFont(name, fontName, size, antialiasing) end) --Fix for bug explained there https://wiki.facepunch.com/gmod/surface.CreateFont
+		timer.Simple(0, function() createFont(name, fontName, size, antialiasing) end) --Fix for bug explained here https://wiki.facepunch.com/gmod/surface.CreateFont
 	end
 
 	surface.SetFont(name)
@@ -824,7 +824,7 @@ function Editor:InitComponents()
 	self.C.ButtonHolder = self:AddComponent(vgui.Create("DPanel", self), -400-4, 4, 400, 22) -- Upper menu
 	self.C.ButtonHolder.Paint = function() end
 	-- AddComponent( panel, x, y, w, h )
-	-- if x, y, w, h is minus, it will stay relative to right or buttom border
+	-- if x, y, w, h are negative, they will stay relative to the right or bottom border
 	self.C.Close = vgui.Create("StarfallButton", self.C.ButtonHolder) -- Close button
 	-- self.C.Inf = self:AddComponent(vgui.CreateFromTable(DMenuButton, self), -45-4-26, 0, 24, 22) -- Info button
 	-- self.C.ConBut = self:AddComponent(vgui.CreateFromTable(DMenuButton, self), -45-4-24-26, 0, 24, 22) -- Control panel open/close
@@ -1402,7 +1402,7 @@ function Editor:OpenOldTabs()
 end
 
 function Editor:Validate(gotoerror)
-	if not self:GetCurrentTabContent():GetTabHandler().IsEditor then --Dont validate for non-editors
+	if not self:GetCurrentTabContent():GetTabHandler().IsEditor then --Don't validate for non-editors
 		self:SetValidatorStatus("")
 		return
 	end
@@ -1668,7 +1668,7 @@ end
 
 ---Reloads the tab associated to the file at `filepath`, if there is one.
 ---@param number tabIndex The index of the tab to reload
----@param boolean interactive If the file has unsaved changed and interactive is true
+---@param boolean interactive If the file has unsaved changes and interactive is true
 ---then prompt the user to overwrite the current unsaved changes, otherwise don't reload the file.
 function Editor:ReloadTab(tabIndex, interactive)
 	local activeTabIndex = self:GetActiveTabIndex()

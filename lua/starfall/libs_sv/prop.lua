@@ -305,7 +305,7 @@ function props_library.createComponent(pos, ang, class, model, frozen)
 end
 
 --- Get a list of all spawnable sents.
--- @param boolean? categorized True to get an categorized list
+-- @param boolean? categorized True to get a categorized list
 -- @return table The table
 function props_library.getSpawnableSents(categorized)
 	local tbl = {}
@@ -405,7 +405,7 @@ end
 -- @param string class Class of created sent
 -- @param boolean? frozen True to spawn the entity in a frozen state (default: false)
 -- @param table? data Optional table, additional entity data to be supplied to certain SENTs.
--- See prop.SENT_Data_Structures table in Docs for list of SENTs
+-- See the prop.SENT_Data_Structures table in Docs for a list of SENTs
 -- @server
 -- @return Entity The sent object
 function props_library.createSent(pos, ang, class, frozen, data)
@@ -469,8 +469,8 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		hookcall = "PlayerSpawnedSENT"
 	elseif npc then
 		if ply ~= SF.Superuser then
-			if npc.AdminOnly and not ply:IsAdmin() then SF.Throw("This npc is admin only!", 2) end
-			if gamemode.Call("PlayerSpawnNPC", ply, class, "") == false then SF.Throw("Another hook prevented the npc from spawning", 2) end
+			if npc.AdminOnly and not ply:IsAdmin() then SF.Throw("This NPC is admin only!", 2) end
+			if gamemode.Call("PlayerSpawnNPC", ply, class, "") == false then SF.Throw("Another hook prevented the NPC from spawning", 2) end
 		end
 
 

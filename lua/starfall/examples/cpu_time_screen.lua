@@ -26,10 +26,10 @@ hook.add("render", "", function ()
 	if quota >= maxQuota then render.setColor(Color(255, 0, 0)) end
 	render.drawText(10, 70, "Percent: " .. math.round(quota * 100, 2) .. "%")
 
-	-- Set the RenderTarget to our background so that we can make a bluring effect
-	render.selectRenderTarget("Background")
-	render.setColor(Color(0, 0, 0, 50))
-	render.drawRect(0, 0, 1024, 1024)
+    -- Set the RenderTarget to our background so that we can make a blurring effect
+    render.selectRenderTarget("Background")
+    render.setColor(Color(0, 0, 0, 50))
+    render.drawRect(0, 0, 1024, 1024)
 
 	-- While our quota is less than 10%.
 	-- This will result in higher FPS, thus more render calls.

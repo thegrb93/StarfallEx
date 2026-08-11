@@ -301,8 +301,8 @@ function file_library.write(path, data)
 	f:Close()
 end
 
---- Reads a temp file's data if it exists. Returns nil if it failed.
--- @param string filename The temp file name. Must be only a file and not a path
+--- Reads a temp file's data if it exists. Returns nil if it fails.
+-- @param string filename The temp file name. Must be a filename only, not a path
 -- @return string? The data of the temp file, or nil if it doesn't exist
 function file_library.readTemp(filename)
 	checkluatype(filename, TYPE_STRING)
@@ -314,8 +314,8 @@ function file_library.readTemp(filename)
 	return file.Read("sf_filedatatemp/"..instance.player:SteamID64().."/"..filename, "DATA")
 end
 
---- Writes a temporary file. Throws an error if it is unable to.
--- @param string filename The name to give the file. Must be only a file and not a path
+--- Writes a temporary file. Throws an error if it is unable to write.
+-- @param string filename The name to give the file. Must be a filename only, not a path
 -- @param string data The data to write
 -- @return string The generated path for your temp file
 function file_library.writeTemp(filename, data)
@@ -335,7 +335,7 @@ function file_library.writeTemp(filename, data)
 end
 
 --- Returns the path of a temp file if it exists. Otherwise returns nil
--- @param string filename The temp file name. Must be only a file and not a path
+-- @param string filename The temp file name. Must be a filename only, not a path
 -- @return string? The path to the temp file, or nil if it doesn't exist
 function file_library.existsTemp(filename)
 	checkluatype(filename, TYPE_STRING)
@@ -373,7 +373,7 @@ function file_library.exists(path)
 	return file.Exists("sf_filedata/" .. SF.NormalizePath(path), "DATA")
 end
 
---- Checks if a file exists in path relative to gmod
+--- Checks if a file exists in a path relative to GMod
 -- @param string path File path in game folder
 -- @return boolean? True if exists, false if not, nil if error
 function file_library.existsInGame(path)
@@ -411,7 +411,7 @@ function file_library.delete(path, recursive)
 end
 
 --- Deletes a temp file
--- @param string filename The temp file name. Must be only a file and not a path
+-- @param string filename The temp file name. Must be a filename only, not a path
 -- @return boolean? True if successful, nil if it wasn't found
 function file_library.deleteTemp(filename)
 	checkpermission (instance, nil, "file.writeTemp")
@@ -455,7 +455,7 @@ end
 
 --- Enumerates a directory
 -- @param string path The folder to enumerate, relative to data/sf_filedata/.
--- @param string? sorting Optional sorting argument. Either nameasc, namedesc, dateasc, datedesc
+-- @param string? sorting Optional sorting argument. Either nameasc, namedesc, dateasc, or datedesc
 -- @return table Table of file names
 -- @return table Table of directory names
 function file_library.find(path, sorting)
@@ -467,7 +467,7 @@ end
 
 --- Enumerates a directory relative to gmod
 -- @param string path The folder to enumerate, relative to garrysmod.
--- @param string? sorting Optional sorting argument. Either nameasc, namedesc, dateasc, datedesc
+-- @param string? sorting Optional sorting argument. Either nameasc, namedesc, dateasc, or datedesc
 -- @return table Table of file names
 -- @return table Table of directory names
 function file_library.findInGame(path, sorting)
@@ -496,12 +496,12 @@ function file_library.size(path)
 	return file.Size("sf_filedata/" .. SF.NormalizePath(path), "DATA")
 end
 
---- Wait until all changes to the file are complete
+--- Waits until all changes to the file are complete
 function file_methods:flush()
 	unwrap(self):Flush()
 end
 
---- Flushes and closes the file. The file must be opened again to use a new file object.
+--- Flushes and closes the file. The file must be opened again to get a new file object.
 function file_methods:close()
 	local f = unwrap(self)
 	files[f] = nil

@@ -57,14 +57,14 @@ local keyword_const = {
 	["..."] = kwNoParenthesis
 }
 
--- fallback for nonexistant entries:
+-- fallback for nonexistent entries:
 local fallback_meta = { __index = function(tbl, index) return {} end }
 setmetatable(keywords, fallback_meta)
 setmetatable(keyword_const, fallback_meta)
 setmetatable(storageTypes, fallback_meta)
 
 -- Get directives from the preprocessor so we don't have to hard-code them here.
--- Allows for addons to make their own directives that properly highlight.
+-- Allows addons to make their own directives that properly highlight.
 local directives = SF.PreprocessData.directives
 
 --Color scheme:
@@ -85,7 +85,7 @@ end
 local cols = {}
 local lastcol
 local lasttoken
-local unconnectable = {--Each token of this type shouldnt be connected because editor goes through them
+local unconnectable = {--Each token of this type shouldn't be connected because the editor goes through them
 	["bracket"] = true,
 	["keyword"] = true,
 }
@@ -214,7 +214,7 @@ local setrgbapattern = "^setRGBA%s*%(%s*"..numbpattern..spacedcomma..numbpattern
 local setrgbapatternG = "^(setRGBA%s*)(%(%s*)"..numbpatternG..spacedcommaG..numbpatternG..spacedcommaG..numbpatternG..spacedcommaG..numbpatternG.."(%s*%))"
 
 
---End of monsterous code
+--End of monstrous code
 
 function EDITOR:SyntaxColorLine(row)
 	local usePigments = SF.Editor.TabHandlers.wire.PigmentsConVar:GetInt() > 0
@@ -334,7 +334,7 @@ function EDITOR:SyntaxColorLine(row)
 				if cr and cg and cb then
 					col = Color(cr, cg, cb)
 				else
-					col = Color(0, 0, 0, 0) -- Transparent because its invalid
+					col = Color(0, 0, 0, 0) -- Transparent because it's invalid
 				end
 				addColorToken("function", col, fname)
 				addColorToken("bracket", col, bracket1)
@@ -365,7 +365,7 @@ function EDITOR:SyntaxColorLine(row)
 				if cr and cg and cb and ca then
 					col = Color(cr, cg, cb, ca)
 				else
-					col = Color(0, 0, 0, 0) -- Transparent because its invalid
+					col = Color(0, 0, 0, 0) -- Transparent because it's invalid
 				end
 				addColorToken("function", col, fname)
 				addColorToken("bracket", col, bracket1)
@@ -423,12 +423,12 @@ function EDITOR:SyntaxColorLine(row)
 				tokenname = "keyword"
 			elseif keyword_const[sstr][keyword] then
 				tokenname = "constant"
-			elseif libmap["Environment"][sstr] then -- We Environment /constant
+			elseif libmap["Environment"][sstr] then -- We found Environment /constant
 				local val = libmap["Environment"][sstr]
 				if istable(val) then
 					addToken("constant", self.tokendata)
 					self.tokendata = ""
-					if self:NextPattern("%.") then -- There is dot after enum, color it
+					if self:NextPattern("%.") then -- There is a dot after the enum, color it
 						addToken("operator", self.tokendata)
 						self.tokendata = ""
 					end
@@ -443,7 +443,7 @@ function EDITOR:SyntaxColorLine(row)
 						local pos = self.position -- We are saving that, so we can move tokenizer back
 						local c = self.character
 						local td = self.tokendata
-						if self:NextPattern("%s*[({'\"]") then -- we are checking if there is ( after name, or if single parameter function with string literal or table literal
+						if self:NextPattern("%s*[({'\"]") then -- we are checking if there is a ( after the name, or if it's a single parameter function with a string literal or table literal
 							tokenname = "function"
 							self.position = pos -- We don't want to move tokenizer as we were just checking without parsing
 							self.character = c
@@ -466,7 +466,7 @@ function EDITOR:SyntaxColorLine(row)
 						if cr and cg and cb and ca then
 							col = Color(cr, cg, cb, ca)
 						else
-							col = Color(0, 0, 0, 0) -- Transparent because its invalid
+							col = Color(0, 0, 0, 0) -- Transparent because it's invalid
 						end
 						addColorToken("function", col, fname)
 						addColorToken("bracket", col, bracket1)
@@ -514,7 +514,7 @@ function EDITOR:SyntaxColorLine(row)
 		elseif self:NextPattern("%[=*%[") then -- Multiline strings
 			local reps = #self.tokendata:match("%[(=*)%[")
 			local ending = "%]"..string.rep("=",reps).."%]"
-			while self.character do -- Find the ending ]] if it isn't really multline(who does that?! Shame on you!)
+			while self.character do -- Find the ending ]] if it isn't really multiline (who does that?! Shame on you!)
 				if self:NextPattern(ending) then
 					tokenname = "string"
 					break
@@ -629,7 +629,7 @@ function EDITOR:SyntaxColorLine(row)
 		end
 	end
 
-	--So other rows can know that one contians unfinished blockcomment, multiline string etc
+	--So other rows can know that one contains an unfinished blockcomment, multiline string, etc
 	cols.multilinestring = self.multilinestring
 	cols.blockcomment = self.blockcomment
 
@@ -661,7 +661,7 @@ function EDITOR:PopulateContextMenu(menu)
 	if not caret then return end
 	local token = self:GetTokenAtPosition(caret)
 	if not token then return end
-	token = token[3]:Split(".") -- It can have subtoken after dot
+	token = token[3]:Split(".") -- It can have a subtoken after the dot
 
 	local subtoken = token[2]
 	token = token[1]
