@@ -925,7 +925,7 @@ end
 -- @server
 -- @param table entTbl A table of entities duped with the chip mapped to their previous indices.
 
---- Called after a client-side has been initialized.
+--- Called after the client side has been initialized.
 -- Use this to know when it's safe to send net messages to the client.
 -- @name ClientInitialized
 -- @class hook
