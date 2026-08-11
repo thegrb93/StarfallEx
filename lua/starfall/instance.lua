@@ -56,14 +56,8 @@ end
 
 local plyPrecacheTimeBurst = SF.BurstObject("model_precache_time", "Model precache time", 5, 0.2, "The rate allowed model precache time regenerates.", "Amount of allowed model precache time.")
 
-function SF.Instance.Compile(code, mainfile, player, entity)
-	if isstring(code) then
-		mainfile = mainfile or "generic"
-		code = { [mainfile] = code }
-	end
-	local ok, message = hook.Run("StarfallCanCompile", code, mainfile, player, entity)
-	if ok == false then return false, { message = message or "StarfallCanCompile hook returned false!", traceback = "" } end
-	if CLIENT and not SF.CvarEnabled:GetBool() then return false, { message = "Clientside disabled", traceback = "" } end
+function SF.Instance.Compile(sfdata)
+	local code, mainfile, player, entity = sfdata.code, sfdata.mainfile, sfdata.owner, sfdata.proc
 
 	local instance = setmetatable({}, SF.Instance)
 	instance.entity = entity
@@ -82,13 +76,15 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 	if not ok then return false, { message = ppdata, traceback = "" } end
 	instance.ppdata = ppdata
 
-	if player:IsWorld() then
+	if player:IsWorld() or sfdata.superuser then
 		player = SF.Superuser
+		sfdata.superuser = true
 	elseif SERVER and ppdata.files[mainfile].superuser then
 		local ok, message = hook.Run("StarfallCanSuperUser", player)
 		if ok == false then return false, { message = message or "StarfallCanSuperUser blocked this superuser request!", traceback = "" } end
 		if ok ~= true and not SF.SuperUsers:contains(player:SteamID()) then return false, { message = "Player is not in sf_super_users cvar list!", traceback = "" } end
 		player = SF.Superuser
+		sfdata.superuser = true
 	end
 	instance.player = player
 	instance.playerid = player:SteamID()

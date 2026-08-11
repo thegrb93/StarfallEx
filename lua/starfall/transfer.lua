@@ -40,7 +40,7 @@ function net.ReadStarfall(ply, callback)
 	else
 		setup(true, true, nil)
 	end
-
+	sfdata.superuser = net.ReadBool()
 	sfdata.mainfile = net.ReadString()
 
 	net.ReadStream(ply, function(data)
@@ -67,6 +67,7 @@ function net.WriteStarfall(sfdata, callback)
 			net.WriteBool(false)
 		end
 	end
+	net.WriteBool(sfdata.superuser == true)
 	net.WriteString(sfdata.mainfile)
 
 	if sfdata.compressed then
