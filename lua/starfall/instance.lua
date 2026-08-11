@@ -56,7 +56,7 @@ end
 
 local plyPrecacheTimeBurst = SF.BurstObject("model_precache_time", "Model precache time", 5, 0.2, "The rate allowed model precache time regenerates.", "Amount of allowed model precache time.")
 
-function SF.Instance.Compile(code, mainfile, player, entity)
+function SF.Instance.Compile(code, mainfile, player, entity, superuser)
 	local ok, message = hook.Run("StarfallCanCompile", code, mainfile, player, entity)
 	if ok == false then return false, { message = message or "StarfallCanCompile hook returned false!", traceback = "" } end
 	if CLIENT and not SF.CvarEnabled:GetBool() then return false, { message = "Clientside disabled", traceback = "" } end
@@ -78,7 +78,7 @@ function SF.Instance.Compile(code, mainfile, player, entity)
 	if not ok then return false, { message = ppdata, traceback = "" } end
 	instance.ppdata = ppdata
 
-	if player:IsWorld() or sfdata.superuser then
+	if player:IsWorld() or superuser then
 		player = SF.Superuser
 	elseif SERVER and ppdata.files[mainfile].superuser then
 		local ok, message = hook.Run("StarfallCanSuperUser", player)

@@ -39,7 +39,7 @@ function ENT:Compile(sfdata)
 	if not (sfdata and sfdata.files and sfdata.files[sfdata.mainfile]) then return end
 	self.error = nil
 
-	local ok, instance = SF.Instance.Compile(sfdata.files, sfdata.mainfile, self.owner, self)
+	local ok, instance = SF.Instance.Compile(sfdata.files, sfdata.mainfile, self.owner, self, sfdata.superuser)
 	if not ok then self:Error(instance) return end
 	sfdata.superuser = instance.player == SF.Superuser
 
