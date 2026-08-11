@@ -1340,17 +1340,17 @@ end
 
 --- Returns a table with a list of bone indices of children bones of the given bone of an entity
 -- @shared
--- @param number bone Bone index
+-- @param number? bone Bone index (starts at 0)
 -- @return table Table of child bone indices
 function ents_methods:getChildBones(bone)
+	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
 	local ent = eunwrap(self)
-	checkluatype(bone, TYPE_NUMBER)
 	bone = math.floor(bone)
-	local bonecount = Ent_GetBoneCount(ent)
-	if bonecount == 0 or bone < 0 or bone >= bonecount then SF.Throw("Invalid bone " .. bone, 2) end
+	local boneCount = Ent_GetBoneCount(ent)
+	if boneCount == 0 or bone < 0 or bone >= boneCount then SF.Throw("Invalid bone " .. bone, 2) end
 
 	local bones = {}
-	for k = 0, bonecount - 1 do
+	for k = 0, boneCount - 1 do
 		if Ent_GetBoneParent(ent, k) == bone then
 			bones[#bones + 1] = k
 		end
