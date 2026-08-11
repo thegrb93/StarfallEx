@@ -119,13 +119,19 @@ if SERVER then
 		local npc = unwrap(self)
 		checkpermission(instance, npc, "npcs.giveweapon")
 
+		local npcSpawnable = false
+		for _, v in ipairs(list.GetForEdit("NPCUsableWeapons")) do
+			if v.class == wep then npcSpawnable = true break end
+		end
+		if not npcSpawnable then SF.Throw("Weapon "..wep.." is not in npc useable weapons list!", 2) end
+
 		local weapon = npc:GetActiveWeapon()
 		if Ent_IsValid(weapon) then
-			if (Ent_GetClass(weapon) == "weapon_" .. wep) then return end
+			if (Ent_GetClass(weapon) == wep) then return end
 			Ent_Remove(weapon)
 		end
 
-		Npc_Give(npc, "ai_weapon_" .. wep)
+		Npc_Give(npc, wep)
 	end
 
 	--- Tell the npc to fight this
