@@ -212,7 +212,7 @@ function TabHandler:FinishedLoading()
 
 	MonacoSetting:applyAll()
 	TabHandler:ApplyTheme(SF.Editor.Themes.CurrentTheme)
-	TabHandler:ApplyDocs()
+	TabHandler:DocsFinished()
 
 	for i = 1, SF.Editor.editor:GetNumTabs() do
 		local tab = SF.Editor.editor:GetTabContent(i)
@@ -226,107 +226,96 @@ function TabHandler:FinishedLoading()
 	end
 end
 
--- Escapes a string for safe inclusion inside a double-quoted JS string
-local function jsEscape(s)
-	s = tostring(s)
-	return (s:gsub("[%z\1-\31\\\"]", function(c)
-		return string.format("\\u%04x", string.byte(c))
-	end))
-end
+local DocGenerator
+DocGenerator = {
+	-- Escapes a string for safe inclusion inside a double-quoted JS string
+	jsEscape = function(s)
+		return (s:gsub("[%z\1-\31\\\"]", function(c)
+			return string.format("\\u%04x", string.byte(c))
+		end))
+	end,
 
--- Builds a compact docs payload (keywords + completions) from SF.Docs and pushes it to Monaco
--- Each entry is: tag .. name .. "\3" .. signature .. "\3" .. description
--- tag is "", "\1" (type method, suggested after `:`) or "\2lib." (library member)
-local function buildSignature(data)
-	local sig = "("
-	if data.params then
-		local params = {}
-		for i, param in ipairs(data.params) do
-			params[i] = (param.name or "?") .. (param.type and (": " .. param.type) or "")
-		end
-		sig = sig .. table.concat(params, ", ")
-	end
-	sig = sig .. ")"
-	if data.returns and data.returns[1] then
-		local rets = {}
-		for i, ret in ipairs(data.returns) do
-			rets[i] = ret.type or "any"
-		end
-		sig = sig .. " → " .. table.concat(rets, ", ")
-	end
-	return sig
-end
-
-local function buildDocText(data)
-	local doc = data.description or ""
-	if data.params then
-		for _, param in ipairs(data.params) do
-			if param.description and param.description ~= "" then
-				doc = doc .. "\n\n**" .. (param.name or "?") .. "**" .. (param.type and " (" .. param.type .. ")" or "") .. " — " .. param.description
+	__index = {
+		generate = function(self)
+			-- Starfall types and their methods (also covers `:` calls)
+			for typeName, typeData in pairs(SF.Docs.Types) do
+				self:add(typeName, nil, typeData)
+				if typeData.methods then
+					for methodName, methodData in pairs(typeData.methods) do self:add(methodName, "\1", methodData) end
+				end
 			end
-		end
-	end
-	if data.returns then
-		for _, ret in ipairs(data.returns) do
-			if ret.description and ret.description ~= "" then
-				doc = doc .. "\n\n**Returns**" .. (ret.type and " (" .. ret.type .. ")" or "") .. " — " .. ret.description
+			-- Libraries, their methods and fields
+			for libName, lib in pairs(SF.Docs.Libraries) do
+				if libName ~= "builtins" then
+					self:add(libName, nil, lib)
+					for methodName, methodData in pairs(lib.methods) do self:add(methodName, "\2"..libName..".", methodData) end
+					for fieldName, fieldData in pairs(lib.fields) do self:add(fieldName, "\2"..libName..".", fieldData) end
+				else
+					for methodName, methodData in pairs(lib.methods) do self:add(methodName, nil, methodData) end
+					for fieldName, fieldData in pairs(lib.fields) do self:add(fieldName, nil, fieldData) end
+				end
 			end
-		end
+			-- Builtin tables (e.g. player.getAll) and their fields
+			for tableName, tbl in pairs(SF.Docs.Libraries.builtins.tables) do
+				self:add(tableName, nil, tbl)
+				if tbl.fields then
+					for _, fieldData in pairs(tbl.fields) do self:add(fieldData.name, "\2"..tableName..".", fieldData) end
+				end
+			end
+			-- Hooks and directives
+			for hookName, hookData in pairs(SF.Docs.Hooks) do self:add(hookName, nil, hookData) end
+			for dirName, dirData in pairs(SF.Docs.Directives) do self:add(dirName, nil, dirData) end
+
+			return table.concat(self.parts, ",")
+		end,
+
+		add = function(self, name, tag, data)
+			local key = (tag or "") .. name
+			if self.seen[key] then return end
+			self.seen[key] = true
+			local entry = data and self:buildSignature(key, data) or (key.."\3\3")
+			self.parts[#self.parts+1] = '"'..DocGenerator.jsEscape(entry)..'"'
+		end,
+
+		-- Builds a compact docs payload (keywords + completions) from SF.Docs and pushes it to Monaco
+		-- Each entry is: tag .. name .. "\3" .. signature .. "\3" .. description
+		-- tag is "", "\1" (type method, suggested after `:`) or "\2lib." (library member)
+		buildSignature = function(self, key, data)
+			local sig = {"("}
+			local doc = {data.description or ""}
+			if data.params then
+				local params = {}
+				for i, param in ipairs(data.params) do
+					params[i] = (param.name or "?") .. (param.type and (": " .. param.type) or "")
+					if param.description and param.description ~= "" then
+						doc[#doc+1] = "**" .. (param.name or "?") .. "**" .. (param.type and " (" .. param.type .. ")" or "") .. " — " .. param.description
+					end
+				end
+				sig[#sig+1] = table.concat(params, ", ")
+			end
+			sig[#sig+1] = ")"
+			if data.returns and data.returns[1] then
+				local rets = {}
+				for i, ret in ipairs(data.returns) do
+					rets[i] = ret.type or "any"
+					if ret.description and ret.description ~= "" then
+						doc[#doc+1] = "**Returns**" .. (ret.type and " (" .. ret.type .. ")" or "") .. " — " .. ret.description
+					end
+				end
+				sig[#sig+1] = " → " .. table.concat(rets, ", ")
+			end
+			return table.concat({key, table.concat(sig), table.concat(doc, "\n\n")}, "\3")
+		end,
+	},
+	__call = function(t)
+		return setmetatable({parts = {}, seen = {}}, t)
 	end
-	return doc
-end
-
-function TabHandler:ApplyDocs()
-	if not (SF.Docs and IsValid(self.html) and self.loaded) then return end
-
-	local parts, n = {}, 0
-	local seen = {}
-	local function add(name, tag, data)
-		local key = (tag or "") .. name
-		if seen[key] then return end
-		seen[key] = true
-		n = n + 1
-		local entry = key .. "\3" .. (data and buildSignature(data) or "") .. "\3" .. (data and buildDocText(data) or "")
-		parts[n] = '"'..jsEscape(entry)..'"'
-	end
-
-	-- Starfall types and their methods (also covers `:` calls)
-	for typeName, typeData in pairs(SF.Docs.Types) do
-		add(typeName, nil, typeData)
-		if typeData.methods then
-			for methodName, methodData in pairs(typeData.methods) do add(methodName, "\1", methodData) end
-		end
-	end
-
-	-- Libraries, their methods and fields
-	for libName, lib in pairs(SF.Docs.Libraries) do
-		if libName ~= "builtins" then
-			add(libName, nil, lib)
-			for methodName, methodData in pairs(lib.methods) do add(methodName, "\2"..libName..".", methodData) end
-			for fieldName, fieldData in pairs(lib.fields) do add(fieldName, "\2"..libName..".", fieldData) end
-		else
-			for methodName, methodData in pairs(lib.methods) do add(methodName, nil, methodData) end
-			for fieldName, fieldData in pairs(lib.fields) do add(fieldName, nil, fieldData) end
-		end
-	end
-
-	-- Builtin tables (e.g. player.getAll) and their fields
-	for tableName, tbl in pairs(SF.Docs.Libraries.builtins.tables) do
-		add(tableName, nil, tbl)
-		if tbl.fields then
-			for _, fieldData in pairs(tbl.fields) do add(fieldData.name, "\2"..tableName..".", fieldData) end
-		end
-	end
-
-	-- Hooks and directives
-	for hookName, hookData in pairs(SF.Docs.Hooks) do add(hookName, nil, hookData) end
-	for dirName, dirData in pairs(SF.Docs.Directives) do add(dirName, nil, dirData) end
-
-	self.html:RunJavascript("if(window.sfApplyDocs){sfApplyDocs(["..table.concat(parts, ",").."]);}")
-end
-
+}
+setmetatable(DocGenerator, DocGenerator)
 function TabHandler:DocsFinished()
-	self:ApplyDocs()
+	if not (SF.Docs and IsValid(self.html) and self.loaded) then return end
+	
+	self.html:RunJavascript("if(window.sfApplyDocs){sfApplyDocs(["..DocGenerator():generate().."]);}")
 end
 
 -- Converts a Starfall editor theme (SF.Editor.Themes) into Monaco theme rules and pushes them to Monaco
