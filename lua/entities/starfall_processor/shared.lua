@@ -41,9 +41,9 @@ function ENT:Compile(sfdata)
 
 	local ok, instance = SF.Instance.Compile(sfdata.files, sfdata.mainfile, self.owner, self)
 	if not ok then self:Error(instance) return end
+	sfdata.superuser = instance.player == SF.Superuser
 
 	if newdata then
-		sfdata.superuser = instance.player == SF.Superuser
 		local mainpp = instance.ppdata.files[instance.mainfile]
 		self.name = mainpp.scriptname or "Generic ( No-Name )"
 		self.author = mainpp.scriptauthor or "No-Author"
