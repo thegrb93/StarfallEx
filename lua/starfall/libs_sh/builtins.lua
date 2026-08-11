@@ -238,7 +238,7 @@ builtins_library.isfunction = isfunction
 
 --- Returns the metatable of an object or nil.
 -- Doesn't work on most internal metatables.
--- For any types other than table, nil will be returned.
+-- For any types other than table, no value will be returned.
 -- @param any tbl Table to get metatable of
 -- @return table? The metatable of tbl
 builtins_library.getmetatable = function(tbl)
@@ -290,19 +290,19 @@ function builtins_library.cpuAverage()
 	return instance.perf:getAverageCpu()
 end
 
---- Gets the current RAM usage of the gmod Lua environment
+--- Gets the current RAM usage of the GMod Lua environment
 -- @name builtins_library.ramUsed
 -- @class function
 -- @return number The RAM used in kilobytes
 builtins_library.ramUsed = gcinfo
 
---- Gets the moving average of RAM usage of the gmod Lua environment
+--- Gets the moving average of RAM usage of the GMod Lua environment
 -- @return number The RAM used in kilobytes
 function builtins_library.ramAverage()
 	return instance.perf:getAverageRam()
 end
 
---- Gets the max allowed RAM usage of the gmod Lua environment
+--- Gets the max allowed RAM usage of the GMod Lua environment
 -- @return number The max RAM usage in kilobytes
 function builtins_library.ramMax()
 	return SF.RamCap:GetInt()
@@ -432,7 +432,7 @@ end
 
 local os_library = instance.Libraries.os
 
---- Returns the approximate CPU uptime (how long gmod has been open).
+--- Returns the approximate CPU uptime (how long GMod has been open).
 -- This function has different precision on Linux (1/100).
 -- @class function
 -- @return number The runtime
@@ -1265,10 +1265,10 @@ function builtins_library.localToWorld(localPos, localAng, originPos, originAngl
 	return vwrap(worldPos), awrap(worldAngles)
 end
 
---- Sets the current instance to allow HUD drawing. Only works if player is in your vehicle or
--- if it's run on yourself or if the player is connected to your hud and you want to disconnect them
--- @param Player ply The player to enable the hud on. If CLIENT, will be forced to player()
--- @param boolean active Whether hud hooks should be active. true to force on, false to force off.
+--- Sets the current instance to allow HUD drawing.
+-- Only works if player is in your vehicle, or if it's run on yourself, or if the player is connected to your HUD and you want to disconnect them
+-- @param Player ply The player to enable the HUD on. On client-side this will be forced to local player
+-- @param boolean active Whether HUD hooks should be active. True to force on, false to force off.
 function builtins_library.enableHud(ply, active)
 	ply = SERVER and eunwrap(ply) or LocalPlayer()
 	checkluatype(active, TYPE_BOOL)

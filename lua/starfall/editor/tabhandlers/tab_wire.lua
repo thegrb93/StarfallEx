@@ -97,7 +97,7 @@ function TabHandler:LoadSyntaxColors()
 	for k,v in pairs(SF.Editor.Themes.CurrentTheme) do
 		if not istable(v) then continue end
 		if not v["r"] then
-			local mult = TabHandler.EnlightenColorsConVar:GetBool() and 1 or 1.2 -- For some reason gmod seems to render text darker than html
+			local mult = TabHandler.EnlightenColorsConVar:GetBool() and 1 or 1.2 -- For some reason GMod seems to render text darker than HTML
 			colors[k] = {
 				v[1] and Color(v[1].r*mult,v[1].g*mult,v[1].b*mult,v[1]["a"] or 255) or nil,
 				v[2] and Color(v[2].r*mult,v[2].g*mult,v[2].b*mult,v[2]["a"] or 255) or nil,

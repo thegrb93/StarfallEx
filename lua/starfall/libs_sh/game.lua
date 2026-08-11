@@ -106,7 +106,7 @@ game_library.getIPAddress = game.GetIPAddress
 
 --- Checks if a model exists in the game files
 -- @param string path File path in game folder
--- @return boolean? True if exists, false if not, nil if error
+-- @return boolean? True if exists, false if not, or nil if error
 function game_library.modelExists(path)
 	checkluatype (path, TYPE_STRING)
 	path = SF.NormalizePath(path)

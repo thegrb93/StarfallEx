@@ -632,7 +632,7 @@ end
 -- Example: local mph = math.unitConversion(UNIT.MILE / UNIT.HOUR)
 --          local converted = x * mph
 -- @param number to The UNIT to convert the number to
--- @param number? from The UNIT to convert the number from (default: 1, works if converting from gmod natural units)
+-- @param number? from The UNIT to convert the number from (default: 1, works if converting from GMod natural units)
 -- @return number A conversion factor multipled by values to convert units
 function math_library.unitConversion( to, from )
 	return to / (from or 1)

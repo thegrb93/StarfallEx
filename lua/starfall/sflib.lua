@@ -1259,12 +1259,12 @@ do
 
 	--- Add a GMod hook so that SF gets access to it
 	-- @shared
-	-- @param string realname The hook name. In-SF hookname will be lowercased
+	-- @param string realname The hook name. In Starfall, the hookname will be lowercased
 	-- @param string? hookname Optional hookname. Defaults to realname
 	-- @param function? customargfunc Optional custom function
 	-- Returns true if the hook should be called, then extra arguments to be passed to the Starfall hooks
 	-- @param function? customretfunc Optional custom function
-	-- Takes values returned from a Starfall hook and returns what should be passed to the gmod hook
+	-- Takes values returned from a Starfall hook and returns what should be passed to the GMod hook
 	-- @param boolean? gmoverride Whether this hook should override the gamemode function (makes the hook run last, but adds a little overhead)
 	function SF.hookAdd(realname, hookname, customargfunc, customretfunc, gmoverride)
 		hookname = string.lower(hookname or realname)

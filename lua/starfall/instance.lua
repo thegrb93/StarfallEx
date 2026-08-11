@@ -342,7 +342,7 @@ function SF.Instance:BuildEnvironment()
 		if safe_types[TypeID(object)] then
 			return object
 		end
-		-- Clientside holograms don't have a gmod metatype so check manually
+		-- Clientside holograms don't have a GMod metatype so check manually
 		if isentity(object) and object.IsSFHologram then
 			return self.Types.Hologram.Wrap(object)
 		end

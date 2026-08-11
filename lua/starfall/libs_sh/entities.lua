@@ -870,8 +870,8 @@ end
 --- Gets the position and angle of an attachment
 -- @shared
 -- @param number index The index of the attachment
--- @return Vector? Position, nil if the attachment doesn't exist
--- @return Angle? Orientation, nil if the attachment doesn't exist
+-- @return Vector? Position, or nil if the attachment doesn't exist
+-- @return Angle? Orientation, or nil if the attachment doesn't exist
 function ents_methods:getAttachment(index)
 	local t = Ent_GetAttachment(eunwrap(self), index)
 	if t then return vwrap(t.Pos), awrap(t.Ang) end
@@ -1993,16 +1993,16 @@ function ents_methods:getEyePos()
 	return vwrap(pos1)
 end
 
---- Gets an entities' material
+--- Returns the material of the `Entity`
 -- @shared
 -- @return string String material
 function ents_methods:getMaterial()
 	return Ent_GetMaterial(eunwrap(self)) or ""
 end
 
---- Gets an entities' submaterial
+--- Returns the submaterial of the `Entity`
 -- @shared
--- @param number index Number index of the sub material
+-- @param number index Number index of the submaterial (from 0 to 31)
 -- @return string String material
 function ents_methods:getSubMaterial(index)
 	checkluatype(index, TYPE_NUMBER)
@@ -2011,7 +2011,7 @@ function ents_methods:getSubMaterial(index)
 	return Ent_GetSubMaterial(eunwrap(self), index) or ""
 end
 
---- Gets an entities' material list
+--- Returns the material list of the `Entity`
 -- @shared
 -- @return table Material
 function ents_methods:getMaterials()
@@ -2039,7 +2039,7 @@ function ents_methods:getForward()
 	return vwrap(Ent_GetForward(eunwrap(self)))
 end
 
---- Returns the timer.curtime() time the entity was created on
+--- Returns the time the entity was created on (relative to `timer.curtime`)
 -- @shared
 -- @return number Seconds relative to server map start
 function ents_methods:getCreationTime()
@@ -2048,7 +2048,7 @@ end
 
 --- Checks if an engine effect is applied to the entity
 -- @shared
--- @param number effect The effect to check. See `EF` enum.
+-- @param number effect The effect to check (see `EF` enum).
 -- @return boolean True if the engine effect is applied to the entity, otherwise false
 function ents_methods:isEffectActive(effect)
 	checkluatype(effect, TYPE_NUMBER)
@@ -2118,9 +2118,10 @@ function ents_methods:getHitBoxBone(hitbox, group)
 end
 
 --- Returns entity's current hit box set.
+-- See also `Entity:getHitBoxSetCount` function.
 -- @shared
--- @return number? Hitbox set number, nil if entity has no hitboxes.
--- @return string? Hitbox set name, nil if entity has no hitboxes.
+-- @return number? Hitbox set number, or nil if entity has no hitboxes.
+-- @return string? Hitbox set name, or nil if entity has no hitboxes.
 function ents_methods:getHitBoxSet()
 	return Ent_GetHitboxSet(eunwrap(self))
 end
@@ -2135,7 +2136,8 @@ end
 --- Gets the hit group of a given hitbox in a given hitbox set.
 -- @shared
 -- @param number hitbox The number of the hit box.
--- @param number hitboxset The number of the hit box set. This should be 0 in most cases.
+-- @param number hitboxset The number of the hit box set (this should be 0 in most cases).
+-- See also `Entity:getHitBoxSet` function.
 -- @return number The hitbox group of given hitbox.
 -- See https://wiki.facepunch.com/gmod/Enums/HITGROUP
 function ents_methods:getHitBoxHitGroup(hitbox, hitboxset)

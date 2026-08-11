@@ -118,15 +118,16 @@ if SERVER then
 	add("PlayerDisconnected")
 
 	--- Called when a player gets hurt, uses the `player_hurt` game event client-side.
-	-- See also https://wiki.facepunch.com/gmod/GM:PlayerHurt
-	-- See also https://wiki.facepunch.com/gmod/gameevent/player_hurt
+	-- On server-side: https://wiki.facepunch.com/gmod/GM:PlayerHurt
+	-- On client-side: https://wiki.facepunch.com/gmod/gameevent/player_hurt
 	-- @name PlayerHurt
 	-- @class hook
 	-- @shared
 	-- @param Player ply Player being hurt
 	-- @param Entity attacker Entity causing damage to the player
 	-- @param number newHealth New health of the player
-	-- @param number damageTaken On server, Amount of damage the player has taken, nil on client.
+	-- @param number damageTaken On server-side: Amount of damage the player has taken.
+	-- On client-side: absent (nil).
 	add("PlayerHurt")
 
 	--- Called when a player spawns for the first time
@@ -326,7 +327,8 @@ else
 	add("FinishChat")
 
 	--- Called when a chat message is printed your chat window (chip owner only)
-	-- See also https://wiki.facepunch.com/gmod/GM:OnPlayerChat
+	-- On server-side: https://wiki.facepunch.com/gmod/GM:OnPlayerChat
+	-- On client-side: https://wiki.facepunch.com/gmod/gameevent/player_say
 	-- @name PlayerChat
 	-- @class hook
 	-- @shared
@@ -747,14 +749,13 @@ add("player_changename", "playerchangename", function(instance, data)
 end)
 
 --- Called when a player connects to the server. (Game Event)
--- See also https://wiki.facepunch.com/gmod/GM:PlayerConnect
 -- See also https://wiki.facepunch.com/gmod/gameevent/player_connect
 -- @name PlayerConnect
 -- @class hook
 -- @shared
--- @param string networkid The SteamID the player had. Will be "BOT" for bots and "STEAM_0:0:0" in single-player.
--- @param string name The name the player had.
--- @param number userid The UserID the player has.
+-- @param string networkid The SteamID the player. Will be "BOT" for bots and "STEAM_0:0:0" in single-player.
+-- @param string name The name of the player.
+-- @param number userid The UserID of the player.
 -- @param boolean isbot False if the player isn't a bot, true if they are.
 gameevent.Listen("player_connect")
 add("player_connect", "playerconnect", function(instance, data)
@@ -766,9 +767,9 @@ end)
 -- @name PlayerDisconnect
 -- @class hook
 -- @shared
--- @param string networkid The SteamID the player had. Will be "BOT" for bots and "STEAM_0:0:0" in single-player.
--- @param string name The name the player had.
--- @param Player player Player entity the player had.
+-- @param string networkid The SteamID of the player. Will be "BOT" for bots and "STEAM_0:0:0" in single-player.
+-- @param string name The name of the player.
+-- @param Player player Player entity.
 -- @param string reason Reason for disconnecting.
 -- @param boolean isbot False if the player isn't a bot, true if they are.
 gameevent.Listen("player_disconnect")
@@ -906,7 +907,7 @@ end
 
 end
 
--- Hooks below are not simple gmod hooks and are called by other events in other files.
+-- Hooks below are not simple GMod hooks and are called by other events in other files.
 
 --- Think hook. Called each frame on the client, and each game tick on the server.
 -- See also https://wiki.facepunch.com/gmod/GM:Think
@@ -944,18 +945,18 @@ end
 -- @shared
 -- @param Entity ent The component entity
 
---- Called when the player disconnects from a HUD component linked to the Starfall Chip
+--- Called when the player disconnects from a HUD component linked to the Starfall chip
 -- @name HUDDisconnected
 -- @class hook
 -- @shared
--- @param Entity ent The hud component entity
+-- @param Entity ent The HUD component entity
 -- @param Player ply The player who disconnected
 
---- Called when the player connects to a HUD component linked to the Starfall Chip
+--- Called when the player connects to a HUD component linked to the Starfall chip
 -- @name HUDConnected
 -- @class hook
 -- @shared
--- @param Entity ent The hud component entity
+-- @param Entity ent The HUD component entity
 -- @param Player ply The player who connected
 
 --- Called when a player uses the screen

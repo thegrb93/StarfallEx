@@ -196,9 +196,9 @@ local file_methods, file_meta, wrap, unwrap = instance.Types.File.Methods, insta
 
 --- Opens and returns a file
 -- @param string path File path relative to data/sf_filedata/.
--- @param string mode The file mode to use (usually "rb" or "wb").
+-- @param string mode The file mode to use (usually "rb", "wb", or "ab").
 -- See Lua manual for explanation.
--- @return File? File object, or nil if it failed
+-- @return File? The opened `File` object, or nil if it failed to open due to it not existing, or being used by another process
 function file_library.open(path, mode)
 	checkpermission (instance, path, "file.open")
 	checkluatype (path, TYPE_STRING)
@@ -226,7 +226,7 @@ function file_library.openInGame(path, mode)
 end
 
 --- Reads a file from path
--- @param string path File path relative to data/sf_filedata/.
+-- @param string path File path relative to data/sf_filedata/
 -- @return string? Contents, or nil if error
 function file_library.read(path)
 	checkpermission (instance, path, "file.read")
@@ -235,7 +235,7 @@ function file_library.read(path)
 end
 
 --- Reads a file from path relative to base GMod directory
--- @param string path File path relative to GarrysMod/garrysmod/.
+-- @param string path File path relative to GarrysMod/garrysmod/
 -- @return string? Contents, or nil if error
 function file_library.readInGame(path)
 	if instance.player ~= LocalPlayer() then SF.Throw("Only chip owner can read game files", 2) end
@@ -243,7 +243,8 @@ function file_library.readInGame(path)
 	return file.Read(SF.NormalizePath(path), "GAME")
 end
 
---- Reads a file asynchronously. Can only read 'sf_file_asyncmax' files at a time
+--- Reads a file asynchronously.
+-- Can only read 'sf_file_asyncmax' files at a time.
 -- @param string path File path relative to data/sf_filedata/.
 -- @param function callback A callback function for when the read operation finishes. With arguments:
 -- 1. string filename: The name of the file
@@ -366,16 +367,16 @@ end
 
 --- Checks if a file exists
 -- @param string path File path relative to data/sf_filedata/.
--- @return boolean? True if exists, false if not, nil if error
+-- @return boolean? True if exists, false if not, or nil if error
 function file_library.exists(path)
 	checkpermission (instance, path, "file.exists")
 	checkluatype (path, TYPE_STRING)
 	return file.Exists("sf_filedata/" .. SF.NormalizePath(path), "DATA")
 end
 
---- Checks if a file exists in a path relative to GMod
--- @param string path File path in game folder
--- @return boolean? True if exists, false if not, nil if error
+--- Checks if a file exists in a path relative to base GMod directory
+-- @param string path File path relative to GarrysMod/garrysmod/
+-- @return boolean? True if exists, false if not, or nil if error
 function file_library.existsInGame(path)
 	checkpermission (instance, path, "file.existsInGame")
 	checkluatype (path, TYPE_STRING)
@@ -394,7 +395,7 @@ end
 --- Deletes a file or directory
 -- @param string path File path relative to data/sf_filedata/.
 -- @param boolean? recursive If true, deletes directories recursively
--- @return boolean? True if successful, nil if it wasn't found
+-- @return boolean? True if successful, or no value if it wasn't found
 function file_library.delete(path, recursive)
 	checkpermission (instance, path, "file.write")
 	checkluatype (path, TYPE_STRING)
@@ -412,7 +413,7 @@ end
 
 --- Deletes a temp file
 -- @param string filename The temp file name. Must be a filename only, not a path
--- @return boolean? True if successful, nil if it wasn't found
+-- @return boolean? True if successful, or no value if it wasn't found
 function file_library.deleteTemp(filename)
 	checkpermission (instance, nil, "file.writeTemp")
 	checkluatype (filename, TYPE_STRING)
@@ -431,7 +432,7 @@ end
 --- Renames a file
 -- @param string path File path relative to data/sf_filedata/.
 -- @param string newPath New filepath relative to data/sf_filedata/.
--- @return boolean? True if successful, nil if source not found
+-- @return boolean? True if successful, or no value if path was not found
 function file_library.rename(path, newPath)
 	checkpermission (instance, path, "file.rename")
 	checkluatype (path, TYPE_STRING)
@@ -455,7 +456,9 @@ end
 
 --- Enumerates a directory
 -- @param string path The folder to enumerate, relative to data/sf_filedata/.
--- @param string? sorting Optional sorting argument. Either nameasc, namedesc, dateasc, or datedesc
+-- @param string? sorting Optional sorting argument.
+-- Can be one of: `"nameasc"`, `"namedesc"`, `"dateasc"`, or `"datedesc"`.
+-- Default: `"nameasc"`
 -- @return table Table of file names
 -- @return table Table of directory names
 function file_library.find(path, sorting)
@@ -465,9 +468,11 @@ function file_library.find(path, sorting)
 	return file.Find("sf_filedata/" .. SF.NormalizePath(path), "DATA", sorting)
 end
 
---- Enumerates a directory relative to gmod
--- @param string path The folder to enumerate, relative to garrysmod.
--- @param string? sorting Optional sorting argument. Either nameasc, namedesc, dateasc, or datedesc
+--- Enumerates a directory relative to base GMod directory
+-- @param string path The folder to enumerate, relative to GarrysMod/garrysmod/
+-- @param string? sorting Optional sorting argument.
+-- Can be one of: `"nameasc"`, `"namedesc"`, `"dateasc"`, or `"datedesc"`.
+-- Default: `"nameasc"`
 -- @return table Table of file names
 -- @return table Table of directory names
 function file_library.findInGame(path, sorting)
@@ -501,7 +506,9 @@ function file_methods:flush()
 	unwrap(self):Flush()
 end
 
---- Flushes and closes the file. The file must be opened again to get a new file object.
+--- Flushes and closes the file.
+-- You can no longer use the `File` object after calling this function.
+-- The file must be opened again to get a new `File` object.
 function file_methods:close()
 	local f = unwrap(self)
 	files[f] = nil
