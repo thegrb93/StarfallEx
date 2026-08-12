@@ -755,7 +755,7 @@ return function(instance)
 	-- 8 = exposed, spot in the open, usually on a ledge or cliff
 	-- Values over 255 will be clamped.
 	-- @param Vector pos The position of the hiding spot on the nav area
-	-- @param number? flags Flags describing what kind of hiding spot this is. Defaults to 7.
+	-- @param number? flags Bit flags describing what kind of hiding spot this is (default: 7).
 	function navarea_methods:addHidingSpot(pos, flags)
 		if flags~=nil then checkluatype(flags, TYPE_NUMBER) end
 		navunwrap(self):AddHidingSpot( vunwrap1(pos), flags )
