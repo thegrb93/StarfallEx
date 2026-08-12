@@ -425,6 +425,26 @@ return function(instance)
 		return lnavunwrap(self):GetCostSoFar()
 	end
 
+	--- Returns a table of good hiding spots in this area.
+	-- See also NavArea:getExposedSpots
+	-- @name navarea_methods.getHidingSpots
+	-- @param number? type Bit mask of spot types to include, defaults to 1. Multiple types can be combined.
+	-- 0 = None (Not recommended)
+	-- 1 = In Cover/basically a hiding spot, in a corner with good hard cover nearby
+	-- 2 = good sniper spot, had at least one decent sniping corridor
+	-- 4 = perfect sniper spot, can see either very far, or a large area, or both
+	-- 8 = exposed, spot in the open, usually on a ledge or cliff, same as GetExposedSpots
+	-- Values over 255 and below 0 will be clamped.
+	-- @return table A table of Vectors
+	function lnavarea_methods:getHidingSpots(type)
+		if type~=nil then checkluatype(type, TYPE_NUMBER) end
+		local out = {}
+		for k, spot in ipairs( lnavunwrap(self):GetHidingSpots(type) ) do
+			out[k] = vwrap(spot)
+		end
+		return out
+	end
+
 	--- Returns a table of very bad hiding spots in this area.
 	-- See also NavArea:getHidingSpots
 	-- @name navarea_methods.getExposedSpots
