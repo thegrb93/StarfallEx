@@ -992,7 +992,7 @@ function builtins_library.loadstring(code, identifier)
 	if env ~= nil then checkluatype(env, TYPE_TABLE) end
 	local retval = SF.CompileString(code, "SF:" .. identifier, false)
 	if isfunction(retval) then
-		return setfenv(retval, env or instance.env)
+		return setfenv(retval, instance.env)
 	end
 	return nil, tostring(retval)
 end
