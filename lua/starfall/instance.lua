@@ -616,7 +616,7 @@ function SF.Instance:setCheckCpu(runWithOps)
 			self.perf:check()
 		end
 		function self:pushCpuCheck(callback)
-			self.cpustatestack[#self.cpustatestack + 1] = (dgethook() or false)
+			self.cpustatestack[#self.cpustatestack + 1] = dgethook()
 			local enabled = callback~=nil
 			if SF.runningOps ~= enabled then
 				SF.runningOps = enabled
@@ -625,7 +625,7 @@ function SF.Instance:setCheckCpu(runWithOps)
 			dsethook(callback, "", 2000)
 		end
 		function self:popCpuCheck()
-			local callback = (table.remove(self.cpustatestack) or nil)
+			local callback = table.remove(self.cpustatestack)
 			dsethook(callback, "", 2000)
 			local enabled = callback~=nil
 			if SF.runningOps ~= enabled then
