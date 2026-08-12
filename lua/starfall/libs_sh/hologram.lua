@@ -49,8 +49,9 @@ end
 -- @libtbl hologram_library
 SF.RegisterLibrary("hologram")
 
---- Hologram type
--- Created with `hologram.create` function
+--- Hologram type.
+-- Inherits all functions from `Entity` type.
+-- Created with `hologram.create` function.
 -- @name Hologram
 -- @class type
 -- @libtbl hologram_methods
