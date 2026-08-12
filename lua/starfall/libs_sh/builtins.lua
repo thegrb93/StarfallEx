@@ -984,16 +984,15 @@ end
 -- For compatibility with older versions of Starfall, `loadstring` is NOT an alias of this function like it is in vanilla LuaJIT/5.2.
 -- @param string code String to compile
 -- @param string? identifier Name of compiled function
--- @param table? env Environment of compiled function
 -- @return function? Compiled function, or nil if failed to compile
--- @return string? Error string, or nil if successfully compiled
-function builtins_library.loadstring(code, identifier, env)
+-- @return string? Error string, or nil if compiled successfully
+function builtins_library.loadstring(code, identifier)
 	checkluatype(code, TYPE_STRING)
 	if identifier ~= nil then checkluatype(identifier, TYPE_STRING) else identifier = "=(load)" end
 	if env ~= nil then checkluatype(env, TYPE_TABLE) end
 	local retval = SF.CompileString(code, "SF:" .. identifier, false)
 	if isfunction(retval) then
-		return setfenv(retval, env or instance.env)
+		return setfenv(retval, instance.env)
 	end
 	return nil, tostring(retval)
 end
