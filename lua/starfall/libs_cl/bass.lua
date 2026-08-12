@@ -428,9 +428,8 @@ function bass_methods:setPan(pan)
 	checkluatype(pan, TYPE_NUMBER)
 
 	local uw = getsnd(self)
-	-- If we ever use / add Set3DEnabled to SF, remember to change this Is3D to Get3DEnabled.
 	if uw:Is3D() then SF.Throw("You cannot set the pan of a 3D Bass Object!", 2) end
-	uw:SetPan( pan )
+	uw:SetPan(pan)
 end
 
 --- Retrieves the number of bits per sample of the sound.
@@ -530,19 +529,14 @@ function bass_methods:is3D()
 	return getsnd(self):Is3D()
 end
 
---- Sets the 3D mode of the channel. This will affect Bass:get3DEnabled() but not Bass:is3D().
---- This feature requires the channel to be initially created in 3D mode, i.e. Bass:is3D() should return true or this function will do nothing. 
--- @param boolean enable True or False to toggle 3D.
-function bass_methods:set3DEnabled(enable)
-	checkluatype(enable, TYPE_BOOLEAN)
+---------------------------------------------------------------------------------------------------
+-- NOTE: Do not add set3DEnabled to SF;
+--       it would only enable exploiting the 3D->2D mode (and break spatial audio).
+--       By creating a '3d' Bass object and then calling `Bass:set3DEnabled(false)` in the callback
+---------------------------------------------------------------------------------------------------
 
-	local uw = getsnd(self)
-	if not uw:Is3D() then SF.Throw("You cannot set the mode of a Bass Object that isn't 3D! Please call is3D first!!", 2) end
-	uw:Set3DEnabled(enable)
-end
-
---- Returns if the sound channel is currently in 3D mode or not. This value will be affected by Bass:set3DEnabled().
--- @return boolean True or False depending on if the sound is currently 3D or not.
+--- Determines whether the sound channel is currently in 3D mode.
+-- @return boolean Whether the sound channel is currently in 3D mode.
 function bass_methods:get3DEnabled()
 	return getsnd(self):Get3DEnabled()
 end
@@ -588,9 +582,8 @@ function bass_methods:set3DCone(innerAngle, outerAngle, outerVolume)
 	checkluatype(outerVolume, TYPE_NUMBER)
 
 	local uw = getsnd(self)
-	-- If we ever use / add Set3DEnabled to SF, remember to change this Is3D to Get3DEnabled.
 	if not uw:Is3D() then SF.Throw("You cannot set the cone of a Bass Object that isn't 3D!", 2) end
-	uw:Set3DCone( innerAngle, outerAngle, outerVolume )
+	uw:Set3DCone(innerAngle, outerAngle, outerVolume)
 end
 
 --- Returns 3D cone of the sound channel.
