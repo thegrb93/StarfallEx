@@ -1350,6 +1350,25 @@ function ents_methods:getBoneParent(bone)
 	return Ent_GetBoneParent(eunwrap(self), bone)
 end
 
+--- Returns a table with a list of bone indices of children bones of the given bone of an entity
+-- @shared
+-- @param number bone Bone index (starts at 0)
+-- @return table Table of child bone indices
+function ents_methods:getChildBones(bone)
+	checkluatype(bone, TYPE_NUMBER)
+	local ent = eunwrap(self)
+	bone = math.floor(bone)
+	local boneCount = Ent_GetBoneCount(ent)
+	if boneCount == 0 or bone < 0 or bone >= boneCount then SF.Throw("Invalid bone " .. bone, 2) end
+	local bones = {}
+	for k = 0, boneCount - 1 do
+		if Ent_GetBoneParent(ent, k) == bone then
+			bones[#bones + 1] = k
+		end
+	end
+	return bones
+end
+
 --- Returns the bone's position and angle in world coordinates
 -- @shared
 -- @param number? bone Bone index. (def 0)
