@@ -274,29 +274,6 @@ function file_library.asyncReadInGame(path, callback)
 	end)
 end
 
---- Reads a temp file asynchronously
--- @param string filename The temp file name. Must be only a file name and not a path
--- @param function callback A callback function that runs when the read operation completes. With arguments:
--- 1. string filename - The name of the file
--- 2. number status - The status of the read operation (see FSASYNC enum)
--- 3. string data - The data read from the file
-function file_library.asyncReadTemp(filename, callback)
-	checkluatype(filename, TYPE_STRING)
-	checkluatype(callback, TYPE_FUNCTION)
-
-	if #filename > 128 then SF.Throw("Filename is too long!", 2) end
-	checkExtension(filename)
-	filename = string.lower(string.GetFileFromFilename(filename))
-
-	if concurrentreads == cv_max_concurrent_reads:GetInt() then SF.Throw("Reading too many files asynchronously!", 2) end
-	concurrentreads = concurrentreads + 1
-	local path = "sf_filedatatemp/"..instance.player:SteamID64().."/"..filename
-	file.AsyncRead(path, "DATA", function(_, _, status, data)
-		concurrentreads = concurrentreads - 1
-		instance:runFunction(callback, filename, status, data)
-	end)
-end
-
 
 local allowedExtensions = {["txt"]=true,["dat"]=true,["json"]=true,["xml"]=true,["csv"]=true,["jpg"]=true,["jpeg"]=true,["png"]=true,["vtf"]=true,["vmt"]=true,["mp3"]=true,["wav"]=true,["ogg"]=true}
 local function checkExtension(filename)
@@ -350,29 +327,6 @@ function file_library.writeTemp(filename, data)
 	local path = TempFileCache:Write(instance, filename, data)
 	tempfilewrites = tempfilewrites + 1
 	return path
-end
-
---- Opens a temp file
--- @param string filename The temp file name. Must be only a file name and not a path
--- @param string mode The file mode to use. See Lua manual for explanation
--- @return File? File object, or no value if it failed
-function file_library.openTemp(filename, mode)
-	checkluatype(filename, TYPE_STRING)
-	checkluatype(mode, TYPE_STRING)
-
-	checkpermission (instance, nil, "file.writeTemp")
-
-	if #filename > 128 then SF.Throw("Filename is too long!", 2) end
-	checkExtension(filename)
-	filename = string.lower(string.GetFileFromFilename(filename))
-
-	local path = "sf_filedatatemp/"..instance.player:SteamID64().."/"..filename
-	file.CreateDir("sf_filedatatemp/"..instance.player:SteamID64())
-	local f = file.Open(path, mode, "DATA")
-	if f then
-		files[f] = true
-		return wrap(f)
-	end
 end
 
 --- Returns the path of a temp file if it exists. Otherwise returns nil
