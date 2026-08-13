@@ -44,7 +44,7 @@ end
 
 local function checkValid(peff)
 	if not peff:IsValid() then
-		SF.Throw("ParticleEffect emitter is no longer valid.", 2)
+		SF.Throw("ParticleEffect emitter is no longer valid.", 3)
 	end
 	return peff -- for method chaining (simpler code)
 end
