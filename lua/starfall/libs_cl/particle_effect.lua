@@ -149,8 +149,7 @@ end
 --- Determines whether the particle effect is valid or not.
 -- @return boolean Is valid or not
 function particleef_methods:isValid()
-	local peff = unwrap(self)
-	return peff and IsValid(peff) or false
+	return unwrap(self):IsValid()
 end
 
 --- Starts emission of the particle effect.
