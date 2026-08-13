@@ -180,8 +180,8 @@ function particleef_methods:restart()
 	checkValid(unwrap(self)):Restart()
 end
 
---- Determines if the particle effect is finished (or is invalid).
--- @return boolean True if the particle effect is finished (or is invalid)
+--- Determines if the particle effect is finished.
+-- @return boolean True if the particle effect is finished
 function particleef_methods:isFinished()
 	local peff = unwrap(self)
 	return peff and IsValid(peff) and peff:IsFinished() or false
