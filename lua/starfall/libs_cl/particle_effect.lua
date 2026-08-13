@@ -166,7 +166,7 @@ end
 function particleef_methods:destroy()
 	local peff = unwrap(self)
 	if peff and particle_effects[peff] then
-		if IsValid(peff) then
+		if peff:IsValid() then
 			peff:StopEmissionAndDestroyImmediately()
 		end
 		particle_effects[peff] = nil
