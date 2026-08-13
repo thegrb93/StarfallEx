@@ -211,7 +211,7 @@ end)
 
 
 --- Creates a particle effect (and attaches it to an entity).
--- @param Entity entity The entity to attach the particle effect to
+-- @param Entity entity The entity to attach the particle effect to (can be world, must not be NULL)
 -- @param string name The name of the effect to create (e.g. "generic_smoke")
 -- @param number pattach See PATTACH enum
 -- @param table? options Optional table of tables (indexes 1 to 64) having the following structure:
@@ -227,6 +227,10 @@ function particleef_library.attach(entity, name, pattach, options)
 	-- Must unwrap the entity before checking the permission
 	entity = eunwrap(entity)
 	-- No need to validate entity; allow attaching to the world entity (which has IsValid = false)
+	-- So, we have to explicitly refuse NULL without using IsValid
+	if entity == NULL then
+		SF.Throw("Invalid entity", 2)
+	end
 
 	checkpermission(instance, entity, "particleEffect.attach")
 
