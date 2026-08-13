@@ -44,6 +44,10 @@ SF.effect_blacklist = EFFECT_BLACKLIST
 SF.effect_limits = EFFECT_LIMITS
 SF.default_effect_limits = DEFAULT_LIMITS
 
+local function checkRange(limit, value)
+	return value ~= value or value < limit[1] or value > limit[2]
+end
+
 local function clampInt(x, min, max)
 	checknumber(x)
 	if x ~= x then
@@ -129,9 +133,9 @@ Effect.setters = {
 
 -- Range checkers for magnitude/radius/scale based on effect name limits
 Effect.checkers = {
-	magnitude = function(limit, value) return value ~= value or value < limit[1] or value > limit[2] end,
-	radius = function(limit, value) return value ~= value or value < limit[1] or value > limit[2] end,
-	scale = function(limit, value) return value ~= value or value < limit[1] or value > limit[2] end,
+	magnitude = checkRange,
+	radius = checkRange,
+	scale = checkRange,
 }
 
 Effect.__index = {
