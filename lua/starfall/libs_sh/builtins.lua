@@ -964,11 +964,7 @@ end
 -- @return string? Error string, or nil if successfully compiled
 function builtins_library.loadstring(code, identifier, env)
 	checkluatype(code, TYPE_STRING)
-	if identifier == nil then
-		identifier = "=(load)"
-	else
-		checkluatype(identifier, TYPE_STRING)
-	end
+	if identifier ~= nil then checkluatype(identifier, TYPE_STRING) else identifier = "=(load)" end
 	if env ~= nil then checkluatype(env, TYPE_TABLE) end
 	local retval = SF.CompileString(code, "SF:" .. identifier, false)
 	if isfunction(retval) then
