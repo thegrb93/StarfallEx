@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local clamp = math.Clamp
 local floor = math.floor
 local checkluatype = SF.CheckLuaType
@@ -10,7 +10,6 @@ local clampPos = SF.clampPos
 SF.Permissions.registerPrivilege("effect.play", "Effect", "Allows the user to play effects", { client = {} })
 
 local plyEffectBurst = SF.BurstObject("effects", "effects", 60, 5, "The rate at which effects can be spawned per second.", "Number of effects that can be spawned in a short time.")
-
 SF.ResourceCounters.Effects = { icon = "icon16/bullet_star.png", count = function(ply) return plyEffectBurst.max - plyEffectBurst:check(ply) end }
 
 -- Effect blacklist (keys are lowercase name).
@@ -44,13 +43,6 @@ local EFFECT_LIMITS = setmetatable({
 SF.effect_blacklist = EFFECT_BLACKLIST
 SF.effect_limits = EFFECT_LIMITS
 SF.default_effect_limits = DEFAULT_LIMITS
-
-local function checkRange(value, min, max, field)
-	if value ~= value or value < min or value > max then
-		SF.Throw("Effect " .. field .. " must be between " .. min .. " and " .. max, 3)
-	end
-	return value
-end
 
 local function clampInt(x, min, max)
 	checknumber(x)
@@ -109,10 +101,112 @@ instance:AddHook("initialize", function()
 	aunwrap1 = ang_meta.QuickUnwrap1
 end)
 
---- Creates an effect data structure
--- @return Effect Effect object
-function effect_library.create()
-	return wrap({
+-- Effect structure
+local Effect = {}
+
+-- Mapping of SF internal keys -> CEffectData setter methods & sanitization
+Effect.setters = {
+	angles = function(ed, v) ed:SetAngles(Angle(tonumber(v[1]) or 0, tonumber(v[2]) or 0, tonumber(v[3]) or 0)) end,
+	attachment = function(ed, v) ed:SetAttachment(clampInt(v, 0, 31)) end,
+	color = function(ed, v) ed:SetColor(clampInt(v, 0, 255)) end,
+	damagetype = function(ed, v) ed:SetDamageType(clampInt(v, 0, DMG_MISSILEDEFENSE)) end,
+	flags = function(ed, v) ed:SetFlags(clampInt(v, 0, 255)) end,
+	hitbox = function(ed, v) ed:SetHitBox(clampInt(v, 0, 2047)) end,
+	magnitude = function(ed, v) ed:SetMagnitude(v) end, -- Pre-checked in :check()
+	materialindex = function(ed, v) ed:SetMaterialIndex(clampInt(v, 0, 4095)) end,
+	normal = function(ed, v) ed:SetNormal(clampNormal(v)) end,
+	origin = function(ed, v) ed:SetOrigin(clampPos(Vector(tonumber(v[1]) or 0, tonumber(v[2]) or 0, tonumber(v[3]) or 0))) end,
+	radius = function(ed, v) ed:SetRadius(v) end, -- Pre-checked in :check()
+	scale = function(ed, v) ed:SetScale(v) end, -- Pre-checked in :check()
+	start = function(ed, v) ed:SetStart(clampPos(Vector(tonumber(v[1]) or 0, tonumber(v[2]) or 0, tonumber(v[3]) or 0))) end,
+	surfaceprop = function(ed, v) ed:SetSurfaceProp(clampInt(v, -1, 254)) end,
+	entindex = function(ed, v)
+		local idx = clampInt(v, -1, 8192)
+		if idx >= 0 then ed:SetEntIndex(idx) end
+	end,
+	entity = function(ed, v) ed:SetEntity(v or NULL) end,
+}
+
+-- Range checkers for magnitude/radius/scale based on effect name limits
+Effect.checkers = {
+	magnitude = function(limit, value) return value ~= value or value < limit[1] or value > limit[2] end,
+	radius = function(limit, value) return value ~= value or value < limit[1] or value > limit[2] end,
+	scale = function(limit, value) return value ~= value or value < limit[1] or value > limit[2] end,
+}
+
+Effect.__index = {
+	-- Validates effect data against limits for a specific effect name
+	check = function(self, name)
+		local limits = EFFECT_LIMITS[name]
+		for k, checker in pairs(Effect.checkers) do
+			local limit = limits[k]
+			if limit then
+				local value = self[k]
+				if value == nil then
+					self[k] = limit[1] -- Default to min if nil
+				elseif checker(limit, value) then
+					SF.Throw("Effect data '" .. k .. "' is out of bounds! " .. tostring(value), 4)
+				end
+			end
+		end
+	end,
+
+	-- Builds a sanitized CEffectData object from current state
+	getData = function(self)
+		-- Create Garry's CEffectData, feed it with sanitized values, and then play it immediately.
+		-- CEffectData is by-Garry-design a 'static singleton' (realloced every time with `EffectData()`).
+		-- This means you are not allowed to create multiple instances of it, such as storing them in a table.
+		-- Any setters, like SetMagnitude, will only modify the last created instance.
+		-- This was probably done for performance reasons.
+		-- The intended usage is to call `EffectData()`, followed by setters, and then call `util.Effect`.
+		-- Thanks Garry.
+		local ed = EffectData()
+
+		-- Ensure C++ object is valid just in case; better be safe than sorry.
+		if not IsValid(ed) then
+			SF.Throw("Invalid effect data", 3)
+		end
+
+		-- Handle entity vs entindex priority
+		if self.useEntity then
+			Effect.setters.entity(ed, self.entity)
+		else
+			Effect.setters.entindex(ed, self.entindex)
+		end
+
+		-- Apply all other setters
+		-- Because of the (realloced) shared reference, the values are carried over (not cleared).
+		-- Set all values, so we don't end up using garbage/older EffectData properties.
+		for k, setter in pairs(Effect.setters) do
+			if k ~= "entity" and k ~= "entindex" and self[k] ~= nil then
+				setter(ed, self[k])
+			end
+		end
+		return ed
+	end,
+
+	-- Plays the effect with full validation and burst checking
+	play = function(self, eff)
+		checkluatype(eff, TYPE_STRING)
+		checkpermission(instance, nil, "effect.play")
+
+		eff = string.lower(eff)
+		if EFFECT_BLACKLIST[eff] then
+			SF.Throw("Effect (" .. eff .. ") is blacklisted", 3)
+		end
+		if hook.Run("Starfall_CanEffect", eff, instance) == false then
+			SF.Throw("Effect (" .. eff .. ") has been blocked from running", 3)
+		end
+
+		-- Validate the effect and throw before consuming burst
+		self:check(eff)
+		plyEffectBurst:use(instance.player, 1)
+		util.Effect(eff, self:getData())
+	end,
+}
+
+Effect.__call = function(t)
+	return setmetatable({
 		angles = Angle(),
 		attachment = 0,
 		color = 0,
@@ -130,20 +224,30 @@ function effect_library.create()
 		scale = 1,
 		start = Vector(),
 		surfaceprop = 0,
-	})
+	}, t)
 end
 
---- Returns number of effects able to be created (global burst quota)
--- @return number Number of effects able to be created
+setmetatable(Effect, Effect)
+
+----------------------------------------------------------------------
+-- Library & Method Bindings
+----------------------------------------------------------------------
+
+--- Creates an effect data structure
+-- @return Effect Effect object
+function effect_library.create()
+	return wrap(Effect())
+end
+
+--- Returns the number of effects that can still be created within the burst quota
+-- @return number Number of remaining effects allowed by the burst quota
 function effect_library.effectsLeft()
 	return plyEffectBurst:check(instance.player)
 end
 
---- Returns whether a new effect can be created
--- @return boolean True if an effect can be created, false otherwise
+--- Returns whether another effect can be created within the burst quota
+-- @return boolean True if a new effect may be created, false otherwise
 function effect_library.canCreate()
-	-- Superusers can create any number of effects.
-	if instance.player == SF.Superuser then return true end
 	return plyEffectBurst:check(instance.player) >= 1
 end
 
@@ -162,13 +266,9 @@ end
 function effect_library.beamRingPoint(pos, lifetime, startRad, endRad, width, amplitude, color, speed, flags, framerate, material)
 	pos = vunwrap1(pos)
 	checkvector(pos)
-
 	checkpermission(instance, nil, "effect.play")
 
-	-- Superusers bypass the limits.
-	if instance.player ~= SF.Superuser then
-		plyEffectBurst:use(instance.player, 1)
-	end
+	plyEffectBurst:use(instance.player, 1)
 
 	lifetime = math.Clamp(lifetime, 0, 25.6)
 	startRad = math.Clamp(startRad, -4096, 4096)
@@ -188,103 +288,12 @@ end
 -- See also https://wiki.facepunch.com/gmod/Default_Effects
 -- @param string eff The effect type name to play
 function effect_methods:play(eff)
-	checkluatype(eff, TYPE_STRING)
-	checkpermission(instance, nil, "effect.play")
-
-	eff = string.lower(eff)
-
-	if EFFECT_BLACKLIST[eff] then
-		SF.Throw("Effect (" .. eff .. ") is blacklisted", 2)
-	end
-
-	if hook.Run("Starfall_CanEffect", eff, instance) == false then
-		SF.Throw("Effect (" .. eff .. ") has been blocked from running", 2)
-	end
-
-	-- Clamp/Sanitize our SF EffectData structure *before* creating Garry's CEffectData.
-	-- (To prevent heap memory exhaustion, GC/JIT mem pressure, etc.)
-	local data = unwrap(self)
-	local limits = EFFECT_LIMITS[eff]
-
-	local magnitude = checkRange(data.magnitude, limits.magnitude[1], limits.magnitude[2], "magnitude")
-	local radius = checkRange(data.radius, limits.radius[1], limits.radius[2], "radius")
-	local scale = checkRange(data.scale, limits.scale[1], limits.scale[2], "scale")
-
-	-- Global hard caps for effect data. Values outside these ranges can crash the engine.
-	local attachment = clampInt(data.attachment, 0, 31)
-	local color = clampInt(data.color, 0, 255)
-	local damagetype = clampInt(data.damagetype, 0, DMG_MISSILEDEFENSE)
-	local flags = clampInt(data.flags, 0, 255)
-	local hitbox = clampInt(data.hitbox, 0, 2047)
-	local materialindex = clampInt(data.materialindex, 0, 4095)
-	local surfaceprop = clampInt(data.surfaceprop, -1, 254)
-
-	local angles = Angle(
-		tonumber(data.angles[1]) or 0,
-		tonumber(data.angles[2]) or 0,
-		tonumber(data.angles[3]) or 0
-	)
-
-	local normal = clampNormal(data.normal)
-
-	local origin = clampPos(Vector(
-		tonumber(data.origin[1]) or 0,
-		tonumber(data.origin[2]) or 0,
-		tonumber(data.origin[3]) or 0
-	))
-
-	local start = clampPos(Vector(
-		tonumber(data.start[1]) or 0,
-		tonumber(data.start[2]) or 0,
-		tonumber(data.start[3]) or 0
-	))
-
-	-- Create Garry's CEffectData, feed it with sanitized values, and then play it immediately.
-	-- CEffectData is by-Garry-design a 'static singleton' (realloced every time with `EffectData()`).
-	-- This means you are not allowed to create multiple instances of it, such as storing them in a table.
-	-- Any setters, like SetMagnitude, will only modify the last created instance.
-	-- This was probably done for performance reasons.
-	-- The intended usage is to call `EffectData()`, followed by setters, and then call `util.Effect`.
-	-- Thanks Garry.
-	local ed = EffectData()
-	-- Ensure C++ object is valid just in case; better be safe than sorry.
-	if not IsValid(ed) then
-		SF.Throw("Invalid effect data", 2)
-	end
-
-	if data.useEntity then
-		ed:SetEntity(data.entity or NULL)
-	else
-		local entIndex = clampInt(data.entindex, -1, 8192)
-		if entIndex >= 0 then -- skip if -1
-			ed:SetEntIndex(entIndex)
-		end
-	end
-
-	-- Because of the (realloced) shared reference, the values are carried over (not cleared).
-	-- Set all values, so we don't end up using garbage/older EffectData properties.
-	ed:SetAngles(angles)
-	ed:SetAttachment(attachment)
-	ed:SetColor(color)
-	ed:SetDamageType(damagetype)
-	ed:SetFlags(flags)
-	ed:SetHitBox(hitbox)
-	ed:SetMagnitude(magnitude)
-	ed:SetMaterialIndex(materialindex)
-	ed:SetNormal(normal)
-	ed:SetOrigin(origin)
-	ed:SetRadius(radius)
-	ed:SetScale(scale)
-	ed:SetStart(start)
-	ed:SetSurfaceProp(surfaceprop)
-
-	-- Superusers bypass burst/frame quota.
-	if instance.player ~= SF.Superuser then
-		plyEffectBurst:use(instance.player, 1)
-	end
-
-	util.Effect(eff, ed)
+	unwrap(self):play(eff)
 end
+
+----------------------------------------------------------------------
+-- Getters / Setters (bridge between SF types and OO internals)
+----------------------------------------------------------------------
 
 --- Returns the effect's angle
 -- @return Angle The effect's angle
