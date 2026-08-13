@@ -119,7 +119,7 @@ end
 
 local function checkRange(value, min, max, field)
 	checknumber(value)
-	if value ~= value or value < min or value > max then
+	if value < min or value > max then
 		SF.Throw("Effect " .. field .. " must be between " .. min .. " and " .. max, 3)
 	end
 	return value
