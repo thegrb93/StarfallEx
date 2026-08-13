@@ -50,16 +50,16 @@ SF.global_effect_limits = GLOBAL_EFFECT_LIMITS
 SF.effect_limits = EFFECT_LIMITS
 SF.default_effect_limits = DEFAULT_LIMITS
 
--- Convar to limit the number of effects a single Starfall chip can create per frame/tick.
+-- Convar to limit the max number of effects a single Starfall chip can *create* per frame/tick.
 -- Set to 0 to disable the limit (not recommended).
 -- Not enforced for superusers.
--- This is intentionally set to 1 to conform to Garry design; read more in the effect_library.create function.
-local EFFECT_CREATE_LIMIT_CONVAR = CreateConVar("sf_effect_create_limit" .. (CLIENT and "_cl" or ""), "1", FCVAR_ARCHIVE, "Maximum number of effects a single Starfall chip can create per frame/tick. Set to 0 to disable the limit (not recommended). Not enforced for superusers.")
+local EFFECT_CREATE_LIMIT_CONVAR = CreateConVar("sf_effect_create_limit" .. (CLIENT and "_cl" or ""), "10", FCVAR_ARCHIVE, "Maximum number of effects a single Starfall chip can *create* per frame/tick. Set to 0 to disable the limit (not recommended). Not enforced for superusers.")
 
--- Convar to tune the per-frame limit value.
+-- Convar to limit the max number of effects a single Starfall chip can *play* per frame/tick.
 -- This prevents one chip from flooding the frame with expensive effects.
--- Set to 0 to disable the per-frame limit (not recommended).
-local EFFECT_FRAME_LIMIT_CONVAR = CreateConVar("sf_effect_frame_limit" .. (CLIENT and "_cl" or ""), "10", FCVAR_ARCHIVE, "Maximum number of effects a single Starfall chip can play per frame/tick. Set to 0 to disable the limit (not recommended). Not enforced for superusers.")
+-- Set to 0 to disable the limit (not recommended).
+-- Not enforced for superusers.
+local EFFECT_FRAME_LIMIT_CONVAR = CreateConVar("sf_effect_frame_limit" .. (CLIENT and "_cl" or ""), "10", FCVAR_ARCHIVE, "Maximum number of effects a single Starfall chip can *play* per frame/tick. Set to 0 to disable the limit (not recommended). Not enforced for superusers.")
 
 -- Instance-local effect frame counters, keyed by instance.
 -- Weak keys allow GC when instances are removed.
