@@ -36,7 +36,7 @@ local particle_effect_blacklist = {
 
 -- Exposed, so addons can modify it if needed.
 --   For example to block all (in case of emergency):
---     setmetatable(SF.particle_effect_blacklist, { __index = function() return false end })
+--     setmetatable(SF.particle_effect_blacklist, { __index = function() return true end })
 SF.particle_effect_blacklist = particle_effect_blacklist
 
 local function isBadParticleEffect(name, instance)
