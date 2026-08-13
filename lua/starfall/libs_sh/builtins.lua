@@ -955,24 +955,20 @@ function builtins_library.dodir(path, loadpriority)
 	return returns
 end
 
---- Like Lua 5.2 or LuaJIT's load/loadstring, except it has no mode parameter and, of course, the resulting function is in your instance's environment by default.
--- For compatibility with older versions of Starfall, loadstring is NOT an alias of this function like it is in vanilla Lua 5.2/LuaJIT.
+--- Similar to LuaJIT/5.2's `loadstring`/`load` functions, except it has no `mode` parameter and, of course, the resulting function is in your instance's environment by default.
+-- For compatibility with older versions of Starfall, `loadstring` is NOT an alias of this function like it is in vanilla LuaJIT/5.2.
 -- @param string code String to compile
 -- @param string? identifier Name of compiled function
 -- @param table? env Environment of compiled function
 -- @return function? Compiled function, or nil if failed to compile
 -- @return string? Error string, or nil if successfully compiled
-function builtins_library.loadstring(ld, source)
-	checkluatype(ld, TYPE_STRING)
-	if source == nil then
-		source = "=(load)"
-	else
-		checkluatype(source, TYPE_STRING)
-	end
-	source = "SF:"..source
-	local retval = SF.CompileString(ld, source, false)
+function builtins_library.loadstring(code, identifier, env)
+	checkluatype(code, TYPE_STRING)
+	if identifier ~= nil then checkluatype(identifier, TYPE_STRING) else identifier = "=(load)" end
+	if env ~= nil then checkluatype(env, TYPE_TABLE) end
+	local retval = SF.CompileString(code, "SF:" .. identifier, false)
 	if isfunction(retval) then
-		return setfenv(retval, instance.env)
+		return setfenv(retval, env or instance.env)
 	end
 	return nil, tostring(retval)
 end
