@@ -43,7 +43,7 @@ local function isBadParticleEffect(name, instance)
 end
 
 local function checkValid(peff)
-	if not IsValid(peff) then
+	if not peff:IsValid() then
 		SF.Throw("ParticleEffect emitter is no longer valid.", 2)
 	end
 	return peff -- for method chaining (simpler code)
