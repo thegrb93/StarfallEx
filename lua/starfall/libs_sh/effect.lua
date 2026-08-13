@@ -61,10 +61,6 @@ local EFFECT_CREATE_LIMIT_CONVAR = CreateConVar("sf_effect_create_limit" .. (CLI
 -- Set to 0 to disable the per-frame limit (not recommended).
 local EFFECT_FRAME_LIMIT_CONVAR = CreateConVar("sf_effect_frame_limit" .. (CLIENT and "_cl" or ""), "10", FCVAR_ARCHIVE, "Maximum number of effects a single Starfall chip can play per frame/tick. Set to 0 to disable the limit (not recommended). Not enforced for superusers.")
 
--- Weak-keyed table mapping EffectData userdata -> effect name string.
--- C++ userdata cannot have Lua fields attached, so we store the name here.
-local effectNames = setmetatable({}, { __mode = "k" })
-
 -- Instance-local effect frame counters, keyed by instance.
 -- Weak keys allow GC when instances are removed.
 local instanceEffectData = setmetatable({}, { __mode = "k" })
@@ -117,39 +113,33 @@ instance:AddHook("deinitialize", function()
 	instanceEffectData[instance] = nil
 end)
 
-local function getLimits(eff)
-	local name
-	if type(eff) == "string" then
-		name = eff
-	else
-		local ed = unwrap(eff)
-		name = effectNames[ed] or ""
-	end
-	local limits = EFFECT_LIMITS[string.lower(name)]
-	if limits then return limits end
-	return DEFAULT_LIMITS
+local function getLimitsForName(name)
+	return EFFECT_LIMITS[string.lower(name)] or DEFAULT_LIMITS
 end
 
 local function checkRange(value, min, max, field)
+	checknumber(value)
 	if value ~= value or value < min or value > max then
 		SF.Throw("Effect " .. field .. " must be between " .. min .. " and " .. max, 3)
 	end
 	return value
 end
 
-local function checkEffectField(eff, value, field)
-	local r = getLimits(eff)[field]
-	return checkRange(value, r[1], r[2], field)
-end
-
 local function clampInt(x, min, max)
 	checknumber(x)
+	if x ~= x then
+		x = min
+	end
 	x = floor(x)
+	if x ~= x then
+		x = min
+	end
 	return clamp(x, min, max)
 end
 
 local function clampNormal(raw)
-	local n = Vector(raw.x, raw.y, raw.z)
+	checkvector(raw)
+	local n = Vector(raw[1], raw[2], raw[3])
 	if n:LengthSqr() > 0 then
 		n:Normalize()
 	else
@@ -158,28 +148,42 @@ local function clampNormal(raw)
 	return n
 end
 
--- Unwrap and validate the EffectData userdata, throwing if invalid.
 local function checkEffectData(self)
-	local ed = unwrap(self)
-	if not IsValid(ed) then
+	local data = unwrap(self)
+	if not istable(data) or not data.__sfeffect then
 		SF.Throw("Invalid effect data", 3)
 	end
-	return ed
+	return data
 end
 
--- Sanitize all fields on an EffectData object before calling `util.Effect`.
--- This is the critical crash-prevention step.
-local function sanitizeEffectData(ed, eff)
-	-- The reason we are checking these again is to ensure C++ object is actually within the limits.
-	-- These will throw if they are out of range. CEffectData is a shared ref, thanks Garry.
-	checkEffectField(eff, ed:GetMagnitude(), "magnitude")
-	checkEffectField(eff, ed:GetRadius(), "radius")
-	checkEffectField(eff, ed:GetScale(), "scale")
-	-- The rest are clamped (within their setter function), but it might be a good idea to clamp them again.
+local function newEffectData()
+	return {
+		__sfeffect = true, -- special field for validation/debugging purposes, leave it alone
+		angles = Angle(),
+		attachment = 0,
+		color = 0,
+		damagetype = 0,
+		useEntity = false, -- whether to call SetEntity or SetEntIndex
+		entindex = -1, -- -1 means invalid (because 0 is the world); skipping SetEntIndex
+		entity = NULL,
+		flags = 0,
+		hitbox = 0,
+		magnitude = 0,
+		materialindex = 0,
+		normal = Vector(0, 0, 1),
+		origin = Vector(),
+		radius = 0,
+		scale = 1,
+		start = Vector(),
+		surfaceprop = 0,
+	}
 end
+
+-- Exposed, so addons can use it too.
+SF.newEffectData = newEffectData
 
 --- Creates an effect data structure
--- @return Effect Effect Object
+-- @return Effect Effect object
 function effect_library.create()
 	-- Superusers can create any number of effects.
 	if instance.player ~= SF.Superuser then
@@ -189,12 +193,8 @@ function effect_library.create()
 			SF.Throw("Effect create limit reached", 2)
 		end
 	end
-	-- NOTE:
-	-- CEffectData is by-Garry-design a 'static singleton' (realloced every time with `EffectData()`).
-	-- This means you are not allowed to create multiple instances of it, such as storing them in a table.
-	-- Any setters, like SetMagnitude, will only modify the last created instance.
-	-- Thanks Garry.
-	return wrap(EffectData())
+
+	return wrap(newEffectData())
 end
 
 --- Returns number of effects able to be created (global burst quota)
@@ -271,10 +271,10 @@ end
 -- @param string eff The effect type name to play
 function effect_methods:play(eff)
 	checkluatype(eff, TYPE_STRING)
-
 	checkpermission(instance, nil, "effect.play")
 
 	eff = string.lower(eff)
+
 	if EFFECT_BLACKLIST[eff] then
 		SF.Throw("Effect (" .. eff .. ") is blacklisted", 2)
 	end
@@ -284,21 +284,92 @@ function effect_methods:play(eff)
 	end
 
 	local limit = EFFECT_FRAME_LIMIT_CONVAR:GetInt()
-	-- Superusers bypass the limits.
+
+	-- Superusers bypass the frame limit.
 	if instance.player ~= SF.Superuser then
 		if limit > 0 and effectdata.frameCount >= limit then
 			SF.Throw("Too many effects spawned in one frame", 2)
 		end
 	end
 
-	local ed = checkEffectData(self)
-	effectNames[ed] = eff
+	-- Clamp/Sanitize our SF EffectData structure *before* creating Garry's CEffectData.
+	-- (To prevent heap memory exhaustion, GC/JIT mem pressure, etc.)
+	local data = checkEffectData(self)
+	local limits = getLimitsForName(eff)
 
-	-- Superusers bypass the limits.
+	local magnitude = checkRange(data.magnitude, limits.magnitude[1], limits.magnitude[2], "magnitude")
+	local radius = checkRange(data.radius, limits.radius[1], limits.radius[2], "radius")
+	local scale = checkRange(data.scale, limits.scale[1], limits.scale[2], "scale")
+
+	local attachment = clampInt(data.attachment, 0, 31)
+	local color = clampInt(data.color, 0, 255)
+	local damagetype = clampInt(data.damagetype, 0, GLOBAL_EFFECT_LIMITS.damage)
+	local flags = clampInt(data.flags, 0, GLOBAL_EFFECT_LIMITS.flags)
+	local hitbox = clampInt(data.hitbox, 0, 2047)
+	local materialindex = clampInt(data.materialindex, 0, 4095)
+	local surfaceprop = clampInt(data.surfaceprop, GLOBAL_EFFECT_LIMITS.surfaceprop_min, GLOBAL_EFFECT_LIMITS.surfaceprop_max)
+
+	local angles = Angle(
+		tonumber(data.angles[1]) or 0,
+		tonumber(data.angles[2]) or 0,
+		tonumber(data.angles[3]) or 0
+	)
+
+	local normal = clampNormal(data.normal)
+
+	local origin = clampPos(Vector(
+		tonumber(data.origin[1]) or 0,
+		tonumber(data.origin[2]) or 0,
+		tonumber(data.origin[3]) or 0
+	))
+
+	local start = clampPos(Vector(
+		tonumber(data.start[1]) or 0,
+		tonumber(data.start[2]) or 0,
+		tonumber(data.start[3]) or 0
+	))
+
+	-- Create Garry's CEffectData, feed it with user's values, and then play it immediately.
+	-- CEffectData is by-Garry-design a 'static singleton' (realloced every time with `EffectData()`).
+	-- This means you are not allowed to create multiple instances of it, such as storing them in a table.
+	-- Any setters, like SetMagnitude, will only modify the last created instance.
+	-- This was probably done for performane reasons.
+	-- The intended usage is to call `EffectData()`, followed by setters, and then call `util.Effect`.
+	-- Thanks Garry.
+	local ed = EffectData()
+	-- Ensure C++ object is valid just in case; better be safe than sorry.
+	if not IsValid(ed) then
+		SF.Throw("Invalid effect data", 2)
+	end
+
+	if data.useEntity then
+		ed:SetEntity(data.entity or NULL)
+	else
+		local entIndex = clampInt(data.entindex, -1, 8192)
+		if entIndex >= 0 then -- skip if -1
+			ed:SetEntIndex(entIndex)
+		end
+	end
+
+	ed:SetAngles(angles)
+	ed:SetAttachment(attachment)
+	ed:SetColor(color)
+	ed:SetDamageType(damagetype)
+	ed:SetFlags(flags)
+	ed:SetHitBox(hitbox)
+	ed:SetMagnitude(magnitude)
+	ed:SetMaterialIndex(materialindex)
+	ed:SetNormal(normal)
+	ed:SetOrigin(origin)
+	ed:SetRadius(radius)
+	ed:SetScale(scale)
+	ed:SetStart(start)
+	ed:SetSurfaceProp(surfaceprop)
+
+	-- Superusers bypass burst/frame quota.
 	if instance.player ~= SF.Superuser then
-		-- Sanitize before using burst so invalid data does not consume burst quota.
-		sanitizeEffectData(ed, eff)
 		plyEffectBurst:use(instance.player, 1)
+
 		if limit > 0 then
 			effectdata.frameCount = effectdata.frameCount + 1
 		end
@@ -310,207 +381,235 @@ end
 --- Returns the effect's angle
 -- @return Angle The effect's angle
 function effect_methods:getAngles()
-	return awrap(checkEffectData(self):GetAngles())
+	local data = checkEffectData(self)
+	return awrap(Angle(data.angles[1], data.angles[2], data.angles[3]))
 end
 
 --- Returns the effect's attachment
--- @return number The effect's attachment ID
+-- @return number The effect's attachment index
 function effect_methods:getAttachment()
-	return checkEffectData(self):GetAttachment()
+	return checkEffectData(self).attachment
 end
 
---- Returns byte which represents the color of the effect.
--- @return number The effect's color as a byte
+--- Returns byte which represents the color of the effect
+-- @return number The effect's color as a byte (from 0 to 255)
 function effect_methods:getColor()
-	return checkEffectData(self):GetColor()
+	return checkEffectData(self).color
 end
 
 --- Returns the effect's damagetype
 -- @return number The effect's damagetype
 function effect_methods:getDamageType()
-	return checkEffectData(self):GetDamageType()
+	return checkEffectData(self).damagetype
 end
 
 --- Returns the effect's entindex
--- @return number The effect's entindex
+-- @return number The effect's entindex, or -1 if invalid
 function effect_methods:getEntIndex()
-	return checkEffectData(self):GetEntIndex()
+	local data = checkEffectData(self)
+	if data.useEntity then
+		return IsValid(data.entity) and data.entity:EntIndex() or -1
+	end
+	local x = tonumber(data.entindex)
+	if not x or x ~= x then
+		x = -1 -- we treat -1 as invalid
+	end
+	return floor(x)
 end
 
 --- Returns the effect's entity
--- @return Entity The effect's entity
+-- @return Entity The effect's entity, or NULL if invalid
 function effect_methods:getEntity()
-	return ewrap(checkEffectData(self):GetEntity())
+	local data = checkEffectData(self)
+	if data.useEntity then
+		return ewrap(data.entity or NULL)
+	end
+	local x = tonumber(data.entindex)
+	if not x or x ~= x then
+		return ewrap(NULL)
+	end
+	return ewrap(Entity(clamp(floor(x), -1, 8192))) -- -1 will yield NULL
 end
 
 --- Returns the effect's flags
 -- @return number The effect's flags
 function effect_methods:getFlags()
-	return checkEffectData(self):GetFlags()
+	return checkEffectData(self).flags
 end
 
---- Returns the effect's hitbox ID
--- @return number The effect's hitbox ID
+--- Returns the effect's hitbox index
+-- @return number The effect's hitbox index
 function effect_methods:getHitBox()
-	return checkEffectData(self):GetHitBox()
+	return checkEffectData(self).hitbox
 end
 
 --- Returns the effect's magnitude
 -- @return number The effect's magnitude
 function effect_methods:getMagnitude()
-	return checkEffectData(self):GetMagnitude()
+	return checkEffectData(self).magnitude
 end
 
 --- Returns the effect's material index
 -- @return number The effect's material index
 function effect_methods:getMaterialIndex()
-	return checkEffectData(self):GetMaterialIndex()
+	return checkEffectData(self).materialindex
 end
 
 --- Returns the effect's normal
 -- @return Vector The effect's normal
 function effect_methods:getNormal()
-	return vwrap(checkEffectData(self):GetNormal())
+	local data = checkEffectData(self)
+	return vwrap(Vector(data.normal[1], data.normal[2], data.normal[3]))
 end
 
 --- Returns the effect's origin
 -- @return Vector The effect's origin
 function effect_methods:getOrigin()
-	return vwrap(checkEffectData(self):GetOrigin())
+	local data = checkEffectData(self)
+	return vwrap(Vector(data.origin[1], data.origin[2], data.origin[3]))
 end
 
 --- Returns the effect's radius
 -- @return number The effect's radius
 function effect_methods:getRadius()
-	return checkEffectData(self):GetRadius()
+	return checkEffectData(self).radius
 end
 
 --- Returns the effect's scale
 -- @return number The effect's scale
 function effect_methods:getScale()
-	return checkEffectData(self):GetScale()
+	return checkEffectData(self).scale
 end
 
 --- Returns the effect's start position
 -- @return Vector The effect's start position
 function effect_methods:getStart()
-	return vwrap(checkEffectData(self):GetStart())
+	local data = checkEffectData(self)
+	return vwrap(Vector(data.start[1], data.start[2], data.start[3]))
 end
 
 --- Returns the effect's surface prop
--- @return number The effect's surface property index
+-- @return number The effect's surface property index (from -1 to 254)
 function effect_methods:getSurfaceProp()
-	return checkEffectData(self):GetSurfaceProp()
+	return checkEffectData(self).surfaceprop
 end
 
 --- Sets the effect's angles
 -- @param Angle ang The angles
 function effect_methods:setAngles(ang)
-	checkEffectData(self):SetAngles(aunwrap1(ang))
+	local a = aunwrap1(ang)
+	checkEffectData(self).angles = Angle(a[1], a[2], a[3])
 end
 
---- Sets the effect's attachment
--- @param number attachment The new attachment ID of the effect
+--- Sets the effect's attachment index
+-- @param number attachment The new attachment index of the effect
 function effect_methods:setAttachment(attachment)
 	checkluatype(attachment, TYPE_NUMBER)
-	checkEffectData(self):SetAttachment(clampInt(attachment, 0, 31))
+	checkEffectData(self).attachment = attachment
 end
 
 --- Sets the effect's color
 -- Internally stored as an integer, but only first 8 bits are networked, effectively limiting this function to 0-255 range.
--- @param number color The color represented by a byte 0-255.
+-- @param number color The color represented by a byte (from 0 to 255).
 function effect_methods:setColor(color)
 	checkluatype(color, TYPE_NUMBER)
-	checkEffectData(self):SetColor(clampInt(color, 0, 255))
+	checkEffectData(self).color = color
 end
 
 --- Sets the effect's damage type
--- @param number dmgtype The damage type, see the DMG enums
+-- @param number dmgtype The damage type (see DMG enum)
 function effect_methods:setDamageType(dmgtype)
 	checkluatype(dmgtype, TYPE_NUMBER)
-	checkEffectData(self):SetDamageType(clampInt(dmgtype, 0, GLOBAL_EFFECT_LIMITS.damage))
+	checkEffectData(self).damagetype = dmgtype
 end
 
 --- Sets the effect's entity index
 -- @param number index The entity index
 function effect_methods:setEntIndex(index)
 	checkluatype(index, TYPE_NUMBER)
-	checkEffectData(self):SetEntIndex(clampInt(index, 0, 8192))
+	local data = checkEffectData(self)
+	data.useEntity = false
+	data.entindex = index
 end
 
 --- Sets the effect's entity
 -- @param Entity ent The entity
 function effect_methods:setEntity(ent)
-	checkEffectData(self):SetEntity(eunwrap(ent))
+	local data = checkEffectData(self)
+	data.useEntity = true
+	data.entity = eunwrap(ent)
 end
 
 --- Sets the effect's flags
 -- @param number flags The flags
 function effect_methods:setFlags(flags)
 	checkluatype(flags, TYPE_NUMBER)
-	checkEffectData(self):SetFlags(clampInt(flags, 0, GLOBAL_EFFECT_LIMITS.flags))
+	checkEffectData(self).flags = flags
 end
 
 --- Sets the effect's hitbox
--- @param number hitbox The hitbox
+-- @param number hitbox The hitbox index
 function effect_methods:setHitBox(hitbox)
 	checkluatype(hitbox, TYPE_NUMBER)
-	checkEffectData(self):SetHitBox(clampInt(hitbox, 0, 2047))
+	checkEffectData(self).hitbox = hitbox
 end
 
 --- Sets the effect's magnitude
 -- @param number magnitude The magnitude
 function effect_methods:setMagnitude(magnitude)
 	checkluatype(magnitude, TYPE_NUMBER)
-	checkEffectData(self):SetMagnitude(checkEffectField(self, magnitude, "magnitude"))
+	checkEffectData(self).magnitude = magnitude
 end
 
 --- Sets the effect's material index
 -- @param number mat The material index
 function effect_methods:setMaterialIndex(mat)
 	checkluatype(mat, TYPE_NUMBER)
-	checkEffectData(self):SetMaterialIndex(clampInt(mat, 0, 4095))
+	checkEffectData(self).materialindex = mat
 end
 
 --- Sets the effect's normal
 -- @param Vector normal The vector normal
 function effect_methods:setNormal(normal)
-	checkEffectData(self):SetNormal(clampNormal(vunwrap1(normal)))
+	local v = vunwrap1(normal)
+	checkEffectData(self).normal = Vector(v[1], v[2], v[3])
 end
 
 --- Sets the effect's origin
 -- @param Vector origin The vector origin
 function effect_methods:setOrigin(origin)
-	checkEffectData(self):SetOrigin(clampPos(vunwrap1(origin)))
+	local v = vunwrap1(origin)
+	checkEffectData(self).origin = Vector(v[1], v[2], v[3])
 end
 
 --- Sets the effect's radius
 -- @param number radius The radius
 function effect_methods:setRadius(radius)
 	checkluatype(radius, TYPE_NUMBER)
-	checkEffectData(self):SetRadius(checkEffectField(self, radius, "radius"))
+	checkEffectData(self).radius = radius
 end
 
 --- Sets the effect's scale
 -- @param number scale The number scale
 function effect_methods:setScale(scale)
 	checkluatype(scale, TYPE_NUMBER)
-	checkEffectData(self):SetScale(checkEffectField(self, scale, "scale"))
+	checkEffectData(self).scale = scale
 end
 
---- Sets the effect's start pos
--- Limited to world bounds (+-16386 on every axis) and has horrible networking precision. (17 bit float per component)
+--- Sets the effect's start position
+-- Limited to world bounds (+-16386 on every axis), and has horrible networking precision (17 bit float per component).
 -- @param Vector start The vector start
 function effect_methods:setStart(start)
-	checkEffectData(self):SetStart(clampPos(vunwrap1(start)))
+	local v = vunwrap1(start)
+	checkEffectData(self).start = Vector(v[1], v[2], v[3])
 end
 
 --- Sets the effect's surface property
--- Internally stored as an integer, but only first 8 bits are networked, effectively limiting this function to -1-254 range.(yes, that's not a mistake)
+-- Internally stored as an integer, but only first 8 bits are networked (from -1 to 254, yes, that's not a mistake).
 -- @param number prop The surface property index
 function effect_methods:setSurfaceProp(prop)
 	checkluatype(prop, TYPE_NUMBER)
-	checkEffectData(self):SetSurfaceProp(clampInt(prop, GLOBAL_EFFECT_LIMITS.surfaceprop_min, GLOBAL_EFFECT_LIMITS.surfaceprop_max))
+	checkEffectData(self).surfaceprop = prop
 end
 
 end
