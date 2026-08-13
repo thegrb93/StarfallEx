@@ -599,7 +599,7 @@ function instance:cleanupRender()
 	end
 	for i = #view_matrix_stack, 1, -1 do
 		local ok, err = pcall(cam[view_matrix_stack[i]])
-		if not ok then ErrorNoHalt(err) end
+		if not ok then ErrorNoHalt(tostring(err) .. "\n") end
 		view_matrix_stack[i] = nil
 	end
 	if renderdata.changedFilterMag then
