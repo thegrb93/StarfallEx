@@ -10,19 +10,15 @@ SF.ResourceCounters.ParticleEffects = { icon = "icon16/asterisk_orange.png", cou
 
 --- ParticleEffect library.
 -- @name particleEffect
--- @shared
 -- @class library
 -- @libtbl particleef_library
 SF.RegisterLibrary("particleEffect")
 
-if CLIENT then
 --- ParticleEffect type
 -- @name ParticleEffect
--- @client
 -- @class type
 -- @libtbl particleef_methods
 SF.RegisterType("ParticleEffect", false, false)
-end
 
 -- Must precache particle effects (on server-side!), otherwise this library won't work (Emitter tool does this as well).
 game.AddParticles("particles/gmod_effects.pcf")
@@ -31,12 +27,12 @@ PrecacheParticleSystem("generic_smoke")
 
 -- Blacklist for bad/expensive particle effects (keys are lowercased name).
 local particle_effect_blacklist = {
-	-- none,                  yet
+	-- none, yet
 }
 
 -- Exposed, so addons can modify it if needed.
---   For example to block all (in case of emergency):
---     setmetatable(SF.particle_effect_blacklist, { __index = function() return true end })
+-- For example to block all (in case of emergency):
+--   setmetatable(SF.particle_effect_blacklist, { __index = function() return true end })
 SF.particle_effect_blacklist = particle_effect_blacklist
 
 local function isBadParticleEffect(name, instance)
@@ -59,25 +55,14 @@ local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check
 
 local particleef_library = instance.Libraries.particleEffect
 
--- The ParticleEffect type is only registered on the client (see the `if CLIENT`
--- block near the top of the file). On a dedicated server this shared library only
--- exists to precache particle systems, so the type-dependent bindings below must
--- only be resolved when they actually exist.
-local particleef_methods
-local particle_meta, wrap, unwrap
-local vec_meta, vwrap, vunwrap
-
+local particleef_methods = instance.Types.ParticleEffect.Methods
+local particle_meta, wrap, unwrap = instance.Types.ParticleEffect, instance.Types.ParticleEffect.Wrap, instance.Types.ParticleEffect.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
-
-if CLIENT then
-	particleef_methods = instance.Types.ParticleEffect.Methods
-	particle_meta, wrap, unwrap = instance.Types.ParticleEffect, instance.Types.ParticleEffect.Wrap, instance.Types.ParticleEffect.Unwrap
-	vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
-end
 
 local vunwrap1
 instance:AddHook("initialize", function()
-	vunwrap1 = vec_meta and vec_meta.QuickUnwrap1
+	vunwrap1 = vec_meta.QuickUnwrap1
 end)
 
 local particle_effects = {} -- setmetatable({}, { __mode = "k" })
@@ -88,14 +73,13 @@ instance:AddHook("deinitialize", function()
 		if IsValid(peff) then
 			peff:StopEmissionAndDestroyImmediately()
 		end
-		plyCount:free(instance.player, 1)
+		plyCount:free(instance.player, 1) -- FIXME: what about superusers?
 		particle_effects[peff] = nil
 	end
 end)
 
 
 --- Creates a particle effect (and attaches it to an entity).
--- CRITICAL NOTE: You must call this on server-side and client-side (to precache the particle effect)!
 -- @param Entity entity The entity to attach the particle effect to
 -- @param string name The name of the effect to create (e.g. "generic_smoke")
 -- @param number pattach See PATTACH enum
@@ -104,13 +88,13 @@ end)
 -- Entity entity - The parent entity (default: NULL).
 -- Vector position - The offset position for the given control point (default: nil).
 -- This only affects the control points of the particle effects, and will do nothing if the effect doesn't use control points.
--- @return ParticleEffect? On client-side: ParticleEffect object.
--- On server-side: no value (only precaching).
+-- @return ParticleEffect ParticleEffect object.
 function particleef_library.attach(entity, name, pattach, options)
 	checkluatype(name, TYPE_STRING)
 	checkluatype(pattach, TYPE_NUMBER)
 	if options ~= nil then checkluatype(options, TYPE_TABLE) end
 
+	-- Must unwrap the entity before checking the permission
 	entity = eunwrap(entity)
 	-- No need to validate entity; allow attaching to the world entity (which has IsValid = false)
 
@@ -126,8 +110,6 @@ function particleef_library.attach(entity, name, pattach, options)
 
 	-- NOTE: Only 4096 can be precached on server-side; no limit on client-side.
 	PrecacheParticleSystem(name)
-	-- Exit early on server-side, we only care about precaching on server-side.
-	if SERVER then return end
 
 	-- Sanitize the options table.
 	local cleanOptions
@@ -164,7 +146,6 @@ function particleef_library.attach(entity, name, pattach, options)
 	return wrap(pEffect)
 end
 
-if CLIENT then
 --- Determines whether the particle effect is valid or not.
 -- @return boolean Is valid or not
 function particleef_methods:isValid()
@@ -190,7 +171,7 @@ function particleef_methods:destroy()
 			peff:StopEmissionAndDestroyImmediately()
 		end
 		particle_effects[peff] = nil
-		plyCount:free(instance.player, 1)
+		plyCount:free(instance.player, 1) -- FIXME: what about superusers?
 	end
 end
 
@@ -260,8 +241,6 @@ function particleef_methods:setControlPointParent(id, parentid)
 	checkluatype(id, TYPE_NUMBER)
 	checkluatype(parentid, TYPE_NUMBER)
 	checkValid(unwrap(self)):SetControlPointParent(id, parentid)
-end
-
 end
 
 end
