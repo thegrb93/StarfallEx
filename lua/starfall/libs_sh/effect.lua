@@ -157,7 +157,6 @@ Effect.__index = {
 
 	-- Builds a sanitized CEffectData object from current state
 	getData = function(self)
-		-- Create Garry's CEffectData, feed it with sanitized values, and then play it immediately.
 		-- CEffectData is by-Garry-design a 'static singleton' (realloced every time with `EffectData()`).
 		-- This means you are not allowed to create multiple instances of it, such as storing them in a table.
 		-- Any setters, like SetMagnitude, will only modify the last created instance.
@@ -205,6 +204,7 @@ Effect.__index = {
 		-- Validate the effect and throw before consuming burst
 		self:check(eff)
 		plyEffectBurst:use(instance.player, 1)
+		-- Create Garry's CEffectData, feed it with sanitized values, and then play it immediately
 		util.Effect(eff, self:getData())
 	end,
 }
