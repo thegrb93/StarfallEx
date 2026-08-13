@@ -329,11 +329,11 @@ function effect_methods:play(eff)
 		tonumber(data.start[3]) or 0
 	))
 
-	-- Create Garry's CEffectData, feed it with user's values, and then play it immediately.
+	-- Create Garry's CEffectData, feed it with sanitized values, and then play it immediately.
 	-- CEffectData is by-Garry-design a 'static singleton' (realloced every time with `EffectData()`).
 	-- This means you are not allowed to create multiple instances of it, such as storing them in a table.
 	-- Any setters, like SetMagnitude, will only modify the last created instance.
-	-- This was probably done for performane reasons.
+	-- This was probably done for performance reasons.
 	-- The intended usage is to call `EffectData()`, followed by setters, and then call `util.Effect`.
 	-- Thanks Garry.
 	local ed = EffectData()
