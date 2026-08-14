@@ -6,7 +6,7 @@ local IsValid = IsValid
 registerprivilege("particleEffect.attach", "Attach a particle effect", "Allows users to attach particle effects to entities", { client = {}, entities = {} })
 
 local plyCount = SF.LimitObject("particleeffects", "particle effects", 16, "The number of created particle effects via Starfall per client at once")
-SF.ResourceCounters.ParticleEffects = { icon = "icon16/asterisk_orange.png", count = function(ply) return plyCount:get(ply) end }
+SF.ResourceCounters.ParticleEffects = {icon = "icon16/asterisk_orange.png", count = function(ply) return plyCount:get(ply) end}
 
 --- ParticleEffect library.
 -- @name particleEffect
@@ -186,22 +186,21 @@ return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 local particleef_library = instance.Libraries.particleEffect
-
 local particleef_methods = instance.Types.ParticleEffect.Methods
+
 local particle_meta, wrap, unwrap = instance.Types.ParticleEffect, instance.Types.ParticleEffect.Wrap, instance.Types.ParticleEffect.Unwrap
-local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 
 local vunwrap1
+local particleEffects = {}
 instance:AddHook("initialize", function()
 	vunwrap1 = vec_meta.QuickUnwrap1
 end)
 
-local particle_effects = {} -- setmetatable({}, { __mode = "k" })
-
 instance:AddHook("deinitialize", function()
 	-- Remove all
-	for p in pairs(particle_effects) do
+	for p in pairs(particleEffects) do
 		if p:IsValid() then
 			p:StopEmissionAndDestroyImmediately()
 		end
@@ -211,7 +210,7 @@ end)
 
 
 --- Creates a particle effect (and attaches it to an entity).
--- @param Entity entity The entity to attach the particle effect to (can be world, must not be NULL)
+-- @param Entity entity The entity to attach the particle effect to (can be world)
 -- @param string name The name of the effect to create (e.g. "generic_smoke")
 -- @param number pattach See PATTACH enum
 -- @param table? options Optional table of tables (indexes 1 to 64) having the following structure:
@@ -224,17 +223,9 @@ function particleef_library.attach(entity, name, pattach, options)
 	checkluatype(name, TYPE_STRING)
 	checkluatype(pattach, TYPE_NUMBER)
 
-	-- Must unwrap the entity before checking the permission
 	entity = eunwrap(entity)
-	-- No need to validate entity; allow attaching to the world entity (which has IsValid = false)
-	-- So, we have to explicitly refuse NULL without using IsValid
-	if entity == NULL then
-		SF.Throw("Invalid entity", 2)
-	end
-
 	checkpermission(instance, entity, "particleEffect.attach")
 
-	-- Superusers bypass the limits.
 	if instance.player ~= SF.Superuser and isBadParticleEffect(name, instance) then
 		SF.Throw("Bad particle effect: " .. name, 2)
 	end
@@ -274,7 +265,7 @@ function particleef_library.attach(entity, name, pattach, options)
 		SF.Throw("Invalid particle effect system.", 2)
 	end
 
-	particle_effects[pEffect] = true
+	particleEffects[pEffect] = true
 
 	return wrap(pEffect)
 end
@@ -282,7 +273,7 @@ end
 --- Determines whether the particle effect is valid or not.
 -- @return boolean Is valid or not
 function particleef_methods:isValid()
-	return unwrap(self):IsValid()
+	return IsValid(particle_meta.sf2sensitive[self])
 end
 
 --- Starts emission of the particle effect.
@@ -298,11 +289,11 @@ end
 --- Stops emission of the particle effect and destroys the object.
 function particleef_methods:destroy()
 	local peff = unwrap(self)
-	if peff and particle_effects[peff] then
+	if particleEffects[peff] then
 		if peff:IsValid() then
 			peff:StopEmissionAndDestroyImmediately()
 		end
-		particle_effects[peff] = nil
+		particleEffects[peff] = nil
 		plyCount:free(instance.player, 1)
 		particle_meta.sf2sensitive[self] = nil -- make sure that future unwrap throws an error
 	end
@@ -317,7 +308,7 @@ end
 -- @return boolean True if the particle effect is finished
 function particleef_methods:isFinished()
 	local peff = unwrap(self)
-	return peff and IsValid(peff) and peff:IsFinished() or false
+	return not peff:IsValid() or peff:IsFinished()
 end
 
 --- Sets the sort origin for the given particle effect system.
