@@ -4,7 +4,6 @@ local floor = math.floor
 local checkluatype = SF.CheckLuaType
 local checknumber = SF.CheckNumber
 local checkvector = SF.CheckVector
-local clampPos = SF.clampPos
 
 -- Register Privileges
 SF.Permissions.registerPrivilege("effect.play", "Effect", "Allows the user to play effects", { client = {} })
@@ -23,9 +22,22 @@ local EFFECT_BLACKLIST = {
 
 -- Default effect limits. Each property uses named fields: min, max, default.
 local DEFAULT_LIMITS = {
+	-- These limits are not made up, they are straight from Source Engine SDK
+	-- https://github.com/ValveSoftware/source-sdk-2013/blob/master/src/game/shared/effect_dispatch_data.cpp
+	attachment = { min = 0, max = 31, default = 0 },
+	color = { min = 0, max = 255, default = 0 },
+	damagetype = { min = 0, max = DMG_MISSILEDEFENSE, default = 0 },
+	entindex = { min = -1, max = 8192, default = -1 },
+	flags = { min = 0, max = 255, default = 0 },
+	hitbox = { min = 0, max = 2047, default = 0 },
 	magnitude = { min = 0, max = 1023, default = 0 },
+	materialindex = { min = 0, max = 4095, default = 0 },
+	normal = { default = Vector(0, 0, 1) },
+	origin = { default = Vector() },
 	radius = { min = 0, max = 1023, default = 0 },
-	scale = { min = -1e7, max = 1e7, default = 1 },
+	scale = { min = -1e6, max = 1e6, default = 1 }, -- full 32-bit float in engine, but we clamp it
+	start = { default = Vector() },
+	surfaceprop = { min = -1, max = 254, default = -1 },
 }
 
 -- Index: effect name (lowercase) -> { magnitude = { min = number, max = number, default = number }, radius = {...}, scale = {...} }
@@ -44,32 +56,28 @@ SF.effect_blacklist = EFFECT_BLACKLIST
 SF.effect_limits = EFFECT_LIMITS
 SF.default_effect_limits = DEFAULT_LIMITS
 
-local function checkRange(limit, value)
+-- Helper checker for range properties
+local function checkRange(limit, value, self, key)
 	return value ~= value or value < limit.min or value > limit.max
 end
 
-local function clampInt(x, min, max)
-	checknumber(x)
-	if x ~= x then
-		x = min
-	end
-	x = floor(x)
-	if x ~= x then
-		x = min
-	end
-	return clamp(x, min, max)
+-- Helper checker for normal vector (validates and normalizes)
+local function checkNormal(limit, value, self, key)
+	-- As per GMod docs, effect's normal must be a normalized (length=1) vector for networking purposes
+	local n = isvector(value) and value or Vector(value[1] or 0, value[2] or 0, value[3] or 0)
+	-- Store as Vector for consistency with Effect object storage
+	self[key] = n:LengthSqr() > 0 and n:GetNormalized() or Vector(0, 0, 1)
+	return false
 end
 
-local function clampNormal(raw)
-	-- As per GMod docs, effect's normal must be a normalized (length=1) vector for networking purposes
-	checkvector(raw)
-	local n = Vector(raw[1], raw[2], raw[3])
-	if n:LengthSqr() > 0 then
-		n:Normalize()
-	else
-		n = Vector(0, 0, 1)
-	end
-	return n
+-- Helper checker for position vectors (validates and clamps to world bounds)
+local function checkPos(limit, value, self, key)
+	-- Store as Vector for consistency with Effect object storage
+	self[key] = isvector(value) and
+		Vector(clamp(value[1], -16386, 16386), clamp(value[2], -16386, 16386), clamp(value[3], -16386, 16386))
+		or
+		Vector(clamp(value[1] or 0, -16386, 16386), clamp(value[2] or 0, -16386, 16386), clamp(value[3] or 0, -16386, 16386))
+	return false
 end
 
 
@@ -108,31 +116,42 @@ end)
 -- Effect structure
 local Effect = {}
 
--- Mapping of SF internal keys -> CEffectData setter methods & sanitization
+-- Mapping of SF internal keys -> CEffectData setter methods
 Effect.setters = {
 	angles = function(ed, v) ed:SetAngles(Angle(tonumber(v[1]) or 0, tonumber(v[2]) or 0, tonumber(v[3]) or 0)) end,
-	attachment = function(ed, v) ed:SetAttachment(clampInt(v, 0, 31)) end,
-	color = function(ed, v) ed:SetColor(clampInt(v, 0, 255)) end,
-	damagetype = function(ed, v) ed:SetDamageType(clampInt(v, 0, DMG_MISSILEDEFENSE)) end,
-	flags = function(ed, v) ed:SetFlags(clampInt(v, 0, 255)) end,
-	hitbox = function(ed, v) ed:SetHitBox(clampInt(v, 0, 2047)) end,
-	magnitude = function(ed, v) ed:SetMagnitude(v) end, -- Pre-checked in :check()
-	materialindex = function(ed, v) ed:SetMaterialIndex(clampInt(v, 0, 4095)) end,
-	normal = function(ed, v) ed:SetNormal(clampNormal(v)) end,
-	origin = function(ed, v) ed:SetOrigin(clampPos(Vector(tonumber(v[1]) or 0, tonumber(v[2]) or 0, tonumber(v[3]) or 0))) end,
-	radius = function(ed, v) ed:SetRadius(v) end, -- Pre-checked in :check()
-	scale = function(ed, v) ed:SetScale(v) end, -- Pre-checked in :check()
-	start = function(ed, v) ed:SetStart(clampPos(Vector(tonumber(v[1]) or 0, tonumber(v[2]) or 0, tonumber(v[3]) or 0))) end,
-	surfaceprop = function(ed, v) ed:SetSurfaceProp(clampInt(v, -1, 254)) end,
-	entindex = function(ed, v) ed:SetEntIndex(clampInt(v, -1, 8192)) end,
+	attachment = function(ed, v) ed:SetAttachment(v) end,
+	color = function(ed, v) ed:SetColor(v) end,
+	damagetype = function(ed, v) ed:SetDamageType(v) end,
+	entindex = function(ed, v) ed:SetEntIndex(v) end,
 	entity = function(ed, v) ed:SetEntity(v or NULL) end,
+	flags = function(ed, v) ed:SetFlags(v) end,
+	hitbox = function(ed, v) ed:SetHitBox(v) end,
+	magnitude = function(ed, v) ed:SetMagnitude(v) end,
+	materialindex = function(ed, v) ed:SetMaterialIndex(v) end,
+	normal = function(ed, v) ed:SetNormal(v) end,
+	origin = function(ed, v) ed:SetOrigin(v) end,
+	radius = function(ed, v) ed:SetRadius(v) end,
+	scale = function(ed, v) ed:SetScale(v) end,
+	start = function(ed, v) ed:SetStart(v) end,
+	surfaceprop = function(ed, v) ed:SetSurfaceProp(v) end,
 }
 
--- Range checkers for magnitude/radius/scale based on effect name limits
+-- Checkers for validating effect properties based on effect name limits
 Effect.checkers = {
+	attachment = checkRange,
+	color = checkRange,
+	damagetype = checkRange,
+	entindex = checkRange,
+	flags = checkRange,
+	hitbox = checkRange,
 	magnitude = checkRange,
+	materialindex = checkRange,
+	normal = checkNormal,
+	origin = checkPos,
 	radius = checkRange,
 	scale = checkRange,
+	start = checkPos,
+	surfaceprop = checkRange,
 }
 
 Effect.__index = {
@@ -145,7 +164,7 @@ Effect.__index = {
 				local value = self[k]
 				if value == nil then
 					self[k] = limit.default
-				elseif checker(limit, value) then
+				elseif checker(limit, value, self, k) then
 					SF.Throw("Effect data '" .. k .. "' is out of bounds! " .. tostring(value), 4)
 				end
 			end
@@ -287,16 +306,16 @@ function effect_library.beamRingPoint(pos, lifetime, startRad, endRad, width, am
 
 	plyEffectBurst:use(instance.player, 1)
 
-	lifetime = math.Clamp(lifetime, 0, 25.6)
-	startRad = math.Clamp(startRad, -4096, 4096)
-	endRad = math.Clamp(endRad, -4096, 4096)
-	width = math.Clamp(width, 0, 128)
-	amplitude = math.Clamp(amplitude, 0, 64)
+	lifetime = clamp(lifetime, 0, 25.6)
+	startRad = clamp(startRad, -4096, 4096)
+	endRad = clamp(endRad, -4096, 4096)
+	width = clamp(width, 0, 128)
+	amplitude = clamp(amplitude, 0, 64)
 
 	effects.BeamRingPoint(pos, lifetime, startRad, endRad, width, amplitude, cunwrap(color), {
-		speed = speed and math.Clamp(speed, 0, 255),
+		speed = speed and clamp(speed, 0, 255),
 		flags = flags,
-		framerate = framerate and math.Clamp(framerate, 0, 255),
+		framerate = framerate and clamp(framerate, 0, 255),
 		material = material,
 	})
 end
@@ -335,8 +354,8 @@ function effect_methods:getColor()
 	return unwrap(self).color
 end
 
---- Returns the effect's damagetype
--- @return number The effect's damagetype
+--- Returns the effect's damage type
+-- @return number The effect's damage type (see DMG enum)
 function effect_methods:getDamageType()
 	return unwrap(self).damagetype
 end
@@ -370,25 +389,27 @@ function effect_methods:getEntity()
 end
 
 --- Returns the effect's flags
--- @return number The effect's flags
+-- What flags do depends entirely on the effect
+-- See also https://wiki.facepunch.com/gmod/Default_Effects
+-- @return number The effect's flags (each effect has their own flags)
 function effect_methods:getFlags()
 	return unwrap(self).flags
 end
 
 --- Returns the effect's hitbox index
--- @return number The effect's hitbox index
+-- @return number The effect's hitbox index (from 0 to 2047)
 function effect_methods:getHitBox()
 	return unwrap(self).hitbox
 end
 
 --- Returns the effect's magnitude
--- @return number The effect's magnitude
+-- @return number The effect's magnitude (from 0 to 1023)
 function effect_methods:getMagnitude()
 	return unwrap(self).magnitude
 end
 
 --- Returns the effect's material index
--- @return number The effect's material index
+-- @return number The effect's material index (from 0 to 4095)
 function effect_methods:getMaterialIndex()
 	return unwrap(self).materialindex
 end
@@ -406,24 +427,24 @@ function effect_methods:getOrigin()
 end
 
 --- Returns the effect's radius
--- @return number The effect's radius
+-- @return number The effect's radius (from 0 to 1023)
 function effect_methods:getRadius()
 	return unwrap(self).radius
 end
 
 --- Returns the effect's scale
--- @return number The effect's scale
+-- @return number The effect's scale (clamped: +-1e6)
 function effect_methods:getScale()
 	return unwrap(self).scale
 end
 
 --- Returns the effect's start position
--- @return Vector The effect's start position
+-- @return Vector The effect's start position (limited to +-16386 on every axis)
 function effect_methods:getStart()
 	return vwrap(unwrap(self).start)
 end
 
---- Returns the effect's surface prop
+--- Returns the effect's surface property index
 -- @return number The effect's surface property index (from -1 to 254)
 function effect_methods:getSurfaceProp()
 	return unwrap(self).surfaceprop
@@ -442,8 +463,9 @@ function effect_methods:setAttachment(attachment)
 	unwrap(self).attachment = attachment
 end
 
---- Sets the effect's color
--- Internally stored as an integer, but only first 8 bits are networked (from 0 to 255)
+--- Sets the effect's color.
+-- Internally stored as an integer, but only first 8 bits are networked (from 0 to 255).
+-- What this will actually do will vary from effect to effect, depending on how a specific effect uses this given data, if at all.
 -- @param number color The color represented by a byte (from 0 to 255)
 function effect_methods:setColor(color)
 	checkluatype(color, TYPE_NUMBER)
@@ -477,7 +499,7 @@ end
 --- Sets the effect's flags.
 -- What flags do depends entirely on the effect.
 -- See also https://wiki.facepunch.com/gmod/Default_Effects
--- @param number flags The flags to set (each effect has their own flags)
+-- @param number flags The flags to set (each effect has their own flags; from 0 to 255)
 function effect_methods:setFlags(flags)
 	checkluatype(flags, TYPE_NUMBER)
 	unwrap(self).flags = flags
@@ -519,14 +541,14 @@ function effect_methods:setOrigin(origin)
 end
 
 --- Sets the effect's radius
--- @param number radius The radius of the effect
+-- @param number radius The radius of the effect (from 0 to 1023)
 function effect_methods:setRadius(radius)
 	checkluatype(radius, TYPE_NUMBER)
 	unwrap(self).radius = radius
 end
 
 --- Sets the effect's scale
--- @param number scale The scale of the effect
+-- @param number scale The scale of the effect (clamped: +-1e6)
 function effect_methods:setScale(scale)
 	checkluatype(scale, TYPE_NUMBER)
 	unwrap(self).scale = scale
