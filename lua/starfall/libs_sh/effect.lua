@@ -155,27 +155,12 @@ Effect.__index = {
 		end
 	end,
 
-	-- Resets all properties to their default values
+	-- Resets all properties to their default values (clears explicitly set fields)
 	reset = function(self)
-		self.angles = Angle()
-		self.attachment = 0
-		self.color = 0
-		self.damagetype = 0
-		self.useEntity = false -- Whether to call SetEntity or SetEntIndex
-		self.entindex = -1 -- -1 means an invalid entity (because 0 is the world)
-		self.entity = NULL
-		self.flags = 0
-		self.hitbox = 0
-		self.magnitude = 0
-		self.materialindex = 0
-		self.normal = Vector(0, 0, 1)
-		self.origin = Vector()
-		self.radius = 0
-		self.scale = 1
-		self.start = Vector()
-		self.surfaceprop = -1 -- -1 means an invalid value
-		-- Clear modified tracking
-		table.Empty(self._modified)
+		-- Clear all explicitly set fields so __index returns defaults
+		for k in pairs(self) do
+			self[k] = nil
+		end
 	end,
 
 	-- Builds a sanitized CEffectData object from current state
@@ -193,9 +178,9 @@ Effect.__index = {
 			SF.Throw("Invalid effect data", 3)
 		end
 
-		-- Apply only modified setters (lazy - inherits old CEffectData values)
+		-- Apply only explicitly set fields (lazy - inherits old CEffectData values)
 		-- Handle entity vs entindex priority
-		if self._modified.useEntity or self._modified.entity or self._modified.entindex then
+		if rawget(self, "useEntity") ~= nil or rawget(self, "entity") ~= nil or rawget(self, "entindex") ~= nil then
 			if self.useEntity then
 				Effect.setters.entity(ed, self.entity)
 			else
@@ -203,9 +188,8 @@ Effect.__index = {
 			end
 		end
 
-		for k in pairs(self._modified) do
-			local setter = Effect.setters[k]
-			if setter and k ~= "entity" and k ~= "entindex" and k ~= "useEntity" then
+		for k, setter in pairs(Effect.setters) do
+			if k ~= "entity" and k ~= "entindex" and k ~= "useEntity" and rawget(self, k) ~= nil then
 				setter(ed, self[k])
 			end
 		end
@@ -233,10 +217,33 @@ Effect.__index = {
 	end,
 }
 
+-- Default values for Effect properties (used by __index when fields are nil)
+local DEFAULT_VALUES = {
+	angles = Angle(),
+	attachment = 0,
+	color = 0,
+	damagetype = 0,
+	useEntity = false, -- Whether to call SetEntity or SetEntIndex
+	entindex = -1, -- -1 means an invalid entity (because 0 is the world)
+	entity = NULL,
+	flags = 0,
+	hitbox = 0,
+	magnitude = 0,
+	materialindex = 0,
+	normal = Vector(0, 0, 1),
+	origin = Vector(),
+	radius = 0,
+	scale = 1,
+	start = Vector(),
+	surfaceprop = -1, -- -1 means an invalid value
+}
+
 Effect.__call = function(t)
-	return setmetatable({
-		_modified = {}, -- Track explicitly set fields for lazy effect data
-	}, t)
+	return setmetatable({}, {
+		__index = function(_, field)
+			return DEFAULT_VALUES[field] or t[field]
+		end
+	})
 end
 
 setmetatable(Effect, Effect)
@@ -427,18 +434,14 @@ end
 --- Sets the effect's angles
 -- @param Angle ang The angles
 function effect_methods:setAngles(ang)
-	local data = unwrap(self)
-	data.angles = aunwrap1(ang)
-	data._modified.angles = true
+	unwrap(self).angles = aunwrap1(ang)
 end
 
 --- Sets the effect's attachment index
 -- @param number attachment The new attachment index of the effect (from 0 to 31)
 function effect_methods:setAttachment(attachment)
 	checkluatype(attachment, TYPE_NUMBER)
-	local data = unwrap(self)
-	data.attachment = attachment
-	data._modified.attachment = true
+	unwrap(self).attachment = attachment
 end
 
 --- Sets the effect's color
@@ -446,18 +449,14 @@ end
 -- @param number color The color represented by a byte (from 0 to 255)
 function effect_methods:setColor(color)
 	checkluatype(color, TYPE_NUMBER)
-	local data = unwrap(self)
-	data.color = color
-	data._modified.color = true
+	unwrap(self).color = color
 end
 
 --- Sets the effect's damage type
 -- @param number dmgtype The damage type (see DMG enum)
 function effect_methods:setDamageType(dmgtype)
 	checkluatype(dmgtype, TYPE_NUMBER)
-	local data = unwrap(self)
-	data.damagetype = dmgtype
-	data._modified.damagetype = true
+	unwrap(self).damagetype = dmgtype
 end
 
 --- Sets the effect's entity index
@@ -467,8 +466,6 @@ function effect_methods:setEntIndex(index)
 	local data = unwrap(self)
 	data.useEntity = false
 	data.entindex = index
-	data._modified.entindex = true
-	data._modified.useEntity = true
 end
 
 --- Sets the effect's entity
@@ -477,8 +474,6 @@ function effect_methods:setEntity(ent)
 	local data = unwrap(self)
 	data.useEntity = true
 	data.entity = eunwrap(ent)
-	data._modified.entity = true
-	data._modified.useEntity = true
 end
 
 --- Sets the effect's flags.
@@ -487,81 +482,63 @@ end
 -- @param number flags The flags to set (each effect has their own flags)
 function effect_methods:setFlags(flags)
 	checkluatype(flags, TYPE_NUMBER)
-	local data = unwrap(self)
-	data.flags = flags
-	data._modified.flags = true
+	unwrap(self).flags = flags
 end
 
 --- Sets the effect's hitbox
 -- @param number hitbox The hitbox index of the effect (from 0 to 2047)
 function effect_methods:setHitBox(hitbox)
 	checkluatype(hitbox, TYPE_NUMBER)
-	local data = unwrap(self)
-	data.hitbox = hitbox
-	data._modified.hitbox = true
+	unwrap(self).hitbox = hitbox
 end
 
 --- Sets the effect's magnitude
 -- @param number magnitude The magnitude of the effect (from 0 to 1023)
 function effect_methods:setMagnitude(magnitude)
 	checkluatype(magnitude, TYPE_NUMBER)
-	local data = unwrap(self)
-	data.magnitude = magnitude
-	data._modified.magnitude = true
+	unwrap(self).magnitude = magnitude
 end
 
 --- Sets the effect's material index
 -- @param number mat The material index of the effect (from 0 to 4095)
 function effect_methods:setMaterialIndex(mat)
 	checkluatype(mat, TYPE_NUMBER)
-	local data = unwrap(self)
-	data.materialindex = mat
-	data._modified.materialindex = true
+	unwrap(self).materialindex = mat
 end
 
 --- Sets the normalized (length=1) direction vector of the effect
 -- This must be a normalized vector for networking purposes
 -- @param Vector normal The normalized direction vector of the effect
 function effect_methods:setNormal(normal)
-	local data = unwrap(self)
-	data.normal = vunwrap1(normal)
-	data._modified.normal = true
+	unwrap(self).normal = vunwrap1(normal)
 end
 
 --- Sets the effect's origin
 -- Limited to world bounds (+-16386 on every axis), and has horrible networking precision (17 bit float per component).
 -- @param Vector origin The origin of the effect
 function effect_methods:setOrigin(origin)
-	local data = unwrap(self)
-	data.origin = vunwrap1(origin)
-	data._modified.origin = true
+	unwrap(self).origin = vunwrap1(origin)
 end
 
 --- Sets the effect's radius
 -- @param number radius The radius of the effect
 function effect_methods:setRadius(radius)
 	checkluatype(radius, TYPE_NUMBER)
-	local data = unwrap(self)
-	data.radius = radius
-	data._modified.radius = true
+	unwrap(self).radius = radius
 end
 
 --- Sets the effect's scale
 -- @param number scale The scale of the effect
 function effect_methods:setScale(scale)
 	checkluatype(scale, TYPE_NUMBER)
-	local data = unwrap(self)
-	data.scale = scale
-	data._modified.scale = true
+	unwrap(self).scale = scale
 end
 
 --- Sets the effect's start position
 -- Limited to world bounds (+-16386 on every axis), and has horrible networking precision (17 bit float per component).
 -- @param Vector start The start position of the effect
 function effect_methods:setStart(start)
-	local data = unwrap(self)
-	data.start = vunwrap1(start)
-	data._modified.start = true
+	unwrap(self).start = vunwrap1(start)
 end
 
 --- Sets the effect's surface property
@@ -569,9 +546,7 @@ end
 -- @param number prop The surface property index of the effect
 function effect_methods:setSurfaceProp(prop)
 	checkluatype(prop, TYPE_NUMBER)
-	local data = unwrap(self)
-	data.surfaceprop = prop
-	data._modified.surfaceprop = true
+	unwrap(self).surfaceprop = prop
 end
 
 end
