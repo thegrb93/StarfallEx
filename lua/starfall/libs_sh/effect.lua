@@ -8,19 +8,48 @@ local checkvector = SF.CheckVector
 -- Register Privileges
 SF.Permissions.registerPrivilege("effect.play", "Effect", "Allows the user to play effects", { client = {} })
 
-local plyEffectBurst = SF.BurstObject("effects", "effects", 60, 5, "The rate at which effects can be spawned per second.", "Number of effects that can be spawned in a short time.")
-SF.ResourceCounters.Effects = { icon = "icon16/bullet_star.png", count = function(ply) return plyEffectBurst.max - plyEffectBurst:check(ply) end }
+local plyEffectBurst = SF.BurstObject("effects", "effects", 60, 5, "Rate effects can be spawned per second.", "Number of effects that can be spawned in a short time.")
+SF.ResourceCounters.Effects = {icon = "icon16/bullet_star.png", count = function(ply) return plyEffectBurst.max - plyEffectBurst:check(ply) end}
 
 -- Effect blacklist (keys are lowercase name).
 local EFFECT_BLACKLIST = {
 	dof_node = true, -- Material effect used by depth of field effect.
-	smoke = true,   -- Justification: Creates a bunch of messed up smoke that can't be deleted, not recommended.
-	--teslahitboxes = true,
+	smoke = true,   -- Creates a bunch of messed up smoke that can't be deleted, not recommended.
 }
 
--- Effect-specific overrides for known expensive/dangerous effects.
 
--- Default effect limits. Each property uses named fields: min, max, default.
+local EffectLimit
+EffectLimit = {
+	__index = {
+		-- Helper checker for range properties
+		checkRange = function(self, value)
+			return value ~= value or value < limit.min or value > limit.max
+		end,
+
+		-- Helper checker for normal vector (validates and normalizes)
+		checkNormal = function(self, value)
+			-- As per GMod docs, effect's normal must be a normalized (length=1) vector for networking purposes
+			local n = isvector(value) and value or Vector(value[1] or 0, value[2] or 0, value[3] or 0)
+			-- Store as Vector for consistency with Effect object storage
+			self[key] = n:LengthSqr() > 0 and n:GetNormalized() or Vector(0, 0, 1)
+			return false
+		end,
+
+		-- Helper checker for position vectors (validates and clamps to world bounds)
+		checkPos = function(self, value)
+			-- Store as Vector for consistency with Effect object storage
+			self[key] = isvector(value) and
+				Vector(clamp(value[1], -16386, 16386), clamp(value[2], -16386, 16386), clamp(value[3], -16386, 16386))
+				or
+				Vector(clamp(value[1] or 0, -16386, 16386), clamp(value[2] or 0, -16386, 16386), clamp(value[3] or 0, -16386, 16386))
+			return false
+		end,
+	},
+	__call = function(t)
+		
+	end
+}
+
 local DEFAULT_LIMITS = {
 	-- These limits are not made up, they are straight from Source Engine SDK
 	-- https://github.com/ValveSoftware/source-sdk-2013/blob/master/src/game/shared/effect_dispatch_data.cpp
@@ -40,45 +69,66 @@ local DEFAULT_LIMITS = {
 	surfaceprop = { min = -1, max = 254, default = -1 },
 }
 
--- Index: effect name (lowercase) -> { magnitude = { min = number, max = number, default = number }, radius = {...}, scale = {...} }
 local EFFECT_LIMITS = setmetatable({
-	teslahitboxes = {
+	teslahitboxes = setmetatable({
 		magnitude = { min = 0, max = 32, default = 0 },
 		radius = { min = 0, max = 512, default = 0 },
 		scale = { min = 0, max = 16, default = 1 },
-	},
-}, {
-	__index = DEFAULT_LIMITS,
-})
+	}, __index = DEFAULT_LIMITS)
+}, __index = function() return DEFAULT_LIMITS end)
+
 
 -- Exposed, so addons can modify these if needed.
 SF.effect_blacklist = EFFECT_BLACKLIST
 SF.effect_limits = EFFECT_LIMITS
 SF.default_effect_limits = DEFAULT_LIMITS
 
--- Helper checker for range properties
-local function checkRange(limit, value, self, key)
-	return value ~= value or value < limit.min or value > limit.max
-end
 
--- Helper checker for normal vector (validates and normalizes)
-local function checkNormal(limit, value, self, key)
-	-- As per GMod docs, effect's normal must be a normalized (length=1) vector for networking purposes
-	local n = isvector(value) and value or Vector(value[1] or 0, value[2] or 0, value[3] or 0)
-	-- Store as Vector for consistency with Effect object storage
-	self[key] = n:LengthSqr() > 0 and n:GetNormalized() or Vector(0, 0, 1)
-	return false
-end
 
--- Helper checker for position vectors (validates and clamps to world bounds)
-local function checkPos(limit, value, self, key)
-	-- Store as Vector for consistency with Effect object storage
-	self[key] = isvector(value) and
-		Vector(clamp(value[1], -16386, 16386), clamp(value[2], -16386, 16386), clamp(value[3], -16386, 16386))
-		or
-		Vector(clamp(value[1] or 0, -16386, 16386), clamp(value[2] or 0, -16386, 16386), clamp(value[3] or 0, -16386, 16386))
-	return false
-end
+-- Effect structure
+local Effect = {
+
+	-- Mapping of SF internal keys -> CEffectData setter methods
+	setters = {
+		angles = function(ed, v) ed:SetAngles(Angle(tonumber(v[1]) or 0, tonumber(v[2]) or 0, tonumber(v[3]) or 0)) end,
+		attachment = function(ed, v) ed:SetAttachment(v) end,
+		color = function(ed, v) ed:SetColor(v) end,
+		damagetype = function(ed, v) ed:SetDamageType(v) end,
+		entindex = function(ed, v) ed:SetEntIndex(v) end,
+		entity = function(ed, v) ed:SetEntity(v or NULL) end,
+		flags = function(ed, v) ed:SetFlags(v) end,
+		hitbox = function(ed, v) ed:SetHitBox(v) end,
+		magnitude = function(ed, v) ed:SetMagnitude(v) end,
+		materialindex = function(ed, v) ed:SetMaterialIndex(v) end,
+		normal = function(ed, v) ed:SetNormal(v) end,
+		origin = function(ed, v) ed:SetOrigin(v) end,
+		radius = function(ed, v) ed:SetRadius(v) end,
+		scale = function(ed, v) ed:SetScale(v) end,
+		start = function(ed, v) ed:SetStart(v) end,
+		surfaceprop = function(ed, v) ed:SetSurfaceProp(v) end,
+	},
+
+	__index = {
+		-- Validates effect data against limits for a specific effect name
+		set = function(self, key, value)
+			self.limits[key]:set(self.data, value)
+		end,
+
+		-- Plays the effect with full validation and burst checking
+		play = function(self, eff)
+			local ed = EffectData()
+			for k, v in pairs(self.data) do
+				Effect.setters[k](ed, v)
+			end
+			util.Effect(eff, ed)
+		end,
+	}
+
+	__call = function(t, name)
+		return setmetatable({name = name, data = {}, limits = EFFECT_LIMITS[name]}, t)
+	end,
+}
+setmetatable(Effect, Effect)
 
 
 --- Effects library.
@@ -107,172 +157,25 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 
 local vunwrap1
 local aunwrap1
-
 instance:AddHook("initialize", function()
 	vunwrap1 = vec_meta.QuickUnwrap1
 	aunwrap1 = ang_meta.QuickUnwrap1
 end)
-
--- Effect structure
-local Effect = {}
-
--- Mapping of SF internal keys -> CEffectData setter methods
-Effect.setters = {
-	angles = function(ed, v) ed:SetAngles(Angle(tonumber(v[1]) or 0, tonumber(v[2]) or 0, tonumber(v[3]) or 0)) end,
-	attachment = function(ed, v) ed:SetAttachment(v) end,
-	color = function(ed, v) ed:SetColor(v) end,
-	damagetype = function(ed, v) ed:SetDamageType(v) end,
-	entindex = function(ed, v) ed:SetEntIndex(v) end,
-	entity = function(ed, v) ed:SetEntity(v or NULL) end,
-	flags = function(ed, v) ed:SetFlags(v) end,
-	hitbox = function(ed, v) ed:SetHitBox(v) end,
-	magnitude = function(ed, v) ed:SetMagnitude(v) end,
-	materialindex = function(ed, v) ed:SetMaterialIndex(v) end,
-	normal = function(ed, v) ed:SetNormal(v) end,
-	origin = function(ed, v) ed:SetOrigin(v) end,
-	radius = function(ed, v) ed:SetRadius(v) end,
-	scale = function(ed, v) ed:SetScale(v) end,
-	start = function(ed, v) ed:SetStart(v) end,
-	surfaceprop = function(ed, v) ed:SetSurfaceProp(v) end,
-}
-
--- Checkers for validating effect properties based on effect name limits
-Effect.checkers = {
-	attachment = checkRange,
-	color = checkRange,
-	damagetype = checkRange,
-	entindex = checkRange,
-	flags = checkRange,
-	hitbox = checkRange,
-	magnitude = checkRange,
-	materialindex = checkRange,
-	normal = checkNormal,
-	origin = checkPos,
-	radius = checkRange,
-	scale = checkRange,
-	start = checkPos,
-	surfaceprop = checkRange,
-}
-
-Effect.__index = {
-	-- Validates effect data against limits for a specific effect name
-	check = function(self, name)
-		local limits = EFFECT_LIMITS[name]
-		for k, checker in pairs(Effect.checkers) do
-			local limit = limits[k]
-			if limit then
-				local value = self[k]
-				if value == nil then
-					self[k] = limit.default
-				elseif checker(limit, value, self, k) then
-					SF.Throw("Effect data '" .. k .. "' is out of bounds! " .. tostring(value), 4)
-				end
-			end
-		end
-	end,
-
-	-- Resets all properties to their default values (clears explicitly set fields)
-	reset = function(self)
-		-- Clear all explicitly set fields so __index returns defaults
-		for k in pairs(self) do
-			self[k] = nil
-		end
-	end,
-
-	-- Builds a sanitized CEffectData object from current state
-	getData = function(self)
-		-- CEffectData is by-Garry-design a 'static singleton' (realloced every time with `EffectData()`).
-		-- This means you are not allowed to create multiple instances of it, such as storing them in a table.
-		-- Any setters, like SetMagnitude, will only modify the last created instance.
-		-- This was probably done for performance reasons.
-		-- The intended usage is to call `EffectData()`, followed by setters, and then call `util.Effect`.
-		-- Thanks Garry.
-		local ed = EffectData()
-
-		-- Ensure C++ object is valid just in case; better be safe than sorry
-		if not IsValid(ed) then
-			SF.Throw("Invalid effect data", 3)
-		end
-
-		-- Apply only explicitly set fields (lazy - inherits old CEffectData values)
-		-- Handle entity vs entindex priority
-		if rawget(self, "useEntity") ~= nil or rawget(self, "entity") ~= nil or rawget(self, "entindex") ~= nil then
-			if self.useEntity then
-				Effect.setters.entity(ed, self.entity)
-			else
-				Effect.setters.entindex(ed, self.entindex)
-			end
-		end
-
-		for k, setter in pairs(Effect.setters) do
-			if k ~= "entity" and k ~= "entindex" and k ~= "useEntity" and rawget(self, k) ~= nil then
-				setter(ed, self[k])
-			end
-		end
-		return ed
-	end,
-
-	-- Plays the effect with full validation and burst checking
-	play = function(self, eff)
-		checkluatype(eff, TYPE_STRING)
-		checkpermission(instance, nil, "effect.play")
-
-		eff = string.lower(eff)
-		if EFFECT_BLACKLIST[eff] then
-			SF.Throw("Effect (" .. eff .. ") is blacklisted", 3)
-		end
-		if hook.Run("Starfall_CanEffect", eff, instance) == false then
-			SF.Throw("Effect (" .. eff .. ") has been blocked from running", 3)
-		end
-
-		-- Validate the effect and throw before consuming burst
-		self:check(eff)
-		plyEffectBurst:use(instance.player, 1)
-		-- Create Garry's CEffectData, feed it with sanitized values, and then play it immediately
-		util.Effect(eff, self:getData())
-	end,
-}
-
--- Default values for Effect properties (used by __index when fields are nil)
-local DEFAULT_VALUES = {
-	angles = Angle(),
-	attachment = 0,
-	color = 0,
-	damagetype = 0,
-	useEntity = false, -- Whether to call SetEntity or SetEntIndex
-	entindex = -1, -- -1 means an invalid entity (because 0 is the world)
-	entity = NULL,
-	flags = 0,
-	hitbox = 0,
-	magnitude = 0,
-	materialindex = 0,
-	normal = Vector(0, 0, 1),
-	origin = Vector(),
-	radius = 0,
-	scale = 1,
-	start = Vector(),
-	surfaceprop = -1, -- -1 means an invalid value
-}
-
-Effect.__call = function(t)
-	return setmetatable({}, {
-		__index = function(_, name)
-			-- Return the default property value, otherwise look for the Effect method
-			return DEFAULT_VALUES[name] or t[name]
-		end
-	})
-end
-
-setmetatable(Effect, Effect)
 
 ----------------------------------------------------------------------
 -- Library & Method Bindings
 ----------------------------------------------------------------------
 
 --- Creates an effect data structure
+-- @param string name The effect type name to play
 -- @return Effect Effect object
-function effect_library.create()
-	return wrap(Effect())
+function effect_library.create(name)
+	checkluatype(name, TYPE_STRING)
+	name = string.lower(name)
+	if EFFECT_BLACKLIST[name] then
+		SF.Throw("Effect (" .. name .. ") is blacklisted", 3)
+	end
+	return wrap(Effect(name))
 end
 
 --- Returns the number of effects that can still be created within the burst quota
@@ -322,14 +225,14 @@ end
 
 --- Plays the effect.
 -- See also https://wiki.facepunch.com/gmod/Default_Effects
--- @param string eff The effect type name to play
-function effect_methods:play(eff)
-	unwrap(self):play(eff)
-end
-
---- Resets all effect properties to their default values
-function effect_methods:reset()
-	unwrap(self):reset()
+function effect_methods:play()
+	checkpermission(instance, nil, "effect.play")
+	local eff = unwrap(self)
+	if hook.Run("Starfall_CanEffect", eff.name, instance) == false then
+		SF.Throw("Effect (" .. eff.name .. ") has been blocked from running", 3)
+	end
+	plyEffectBurst:use(instance.player, 1)
+	eff:play()
 end
 
 ----------------------------------------------------------------------
@@ -339,25 +242,25 @@ end
 --- Returns the effect's angle
 -- @return Angle The effect's angle
 function effect_methods:getAngles()
-	return awrap(unwrap(self).angles)
+	return awrap(unwrap(self):get("angles"))
 end
 
 --- Returns the effect's attachment
 -- @return number The effect's attachment index (from 0 to 31)
 function effect_methods:getAttachment()
-	return unwrap(self).attachment
+	return unwrap(self):get("attachment")
 end
 
 --- Returns byte which represents the color of the effect
 -- @return number The effect's color as a byte (from 0 to 255)
 function effect_methods:getColor()
-	return unwrap(self).color
+	return unwrap(self):get("color")
 end
 
 --- Returns the effect's damage type
 -- @return number The effect's damage type (see DMG enum)
 function effect_methods:getDamageType()
-	return unwrap(self).damagetype
+	return unwrap(self):get("damagetype")
 end
 
 --- Returns the effect's entindex
@@ -566,7 +469,7 @@ end
 -- @param number prop The surface property index of the effect
 function effect_methods:setSurfaceProp(prop)
 	checkluatype(prop, TYPE_NUMBER)
-	unwrap(self).surfaceprop = prop
+	unwrap(self):set("surfaceprop", prop)
 end
 
 end
