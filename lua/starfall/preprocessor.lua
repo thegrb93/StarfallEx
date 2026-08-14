@@ -114,7 +114,8 @@ SF.Preprocessor = {
 			local senddata = {
 				owner = sfdata.owner,
 				mainfile = self.files[sfdata.mainfile].clientmain or sfdata.mainfile,
-				proc = sfdata.proc
+				proc = sfdata.proc,
+				superuser = sfdata.superuser
 			}
 			local ownersenddata
 
@@ -150,6 +151,7 @@ SF.Preprocessor = {
 					owner = sfdata.owner,
 					mainfile = senddata.mainfile,
 					proc = sfdata.proc,
+					superuser = sfdata.superuser,
 					files = ownerfiles,
 					compressed = SF.CompressFiles(ownerfiles)
 				}
