@@ -124,10 +124,7 @@ Effect.setters = {
 	scale = function(ed, v) ed:SetScale(v) end, -- Pre-checked in :check()
 	start = function(ed, v) ed:SetStart(clampPos(Vector(tonumber(v[1]) or 0, tonumber(v[2]) or 0, tonumber(v[3]) or 0))) end,
 	surfaceprop = function(ed, v) ed:SetSurfaceProp(clampInt(v, -1, 254)) end,
-	entindex = function(ed, v)
-		local idx = clampInt(v, -1, 8192)
-		if idx >= 0 then ed:SetEntIndex(idx) end
-	end,
+	entindex = function(ed, v) ed:SetEntIndex(clampInt(v, -1, 8192)) end,
 	entity = function(ed, v) ed:SetEntity(v or NULL) end,
 }
 
@@ -240,8 +237,9 @@ local DEFAULT_VALUES = {
 
 Effect.__call = function(t)
 	return setmetatable({}, {
-		__index = function(_, field)
-			return DEFAULT_VALUES[field] or t[field]
+		__index = function(_, name)
+			-- Return the default property value, otherwise look for the Effect method
+			return DEFAULT_VALUES[name] or t[name]
 		end
 	})
 end
@@ -460,7 +458,7 @@ function effect_methods:setDamageType(dmgtype)
 end
 
 --- Sets the effect's entity index
--- @param number index The entity index (-1 = skip setting entindex)
+-- @param number index The entity index
 function effect_methods:setEntIndex(index)
 	checkluatype(index, TYPE_NUMBER)
 	local data = unwrap(self)
