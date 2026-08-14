@@ -598,8 +598,7 @@ function instance:cleanupRender()
 		renderdata.usingRT = false
 	end
 	for i = #view_matrix_stack, 1, -1 do
-		local ok, err = pcall(cam[view_matrix_stack[i]])
-		if not ok then ErrorNoHalt(tostring(err) .. "\n") end
+		cam[view_matrix_stack[i]]()
 		view_matrix_stack[i] = nil
 	end
 	if renderdata.changedFilterMag then
