@@ -168,7 +168,7 @@ local particle_effect_blacklist = {
 SF.particle_effect_blacklist = particle_effect_blacklist
 
 local function isBadParticleEffect(name, instance)
-	name = string.lower(name)
+	name = string.gsub(string.lower(name), "\x00.*", "")
 	if particle_effect_blacklist[name] then return true end
 	if hook.Run("Starfall_CanParticleEffect", name, instance) == false then return true end
 	return false
