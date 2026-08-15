@@ -139,11 +139,11 @@ function effect_library.create(name, data)
 
 	name = string.lower(name)
 	if EFFECT_BLACKLIST[name] then
-		SF.Throw("Effect (" .. name .. ") is blacklisted", 3)
+		SF.Throw("Effect (" .. name .. ") is blacklisted", 2)
 	end
 
 	if hook.Run("Starfall_CanEffect", name, instance) == false then
-		SF.Throw("Effect (" .. name .. ") has been blocked from running", 3)
+		SF.Throw("Effect (" .. name .. ") has been blocked from running", 2)
 	end
 
 	local settingMember
