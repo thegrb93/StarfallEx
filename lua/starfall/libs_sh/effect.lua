@@ -147,7 +147,7 @@ function effect_library.create(name, data)
 	end
 
 	local settingMember
-	local ok, err = pcall(function()
+	local ok, ret = pcall(function()
 		local eff = EffectData()
 		local limit = EFFECT_LIMITS[name]
 		if limit then
@@ -176,10 +176,10 @@ function effect_library.create(name, data)
 		end
 		return eff
 	end)
-	if not ok then SF.Throw("Error setting member '"..settingMember.."': "..tostring(err), 2) end
+	if not ok then SF.Throw("Error setting member '"..settingMember.."': "..tostring(ret), 2) end
 
 	plyEffectBurst:use(instance.player, 1)
-	util.Effect(name, err)
+	util.Effect(name, ret)
 end
 
 --- Returns the number of effects that can still be created within the burst quota
