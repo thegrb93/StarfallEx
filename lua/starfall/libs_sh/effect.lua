@@ -137,7 +137,7 @@ function effect_library.create(name, data)
 	checkluatype(data, TYPE_TABLE)
 	checkpermission(instance, nil, "effect.create")
 
-	name = string.lower(name)
+	name = string.gsub(string.lower(name), "\x00.*", "")
 	if EFFECT_BLACKLIST[name] then
 		SF.Throw("Effect (" .. name .. ") is blacklisted", 2)
 	end
