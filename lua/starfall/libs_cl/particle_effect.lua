@@ -167,20 +167,12 @@ local particle_effect_blacklist = {
 --   setmetatable(SF.particle_effect_blacklist, { __index = function() return true end })
 SF.particle_effect_blacklist = particle_effect_blacklist
 
-local function isBadParticleEffect(name, instance)
-	name = string.gsub(string.lower(name), "\x00.*", "")
-	if particle_effect_blacklist[name] then return true end
-	if hook.Run("Starfall_CanParticleEffect", name, instance) == false then return true end
-	return false
-end
-
 local function checkValid(peff)
 	if not peff:IsValid() then
 		SF.Throw("ParticleEffect emitter is no longer valid.", 3)
 	end
 	return peff -- for method chaining (simpler code)
 end
-
 
 return function(instance)
 local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
@@ -220,16 +212,19 @@ end)
 -- This only affects the control points of the particle effects, and will do nothing if the effect doesn't use control points.
 -- @return ParticleEffect ParticleEffect object.
 function particleef_library.attach(entity, name, pattach, options)
+	entity = eunwrap(entity)
 	checkluatype(name, TYPE_STRING)
 	checkluatype(pattach, TYPE_NUMBER)
 
-	entity = eunwrap(entity)
 	checkpermission(instance, entity, "particleEffect.attach")
+	plyCount:checkuse(instance.player, 1)
 
-	if instance.player ~= SF.Superuser and isBadParticleEffect(name, instance) then
-		SF.Throw("Bad particle effect: " .. name, 2)
+	name = string.gsub(string.lower(name), "\x00.*", "")
+
+	if instance.player ~= SF.Superuser then
+		if particle_effect_blacklist[name] then SF.Throw("Tried to use blacklisted particle effect: "..name, 2) end
+		if hook.Run("Starfall_CanParticleEffect", name, instance) == false then SF.Throw("Effect hook blocked using "..name, 2) end
 	end
-	plyCount:use(instance.player, 1)
 
 	-- NOTE: There is no precache limit on client-side, but still must precache it!
 	PrecacheParticleSystem(name)
@@ -265,8 +260,8 @@ function particleef_library.attach(entity, name, pattach, options)
 		SF.Throw("Invalid particle effect system.", 2)
 	end
 
+	plyCount:free(instance.player, -1)
 	particleEffects[pEffect] = true
-
 	return wrap(pEffect)
 end
 
