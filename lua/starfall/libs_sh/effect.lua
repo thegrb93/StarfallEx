@@ -151,12 +151,12 @@ function effect_library.create(name, data)
 		local eff = EffectData()
 		local limit = EFFECT_LIMITS[name]
 		if limit then
-			for k, v in pairs(limit) do
+			for k, limitfunc in pairs(limit) do
 				settingMember = k
 				local member = EFFECT_MEMBERS[k] or error("Invalid data key")
-				local val = data[k]
-				if val then
-					member:setLimited(eff, v, val)
+				local v = data[k]
+				if v then
+					member:setLimited(eff, limitfunc, v)
 				else
 					member:setDefault(eff)
 				end
