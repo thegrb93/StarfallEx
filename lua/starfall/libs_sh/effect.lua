@@ -95,7 +95,7 @@ end)
 ----------------------------------------------------------------------
 
 local EFFECT_MEMBERS = {
-	angles = EffectMember(angle_origin, "SetAngles", aunwrap1),
+	angles = EffectMember(angle_origin, "SetAngles", function(v) v=aunwrap1(v) checkvector(v) return v end),
 	attachment = EffectMember(0, "SetAttachment"),
 	color = EffectMember(color_white, "SetColor", cunwrap1),
 	damagetype = EffectMember(0, "SetDamageType"),
@@ -105,11 +105,11 @@ local EFFECT_MEMBERS = {
 	hitbox = EffectMember(0, "SetHitBox"),
 	magnitude = EffectMember(0, "SetMagnitude"),
 	materialindex = EffectMember(0, "SetMaterialIndex"),
-	normal = EffectMember(Vector(1, 0, 0), "SetNormal", vunwrap1),
-	origin = EffectMember(vector_origin, "SetOrigin", vunwrap1),
+	normal = EffectMember(Vector(1, 0, 0), "SetNormal", function(v) v=vunwrap1(v) checkvector(v) return v end),
+	origin = EffectMember(vector_origin, "SetOrigin", function(v) v=vunwrap1(v) checkvector(v) return v end),
 	radius = EffectMember(0, "SetRadius"),
 	scale = EffectMember(0, "SetScale"),
-	start = EffectMember(vector_origin, "SetStart", vunwrap1),
+	start = EffectMember(vector_origin, "SetStart", function(v) v=vunwrap1(v) checkvector(v) return v end),
 	surfaceprop = EffectMember(0, "SetSurfaceProp"),
 }
 
