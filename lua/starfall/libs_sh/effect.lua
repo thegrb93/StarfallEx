@@ -18,19 +18,19 @@ local EFFECT_BLACKLIST = {
 }
 
 -- Helper checker for range properties
-local function checkNumberRange(name, min, max)
+local function checkNumberRange(min, max)
 	return function(val)
 		if val ~= val or val < min or val > max then
-			SF.Throw("Value is out of bounds for member '"..name.."'! (min = "..min..", max = "..max..", val = "..val..")", 4)
+			SF.Throw("Value is out of bounds! (min = "..min..", max = "..max..", val = "..val..")", 4)
 		end
 	end
 end
 
 local EFFECT_LIMITS = {
 	teslahitboxes = {
-		magnitude = checkNumberRange("magnitude", 0, 32),
-		radius = checkNumberRange("radius", 0, 512),
-		scale = checkNumberRange("scale", 0, 16),
+		magnitude = checkNumberRange(0, 32),
+		radius = checkNumberRange(0, 512),
+		scale = checkNumberRange(0, 16),
 	}
 }
 
