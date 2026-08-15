@@ -1989,9 +1989,9 @@ end
 
 -- This function clamps the position before moving the entity
 function SF.clampPos(pos)
-	pos.x = math_Clamp(pos.x, -16384, 16384)
-	pos.y = math_Clamp(pos.y, -16384, 16384)
-	pos.z = math_Clamp(pos.z, -16384, 16384)
+	pos[1] = math_Clamp(pos[1], -16384, 16384)
+	pos[2] = math_Clamp(pos[2], -16384, 16384)
+	pos[3] = math_Clamp(pos[3], -16384, 16384)
 	return pos
 end
 

@@ -6,7 +6,7 @@ local checknumber = SF.CheckNumber
 local checkvector = SF.CheckVector
 
 -- Register Privileges
-SF.Permissions.registerPrivilege("effect.play", "Effect", "Allows the user to play effects", { client = {} })
+SF.Permissions.registerPrivilege("effect.create", "Effect", "Allows the user to create effects", { client = {} })
 
 local plyEffectBurst = SF.BurstObject("effects", "effects", 60, 5, "Rate effects can be spawned per second.", "Number of effects that can be spawned in a short time.")
 SF.ResourceCounters.Effects = {icon = "icon16/bullet_star.png", count = function(ply) return plyEffectBurst.max - plyEffectBurst:check(ply) end}
@@ -18,59 +18,51 @@ local EFFECT_BLACKLIST = {
 }
 
 -- Helper checker for range properties
-local function checkRange(self, value)
-	return value ~= value or value < limit.min or value > limit.max
-end,
-
--- Helper checker for normal vector (validates and normalizes)
-local function checkNormal(self, value)
-	-- As per GMod docs, effect's normal must be a normalized (length=1) vector for networking purposes
-	local n = isvector(value) and value or Vector(value[1] or 0, value[2] or 0, value[3] or 0)
-	-- Store as Vector for consistency with Effect object storage
-	self[key] = n:LengthSqr() > 0 and n:GetNormalized() or Vector(0, 0, 1)
-	return false
-end,
-
--- Helper checker for position vectors (validates and clamps to world bounds)
-local function checkPos(self, value)
-	-- Store as Vector for consistency with Effect object storage
-	self[key] = isvector(value) and
-		Vector(clamp(value[1], -16386, 16386), clamp(value[2], -16386, 16386), clamp(value[3], -16386, 16386))
-		or
-		Vector(clamp(value[1] or 0, -16386, 16386), clamp(value[2] or 0, -16386, 16386), clamp(value[3] or 0, -16386, 16386))
-	return false
+local function checkNumberRange(name, min, max)
+	return function(val)
+		if val ~= val or val < min or val > max then
+			SF.Throw("Value is out of bounds for member '"..name.."'! (min = "..min..", max = "..max..", val = "..val..")", 4)
+		end
+	end
 end
 
 local EFFECT_LIMITS = {
 	teslahitboxes = {
-		magnitude = { min = 0, max = 32, default = 0 },
-		radius = { min = 0, max = 512, default = 0 },
-		scale = { min = 0, max = 16, default = 1 },
+		magnitude = checkNumberRange("magnitude", 0, 32),
+		radius = checkNumberRange("radius", 0, 512),
+		scale = checkNumberRange("scale", 0, 16),
 	}
-}
-
-local EFFECT_SETTERS = {
-	angles = function(ed, v) ed:SetAngles(Angle(tonumber(v[1]) or 0, tonumber(v[2]) or 0, tonumber(v[3]) or 0)) end,
-	attachment = function(ed, v) ed:SetAttachment(v) end,
-	color = function(ed, v) ed:SetColor(v) end,
-	damagetype = function(ed, v) ed:SetDamageType(v) end,
-	entindex = function(ed, v) ed:SetEntIndex(v) end,
-	entity = function(ed, v) ed:SetEntity(v or NULL) end,
-	flags = function(ed, v) ed:SetFlags(v) end,
-	hitbox = function(ed, v) ed:SetHitBox(v) end,
-	magnitude = function(ed, v) ed:SetMagnitude(v) end,
-	materialindex = function(ed, v) ed:SetMaterialIndex(v) end,
-	normal = function(ed, v) ed:SetNormal(v) end,
-	origin = function(ed, v) ed:SetOrigin(v) end,
-	radius = function(ed, v) ed:SetRadius(v) end,
-	scale = function(ed, v) ed:SetScale(v) end,
-	start = function(ed, v) ed:SetStart(v) end,
-	surfaceprop = function(ed, v) ed:SetSurfaceProp(v) end,
 }
 
 -- Exposed, so addons can modify these if needed.
 SF.effect_blacklist = EFFECT_BLACKLIST
 SF.effect_limits = EFFECT_LIMITS
+
+local EffectMember = {
+	__index = {
+		setDefault = function(self, eff)
+			eff[self.setfunc](eff, self.default)
+		end,
+
+		setLimited = function(self, eff, limitfunc, val)
+			val = self.unwrapfunc(val)
+			limitfunc(val)
+			eff[self.setfunc](eff, val)
+		end,
+
+		set = function(self, eff, val)
+			eff[self.setfunc](eff, self.unwrapfunc(val))
+		end,
+	},
+	__call = function(t, default, setfunc, unwrapfunc)
+		return setmetatable({
+			default = default,
+			setfunc = setfunc,
+			unwrapfunc = unwrapfunc or function(v) return v end,
+		}, t)
+	end
+}
+setmetatable(EffectMember, EffectMember)
 
 
 --- Effects library.
@@ -91,19 +83,38 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 
-local vunwrap1
-local aunwrap1
+local vunwrap1, aunwrap1, cunwrap1
 instance:AddHook("initialize", function()
 	vunwrap1 = vec_meta.QuickUnwrap1
 	aunwrap1 = ang_meta.QuickUnwrap1
+	cunwrap1 = col_meta.QuickUnwrap1
 end)
 
 ----------------------------------------------------------------------
 -- Library & Method Bindings
 ----------------------------------------------------------------------
 
+local EFFECT_MEMBERS = {
+	angles = EffectMember(angle_origin, "SetAngles", aunwrap1),
+	attachment = EffectMember(0, "SetAttachment"),
+	color = EffectMember(color_white, "SetColor", cunwrap1),
+	damagetype = EffectMember(0, "SetDamageType"),
+	entindex = EffectMember(0, "SetEntIndex"),
+	entity = EffectMember(NULL, "SetEntity", eunwrap),
+	flags = EffectMember(0, "SetFlags"),
+	hitbox = EffectMember(0, "SetHitBox"),
+	magnitude = EffectMember(0, "SetMagnitude"),
+	materialindex = EffectMember(0, "SetMaterialIndex"),
+	normal = EffectMember(Vector(1, 0, 0), "SetNormal", vunwrap1),
+	origin = EffectMember(vector_origin, "SetOrigin", vunwrap1),
+	radius = EffectMember(0, "SetRadius"),
+	scale = EffectMember(0, "SetScale"),
+	start = EffectMember(vector_origin, "SetStart", vunwrap1),
+	surfaceprop = EffectMember(0, "SetSurfaceProp"),
+}
+
 --- Creates an effect data structure
--- @param string name The effect type name to play
+-- @param string name The effect type name to create
 -- @param table data The effect data table with keys:
 -- angles - Angle angle of the effect
 -- attachment - number Entity attachment id to attach to
@@ -121,10 +132,10 @@ end)
 -- scale - number The scale value of the effect
 -- start - Vector the start vector of the effect
 -- surfaceprop - number The surfaceprop id of the effect
-function effect_library.play(name, data)
+function effect_library.create(name, data)
 	checkluatype(name, TYPE_STRING)
 	checkluatype(data, TYPE_TABLE)
-	checkpermission(instance, nil, "effect.play")
+	checkpermission(instance, nil, "effect.create")
 
 	name = string.lower(name)
 	if EFFECT_BLACKLIST[name] then
@@ -135,30 +146,40 @@ function effect_library.play(name, data)
 		SF.Throw("Effect (" .. name .. ") has been blocked from running", 3)
 	end
 
+	local settingMember
+	local ok, err = pcall(function()
+		local eff = EffectData()
+		local limit = EFFECT_LIMITS[name]
+		if limit then
+			for k, v in pairs(limit) do
+				settingMember = k
+				local member = EFFECT_MEMBERS[k] or SF.Throw("Invalid data key", 2)
+				local val = data[k]
+				if val then
+					member:setLimited(eff, v, val)
+				else
+					member:setDefault(eff)
+				end
+			end
+			for k, v in pairs(data) do
+				if limit[k] then continue end
+				settingMember = k
+				local member = EFFECT_MEMBERS[k] or SF.Throw("Invalid data key", 2)
+				member:set(eff, v)
+			end
+		else
+			for k, v in pairs(data) do
+				settingMember = k
+				local member = EFFECT_MEMBERS[k] or SF.Throw("Invalid data key", 2)
+				member:set(eff, v)
+			end
+		end
+		return eff
+	end)
+	if not ok then SF.Throw("Error setting member '"..settingMember.."': "..tostring(err), 2) end
+
 	plyEffectBurst:use(instance.player, 1)
-
-	local limit = EFFECT_LIMITS[name]
-
-	local eff = EffectData()
-	if limit then
-		for k, v in pairs(limit) do
-			local val = data[k] or v.default
-			v:check(val)
-			local setter = EFFECT_SETTERS[k] or SF.Throw("Invalid data key: "..k, 2)
-			setter(eff, val)
-		end
-		for k, v in pairs(data) do
-			if limit[k] then continue end
-			local setter = EFFECT_SETTERS[k] or SF.Throw("Invalid data key: "..k, 2)
-			setter(eff, v)
-		end
-	else
-		for k, v in pairs(data) do
-			local setter = EFFECT_SETTERS[k] or SF.Throw("Invalid data key: "..k, 2)
-			setter(eff, v)
-		end
-	end
-	util.Effect(name, eff)
+	util.Effect(name, err)
 end
 
 --- Returns the number of effects that can still be created within the burst quota
@@ -188,7 +209,7 @@ end
 function effect_library.beamRingPoint(pos, lifetime, startRad, endRad, width, amplitude, color, speed, flags, framerate, material)
 	pos = vunwrap1(pos)
 	checkvector(pos)
-	checkpermission(instance, nil, "effect.play")
+	checkpermission(instance, nil, "effect.create")
 
 	plyEffectBurst:use(instance.player, 1)
 
