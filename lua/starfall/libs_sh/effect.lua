@@ -21,7 +21,7 @@ local EFFECT_BLACKLIST = {
 local function checkNumberRange(min, max)
 	return function(val)
 		if val ~= val or val < min or val > max then
-			SF.Throw("Value is out of bounds! (min = "..min..", max = "..max..", val = "..val..")", 4)
+			error("Value is out of bounds! (min = "..min..", max = "..max..", val = "..val..")")
 		end
 	end
 end
@@ -153,7 +153,7 @@ function effect_library.create(name, data)
 		if limit then
 			for k, v in pairs(limit) do
 				settingMember = k
-				local member = EFFECT_MEMBERS[k] or SF.Throw("Invalid data key", 2)
+				local member = EFFECT_MEMBERS[k] or error("Invalid data key")
 				local val = data[k]
 				if val then
 					member:setLimited(eff, v, val)
@@ -164,13 +164,13 @@ function effect_library.create(name, data)
 			for k, v in pairs(data) do
 				if limit[k] then continue end
 				settingMember = k
-				local member = EFFECT_MEMBERS[k] or SF.Throw("Invalid data key", 2)
+				local member = EFFECT_MEMBERS[k] or error("Invalid data key")
 				member:set(eff, v)
 			end
 		else
 			for k, v in pairs(data) do
 				settingMember = k
-				local member = EFFECT_MEMBERS[k] or SF.Throw("Invalid data key", 2)
+				local member = EFFECT_MEMBERS[k] or error("Invalid data key")
 				member:set(eff, v)
 			end
 		end
