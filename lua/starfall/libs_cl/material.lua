@@ -154,7 +154,7 @@ local blacklisted_keys = {
 }
 local function checkkey(key)
 	checkluatype(key, TYPE_STRING, 2)
-	if blacklisted_keys[string.lower(key)] then SF.Throw("Blocked material key: "..key, 3) end
+	if blacklisted_keys[string.gsub(string.lower(key), "\x00.*", "")] then SF.Throw("Blocked material key: "..key, 3) end
 end
 
 local function tex2str(t)
