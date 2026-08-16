@@ -98,7 +98,6 @@ local EFFECT_MEMBERS = {
 	attachment = EffectMember(0, "SetAttachment"),
 	color = EffectMember(color_white, "SetColor", cunwrap1),
 	damagetype = EffectMember(0, "SetDamageType"),
-	entindex = EffectMember(0, "SetEntIndex"),
 	entity = EffectMember(NULL, "SetEntity", eunwrap),
 	flags = EffectMember(0, "SetFlags"),
 	hitbox = EffectMember(0, "SetHitBox"),
@@ -111,6 +110,14 @@ local EFFECT_MEMBERS = {
 	start = EffectMember(vector_origin, "SetStart", function(v) v=vunwrap1(v) checkvector(v) return v end),
 	surfaceprop = EffectMember(0, "SetSurfaceProp"),
 }
+if SERVER then
+	EFFECT_MEMBERS.entindex = EffectMember(-1, "SetEntIndex")
+end
+
+local function getEffectMember(k)
+	if k == "entindex" and not SERVER then return end
+	return EFFECT_MEMBERS[k] or error("Invalid data key")
+end
 
 --- Creates an effect data structure
 -- @param string name The effect type name to create
@@ -151,26 +158,33 @@ function effect_library.create(name, data)
 		local limit = EFFECT_LIMITS[name]
 		if limit then
 			for k, limitfunc in pairs(limit) do
-				settingMember = k
-				local member = EFFECT_MEMBERS[k] or error("Invalid data key")
-				local v = data[k]
-				if v then
-					member:setLimited(eff, limitfunc, v)
-				else
-					member:setDefault(eff)
+				local member = getEffectMember(k)
+				if member then
+					settingMember = k
+					local v = data[k]
+					if v then
+						member:setLimited(eff, limitfunc, v)
+					else
+						member:setDefault(eff)
+					end
 				end
 			end
 			for k, v in pairs(data) do
-				if limit[k] then continue end
-				settingMember = k
-				local member = EFFECT_MEMBERS[k] or error("Invalid data key")
-				member:set(eff, v)
+				if not limit[k] then
+					settingMember = k
+					local member = getEffectMember(k)
+					if member then
+						member:set(eff, v)
+					end
+				end
 			end
 		else
 			for k, v in pairs(data) do
 				settingMember = k
-				local member = EFFECT_MEMBERS[k] or error("Invalid data key")
-				member:set(eff, v)
+				local member = getEffectMember(k)
+				if member then
+					member:set(eff, v)
+				end
 			end
 		end
 		return eff
