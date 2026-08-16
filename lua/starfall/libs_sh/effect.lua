@@ -82,11 +82,10 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 
-local vunwrap1, aunwrap1, cunwrap1
+local vunwrap1, aunwrap1
 instance:AddHook("initialize", function()
 	vunwrap1 = vec_meta.QuickUnwrap1
 	aunwrap1 = ang_meta.QuickUnwrap1
-	cunwrap1 = col_meta.QuickUnwrap1
 end)
 
 ----------------------------------------------------------------------
@@ -96,7 +95,7 @@ end)
 local EFFECT_MEMBERS = {
 	angles = EffectMember(angle_origin, "SetAngles", function(v) v=aunwrap1(v) checkvector(v) return v end),
 	attachment = EffectMember(0, "SetAttachment"),
-	color = EffectMember(color_white, "SetColor", cunwrap1),
+	color = EffectMember(0, "SetColor"),
 	damagetype = EffectMember(0, "SetDamageType"),
 	entindex = EffectMember(0, "SetEntIndex"),
 	entity = EffectMember(NULL, "SetEntity", eunwrap),
@@ -117,7 +116,7 @@ local EFFECT_MEMBERS = {
 -- @param table data The effect data table with keys:
 -- angles - Angle angle of the effect
 -- attachment - number Entity attachment id to attach to
--- color - Color The color to set the effect
+-- color - number The color to set the effect
 -- damagetype - number The damage type of the effect
 -- entindex - number The entity index to set the effect to
 -- entity - Entity entity to set the effect to
