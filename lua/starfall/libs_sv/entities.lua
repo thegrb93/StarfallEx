@@ -1204,6 +1204,37 @@ function ents_methods:setTriggerListener(startTouchCB, endTouchCB)
 	end
 end
 
+--- Set the function to run whenever the entity receives damage.
+---
+--- You can only use this function on these classes:
+--- - starfall_prop
+--- - starfall_processor
+-- @param function|nil func The callback function. Use nil to remove an existing callback. Arguments are the same as the EntityTakeDamage hook.
+function ents_methods:setDamageListener(func)
+	local ent = eunwrap(self)
+	checkpermission(instance, ent, "entities.canTool")
+
+	local class = Ent_GetClass(ent)
+	if not physUpdateWhitelist[class] then SF.Throw("Cannot use damage listener on " .. class, 2) end
+
+	if func then
+		checkluatype(func, TYPE_FUNCTION)
+
+		Ent_GetTable(ent).OnTakeDamage = function(_, dmg)
+			instance:runFunction(func, 
+				self,
+				owrap(dmg:GetAttacker()),
+				owrap(dmg:GetInflictor()),
+				dmg:GetDamage(),
+				dmg:GetDamageType(),
+				vwrap(dmg:GetDamagePosition()),
+				vwrap(dmg:GetDamageForce()))
+		end
+	else
+		Ent_GetTable(ent).OnTakeDamage = nil
+	end
+end
+
 --- Returns a copy of the entity's sanitized internal glua table.
 -- @return table The entity's table.
 function ents_methods:getTable()
