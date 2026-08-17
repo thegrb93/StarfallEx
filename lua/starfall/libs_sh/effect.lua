@@ -97,7 +97,7 @@ local EFFECT_MEMBERS = {
 	attachment = EffectMember(0, "SetAttachment"),
 	color = EffectMember(0, "SetColor"),
 	damagetype = EffectMember(0, "SetDamageType"),
-	entindex = EffectMember(0, "SetEntIndex"),
+	entindex = SERVER and EffectMember(0, "SetEntIndex") or nil,
 	entity = EffectMember(NULL, "SetEntity", eunwrap),
 	flags = EffectMember(0, "SetFlags"),
 	hitbox = EffectMember(0, "SetHitBox"),
@@ -118,7 +118,7 @@ local EFFECT_MEMBERS = {
 -- attachment - number Entity attachment id to attach to
 -- color - number The color to set the effect
 -- damagetype - number The damage type of the effect
--- entindex - number The entity index to set the effect to
+-- entindex - number The entity index to set the effect to (SERVER only)
 -- entity - Entity entity to set the effect to
 -- flags - number Flags to add to the effect
 -- hitbox - number The hitbox id of the effect
