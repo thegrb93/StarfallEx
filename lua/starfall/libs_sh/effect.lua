@@ -126,7 +126,7 @@ end
 -- attachment - number Entity attachment id to attach to
 -- color - Color The color to set the effect
 -- damagetype - number The damage type of the effect
--- entindex - number The entity index to set the effect to
+-- entindex - number The entity index to set the effect to (server-side only, default: -1)
 -- entity - Entity entity to set the effect to
 -- flags - number Flags to add to the effect
 -- hitbox - number The hitbox id of the effect
