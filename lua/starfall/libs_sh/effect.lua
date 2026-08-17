@@ -116,7 +116,7 @@ local EFFECT_MEMBERS = {
 -- @param table data The effect data table with keys:
 -- angles - Angle angle of the effect
 -- attachment - number Entity attachment id to attach to
--- color - number The color to set the effect
+-- color - number The color to set the effect (This is an 8 bit color integer specific to the effect implementation)
 -- damagetype - number The damage type of the effect
 -- entindex - number The entity index to set the effect to (SERVER only)
 -- entity - Entity entity to set the effect to
