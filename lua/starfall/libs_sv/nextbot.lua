@@ -124,13 +124,6 @@ function nextbot_library.create(pos, mdl)
 	return nbwrap(nb)
 end
 
---- Removes the given nextbot.
-function nextbot_library:remove()
-	local nb = nbunwrap(self)
-	checkpermission(instance, nb, "nextbot.remove")
-	entList:remove(nb)
-end
-
 --- Checks if you can spawn any more nextbots
 -- @server
 -- @return boolean Returns true if you can spawn nextbots, false if not
@@ -161,6 +154,14 @@ end
 function nextbot_library.ragdollsLeft()
 	if not SF.Permissions.hasAccess(instance,  nil, "nextbot.ragdollOnDeath") then return 0 end
 	return SF.NextBotRagdolls:check(instance.player)
+end
+
+--- Removes the given nextbot.
+-- @server
+function nb_methods:remove()
+	local nb = nbunwrap(self)
+	checkpermission(instance, nb, "nextbot.remove")
+	entList:remove(nb)
 end
 
 --- Makes the nextbot try to go to a specified position without using navmesh pathfinding (in a straight line).
