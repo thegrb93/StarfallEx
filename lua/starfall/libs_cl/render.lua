@@ -2784,11 +2784,11 @@ render_library.getFogMode = function()
 end
 
 --- Get the color of the current calculated Fog
--- @return Color Color object with ( r, g, b, a ) from the specified fog color.
-render_library.getFogColor = function()
-	local r, g, b = render.GetFogColor()
-	return setmetatable({r, g, b, 255}, col_meta)
-end
+-- @class function
+-- @return number The red channel value.
+-- @return number The green channel value.
+-- @return number The blue channel value.
+render_library.getFogColor = render.GetFogColor
 
 --- Get the distances of the current calculated Fog
 -- @return number The start distance of the Fog.
