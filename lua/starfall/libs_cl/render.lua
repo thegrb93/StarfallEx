@@ -2777,11 +2777,6 @@ end
 -- @class function
 -- @return number Returns the current fog mode.
 render_library.getFogMode = render.GetFogMode
---- Get the mode of the current calculated Fog. See: https://wiki.facepunch.com/gmod/Enums/MATERIAL_FOG
--- @return number return the Fog mode.
-render_library.getFogMode = function()
-	return render.GetFogMode()
-end
 
 --- Get the color of the current calculated Fog
 -- @class function
@@ -2791,31 +2786,26 @@ end
 render_library.getFogColor = render.GetFogColor
 
 --- Get the distances of the current calculated Fog
+-- @class function
 -- @return number The start distance of the Fog.
 -- @return number The end distance of the Fog.
 -- @return number The height of the Fog.
-render_library.getFogDistances = function()
-	local start, endd, height = render.GetFogDistances()
-	return start, endd, height
-end
+render_library.getFogDistances = render.GetFogDistances
 
 --- Get the maximum density of the current calculated Fog
+-- @class function
 -- @return number The maximum density of the Fog (0-1).
-render_library.getFogDensity = function()
-	return render.GetFogMaxDensity()
-end
+render_library.getFogDensity = render.GetFogMaxDensity
 
 --- Checks whether the hardware supports HDR
+-- @class function
 -- @return boolean True if supported.
-render_library.supportsHDR = function()
-	return render.SupportsHDR()
-end
+render_library.supportsHDR = render.SupportsHDR
 
 --- Checks whether HDR is enabled. Hardware support, map and client settings are all taken into account
+-- @class function
 -- @return boolean True if available.
-render_library.getHDREnabled = function()
-	return render.GetHDREnabled()
-end
+render_library.getHDREnabled = render.GetHDREnabled
 
 --- Sets the overlay of the chip to a user's rendertarget
 -- @param string? name The name of the RT to use or nil to set it back to normal
