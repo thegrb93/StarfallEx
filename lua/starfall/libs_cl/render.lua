@@ -142,8 +142,9 @@ local pp = {
 	add = Material("pp/add"),				-- basetexture
 	sub = Material("pp/sub"),				-- basetexture
 	bloom = Material("pp/bloom"),			-- basetexture, levelr, levelg, levelb, colormul
-	colour = Material("pp/colour"),			-- fbtexture, pp_colour_*: addr, addg, addb, brightness, colour, contrast, mulr, mulg, mulb
-	downsample = Material("pp/downsample")	-- fbtexture, darken, multiply
+	colour = Material("pp/colour"),			-- fbtexture, pp_colour_*: addr, addg, addb, brightness, colour, invert, contrast, mulr, mulg, mulb
+	downsample = Material("pp/downsample"),	-- fbtexture, darken, multiply
+	texturize = Material("pp/texturize")	-- fbtexture, patern
 
 }
 local tex_screenEffect = render.GetScreenEffectTexture(0)
@@ -1147,6 +1148,22 @@ function render_library.setMaterialEffectDownsample(mat, darken, multiply)
 
 end
 
+--- Sets the current render material to the given material or the rendertarget, texturizing the texture with a pattern.
+-- @param Material mat The material object to use the texture of, or the name of a rendertarget to use instead.
+-- @param Material patern The material object to use the patern of, or the name of a rendertarget to use instead.
+function render_library.setMaterialEffectTexturize(mat, patern)
+
+	checkpermission(instance, nil, "render.effects")
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	local fbtex = gettexture(mat)
+	local paterntex = gettexture(patern)
+
+	pp.texturize:SetTexture("$fbtexture", fbtex)
+	pp.texturize:SetTexture("$basetexture", paterntex)
+	surface_SetMaterial(pp.texturize)
+	render_SetMaterial(pp.texturize)
+
+end
 
 local defaultCM = {
 	addr = 0,
@@ -1154,15 +1171,16 @@ local defaultCM = {
 	addb = 0,
 	brightness = 0,
 	colour = 1,
+	inv = 0,
 	contrast = 1,
-	mulr = 1,
-	mulg = 1,
-	mulb = 1
+	mulr = 0,
+	mulg = 0,
+	mulb = 0
 }
 
 --- Sets the current render material to the given material or the rendertarget, applying a color modification shader to the texture. Alias: render.setMaterialEffectColourModify
 -- @param Material mat The material object to use the texture of, or the name of a rendertarget to use instead.
--- @param table cmStructure A table where each key must be of "addr", "addg", "addb", "brightness", "color" or "colour", "contrast", "mulr", "mulg", and "mulb". All keys are optional.
+-- @param table cmStructure A table where each key must be of "addr", "addg", "addb", "brightness", "color" or "colour", "inv" or "invert", "contrast", "mulr", "mulg", and "mulb". All keys are optional.
 function render_library.setMaterialEffectColorModify(mat, cmStructure)
 
 	checkpermission(instance, nil, "render.effects")
@@ -1175,6 +1193,8 @@ function render_library.setMaterialEffectColorModify(mat, cmStructure)
 		if TypeID(value) == TYPE_NIL then
 			if key == "colour" then
 				value = cmStructure["color"] or default
+			elseif key == "inv" then
+				value = cmStructure["invert"] or default
 			else
 				value = default
 			end
@@ -2749,31 +2769,43 @@ end
 
 --- Get the mode of the current calculated Fog. See: https://wiki.facepunch.com/gmod/Enums/MATERIAL_FOG
 -- @return number return the Fog mode.
-render_library.getFogMode = render.GetFogMode
+render_library.getFogMode = function()
+	return render.GetFogMode()
+end
 
 --- Get the color of the current calculated Fog
--- @return number The red channel value.
--- @return number The green channel value.
--- @return number The blue channel value.
-render_library.getFogColor = render.GetFogColor
+-- @return Color Color object with ( r, g, b, a ) from the specified fog color.
+render_library.getFogColor = function()
+	local r, g, b = render.GetFogColor()
+	return setmetatable({r, g, b, 255}, col_meta)
+end
 
 --- Get the distances of the current calculated Fog
 -- @return number The start distance of the Fog.
 -- @return number The end distance of the Fog.
 -- @return number The height of the Fog.
-render_library.getFogDistances = render.GetFogDistances
+render_library.getFogDistances = function()
+	local start, endd, height = render.GetFogDistances()
+	return start, endd, height
+end
 
 --- Get the maximum density of the current calculated Fog
 -- @return number The maximum density of the Fog (0-1).
-render_library.getFogDensity = render.GetFogMaxDensity
+render_library.getFogDensity = function()
+	return render.GetFogMaxDensity()
+end
 
 --- Checks whether the hardware supports HDR
--- @return boolean True if supported
-render_library.supportsHDR = render.SupportsHDR
+-- @return boolean True if supported.
+render_library.supportsHDR = function()
+	return render.SupportsHDR()
+end
 
 --- Checks whether HDR is enabled. Hardware support, map and client settings are all taken into account
--- @return boolean True if available
-render_library.getHDREnabled = render.GetHDREnabled
+-- @return boolean True if available.
+render_library.getHDREnabled = function()
+	return render.GetHDREnabled()
+end
 
 --- Sets the overlay of the chip to a user's rendertarget
 -- @param string? name The name of the RT to use or nil to set it back to normal
