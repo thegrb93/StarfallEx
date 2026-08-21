@@ -1152,15 +1152,15 @@ end
 -- @param Material mat The material object to use the texture of, or the name of a rendertarget to use instead.
 -- @param Material patern The material object to use the patern of, or the name of a rendertarget to use instead.
 -- @param number scalex The size of the texturing on the x axis
--- @param number scaley size of the texturing on the y axis
+-- @param number scaley The size of the texturing on the y axis
 function render_library.setMaterialEffectTexturize(mat, patern, scalex, scaley)
 
 	checkpermission(instance, nil, "render.effects")
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	local fbtex = gettexture(mat)
 	local paterntex = gettexture(patern)
-	scalex = clamp(scalex, 1, 4096)
-	scaley = clamp(scaley, 1, 4096)
+	scalex = max(1, scalex)
+	scaley = max(1, scaley)
 
 	pp.texturize:SetTexture("$fbtexture", fbtex)
 	pp.texturize:SetTexture("$basetexture", paterntex)
