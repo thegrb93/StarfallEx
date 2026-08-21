@@ -1151,8 +1151,8 @@ end
 --- Sets the current render material to the given material or the rendertarget, texturizing the texture with a pattern.
 -- @param Material mat The material object to use the texture of, or the name of a rendertarget to use instead.
 -- @param Material patern The material object to use the patern of, or the name of a rendertarget to use instead.
--- @param number The size of the texturing on the x axis
--- @param number The size of the texturing on the y axis
+-- @param number scalex The size of the texturing on the x axis
+-- @param number scaley size of the texturing on the y axis
 function render_library.setMaterialEffectTexturize(mat, patern, scalex, scaley)
 
 	checkpermission(instance, nil, "render.effects")
