@@ -1151,15 +1151,21 @@ end
 --- Sets the current render material to the given material or the rendertarget, texturizing the texture with a pattern.
 -- @param Material mat The material object to use the texture of, or the name of a rendertarget to use instead.
 -- @param Material patern The material object to use the patern of, or the name of a rendertarget to use instead.
-function render_library.setMaterialEffectTexturize(mat, patern)
+-- @param number The size of the texturing on the x axis
+-- @param number The size of the texturing on the y axis
+function render_library.setMaterialEffectTexturize(mat, patern, scalex, scaley)
 
 	checkpermission(instance, nil, "render.effects")
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	local fbtex = gettexture(mat)
 	local paterntex = gettexture(patern)
+	scalex = clamp(scalex, 1, 4096)
+	scaley = clamp(scaley, 1, 4096)
 
 	pp.texturize:SetTexture("$fbtexture", fbtex)
 	pp.texturize:SetTexture("$basetexture", paterntex)
+	pp.texturize:SetInt("$scalex", scalex)
+	pp.texturize:SetInt("$scaley", scaley)
 	surface_SetMaterial(pp.texturize)
 	render_SetMaterial(pp.texturize)
 
