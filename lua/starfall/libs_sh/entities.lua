@@ -1308,13 +1308,13 @@ if CLIENT then
 --- Sets the bone matrix of given bone to given matrix.
 -- Call `Entity:setupBones` to apply all changes.
 -- @client
--- @param number? bone The bone index (default: 0)
+-- @param number bone The bone index
 -- @param VMatrix matrix The matrix to set
 function ents_methods:setBoneMatrix(bone, matrix)
 	local matrix = munwrap(matrix)
 	local ent = eunwrap(self)
 
-	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
+	checkluatype(bone, TYPE_NUMBER)
 	checkpermission(instance, ent, "entities.setRenderProperty")
 
 	bone = math.Clamp(math.floor(bone), 0, Ent_GetBoneCount(ent)-1)
