@@ -71,7 +71,7 @@ function jiggleprop_cl:generate()
     self.mesh = mesh.createEmptySkinned()
     self.matrices = self.mesh:setupBoneMatrices(self.nbones)
 
-    -- Wait for average to decrease enough to generate the mesh
+    -- Wait for the average to decrease enough to generate the mesh
     while quotaAverage()>quotaMax()*0.1 do coroutine.yield("wait") end
 
     mesh.generate(self.mesh, MATERIAL.QUADS, nx*ny, function()

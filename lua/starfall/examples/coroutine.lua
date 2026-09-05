@@ -41,10 +41,10 @@ local erato = coroutine.create(function (n)
 		end
 	end
 
-	-- Finally we want to return our table of primes we've generated.
-	-- Therefore we yield but pass it the table to yield back.
-	print((timer.systime() - time) .. " seconds to complete")
-	return primes
+    -- Finally we want to return our table of primes we've generated.
+    -- Therefore we yield and pass it the table to yield back.
+    print((timer.systime() - time) .. " seconds to complete")
+    return primes
 end)
 
 hook.add("think", "primeNumbers", function ()

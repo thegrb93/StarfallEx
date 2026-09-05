@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 
 -- Register privileges
@@ -92,7 +92,8 @@ end
 -- @param Vector pos The cone vertex position
 -- @param Vector dir The direction to project the cone
 -- @param number distance The length to project the cone
--- @param number radius The cosine of angle of the cone. 1 makes a 0° cone, 0.707 makes approximately 90°, 0 makes 180°, and so on.
+-- @param number radius The cosine of angle of the cone. 1 makes a 0° cone, 0.707 makes approximately 90°,
+-- 0 makes 180°, and so on.
 -- @param function? filter Optional function to filter results
 -- @return table An array of found entities
 function find_library.inCone(pos, dir, distance, radius, filter)
@@ -285,7 +286,7 @@ end
 
 --- Returns entity that has given Entity:mapCreationID.
 -- @param number num Entity's creation id
--- @return Entity? The found entity or nil if not found
+-- @return Entity? The found entity, or nil if not found
 function find_library.getMapCreatedEntity(num)
 	checkluatype(num, TYPE_NUMBER)
 	return owrap(ents.GetMapCreatedEntity(num))

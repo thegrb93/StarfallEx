@@ -79,12 +79,14 @@ local projectedLights = SF.EntManager("projectedlights", "projected lights", 20,
 SF.RegisterLibrary("light")
 
 --- Light type
+-- Created with `light.create` function
 -- @name Light
 -- @class type
 -- @libtbl light_methods
 SF.RegisterType("Light", true, false)
 
---- Projected Texture type
+--- ProjectedTexture type
+-- Created with `light.createProjected` function
 -- @name ProjectedTexture
 -- @class type
 -- @libtbl projectedtexture_methods
@@ -131,9 +133,9 @@ instance:AddHook("deinitialize", function()
 	projectedLights:deinitialize(instance, true)
 end)
 
---- Creates a dynamic light (make sure to draw it)
+--- Creates a dynamic light (don't forget to draw it)
 -- @param Vector pos The position of the light
--- @param number size The size of the light. Must be lower than sf_light_maxsize
+-- @param number size The size of the light (must be lower than sf_light_maxsize)
 -- @param number brightness The brightness of the light
 -- @param Color color The color of the light
 -- @return Light Dynamic light
@@ -156,13 +158,15 @@ function light_library.create(pos, size, brightness, color)
 	return wrap(light)
 end
 
---- Draws the light. Typically used in the think hook. Will throw an error if it fails (use pcall)
+--- Draws the light.
+-- Typically used in the `Think` hook.
+-- Will throw an error if it fails (use `pcall`).
 function light_methods:draw()
 	local curtime = CurTime()
 	processLights(curtime)
 	if lightsUsed >= 32 then SF.Throw("Max number of dynamiclights reached", 2) end
 	lightsUsed = lightsUsed + 1
-	
+
 	local light = unwrap(self)
 	if not light.slot then
 		light.slot = getFreeSlot()
@@ -191,7 +195,7 @@ function light_methods:setDecay(decay)
 end
 
 --- Sets the light lifespan (Required for fade effect i.e. decay)
--- @param number dietime The how long the light will stay alive after turning it off.
+-- @param number dietime How long the light will stay alive after turning it off.
 function light_methods:setDieTime(dietime)
 	checkluatype(dietime, TYPE_NUMBER)
 	unwrap(self).dietime = math.max(dietime, 0)
@@ -251,7 +255,8 @@ function light_methods:setSize(size)
 	unwrap(self).data.size = math.Clamp(size, 0, maxSize:GetFloat())
 end
 
---- Sets the flicker style of the light https://developer.valvesoftware.com/wiki/Light_dynamic#Appearances
+--- Sets the flicker style of the light
+-- See https://developer.valvesoftware.com/wiki/Light_dynamic#Appearances
 -- @param number style The number of the flicker style
 function light_methods:setStyle(style)
 	checkluatype(style, TYPE_NUMBER)
@@ -267,7 +272,7 @@ function light_methods:setColor(col)
 	data.b = tonumber(col[3])
 end
 
---- Destroys the light object freeing up whatever slot it was using
+--- Destroys the light object, freeing up whatever slot it was using
 function light_methods:destroy()
 	local light = unwrap(self)
 	destroyLight(light)
@@ -311,7 +316,7 @@ function projectedtexture_methods:getConstantAttenuation()
 	return ptunwrap(self):GetConstantAttenuation()
 end
 
---- Gets if the Projected Texture is casting shadows
+--- Returns whether the Projected Texture is casting shadows
 -- @return boolean enabled
 function projectedtexture_methods:getEnableShadows()
 	return ptunwrap(self):GetEnableShadows()
@@ -329,7 +334,7 @@ function projectedtexture_methods:getHorizontalFOV()
 	return ptunwrap(self):GetHorizontalFOV()
 end
 
---- Gets whether the Projected Texture is lighting world geometry or not
+--- Gets whether the Projected Texture is lighting world geometry
 -- @return boolean Lighting
 function projectedtexture_methods:getLightWorld()
 	return ptunwrap(self):GetLightWorld()
@@ -360,11 +365,12 @@ function projectedtexture_methods:getNoCull()
 end
 
 --- Gets the orthographic settings of the Projected Texture
--- @return boolean orthographic Whether or not the Projected Texture is actually orthographic. If false, then the other value are not returned.
+-- @return boolean orthographic Whether the Projected Texture is actually orthographic.
+-- If false, then the other values are not returned.
 -- @return number left
 -- @return number top
 -- @return number right
--- @return number botom
+-- @return number bottom
 function projectedtexture_methods:getOrthographic()
 	return ptunwrap(self):GetOrthographic()
 end
@@ -490,7 +496,7 @@ function projectedtexture_methods:setHorizontalFOV(fov)
 	ptunwrap(self):SetHorizontalFOV(fov)
 end
 
---- Sets whether or not the Projected Texture lights world geometry
+--- Sets if the Projected Texture should light the world geometry
 -- Will not take effect until ProjectedTexture:update() is called.
 -- @param boolean enable
 function projectedtexture_methods:setLightWorld(enable)
@@ -504,7 +510,7 @@ function projectedtexture_methods:setLinearAttenuation(attenuation)
 	ptunwrap(self):SetLinearAttenuation(attenuation)
 end
 
---- Sets the distance at which the Projected Texture ends
+--- Sets the distance at which the Projected Texture starts
 -- A value of 0 will disable the Projected Texture
 -- Will not take effect until ProjectedTexture:update() is called.
 -- @param number nearZ
@@ -568,7 +574,7 @@ function projectedtexture_methods:setShadowSlopeScaleDepthBias(bias)
 end
 
 --- Sets the Projected Texture's target entity
--- If set, this will be the only entity that is lit, as well as the world
+-- If set, this will be the only entity that is lit (in addition to the world)
 -- Will not take effect until ProjectedTexture:update() is called.
 -- @param Entity ent
 function projectedtexture_methods:setTargetEntity(ent)
@@ -597,7 +603,7 @@ function projectedtexture_methods:setVerticalFOV(fov)
 	ptunwrap(self):SetVerticalFOV(fov)
 end
 
---- Updates the Projected Texture with whatever paremeters were previously set
+--- Updates the Projected Texture with whatever parameters were previously set
 function projectedtexture_methods:update()
 	ptunwrap(self):Update()
 end

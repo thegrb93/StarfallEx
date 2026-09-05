@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 
 
@@ -17,12 +17,14 @@ SF.ResourceCounters.ParticleEmitters = {icon = "icon16/asterisk_yellow.png", cou
 SF.RegisterLibrary("particle")
 
 --- ParticleEmitter type
+-- Created with `particle.create` function
 -- @name ParticleEmitter
 -- @class type
 -- @libtbl particleem_methods
 SF.RegisterType("ParticleEmitter", true, false)
 
 --- Particle type
+-- Created with `ParticleEmitter:add` function
 -- @name Particle
 -- @class type
 -- @libtbl particle_methods
@@ -69,7 +71,7 @@ end)
 --- Creates a ParticleEmitter data structure
 -- @param Vector position The particle emitter's position
 -- @param boolean use3D Create the emitter in 3D mode
--- @return ParticleEmitter? ParticleEmitter Object or nil if the engine max of 4097 was hit
+-- @return ParticleEmitter? Particle emitter object, or nil if the engine max of 4097 was hit
 function particle_library.create(position, use3D)
 	checkluatype(use3D, TYPE_BOOL)
 	checkpermission(instance, nil, "particle.create")
@@ -83,7 +85,7 @@ function particle_library.create(position, use3D)
 	end
 end
 
---- Returns number of particle emitters left able to be created
+--- Returns the number of particle emitters that can still be created
 -- @return number Number of particle emitters left
 function particle_library.particleEmittersLeft()
 	return plyEmitterCount:check(instance.player)
@@ -148,7 +150,7 @@ function particleem_methods:getNumActiveParticles()
 	return peunwrap(self):GetNumActiveParticles()
 end
 
---- Returns number of particles left able to be created from the emitter
+--- Returns the number of particles that can still be created from the emitter
 -- @return number Number of particles left
 function particleem_methods:getParticlesLeft()
 	return cv_particle_count:GetInt() - peunwrap(self):GetNumActiveParticles()
@@ -179,7 +181,7 @@ function particleem_methods:setBBox(mins, maxs)
 	peunwrap(self):SetBBox(vunwrap1(mins), vunwrap2(maxs))
 end
 
---- This function sets the the distance between the render camera and the emitter at which the particles should start fading and at which distance fade ends ( alpha becomes 0 ).
+--- This function sets the distance between the render camera and the emitter at which the particles should start fading and at which distance the fade ends (alpha becomes 0).
 -- @param number distanceMin
 -- @param number distanceMax
 function particleem_methods:setNearClip(distanceMin, distanceMax)
@@ -195,8 +197,8 @@ function particleem_methods:setNoDraw(noDraw)
 	peunwrap(self):SetNoDraw(noDraw)
 end
 
---- The function name has not much in common with its actual function.
--- It applies a radius to every particles that affects the building of the bounding box, as it usually is constructed by the particle that has the lowest x, y and z and the highest x, y and z.
+--- The function name doesn't have much in common with its actual function.
+-- It applies a radius to every particle that affects the building of the bounding box, as it usually is constructed by the particle that has the lowest x, y and z and the highest x, y and z.
 -- This function just adds/subtracts the radius and inflates the bounding box.
 -- @param number radius Particle radius
 function particleem_methods:setParticleCullRadius(radius)
@@ -253,20 +255,20 @@ function particle_methods:setAngles(ang)
 	punwrap(self):SetAngles(aunwrap1(ang))
 end
 
---- Sets the angular velocity of the the particle.
--- @param Angle angVel Angular velocity to set the particle's to
+--- Sets the angular velocity of the particle.
+-- @param Angle angVel Angular velocity to set the particle's angular velocity to
 function particle_methods:setAngleVelocity(angVel)
 	punwrap(self):SetAngleVelocity(aunwrap1(angVel))
 end
 
---- Sets the 'bounciness' of the the particle.
+--- Sets the 'bounciness' of the particle.
 -- @param number bounce Bounciness to set to
 function particle_methods:setBounce(bounce)
 	checkluatype(bounce, TYPE_NUMBER)
 	punwrap(self):SetBounce(bounce)
 end
 
---- Sets the whether the particle should collide with the world or not.
+--- Sets whether the particle should collide with the world or not.
 -- @param boolean shouldCollide Whether it should collide
 function particle_methods:setCollide(shouldCollide)
 	checkluatype(shouldCollide, TYPE_BOOL)
@@ -307,7 +309,7 @@ function particle_methods:setRoll(roll)
 end
 
 --- Sets the rotation speed of the particle in radians. This should only be used for 2D particles.
--- @param number rollDelta Rolldelta
+-- @param number rollDelta Roll delta
 function particle_methods:setRollDelta(rollDelta)
 	checkluatype(rollDelta, TYPE_NUMBER)
 	punwrap(self):SetRollDelta(rollDelta)
@@ -319,14 +321,14 @@ function particle_methods:setVelocity(vel)
 	punwrap(self):SetVelocity(vunwrap1(vel))
 end
 
---- Sets the air resistance of the the particle.
+--- Sets the air resistance of the particle.
 -- @param number airResistance AirResistance to set to
 function particle_methods:setAirResistance(airResistance)
 	checkluatype(airResistance, TYPE_NUMBER)
 	punwrap(self):SetAirResistance(airResistance)
 end
 
---- Sets the directional gravity aka. acceleration of the particle.
+--- Sets the directional gravity aka acceleration of the particle.
 -- @param Vector gravity Directional gravity
 function particle_methods:setGravity(gravity)
 	punwrap(self):SetGravity(vunwrap1(gravity))

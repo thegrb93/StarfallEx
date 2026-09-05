@@ -93,7 +93,7 @@ function SF.Editor.Themes.SwitchTheme(name)
 	end
 	if theme.Version ~= themeformat_version then
 		SF.Editor.Themes.SwitchTheme("default")
-		print("Theme "..name.." isn't compatible with this starfall version, you have to reimport it!")
+		print("Theme "..name.." isn't compatible with this Starfall version, you have to reimport it!")
 		return
 	end
 	for k, v in pairs(SF.Editor.Themes.Themes.default) do
@@ -235,9 +235,9 @@ local function parseTextMate(text)
 end
 
 --- Parses a TextMate XML theme file.
--- @param text The contents of XML file
--- @return Theme table that can be used with SF.Editor.Themes.AddTheme, nil if there was an error
--- @return Sanitized string identifier for the theme - a lowercase string without whitespace, nil if there was an error
+-- @param string text The contents of XML file
+-- @return Theme table that can be used with SF.Editor.Themes.AddTheme, or nil if there was an error
+-- @return Sanitized string identifier for the theme - a lowercase string without whitespace, or nil if there was an error
 -- @return Parsing error string
 function SF.Editor.Themes.ParseTextMate(text)
 	local ok, themeTable, strId = pcall(parseTextMate, text)

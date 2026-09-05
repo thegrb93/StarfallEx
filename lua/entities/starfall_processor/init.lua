@@ -47,7 +47,7 @@ function ENT:SetCustomModel(model)
 			self:GetPhysicsObject():EnableMotion(movable)
 		end
 		self:GetPhysicsObject():EnableMotion(false)
-		timer.Simple(0, remakeConstraints) -- Need timer or wont work
+		timer.Simple(0, remakeConstraints) -- Need a timer or it won't work
 	end
 end
 
@@ -139,13 +139,13 @@ function ENT:PostEntityPaste(ply, ent, CreatedEntities)
 		if istable(info.starfall) then
 			local ver = tonumber(info.starfall.ver)
 			if ver == 4.3 then
-				if not isstring(info.starfall.files) then error("Corrupt starfall dupe data") end
+				if not isstring(info.starfall.files) then error("Corrupt Starfall dupe data") end
 				local files = SF.DecompressFiles(info.starfall.files)
 				self.starfalluserdata = info.starfall.udata and tostring(info.starfall.udata) or nil
 				self.sfdata = {owner = ply, files = files, mainfile = tostring(info.starfall.mainfile), proc = self}
 			elseif ver==nil then
 				-- Legacy duplications
-				if not istable(info.starfall.source) then error("Corrupt starfall dupe data") end
+				if not istable(info.starfall.source) then error("Corrupt Starfall dupe data") end
 				local files = {}
 				for filename, source in pairs(info.starfall.source) do
 					files[tostring(filename)] = string.gsub(source, "[" .. string.char(5) .. string.char(4) .. "]", { [string.char(5)[1]] = "\n", [string.char(4)[1]] = '"' })
@@ -153,7 +153,7 @@ function ENT:PostEntityPaste(ply, ent, CreatedEntities)
 				self.starfalluserdata = info.starfalluserdata and tostring(info.starfalluserdata) or nil
 				self.sfdata = {owner = ply, files = files, mainfile = tostring(info.starfall.mainfile), proc = self}
 			else
-				error("This server's starfall is too out of date to paste")
+				error("This server's Starfall is too out of date to paste")
 			end
 		end
 	end
@@ -183,7 +183,7 @@ util.AddNetworkString("starfall_processor_link")
 util.AddNetworkString("starfall_processor_kill")
 util.AddNetworkString("starfall_processor_clinit")
 
--- Request code from the chip. If the chip doesn't have code yet add player to list to send when there is code.
+-- Request code from the chip. If the chip doesn't have code yet, add the player to the list to send when there is code.
 net.Receive("starfall_processor_download", function(len, ply)
 	local proc = net.ReadEntity()
 	if Ent_IsValid(ply) and Ent_IsValid(proc) then

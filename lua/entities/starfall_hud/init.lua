@@ -24,7 +24,7 @@ function ENT:UpdateTransmitState()
 end
 
 function ENT:Use(ply)
-	if not IsValid(self.link) then ply:ChatPrint("This hud isn't linked to a chip!") return end
+	if not IsValid(self.link) then ply:ChatPrint("This HUD isn't linked to a chip!") return end
 	SF.EnableHud(ply, self.link, self, not SF.IsHUDActive(self.link, ply))
 end
 

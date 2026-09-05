@@ -26,7 +26,7 @@ if sf_dir then
 		local lastCommit = file.Read( sf_dir..".git/"..head, "GAME")
 
 		if lastCommit then
-			SF.Version = SF.Version .. "_" .. lastCommit:sub(1,7) -- We need only first 7 to be safely unique
+			SF.Version = SF.Version .. "_" .. lastCommit:sub(1,7) -- We need only the first 7 to be safely unique
 		end
 	end
 end

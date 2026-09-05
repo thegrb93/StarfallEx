@@ -105,7 +105,7 @@ function TabHandler:AddSession(tab)
 	self.Tabs[tab.uri] = tab
 	self.Uri = self.Uri + 1
 
-	-- Lua can't retreive data from javascript directly so we have to update the tab's code any time if changes
+	-- Lua can't retrieve data from javascript directly so we have to update the tab's code any time it changes
 	self.html:RunJavascript([[
 	{
 		let uri="]]..tab.uri..[[";

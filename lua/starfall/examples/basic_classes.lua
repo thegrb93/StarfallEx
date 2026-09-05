@@ -21,7 +21,7 @@ end
 -- Make a class that derives from Student
 local CollegeStudent = class("CollegeStudent", Student)
 
--- This overrides Student's initialize so that won't be called alongside this.
+-- This overrides Student's initialize so that it won't be called alongside this.
 function CollegeStudent:initialize(name, school, procrastinating)
     self.name = name
     self.school = school

@@ -1,7 +1,7 @@
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 
--- Register Priveleges
+-- Register Privileges
 registerprivilege("notification", "Create notifications", "Allows the user to create notifications on their screen", { client = { default = 5 } })
 
 
@@ -43,10 +43,10 @@ function notification_library.addLegacy(text, type, length)
 end
 
 
---- Displays a notification with an animated progress bar, will persist unless killed or chip is removed.
+--- Displays a notification with an animated progress bar, will persist unless killed or the chip is removed.
 -- @param string id String index of the notification
 -- @param string text The text to display
--- @param number? progress An optional progress val 0-1 indicating progress.
+-- @param number? progress An optional progress value from 0-1 indicating progress.
 function notification_library.addProgress(id, text, progress)
 	checkpermission(instance, nil, "notification")
 	checkluatype(id, TYPE_STRING)

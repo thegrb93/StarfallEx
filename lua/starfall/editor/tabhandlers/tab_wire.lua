@@ -1,5 +1,5 @@
 --[[
-Modified version of Wire Editor, you can find original code and it's licence on link below.
+Modified version of the Wire Editor; you can find the original code and its license on the link below.
 https://github.com/wiremod/wire
 File in use: https://github.com/wiremod/wire/blob/3cf67a781006886fb76619c23ea55fa1c661ae90/lua/wire/client/text_editor/texteditor.lua
 ]]
@@ -97,7 +97,7 @@ function TabHandler:LoadSyntaxColors()
 	for k,v in pairs(SF.Editor.Themes.CurrentTheme) do
 		if not istable(v) then continue end
 		if not v["r"] then
-			local mult = TabHandler.EnlightenColorsConVar:GetBool() and 1 or 1.2 -- For some reason gmod seems to render text darker than html
+			local mult = TabHandler.EnlightenColorsConVar:GetBool() and 1 or 1.2 -- For some reason GMod seems to render text darker than HTML
 			colors[k] = {
 				v[1] and Color(v[1].r*mult,v[1].g*mult,v[1].b*mult,v[1]["a"] or 255) or nil,
 				v[2] and Color(v[2].r*mult,v[2].g*mult,v[2].b*mult,v[2]["a"] or 255) or nil,
@@ -971,13 +971,13 @@ function PANEL:PaintLine(row, drawpos, leftOffset, drawonlytext)
 		self.Rows[row][2] = colored
 
 		local newrow = row+1
-		--Let's find end of string/comment
+		--Let's find the end of the string/comment
 		while colored.unfinished do
 			if newrow > lines then break end -- End of file
 			if newrow - row < 50 then
 				colored = self:SyntaxColorLine(newrow)
 				self.Rows[newrow][2] = colored
-			else -- If string/comment is above 50 lines long invalidate rest of cache so it gets rebuilt later instead of doing it now
+			else -- If a string/comment is above 50 lines long, invalidate the rest of the cache so it gets rebuilt later instead of doing it now
 				self.Rows[newrow][2] = false
 			end
 			newrow = newrow + 1
@@ -1043,12 +1043,12 @@ function PANEL:PaintLine(row, drawpos, leftOffset, drawonlytext)
 
 	local nonwhitespace = false
 	for i, cell in ipairs(cells) do
-		if cell[3] == "whitespace" and not nonwhitespace and drawonlytext then -- Skip whitespaces at beginning if its text only
+		if cell[3] == "whitespace" and not nonwhitespace and drawonlytext then -- Skip whitespaces at the beginning if it's text only
 			continue
 		end
 		nonwhitespace = true
 		if offset > self.Size[2] then return end
-		if offset < 0 then -- When there is part of line horizontally beginning before our scrolled area
+		if offset < 0 then -- When part of the line extends horizontally before our scrolled area
 			local length = cell[1]:len()
 			if length > -offset then
 				local line = cell[1]:sub(1-offset)
@@ -1273,7 +1273,7 @@ function PANEL:Paint()
 		i = i+1
 	end
 
-	-- Paint the overlay of the text (bracket highlighting and carret postition)
+	-- Paint the overlay of the text (bracket highlighting and caret position)
 	self:PaintTextOverlay()
 
 	if TabHandler.DisplayCaretPosConVar:GetBool() then
@@ -2583,7 +2583,7 @@ function PANEL:_OnKeyCodeTyped(code)
 			local tabs = string_rep(indent_str, TabHandler.ExpandTabsConVar:GetBool() and math_floor(diff / TabHandler.TabSizeConVar:GetInt()) or diff)
 			if TabHandler.AutoIndentConVar:GetBool() then
 				local function countMatches(s,open,close)
-					-- add spaces to string to detect whole word
+					-- add spaces to the string to detect the whole word
 					s = " " .. s .. " "
 					local n = 0
 					for i=1,#open do

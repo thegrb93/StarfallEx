@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 local ENT_META = FindMetaTable("Entity")
@@ -49,7 +49,9 @@ end
 -- @libtbl hologram_library
 SF.RegisterLibrary("hologram")
 
---- Hologram type
+--- Hologram type.
+-- Inherits all functions from `Entity` type.
+-- Created with `hologram.create` function.
 -- @name Hologram
 -- @class type
 -- @libtbl hologram_methods
@@ -82,7 +84,7 @@ instance:AddHook("deinitialize", function()
 	if SERVER then
 		entList:deinitialize(instance, true)
 	else
-		-- Removing hologram in render hook = lua error
+		-- Removing hologram in render hook = Lua error
 		timer.Simple(0, function()
 			entList:deinitialize(instance, true)
 		end)
@@ -104,7 +106,7 @@ local scale_identity = Vector(1,1,1)
 -- @param Angle ang The angle to create the hologram
 -- @param string model The model to give the hologram
 -- @param Vector? scale (Optional) The scale to give the hologram
--- @return Hologram? The hologram object or nil if it failed to create
+-- @return Hologram? The hologram object, or nil if it failed to create
 function hologram_library.create(pos, ang, model, scale)
 	checkpermission(instance, nil, "hologram.create")
 	checkluatype(model, TYPE_STRING)
@@ -197,7 +199,7 @@ if SERVER then
 
 	--- Sets the hologram's movetype
 	-- @server
-	-- @param number Movetype to set, either MOVETYPE.NOCLIP (default) or MOVETYPE.NONE
+	-- @param number move Movetype to set, either MOVETYPE.NOCLIP (default) or MOVETYPE.NONE
 	function hologram_methods:setMoveType(move)
 		if move ~= MOVETYPE_NONE and move ~= MOVETYPE_NOCLIP then
 			SF.Throw("Invalid movetype provided, must be either MOVETYPE.NOCLIP or MOVETYPE.NONE", 2)
@@ -262,7 +264,7 @@ else
 
 	--- Sets the texture filtering function when viewing a close texture
 	-- @client
-	-- @param number val The filter function to use http://wiki.facepunch.com/gmod/Enums/TEXFILTER
+	-- @param number val The filter function to use https://wiki.facepunch.com/gmod/Enums/TEXFILTER
 	function hologram_methods:setFilterMag(val)
 		local holo = unwrap(self)
 		local ent_tbl = Ent_GetTable(holo)
@@ -279,7 +281,7 @@ else
 
 	--- Sets the texture filtering function when viewing a far texture
 	-- @client
-	-- @param number val The filter function to use http://wiki.facepunch.com/gmod/Enums/TEXFILTER
+	-- @param number val The filter function to use https://wiki.facepunch.com/gmod/Enums/TEXFILTER
 	function hologram_methods:setFilterMin(val)
 		local holo = unwrap(self)
 		local ent_tbl = Ent_GetTable(holo)
@@ -320,9 +322,10 @@ else
 	local render_GetColorModulation, render_GetBlend = render.GetColorModulation, render.GetBlend
 	local render_SetColorModulation, render_SetBlend = render.SetColorModulation, render.SetBlend
 
-	--- Manually draws a hologram, requires a 3d render context
+	--- Manually draws a hologram, requires a 3D render context
 	-- @client
-	-- @param boolean? noTint If true, renders the hologram without its color and opacity. The default is for holograms to render with color or opacity, so use this argument if you need that behavior.
+	-- @param boolean? noTint If true, renders the hologram without its color and opacity.
+	-- The default for holograms is to render with color or opacity, so use this argument if you need that behavior.
 	function hologram_methods:draw(noTint)
 		if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 		plyHoloRenderBurst:use(instance.player, 1)
@@ -376,9 +379,12 @@ end
 -- @shared
 -- @param number index Whatever number you want the clip to be
 -- @param boolean enabled Whether the clip is enabled
--- @param Vector? origin The center of the clip plane in world coordinates, or local to entity if it is specified. Only used if enabled.
--- @param Vector? normal The the direction of the clip plane in world coordinates, or local to entity if it is specified. Only used if enabled.
--- @param Entity? entity (Optional) The entity to make coordinates local to, otherwise the world is used. Only used if enabled.
+-- @param Vector? origin The center of the clip plane in world coordinates, or local to entity if it is specified.
+-- Only used if enabled.
+-- @param Vector? normal The direction of the clip plane in world coordinates, or local to entity if it is specified.
+-- Only used if enabled.
+-- @param Entity? entity (Optional) The entity to make coordinates local to, otherwise the world is used.
+-- Only used if enabled.
 function hologram_methods:setClip(index, enabled, origin, normal, entity)
 	local holo = unwrap(self)
 	local ent_tbl = Ent_GetTable(holo)
@@ -474,8 +480,8 @@ end
 --- Animates a hologram
 -- @shared
 -- @param number|string animation Animation number or string name.
--- @param number? frame Optional int (Default 0) The starting frame number. Does nothing if nil
--- @param number? rate Optional float (Default 1) Frame speed. Does nothing if nil
+-- @param number? frame Optional int. The starting frame number. Does nothing if nil.
+-- @param number? rate Optional float. Frame speed. Does nothing if nil.
 function hologram_methods:setAnimation(animation, frame, rate)
 	local holo = unwrap(self)
 	local ent_tbl = Ent_GetTable(holo)
@@ -504,7 +510,7 @@ end
 
 --- Set the cull mode for a hologram.
 -- @shared
--- @param number mode Cull mode. 0 for counter clock wise, 1 for clock wise
+-- @param number mode Cull mode. 0 for counter clock-wise, 1 for clock-wise
 function hologram_methods:setCullMode(mode)
 	checkluatype(mode, TYPE_NUMBER)
 	local holo = unwrap(self)
@@ -516,14 +522,21 @@ end
 
 --- Set the render group for a hologram.
 -- @shared
--- @param number|nil group Render group. If unset, the engine will decide the render group based on the entity's materials. Can be RENDERGROUP.OPAQUE RENDERGROUP.TRANSLUCENT RENDERGROUP.BOTH RENDERGROUP.VIEWMODEL RENDERGROUP.VIEWMODEL.TRANSLUCENT RENDERGROUP.OPAQUE.BRUSH
+-- @param number? group Render group to set.
+-- If `nil`, the engine will decide the render group based on the entity's materials.
+-- Can be one of:
+-- RENDERGROUP.OPAQUE
+-- RENDERGROUP.TRANSLUCENT
+-- RENDERGROUP.BOTH
+-- RENDERGROUP.VIEWMODEL
+-- RENDERGROUP.VIEWMODEL_TRANSLUCENT
 function hologram_methods:setRenderGroup(group)
 	local holo = unwrap(self)
 	checkpermission(instance, holo, "entities.setRenderProperty")
 
 	if group then
 		checkluatype(group, TYPE_NUMBER)
-		if not SF.allowedRenderGroups[group] then SF.Throw("Invalid rendergroup!") end
+		if not SF.allowedRenderGroups[group] then SF.Throw("Invalid render group!") end
 		Ent_GetTable(holo).SetRenderGroupInternal(holo, group)
 	else
 		Ent_GetTable(holo).SetRenderGroupInternal(holo, -1)
