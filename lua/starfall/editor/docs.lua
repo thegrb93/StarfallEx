@@ -43,7 +43,7 @@ local generic_lua_types = {
 	["nil"] = true -- For nullable / optional values
 }
 
-local sf_types = Docs.Types -- Get the types from documentation rather than the lua state
+local sf_types = Docs.Types -- Get the types from documentation rather than the Lua state
 local function valid_sftype(type1)
 	if sf_types[type1] or generic_lua_types[type1] then return true end
 
@@ -121,15 +121,19 @@ end
 
 local processTypes = {
 	["type"] = function(data)
-		for k, v in ipairs(data.libtbl) do
-			methodstolib[v] = data.name
+		if data.libtbl then
+			for k, v in ipairs(data.libtbl) do
+				methodstolib[v] = data.name
+			end
 		end
 		Docs.Types[data.name] = data
 		data.methods = {}
 	end,
 	["library"] = function(data)
-		for k, v in ipairs(data.libtbl) do
-			methodstolib[v] = data.name
+		if data.libtbl then
+			for k, v in ipairs(data.libtbl) do
+				methodstolib[v] = data.name
+			end
 		end
 		Docs.Libraries[data.name] = data
 		data.tables = {}
