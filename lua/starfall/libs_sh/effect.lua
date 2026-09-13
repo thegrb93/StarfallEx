@@ -129,9 +129,11 @@ local EFFECT_MEMBERS = {
 -- number scale: The scale value of the effect
 -- `Vector` start: The start vector of the effect
 -- number surfaceprop: The surfaceprop index of the effect
-function effect_library.create(name, data)
+-- @param boolean? nofilter (Optional) Make the effect play for everyone, even in predicted hooks. Only affects Server-side effects.
+function effect_library.create(name, data, nofilter)
 	checkluatype(name, TYPE_STRING)
 	checkluatype(data, TYPE_TABLE)
+	if nofilter~=nil then checkluatype(nofilter, TYPE_BOOL) end
 	checkpermission(instance, nil, "effect.create")
 
 	name = string.gsub(string.lower(name), "\x00.*", "")
@@ -176,7 +178,7 @@ function effect_library.create(name, data)
 	if not ok then SF.Throw("Error setting member '"..settingMember.."': "..tostring(ret), 2) end
 
 	plyEffectBurst:use(instance.player, 1)
-	util.Effect(name, ret)
+	util.Effect(name, ret, true, nofilter)
 end
 
 --- Returns the number of effects that can still be created within the burst quota
