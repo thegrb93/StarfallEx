@@ -252,4 +252,4 @@ SF.SteamIDConcommand("sf_kill", function( executor, ply )
 		net.WriteEntity( instance.entity )
 		net.SendToServer()
 	end
-end, "Admin only. Terminate all user's Starfall chips.", true )
+end, "Admin only. Terminate all of a user's Starfall chips.", true )
