@@ -769,6 +769,8 @@ function SF.Instance:require(path, ...)
 end
 
 function SF.Instance:deinitialize()
+	while self.cpustatestack[1] do self:popCpuCheck() end
+
 	self:RunHook("deinitialize")
 	SF.allInstances[self] = nil
 	SF.playerInstances[self.player][self] = nil
