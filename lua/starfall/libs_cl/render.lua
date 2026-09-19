@@ -326,7 +326,7 @@ end, cleanupRender)
 -- @return boolean Return true to prevent the player from drawing
 SF.hookAdd("PrePlayerDraw", "predrawplayer", function(instance, ply, flags)
 	if canRenderHud(instance) then
-		instance:prepareRender()
+		instance:prepareRenderNoReset()
 		return true, { instance.Types.Player.Wrap(ply), flags }
 	end
 	return false
@@ -544,6 +544,14 @@ instance:AddHook("deinitialize", function ()
 	end
 end)
 
+function instance:prepareRenderNoReset()
+	renderdata.isRendering = true
+	if not renderingView then
+		renderdata.needRT = false
+		renderdata.scrW = ScrW()
+		renderdata.scrH = ScrH()
+	end
+end
 
 function instance:prepareRender()
 	Col_SetUnpacked(currentcolor, 255, 255, 255, 255)
