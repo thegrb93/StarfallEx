@@ -769,8 +769,6 @@ function SF.Instance:require(path, ...)
 end
 
 function SF.Instance:deinitialize()
-	while self.cpustatestack[1] do self:popCpuCheck() end
-
 	self:RunHook("deinitialize")
 	SF.allInstances[self] = nil
 	SF.playerInstances[self.player][self] = nil
@@ -823,10 +821,12 @@ hook.Add("EntityRemoved", "SF_EntityRemoved", function(ent, snapshot)
 end)
 
 function SF.Instance:Error(err)
+	self:pushCpuCheck()
 	if self.runOnError then -- We have a custom error function, use that instead
 		self.runOnError(err)
 	else
 		-- Default behavior
 		self:deinitialize()
 	end
+	self:popCpuCheck()
 end
