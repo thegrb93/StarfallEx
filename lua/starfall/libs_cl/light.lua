@@ -582,6 +582,18 @@ function projectedtexture_methods:setTexture(texture)
 	ptunwrap(self):SetTexture(texture)
 end
 
+--- Sets the Projected Texture's texture from a render target.
+-- Will not take effect until ProjectedTexture:update() is called.
+-- @param string name
+function projectedtexture_methods:setTextureRenderTarget( name )
+	checkluatype(name, TYPE_STRING)
+
+	local rt = instance.data.render.rendertargets[name]
+	if not rt then SF.Throw("Invalid rendertarget: "..name, 2) end
+
+	ptunwrap(self):SetTexture(rt)
+end
+
 --- Sets the Projected Texture's texture frame
 -- Will not take effect until ProjectedTexture:update() is called.
 -- @param number frame
