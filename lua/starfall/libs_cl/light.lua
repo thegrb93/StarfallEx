@@ -585,7 +585,7 @@ end
 --- Sets the Projected Texture's texture from a render target.
 -- Will not take effect until ProjectedTexture:update() is called.
 -- @param string name
-function projectedtexture_methods:setTextureRenderTarget( name )
+function projectedtexture_methods:setTextureRenderTarget(name)
 	checkluatype(name, TYPE_STRING)
 
 	local rt = instance.data.render.rendertargets[name]
