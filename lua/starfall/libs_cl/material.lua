@@ -398,9 +398,11 @@ function material_methods:destroy()
 	local m = unwrap(self)
 
 	local name = m:GetName()
-	local rt = instance.data.render.rendertargets[name]
-	if rt then
-		instance.env.render.destroyRenderTarget(name)
+
+	for i_key, i_rt in pairs( instance.data.render.rendertargets ) do
+		if i_key == name or string.Left( i_key, #name + 1 ) == name .. "$" then
+			instance.env.render.destroyRenderTarget( i_key )
+		end
 	end
 
 	material_meta.sf2sensitive[self] = nil
