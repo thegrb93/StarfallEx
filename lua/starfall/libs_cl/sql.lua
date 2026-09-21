@@ -16,7 +16,7 @@ local sql_library = instance.Libraries.sql
 
 --- Performs a query on the local SQLite database.
 -- @param string query The query to execute.
--- @return table? Query results as a table, nil if the query returned no data.
+-- @return table? Query results as a table, or nil if the query returned no data.
 function sql_library.query(query)
 	checkpermission(instance, nil, "sql")
 	checkluatype(query, TYPE_STRING)
@@ -53,7 +53,7 @@ end
 
 --- Escapes dangerous characters and symbols from user input used in an SQLite SQL Query.
 -- @param string str The string to be escaped.
--- @param boolean bNoQuotes Set this as true, and the function will not wrap the input string in apostrophes.
+-- @param boolean bNoQuotes Set this to true, and the function will not wrap the input string in apostrophes.
 -- @return string The escaped input.
 function sql_library.SQLStr(str, bNoQuotes)
 	checkpermission(instance, nil, "sql")

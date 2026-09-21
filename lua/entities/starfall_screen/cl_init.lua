@@ -148,7 +148,7 @@ function ENT:DrawTranslucent()
 			render.ClearBuffersObeyStencil(color.r, color.g, color.b, color.a, true)
 		end
 
-		--Render the starfall stuff
+		--Render the Starfall stuff
 		render.PushFilterMag(TEXFILTER.ANISOTROPIC)
 		render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 

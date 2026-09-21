@@ -1,7 +1,8 @@
 
 local checkluatype = SF.CheckLuaType
 
---- Lua math library https://wiki.garrysmod.com/page/Category:math
+--- Lua math library
+-- https://wiki.facepunch.com/gmod/math
 -- @name math
 -- @class library
 -- @field huge inf error-float. Represents infinity.
@@ -79,7 +80,8 @@ math_library.asin = math.asin
 -- @return number Angle in radians
 math_library.atan = math.atan
 
---- Functions like math.atan(y / x), except it also takes into account the quadrant of the angle and so doesn't have a limited range of output.
+--- Functions like math.atan(y / x), except it also takes into account the quadrant of the angle and so doesn't have a
+-- limited range of output.
 -- @class function
 -- @param number y The Y coordinate
 -- @param number x The X coordinate
@@ -184,11 +186,11 @@ math_library.huge = math.huge
 -- @return string Binary number string. The length of this will always be a multiple of 3
 math_library.intToBin = math.IntToBin
 
---- Takes a normalised number and returns the floating point representation.
+--- Takes a normalized number and returns the floating point representation.
 -- @class function
 -- @param number normalizedFraction The value to get the normalized fraction and the exponent from
 -- @param number exponent The value to get the normalized fraction and the exponent from
--- @return number Floating point reperesentation
+-- @return number Floating point representation
 math_library.ldexp = math.ldexp
 
 --- With one argument, returns the natural logarithm of x (to base e).
@@ -282,7 +284,7 @@ math_library.remap = math.Remap
 --- Rounds the given value to the nearest whole number or to the given decimal places.
 -- @class function
 -- @param number value The number to be rounded
--- @param number? decimals Optional decimal places to round to. Defaults to 0
+-- @param number? decimals Optional decimal places to round to (default: 0)
 -- @return number The rounded value
 math_library.round = math.Round
 
@@ -327,7 +329,7 @@ math_library.timeFraction = math.TimeFraction
 --- Rounds towards zero
 -- @class function
 -- @param number val The number to truncate
--- @param number? digits The amount of digits to keep after the point. Default 0
+-- @param number? digits The amount of digits to keep after the point (default: 0)
 -- @return number Rounded number
 math_library.truncate = math.Truncate
 
@@ -417,12 +419,12 @@ function math_library.bezierVectorCubic(r, v1, v2, v3, v4)
 	local r2 = r * r
 	local ri = 1 - r
 	local ri2 = ri * ri
-	
+
 	local c1 = ri2 * ri
 	local c2 = 3 * ri2 * r
 	local c3 = 3 * ri * r2
 	local c4 = r2 * r
-	
+
 	return setmetatable({
 	  c1*v1[1] + c2*v2[1] + c3*v3[1] + c4*v4[1],
 	  c1*v1[2] + c2*v2[2] + c3*v3[2] + c4*v4[2],
@@ -434,7 +436,7 @@ end
 -- @param string uniqueName The seed for the random value
 -- @param number Min The minimum value of the random range
 -- @param number Max The maximum value of the random range
--- @param number? additionalSeed The additional seed. Default 0
+-- @param number? additionalSeed The additional seed (default: 0)
 -- @return number The random float value
 function math_library.sharedRandom(uniqueName, Min, Max, additionalSeed)
 	checkluatype(uniqueName, TYPE_STRING)
@@ -525,7 +527,7 @@ math_library.easeInOutQuad = math.ease.InOutQuad
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
 -- @return number "Eased" Value
 math_library.easeInOutQuart = math.ease.InOutQuart
-	
+
 --- Eases in and out by raising the fraction to the power of 5.
 -- @class function
 -- @param number fraction Fraction of the progress to ease, from 0 to 1
@@ -616,7 +618,7 @@ math_library.easeOutSine = math.ease.OutSine
 -- @return number Number average of all values
 function math_library.mean( numbers )
 	checkluatype( numbers, TYPE_TABLE )
-	
+
 	local sum = 0
 
 	for i = 1, #numbers do
@@ -629,8 +631,8 @@ end
 --- Provides a conversion factor given input units
 -- Example: local mph = math.unitConversion(UNIT.MILE / UNIT.HOUR)
 --          local converted = x * mph
--- @param number to the UNIT to convert the number to
--- @param number? from the UNIT to convert the number from (Default: 1, works if converting from gmod natural units)
+-- @param number to The UNIT to convert the number to
+-- @param number? from The UNIT to convert the number from (default: 1, works if converting from GMod natural units)
 -- @return number A conversion factor multipled by values to convert units
 function math_library.unitConversion( to, from )
 	return to / (from or 1)

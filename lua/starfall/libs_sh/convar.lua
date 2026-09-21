@@ -52,7 +52,7 @@ end
 --- Returns the minimum value of the convar
 -- @client
 -- @param string name Name of the ConVar
--- @return number The minimum value or nil if not specified
+-- @return number The minimum value, or nil if not specified
 function convar_library.getMin(name)
 	return getValidConVar(name):GetMin()
 end
@@ -60,7 +60,7 @@ end
 --- Returns the maximum value of the convar
 -- @client
 -- @param string name Name of the ConVar
--- @return number? The maximum value or nil if not specified
+-- @return number? The maximum value, or nil if not specified
 function convar_library.getMax(name)
 	return getValidConVar(name):GetMax()
 end

@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local dgetmeta = debug.getmetatable
 
@@ -300,7 +300,7 @@ do
 	function find_plane(p1, p2, p3)
 		local normal = (p3.vec - p1.vec):cross(p2.vec - p1.vec):getNormalized()
 		local dist = normal:dot(p1.vec)
-		return { a = normal.x, b = normal.y, c = normal.z, d = dist, n = normal } 
+		return { a = normal.x, b = normal.y, c = normal.z, d = dist, n = normal }
 	end
 
 	function face_vertices(face)
@@ -388,7 +388,7 @@ do
 			{ point3, point4, point1 },
 		}
 		for i, verts in ipairs(face_verts) do
-			local he_face = { plane = find_plane(verts[1], verts[2], verts[3]), points = { } } 
+			local he_face = { plane = find_plane(verts[1], verts[2], verts[3]), points = { } }
 			local he_f_edges = { }
 			for j = 1, 3 do
 				local he_f_edge = { face = he_face }
@@ -447,11 +447,11 @@ do
 
 		face.lightface = true
 		ret[#ret + 1] = face
-	
+
 		find_lightfaces(point, face.edge.twin.face, ret)
 		find_lightfaces(point, face.edge.next.twin.face, ret)
 		find_lightfaces(point, face.edge.next.next.twin.face, ret)
-	
+
 		return ret
 	end
 
@@ -471,7 +471,7 @@ do
 		for i, point in ipairs(points) do
 			if point.ignore then continue end
 			for j, face in ipairs(faces) do
-				face.points = face.points or { } 
+				face.points = face.points or { }
 				if dist_to_plane(point, face.plane) > 0 then
 					face.points[#face.points + 1] = point
 					point.face = face
@@ -502,7 +502,7 @@ do
 			-- If no points, the face is processed
 			if #curface.points == 0 then
 				curface.list_parent = face_list
-				face_list = { next = face_list, value = curface } 
+				face_list = { next = face_list, value = curface }
 
 				continue
 			end
@@ -592,7 +592,7 @@ do
 							lface.points[k1] = nil -- This is ok since we are not adding new keys
 						end
 
-						if thread_yield then 
+						if thread_yield then
 							iter2 = iter2 + 1
 							if iter2 % 100 == 0 then thread_yield() end
 						end
@@ -643,7 +643,7 @@ do
 				ret_points[#ret_points + 1] = vert.point
 			end
 			ret_faces[#ret_faces + 1] = face
-			
+
 			if #ret_faces % 100 == 0 and thread_yield then thread_yield() end
 		end
 
@@ -678,6 +678,7 @@ SF.RegisterLibrary("mesh")
 
 if CLIENT then
 	--- Mesh type
+	-- Created with `mesh.createEmpty` or `mesh.createFromTable` function
 	-- @name Mesh
 	-- @class type
 	-- @client
@@ -756,7 +757,8 @@ function mesh_library.generateTangents(vertices)
 end
 
 --- Finds the convex hull of provided vertices table.
--- @param table vertices The table of vertices (vectors) or vertex data (http://wiki.facepunch.com/gmod/Structures/MeshVertex)
+-- @param table vertices The table of vertices (vectors) or vertex data
+-- (https://wiki.facepunch.com/gmod/Structures/MeshVertex)
 -- @param boolean? threaded Optional bool, use threading object that can be used to run algorithm over time to prevent hitting quota limit
 -- @return table The mesh table which can be passed to mesh.createFromTable
 -- @return table The table of vertices which can be passed to prop.createCustom
@@ -770,7 +772,7 @@ function mesh_library.findConvexHull(vertices, threaded)
 	end
 	local nvertices = #vertices
 	if nvertices < 4 then SF.Throw("Expected at least 4 vertices.", 2) end
-	
+
 	local newVertices = { }
 	for i = 1, nvertices do
 		checkluatype(vertices[i], TYPE_TABLE)
@@ -779,7 +781,7 @@ function mesh_library.findConvexHull(vertices, threaded)
 		else
 			newVertices[i] = vertices[i].pos
 		end
-		
+
 		if i % 100 == 0 and threaded then thread_yield() end
 	end
 
@@ -852,7 +854,7 @@ if CLIENT then
 	}
 
 	--- Creates a mesh from vertex data.
-	-- @param table vertices Table containing vertex data. http://wiki.facepunch.com/gmod/Structures/MeshVertex
+	-- @param table vertices Table containing vertex data. https://wiki.facepunch.com/gmod/Structures/MeshVertex
 	-- @param boolean? threaded Optional bool, use threading object that can be used to load the mesh over time to prevent hitting quota limit. The thread will yield with number of vertices remaining to be processed. After 0 is yielded, the final expensive phase starts.
 	-- @return Mesh Mesh object
 	-- @client
@@ -953,12 +955,22 @@ if CLIENT then
 		return tri
 	end
 
-	--- Returns a table of visual meshes of given model or nil if the model is invalid
+	--- Returns a table of visual meshes of given model, or nil if the model is invalid.
 	-- @param string model The full path to a model to get the visual meshes of.
-	-- @param number? lod The lod of the model to use. Default 0.
-	-- @param number? bodygroupMask The bodygroupMask of the model to use. Default 0.
-	-- @return table A table of tables with the following format:  string material - The material of the specific mesh table triangles - A table of MeshVertex structures ready to be fed into IMesh:BuildFromTriangles table verticies - A table of MeshVertex structures representing all the vertexes of the mesh. This table is used internally to generate the "triangles" table. Each MeshVertex structure returned also has an extra table of tables field called "weights" with the following data:  number boneID - The bone this vertex is attached to number weight - How "strong" this vertex is attached to the bone. A vertex can be attached to multiple bones at once.
-	-- @return table A table of tables with bone id keys with the following format:  number parent - The parent bone id Matrix matrix - pretransformed bone matrix
+	-- @param number? lod The LOD of the model to use (default: 0)
+	-- @param number? bodygroupMask The bodygroupMask of the model to use (default: 0)
+	-- @return table A table of tables with the following format:
+	-- string material - The material of the specific mesh
+	-- table triangles - A table of `MeshVertex` structures ready to be fed into `IMesh:BuildFromTriangles`
+	-- table verticies - A table of `MeshVertex` structures representing all the vertexes of the mesh
+	-- This table is used internally to generate the `triangles` table.
+	-- Each `MeshVertex` structure returned also has an extra table of tables field called `weights` with the following data:
+	-- number boneID - The bone index this vertex is attached to
+	-- number weight - How "strong" this vertex is attached to the bone
+	-- A vertex can be attached to multiple bones at once.
+	-- @return table A table of tables with bone index as keys with the following format:
+	-- number parent - The parent bone index
+	-- Matrix matrix - Pretransformed bone matrix
 	-- @client
 	function mesh_library.getModelMeshes(model, lod, bodygroupMask)
 		checkluatype(model, TYPE_STRING)
@@ -1015,7 +1027,7 @@ if CLIENT then
 		[MATERIAL_TRIANGLES] = function(count) return count end,
 		[MATERIAL_TRIANGLE_STRIP] = function(count) return count end
 	}
-	--- Generates mesh data. If an Mesh object is passed, it will populate that mesh with the data. Otherwise, it will render directly to renderer.
+	--- Generates mesh data. If a Mesh object is passed, it will populate that mesh with the data. Otherwise, it will render directly to renderer.
 	-- @param Mesh? mesh_obj Optional Mesh object, mesh to build. (default: nil)
 	-- @param number prim_type Int, primitive type, see MATERIAL
 	-- @param number prim_count Int, the amount of primitives
@@ -1132,7 +1144,7 @@ if CLIENT then
 	-- @class function
 	-- @param number index The slot index for the vertex, either 0 or 1.
 	-- @param number matrixId The matrix index for the vertex, in the range of 1 -> 53.
-	-- @param number weight How much influence that matrix will have on this vertex, in the range of 0 -> 1. Both weights on each vertex should sum to 1. 
+	-- @param number weight How much influence that matrix will have on this vertex, in the range of 0 -> 1. Both weights on each vertex should sum to 1.
 	mesh_library.writeBoneData = mesh.BoneData
 
 	--- Pushes the vertex data onto the render stack

@@ -1,11 +1,12 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local checkluatype = SF.CheckLuaType
 local timer = timer
 
-local timer_count = SF.LimitObject("timer", "timer", 200, "The number of concurrent starfall timers")
+local timer_count = SF.LimitObject("timer", "timer", 200, "The number of concurrent Starfall timers")
 
 
 --- Deals with time and timers.
+-- https://wiki.facepunch.com/gmod/timer
 -- @name timer
 -- @class library
 -- @libtbl timer_library
@@ -99,7 +100,9 @@ local function createTimer(name, delay, reps, func, simple)
 	timers[timername] = timerdata
 end
 
---- Creates (and starts) a timer
+--- Creates (and starts) a timer.
+-- Timers use `timer.curtime` internally.
+-- Due to this, they won't advance while the client is timing out from the server, or on an empty dedicated server due to hibernation (unless `sv_hibernate_think` is set to 1, or `delay` is set to 0).
 -- @param string name The timer name
 -- @param number delay The time, in seconds, to set the timer to.
 -- @param number reps The repetitions of the timer. 0 = infinite
@@ -163,8 +166,10 @@ end
 --- Adjusts a timer
 -- @param string name The timer name
 -- @param number delay The time, in seconds, to set the timer to.
--- @param number? reps (Optional) The repetitions of the timer. 0 = infinite, nil = 1
--- @param function? func (Optional) The function to call when the timer is fired
+-- @param number? reps (Optional) The repetitions of the timer.
+-- Use 0 for infinite, or nil to keep the previous value.
+-- @param function? func (Optional) The function to call when the timer is fired.
+-- Use nil to keep the previous value.
 -- @return boolean True if succeeded
 function timer_library.adjust(name, delay, reps, func)
 	checkluatype(name, TYPE_STRING)
@@ -211,7 +216,9 @@ end
 
 --- Returns amount of time left (in seconds) before the timer executes its function.
 -- @param string name The timer name
--- @return number The amount of time left (in seconds). If the timer is paused, the amount will be negative. Nil if timer doesn't exist
+-- @return number The amount of time left (in seconds).
+-- If the timer is paused, the amount will be negative.
+-- Nil if timer doesn't exist
 function timer_library.timeleft(name)
 	checkluatype(name, TYPE_STRING)
 
@@ -220,7 +227,8 @@ end
 
 --- Returns amount of repetitions/executions left before the timer destroys itself.
 -- @param string name The timer name
--- @return number The amount of executions left. Nil if timer doesn't exist
+-- @return number The amount of executions left.
+-- Nil if timer doesn't exist
 function timer_library.repsleft(name)
 	checkluatype(name, TYPE_STRING)
 

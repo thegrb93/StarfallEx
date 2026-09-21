@@ -147,7 +147,7 @@ if CLIENT then
 		if server ~= false then -- default to true
 			server = true
 		end
-		if client ~= false then -- defualt to true
+		if client ~= false then -- default to true
 			client = true
 		end
 		local permsPanel = vgui.Create("StarfallPermissions")

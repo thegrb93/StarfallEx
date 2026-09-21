@@ -1,4 +1,4 @@
--- Global to all starfalls
+-- Global to all Starfalls
 local registerprivilege = SF.Permissions.registerPrivilege
 local haspermission = SF.Permissions.hasAccess
 local checkluatype = SF.CheckLuaType
@@ -50,9 +50,9 @@ end
 registerprivilege("input", "Input", "Allows the user to see what buttons you're pressing.", { client = {} })
 registerprivilege("input.chat", "Input", "Allows the user to see your chat keypresses.", { client = { default = 1 } })
 registerprivilege("input.bindings", "Input", "Allows the user to see your bindings.", { client = { default = 1 } })
-registerprivilege("input.emulate", "Input", "Allows starfall to emulate user input.", { client = { default = 1 } })
-registerprivilege("input.lockcontrols", "Input", "Allows starfall to lock game control input.", { client = { default = 5 } })
-registerprivilege("input.enablecursor", "Input", "Allows starfall to enable the game's cursor.", { client = { default = 5 } })
+registerprivilege("input.emulate", "Input", "Allows Starfall to emulate user input.", { client = { default = 1 } })
+registerprivilege("input.lockcontrols", "Input", "Allows Starfall to lock game control input.", { client = { default = 5 } })
+registerprivilege("input.enablecursor", "Input", "Allows Starfall to enable the game's cursor.", { client = { default = 5 } })
 
 local controlsLocked = false
 local function unlockControls(instance)
@@ -111,20 +111,31 @@ local function CheckButtonPerms(instance, ply, button)
 end
 
 --- Called when a button is pressed
+-- See also https://wiki.facepunch.com/gmod/GM:PlayerButtonDown
 -- @client
 -- @name InputPressed
 -- @class hook
--- @param number button Number of the button
+-- @param number button The button code (see KEY and MOUSE enums)
+-- See also https://wiki.facepunch.com/gmod/Enums/BUTTON_CODE
+-- See also https://wiki.facepunch.com/gmod/Enums/KEY
+-- See also https://wiki.facepunch.com/gmod/Enums/MOUSE
+-- See also https://wiki.facepunch.com/gmod/Enums/JOYSTICK
 SF.hookAdd(PlayerButtonDown, "inputpressed", CheckButtonPerms)
 
 --- Called when a button is released
+-- See also https://wiki.facepunch.com/gmod/GM:PlayerButtonUp
 -- @client
 -- @name InputReleased
 -- @class hook
--- @param number button Number of the button
+-- @param number button The button code (see KEY and MOUSE enums)
+-- See also https://wiki.facepunch.com/gmod/Enums/BUTTON_CODE
+-- See also https://wiki.facepunch.com/gmod/Enums/KEY
+-- See also https://wiki.facepunch.com/gmod/Enums/MOUSE
+-- See also https://wiki.facepunch.com/gmod/Enums/JOYSTICK
 SF.hookAdd(PlayerButtonUp, "inputreleased", CheckButtonPerms)
 
 --- Called when a keybind is pressed
+-- See also https://wiki.facepunch.com/gmod/GM:PlayerBindPress
 -- @client
 -- @name InputBindPressed
 -- @class hook
@@ -141,6 +152,7 @@ function(instance, args, ply)
 end)
 
 --- Called when the mouse is moved
+-- See also https://wiki.facepunch.com/gmod/GM:InputMouseApply
 -- @client
 -- @name MouseMoved
 -- @class hook
@@ -157,6 +169,7 @@ SF.hookAdd("InputMouseApply", "mousemoved", function(instance, _, x, y)
 end)
 
 --- Called when the mouse wheel is rotated
+-- See also https://wiki.facepunch.com/gmod/GM:StartCommand
 -- @client
 -- @name MouseWheeled
 -- @class hook
@@ -336,7 +349,7 @@ end
 
 --- Sets the state of the mouse cursor
 -- @client
--- @param boolean enabled Whether or not the cursor should be enabled
+-- @param boolean enabled Whether the cursor should be enabled
 function input_library.enableCursor(enabled)
 	checkluatype(enabled, TYPE_BOOL)
 	checkpermission(instance, nil, "input.enablecursor")

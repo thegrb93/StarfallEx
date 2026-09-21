@@ -275,7 +275,7 @@ SF.BurstObject = {
 			return self:calc(obj)
 		end,
 		get = function(self, ply)
-			if ply~=SF.Superuser and not Ent_IsValid(ply) then SF.Throw("Invalid starfall user", 4) end
+			if ply~=SF.Superuser and not Ent_IsValid(ply) then SF.Throw("Invalid Starfall user", 4) end
 			local obj = self.objects[ply]
 			if not obj then
 				obj = {
@@ -318,7 +318,7 @@ SF.LimitObject = {
 				end
 				self.counters[ply] = new
 			else
-				SF.Throw("Invalid starfall user", 3)
+				SF.Throw("Invalid Starfall user", 3)
 			end
 		end,
 		checkuse = function(self, ply, amount)
@@ -328,7 +328,7 @@ SF.LimitObject = {
 					SF.Throw("The ".. self.name .." limit has been reached. (".. self.max ..")", 3)
 				end
 			else
-				SF.Throw("Invalid starfall user", 3)
+				SF.Throw("Invalid Starfall user", 3)
 			end
 		end,
 		check = function(self, ply)
@@ -336,7 +336,7 @@ SF.LimitObject = {
 			if Ent_IsValid(ply) then
 				return self.max - self.counters[ply]
 			else
-				SF.Throw("Invalid starfall user", 3)
+				SF.Throw("Invalid Starfall user", 3)
 			end
 		end,
 		free = function(self, ply, amount)
@@ -431,7 +431,7 @@ SF.EntManager = {
 setmetatable(SF.EntManager, SF.EntManager)
 setmetatable(SF.EntManager.__index, SF.LimitObject)
 
---- Returns a class that can limit per player and recycle a indestructable resource
+--- Returns a class that can limit per player and recycle an indestructible resource
 SF.ResourceHandler = {
 	__index = {
 		use = function(self, ply, key)
@@ -819,7 +819,7 @@ setmetatable(SF.Parent.__index.parentTypes.bone, SF.Parent)
 SF.Parent.__index.parentTypes.bone.__index = SF.Parent.__index.parentTypes.bone
 
 if CLIENT then
--- When parent is retransmitted, it loses it's children
+-- When parent is retransmitted, it loses its children
 hook.Add("NotifyShouldTransmit", "SF_HologramParentFix", function(ent)
 	local sfParent = Ent_GetTable(ent).sfParent
 	if sfParent then sfParent:fix() end
@@ -1094,7 +1094,7 @@ SF.AutoGrowingTable = {
 }
 setmetatable(SF.AutoGrowingTable, SF.AutoGrowingTable)
 
---- Builds an error type to that contains line numbers, file name, and traceback
+--- Builds an error type that contains line numbers, file name, and traceback
 function SF.MakeError(msg, level, uncatchable, prependinfo, userdata)
 	level = 1 + (level or 1)
 	local info = debug.getinfo(level, "Sl")
@@ -1148,7 +1148,7 @@ do
 	local gmod_hooks = {}
 
 	local function getHookFunc(instances, hookname, customargfunc, customretfunc)
-		--- There are 4 variants of hookfunc depending on if there are custom callbacks
+		--- There are 4 variants of hookfunc depending on whether there are custom callbacks
 		if customargfunc then
 			if customretfunc then
 				return function(...)
@@ -1259,12 +1259,13 @@ do
 
 	--- Add a GMod hook so that SF gets access to it
 	-- @shared
-	-- @param hookname The hook name. In-SF hookname will be lowercased
-	-- @param customargfunc Optional custom function
-	-- Returns true if the hook should be called, then extra arguements to be passed to the starfall hooks
-	-- @param customretfunc Optional custom function
-	-- Takes values returned from starfall hook and returns what should be passed to the gmod hook
-	-- @param gmoverride Whether this hook should override the gamemode function (makes the hook run last, but adds a little overhead)
+	-- @param string realname The hook name. In Starfall, the hookname will be lowercased
+	-- @param string? hookname Optional hookname. Defaults to realname
+	-- @param function? customargfunc Optional custom function
+	-- Returns true if the hook should be called, then extra arguments to be passed to the Starfall hooks
+	-- @param function? customretfunc Optional custom function
+	-- Takes values returned from a Starfall hook and returns what should be passed to the GMod hook
+	-- @param boolean? gmoverride Whether this hook should override the gamemode function (makes the hook run last, but adds a little overhead)
 	function SF.hookAdd(realname, hookname, customargfunc, customretfunc, gmoverride)
 		hookname = string.lower(hookname or realname)
 		registered_instances[hookname] = {}
@@ -1430,19 +1431,20 @@ function SF.DeleteFolder(folder)
 end
 
 --- Throws an error like the throw function in builtins
--- @param msg Message
--- @param level Which level in the stacktrace to blame
--- @param uncatchable Makes this exception uncatchable
+-- @param string? msg Message
+-- @param number? level Which level in the stacktrace to blame
+-- @param boolean? uncatchable Makes this exception uncatchable
+-- @param any userdata Any userdata to attach to the error
 function SF.Throw(msg, level, uncatchable, userdata)
 	local level = 1 + (level or 1)
 	error(SF.MakeError(msg, level, uncatchable, true, userdata), level)
 end
 
 --- Throws a type error
--- @param expected The expected type name
--- @param got The type name that was provided
--- @param level The stack level
--- @param msg Optional error message
+-- @param string expected The expected type name
+-- @param string got The type name that was provided
+-- @param number level The stack level
+-- @param string? msg Optional error message
 function SF.ThrowTypeError(expected, got, level, msg)
 	local level = 1 + (level or 1)
 	local funcname = debug.getinfo(level-1, "n").name or "<unnamed>"
@@ -1472,7 +1474,7 @@ SF.TYPENAME = {
 	[TYPE_MOVEDATA]         = "CMoveData",
 	[TYPE_RECIPIENTFILTER]  = "CRecipientFilter",
 	[TYPE_USERCMD]          = "CUserCmd",
-	[TYPE_SCRIPTEDVEHICLE]  = "ScriptedVehicle", -- Deprecated, also TYPE Enum doesn't specify the name so this it is
+	[TYPE_SCRIPTEDVEHICLE]  = "ScriptedVehicle", -- Deprecated, also TYPE Enum doesn't specify the name so this is it
 	[TYPE_MATERIAL]         = "IMaterial",
 	[TYPE_PANEL]            = "Panel",
 	[TYPE_PARTICLE]         = "CLuaParticle",
@@ -1496,12 +1498,12 @@ SF.TYPENAME = {
 	[TYPE_PROJECTEDTEXTURE] = "ProjectedTexture",
 	[TYPE_PHYSCOLLIDE]      = "PhysCollide",
 	[TYPE_SURFACEINFO]      = "SurfaceInfo",
-	[TYPE_COLOR]            = "Color" -- TypeID doesn't return this but lets still add it
+	[TYPE_COLOR]            = "Color" -- TypeID doesn't return this but let's still add it
 }
 
 --- Returns corresponding name of the TypeID
--- @param typeid The TYPE
--- @return String name
+-- @param number typeid The TYPE
+-- @return string Type name
 function SF.TypeName(typeid)
 	return assert(SF.TYPENAME[typeid], "Type not defined")
 end
@@ -1822,7 +1824,7 @@ do
 end
 
 --- Gets the type of val.
--- @param val The value to be checked.
+-- @param any val The value to be checked.
 function SF.GetType(val)
 	local meta = dgetmeta(val)
 	return meta and isstring(meta.__metatable) and meta.__metatable or type(val)
@@ -1845,7 +1847,7 @@ SF.allowedRenderGroups = {
 }
 
 --- Checks that the material isn't malicious
--- @param Material The path to the material
+-- @param Material material The path to the material
 -- @return The material object or false if it's invalid
 function SF.CheckMaterial(material)
 	if material == "" then return end

@@ -1,5 +1,5 @@
 local TabHandler = {
-	ControlName = "sf_settings", -- Its name of vgui panel used by handler, there has to be one
+	ControlName = "sf_settings", -- It's the name of the vgui panel used by the handler, there has to be one
 	IsEditor = false, -- If it should be treated as editor of file, like ACE or Wire
 	DefaultTitle = "Settings",
  }
@@ -9,7 +9,7 @@ local PANEL = {} -- It's our VGUI
 -- Handler part (Tab Handler)
 -------------------------------
 
-function TabHandler:Init() -- It's caled when editor is initalized, you can create library map there etc
+function TabHandler:Init() -- It's called when the editor is initialized, you can create a library map there etc
 end
 
 function TabHandler:RegisterSettings() -- Setting panels should be registered there
@@ -57,7 +57,7 @@ function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate
 	end
 
 	for name, data in SortedPairs(categories) do
-		local data = categories[name] -- SortedPairs uses copy of the table
+		local data = categories[name] -- SortedPairs uses a copy of the table
 		local button = vgui.Create("StarfallButton")
 		button.PerformLayout = EMPTY_FUNC
 		button:SetSize(200,40)

@@ -153,7 +153,7 @@ end
 -- Load the permission settings for each provider
 function P.loadPermissions()
 	if not pcall(P.loadPermissionsSafe) then
-		-- Errored, try deleting the old config and trying again
+		-- If it errored, try deleting the old config and try again
 		file.Delete(P.filename, "DATA")
 		pcall(P.loadPermissionsSafe)
 	end

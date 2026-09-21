@@ -1,6 +1,7 @@
 -- Globals unneeded for now
 
 --- SurfaceInfo type
+-- Created with `Entity:getBrushSurfaces` function
 -- @name SurfaceInfo
 -- @class type
 -- @libtbl surfaceinfo_methods

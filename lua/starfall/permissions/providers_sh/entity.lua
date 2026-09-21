@@ -2,7 +2,7 @@
 
 local owneraccess
 if SERVER then
-	owneraccess = CreateConVar("sf_permissions_entity_owneraccess", "0", { FCVAR_ARCHIVE }, "Allows starfall chip's owner to access their player entity")
+	owneraccess = CreateConVar("sf_permissions_entity_owneraccess", "0", { FCVAR_ARCHIVE }, "Allows Starfall chip's owner to access their player entity")
 end
 local cacheLifetime = CreateConVar("sf_permissions_entity_cachelife", "5", {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "How long to store successful prop permission checks before checking again")
 

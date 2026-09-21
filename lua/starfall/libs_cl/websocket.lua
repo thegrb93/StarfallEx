@@ -15,7 +15,7 @@ local function make_js(address)
 		sf_websocket.onclose = function()        { sf.on_close(false);                    };
 		sf_websocket.onerror = function()        { sf.on_close(true);                     };
 
-		// Exposed functions to lua
+		// Exposed functions to Lua
 		sf.send = function(data) { sf_websocket.send(data); };
 
 		console.log("SF: Opened websocket to ]] .. address .. [[");
@@ -73,7 +73,7 @@ function WebSocket:close()
 	self.html:Remove()
 
 	-- Calling this manually so we wouldn't need to make a timer to wait for the callback to run on the JS side.
-	-- Also removing the panel halts all js immediately
+	-- Also removing the panel halts all JS immediately
 	if self["onDisconnected"] then
 		self["onDisconnected"](self, false)
 	end
@@ -94,7 +94,8 @@ end
 
 local checkluatype = SF.CheckLuaType
 
---- Websocket Type. Create a websocket with WebSocket(...)
+--- WebSocket type
+-- Created with the `WebSocket` function
 -- @name WebSocket
 -- @class type
 -- @libtbl websocket_methods
@@ -114,8 +115,8 @@ local websocket_list = {}
 --- Also see the websocket example.
 -- @name builtins_library.WebSocket
 -- @param string domain Domain of the websocket server.
--- @param number? port Port of the websocket server. (Default 443)
--- @param boolean? secure Whether to use secure connection (wss). (Default false)
+-- @param number? port Port of the websocket server (default: 443)
+-- @param boolean? secure Whether to use secure/wss connection (default: false)
 -- @param string? path Optional path of the websocket.
 -- @return WebSocket The websocket object. Use WebSocket:connect() to connect.
 function instance.env.WebSocket(domain, port, secure, path)
@@ -160,7 +161,7 @@ end
 -- Can be used with the following callbacks:
 -- * onMessage - Called when a message is received.
 -- * onConnected - Called when the websocket initially connects.
--- * onDisconnected - Called when the websocket is disconnected, with the only param being if it was caused by an 'error' event.
+-- * onDisconnected - Called when the websocket is disconnected, with the only parameter being whether it was caused by an 'error' event.
 -- @param string k onMessage, onConnected, onDisconnected
 -- @param function v The callback function, which will be called with the websocket as the first argument.
 function websocket_meta:__newindex(k, v)

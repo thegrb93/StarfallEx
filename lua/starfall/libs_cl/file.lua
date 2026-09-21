@@ -31,6 +31,7 @@ local cv_max_concurrent_reads = CreateConVar("sf_file_asyncmax", "10", { FCVAR_A
 SF.RegisterLibrary("file")
 
 --- File type
+-- Created with `file.open` function
 -- @name File
 -- @class type
 -- @libtbl file_methods
@@ -194,9 +195,10 @@ local file_methods, file_meta, wrap, unwrap = instance.Types.File.Methods, insta
 
 
 --- Opens and returns a file
--- @param string path Filepath relative to data/sf_filedata/.
--- @param string mode The file mode to use. See lua manual for explanation
--- @return File? File object or nil if it failed
+-- @param string path File path relative to data/sf_filedata/.
+-- @param string mode The file mode to use (usually "rb", "wb", or "ab").
+-- See Lua manual for explanation.
+-- @return File? The opened `File` object, or nil if it failed to open due to it not existing, or being used by another process
 function file_library.open(path, mode)
 	checkpermission (instance, path, "file.open")
 	checkluatype (path, TYPE_STRING)
@@ -224,7 +226,7 @@ function file_library.openInGame(path, mode)
 end
 
 --- Reads a file from path
--- @param string path Filepath relative to data/sf_filedata/.
+-- @param string path File path relative to data/sf_filedata/
 -- @return string? Contents, or nil if error
 function file_library.read(path)
 	checkpermission (instance, path, "file.read")
@@ -233,17 +235,21 @@ function file_library.read(path)
 end
 
 --- Reads a file from path relative to base GMod directory
--- @param string path Filepath relative to GarrysMod/garrysmod/.
--- @return string? Contents or nil if error
+-- @param string path File path relative to GarrysMod/garrysmod/
+-- @return string? Contents, or nil if error
 function file_library.readInGame(path)
 	if instance.player ~= LocalPlayer() then SF.Throw("Only chip owner can read game files", 2) end
 	checkluatype (path, TYPE_STRING)
 	return file.Read(SF.NormalizePath(path), "GAME")
 end
 
---- Reads a file asynchronously. Can only read 'sf_file_asyncmax' files at a time
--- @param string path Filepath relative to data/sf_filedata/.
--- @param function callback A callback function for when the read operation finishes. It has 3 arguments: `filename` string, `status` number and `data` string
+--- Reads a file asynchronously.
+-- Can only read 'sf_file_asyncmax' files at a time.
+-- @param string path File path relative to data/sf_filedata/.
+-- @param function callback A callback function for when the read operation finishes. With arguments:
+-- 1. string filename: The name of the file
+-- 2. number status: The status of the read operation (see FSASYNC enum)
+-- 3. string data: The data read from the file
 function file_library.asyncRead(path, callback)
 	checkpermission (instance, path, "file.read")
 	checkluatype (path, TYPE_STRING)
@@ -259,9 +265,9 @@ end
 --- Reads a file asynchronously from path relative to base GMod directory
 -- @param string path File path relative to GarrysMod/garrysmod/.
 -- @param function callback A callback function that runs when the read operation completes. With arguments:
--- 1. string filename - The name of the file
--- 2. number status - The status of the read operation (see FSASYNC enum)
--- 3. string data - The data read from the file
+-- 1. string filename: The name of the file
+-- 2. number status: The status of the read operation (see FSASYNC enum)
+-- 3. string data: The data read from the file
 function file_library.asyncReadInGame(path, callback)
 	if instance.player ~= LocalPlayer() then SF.Throw("Only chip owner can read game files", 2) end
 	checkluatype (path, TYPE_STRING)
@@ -280,8 +286,8 @@ local function checkExtension(filename)
 	if not allowedExtensions[string.GetExtensionFromFilename(filename)] then SF.Throw("Invalid file extension!", 3) end
 end
 
---- Writes to a file. Throws an error if it failed to write
--- @param string path Filepath relative to data/sf_filedata/.
+--- Writes to a file. Throws an error if it failed to write.
+-- @param string path File path relative to data/sf_filedata/.
 -- @param string data The data to write
 function file_library.write(path, data)
 	checkpermission (instance, path, "file.write")
@@ -296,9 +302,9 @@ function file_library.write(path, data)
 	f:Close()
 end
 
---- Reads a temp file's data if it exists. Otherwise returns nil
--- @param string filename The temp file name. Must be only a file and not a path
--- @return string? The data of the temp file or nil if it doesn't exist
+--- Reads a temp file's data if it exists. Returns nil if it fails.
+-- @param string filename The temp file name. Must be a filename only, not a path
+-- @return string? The data of the temp file, or nil if it doesn't exist
 function file_library.readTemp(filename)
 	checkluatype(filename, TYPE_STRING)
 
@@ -309,8 +315,8 @@ function file_library.readTemp(filename)
 	return file.Read("sf_filedatatemp/"..instance.player:SteamID64().."/"..filename, "DATA")
 end
 
---- Writes a temporary file. Throws an error if it is unable to.
--- @param string filename The name to give the file. Must be only a file and not a path
+--- Writes a temporary file. Throws an error if it is unable to write.
+-- @param string filename The name to give the file. Must be a filename only, not a path
 -- @param string data The data to write
 -- @return string The generated path for your temp file
 function file_library.writeTemp(filename, data)
@@ -330,8 +336,8 @@ function file_library.writeTemp(filename, data)
 end
 
 --- Returns the path of a temp file if it exists. Otherwise returns nil
--- @param string filename The temp file name. Must be only a file and not a path
--- @return string? The path to the temp file or nil if it doesn't exist
+-- @param string filename The temp file name. Must be a filename only, not a path
+-- @return string? The path to the temp file, or nil if it doesn't exist
 function file_library.existsTemp(filename)
 	checkluatype(filename, TYPE_STRING)
 
@@ -346,7 +352,7 @@ function file_library.existsTemp(filename)
 end
 
 --- Appends a string to the end of a file
--- @param string path Filepath relative to data/sf_filedata/.
+-- @param string path File path relative to data/sf_filedata/.
 -- @param string data String that will be appended to the file.
 function file_library.append(path, data)
 	checkpermission (instance, path, "file.write")
@@ -360,17 +366,17 @@ function file_library.append(path, data)
 end
 
 --- Checks if a file exists
--- @param string path Filepath relative to data/sf_filedata/.
--- @return boolean? True if exists, false if not, nil if error
+-- @param string path File path relative to data/sf_filedata/.
+-- @return boolean? True if exists, false if not, or nil if error
 function file_library.exists(path)
 	checkpermission (instance, path, "file.exists")
 	checkluatype (path, TYPE_STRING)
 	return file.Exists("sf_filedata/" .. SF.NormalizePath(path), "DATA")
 end
 
---- Checks if a file exists in path relative to gmod
--- @param string path Filepath in game folder
--- @return boolean? True if exists, false if not, nil if error
+--- Checks if a file exists in a path relative to base GMod directory
+-- @param string path File path relative to GarrysMod/garrysmod/
+-- @return boolean? True if exists, false if not, or nil if error
 function file_library.existsInGame(path)
 	checkpermission (instance, path, "file.existsInGame")
 	checkluatype (path, TYPE_STRING)
@@ -378,7 +384,7 @@ function file_library.existsInGame(path)
 end
 
 --- Checks if a given file is a directory or not
--- @param string path Filepath relative to data/sf_filedata/.
+-- @param string path File path relative to data/sf_filedata/.
 -- @return boolean True if given path is a directory, false if it's a file
 function file_library.isDir(path)
 	checkpermission (instance, path, "file.isDir")
@@ -387,9 +393,9 @@ function file_library.isDir(path)
 end
 
 --- Deletes a file or directory
--- @param string path Filepath relative to data/sf_filedata/.
+-- @param string path File path relative to data/sf_filedata/.
 -- @param boolean? recursive If true, deletes directories recursively
--- @return boolean? True if successful, nil if it wasn't found
+-- @return boolean? True if successful, or no value if it wasn't found
 function file_library.delete(path, recursive)
 	checkpermission (instance, path, "file.write")
 	checkluatype (path, TYPE_STRING)
@@ -406,8 +412,8 @@ function file_library.delete(path, recursive)
 end
 
 --- Deletes a temp file
--- @param string filename The temp file name. Must be only a file and not a path
--- @return boolean? True if successful, nil if it wasn't found
+-- @param string filename The temp file name. Must be a filename only, not a path
+-- @return boolean? True if successful, or no value if it wasn't found
 function file_library.deleteTemp(filename)
 	checkpermission (instance, nil, "file.writeTemp")
 	checkluatype (filename, TYPE_STRING)
@@ -424,9 +430,9 @@ function file_library.deleteTemp(filename)
 end
 
 --- Renames a file
--- @param string path Filepath relative to data/sf_filedata/.
+-- @param string path File path relative to data/sf_filedata/.
 -- @param string newPath New filepath relative to data/sf_filedata/.
--- @return boolean? True if successful, nil if source not found
+-- @return boolean? True if successful, or no value if path was not found
 function file_library.rename(path, newPath)
 	checkpermission (instance, path, "file.rename")
 	checkluatype (path, TYPE_STRING)
@@ -441,7 +447,7 @@ function file_library.rename(path, newPath)
 end
 
 --- Creates a directory
--- @param string path Filepath relative to data/sf_filedata/.
+-- @param string path File path relative to data/sf_filedata/.
 function file_library.createDir(path)
 	checkpermission (instance, path, "file.write")
 	checkluatype (path, TYPE_STRING)
@@ -450,7 +456,9 @@ end
 
 --- Enumerates a directory
 -- @param string path The folder to enumerate, relative to data/sf_filedata/.
--- @param string? sorting Optional sorting argument. Either nameasc, namedesc, dateasc, datedesc
+-- @param string? sorting Optional sorting argument.
+-- Can be one of: `"nameasc"`, `"namedesc"`, `"dateasc"`, or `"datedesc"`.
+-- Default: `"nameasc"`
 -- @return table Table of file names
 -- @return table Table of directory names
 function file_library.find(path, sorting)
@@ -460,9 +468,11 @@ function file_library.find(path, sorting)
 	return file.Find("sf_filedata/" .. SF.NormalizePath(path), "DATA", sorting)
 end
 
---- Enumerates a directory relative to gmod
--- @param string path The folder to enumerate, relative to garrysmod.
--- @param string? sorting Optional sorting argument. Either nameasc, namedesc, dateasc, datedesc
+--- Enumerates a directory relative to base GMod directory
+-- @param string path The folder to enumerate, relative to GarrysMod/garrysmod/
+-- @param string? sorting Optional sorting argument.
+-- Can be one of: `"nameasc"`, `"namedesc"`, `"dateasc"`, or `"datedesc"`.
+-- Default: `"nameasc"`
 -- @return table Table of file names
 -- @return table Table of directory names
 function file_library.findInGame(path, sorting)
@@ -473,8 +483,8 @@ function file_library.findInGame(path, sorting)
 end
 
 --- Returns when the file or folder was last modified in Unix time.
---- Can then be used with something like os.date for a human-readable date.
--- @param string path Filepath relative to data/sf_filedata/.
+-- Can then be used with something like os.date for a human-readable date.
+-- @param string path File path relative to data/sf_filedata/.
 -- @return number Last modified time in Unix time
 function file_library.time(path)
 	checkpermission (instance, path, "file.time")
@@ -483,7 +493,7 @@ function file_library.time(path)
 end
 
 --- Returns the size of the file in bytes
--- @param string path Filepath relative to data/sf_filedata/.
+-- @param string path File path relative to data/sf_filedata/.
 -- @return number Size in bytes
 function file_library.size(path)
 	checkpermission (instance, path, "file.size")
@@ -491,12 +501,14 @@ function file_library.size(path)
 	return file.Size("sf_filedata/" .. SF.NormalizePath(path), "DATA")
 end
 
---- Wait until all changes to the file are complete
+--- Waits until all changes to the file are complete
 function file_methods:flush()
 	unwrap(self):Flush()
 end
 
---- Flushes and closes the file. The file must be opened again to use a new file object.
+--- Flushes and closes the file.
+-- You can no longer use the `File` object after calling this function.
+-- The file must be opened again to get a new `File` object.
 function file_methods:close()
 	local f = unwrap(self)
 	files[f] = nil
@@ -592,7 +604,7 @@ function file_methods:readUShort()
 end
 
 --- Reads an unsigned 64-bit integer and advances the file position
---- Note: Since Lua cannot store full 64-bit integers, this function returns a string.
+-- Note: Since Lua cannot store full 64-bit integers, this function returns a string.
 -- @return string UInt64 number
 function file_methods:readUInt64()
 	return unwrap(self):ReadUInt64()
@@ -662,7 +674,7 @@ function file_methods:writeUShort(x)
 end
 
 --- Writes an unsigned 64-bit integer and advances the file position
---- Note: Since Lua cannot store full 64-bit integers, this function takes a string.
+-- Note: Since Lua cannot store full 64-bit integers, this function takes a string.
 -- @param string x The unsigned 64-bit integer to write
 function file_methods:writeUInt64(x)
 	checkluatype (x, TYPE_STRING)
