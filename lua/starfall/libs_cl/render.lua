@@ -318,6 +318,7 @@ SF.hookAdd("PostDrawHUD", nil, function(instance)
 end, cleanupRender)
 
 --- Called before drawing the player. (Only works with HUD) (3D Context)
+-- Rendering using this hook may cause other effects or colors on the player to not work
 -- @name PreDrawPlayer
 -- @class hook
 -- @client
@@ -326,11 +327,27 @@ end, cleanupRender)
 -- @return boolean Return true to prevent the player from drawing
 SF.hookAdd("PrePlayerDraw", "predrawplayer", function(instance, ply, flags)
 	if canRenderHud(instance) then
-		instance:prepareRenderNoReset()
+		instance:prepareRender()
 		return true, { instance.Types.Player.Wrap(ply), flags }
 	end
 	return false
 end, cleanupRenderAllowTrueReturn)
+
+--- Return false to prevent rendering a player
+-- @name ShouldDrawPlayer
+-- @class hook
+-- @client
+-- @param Player ply Player that's about to be drawn
+-- @param number flags STUDIO flags for the render operation
+-- @return boolean Return false to prevent the player from drawing
+SF.hookAdd("PrePlayerDraw", "shoulddrawplayer", function(instance, ply, flags)
+	if canRenderHud(instance) then
+		return true, { instance.Types.Player.Wrap(ply), flags }
+	end
+	return false
+end, function(instance, args)
+	if args[1] and args[2]==false then return true end
+end)
 
 --- Called after drawing the player. (Only works with HUD) (3D Context)
 -- @name PostDrawPlayer
@@ -544,14 +561,6 @@ instance:AddHook("deinitialize", function ()
 	end
 end)
 
-function instance:prepareRenderNoReset()
-	renderdata.isRendering = true
-	if not renderingView then
-		renderdata.needRT = false
-		renderdata.scrW = ScrW()
-		renderdata.scrH = ScrH()
-	end
-end
 
 function instance:prepareRender()
 	Col_SetUnpacked(currentcolor, 255, 255, 255, 255)
