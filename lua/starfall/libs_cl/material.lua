@@ -398,13 +398,13 @@ end
 function material_methods:destroy()
 	local m = unwrap(self)
 
-	if materialrt[ self ] then
-		for _, rt_name in ipairs( materialrt[ self ] ) do
-			if not instance.data.render.rendertargets[ rt_name ] then continue end
-			instance.env.render.destroyRenderTarget( rt_name )
+	if materialrt[self] then
+		for _, rt_name in ipairs(materialrt[self]) do
+			if instance.data.render.rendertargets[rt_name] then
+				instance.env.render.destroyRenderTarget(rt_name)
+			end
 		end
-
-		materialrt[ self ] = nil
+		materialrt[self] = nil
 	end
 
 	material_meta.sf2sensitive[self] = nil
@@ -595,8 +595,8 @@ function material_methods:setTextureURL(key, url, cb, done)
 		self:setTextureRenderTarget(key, name)
 		texture = instance.data.render.rendertargets[name]
 
-		materialrt[ self ] = materialrt[ self ] or {}
-		table.insert( materialrt[ self ], name )
+		materialrt[self] = materialrt[self] or {}
+		table.insert(materialrt[self], name)
 	end
 
 	if #url > cv_max_data_material_size:GetInt() then
