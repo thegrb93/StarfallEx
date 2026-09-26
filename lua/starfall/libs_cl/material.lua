@@ -207,6 +207,7 @@ instance:AddHook("deinitialize", function()
 		material_bank:free(instance.player, k, k:GetShader())
 	end
 end)
+local materialrt = {}
 
 --- Loads a .vmt material or existing material. Throws an error if the material fails to load
 --- Existing created materials can be loaded with ! prepended to the name
@@ -397,10 +398,13 @@ end
 function material_methods:destroy()
 	local m = unwrap(self)
 
-	local name = m:GetName()
-	local rt = instance.data.render.rendertargets[name]
-	if rt then
-		instance.env.render.destroyRenderTarget(name)
+	if materialrt[self] then
+		for _, rt_name in ipairs(materialrt[self]) do
+			if instance.data.render.rendertargets[rt_name] then
+				instance.env.render.destroyRenderTarget(rt_name)
+			end
+		end
+		materialrt[self] = nil
 	end
 
 	material_meta.sf2sensitive[self] = nil
@@ -590,6 +594,9 @@ function material_methods:setTextureURL(key, url, cb, done)
 		instance.env.render.createRenderTarget(name)
 		self:setTextureRenderTarget(key, name)
 		texture = instance.data.render.rendertargets[name]
+
+		materialrt[self] = materialrt[self] or {}
+		table.insert(materialrt[self], name)
 	end
 
 	if #url > cv_max_data_material_size:GetInt() then
