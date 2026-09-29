@@ -338,14 +338,12 @@ function SF.Instance:BuildEnvironment()
 				end
 			end
 		end
-
-		local tID = TypeID(object)
 		-- Do not elseif here because strings do have a metatable.
-		if safe_types[tID] then
+		if safe_types[TypeID(object)] then
 			return object
 		end
-		-- Holograms don't have a gmod metatable, check manually. Client-only holos count as userdata.
-		if (tID == TYPE_USERDATA or isentity(object)) and object.IsSFHologram then
+		-- Holograms don't have a gmod metatable, check manually
+		if metatable and metatable.__index and object.IsSFHologram then
 			return self.Types.Hologram.Wrap(object)
 		end
 	end
