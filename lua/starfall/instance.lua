@@ -343,7 +343,7 @@ function SF.Instance:BuildEnvironment()
 			return object
 		end
 		-- Clientside holograms don't have a gmod metatype so check manually
-		if isentity(object) and object.IsSFHologram then
+		if metatable and metatable.__index and object.IsSFHologram then
 			return self.Types.Hologram.Wrap(object)
 		end
 	end
