@@ -663,4 +663,18 @@ function material_methods:setVector(key, v)
 	unwrap(self):SetVector(key, vunwrap1(v))
 end
 
+--- Given a texture key, reloads file-based textures from disk, or clears render target textures.
+-- @param string key The material key name that has the texture. $basetexture is the key name for most purposes.
+function material_methods:downloadTexture(key)
+	checkkey(key)
+
+	local texture = unwrap(self):GetTexture(key)
+
+	if not texture then
+		SF.Throw("This material key does not have a texture", 2)
+	end
+
+	texture:Download()
+end
+
 end
