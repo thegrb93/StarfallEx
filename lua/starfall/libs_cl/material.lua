@@ -668,11 +668,7 @@ end
 function material_methods:downloadTexture(key)
 	checkkey(key)
 
-	local texture = unwrap(self):GetTexture(key)
-
-	if not texture then
-		SF.Throw("This material key does not have a texture", 2)
-	end
+	local texture = unwrap(self):GetTexture(key) or SF.Throw("This material key does not have a texture", 2)
 
 	texture:Download()
 end
