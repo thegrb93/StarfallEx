@@ -34,14 +34,18 @@ function ENT:GetOverlayText()
 		local bufferAvg = instance.perf.cpuAverage
 		clientstr = tostring(math.Round(bufferAvg * 1000000)) .. "us. (" .. tostring(math.floor(bufferAvg / instance.perf.cpuLimit * 100)) .. "%)"
 	elseif ent_tbl.error then
-		clientstr = "Errored / Terminated"
+		if ent_tbl.errorCPUus then
+			clientstr = "Errored / Terminated (" .. tostring(ent_tbl.errorCPUus) .. "us. (" .. tostring(ent_tbl.errorCPUpercent) .. "%))"
+		else
+			clientstr = "Errored / Terminated"
+		end
 	else
 		clientstr = "None"
 	end
 	if state == 0 or state == 1 then
 		serverstr = tostring(ent_tbl.GetCPUus(self)) .. "us. (" .. tostring(ent_tbl.GetCPUpercent(self)) .. "%)"
 	elseif state == 2 then
-		serverstr = "Errored"
+		serverstr = "Errored (" .. tostring(ent_tbl.GetCPUus(self)) .. "us. (" .. tostring(ent_tbl.GetCPUpercent(self)) .. "%))"
 	else
 		serverstr = "None"
 	end

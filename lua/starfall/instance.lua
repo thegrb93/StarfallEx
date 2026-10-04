@@ -551,7 +551,7 @@ local CpuRamAverage = {
 			local cpuAverage = self:getAverageCpu()
 			if cpuAverage > self.cpuSoftLimit then
 				if cpuAverage > self.cpuLimit then
-					return self:doError("CPU usage exceeded!", true, noThrow, forceThrow or cpuAverage > self.cpuHardLimit)
+					return self:doError(("CPU usage exceeded! (%dus, %d%%)"):format(math.Round(cpuAverage * 1e6), math.floor(cpuAverage / self.cpuLimit * 100)), true, noThrow, forceThrow or cpuAverage > self.cpuHardLimit)
 				else
 					return self:doError("CPU usage warning!", false, noThrow, false)
 				end

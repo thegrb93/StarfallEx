@@ -116,6 +116,17 @@ end
 function ENT:Error(err)
 	self.error = err
 	if self.instance then
+		-- Snapshot the cpu usage the chip died at, since Think stops updating after the instance is gone
+		local perf = self.instance.perf
+		if perf then
+			local bufferAvg = math.max(perf.cpuAverage, perf:getAverageCpu())
+			self.errorCPUus = math.Round(bufferAvg * 1000000)
+			self.errorCPUpercent = math.floor(bufferAvg / perf.cpuLimit * 100)
+			if SERVER then
+				self:SetCPUus(self.errorCPUus)
+				self:SetCPUpercent(self.errorCPUpercent)
+			end
+		end
 		self.instance:deinitialize()
 		self.instance = nil
 	end
