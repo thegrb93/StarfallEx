@@ -24,6 +24,10 @@ function ENT:Initialize()
 	end)
 end
 
+local function cpuString(us, perc)
+	return string.format("(%dus, %d%%)", us, perc)
+end
+
 function ENT:GetOverlayText()
 	local ent_tbl = Ent_GetTable(self)
 	local state = ent_tbl.GetCPUstate(self)
@@ -31,17 +35,16 @@ function ENT:GetOverlayText()
 
 	local clientstr, serverstr
 	if instance then
-		local bufferAvg = instance.perf.cpuAverage
-		clientstr = tostring(math.Round(bufferAvg * 1000000)) .. "us. (" .. tostring(math.floor(bufferAvg / instance.perf.cpuLimit * 100)) .. "%)"
+		clientstr = cpuString(instance.perf:getCpuReadableMetrics())
 	elseif ent_tbl.error then
-		clientstr = "Errored / Terminated"
+		clientstr = "Errored / Terminated " .. cpuString(ent_tbl.clErrorCPUus, ent_tbl.clErrorCPUpercent)
 	else
 		clientstr = "None"
 	end
 	if state == 0 or state == 1 then
-		serverstr = tostring(ent_tbl.GetCPUus(self)) .. "us. (" .. tostring(ent_tbl.GetCPUpercent(self)) .. "%)"
+		serverstr = cpuString(ent_tbl.GetCPUus(self), ent_tbl.GetCPUpercent(self))
 	elseif state == 2 then
-		serverstr = "Errored"
+		serverstr = "Errored " .. cpuString(ent_tbl.GetCPUus(self), ent_tbl.GetCPUpercent(self))
 	else
 		serverstr = "None"
 	end
