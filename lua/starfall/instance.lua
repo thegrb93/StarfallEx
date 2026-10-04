@@ -531,9 +531,8 @@ local CpuRamAverage = {
 		getAverageRam = function(self)
 			return self.ramAverage + (gcinfo() - self.ramAverage)*0.001
 		end,
-		getReadableCpuMetrics = function(self)
-			local bufferAvg = self:getAverageCpu()
-			return math.Round(bufferAvg * 1000000), bufferAvg / self.cpuLimit * 100
+		getCpuReadableMetrics = function(self)
+			return math.Round(self.cpuAverage * 1000000), self.cpuAverage / self.cpuLimit * 100
 		end,
 		check = function(self, forceThrow, noThrow)
 			-- Check ram and cleanup before checking cpu so time spent is measured
@@ -555,7 +554,7 @@ local CpuRamAverage = {
 			local cpuAverage = self:getAverageCpu()
 			if cpuAverage > self.cpuSoftLimit then
 				if cpuAverage > self.cpuLimit then
-					return self:doError(("CPU usage exceeded! (%dus, %d%%)"):format(math.Round(cpuAverage * 1e6), math.floor(cpuAverage / self.cpuLimit * 100)), true, noThrow, forceThrow or cpuAverage > self.cpuHardLimit)
+					return self:doError("CPU usage exceeded! "..string.format("(%dus, %d%%)", cpuAverage * 1e6, cpuAverage / self.cpuLimit * 100), true, noThrow, forceThrow or cpuAverage > self.cpuHardLimit)
 				else
 					return self:doError("CPU usage warning!", false, noThrow, false)
 				end
@@ -826,6 +825,7 @@ end)
 
 function SF.Instance:Error(err)
 	self:pushCpuCheck()
+	self.perf:stop()
 	if self.runOnError then -- We have a custom error function, use that instead
 		self.runOnError(err)
 	else

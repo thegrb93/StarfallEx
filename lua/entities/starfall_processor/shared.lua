@@ -119,7 +119,7 @@ function ENT:Error(err)
 	if ent_tbl.instance then
 		-- Snapshot the cpu usage the chip died at, since Think stops updating after the instance is gone
 		if ent_tbl.instance.perf then
-			local errus, errperc = ent_tbl.instance.perf:getReadableCpuMetrics()
+			local errus, errperc = ent_tbl.instance.perf:getCpuReadableMetrics()
 			ent_tbl.clErrorCPUus = errus
 			ent_tbl.clErrorCPUpercent = errperc
 			if SERVER then
