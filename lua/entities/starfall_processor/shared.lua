@@ -114,21 +114,21 @@ function ENT:GetGateName()
 end
 
 function ENT:Error(err)
-	self.error = err
-	if self.instance then
+	local ent_tbl = self:GetTable()
+	ent_tbl.error = err
+	if ent_tbl.instance then
 		-- Snapshot the cpu usage the chip died at, since Think stops updating after the instance is gone
-		local perf = self.instance.perf
-		if perf then
-			local bufferAvg = math.max(perf.cpuAverage, perf:getAverageCpu())
-			self.errorCPUus = math.Round(bufferAvg * 1000000)
-			self.errorCPUpercent = math.floor(bufferAvg / perf.cpuLimit * 100)
+		if ent_tbl.instance.perf then
+			local errus, errperc = ent_tbl.instance.perf:getReadableCpuMetrics()
+			ent_tbl.clErrorCPUus = errus
+			ent_tbl.clErrorCPUpercent = errperc
 			if SERVER then
-				self:SetCPUus(self.errorCPUus)
-				self:SetCPUpercent(self.errorCPUpercent)
+				ent_tbl.SetCPUus(self, errus)
+				ent_tbl.SetCPUpercent(self, errperc)
 			end
 		end
-		self.instance:deinitialize()
-		self.instance = nil
+		ent_tbl.instance:deinitialize()
+		ent_tbl.instance = nil
 	end
 
 	local msg = string.match(err.message, "[^\n]+") or ""

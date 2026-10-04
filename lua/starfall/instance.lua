@@ -531,6 +531,10 @@ local CpuRamAverage = {
 		getAverageRam = function(self)
 			return self.ramAverage + (gcinfo() - self.ramAverage)*0.001
 		end,
+		getReadableCpuMetrics = function(self)
+			local bufferAvg = self:getAverageCpu()
+			return math.Round(bufferAvg * 1000000), bufferAvg / self.cpuLimit * 100
+		end,
 		check = function(self, forceThrow, noThrow)
 			-- Check ram and cleanup before checking cpu so time spent is measured
 			local ram = gcinfo()
