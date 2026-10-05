@@ -25,7 +25,7 @@ function ENT:Initialize()
 end
 
 local function cpuString(us, perc)
-	return string.format("(%dus, %d%%)", us, perc)
+	return string.format("(%dus, %d%%)", us or 0, perc or 0)
 end
 
 function ENT:GetOverlayText()
