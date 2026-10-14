@@ -24,7 +24,7 @@ local cv_temp_maxsize = CreateConVar("sf_file_tempmaxsize", "128", { FCVAR_ARCHI
 local cv_temp_maxage = CreateConVar("sf_file_tempmaxage", "604800", { FCVAR_ARCHIVE }, "The max age of a temp file in seconds (default 7 days)")
 local cv_max_concurrent_reads = CreateConVar("sf_file_asyncmax", "10", { FCVAR_ARCHIVE }, "The max concurrent async reads allowed")
 
-local writeTempBurst = SF.BurstObject("file_temp_write", "temp writes", 2, 32, "Regen rate of file.writeTemp burst in MB/second", "The file.writeTemp burst limit in MB.", 1000000)
+local writeTempBurst = SF.BurstObject("file_temp_write", "temp writes", 8, 48, "Regen rate of file.writeTemp burst in MB/second", "The file.writeTemp burst limit in MB.", 1000000)
 
 --- File functions. Allows modification of files.
 -- @name file
