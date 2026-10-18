@@ -1879,13 +1879,40 @@ vgui.Register("StarfallEditorFrame", Editor, "DFrame")
 -- Starfall Users
 local PANEL = {}
 
-function PANEL:UpdatePlayers(players)
+function PANEL:GetPlayerCpu(ply)
+	local sv, cl = 0, 0
+	for instance, _ in pairs(SF.playerInstances[ply] or {}) do
+		sv = sv + (instance.entity:IsValid() and instance.entity:GetCPUus("CPUus") or 0)
+		cl = cl + instance.perf.cpuAverage
+	end
+	return sv, cl
+end
+
+-- Returns the players in display order: by server cpu, client cpu, or name when mode is nil
+function PANEL:GetSortedPlayers(mode)
 	local sortedplayers = {}
 	for ply in pairs(self.players) do
 		local plyname = ply:GetName()
-		sortedplayers[#sortedplayers+1] = {ply = ply, name = plyname, namel = string.lower(plyname)}
+		local sv, cl = self:GetPlayerCpu(ply)
+		sortedplayers[#sortedplayers+1] = {ply = ply, name = plyname, namel = string.lower(plyname), sv = sv, cl = cl}
 	end
-	table.sort(sortedplayers, function(a,b) return a.namel<b.namel end)
+	table.sort(sortedplayers, function(a,b)
+		if mode == "sv" and a.sv ~= b.sv then return a.sv > b.sv end
+		if mode == "cl" and a.cl ~= b.cl then return a.cl > b.cl end
+		return a.namel<b.namel
+	end)
+	return sortedplayers
+end
+
+-- One-shot sort: orders the rows once, no continuous re-sorting
+function PANEL:SortOnce(mode)
+	self:UpdatePlayers(mode)
+end
+
+function PANEL:UpdatePlayers(mode)
+	local sortedplayers = self:GetSortedPlayers(mode)
+	self.shownOrder = {}
+	for i, tbl in ipairs(sortedplayers) do self.shownOrder[i] = tbl.ply end
 
 	self.scrollPanel:Clear()
 
@@ -1912,6 +1939,22 @@ function PANEL:UpdatePlayers(players)
 	totalClientText:SetSize(150, 13)
 
 	local usersPanel = self
+	local sortModes = {
+		{label = "Sort SV", mode = "sv"},
+		{label = "Sort CL", mode = "cl"},
+		{label = "Unsort", mode = nil},
+	}
+	for _, info in ipairs(sortModes) do
+		local btn = vgui.Create("StarfallButton", totalHeader)
+		btn:SetText(info.label)
+		btn:DockMargin(0, 0, 3, 0)
+		btn:SetSize(60, 22)
+		btn:Dock(LEFT)
+		btn.DoClick = function()
+			usersPanel:SortOnce(info.mode)
+		end
+	end
+
 	totalHeader.nextThink = 0
 	function totalHeader:Think()
 		local t = CurTime()
@@ -1921,10 +1964,9 @@ function PANEL:UpdatePlayers(players)
 		local svtotal = 0
 		local cltotal = 0
 		for ply in pairs(usersPanel.players) do
-			for instance, _ in pairs(SF.playerInstances[ply] or {}) do
-				svtotal = svtotal + (instance.entity:IsValid() and instance.entity:GetCPUus("CPUus") or 0)
-				cltotal = cltotal + instance.perf.cpuAverage
-			end
+			local sv, cl = usersPanel:GetPlayerCpu(ply)
+			svtotal = svtotal + sv
+			cltotal = cltotal + cl
 		end
 		totalServerText:SetText(string.format("Total SV CPU: %3.1f us", svtotal))
 		totalClientText:SetText(string.format("Total CL CPU: %3.1f us", cltotal*1e6))
@@ -1941,6 +1983,16 @@ function PANEL:UpdatePlayers(players)
 		header:Dock(TOP)
 		header:SetBackgroundColor(Color(0,0,0,20))
 		header:SetTooltip(tbl.name)
+
+		header:SetMouseInputEnabled(true)
+		function header:OnMousePressed(code)
+			if code ~= MOUSE_RIGHT then return end
+			local menu = DermaMenu()
+			menu:AddOption("Copy Name", function() SetClipboardText(ply:GetName()) end):SetIcon("icon16/user.png")
+			menu:AddOption("Copy SteamID64", function() SetClipboardText(ply:SteamID64()) end):SetIcon("icon16/vcard.png")
+			menu:AddOption("Copy SteamID", function() SetClipboardText(ply:SteamID()) end):SetIcon("icon16/vcard.png")
+			menu:Open()
+		end
 
 		local blocked = SF.BlockedUsers:contains(steamid)
 		local button = vgui.Create("StarfallButton", header)
@@ -2073,6 +2125,10 @@ function PANEL:UpdatePlayers(players)
 
 		self.scrollPanel:AddItem(header)
 	end
+
+	-- Force layout now so rebuilt rows are positioned immediately
+	self.scrollPanel:InvalidateChildren(true)
+	self.scrollPanel:InvalidateLayout(true)
 end
 
 function PANEL:CheckPlayersChanged()
@@ -2104,6 +2160,7 @@ end
 
 function PANEL:Init()
 	self.players = {}
+	self.shownOrder = {}
 	self.scrollPanel = vgui.Create("DScrollPanel", self)
 	self.scrollPanel:Dock(FILL)
 	self.scrollPanel:SetPaintBackgroundEnabled(false)
