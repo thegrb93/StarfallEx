@@ -1888,6 +1888,49 @@ function PANEL:UpdatePlayers(players)
 	table.sort(sortedplayers, function(a,b) return a.namel<b.namel end)
 
 	self.scrollPanel:Clear()
+
+	local totalHeader = vgui.Create("StarfallPanel")
+	totalHeader:DockMargin(0, 5, 0, 0)
+	totalHeader:SetSize(0, 32)
+	totalHeader:Dock(TOP)
+	totalHeader:SetBackgroundColor(Color(0,0,0,40))
+
+	local totalServerText = vgui.Create("DLabel", totalHeader)
+	totalServerText:SetFont("DermaDefault")
+	totalServerText:SetColor(Color(255, 255, 255))
+	totalServerText:DockMargin(5, 0, 5, 0)
+	totalServerText:Dock(LEFT)
+	totalServerText:SetText("Total SV CPU: 0.0 us")
+	totalServerText:SetSize(150, 13)
+
+	local totalClientText = vgui.Create("DLabel", totalHeader)
+	totalClientText:SetFont("DermaDefault")
+	totalClientText:SetColor(Color(255, 255, 255))
+	totalClientText:DockMargin(5, 0, 5, 0)
+	totalClientText:Dock(LEFT)
+	totalClientText:SetText("Total CL CPU: 0.0 us")
+	totalClientText:SetSize(150, 13)
+
+	local usersPanel = self
+	totalHeader.nextThink = 0
+	function totalHeader:Think()
+		local t = CurTime()
+		if t < self.nextThink then return end
+		self.nextThink = t + 0.1
+
+		local svtotal = 0
+		local cltotal = 0
+		for ply in pairs(usersPanel.players) do
+			for instance, _ in pairs(SF.playerInstances[ply] or {}) do
+				svtotal = svtotal + (instance.entity:IsValid() and instance.entity:GetCPUus("CPUus") or 0)
+				cltotal = cltotal + instance.perf.cpuAverage
+			end
+		end
+		totalServerText:SetText(string.format("Total SV CPU: %3.1f us", svtotal))
+		totalClientText:SetText(string.format("Total CL CPU: %3.1f us", cltotal*1e6))
+	end
+	self.scrollPanel:AddItem(totalHeader)
+
 	for _, tbl in ipairs(sortedplayers) do
 		local ply = tbl.ply
 		local steamid = ply:SteamID()
