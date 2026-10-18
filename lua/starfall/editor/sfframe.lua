@@ -1904,11 +1904,6 @@ function PANEL:GetSortedPlayers(mode)
 	return sortedplayers
 end
 
--- One-shot sort: orders the rows once, no continuous re-sorting
-function PANEL:SortOnce(mode)
-	self:UpdatePlayers(mode)
-end
-
 function PANEL:UpdatePlayers(mode)
 	local sortedplayers = self:GetSortedPlayers(mode)
 	self.shownOrder = {}
@@ -1951,7 +1946,7 @@ function PANEL:UpdatePlayers(mode)
 		btn:SetSize(60, 22)
 		btn:Dock(LEFT)
 		btn.DoClick = function()
-			usersPanel:SortOnce(info.mode)
+			usersPanel:UpdatePlayers(info.mode)
 		end
 	end
 
@@ -2126,7 +2121,6 @@ function PANEL:UpdatePlayers(mode)
 		self.scrollPanel:AddItem(header)
 	end
 
-	-- Force layout now so rebuilt rows are positioned immediately
 	self.scrollPanel:InvalidateChildren(true)
 	self.scrollPanel:InvalidateLayout(true)
 end
