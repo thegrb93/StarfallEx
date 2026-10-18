@@ -1935,9 +1935,9 @@ function PANEL:UpdatePlayers(mode)
 
 	local usersPanel = self
 	local sortModes = {
-		{label = "Sort SV", mode = "sv"},
-		{label = "Sort CL", mode = "cl"},
-		{label = "Unsort", mode = nil},
+		{label = "Sort SV", mode = "sv", tooltip = "Sort by server CPU usage"},
+		{label = "Sort CL", mode = "cl", tooltip = "Sort by client CPU usage"},
+		{label = "Unsort", mode = nil, tooltip = "Sort by name"},
 	}
 	for _, info in ipairs(sortModes) do
 		local btn = vgui.Create("StarfallButton", totalHeader)
@@ -1945,6 +1945,7 @@ function PANEL:UpdatePlayers(mode)
 		btn:DockMargin(0, 0, 3, 0)
 		btn:SetSize(60, 22)
 		btn:Dock(LEFT)
+		btn:SetTooltip(info.tooltip)
 		btn.DoClick = function()
 			usersPanel:UpdatePlayers(info.mode)
 		end
