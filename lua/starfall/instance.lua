@@ -78,7 +78,8 @@ function SF.Instance.Compile(code, mainfile, player, entity, superuser)
 	if not ok then return false, { message = ppdata, traceback = "" } end
 	instance.ppdata = ppdata
 
-	if player:IsWorld() or superuser then
+	-- Only clients may trust the server's superuser flag; uploads must pass server authorization.
+	if player:IsWorld() or (CLIENT and superuser) then
 		player = SF.Superuser
 	elseif SERVER and ppdata.files[mainfile].superuser then
 		local ok, message = hook.Run("StarfallCanSuperUser", player)
