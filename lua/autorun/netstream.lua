@@ -14,24 +14,25 @@ net.Stream.MaxTries = 3 --Maximum times the client may retry downloading the who
 local WriteStreamQueue = {
 	__index = {
 		Add = function(self, stream)
-			local identifier = self.curidentifier
-			local startid = identifier
-			while self.queue[identifier] do
-				identifier = identifier % net.Stream.MaxWriteStreams + 1
-				if identifier == startid then
-					ErrorNoHalt("Netstream is full of WriteStreams!")
-					net.WriteUInt(0, 32)
-					return
-				end
+			local queue = self.queue
+			if self.count >= net.Stream.MaxWriteStreams then
+				ErrorNoHalt("Netstream is full of WriteStreams!")
+				net.WriteUInt(0, 32)
+				return
 			end
-			self.curidentifier = identifier % net.Stream.MaxWriteStreams + 1
+			--Randomized so that clients can't guess the identifiers of streams meant for other players
+			local identifier = math.random(1, 4294967295)
+			while queue[identifier] do
+				identifier = math.random(1, 4294967295)
+			end
 
-			if next(self.queue)==nil then
+			if next(queue)==nil then
 				self.activitytimeout = CurTime()+net.Stream.Timeout
 				timer.Create("netstream_queueclean", 5, 0, function() self:Clean() end)
 			end
-			self.queue[identifier] = stream
+			queue[identifier] = stream
 			stream.identifier = identifier
+			self.count = self.count + 1
 			return stream
 		end,
 
@@ -60,6 +61,7 @@ local WriteStreamQueue = {
 				if (next(stream.clients)~=nil and t >= stream.timeout) or t >= self.activitytimeout then
 					stream:Remove()
 					self.queue[k] = nil
+					self.count = self.count - 1
 				end
 			end
 			if next(self.queue)==nil then
@@ -70,7 +72,7 @@ local WriteStreamQueue = {
 	__call = function(t)
 		return setmetatable({
 			activitytimeout = CurTime()+net.Stream.Timeout,
-			curidentifier = 1,
+			count = 0,
 			queue = {}
 		}, t)
 	end
