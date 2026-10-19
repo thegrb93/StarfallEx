@@ -225,8 +225,10 @@ local function syncHud(ply, chip, activator, enabled)
 	hudsToSync[ply][chip] = {activator or game.GetWorld(), enabled}
 end
 
-net.Receive("starfall_hud_set_enabled" , function()
+net.Receive("starfall_hud_set_enabled" , function(len, sender)
 	local ply = net.ReadEntity()
+	-- Clients may only synchronize their own HUD connections.
+	if SERVER and ply ~= sender then return end
 	local chip = net.ReadEntity()
 	local activator = net.ReadEntity()
 	local enabled = net.ReadBool()
