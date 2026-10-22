@@ -25,7 +25,7 @@ SF.RegisterType("ParticleEffect", false, false)
 -- We precache all builtin and TF2 PCF since there aren't *that* many, because we can precache any amount on client-side.
 -- All works fine even if some of these are missing (e.g. HL Episodes), such as if you don't have the game installed.
 -- TODO: Use file.Find? But not sure how to find TF2 PCFs...
-if not GetConVar("mat_reduceparticles"):GetBool() and SF.CvarPrecacheParticles:GetBool() then
+if not GetConVar("mat_reduceparticles"):GetBool() or SF.CvarPrecacheParticles:GetBool() then
 	local files = {
 		-- Source Engine base (all are on-demand)
 		"antlion_blood",
