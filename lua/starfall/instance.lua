@@ -28,6 +28,7 @@ else
 	SF.RamCap = CreateConVar("sf_ram_max_cl", 1500000, FCVAR_ARCHIVE, "If ram exceeds this limit (in kB), starfalls will be terminated")
 	SF.CvarEnabled = CreateConVar("sf_enabled_cl", "1", { FCVAR_ARCHIVE, FCVAR_USERINFO, FCVAR_DONTRECORD }, "Enable clientside starfall")
 	SF.CvarNotifyErrors = CreateConVar("sf_notify_cl", "3", FCVAR_ARCHIVE, "Chip error notification level (0=off, 1=self only, 2=filter common spam, 3=all)")
+	SF.CvarPrecacheParticles = CreateConVar("sf_particle_precache_cl", "1", FCVAR_ARCHIVE, "Precache particle system .pcf files at Starfall startup (0=skip. Particles will be precached on first use instead, trading a small hitch for faster startup. Useful for low-end clients)")
 end
 local ramlimit
 SF.CvarCallback(SF.RamCap, function(val) ramlimit = val end, "number")
