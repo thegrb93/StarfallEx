@@ -189,7 +189,7 @@ function TOOL:OpenEditor(ply, ent)
 		if ent.sfdata then
 			net.Start("starfall_openeditor")
 			net.WriteBool(true)
-			net.WriteStarfall(ent.sfdata)
+			net.WriteStarfall(ent.sfdata, nil, {ply})
 			net.Send(ply)
 		end
 	else
