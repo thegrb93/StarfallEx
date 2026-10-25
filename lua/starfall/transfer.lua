@@ -51,7 +51,7 @@ function net.ReadStarfall(ply, callback)
 	end)
 end
 
-function net.WriteStarfall(sfdata, callback)
+function net.WriteStarfall(sfdata, callback, recipients)
 	if #sfdata.mainfile > 255 then error("Main file name too large: " .. #sfdata.mainfile .. " (max is 255)") end
 	if SERVER then
 		if IsValid(sfdata.proc) then
@@ -71,10 +71,10 @@ function net.WriteStarfall(sfdata, callback)
 	net.WriteString(sfdata.mainfile)
 
 	if sfdata.compressed then
-		return net.WriteStream(sfdata.compressed, callback, true)
+		return net.WriteStream(sfdata.compressed, callback, true, recipients)
 	else
 		local data = SF.CompressFiles(sfdata.files)
-		return net.WriteStream(data, callback, true)
+		return net.WriteStream(data, callback, true, recipients)
 	end
 end
 
@@ -119,10 +119,11 @@ if SERVER then
 
 	function SF.SendStarfall(msg, sfdata, recipient, callback)
 		net.Start(msg)
-		net.WriteStarfall(sfdata, callback)
 		if recipient then
+			net.WriteStarfall(sfdata, callback, istable(recipient) and recipient or {recipient})
 			net.Send(recipient)
 		else
+			net.WriteStarfall(sfdata, callback, player.GetHumans())
 			net.Broadcast()
 		end
 	end

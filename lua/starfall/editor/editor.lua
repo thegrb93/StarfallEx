@@ -737,7 +737,7 @@ elseif SERVER then
 				net.WriteBool(true)
 			else
 				net.WriteBool(false)
-				ply.SF_SentDocs = net.WriteStream(SF.Docs, nil, true)
+				ply.SF_SentDocs = net.WriteStream(SF.Docs, nil, true, {ply})
 			end
 			net.Send(ply)
 		end

@@ -16,7 +16,8 @@ local StreamManager = {
 
 			return function()
 				if self.placeholders[placeholder] then
-					local stream = net.WriteStream(str, function() end, nocompress)
+					local recipients = SERVER and (instance.data.net.netRecipients[1] and instance.data.net.netRecipients or player.GetHumans()) or nil
+					local stream = net.WriteStream(str, function() end, nocompress, recipients)
 					if stream then
 						self.writeStreams[stream] = self.placeholders[placeholder]
 					end
@@ -139,8 +140,9 @@ local netStarted = false
 local netSize = 0
 local netData
 local netReceives = {}
+local netRecipients = {}
 local plyStreams = StreamManager.plyStreams[instance.player]
-instance.data.net = {receives = netReceives}
+instance.data.net = {receives = netReceives, netRecipients = netRecipients}
 instance:AddHook("initialize", function()
 	vunwrap1 = vec_meta.QuickUnwrap1
 end)
@@ -192,15 +194,14 @@ function net_library.send(target, unreliable)
 	if unreliable~=nil then checkluatype(unreliable, TYPE_BOOL) end
 	if not netStarted then SF.Throw("net message not started", 2) end
 
-	local newtarget
+	table.Empty(netRecipients)
 	if SERVER and target then
 		checkluatype(target, TYPE_TABLE)
 		if debug.getmetatable(target)==instance.Types.Player then
-			newtarget = instance.Types.Player.Unwrap(target)
+			netRecipients[1] = instance.Types.Player.Unwrap(target)
 		else
-			newtarget = {}
 			for i, pl in ipairs(target) do
-				newtarget[i] = instance.Types.Player.Unwrap(pl)
+				netRecipients[i] = instance.Types.Player.Unwrap(pl)
 			end
 		end
 	end
@@ -209,8 +210,8 @@ function net_library.send(target, unreliable)
 	net_write(unreliable)
 
 	if SERVER then
-		if newtarget then
-			net.Send(newtarget)
+		if netRecipients[1] then
+			net.Send(netRecipients)
 		else
 			net.Broadcast()
 		end
