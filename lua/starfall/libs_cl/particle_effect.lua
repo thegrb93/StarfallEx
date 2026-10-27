@@ -27,7 +27,7 @@ local PCFFile = {
 			if self.file == nil then error("Failed to open file!") end
 			local header = self:readString()
 			local version = tonumber(string.sub(header, 26, 26)) or error("Unknown version found!")
-			if version > 5 then error("Incompatible PCF version") end
+			if version > 5 then error("Incompatible PCF version: "..version) end
 		
 			local strings
 			if version > 1 then
@@ -40,19 +40,16 @@ local PCFFile = {
 			for i=1, self:readIndex(true) do
 				local typename
 				if version > 1 then
-					typename = strings[self:readIndex(version > 4)+1]
+					local index = self:readIndex(version > 4)
+					typename = strings[index+1] or error("Invalid string index: "..index)
 				else
 					typename = self:readString()
 				end
 
-				-- Skip description
-				if version > 4 then
-					self:readIndex(version > 4)
-				end
-
 				local name
 				if version > 3 then
-					name = strings[self:readIndex(version > 4)+1]
+					local index = self:readIndex(version > 4)
+					name = strings[index+1] or error("Invalid string index: "..index)
 				else
 					name = self:readString()
 				end
@@ -86,9 +83,9 @@ local PCFFile = {
 					self:load()
 				elseif string.byte(s, #s) == 0 then
 					if str == nil then
-						return s
+						return string.sub(s, 1, -2)
 					else
-						str[#str+1] = s
+						str[#str+1] = string.sub(s, 1, -2)
 						return table.concat(str)
 					end
 				else
@@ -104,7 +101,7 @@ local PCFFile = {
 
 		load = function(self)
 			-- Load in 16kb chunks
-			if self.file:EOF() then error("Unexpected EOF while reading file!") end
+			if self.file:EndOfFile() then error("Unexpected EOF while reading file!") end
 			self.stream[#self.stream + 1] = self.file:Read(16384)
 		end,
 
@@ -130,7 +127,7 @@ setmetatable(PCFFile, PCFFile)
 
 PCFEffectMap = {
 	initialize = function(self)
-		hook.Add("Think", "sf_pcf_map", coroutine.Wrap(function()
+		hook.Add("Think", "sf_pcf_map", coroutine.wrap(function()
 			local deadline = SysTime() + 0.005
 			for _, path in ipairs(file.Find("particles/*.pcf", "GAME")) do
 				PCFFile("particles/"..path)
@@ -146,8 +143,7 @@ PCFEffectMap = {
 	end,
 
 	getEffect = function(self, name)
-		if self.cachedEffects[name] then return true end
-
+		if rawget(self.cachedEffects, name) then return true end
 		local pcf = self.pcfByEffect[name]
 		return pcf ~= nil and self.cachedPcfs[pcf] and self.cachedEffects[name]
 	end,

@@ -435,7 +435,7 @@ end
 -- @return string The string of bytes read
 function ss_methods:readString()
 	local s = self:readUntil(0)
-	return string.sub(s, 1, #s-1)
+	return string.sub(s, 1, -2)
 end
 
 --- Writes a signed byte to the buffer and advances the buffer pointer.
