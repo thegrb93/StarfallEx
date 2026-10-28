@@ -59,7 +59,7 @@ local PCFFile = {
 				self.stream:skip(16)
 
 				if typename == "DmeParticleSystemDefinition" then
-					PCFEffectMap.pcfByEffect[name] = self.path
+					PCFEffectMap.pcfByEffect[string.lower(name)] = self.path
 				end
 			end
 
@@ -259,6 +259,18 @@ function particleef_library.attach(entity, name, pattach, options)
 	plyCount:free(instance.player, -1)
 	particleEffects[pEffect] = true
 	return wrap(pEffect)
+end
+
+--- Returns a list of particle system names able to be used
+-- @return table List of particle system names
+function particleef_library.getList()
+	local ret = {}
+	for name in pairs(PCFEffectMap.pcfByEffect) do
+		if not PCFEffectMap.blacklistedEffects[name] then
+			ret[#ret+1] = name
+		end
+	end
+	return ret
 end
 
 --- Determines whether the particle effect is valid or not.
