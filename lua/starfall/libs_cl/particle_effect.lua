@@ -20,15 +20,148 @@ SF.RegisterLibrary("particleEffect")
 -- @libtbl particleef_methods
 SF.RegisterType("ParticleEffect", false, false)
 
--- Blacklist for bad/expensive particle effects (keys are lowercased name).
-local particle_effect_blacklist = {
-	-- none, yet
-}
+local PCFEffectMap
+local PCFFile = {
+	__index = {
+		parse = function(self)
+			if self.file == nil then error("Failed to open file!") end
+			local header = self:readString()
+			local version = tonumber(string.sub(header, 26, 26)) or error("Unknown version found!")
+			if version > 5 then error("Incompatible PCF version: "..version) end
+		
+			local strings
+			if version > 1 then
+				strings = {}
+				for i=1, self:readIndex(version > 3) do
+					strings[i] = self:readString()
+				end
+			end
 
--- Exposed, so addons can modify it if needed.
--- For example to block all (in case of emergency):
---   setmetatable(SF.particle_effect_blacklist, { __index = function() return true end })
-SF.particle_effect_blacklist = particle_effect_blacklist
+			for i=1, self:readIndex(true) do
+				local typename
+				if version > 1 then
+					local index = self:readIndex(version > 4)
+					typename = strings[index+1] or error("Invalid string index: "..index)
+				else
+					typename = self:readString()
+				end
+
+				local name
+				if version > 3 then
+					local index = self:readIndex(version > 4)
+					name = strings[index+1] or error("Invalid string index: "..index)
+				else
+					name = self:readString()
+				end
+
+				-- Skip UUID
+				self:checkload(16)
+				self.stream:skip(16)
+
+				if typename == "DmeParticleSystemDefinition" then
+					PCFEffectMap.pcfByEffect[string.lower(name)] = self.path
+				end
+			end
+
+		end,
+
+		readIndex = function(self, wide)
+			if wide then
+				self:checkload(4)
+				return self.stream:readUInt32()
+			else
+				self:checkload(2)
+				return self.stream:readUInt16()
+			end
+		end,
+
+		readString = function(self)
+			local str = nil
+			while true do
+				local s = self.stream:readUntil(0)
+				if #s == 0 then
+					self:load()
+				elseif string.byte(s, #s) == 0 then
+					if str == nil then
+						return string.sub(s, 1, -2)
+					else
+						str[#str+1] = string.sub(s, 1, -2)
+						return table.concat(str)
+					end
+				else
+					if str == nil then
+						str = {s}
+					else
+						str[#str+1] = s
+					end
+					self:load()
+				end
+			end
+		end,
+
+		load = function(self)
+			-- Load in 16kb chunks
+			if self.file:EndOfFile() then error("Unexpected EOF while reading file!") end
+			self.stream[#self.stream + 1] = self.file:Read(16384)
+		end,
+
+		checkload = function(self, size)
+			if self.stream.index > #self.stream or self.stream.subindex + size > 16384 then
+				self:load()
+			end
+		end,
+	},
+	__call = function(t, path)
+		local self = setmetatable({
+			path = path,
+			file = file.Open(path, "rb", "GAME"),
+			stream = SF.StringStream()
+		}, t)
+
+		local ok, err = xpcall(self.parse, debug.traceback, self)
+		if not ok then ErrorNoHalt("Error parsing PCF \""..path.."\": "..tostring(err)) end
+		if self.file then self.file:Close() end
+	end,
+}
+setmetatable(PCFFile, PCFFile)
+
+PCFEffectMap = {
+	initialize = function(self)
+		hook.Add("Think", "sf_pcf_map", coroutine.wrap(function()
+			local deadline = SysTime() + 0.005
+			for _, path in ipairs(file.Find("particles/*.pcf", "GAME")) do
+				PCFFile("particles/"..path)
+
+				if SysTime() > deadline then
+					coroutine.yield()
+					deadline = SysTime() + 0.005
+				end
+			end
+			hook.Remove("Think", "sf_pcf_map")
+		end))
+		return self
+	end,
+
+	getEffect = function(self, name)
+		if rawget(self.cachedEffects, name) then return true end
+		local pcf = self.pcfByEffect[name]
+		return pcf ~= nil and self.cachedPcfs[pcf] and self.cachedEffects[name]
+	end,
+
+	pcfByEffect = {},
+	cachedPcfs = setmetatable({},{__index = function(t,k) game.AddParticles(k) t[k]=true return true end}),
+	cachedEffects = setmetatable({},{__index = function(t,k) PrecacheParticleSystem(k) t[k]=true return true end}),
+	blacklistedEffects = {
+		["frozen_steam"] = true,
+		["portal_rift_01"] = true,
+		["explosion_silo"] = true,
+		["citadel_shockwave_06"] = true,
+		["citadel_shockwave"] = true,
+		["choreo_launch_rocket_start"] = true,
+		["choreo_launch_rocket_jet"] = true,
+	},
+}
+SF.PCFEffectMap = PCFEffectMap:initialize()
 
 local function checkValid(peff)
 	if not peff:IsValid() then
@@ -85,8 +218,11 @@ function particleef_library.attach(entity, name, pattach, options)
 	name = string.gsub(string.lower(name), "\x00.*", "")
 
 	if instance.player ~= SF.Superuser then
-		if particle_effect_blacklist[name] then SF.Throw("Tried to use blacklisted particle effect: "..name, 2) end
+		if PCFEffectMap.blacklistedEffects[name] then SF.Throw("Tried to use blacklisted particle effect: "..name, 2) end
 		if hook.Run("Starfall_CanParticleEffect", name, instance) == false then SF.Throw("Effect hook blocked using "..name, 2) end
+	end
+	if not PCFEffectMap:getEffect(name) then
+		SF.Throw("Invalid particle effect system name: "..name, 2)
 	end
 
 	-- Sanitize the options table.
@@ -123,6 +259,18 @@ function particleef_library.attach(entity, name, pattach, options)
 	plyCount:free(instance.player, -1)
 	particleEffects[pEffect] = true
 	return wrap(pEffect)
+end
+
+--- Returns a list of particle system names able to be used
+-- @return table List of particle system names
+function particleef_library.getList()
+	local ret = {}
+	for name in pairs(PCFEffectMap.pcfByEffect) do
+		if not PCFEffectMap.blacklistedEffects[name] then
+			ret[#ret+1] = name
+		end
+	end
+	return ret
 end
 
 --- Determines whether the particle effect is valid or not.

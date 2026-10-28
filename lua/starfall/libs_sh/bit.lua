@@ -401,17 +401,18 @@ function ss_methods_big:readDouble()
 	return UnpackIEEE754Double(h, g, f, e, d, c, b, a)
 end
 
---- Reads until the given byte and advances the buffer pointer.
+--- Reads until the given byte and advances the buffer pointer. Will return until end of stream if no matching byte is found
 -- @param number byte The byte to read until (in number form)
+-- @param boolean trim Return without the 'read to' byte
 -- @return string The string of bytes read
-function ss_methods:readUntil(byte)
+function ss_methods:readUntil(byte, trim)
 	byte = string.char(byte)
 	local ret = {}
 	for i=self.index, #self do
 		local cur = self[self.index]
 		local find = string.find(cur, byte, self.subindex, true)
 		if find then
-			ret[#ret+1] = string.sub(cur, self.subindex, find)
+			ret[#ret+1] = string.sub(cur, self.subindex, trim and (find-1) or find)
 			self.subindex = find+1
 			if self.subindex > #cur then
 				self.index = self.index + 1
@@ -434,8 +435,7 @@ end
 --- Returns a null terminated string, reads until "\x00" and advances the buffer pointer.
 -- @return string The string of bytes read
 function ss_methods:readString()
-	local s = self:readUntil(0)
-	return string.sub(s, 1, #s-1)
+	return self:readUntil(0, true)
 end
 
 --- Writes a signed byte to the buffer and advances the buffer pointer.
