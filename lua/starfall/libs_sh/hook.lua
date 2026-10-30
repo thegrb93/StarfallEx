@@ -794,7 +794,12 @@ function hook_library.runRemote(recipient, ...)
 		end
 
 		if result[1] and result[2]~=nil then
-			results[#results + 1] = instance.Sanitize(k.Unsanitize({unpack(result, 2)}))
+			local ok, ret = pcall(k.Unsanitize, {unpack(result, 2)})
+			if ok then
+				results[#results + 1] = instance.Sanitize(ret)
+			else
+				k:Error(SF.MakeError("'remote' hook returned invalid object!"))
+			end
 		end
 
 	end
