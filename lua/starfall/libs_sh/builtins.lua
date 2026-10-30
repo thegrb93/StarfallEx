@@ -299,7 +299,7 @@ function builtins_library.version()
 	if SERVER then
 		return SF.Version
 	else
-		return GetGlobalString("SF.Version")
+		return GetGlobal2String("SF.Version")
 	end
 end
 
