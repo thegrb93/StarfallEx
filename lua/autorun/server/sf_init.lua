@@ -30,7 +30,7 @@ if sf_dir then
 		end
 	end
 end
-SetGlobalString("SF.Version", SF.Version)
+SetGlobal2String("SF.Version", SF.Version)
 
 
 include("starfall/sflib.lua")
