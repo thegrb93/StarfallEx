@@ -564,16 +564,20 @@ local CpuRamAverage = {
 		doError = function(self, msg, nocatch, noThrow, forceThrow)
 			if noThrow then
 				return SF.MakeError(msg, 3, nocatch, true)
-			elseif forceThrow or string.find(debug.getinfo(4, "S").short_src, "SF:", 1, true) then
-				if SERVER and nocatch then
-					local consolemsg = "[Starfall] "..msg..
-						(Ent_IsValid(self.instance.player)
-						and (" by " .. self.instance.player:Nick() .. " (" .. self.instance.player:SteamID() .. ")")
-						or (" by [Disconnected Player])"))
-					SF.Print(nil, consolemsg .. "\n")
-					MsgC(Color(255,0,0), consolemsg .. "\n")
+			else
+				local info = debug.getinfo(3, "S")
+				info = (info and info.short_src or "[C]")
+				if forceThrow or string.find(info, "SF:", 1, true) then
+					if SERVER and nocatch then
+						local consolemsg = "[Starfall] "..msg..
+							(Ent_IsValid(self.instance.player)
+							and (" by " .. self.instance.player:Nick() .. " (" .. self.instance.player:SteamID() .. ")")
+							or (" by [Disconnected Player])"))
+						SF.Print(nil, consolemsg .. "\n")
+						MsgC(Color(255,0,0), consolemsg .. "\n")
+					end
+					SF.Throw(msg, 3, nocatch)
 				end
-				SF.Throw(msg, 4, nocatch)
 			end
 		end,
 	},
