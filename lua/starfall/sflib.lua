@@ -877,8 +877,7 @@ setmetatable(SF.RenderStack, SF.RenderStack)
 SF.HttpTextureRequest = {
 	__index = {
 		INIT=function(self, new) return new~=self.LOAD and new~=self.DESTROY end,
-		LOAD=function(self, new) return new~=self.FETCH and new~=self.LAYOUT and new~=self.DESTROY end,
-		FETCH=function(self, new) return new~=self.LOAD and new~=self.DESTROY end,
+		LOAD=function(self, new) return new~=self.LAYOUT and new~=self.DESTROY end,
 		LAYOUT=function(self, new) return new~=self.RENDER and new~=self.LAYOUT and new~=self.DESTROY end,
 		RENDER=function(self, new) return new~=self.DESTROY end,
 		DESTROY=function(self, new) return true end,
