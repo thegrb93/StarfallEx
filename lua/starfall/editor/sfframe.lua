@@ -1807,19 +1807,15 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
 	SFHelp:Dock(RIGHT)
 	SFHelp:SetText("SFHelper")
 	SFHelp.DoClick = function()
-		if BRANCH == "unknown" then
-			gui.OpenURL(SF.Editor.HelperURL:GetString())
-		else
-			local th = GetTabHandler("helper")
-			if th.htmldata then
-				local sheet = self:CreateTab("helper")
-				self:SetActiveTab(sheet.Tab)
-				if Editor.StartHelperUndocked:GetBool() then
-					sheet.Tab.content:Undock()
-				end
-			else
-				gui.OpenURL(SF.Editor.HelperURL:GetString())
+		local th = GetTabHandler("helper")
+		if th.htmldata then
+			local sheet = self:CreateTab("helper")
+			self:SetActiveTab(sheet.Tab)
+			if Editor.StartHelperUndocked:GetBool() then
+				sheet.Tab.content:Undock()
 			end
+		else
+			gui.OpenURL(SF.Editor.HelperURL:GetString())
 		end
 	end
 	self.C.SFHelp = SFHelp

@@ -874,7 +874,6 @@ SF.RenderStack = {
 }
 setmetatable(SF.RenderStack, SF.RenderStack)
 
-local USE_AWESOMIUM_HACK = BRANCH == "unknown" or BRANCH == "dev" or BRANCH == "prerelease"
 SF.HttpTextureRequest = {
 	__index = {
 		INIT=function(self, new) return new~=self.LOAD and new~=self.DESTROY end,
@@ -895,11 +894,6 @@ SF.HttpTextureRequest = {
 			if textureloader then self.textureloader = textureloader end
 			if self:badnewstate(self.LOAD) then return end
 
-			if USE_AWESOMIUM_HACK and not string.match(self.url, "^data:") then
-				self:loadAwesomium()
-				return
-			end
-
 			self.textureloader.Panel:AddFunction("sf", "imageLoaded", function(w, h)
 				timer.Simple(0, function() self:layout(w, h) end)
 			end)
@@ -911,23 +905,8 @@ SF.HttpTextureRequest = {
 			img.removeAttribute("height");
 			img.style.left="0px";
 			img.style.top="0px";
-			img.src="]] .. string.JavascriptSafe(self.url) .. [[";]]..
-			(BRANCH == "unknown" and "\nif(img.complete)renderImage();" or ""))
-		end,
-
-		loadAwesomium = function(self)
-			if self:badnewstate(self.FETCH) then return end
-
-			http.Fetch(self.url, function(body, _, headers, code)
-				if code >= 300 then self:destroy() return end
-
-				local content_type = headers["Content-Type"] or headers["content-type"]
-				local data = util.Base64Encode(body, true)
-
-				self.url = table.concat({"data:", content_type, ";base64,", data})
-
-				self:load()
-			end, function() self:destroy() end)
+			img.src="]] .. string.JavascriptSafe(self.url) .. [[";]]
+			)
 		end,
 
 		layout = function(self, w, h)
