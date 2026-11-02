@@ -490,8 +490,19 @@ function SF.Instance:DoAliases()
 end
 
 -- Monitor average cpu and ram usage by instance
-local CpuRamAverage = {
-	checkTotalPlayerCpu = function()
+local CpuRamAverage
+CpuRamAverage = {
+	getHighestCpu = function(insts)
+		local maxinst, max = nil, 0
+		for instance, _ in pairs(insts) do
+			if instance.perf.cpuAverage>=max then
+				max = instance.perf.cpuAverage
+				maxinst = instance
+			end
+		end
+		return maxinst, max
+	end,
+	checkTotalCpu = function()
 		local globaltotal = 0
 		for pl, insts in pairs(SF.playerInstances) do
 			local plquota = math.huge
@@ -504,14 +515,7 @@ local CpuRamAverage = {
 
 			while cputotal>plquota do
 				-- Get highest average cpu instance
-				local max, maxinst = 0, nil
-				for instance, _ in pairs(insts) do
-					if instance.perf.cpuAverage>=max then
-						max = instance.perf.cpuAverage
-						maxinst = instance
-					end
-				end
-
+				local maxinst, max = CpuRamAverage.getHighestCpu(insts)
 				if maxinst then
 					maxinst:Error(SF.MakeError("SF: Player cpu time limit reached!", 1))
 					cputotal = cputotal - max
@@ -526,21 +530,11 @@ local CpuRamAverage = {
 
 		while globalquota>0 and globaltotal>globalquota do
 			-- Get highest average cpu instance out of all players
-			local max, maxinst, maxinsts = 0, nil, nil
-			for _, insts in pairs(SF.playerInstances) do
-				for instance, _ in pairs(insts) do
-					if instance.perf.cpuAverage>=max then
-						max = instance.perf.cpuAverage
-						maxinst = instance
-						maxinsts = insts
-					end
-				end
-			end
-
+			local maxinst, max = CpuRamAverage.getHighestCpu(SF.allInstances)
 			if maxinst then
 				maxinst:Error(SF.MakeError("SF: Global cpu time limit reached!", 1))
 				globaltotal = globaltotal - max
-				maxinsts[maxinst] = nil -- In case of freak issue the Error function doesn't remove the instance
+				SF.allInstances[maxinst] = nil -- In case of freak issue the Error function doesn't remove the instance
 			else
 				break -- Shouldn't ever happen but in case some freak numerical issue happens, prevent infinite loop
 			end
@@ -832,7 +826,7 @@ hook.Add("Think", "SF_Think", function()
 	for instance in pairs(SF.allInstances) do
 		instance:runScriptHook("think")
 	end
-	CpuRamAverage.checkTotalPlayerCpu()
+	CpuRamAverage.checkTotalCpu()
 end)
 
 hook.Add("EntityRemoved", "SF_EntityRemoved", function(ent, snapshot)
