@@ -33,6 +33,8 @@ else
 end
 local ramlimit
 SF.CvarCallback(SF.RamCap, function(val) ramlimit = val end, "number")
+local globalquota
+SF.CvarCallback(SF.cpuGlobalQuota, function(val) globalquota = val end, "number")
 
 SF.Instance = {}
 SF.Instance.__index = SF.Instance
@@ -522,7 +524,6 @@ local CpuRamAverage = {
 			globaltotal = globaltotal + cputotal
 		end
 
-		local globalquota = SF.cpuGlobalQuota:GetFloat()
 		while globalquota>0 and globaltotal>globalquota do
 			-- Get highest average cpu instance out of all players
 			local max, maxinst, maxinsts = 0, nil, nil
