@@ -95,7 +95,7 @@ __index = {
 __call = function(t,cvarUrlName,cvarOpacityName)
 	local self = setmetatable({}, t)
 
-	SF.CvarCallback(CreateClientConVar(cvarUrlName, "", true, false), function(val) self.url = val self:applyUrl() end, "string")
+	SF.CvarCallback(CreateClientConVar(cvarUrlName, "", true, false), function(val) self.url = string.JavascriptSafe(val) self:applyUrl() end, "string")
 
 	SF.CvarCallback(CreateClientConVar(cvarOpacityName, "200", true, false), function(val) self.opacity = math.Clamp(val, 0, 255) self:applyOpacity() end, "number")
 
