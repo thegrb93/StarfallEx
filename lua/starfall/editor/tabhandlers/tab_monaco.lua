@@ -79,7 +79,7 @@ end
 
 local ImageBackgroundSetting = {
 __index = {
-	applyUrl = function(self, val)
+	applyUrl = function(self)
 		if not (IsValid(TabHandler.html) and TabHandler.loaded) then return end
 		if self.url ~= "" then
 			TabHandler.html:RunJavascript([[document.getElementById('editor').style.setProperty('background-image', 'url(\']]..self.url..[[\')');]])
@@ -87,7 +87,7 @@ __index = {
 			TabHandler.html:RunJavascript([[document.getElementById('editor').style.removeProperty('background-image');]])
 		end
 	end,
-	applyOpacity = function(self, val)
+	applyOpacity = function(self)
 		if not (IsValid(TabHandler.html) and TabHandler.loaded) then return end
 		TabHandler:ApplyTheme()
 	end,
@@ -95,9 +95,9 @@ __index = {
 __call = function(t,cvarUrlName,cvarOpacityName)
 	local self = setmetatable({}, t)
 
-	SF.CvarCallback(CreateClientConVar(cvarUrlName, "", true, false), function(val) self.url = val self:applyUrl(val) end, "string")
+	SF.CvarCallback(CreateClientConVar(cvarUrlName, "", true, false), function(val) self.url = val self:applyUrl() end, "string")
 
-	SF.CvarCallback(CreateClientConVar(cvarOpacityName, "200", true, false), function(val) self.opacity = math.Clamp(val, 0, 255) self:applyOpacity(val) end, "number")
+	SF.CvarCallback(CreateClientConVar(cvarOpacityName, "200", true, false), function(val) self.opacity = math.Clamp(val, 0, 255) self:applyOpacity() end, "number")
 
 	return self
 end
