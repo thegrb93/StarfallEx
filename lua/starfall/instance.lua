@@ -14,6 +14,7 @@ local Ent_IsValid, Ent_IsWorld = ENTMETA.IsValid, ENTMETA.IsWorld
 if SERVER then
 	SF.cpuQuota = CreateConVar("sf_timebuffer", 0.005, FCVAR_ARCHIVE, "The max average the CPU time can reach.")
 	SF.cpuBufferN = CreateConVar("sf_timebuffersize", 100, FCVAR_ARCHIVE, "The window width of the CPU time quota moving average.")
+	SF.cpuGlobalQuota = CreateConVar("sf_timebuffer_global", 0.0, FCVAR_ARCHIVE, "The max total average CPU time of all players combined. 0 disables the limit.")
 	SF.softLockProtection = CreateConVar("sf_timebuffersoftlock", 1, FCVAR_ARCHIVE, "Consumes more cpu, but protects from freezing the game. Only turn this off if you want to use a profiler on your scripts.")
 	SF.softLockProtectionSuperUser = CreateConVar("sf_timebuffersoftlock_superuser", 0, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Determines whether CPU checks should be done for superusers as well?")
 	SF.RamCap = CreateConVar("sf_ram_max", 1500000, FCVAR_ARCHIVE, "If ram exceeds this limit (in kB), starfalls will be terminated")
@@ -22,6 +23,7 @@ else
 	SF.cpuQuota = CreateConVar("sf_timebuffer_cl", 0.006, FCVAR_ARCHIVE, "The max average the CPU time can reach.")
 	SF.cpuOwnerQuota = CreateConVar("sf_timebuffer_cl_owner", 0.015, FCVAR_ARCHIVE, "The max average the CPU time can reach for your own chips.")
 	SF.cpuBufferN = CreateConVar("sf_timebuffersize_cl", 100, FCVAR_ARCHIVE, "The window width of the CPU time quota moving average.")
+	SF.cpuGlobalQuota = CreateConVar("sf_timebuffer_cl_global", 0, FCVAR_ARCHIVE, "The max total average CPU time of all players combined. 0 disables the limit.")
 	SF.softLockProtection = CreateConVar("sf_timebuffersoftlock_cl", 1, FCVAR_ARCHIVE, "Enable Cpu-time limiting on other player's chips.")
 	SF.softLockProtectionOwner = CreateConVar("sf_timebuffersoftlock_cl_owner", 1, FCVAR_ARCHIVE, "Enable Cpu-time limiting on your own chips.")
 	SF.softLockProtectionSuperUser = CreateConVar("sf_timebuffersoftlock_superuser", 0, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Determines whether CPU checks should be done for superusers as well?")
@@ -31,6 +33,8 @@ else
 end
 local ramlimit
 SF.CvarCallback(SF.RamCap, function(val) ramlimit = val end, "number")
+local globalquota
+SF.CvarCallback(SF.cpuGlobalQuota, function(val) globalquota = val end, "number")
 
 SF.Instance = {}
 SF.Instance.__index = SF.Instance
@@ -486,8 +490,20 @@ function SF.Instance:DoAliases()
 end
 
 -- Monitor average cpu and ram usage by instance
-local CpuRamAverage = {
-	checkTotalPlayerCpu = function()
+local CpuRamAverage
+CpuRamAverage = {
+	getHighestCpu = function(insts)
+		local maxinst, max = nil, 0
+		for instance, _ in pairs(insts) do
+			if instance.perf.cpuAverage>=max then
+				max = instance.perf.cpuAverage
+				maxinst = instance
+			end
+		end
+		return maxinst, max
+	end,
+	checkTotalCpu = function()
+		local globaltotal = 0
 		for pl, insts in pairs(SF.playerInstances) do
 			local plquota = math.huge
 			local cputotal = 0
@@ -499,14 +515,7 @@ local CpuRamAverage = {
 
 			while cputotal>plquota do
 				-- Get highest average cpu instance
-				local max, maxinst = 0, nil
-				for instance, _ in pairs(insts) do
-					if instance.perf.cpuAverage>=max then
-						max = instance.perf.cpuAverage
-						maxinst = instance
-					end
-				end
-
+				local maxinst, max = CpuRamAverage.getHighestCpu(insts)
 				if maxinst then
 					maxinst:Error(SF.MakeError("SF: Player cpu time limit reached!", 1))
 					cputotal = cputotal - max
@@ -514,6 +523,20 @@ local CpuRamAverage = {
 				else
 					break -- Shouldn't ever happen but in case some freak numerical issue happens, prevent infinite loop
 				end
+			end
+
+			globaltotal = globaltotal + cputotal
+		end
+
+		while globalquota>0 and globaltotal>globalquota do
+			-- Get highest average cpu instance out of all players
+			local maxinst, max = CpuRamAverage.getHighestCpu(SF.allInstances)
+			if maxinst then
+				maxinst:Error(SF.MakeError("SF: Global cpu time limit reached!", 1))
+				globaltotal = globaltotal - max
+				SF.allInstances[maxinst] = nil -- In case of freak issue the Error function doesn't remove the instance
+			else
+				break -- Shouldn't ever happen but in case some freak numerical issue happens, prevent infinite loop
 			end
 		end
 	end,
@@ -803,7 +826,7 @@ hook.Add("Think", "SF_Think", function()
 	for instance in pairs(SF.allInstances) do
 		instance:runScriptHook("think")
 	end
-	CpuRamAverage.checkTotalPlayerCpu()
+	CpuRamAverage.checkTotalCpu()
 end)
 
 hook.Add("EntityRemoved", "SF_EntityRemoved", function(ent, snapshot)
