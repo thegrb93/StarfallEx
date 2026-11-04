@@ -79,21 +79,25 @@ end
 
 local ImageBackgroundSetting = {
 __index = {
-	apply = function(self)
+	applyUrl = function(self)
 		if not (IsValid(TabHandler.html) and TabHandler.loaded) then return end
 		if self.url ~= "" then
 			TabHandler.html:RunJavascript([[document.getElementById('editor').style.setProperty('background-image', 'url(\']]..self.url..[[\')');]])
 		else
 			TabHandler.html:RunJavascript([[document.getElementById('editor').style.removeProperty('background-image');]])
 		end
-	end
+	end,
+	applyOpacity = function(self)
+		if not (IsValid(TabHandler.html) and TabHandler.loaded) then return end
+		TabHandler:ApplyTheme()
+	end,
 },
 __call = function(t,cvarUrlName,cvarOpacityName)
 	local self = setmetatable({}, t)
 
-	SF.CvarCallback(CreateClientConVar(cvarUrlName, "", true, false), function(val) self.url=val self:apply() end, "string")
+	SF.CvarCallback(CreateClientConVar(cvarUrlName, "", true, false), function(val) self.url = string.JavascriptSafe(val) self:applyUrl() end, "string")
 
-	SF.CvarCallback(CreateClientConVar(cvarOpacityName, "200", true, false), function(val) self.opacity=math.Clamp(val/255, 0, 1) self:apply() end, "number")
+	SF.CvarCallback(CreateClientConVar(cvarOpacityName, "200", true, false), function(val) self.opacity = math.Clamp(val, 0, 255) self:applyOpacity() end, "number")
 
 	return self
 end
@@ -207,11 +211,11 @@ function TabHandler:FinishedLoading()
 	self.disabledFuncs = nil
 
 	if TabHandler.ImageBackground.url ~= "" then
-		TabHandler.ImageBackground:apply()
+		TabHandler.ImageBackground:applyUrl()
 	end
 
 	MonacoSetting:applyAll()
-	TabHandler:ApplyTheme(SF.Editor.Themes.CurrentTheme)
+	TabHandler:ApplyTheme()
 	TabHandler:DocsFinished()
 
 	for i = 1, SF.Editor.editor:GetNumTabs() do
@@ -320,7 +324,7 @@ end
 
 -- Converts a Starfall editor theme (SF.Editor.Themes) into Monaco theme rules and pushes them to Monaco
 local function colorHex(c)
-	return c and string.format("%02X%02X%02X", c.r, c.g, c.b) or nil
+	return c and string.format("%02X%02X%02X%02X", c.r, c.g, c.b, c.a) or nil
 end
 
 -- theme token name -> Monaco Monarch token type(s)
@@ -344,6 +348,7 @@ local themeTokenMap = {
 
 function TabHandler:ApplyTheme(theme)
 	if not (IsValid(self.html) and self.loaded) then return end
+	theme = theme or SF.Editor.Themes.CurrentTheme
 	if not theme then return end
 
 	local rules, n = {}, 0
@@ -357,7 +362,14 @@ function TabHandler:ApplyTheme(theme)
 	end
 
 	local colors = {}
-	if theme.background then colors[#colors+1] = '"editor.background":"#'..colorHex(theme.background)..'"' end
+	if theme.background then
+		local c = theme.background
+		if TabHandler.ImageBackground.url ~= "" then
+			c = Color(theme.background:Unpack())
+			c.a = TabHandler.ImageBackground.opacity
+		end
+		colors[#colors+1] = '"editor.background":"#'..colorHex(c)..'"'
+	end
 	if theme.line_highlight then colors[#colors+1] = '"editor.lineHighlightBackground":"#'..colorHex(theme.line_highlight)..'"' end
 	if theme.caret then colors[#colors+1] = '"editorCursor.foreground":"#'..colorHex(theme.caret)..'"' end
 	if theme.selection then colors[#colors+1] = '"editor.selectionBackground":"#'..colorHex(theme.selection)..'"' end
