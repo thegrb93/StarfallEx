@@ -2557,8 +2557,8 @@ do
 					files[name..":"..path] = file.Read(path, "LUA")
 				end
 				net.Start("sf_receivelibrary")
-				net.WriteStarfall({files = files, mainfile = name}, nil, player.GetHumans())
-				net.Broadcast()
+				local ok = pcall(net.WriteStarfall, {files = files, mainfile = name}, nil, player.GetHumans())
+				if ok then net.Broadcast() else net.Abort() end
 			end
 
 			SF.ReloadingLibrary = false
