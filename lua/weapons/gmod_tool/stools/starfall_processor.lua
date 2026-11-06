@@ -189,8 +189,8 @@ function TOOL:OpenEditor(ply, ent)
 		if ent.sfdata then
 			net.Start("starfall_openeditor")
 			net.WriteBool(true)
-			net.WriteStarfall(ent.sfdata, nil, {ply})
-			net.Send(ply)
+			local ok = pcall(net.WriteStarfall, ent.sfdata, nil, {ply})
+			if ok then net.Send(ply) else net.Abort() end
 		end
 	else
 		net.Start("starfall_openeditor")
