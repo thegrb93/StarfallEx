@@ -108,7 +108,8 @@ function ENT:SetReuploadOnReload(enabled)
 		hook.Add("StarfallEditorFileReload", self, function(_, reloaded_file)
 			if not self:DependsOnFile(reloaded_file) then return end
 			SF.Editor.BuildIncludesTable(self.sfdata.mainfile, function(files, mainfile)
-				SF.PushStarfall(self, {files = files, mainfile = mainfile})
+				local err = SF.PushStarfall(self, {files = files, mainfile = mainfile})
+				if err then SF.AddNotify(LocalPlayer(), "Failed to upload starfall: " .. err, "ERROR", 7, "ERROR1") end
 			end,
 			function(err)
 				SF.AddNotify(LocalPlayer(), err, "ERROR", 7, "ERROR1")

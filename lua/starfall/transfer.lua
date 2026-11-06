@@ -243,9 +243,9 @@ else
 	---@param sfdata any
 	function SF.PushStarfall(sf, sfdata)
 		net.Start("starfall_upload_push")
-			net.WriteEntity(sf)
-			net.WriteStarfall(sfdata)
-		net.SendToServer()
+		net.WriteEntity(sf)
+		local ok, err = pcall(net.WriteStarfall, sfdata)
+		if ok then net.SendToServer() else net.Abort() return err end
 	end
 
 	

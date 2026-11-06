@@ -2556,9 +2556,7 @@ do
 				for k, path in pairs(sendToClientTbl) do
 					files[name..":"..path] = file.Read(path, "LUA")
 				end
-				net.Start("sf_receivelibrary")
-				local ok = pcall(net.WriteStarfall, {files = files, mainfile = name}, nil, player.GetHumans())
-				if ok then net.Broadcast() else net.Abort() end
+				SF.SendStarfall("sf_receivelibrary", {files = files, mainfile = name})
 			end
 
 			SF.ReloadingLibrary = false
