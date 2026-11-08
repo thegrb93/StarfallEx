@@ -502,6 +502,19 @@ CpuRamAverage = {
 		end
 		return maxinst, max
 	end,
+	getHighestPlayerCpu = function(insts)
+		local worst_ply, worst_time = nil, 0
+		for pl, insts in pairs(SF.playerInstances) do
+			local cputotal = 0
+			for instance in pairs(insts) do
+				cputotal = cputotal + instance.perf.cpuAverage
+			end
+			if cputotal > worst_time then
+				worst_ply, worst_time = pl, cputotal
+			end
+		end
+		return worst_ply, worst_time
+	end,
 	checkTotalCpu = function()
 		local globaltotal = 0
 		for pl, insts in pairs(SF.playerInstances) do
@@ -529,12 +542,16 @@ CpuRamAverage = {
 		end
 
 		while globalquota>0 and globaltotal>globalquota do
-			-- Get highest average cpu instance out of all players
-			local maxinst, max = CpuRamAverage.getHighestCpu(SF.allInstances)
+			-- Find the player whose chips are using the most total cpu time
+			local worst_ply = CpuRamAverage.getHighestPlayerCpu(SF.playerInstances)
+			if not worst_ply then break end
+
+			-- Kill the heaviest chip of the player with the highest total usage
+			local maxinst, max = CpuRamAverage.getHighestCpu(SF.playerInstances[worst_ply])
 			if maxinst then
 				maxinst:Error(SF.MakeError("SF: Global cpu time limit reached!", 1))
 				globaltotal = globaltotal - max
-				SF.allInstances[maxinst] = nil -- In case of freak issue the Error function doesn't remove the instance
+				SF.playerInstances[worst_ply][maxinst] = nil -- In case of freak issue the Error function doesn't remove the instance
 			else
 				break -- Shouldn't ever happen but in case some freak numerical issue happens, prevent infinite loop
 			end
