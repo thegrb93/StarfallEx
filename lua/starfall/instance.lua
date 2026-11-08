@@ -502,6 +502,19 @@ CpuRamAverage = {
 		end
 		return maxinst, max
 	end,
+	getHighestPlayerCpu = function(insts)
+		local worst_ply, worst_time = nil, 0
+		for pl, insts in pairs(SF.playerInstances) do
+			local cputotal = 0
+			for instance in pairs(insts) do
+				cputotal = cputotal + instance.perf.cpuAverage
+			end
+			if cputotal > worst_time then
+				worst_ply, worst_time = pl, cputotal
+			end
+		end
+		return worst_ply, worst_time
+	end
 	checkTotalCpu = function()
 		local globaltotal = 0
 		for pl, insts in pairs(SF.playerInstances) do
@@ -530,17 +543,7 @@ CpuRamAverage = {
 
 		while globalquota>0 and globaltotal>globalquota do
 			-- Find the player whose chips are using the most total cpu time
-			local worst_ply, worst_time = nil, 0
-			for pl, insts in pairs(SF.playerInstances) do
-				local cputotal = 0
-				for instance in pairs(insts) do
-					cputotal = cputotal + instance.perf.cpuAverage
-				end
-				if cputotal > worst_time then
-					worst_ply, worst_time = pl, cputotal
-				end
-			end
-
+			local worst_ply = CpuRamAverage.getHighestPlayerCpu(SF.playerInstances)
 			if not worst_ply then break end
 
 			-- Kill the heaviest chip of the player with the highest total usage
