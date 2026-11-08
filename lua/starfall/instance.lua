@@ -514,7 +514,7 @@ CpuRamAverage = {
 			end
 		end
 		return worst_ply, worst_time
-	end
+	end,
 	checkTotalCpu = function()
 		local globaltotal = 0
 		for pl, insts in pairs(SF.playerInstances) do
