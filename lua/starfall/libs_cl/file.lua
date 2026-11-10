@@ -246,13 +246,14 @@ end
 --- Reads a file asynchronously. Can only read 'sf_file_asyncmax' files at a time
 -- @param string path Filepath relative to data/sf_filedata/.
 -- @param function callback A callback function for when the read operation finishes. It has 3 arguments: `filename` string, `status` number and `data` string
+-- @return number Status. `FSASYNC.OK` on success, `FSASYNC.ERR_*` on failure, see https://wiki.facepunch.com/gmod/Enums/FSASYNC
 function file_library.asyncRead(path, callback)
 	checkpermission (instance, path, "file.read")
 	checkluatype (path, TYPE_STRING)
 	checkluatype (callback, TYPE_FUNCTION)
 	if concurrentreads == cv_max_concurrent_reads:GetInt() then SF.Throw("Reading too many files asynchronously!", 2) end
 	concurrentreads = concurrentreads + 1
-	file.AsyncRead("sf_filedata/" .. SF.NormalizePath(path), "DATA", function(_, _, status, data)
+	return file.AsyncRead("sf_filedata/" .. SF.NormalizePath(path), "DATA", function(_, _, status, data)
 		concurrentreads = concurrentreads - 1
 		instance:runFunction(callback, path, status, data)
 	end)
@@ -264,13 +265,14 @@ end
 -- 1. string filename - The name of the file
 -- 2. number status - The status of the read operation (see FSASYNC enum)
 -- 3. string data - The data read from the file
+-- @return number Status. `FSASYNC.OK` on success, `FSASYNC.ERR_*` on failure, see https://wiki.facepunch.com/gmod/Enums/FSASYNC
 function file_library.asyncReadInGame(path, callback)
 	if instance.player ~= LocalPlayer() then SF.Throw("Only chip owner can read game files", 2) end
 	checkluatype (path, TYPE_STRING)
 	checkluatype (callback, TYPE_FUNCTION)
 	if concurrentreads == cv_max_concurrent_reads:GetInt() then SF.Throw("Reading too many files asynchronously!", 2) end
 	concurrentreads = concurrentreads + 1
-	file.AsyncRead(SF.NormalizePath(path), "GAME", function(_, _, status, data)
+	return file.AsyncRead(SF.NormalizePath(path), "GAME", function(_, _, status, data)
 		concurrentreads = concurrentreads - 1
 		instance:runFunction(callback, path, status, data)
 	end)
