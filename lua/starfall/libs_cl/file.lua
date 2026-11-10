@@ -253,10 +253,11 @@ function file_library.asyncRead(path, callback)
 	checkluatype (callback, TYPE_FUNCTION)
 	if concurrentreads == cv_max_concurrent_reads:GetInt() then SF.Throw("Reading too many files asynchronously!", 2) end
 	concurrentreads = concurrentreads + 1
-	return file.AsyncRead("sf_filedata/" .. SF.NormalizePath(path), "DATA", function(_, _, status, data)
+	local status = file.AsyncRead("sf_filedata/" .. SF.NormalizePath(path), "DATA", function(_, _, status, data)
 		concurrentreads = concurrentreads - 1
 		instance:runFunction(callback, path, status, data)
 	end)
+	return tonumber(status)
 end
 
 --- Reads a file asynchronously from path relative to base GMod directory
@@ -272,10 +273,11 @@ function file_library.asyncReadInGame(path, callback)
 	checkluatype (callback, TYPE_FUNCTION)
 	if concurrentreads == cv_max_concurrent_reads:GetInt() then SF.Throw("Reading too many files asynchronously!", 2) end
 	concurrentreads = concurrentreads + 1
-	return file.AsyncRead(SF.NormalizePath(path), "GAME", function(_, _, status, data)
+	local status = file.AsyncRead(SF.NormalizePath(path), "GAME", function(_, _, status, data)
 		concurrentreads = concurrentreads - 1
 		instance:runFunction(callback, path, status, data)
 	end)
+	return tonumber(status)
 end
 
 
