@@ -2569,6 +2569,8 @@ function render_library.renderView(tbl)
 
 	local newtbl = RenderViewSanitize(tbl)
 
+	instance:pushCpuCheck()
+
 	local prevData = {
 		matrix_stack = matrix_stack,
 		view_matrix_stack = view_matrix_stack,
