@@ -2505,63 +2505,57 @@ function render_library.isHUDActive()
 	return SF.IsHUDActive(instance.entity)
 end
 
+local RenderViewMembers = {
+	origin = function(v) return vunwrap1(v) end,
+	angles = function(v) return aunwrap1(v) end,
+	aspect = function(v) checkluatype(v, TYPE_NUMBER) return v end,
+	aspectratio = function(v) checkluatype(v, TYPE_NUMBER) return v end,
+	x = function(v) checkluatype(v, TYPE_NUMBER) return v end,
+	y = function(v) checkluatype(v, TYPE_NUMBER) return v end,
+	w = function(v) checkluatype(v, TYPE_NUMBER) return clamp(v, 1, 1024) end,
+	h = function(v) checkluatype(v, TYPE_NUMBER) return clamp(v, 1, 1024) end,
+	fov = function(v) checkluatype(v, TYPE_NUMBER) return v end,
+	zfar = function(v) checkluatype(v, TYPE_NUMBER) return v end,
+	znear = function(v) checkluatype(v, TYPE_NUMBER) return v end,
+	zfarviewmodel = function(v) checkluatype(v, TYPE_NUMBER) return v end,
+	znearviewmodel = function(v) checkluatype(v, TYPE_NUMBER) return v end,
+	drawmonitors = function(v) checkluatype(v, TYPE_BOOL) return v end,
+	drawviewmodel = function(v) checkluatype(v, TYPE_BOOL) return v end,
+	drawviewer = function(v) checkluatype(v, TYPE_BOOL) return v end,
+	dopostprocess = function(v) checkluatype(v, TYPE_BOOL) return v end,
+	bloomtone = function(v) checkluatype(v, TYPE_BOOL) return v end,
+	ortho = function(v)
+		checkluatype(v, TYPE_TABLE)
+		local left, right, top, bottom = v.left, v.right, v.top, v.bottom
+		checkluatype(left, TYPE_NUMBER)
+		checkluatype(right, TYPE_NUMBER)
+		checkluatype(top, TYPE_NUMBER)
+		checkluatype(bottom, TYPE_NUMBER)
+		return { left = left, right = right, top = top, bottom = bottom }
+	end,
+}
+RenderViewMembers.offcenter = RenderViewMembers.ortho
+
+local function RenderViewSanitize(tbl)
+	local newtbl = {}
+	for k, func in pairs(RenderViewMembers) do
+		if tbl[k]~=nil then newtbl[k] = func(tbl[k]) end
+	end
+	if newtbl.aspectratio ~= nil and newtbl.aspect == nil then newtbl.aspect = newtbl.aspectratio end
+	newtbl.drawhud = false
+	return newtbl
+end
+
 --- Renders the scene with the specified viewData to the current active render target.
 -- @param table tbl view The view data to be used in the rendering. See http://wiki.facepunch.com/gmod/Structures/ViewData. There's an additional key drawviewer used to tell the engine whether the local player model should be rendered.
 function render_library.renderView(tbl)
 	checkluatype(tbl, TYPE_TABLE)
-
-	local origin, angles, w, h, ortho, offcenter
-	if tbl.origin~=nil then origin = vunwrap1(tbl.origin) end
-	if tbl.angles~=nil then angles = aunwrap1(tbl.angles) end
-	if tbl.aspect~=nil then checkluatype(tbl.aspect, TYPE_NUMBER) end
-	if tbl.aspectratio~=nil then checkluatype(tbl.aspectratio, TYPE_NUMBER) end
-	if tbl.x~=nil then checkluatype(tbl.x, TYPE_NUMBER) end
-	if tbl.y~=nil then checkluatype(tbl.y, TYPE_NUMBER) end
-	if tbl.w~=nil then checkluatype(tbl.w, TYPE_NUMBER) w = clamp(tbl.w, 1, 1024) end
-	if tbl.h~=nil then checkluatype(tbl.h, TYPE_NUMBER) h = clamp(tbl.h, 1, 1024) end
-	if tbl.fov~=nil then checkluatype(tbl.fov, TYPE_NUMBER) end
-	if tbl.zfar~=nil then checkluatype(tbl.zfar, TYPE_NUMBER) end
-	if tbl.znear~=nil then checkluatype(tbl.znear, TYPE_NUMBER) end
-	if tbl.drawmonitors~=nil then checkluatype(tbl.drawmonitors, TYPE_BOOL) end
-	if tbl.drawviewmodel~=nil then checkluatype(tbl.drawviewmodel, TYPE_BOOL) end
-	if tbl.ortho~=nil then
-		checkluatype(tbl.ortho, TYPE_TABLE)
-		checkluatype(tbl.ortho.left, TYPE_NUMBER)
-		checkluatype(tbl.ortho.right, TYPE_NUMBER)
-		checkluatype(tbl.ortho.top, TYPE_NUMBER)
-		checkluatype(tbl.ortho.bottom, TYPE_NUMBER)
-		ortho = {
-			left = tbl.ortho.left,
-			right = tbl.ortho.right,
-			top = tbl.ortho.top,
-			bottom = tbl.ortho.bottom,
-		}
-	end
-	if tbl.dopostprocess~=nil then checkluatype(tbl.dopostprocess, TYPE_BOOL) end
-	if tbl.bloomtone~=nil then checkluatype(tbl.bloomtone, TYPE_BOOL) end
-	if tbl.znearviewmodel~=nil then checkluatype(tbl.znearviewmodel, TYPE_NUMBER) end
-	if tbl.zfarviewmodel~=nil then checkluatype(tbl.zfarviewmodel, TYPE_NUMBER) end
-	if tbl.offcenter~=nil then
-		checkluatype(tbl.offcenter, TYPE_TABLE)
-		checkluatype(tbl.offcenter.left, TYPE_NUMBER)
-		checkluatype(tbl.offcenter.right, TYPE_NUMBER)
-		checkluatype(tbl.offcenter.top, TYPE_NUMBER)
-		checkluatype(tbl.offcenter.bottom, TYPE_NUMBER)
-		offcenter = {
-			left = tbl.offcenter.left,
-			right = tbl.offcenter.right,
-			top = tbl.offcenter.top,
-			bottom = tbl.offcenter.bottom,
-		}
-	end
-
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if not renderdata.isScenic then SF.Throw("Can't use render.renderView outside of renderscene hook.", 2) end
 
 	if renderdata.renderingView then
 		SF.Throw("Already rendering a view.", 2)
 	end
-
 	if renderingView then
 		return
 	end
@@ -2573,7 +2567,7 @@ function render_library.renderView(tbl)
 	end
 	renderdata.renderedViews = renderdata.renderedViews + 1
 
-	instance:pushCpuCheck()
+	local newtbl = RenderViewSanitize(tbl)
 
 	local prevData = {
 		matrix_stack = matrix_stack,
@@ -2598,7 +2592,7 @@ function render_library.renderView(tbl)
 	renderingView = true
 	renderdata.renderingView = true
 
-	drawViewerInView = tbl.drawviewer == true
+	drawViewerInView = newtbl.drawviewer == true
 
 	local oldRt = render.GetRenderTarget()
 	renderingViewRt = oldRt
@@ -2606,27 +2600,7 @@ function render_library.renderView(tbl)
 	render.PushRenderTarget(oldRt)
 	cam.Start3D() -- Seems to fix some of the issues with render operations leaking into default RT
 
-	render.RenderView({
-		origin = origin,
-		angles = angles,
-		aspect = tbl.aspect or tbl.aspectratio,
-		x = tbl.x,
-		y = tbl.y,
-		w = w,
-		h = h,
-		fov = tbl.fov,
-		zfar = tbl.zfar,
-		znear = tbl.znear,
-		drawhud = false,
-		drawmonitors = tbl.drawmonitors,
-		drawviewmodel = tbl.drawviewmodel,
-		ortho = ortho,
-		dopostprocess = tbl.dopostprocess,
-		bloomtone = tbl.bloomtone,
-		znearviewmodel = tbl.znearviewmodel,
-		zfarviewmodel = tbl.zfarviewmodel,
-		offcenter = offcenter,
-	})
+	local ok, err = pcall(render.RenderView, newtbl)
 
 	cam.End3D()
 	render.PopRenderTarget()
@@ -2648,6 +2622,7 @@ function render_library.renderView(tbl)
 
 	instance:popCpuCheck()
 	instance:checkCpu()
+	if not ok then SF.Throw(tostring(err), 2) end
 end
 
 --- Returns whether render.renderView is being executed.
