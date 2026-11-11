@@ -955,11 +955,10 @@ function builtins_library.dodir(path, loadpriority)
 	return returns
 end
 
---- Similar to LuaJIT/5.2's `loadstring`/`load` functions, except it has no `mode` parameter and, of course, the resulting function is in your instance's environment by default.
+--- Similar to LuaJIT/5.2's `loadstring`/`load` functions, except it has no `mode` parameter and, of course, the resulting function is in your instance's environment.
 -- For compatibility with older versions of Starfall, `loadstring` is NOT an alias of this function like it is in vanilla LuaJIT/5.2.
 -- @param string code String to compile
 -- @param string? identifier Name of compiled function
--- @param table? env Environment of compiled function
 -- @return function? Compiled function, or nil if failed to compile
 -- @return string? Error string, or nil if successfully compiled
 function builtins_library.loadstring(code, identifier, env)
