@@ -201,7 +201,6 @@ local function createCustomProp(ply, pos, ang, sfmeshdata)
 	end
 
 	checkMesh(ply, meshConvexes)
-	SF.NetBurst:use(ply, #sfmeshdata*8)
 
 	local propent = ents.Create("starfall_prop")
 	propent.sf_physmesh = meshConvexes
