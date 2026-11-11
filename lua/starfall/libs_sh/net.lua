@@ -229,6 +229,9 @@ if SERVER then
 	-- @param boolean? unreliable Optional. Whether it's more important for the message to actually reach its destination (false), or reach it as fast as possible (true). Default is false.
 	function net_library.sendPVS(pos, unreliable)
 		if not netStarted then SF.Throw("net message not started", 2) end
+
+		checkluatype (pos, TYPE_VECTOR)
+
 		pos = vunwrap1(pos)
 
 		netBurst:use(instance.player, netSize)
@@ -517,6 +520,9 @@ end
 -- @param Angle t The angle to be written
 function net_library.writeAngle(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
+
+	checkluatype (t, TYPE_ANGLE)
+
 	write{net.WriteFloat, 4*8, t[1]}
 	write{net.WriteFloat, 4*8, t[2]}
 	write{net.WriteFloat, 4*8, t[3]}
@@ -534,6 +540,9 @@ end
 -- @param Vector t The vector to be written
 function net_library.writeVector(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
+
+	checkluatype (t, TYPE_VECTOR)
+
 	write{net.WriteFloat, 4*8, t[1]}
 	write{net.WriteFloat, 4*8, t[2]}
 	write{net.WriteFloat, 4*8, t[3]}
