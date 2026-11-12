@@ -92,6 +92,7 @@ SF.StreamManager = StreamManager
 
 local netBurst = SF.BurstObject("net", "net message", 5, 10, "Regen rate of net message burst in kB/sec.", "The net message burst limit in kB.", 1000 * 8)
 SF.NetBurst = netBurst
+local netMax = 64000
 
 if SERVER then
 	util.AddNetworkString("SF_netmessage")
@@ -150,10 +151,53 @@ instance:AddHook("deinitialize", function()
 	plyStreams:deinitialize(instance)
 end)
 
-local function write(data)
-	netSize = netSize + data[2]
-	netData[#netData + 1] = data
-end
+local write = {
+	string = function(v)
+		checkluatype(v, TYPE_STRING)
+		if #v>netMax then SF.Throw("String is too large! (Should be less than "..netMax.."): "..#v, 3) end
+		netSize = netSize + (#v+1)*8
+		netData[#netData + 1] = {net.WriteString, v}
+	end,
+	data = function(v, size)
+		if size>netMax then SF.Throw("Data is too large! (Should be less than "..netMax.."): "..size, 3) end
+		netSize = netSize + size*8
+		netData[#netData + 1] = {net.WriteData, v, size}
+	end,
+	int = function(v, size)
+		checkluatype(v, TYPE_NUMBER)
+		netSize = netSize + size
+		netData[#netData + 1] = {net.WriteInt, v, size}
+	end,
+	uint = function(v, size)
+		checkluatype(v, TYPE_NUMBER)
+		netSize = netSize + size
+		netData[#netData + 1] = {net.WriteUInt, v, size}
+	end,
+	uint64 = function(v)
+		checkluatype(v, TYPE_STRING)
+		netSize = netSize + 64
+		netData[#netData + 1] = {net.WriteUInt64, v}
+	end
+	float = function(v)
+		checkluatype(v, TYPE_NUMBER)
+		netSize = netSize + 32
+		netData[#netData + 1] = {net.WriteFloat, v}
+	end,
+	double = function(v)
+		checkluatype(v, TYPE_NUMBER)
+		netSize = netSize + 64
+		netData[#netData + 1] = {net.WriteDouble, v}
+	end,
+	bool = function(v)
+		checkluatype(v, TYPE_BOOL)
+		netSize = netSize + 1
+		netData[#netData + 1] = {net.WriteBool, v}
+	end,
+	stream = function(v)
+		netSize = netSize + 64
+		netData[#netData + 1] = {v}
+	end,
+}
 
 local function net_reset()
 	netSize = 0
@@ -166,7 +210,7 @@ local function net_write(unreliable)
 	net.Start("SF_netmessage", unreliable)
 	net.WriteEntity(instance.entity)
 	for _, v in ipairs(netData) do
-		v[1](unpack(v, 3))
+		v[1](unpack(v, 2))
 	end
 	net_reset()
 end
@@ -175,7 +219,6 @@ end
 -- @shared
 -- @param string name The message name
 function net_library.start(name)
-	checkluatype (name, TYPE_STRING)
 	if netStarted then SF.Throw("net message was already started", 2) end
 
 	netStarted = true
@@ -183,7 +226,7 @@ function net_library.start(name)
 	netData = {}
 	plyStreams:cleanupPlaceholders(instance)
 
-	write{net.WriteString, (#name + 1) * 8, name} -- Include null character
+	write.string(name)
 end
 
 --- Send a net message from client->server, or server->client.
@@ -206,20 +249,26 @@ function net_library.send(target, unreliable)
 		end
 	end
 
+	if netSize > netMax then SF.Throw("Net message size is too large! (Should be less than "..netMax.."): "..netSize, 2) end
 	netBurst:use(instance.player, netSize)
-	net_write(unreliable)
+	local ok, err = pcall(net_write, unreliable)
 
-	if SERVER then
-		if netRecipients[1] then
-			net.Send(netRecipients)
+	if ok then
+		if SERVER then
+			if netRecipients[1] then
+				net.Send(netRecipients)
+			else
+				net.Broadcast()
+			end
 		else
-			net.Broadcast()
+			net.SendToServer()
 		end
+		instance:checkCpu()
 	else
-		net.SendToServer()
+		net.Abort()
+		instance:checkCpu()
+		SF.Throw(tostring(err), 2)
 	end
-
-	instance:checkCpu()
 end
 
 if SERVER then
@@ -231,10 +280,17 @@ if SERVER then
 		if not netStarted then SF.Throw("net message not started", 2) end
 		pos = vunwrap1(pos)
 
+		if netSize > netMax then SF.Throw("Net message size is too large! (Should be less than "..netMax.."): "..netSize, 2) end
 		netBurst:use(instance.player, netSize)
 		net_write(unreliable)
-		net.SendPVS(pos)
-		instance:checkCpu()
+		local ok, err = pcall(net.SendPVS, pos)
+		if ok then
+			instance:checkCpu()
+		else
+			net.Abort()
+			instance:checkCpu()
+			SF.Throw(tostring(err), 2)
+		end
 	end
 end
 
@@ -250,8 +306,8 @@ function net_library.writeType(v)
 	if not netStarted then SF.Throw("net message not started", 2) end
 
 	local str = util.Compress(SF.TableToString({v}, instance))
-	write{net.WriteUInt, 32, #str, 32}
-	write{net.WriteData, #str*8, str, #str}
+	write.uint(#str, 32)
+	write.data(str, #str)
 end
 
 --- Reads an object from a net message automatically typing it
@@ -259,7 +315,7 @@ end
 -- @shared
 -- @return any The object
 function net_library.readType()
-	return SF.StringToTable(util.Decompress(net.ReadData(net.ReadUInt(32))), instance)[1]
+	return SF.StringToTable(util.Decompress(net.ReadData(net.ReadUInt(32)), netMax), instance)[1]
 end
 
 --- Writes a table to a net message automatically typing it.
@@ -270,8 +326,8 @@ function net_library.writeTable(t)
 	checkluatype(t, TYPE_TABLE)
 
 	local str = util.Compress(SF.TableToString(t, instance))
-	write{net.WriteUInt, 32, #str, 32}
-	write{net.WriteData, #str*8, str, #str}
+	write.uint(#str, 32)
+	write.data(str, #str)
 end
 
 --- Reads an table from a net message automatically typing it
@@ -287,10 +343,7 @@ end
 -- @param string t The string to be written
 function net_library.writeString(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
-
-	checkluatype (t, TYPE_STRING)
-
-	write{net.WriteString, (#t+1)*8, t}
+	write.string(t)
 end
 
 --- Reads a string from the net message
@@ -307,11 +360,11 @@ end
 function net_library.writeData(t, n)
 	if not netStarted then SF.Throw("net message not started", 2) end
 
-	checkluatype (t, TYPE_STRING)
-	checkluatype (n, TYPE_NUMBER)
+	checkluatype(t, TYPE_STRING)
+	checkluatype(n, TYPE_NUMBER)
 
-	if n>#t or n>64000 then SF.Throw("Invalid length "..n.." for input string of size "..(#t), 2) end
-	write{net.WriteData, n*8, t, n}
+	if n>#t then SF.Throw("Invalid length "..n.." for input string of size "..(#t), 2) end
+	write.data(t, n)
 end
 
 --- Reads a string from the net message
@@ -319,8 +372,8 @@ end
 -- @param number n How many characters are in the data
 -- @return string The string that was read
 function net_library.readData(n)
-	checkluatype (n, TYPE_NUMBER)
-	n = math.Clamp(n, 0, 64000)
+	checkluatype(n, TYPE_NUMBER)
+	n = math.Clamp(n, 0, netMax)
 	return net.ReadData(n)
 end
 
@@ -330,19 +383,19 @@ end
 -- @param boolean? compress Compress the data. True by default
 function net_library.writeStream(str, compress)
 	if not netStarted then SF.Throw("net message not started", 2) end
-	checkluatype (str, TYPE_STRING)
+	checkluatype(str, TYPE_STRING)
 	if #str == 0 then SF.Throw("String is empty!", 2) end
 	if #str > 64e6 then SF.Throw("String is too long!", 2) end
 
 	if not plyStreams:canWriteStream() then SF.Throw("Too many active writeStreams!", 2) end
-	write{plyStreams:addWriteStream(instance, str, compress == false), 8*8}
+	write.stream(plyStreams:addWriteStream(instance, str, compress == false))
 end
 
 --- Reads a large string stream from the net message.
 -- @shared
 -- @param function cb Callback to run when the stream is finished. The first parameter in the callback is the data. Will be nil if transfer fails or is cancelled
 function net_library.readStream(cb)
-	checkluatype (cb, TYPE_FUNCTION)
+	checkluatype(cb, TYPE_FUNCTION)
 	if plyStreams.readStream then SF.Throw("The previous stream must finish before reading another.", 2) end
 
 	local ply
@@ -382,12 +435,10 @@ end
 -- @param number n The amount of bits the integer consists of
 function net_library.writeInt(t, n)
 	if not netStarted then SF.Throw("net message not started", 2) end
-
-	checkluatype (t, TYPE_NUMBER)
-	checkluatype (n, TYPE_NUMBER)
-
-	n = math.Clamp(n, 0, 32)
-	write{net.WriteInt, n, t, n}
+	checkluatype(n, TYPE_NUMBER)
+	n = math.floor(n)
+	if n<1 or n>32 then SF.Throw("Invalid int size should be 1-32: "..n, 2) end
+	write.int(t, n)
 end
 
 --- Reads an integer from the net message
@@ -395,7 +446,9 @@ end
 -- @param number n The amount of bits to read
 -- @return number The integer that was read
 function net_library.readInt(n)
-	checkluatype (n, TYPE_NUMBER)
+	checkluatype(n, TYPE_NUMBER)
+	n = math.floor(n)
+	if n<1 or n>32 then SF.Throw("Invalid int size should be 1-32: "..n, 2) end
 	return net.ReadInt(n)
 end
 
@@ -405,12 +458,10 @@ end
 -- @param number n The amount of bits the integer consists of. Should not be greater than 32
 function net_library.writeUInt(t, n)
 	if not netStarted then SF.Throw("net message not started", 2) end
-
-	checkluatype (t, TYPE_NUMBER)
-	checkluatype (n, TYPE_NUMBER)
-
-	n = math.Clamp(n, 0, 32)
-	write{net.WriteUInt, n, t, n}
+	checkluatype(n, TYPE_NUMBER)
+	n = math.floor(n)
+	if n<1 or n>32 then SF.Throw("Invalid int size should be 1-32: "..n, 2) end
+	write.uint(t, n)
 end
 
 --- Reads an unsigned integer from the net message
@@ -418,7 +469,9 @@ end
 -- @param number n The amount of bits to read
 -- @return number The unsigned integer that was read
 function net_library.readUInt(n)
-	checkluatype (n, TYPE_NUMBER)
+	checkluatype(n, TYPE_NUMBER)
+	n = math.floor(n)
+	if n<1 or n>32 then SF.Throw("Invalid int size (should be 1-32): "..n, 2) end
 	return net.ReadUInt(n)
 end
 
@@ -427,10 +480,7 @@ end
 -- @param string t The 64-bit integer written as a string because lua numbers can't hold 64-bit ints
 function net_library.writeUInt64(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
-
-	checkluatype (t, TYPE_STRING)
-
-	write{net.WriteUInt64, 64, t}
+	write.uint64(t)
 end
 
 --- Reads an unsigned 64-bit integer from the net message
@@ -445,10 +495,7 @@ end
 -- @param number t The bit to be written. (0 for false, 1 (or anything) for true)
 function net_library.writeBit(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
-
-	checkluatype (t, TYPE_NUMBER)
-
-	write{net.WriteBit, 1, t~=0}
+	write.uint(t, 1)
 end
 
 --- Reads a bit from the net message
@@ -463,10 +510,7 @@ end
 -- @param boolean t The bit to be written.
 function net_library.writeBool(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
-
-	checkluatype (t, TYPE_BOOL)
-
-	write{net.WriteBool, 1, t}
+	write.bool(t)
 end
 
 --- Reads a boolean from the net message
@@ -481,10 +525,7 @@ end
 -- @param number t The double to be written
 function net_library.writeDouble(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
-
-	checkluatype (t, TYPE_NUMBER)
-
-	write{net.WriteDouble, 8*8, t}
+	write.double(t)
 end
 
 --- Reads a double from the net message
@@ -499,10 +540,7 @@ end
 -- @param number t The float to be written
 function net_library.writeFloat(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
-
-	checkluatype (t, TYPE_NUMBER)
-
-	write{net.WriteFloat, 4*8, t}
+	write.float(t)
 end
 
 --- Reads a float from the net message
@@ -517,9 +555,9 @@ end
 -- @param Angle t The angle to be written
 function net_library.writeAngle(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
-	write{net.WriteFloat, 4*8, t[1]}
-	write{net.WriteFloat, 4*8, t[2]}
-	write{net.WriteFloat, 4*8, t[3]}
+	write.float(t[1])
+	write.float(t[2])
+	write.float(t[3])
 end
 
 --- Reads an angle from the net message
@@ -534,9 +572,9 @@ end
 -- @param Vector t The vector to be written
 function net_library.writeVector(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
-	write{net.WriteFloat, 4*8, t[1]}
-	write{net.WriteFloat, 4*8, t[2]}
-	write{net.WriteFloat, 4*8, t[3]}
+	write.float(t[1])
+	write.float(t[2])
+	write.float(t[3])
 end
 
 --- Reads a vector from the net message
@@ -553,7 +591,7 @@ function net_library.writeMatrix(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
 	local vals = {munwrap(t):Unpack()}
 	for i=1, 16 do
-		write{net.WriteFloat, 4*8, vals[i]}
+		write.float(vals[i])
 	end
 end
 
@@ -571,14 +609,14 @@ end
 -- @param Color t The color to be written
 function net_library.writeColor(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
-	write{net.WriteColor, 4*8, cunwrap(t)}
+	write.uint(t.r, 8) write.uint(t.g, 8) write.uint(t.b, 8) write.uint(t.a, 8)
 end
 
 --- Reads a color from the net message
 -- @shared
 -- @return Color The color that was read
 function net_library.readColor()
-	return cwrap(net.ReadColor())
+	return setmetatable({net.ReadUInt(8), net.ReadUInt(8), net.ReadUInt(8), net.ReadUInt(8)}, col_meta)
 end
 
 --- Writes an entity to the net message
@@ -587,8 +625,8 @@ end
 function net_library.writeEntity(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
 	local ent = eunwrap(t)
-	write{net.WriteUInt, 16, ent:EntIndex(), 16}
-	write{net.WriteUInt, 32, ent:GetCreationID(), 32}
+	write.uint(ent:EntIndex(), 16)
+	write.uint(ent:GetCreationID(), 32)
 end
 
 --- Reads an entity from the net message
@@ -615,8 +653,8 @@ end
 -- @param string name The name of the net message
 -- @param function func The callback or nil to remove callback. (len - length of the net message, ply - player that sent it or nil if clientside)
 function net_library.receive(name, func)
-	checkluatype (name, TYPE_STRING)
-	if func~=nil then checkluatype (func, TYPE_FUNCTION) end
+	checkluatype(name, TYPE_STRING)
+	if func~=nil then checkluatype(func, TYPE_FUNCTION) end
 	netReceives[name] = func
 end
 
