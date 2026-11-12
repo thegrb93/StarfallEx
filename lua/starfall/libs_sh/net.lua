@@ -521,11 +521,13 @@ end
 function net_library.writeAngle(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
 
-	checkluatype (t, TYPE_ANGLE)
-
-	write{net.WriteFloat, 4*8, t[1]}
-	write{net.WriteFloat, 4*8, t[2]}
-	write{net.WriteFloat, 4*8, t[3]}
+	local a, y, r = t[1], t[2], t[3]
+	checkluatype(a, TYPE_NUMBER)
+	checkluatype(y, TYPE_NUMBER)
+	checkluatype(r, TYPE_NUMBER)
+	write{net.WriteFloat, 4*8, a}
+	write{net.WriteFloat, 4*8, y}
+	write{net.WriteFloat, 4*8, r}
 end
 
 --- Reads an angle from the net message
@@ -541,11 +543,13 @@ end
 function net_library.writeVector(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
 
-	checkluatype (t, TYPE_VECTOR)
-
-	write{net.WriteFloat, 4*8, t[1]}
-	write{net.WriteFloat, 4*8, t[2]}
-	write{net.WriteFloat, 4*8, t[3]}
+	local x, y, z = t[1], t[2], t[3]
+	checkluatype(x, TYPE_NUMBER)
+	checkluatype(y, TYPE_NUMBER)
+	checkluatype(z, TYPE_NUMBER)
+	write{net.WriteFloat, 4*8, x}
+	write{net.WriteFloat, 4*8, y}
+	write{net.WriteFloat, 4*8, z}
 end
 
 --- Reads a vector from the net message
