@@ -153,43 +153,37 @@ end)
 
 local write = {
 	string = function(v)
-		checkluatype(v, TYPE_STRING)
 		if #v>netMax then SF.Throw("String is too large! (Should be less than "..netMax.."): "..#v, 3) end
 		netSize = netSize + (#v+1)*8
 		netData[#netData + 1] = {net.WriteString, v}
 	end,
 	data = function(v, size)
+		if size>#v then SF.Throw("Invalid length "..size.." for input string of size "..(#v), 3) end
 		if size>netMax then SF.Throw("Data is too large! (Should be less than "..netMax.."): "..size, 3) end
 		netSize = netSize + size*8
 		netData[#netData + 1] = {net.WriteData, v, size}
 	end,
 	int = function(v, size)
-		checkluatype(v, TYPE_NUMBER)
 		netSize = netSize + size
 		netData[#netData + 1] = {net.WriteInt, v, size}
 	end,
 	uint = function(v, size)
-		checkluatype(v, TYPE_NUMBER)
 		netSize = netSize + size
 		netData[#netData + 1] = {net.WriteUInt, v, size}
 	end,
 	uint64 = function(v)
-		checkluatype(v, TYPE_STRING)
 		netSize = netSize + 64
 		netData[#netData + 1] = {net.WriteUInt64, v}
 	end
 	float = function(v)
-		checkluatype(v, TYPE_NUMBER)
 		netSize = netSize + 32
 		netData[#netData + 1] = {net.WriteFloat, v}
 	end,
 	double = function(v)
-		checkluatype(v, TYPE_NUMBER)
 		netSize = netSize + 64
 		netData[#netData + 1] = {net.WriteDouble, v}
 	end,
 	bool = function(v)
-		checkluatype(v, TYPE_BOOL)
 		netSize = netSize + 1
 		netData[#netData + 1] = {net.WriteBool, v}
 	end,
@@ -220,6 +214,7 @@ end
 -- @param string name The message name
 function net_library.start(name)
 	if netStarted then SF.Throw("net message was already started", 2) end
+	checkluatype(name, TYPE_STRING)
 
 	netStarted = true
 	netSize = 8*8 -- 8 byte overhead
@@ -343,6 +338,7 @@ end
 -- @param string t The string to be written
 function net_library.writeString(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
+	checkluatype(t, TYPE_STRING)
 	write.string(t)
 end
 
@@ -363,7 +359,6 @@ function net_library.writeData(t, n)
 	checkluatype(t, TYPE_STRING)
 	checkluatype(n, TYPE_NUMBER)
 
-	if n>#t then SF.Throw("Invalid length "..n.." for input string of size "..(#t), 2) end
 	write.data(t, n)
 end
 
@@ -435,6 +430,7 @@ end
 -- @param number n The amount of bits the integer consists of
 function net_library.writeInt(t, n)
 	if not netStarted then SF.Throw("net message not started", 2) end
+	checkluatype(t, TYPE_NUMBER)
 	checkluatype(n, TYPE_NUMBER)
 	n = math.floor(n)
 	if n<1 or n>32 then SF.Throw("Invalid int size should be 1-32: "..n, 2) end
@@ -458,6 +454,7 @@ end
 -- @param number n The amount of bits the integer consists of. Should not be greater than 32
 function net_library.writeUInt(t, n)
 	if not netStarted then SF.Throw("net message not started", 2) end
+	checkluatype(t, TYPE_NUMBER)
 	checkluatype(n, TYPE_NUMBER)
 	n = math.floor(n)
 	if n<1 or n>32 then SF.Throw("Invalid int size should be 1-32: "..n, 2) end
@@ -480,6 +477,7 @@ end
 -- @param string t The 64-bit integer written as a string because lua numbers can't hold 64-bit ints
 function net_library.writeUInt64(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
+	checkluatype(t, TYPE_STRING)
 	write.uint64(t)
 end
 
@@ -495,6 +493,7 @@ end
 -- @param number t The bit to be written. (0 for false, 1 (or anything) for true)
 function net_library.writeBit(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
+	checkluatype(t, TYPE_NUMBER)
 	write.uint(t, 1)
 end
 
@@ -510,6 +509,7 @@ end
 -- @param boolean t The bit to be written.
 function net_library.writeBool(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
+	checkluatype(t, TYPE_BOOL)
 	write.bool(t)
 end
 
@@ -525,6 +525,7 @@ end
 -- @param number t The double to be written
 function net_library.writeDouble(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
+	checkluatype(t, TYPE_NUMBER)
 	write.double(t)
 end
 
@@ -540,6 +541,7 @@ end
 -- @param number t The float to be written
 function net_library.writeFloat(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
+	checkluatype(t, TYPE_NUMBER)
 	write.float(t)
 end
 
@@ -555,9 +557,9 @@ end
 -- @param Angle t The angle to be written
 function net_library.writeAngle(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
-	write.float(t[1])
-	write.float(t[2])
-	write.float(t[3])
+	local x, y, z = t[1], t[2], t[3]
+	checkluatype(x, TYPE_NUMBER) checkluatype(y, TYPE_NUMBER) checkluatype(z, TYPE_NUMBER)
+	write.float(x) write.float(y) write.float(z)
 end
 
 --- Reads an angle from the net message
@@ -572,9 +574,9 @@ end
 -- @param Vector t The vector to be written
 function net_library.writeVector(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
-	write.float(t[1])
-	write.float(t[2])
-	write.float(t[3])
+	local x, y, z = t[1], t[2], t[3]
+	checkluatype(x, TYPE_NUMBER) checkluatype(y, TYPE_NUMBER) checkluatype(z, TYPE_NUMBER)
+	write.float(x) write.float(y) write.float(z)
 end
 
 --- Reads a vector from the net message
@@ -609,7 +611,9 @@ end
 -- @param Color t The color to be written
 function net_library.writeColor(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
-	write.uint(t.r, 8) write.uint(t.g, 8) write.uint(t.b, 8) write.uint(t.a, 8)
+	local r, g, b, a = t.r, t.g, t.b, t.a
+	checkluatype(r, TYPE_NUMBER) checkluatype(g, TYPE_NUMBER) checkluatype(b, TYPE_NUMBER) checkluatype(a, TYPE_NUMBER)
+	write.uint(r, 8) write.uint(g, 8) write.uint(b, 8) write.uint(a, 8)
 end
 
 --- Reads a color from the net message
