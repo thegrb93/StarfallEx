@@ -576,6 +576,11 @@ CpuRamAverage = {
 			return math.Round(self.cpuAverage * 1000000), self.cpuAverage / self.cpuLimit * 100
 		end,
 		check = function(self, forceThrow, noThrow)
+			-- Prevent rediculous stack depth
+			if debug.getinfo(1024) then
+				return self:doError("sf stack overflow", true, noThrow, true)
+			end
+
 			-- Check ram and cleanup before checking cpu so time spent is measured
 			local ram = gcinfo()
 			if ram > self.ramLimit then
