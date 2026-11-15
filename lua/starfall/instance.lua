@@ -608,13 +608,14 @@ CpuRamAverage = {
 		end,
 		doError = function(self, msg, nocatch, noThrow, forceThrow)
 			if self.errored then return end
-			if nocatch then self.errored = true end
 			if noThrow then
+				if nocatch then self.errored = true end
 				return SF.MakeError(msg, 3, nocatch, true)
 			else
 				local info = debug.getinfo(3, "S")
 				info = (info and info.short_src or "[C]")
 				if forceThrow or string.find(info, "SF:", 1, true) then
+					if nocatch then self.errored = true end
 					if SERVER and nocatch then
 						local consolemsg = "[Starfall] "..msg..
 							(Ent_IsValid(self.instance.player)
