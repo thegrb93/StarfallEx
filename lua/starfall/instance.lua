@@ -602,6 +602,8 @@ CpuRamAverage = {
 			end
 		end,
 		doError = function(self, msg, nocatch, noThrow, forceThrow)
+			if self.errored then return end
+			if nocatch then self.errored = true end
 			if noThrow then
 				return SF.MakeError(msg, 3, nocatch, true)
 			else
@@ -634,7 +636,8 @@ CpuRamAverage = {
 			cpuSoftLimit = cpuLimit,
 			cpuHardLimit = cpuLimit*1.5,
 			ramLimit = math.min(ramLimit, ramHardlimit*0.95),
-			ramHardlimit = ramHardlimit
+			ramHardlimit = ramHardlimit,
+			errored = false
 		}, t)
 	end
 }
@@ -831,15 +834,17 @@ function SF.Instance:deinitialize()
 	self.Error = noop
 end
 
-hook.Add("Think", "SF_Think", function()
-
+timer.Create("sf_recover",0,0,function()
 	-- Check and attempt recovery from potential failures
 	if SF.runningOps then
+		debug.sethook()
 		SF.runningOps = false
 		SF.OnRunningOps(false)
 		ErrorNoHalt("[Starfall] ERROR: This should not happen, bad addons?\n")
 	end
+end)
 
+hook.Add("Think", "SF_Think", function()
 	for instance in pairs(SF.allInstances) do
 		instance:runScriptHook("think")
 	end
