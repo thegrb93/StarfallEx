@@ -119,7 +119,7 @@ local PCFFile = {
 		}, t)
 
 		local ok, err = xpcall(self.parse, debug.traceback, self)
-		if not ok then ErrorNoHalt("Error parsing PCF \""..path.."\": "..tostring(err)) end
+		if not ok then print("Error parsing PCF \""..path.."\": "..tostring(err)) end
 		if self.file then self.file:Close() end
 	end,
 }
