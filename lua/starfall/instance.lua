@@ -834,7 +834,8 @@ function SF.Instance:deinitialize()
 	self.Error = noop
 end
 
-timer.Create("sf_recover",0,0,function()
+hook.Add("Think", "SF_Think", function()
+
 	-- Check and attempt recovery from potential failures
 	if SF.runningOps then
 		debug.sethook()
@@ -842,9 +843,7 @@ timer.Create("sf_recover",0,0,function()
 		SF.OnRunningOps(false)
 		ErrorNoHalt("[Starfall] ERROR: This should not happen, bad addons?\n")
 	end
-end)
 
-hook.Add("Think", "SF_Think", function()
 	for instance in pairs(SF.allInstances) do
 		instance:runScriptHook("think")
 	end
