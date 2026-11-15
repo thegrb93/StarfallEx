@@ -577,7 +577,7 @@ CpuRamAverage = {
 		end,
 		check = function(self, forceThrow, noThrow)
 			-- Prevent rediculous stack depth
-			if debug.getinfo(1024) then
+			if debug.getinfo(1024, "") then
 				return self:doError("sf stack overflow", true, noThrow, true)
 			end
 
