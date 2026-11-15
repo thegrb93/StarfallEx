@@ -174,7 +174,7 @@ local write = {
 	uint64 = function(v)
 		netSize = netSize + 64
 		netData[#netData + 1] = {net.WriteUInt64, v}
-	end
+	end,
 	float = function(v)
 		netSize = netSize + 32
 		netData[#netData + 1] = {net.WriteFloat, v}
