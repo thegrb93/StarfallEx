@@ -1,11 +1,20 @@
 -- Global to each starfall
 local checkluatype = SF.CheckLuaType
+local checknumber = SF.CheckValidNumber
 local registerprivilege = SF.Permissions.registerPrivilege
 
 -- Register privileges
 registerprivilege("light.create", "Create dynamic lights.", "Allows creation of dynamic lights.", { client = {} })
 
 local maxSize = CreateClientConVar( "sf_light_maxsize", "1024", true, false, "Max size lights can be" )
+
+local MAX_LIGHT_BRIGHTNESS = 100
+local MAX_PROJECTED_BRIGHTNESS = 100
+local MAX_PROJECTED_DISTANCE = 16384
+local MAX_PROJECTED_ATTENUATION = 10000
+local MAX_PROJECTED_FOV = 180
+local MAX_SHADOW_FILTER = 100
+local MAX_SHADOW_BIAS = 10
 
 SF.ResourceCounters.Lights = {icon = "icon16/lightbulb.png", count = function(ply)
 	local total = 0
@@ -141,13 +150,13 @@ function light_library.create(pos, size, brightness, color)
 	if numlights >= 256 then SF.Throw("Too many lights have already been allocated (max 256)", 2) end
 	if maxSize:GetFloat() == 0 then SF.Throw("sf_light_maxsize is set to 0", 2) end
 	checkpermission(instance, nil, "light.create")
-	checkluatype(size, TYPE_NUMBER)
-	checkluatype(brightness, TYPE_NUMBER)
+	checknumber(size)
+	checknumber(brightness)
 	local slot = getFreeSlot()
 	if not slot then SF.Throw("Failed to allocate slot for the light", 2) end
 
 	local light = {
-		data = {pos = vunwrap(pos), size = math.Clamp(size, 0, maxSize:GetFloat()), brightness = brightness, r=tonumber(color[1]), g=tonumber(color[2]), b=tonumber(color[3]), decay = 1000, dir=Vector()},
+		data = {pos = vunwrap(pos), size = math.Clamp(size, 0, maxSize:GetFloat()), brightness = math.Clamp(brightness, 0, MAX_LIGHT_BRIGHTNESS), r=tonumber(color[1]), g=tonumber(color[2]), b=tonumber(color[3]), decay = 1000, dir=Vector()},
 		slot = slot,
 		dietime = 1
 	}
@@ -179,21 +188,21 @@ end
 --- Sets the light brightness
 -- @param number brightness The light's brightness
 function light_methods:setBrightness(brightness)
-	checkluatype(brightness, TYPE_NUMBER)
-	unwrap(self).data.brightness = brightness
+	checknumber(brightness)
+	unwrap(self).data.brightness = math.Clamp(brightness, 0, MAX_LIGHT_BRIGHTNESS)
 end
 
 --- Sets the light decay speed in thousandths per second. 1000 lasts for 1 second, 2000 lasts for 0.5 seconds
 -- @param number decay The light's decay speed
 function light_methods:setDecay(decay)
-	checkluatype(decay, TYPE_NUMBER)
-	unwrap(self).data.decay = decay
+	checknumber(decay)
+	unwrap(self).data.decay = math.Clamp(decay, 0, 1e6)
 end
 
 --- Sets the light lifespan (Required for fade effect i.e. decay)
 -- @param number dietime The how long the light will stay alive after turning it off.
 function light_methods:setDieTime(dietime)
-	checkluatype(dietime, TYPE_NUMBER)
+	checknumber(dietime)
 	unwrap(self).dietime = math.max(dietime, 0)
 end
 
@@ -206,22 +215,22 @@ end
 --- Sets the light inner angle (used with setDirection and setOuterAngle)
 -- @param number ang Inner angle of the light
 function light_methods:setInnerAngle(ang)
-	checkluatype(ang, TYPE_NUMBER)
-	unwrap(self).data.innerangle = ang
+	checknumber(ang)
+	unwrap(self).data.innerangle = math.Clamp(ang, 0, 180)
 end
 
 --- Sets the light outer angle (used with setDirection and setInnerAngle)
 -- @param number ang Outer angle of the light
 function light_methods:setOuterAngle(ang)
-	checkluatype(ang, TYPE_NUMBER)
-	unwrap(self).data.outerangle = ang
+	checknumber(ang)
+	unwrap(self).data.outerangle = math.Clamp(ang, 0, 180)
 end
 
 --- Sets the minimum light amount
 -- @param number min The minimum light
 function light_methods:setMinLight(min)
-	checkluatype(min, TYPE_NUMBER)
-	unwrap(self).data.minlight = min
+	checknumber(min)
+	unwrap(self).data.minlight = math.Clamp(min, 0, 1)
 end
 
 --- Sets whether the light should cast onto the world or not
@@ -247,15 +256,15 @@ end
 --- Sets the size of the light (max is sf_light_maxsize)
 -- @param number size The size of the light
 function light_methods:setSize(size)
-	checkluatype(size, TYPE_NUMBER)
+	checknumber(size)
 	unwrap(self).data.size = math.Clamp(size, 0, maxSize:GetFloat())
 end
 
 --- Sets the flicker style of the light https://developer.valvesoftware.com/wiki/Light_dynamic#Appearances
 -- @param number style The number of the flicker style
 function light_methods:setStyle(style)
-	checkluatype(style, TYPE_NUMBER)
-	unwrap(self).data.style = style
+	checknumber(style)
+	unwrap(self).data.style = math.Clamp(math.floor(style), 0, 63)
 end
 
 --- Sets the color of the light
@@ -442,7 +451,8 @@ end
 -- Will not take effect until ProjectedTexture:update() is called.
 -- @param number brightness
 function projectedtexture_methods:setBrightness(brightness)
-	ptunwrap(self):SetBrightness(brightness)
+	checknumber(brightness)
+	ptunwrap(self):SetBrightness(math.Clamp(brightness, 0, MAX_PROJECTED_BRIGHTNESS))
 end
 
 --- Sets the Projected Texture's color
@@ -456,7 +466,8 @@ end
 -- Will not take effect until ProjectedTexture:update() is called.
 -- @param number attenuation
 function projectedtexture_methods:setConstantAttenuation(attenuation)
-	ptunwrap(self):SetConstantAttenuation(attenuation)
+	checknumber(attenuation)
+	ptunwrap(self):SetConstantAttenuation(math.Clamp(attenuation, 0, MAX_PROJECTED_ATTENUATION))
 end
 
 --- Sets if the Projected Texture should draw shadows
@@ -471,7 +482,8 @@ end
 -- Will not take effect until ProjectedTexture:update() is called.
 -- @param number farZ
 function projectedtexture_methods:setFarZ(farZ)
-	ptunwrap(self):SetFarZ(farZ)
+	checknumber(farZ)
+	ptunwrap(self):SetFarZ(math.Clamp(farZ, 0, MAX_PROJECTED_DISTANCE))
 end
 
 --- Sets the FOV of the Projected texture
@@ -479,7 +491,8 @@ end
 -- Will not take effect until ProjectedTexture:update() is called.
 -- @param number fov
 function projectedtexture_methods:setFOV(fov)
-	ptunwrap(self):SetFOV(fov)
+	checknumber(fov)
+	ptunwrap(self):SetFOV(math.Clamp(fov, 0, MAX_PROJECTED_FOV))
 end
 
 --- Sets the horizontal FOV of the Projected texture
@@ -487,7 +500,8 @@ end
 -- Will not take effect until ProjectedTexture:update() is called.
 -- @param number fov
 function projectedtexture_methods:setHorizontalFOV(fov)
-	ptunwrap(self):SetHorizontalFOV(fov)
+	checknumber(fov)
+	ptunwrap(self):SetHorizontalFOV(math.Clamp(fov, 0, MAX_PROJECTED_FOV))
 end
 
 --- Sets whether or not the Projected Texture lights world geometry
@@ -501,7 +515,8 @@ end
 -- Will not take effect until ProjectedTexture:update() is called.
 -- @param number attenuation
 function projectedtexture_methods:setLinearAttenuation(attenuation)
-	ptunwrap(self):SetLinearAttenuation(attenuation)
+	checknumber(attenuation)
+	ptunwrap(self):SetLinearAttenuation(math.Clamp(attenuation, 0, MAX_PROJECTED_ATTENUATION))
 end
 
 --- Sets the distance at which the Projected Texture ends
@@ -509,7 +524,8 @@ end
 -- Will not take effect until ProjectedTexture:update() is called.
 -- @param number nearZ
 function projectedtexture_methods:setNearZ(nearZ)
-	ptunwrap(self):SetNearZ(nearZ)
+	checknumber(nearZ)
+	ptunwrap(self):SetNearZ(math.Clamp(nearZ, 0, MAX_PROJECTED_DISTANCE))
 end
 
 --- Sets the view-frustum culling of the Projected Texture
@@ -528,6 +544,16 @@ end
 -- @param number right
 -- @param number bottom
 function projectedtexture_methods:setOrthographic(orthographic, left, top, right, bottom)
+	if orthographic then
+		checknumber(left)
+		checknumber(top)
+		checknumber(right)
+		checknumber(bottom)
+		left = math.Clamp(left, -MAX_PROJECTED_DISTANCE, MAX_PROJECTED_DISTANCE)
+		top = math.Clamp(top, -MAX_PROJECTED_DISTANCE, MAX_PROJECTED_DISTANCE)
+		right = math.Clamp(right, -MAX_PROJECTED_DISTANCE, MAX_PROJECTED_DISTANCE)
+		bottom = math.Clamp(bottom, -MAX_PROJECTED_DISTANCE, MAX_PROJECTED_DISTANCE)
+	end
 	ptunwrap(self):SetOrthographic(orthographic, left, top, right, bottom)
 end
 
@@ -542,14 +568,16 @@ end
 -- Will not take effect until ProjectedTexture:update() is called.
 -- @param number attenuation
 function projectedtexture_methods:setQuadraticAttenuation(attenuation)
-	ptunwrap(self):SetQuadraticAttenuation(attenuation)
+	checknumber(attenuation)
+	ptunwrap(self):SetQuadraticAttenuation(math.Clamp(attenuation, 0, MAX_PROJECTED_ATTENUATION))
 end
 
 --- Sets the Projected Texture's shadow depth bias
 -- Will not take effect until ProjectedTexture:update() is called.
 -- @param number bias
 function projectedtexture_methods:setShadowDepthBias(bias)
-	ptunwrap(self):SetShadowDepthBias(bias)
+	checknumber(bias)
+	ptunwrap(self):SetShadowDepthBias(math.Clamp(bias, -1, 1))
 end
 
 --- Sets the Projected Texture's shadow filter size
@@ -557,14 +585,16 @@ end
 -- Will not take effect until ProjectedTexture:update() is called.
 -- @param number filter
 function projectedtexture_methods:setShadowFilter(filter)
-	ptunwrap(self):SetShadowFilter(filter)
+	checknumber(filter)
+	ptunwrap(self):SetShadowFilter(math.Clamp(filter, 0, MAX_SHADOW_FILTER))
 end
 
 --- Sets the Projected Texture's shadow slope scale depth bias
 -- Will not take effect until ProjectedTexture:update() is called.
 -- @param number bias
 function projectedtexture_methods:setShadowSlopeScaleDepthBias(bias)
-	ptunwrap(self):SetShadowSlopeScaleDepthBias(bias)
+	checknumber(bias)
+	ptunwrap(self):SetShadowSlopeScaleDepthBias(math.Clamp(bias, -MAX_SHADOW_BIAS, MAX_SHADOW_BIAS))
 end
 
 --- Sets the Projected Texture's target entity
@@ -606,7 +636,8 @@ end
 -- Will not take effect until ProjectedTexture:update() is called.
 -- @param number fov
 function projectedtexture_methods:setVerticalFOV(fov)
-	ptunwrap(self):SetVerticalFOV(fov)
+	checknumber(fov)
+	ptunwrap(self):SetVerticalFOV(math.Clamp(fov, 0, MAX_PROJECTED_FOV))
 end
 
 --- Updates the Projected Texture with whatever paremeters were previously set
