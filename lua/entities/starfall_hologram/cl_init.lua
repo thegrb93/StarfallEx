@@ -208,11 +208,6 @@ hook.Add("NetworkEntityCreated", "starfall_hologram_rescale", function(holo)
 			holo:EnableMatrix("RenderMultiply", holo.HoloMatrix)
 		end
 		holo:UpdateRenderBounds()
-	else
-		local sf_userrenderbounds = holo.sf_userrenderbounds
-		if sf_userrenderbounds then
-			holo:SetRenderBounds(sf_userrenderbounds[1], sf_userrenderbounds[2])
-		end
 	end
 end)
 

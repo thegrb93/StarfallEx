@@ -121,7 +121,7 @@ if CLIENT then
 		else
 			ent_tbl.custom_mesh = nil
 		end
-		if ent_tbl.IsSFHologram then ent_tbl.UpdateRenderBounds(ent) end
+		ent_tbl.UpdateRenderBounds(ent)
 	end
 
 	--- Sets a hologram or custom_prop's custom mesh material

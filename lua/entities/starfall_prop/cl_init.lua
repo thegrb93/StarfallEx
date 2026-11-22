@@ -64,6 +64,21 @@ function ENT:Draw(flags)
 	self:DrawModel(flags)
 end
 
+function ENT:UpdateRenderBounds()
+	local bounds = self.sf_userrenderbounds
+	if not bounds then
+		local custom_mesh = self.custom_mesh
+		if custom_mesh and custom_mesh.mins then
+			bounds = {custom_mesh.mins, custom_mesh.maxs}
+		else
+			bounds = self.sf_physbounds
+		end
+	end
+	if bounds then
+		self:SetRenderBounds(bounds[1], bounds[2])
+	end
+end
+
 function ENT:GetRenderMesh()
 	local ent_tbl = Ent_GetTable(self)
 	local custom_mesh = ent_tbl.custom_mesh
@@ -72,6 +87,7 @@ function ENT:GetRenderMesh()
 			return { Mesh = custom_mesh.mesh, Material = ent_tbl.Material--[[, Matrix = ent_tbl.render_matrix]] }
 		else
 			ent_tbl.custom_mesh = nil
+			ent_tbl.UpdateRenderBounds(self)
 		end
 	else
 		return { Mesh = ent_tbl.sf_rendermesh, Material = ent_tbl.Material--[[, Matrix = ent_tbl.render_matrix]] }
@@ -116,7 +132,8 @@ net.Receive("starfall_custom_prop", function()
 
 		ent_tbl.BuildPhysics(self, ent_tbl, physmesh)
 		ent_tbl.BuildRenderMesh(self, ent_tbl)
-		self:SetRenderBounds(mins, maxs)
+		ent_tbl.sf_physbounds = {mins, maxs}
+		ent_tbl.UpdateRenderBounds(self)
 		self:SetCollisionBounds(mins, maxs)
 	end)
 
@@ -126,10 +143,12 @@ end)
 
 hook.Add("NetworkEntityCreated", "starfall_prop_physics", function(ent)
 	local ent_tbl = Ent_GetTable(ent)
+	if not ent_tbl.IsSFProp then return end
 	local mesh = ent_tbl.sf_physmesh
 	if mesh and not Phys_IsValid(ent:GetPhysicsObject()) then
 		ent_tbl.BuildPhysics(ent, ent_tbl, mesh)
 	end
+	ent_tbl.UpdateRenderBounds(ent)
 end)
 
 function ENT:OnPhysMaterialChanged(name, old, new)
