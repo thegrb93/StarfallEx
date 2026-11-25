@@ -357,6 +357,7 @@ function props_library.createSeat(pos, ang, model, frozen)
 	entList:checkuse(ply, 1)
 
 	local class = "prop_vehicle_prisoner_pod"
+	if ply ~= SF.Superuser and gamemode.Call("PlayerSpawnVehicle", ply, model, class, {}) == false then SF.Throw("Another hook prevented the seat from spawning", 2) end
 
 	local prop
 
