@@ -83,7 +83,9 @@ local function createTimer(name, delay, reps, func, simple)
 	end
 
 	local timerdata = {reps = reps, func = func}
-	local function timerCallback()
+	timers[timername] = timerdata
+
+	timer.Create(timername, delay, reps, function()
 		if timerdata.reps ~= 0 then
 			timerdata.reps = timerdata.reps - 1
 			if timerdata.reps<=0 then
@@ -92,11 +94,7 @@ local function createTimer(name, delay, reps, func, simple)
 			end
 		end
 		instance:runFunction(timerdata.func)
-	end
-
-	timer.Create(timername, math.max(delay, 0.001), reps, timerCallback)
-
-	timers[timername] = timerdata
+	end)
 end
 
 --- Creates (and starts) a timer
@@ -110,6 +108,10 @@ function timer_library.create(name, delay, reps, func)
 	checkluatype(reps, TYPE_NUMBER)
 	checkluatype(func, TYPE_FUNCTION)
 
+	name = string.sub(name, 1, 512)
+	delay = math.max(delay, 0.001)
+	reps = math.max(reps, 0)
+
 	createTimer(name, delay, reps, func, false)
 end
 
@@ -119,6 +121,9 @@ end
 function timer_library.simple(delay, func)
 	checkluatype(delay, TYPE_NUMBER)
 	checkluatype(func, TYPE_FUNCTION)
+
+	delay = math.max(delay, 0.001)
+
 	createTimer("", delay, 1, func, true)
 end
 
@@ -174,9 +179,10 @@ function timer_library.adjust(name, delay, reps, func)
 	local data = timers[timername]
 
 	if data then
-		if reps~=nil then checkluatype(reps, TYPE_NUMBER) data.reps = reps end
+		delay = math.max(delay, 0.001)
+		if reps~=nil then checkluatype(reps, TYPE_NUMBER) reps = math.max(reps, 0) data.reps = reps end
 		if func~=nil then checkluatype(func, TYPE_FUNCTION) data.func = func end
-		return timer.Adjust(timername, math.max(delay, 0.001), reps)
+		return timer.Adjust(timername, delay, reps)
 	else
 		return false
 	end
