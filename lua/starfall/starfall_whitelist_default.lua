@@ -188,7 +188,7 @@ pattern [[([%w-_]+)%.dzcdn%.net/(.+)]]
 -- DECTalk Online
 -- Examples:
 -- https://tts.cyzon.us/tts?text=test
-pattern [[tts.cyzon.us/(.+)]]
+simple [[tts.cyzon.us]]
 
 -- Stoat
 --- Examples:
