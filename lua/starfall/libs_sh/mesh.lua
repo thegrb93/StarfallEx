@@ -808,8 +808,20 @@ if CLIENT then
 
 	local instanceMeshes = {}
 
-	local function registerMesh(mesh, ntriangles, isskinned)
+	local function computeBounds(vertices)
+		local minsx, minsy, minsz, minsx, maxsy, maxsz = math.huge, math.huge, math.huge, -math.huge, -math.huge, -math.huge
+		for _, v in ipairs(vertices) do
+			local x, y, z = v.pos:Unpack()
+			if x < minsx then minsx = x elseif x > maxsx then maxsx = x end
+			if y < minsy then minsy = y elseif y > maxsy then maxsy = y end
+			if z < minsz then minsz = z elseif z > maxsz then maxsz = z end
+		end
+		return Vector(minsx, minsy, minsz), Vector(minsx, maxsy, maxsz)
+	end
+
+	local function registerMesh(mesh, ntriangles, isskinned, vertices)
 		local meshdata = { ntriangles = ntriangles, mesh = mesh }
+		if vertices then meshdata.mins, meshdata.maxs = computeBounds(vertices) end
 		if isskinned then meshdata.matrices = {} end
 		instanceMeshes[meshdata] = true
 		return meshdata
@@ -890,7 +902,7 @@ if CLIENT then
 
 		local mesh = Mesh()
 		mesh:BuildFromTriangles(unwrapped)
-		return wrap(registerMesh(mesh, ntriangles, false))
+		return wrap(registerMesh(mesh, ntriangles, false, unwrapped))
 	end
 
 	--- Creates a mesh from an obj file. Only supports triangular meshes with normals and texture coordinates.
@@ -915,7 +927,7 @@ if CLIENT then
 
 			local mesh = Mesh()
 			mesh:BuildFromTriangles(vertices)
-			meshes[name] = wrap(registerMesh(mesh, ntriangles, false))
+			meshes[name] = wrap(registerMesh(mesh, ntriangles, false, vertices))
 			if threaded then thread_yield() end
 		end
 		return meshes

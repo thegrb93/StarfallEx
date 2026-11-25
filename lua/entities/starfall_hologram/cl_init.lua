@@ -102,9 +102,23 @@ function ENT:OnScaleChanged(name, old, scale)
 		self:EnableMatrix("RenderMultiply", scalematrix)
 	end
 	self:SetupBones()
-	if not self.sf_userrenderbounds then
-		local mins, maxs = self:GetModelBounds()
+	self:UpdateRenderBounds()
+end
+
+function ENT:UpdateRenderBounds()
+	local userbounds = self.sf_userrenderbounds
+	if userbounds then
+		self:SetRenderBounds(userbounds[1], userbounds[2])
+	else
+		local mins, maxs
+		local custom_mesh = self.custom_mesh
+		if custom_mesh and custom_mesh.mins then
+			mins, maxs = custom_mesh.mins, custom_mesh.maxs
+		else
+			mins, maxs = self:GetModelBounds()
+		end
 		if mins then
+			local scale = self:GetScale()
 			self:SetRenderBounds(mins * scale, maxs * scale)
 		end
 	end
@@ -150,6 +164,7 @@ function ENT:GetRenderMesh()
 			return { Mesh = custom_mesh.mesh, Material = ent_tbl.Material--[[, Matrix = self.HoloMatrix]] }
 		else
 			ent_tbl.custom_mesh = nil
+			ent_tbl.UpdateRenderBounds(self)
 		end
 	end
 end
@@ -187,23 +202,11 @@ end)
 
 -- For when the hologram matrix gets cleared
 hook.Add("NetworkEntityCreated", "starfall_hologram_rescale", function(holo)
-	local sf_userrenderbounds = holo.sf_userrenderbounds
 	if holo.IsSFHologram then
 		if holo.HoloMatrix then
 			holo:EnableMatrix("RenderMultiply", holo.HoloMatrix)
 		end
-
-		if not sf_userrenderbounds then
-			local mins, maxs = holo:GetModelBounds()
-			if mins then
-				local scale = holo:GetScale()
-				holo:SetRenderBounds(mins * scale, maxs * scale)
-			end
-		end
-	end
-
-	if sf_userrenderbounds then
-		holo:SetRenderBounds(sf_userrenderbounds[1], sf_userrenderbounds[2])
+		holo:UpdateRenderBounds()
 	end
 end)
 
