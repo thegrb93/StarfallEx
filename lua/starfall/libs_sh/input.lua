@@ -101,9 +101,9 @@ local function CheckButtonPerms(instance, ply, button)
 	if instance.player ~= SF.Superuser then
 		if not haspermission(instance, nil, "input") then return false end
 		if isChatOpen and not haspermission(instance, nil, "input.chat") then
-			local notMouseButton = button < MOUSE_FIRST and button > MOUSE_LAST
-			local notJoystick = button < JOYSTICK_FIRST and button > JOYSTICK_LAST
-			if notMouseButton and notJoystick then return false end -- Mouse and joystick are allowed, they don't put text into the chat
+			local isMouse = button >= MOUSE_FIRST and button <= MOUSE_LAST
+			local isJoy = button >= JOYSTICK_FIRST and button <= JOYSTICK_LAST
+			if not isMouse and not isJoy then return false end
 		end
 	end
 
