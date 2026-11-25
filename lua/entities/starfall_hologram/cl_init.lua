@@ -109,19 +109,18 @@ function ENT:UpdateRenderBounds()
 	local userbounds = self.sf_userrenderbounds
 	if userbounds then
 		self:SetRenderBounds(userbounds[1], userbounds[2])
-		return
-	end
-
-	local mins, maxs
-	local custom_mesh = self.custom_mesh
-	if custom_mesh and custom_mesh.mins then
-		mins, maxs = custom_mesh.mins, custom_mesh.maxs
 	else
-		mins, maxs = self:GetModelBounds()
-	end
-	if mins then
-		local scale = self:GetScale()
-		self:SetRenderBounds(mins * scale, maxs * scale)
+		local mins, maxs
+		local custom_mesh = self.custom_mesh
+		if custom_mesh and custom_mesh.mins then
+			mins, maxs = custom_mesh.mins, custom_mesh.maxs
+		else
+			mins, maxs = self:GetModelBounds()
+		end
+		if mins then
+			local scale = self:GetScale()
+			self:SetRenderBounds(mins * scale, maxs * scale)
+		end
 	end
 end
 
