@@ -421,6 +421,20 @@ SF.hookAdd("PostDraw2DSkyBox", nil, hudPrepareSafeArgs, cleanupRender)
 -- @client
 SF.hookAdd("PostDrawSkyBox", nil, hudPrepareSafeArgs, cleanupRender)
 
+local function calcviewSanitize(instance, tbl)
+	local ret = {
+		fov = rawget(tbl, "fov"),
+		znear = rawget(tbl, "znear"),
+		zfar = rawget(tbl, "zfar"),
+		drawviewer = rawget(tbl, "drawviewer"),
+		ortho = rawget(tbl, "ortho"),
+	}
+	local origin, angles = rawget(tbl, "origin"), rawget(tbl, "angles")
+	if origin~=nil then ret.origin = instance.Types.Vector.Unwrap(origin) checkvector(ret.origin) end
+	if angles~=nil then ret.angles = instance.Types.Angle.Unwrap(angles) checkvector(ret.angles) end
+	return ret
+end
+
 --- Called when the engine wants to calculate the player's view (only works if connected to Starfall HUD)
 -- @name CalcView
 -- @class hook
@@ -435,23 +449,14 @@ SF.hookAdd("CalcView", nil, function(instance, ply, pos, ang, fov, znear, zfar)
 	return instance.player == SF.Superuser or haspermission(instance, nil, "render.calcview"),
 		{instance.Types.Vector.Wrap(pos), instance.Types.Angle.Wrap(ang), fov, znear, zfar}
 end, function(instance, tbl)
-	local t = tbl[2]
-	if tbl[1] and istable(t) then
-		local ret = {}
-		local ok, err = pcall(function()
-			if t.origin~=nil then ret.origin = instance.Types.Vector.Unwrap(t.origin) checkvector(t.origin) end
-			if t.angles~=nil then ret.angles = instance.Types.Angle.Unwrap(t.angles) checkvector(t.angles) end
-		end)
-		if not ok then
+	if tbl[1] and istable(tbl[2]) then
+		local ok, err = pcall(calcviewSanitize, instance, tbl[2])
+		if ok then
+			return err
+		else
 			instance:Error(SF.MakeError("CalcView hook invalid origin or angles! "..tostring(err)))
-			return
+			return nil
 		end
-		ret.fov = t.fov
-		ret.znear = t.znear
-		ret.zfar = t.zfar
-		ret.drawviewer = t.drawviewer
-		ret.ortho  = t.ortho
-		return ret
 	end
 end)
 
