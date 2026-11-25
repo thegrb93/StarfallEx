@@ -638,7 +638,7 @@ SF.SavedUserList = {
 			end
 		end
 	},
-	__call = function(p, prefix, desc, filename, onblock, onunblock)
+	__call = function(p, prefix, desc, filename, onblock, onunblock, auth)
 		local obj = setmetatable({
 			list = {},
 			filename = filename,
@@ -651,10 +651,18 @@ SF.SavedUserList = {
 		end
 
 		SF.SteamIDConcommand("sf_"..prefix.."_add", function(executor, id)
+			if auth and not auth(executor) then 
+				Ply_PrintMessage(executor, HUD_PRINTCONSOLE, "Not allowed!\n")
+				return
+			end
 			obj:add(id)
 		end, "Add a user to list of " .. desc, false)
 
 		SF.SteamIDConcommand("sf_"..prefix.."_remove", function(executor, id)
+			if auth and not auth(executor) then 
+				Ply_PrintMessage(executor, HUD_PRINTCONSOLE, "Not allowed!\n")
+				return
+			end
 			obj:remove(id)
 		end, "Remove a user from list of " .. desc, false,
 		function(cmd)
