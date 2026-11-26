@@ -809,14 +809,14 @@ if CLIENT then
 	local instanceMeshes = {}
 
 	local function computeBounds(vertices)
-		local minsx, minsy, minsz, minsx, maxsy, maxsz = math.huge, math.huge, math.huge, -math.huge, -math.huge, -math.huge
+		local minsx, minsy, minsz, maxsx, maxsy, maxsz = math.huge, math.huge, math.huge, -math.huge, -math.huge, -math.huge
 		for _, v in ipairs(vertices) do
 			local x, y, z = v.pos:Unpack()
 			if x < minsx then minsx = x elseif x > maxsx then maxsx = x end
 			if y < minsy then minsy = y elseif y > maxsy then maxsy = y end
 			if z < minsz then minsz = z elseif z > maxsz then maxsz = z end
 		end
-		return Vector(minsx, minsy, minsz), Vector(minsx, maxsy, maxsz)
+		return Vector(minsx, minsy, minsz), Vector(maxsx, maxsy, maxsz)
 	end
 
 	local function registerMesh(mesh, ntriangles, isskinned, vertices)
