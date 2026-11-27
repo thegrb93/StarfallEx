@@ -297,12 +297,14 @@ net_library.abort = net_reset
 --- Writes an object to a net message automatically typing it
 -- @shared
 -- @param any v The object to write
+-- @return Returns the size of the data in bytes
 function net_library.writeType(v)
 	if not netStarted then SF.Throw("net message not started", 2) end
 
 	local str = util.Compress(SF.TableToString({v}, instance))
 	write.uint(#str, 32)
 	write.data(str, #str)
+	return #str
 end
 
 --- Reads an object from a net message automatically typing it
@@ -316,6 +318,7 @@ end
 --- Writes a table to a net message automatically typing it.
 -- @shared
 -- @param table t The table to write
+-- @return Returns the size of the data in bytes
 function net_library.writeTable(t)
 	if not netStarted then SF.Throw("net message not started", 2) end
 	checkluatype(t, TYPE_TABLE)
@@ -323,6 +326,7 @@ function net_library.writeTable(t)
 	local str = util.Compress(SF.TableToString(t, instance))
 	write.uint(#str, 32)
 	write.data(str, #str)
+	return #str
 end
 
 --- Reads an table from a net message automatically typing it
@@ -330,7 +334,7 @@ end
 -- @shared
 -- @return table The table
 function net_library.readTable()
-	return SF.StringToTable(util.Decompress(net.ReadData(net.ReadUInt(32))), instance)
+	return SF.StringToTable(util.Decompress(net.ReadData(net.ReadUInt(32)), netMax), instance)
 end
 
 --- Writes a string to the net message. Null characters will terminate the string.
